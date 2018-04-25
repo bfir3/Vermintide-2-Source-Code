@@ -97,7 +97,7 @@ StartMenuView._setup_state_machine = function (self, state_machine_params, optio
 	local start_state = optional_start_state or StartMenuStateOverview
 	local profiling_debugging_enabled = false
 	state_machine_params.start_state = optional_start_sub_state
-	self._machine = StateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
+	self._machine = GameStateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
 	self._state_machine_params = state_machine_params
 
 	return 

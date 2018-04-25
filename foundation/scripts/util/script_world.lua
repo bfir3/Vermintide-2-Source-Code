@@ -107,29 +107,6 @@ ScriptWorld.render = function (world)
 		local camera = ScriptViewport.camera(global_free_flight_viewport)
 
 		Application.render_world(world, camera, global_free_flight_viewport, shading_env)
-	elseif Bulldozer.rift then
-		local render_queue = World.get_data(world, "render_queue")
-
-		if table.is_empty(render_queue) then
-			return 
-		end
-
-		local viewport = render_queue[1]
-		local camera = ScriptViewport.camera(viewport)
-		local camera_unit = Camera.get_data(camera, "unit")
-
-		ShadingEnvironment.blend(shading_env, {
-			"default",
-			1
-		})
-		Camera.set_local_position(camera, camera_unit, Vector3(-Bulldozer.half_eye_shift, 0, 0))
-		Camera.set_post_projection_transform(camera, Bulldozer.left_projection_transform:unbox())
-		Viewport.set_rect(viewport, 0, 0, 0.5, 1)
-		Application.render_world(world, camera, viewport, shading_env)
-		Camera.set_local_position(camera, camera_unit, Vector3(Bulldozer.half_eye_shift, 0, 0))
-		Camera.set_post_projection_transform(camera, Bulldozer.right_projection_transform:unbox())
-		Viewport.set_rect(viewport, 0.5, 0, 0.5, 1)
-		Application.render_world(world, camera, viewport, shading_env)
 	else
 		local render_queue = World.get_data(world, "render_queue")
 

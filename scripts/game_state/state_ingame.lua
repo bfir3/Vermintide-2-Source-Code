@@ -95,15 +95,6 @@ StateIngame.on_enter = function (self)
 		input_manager.map_device_to_service(input_manager, "DebugMenu", "keyboard")
 		input_manager.map_device_to_service(input_manager, "DebugMenu", "mouse")
 		input_manager.map_device_to_service(input_manager, "DebugMenu", "gamepad")
-
-		if PLATFORM == "win32" and (BUILD == "dev" or BUILD == "debug") then
-			input_manager.initialize_device(input_manager, "synergy_keyboard")
-			input_manager.initialize_device(input_manager, "synergy_mouse")
-			input_manager.map_device_to_service(input_manager, "Debug", "synergy_keyboard")
-			input_manager.map_device_to_service(input_manager, "Debug", "synergy_mouse")
-			input_manager.map_device_to_service(input_manager, "DebugMenu", "synergy_keyboard")
-			input_manager.map_device_to_service(input_manager, "DebugMenu", "synergy_mouse")
-		end
 	end
 
 	Managers.popup:set_input_manager(input_manager)
@@ -211,7 +202,7 @@ StateIngame.on_enter = function (self)
 	Managers.state.difficulty:set_difficulty(difficulty)
 
 	loading_context.difficulty = difficulty
-	local num_players = (not DEDICATED_SERVER or 0) and 1
+	local num_players = (DEDICATED_SERVER and 0) or 1
 	self.num_local_human_players = num_players
 
 	if Managers.matchmaking then
@@ -365,7 +356,7 @@ StateIngame.on_enter = function (self)
 			StatisticsUtil.register_played_quickplay_level(self.statistics_db, player, level_key)
 		end
 
-		self.machines[i] = StateMachine:new(self, StateInGameRunning, params, true)
+		self.machines[i] = GameStateMachine:new(self, StateInGameRunning, params, true)
 	end
 
 	if checkpoint_data then
@@ -1789,7 +1780,7 @@ StateIngame._check_and_add_end_game_telemetry = function (self, application_shut
 	local reason = self.exit_type
 
 	if application_shutdown then
-		local controlled_exit = Boot:is_controlled_exit()
+		local controlled_exit = Boot.is_controlled_exit
 
 		if controlled_exit then
 			reason = "controlled_exit"

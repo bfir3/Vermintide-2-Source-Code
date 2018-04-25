@@ -279,11 +279,7 @@ PlayerUnitFirstPerson.update_rotation = function (self, t, dt)
 	local first_person_unit = self.first_person_unit
 	local aim_assist_data = self.smart_targeting_extension:get_targeting_data()
 
-	if Bulldozer.rift then
-		local new_rotation = Oculus.get_orientation(Bulldozer.rift_info.hmd_device)
-
-		Unit.set_local_rotation(first_person_unit, 0, new_rotation)
-	elseif self.forced_look_rotation ~= nil then
+	if self.forced_look_rotation ~= nil then
 		local total_lerp_time = self.forced_total_lerp_time or 0.3
 		self.forced_lerp_timer = self.forced_lerp_timer + dt
 		local p = 1 - self.forced_lerp_timer / total_lerp_time

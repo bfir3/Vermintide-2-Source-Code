@@ -74,7 +74,7 @@ StateDedicatedServer._setup_network = function (self)
 end
 StateDedicatedServer._setup_state_machine = function (self)
 	local params = {}
-	self._machine = StateMachine:new(self, StateDedicatedServerInit, params, true)
+	self._machine = GameStateMachine:new(self, StateDedicatedServerInit, params, true)
 
 	return 
 end

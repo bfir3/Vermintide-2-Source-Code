@@ -166,7 +166,7 @@ StateLoading._setup_world = function (self)
 end
 StateLoading._setup_init_network_view = function (self)
 
-	-- decompilation error in this vicinity
+	-- Decompilation error in this vicinity:
 	require("scripts/game_state/state_ingame")
 
 	self._wanted_state = StateIngame
@@ -419,11 +419,11 @@ StateLoading._setup_state_machine = function (self)
 	}
 
 	if self.parent.loading_context.restart_network then
-		self._machine = StateMachine:new(self, StateLoadingRestartNetwork, params, true)
+		self._machine = GameStateMachine:new(self, StateLoadingRestartNetwork, params, true)
 	elseif self.parent.loading_context.host_migration_info then
-		self._machine = StateMachine:new(self, StateLoadingMigrateHost, params, true)
+		self._machine = GameStateMachine:new(self, StateLoadingMigrateHost, params, true)
 	else
-		self._machine = StateMachine:new(self, StateLoadingRunning, params, true)
+		self._machine = GameStateMachine:new(self, StateLoadingRunning, params, true)
 	end
 
 	return 

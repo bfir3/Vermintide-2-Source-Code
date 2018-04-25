@@ -333,7 +333,12 @@ DebugManager._update_actor_draw = function (self, dt)
 			local drawer = self._actor_drawer
 
 			for _, actor in ipairs(data.actors) do
-				drawer.actor(drawer, actor, data.color:unbox(), pose)
+				local box = ActorBox(actor)
+				local unboxed = box.unbox(box)
+
+				if unboxed then
+					drawer.actor(drawer, actor, data.color:unbox(), pose)
+				end
 			end
 		end
 	end

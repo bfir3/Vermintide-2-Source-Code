@@ -193,7 +193,7 @@ StateTitleScreen._setup_state_machine = function (self)
 
 	if loading_context.skip_signin then
 		loading_context.skip_signin = nil
-		self._machine = StateMachine:new(self, StateTitleScreenMainMenu, {
+		self._machine = GameStateMachine:new(self, StateTitleScreenMainMenu, {
 			skip_signin = true,
 			world = self._world,
 			ui = self._title_start_ui,
@@ -201,7 +201,7 @@ StateTitleScreen._setup_state_machine = function (self)
 			auto_start = self._auto_start
 		}, true)
 	else
-		self._machine = StateMachine:new(self, StateTitleScreenMain, {
+		self._machine = GameStateMachine:new(self, StateTitleScreenMain, {
 			world = self._world,
 			ui = self._title_start_ui,
 			viewport = self._viewport,

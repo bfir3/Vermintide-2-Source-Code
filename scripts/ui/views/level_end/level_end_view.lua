@@ -53,9 +53,15 @@ LevelEndView.init = function (self, context)
 	}
 	self._lobby = context.lobby
 	self.is_server = context.is_server
-	self.level_up_rewards = self._get_level_up_rewards(self)
-	self.deed_rewards = self._get_deed_rewards(self)
-	self.keep_decoration_rewards = self._get_keep_decoration_rewards(self)
+	local is_untrusted = script_data["eac-untrusted"]
+	self._is_untrusted = is_untrusted
+
+	if not is_untrusted then
+		self.level_up_rewards = self._get_level_up_rewards(self)
+		self.deed_rewards = self._get_deed_rewards(self)
+		self.keep_decoration_rewards = self._get_keep_decoration_rewards(self)
+	end
+
 	local world = context.world
 	self.wwise_world = Managers.world:wwise_world(world)
 	context.wwise_world = self.wwise_world
@@ -205,7 +211,7 @@ LevelEndView.start = function (self)
 	self.waiting_to_start = nil
 	self.state_auto_change = true
 
-	self._setup_state_machine(self, nil, true)
+	self._proceed_to_next_auto_state(self, 1, #self._state_name_by_index)
 	self.play_sound(self, "play_gui_chestroom_start")
 
 	self._playing_music = nil
@@ -218,11 +224,13 @@ LevelEndView.on_enter = function (self)
 	return 
 end
 LevelEndView.on_exit = function (self)
-	local difficulty_key = Managers.state.difficulty:get_difficulty()
-	local chest_settings = LootChestData.chests_by_category[difficulty_key]
-	local chests_package_name = chest_settings.package_name
+	if not self._is_untrusted then
+		local difficulty_key = Managers.state.difficulty:get_difficulty()
+		local chest_settings = LootChestData.chests_by_category[difficulty_key]
+		local chests_package_name = chest_settings.package_name
 
-	Managers.package:unload(chests_package_name, "global")
+		Managers.package:unload(chests_package_name, "global")
+	end
 
 	return 
 end
@@ -335,7 +343,11 @@ end
 LevelEndView._setup_pages = function (self, game_won)
 	local index_by_state_name = nil
 
-	if game_won then
+	if self._is_untrusted then
+		index_by_state_name = {
+			EndViewStateScore = 1
+		}
+	elseif game_won then
 		index_by_state_name = {
 			EndViewStateChest = 2,
 			EndViewStateScore = 3,
@@ -761,28 +773,14 @@ LevelEndView._handle_state_auto_change = function (self)
 
 	if self._next_auto_state_index then
 		if current_state.exit_done(current_state) then
-			local new_state = self._state_name_by_index[self._next_auto_state_index]
-
-			self._setup_state_machine(self, new_state, true)
-
-			if self._next_auto_state_index == num_states then
-				self.state_auto_change = false
-
-				self._push_mouse_cursor(self)
-			end
-
-			self._next_auto_state_index = nil
+			self._proceed_to_next_auto_state(self, self._next_auto_state_index, num_states)
 		end
 	else
 		local new_state_index = nil
 		local displaying_reward_presentation = self.displaying_reward_presentation(self)
 
 		if not displaying_reward_presentation then
-			if state_name == "EndViewStateSummary" and current_state.done(current_state) then
-				if current_state_index < num_states then
-					new_state_index = current_state_index + 1
-				end
-			elseif state_name == "EndViewStateChest" and current_state.done(current_state) and current_state_index < num_states then
+			if current_state_index < num_states and current_state.done(current_state) then
 				new_state_index = current_state_index + 1
 			end
 
@@ -793,6 +791,21 @@ LevelEndView._handle_state_auto_change = function (self)
 			end
 		end
 	end
+
+	return 
+end
+LevelEndView._proceed_to_next_auto_state = function (self, index, num_states)
+	local new_state = self._state_name_by_index[index]
+
+	self._setup_state_machine(self, new_state, true)
+
+	if index == num_states then
+		self.state_auto_change = false
+
+		self._push_mouse_cursor(self)
+	end
+
+	self._next_auto_state_index = nil
 
 	return 
 end
