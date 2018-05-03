@@ -224,8 +224,8 @@ local function create_static_widget()
 			},
 			player_name = {
 				vertical_alignment = "bottom",
-				font_type = "hell_shark",
-				font_size = 20,
+				font_type = "arial",
+				font_size = 18,
 				horizontal_alignment = "center",
 				text_color = Colors.get_table("white"),
 				offset = {
@@ -236,8 +236,8 @@ local function create_static_widget()
 			},
 			player_name_shadow = {
 				vertical_alignment = "bottom",
-				font_type = "hell_shark",
-				font_size = 20,
+				font_type = "arial",
+				font_size = 18,
 				horizontal_alignment = "center",
 				text_color = Colors.get_table("black"),
 				offset = {

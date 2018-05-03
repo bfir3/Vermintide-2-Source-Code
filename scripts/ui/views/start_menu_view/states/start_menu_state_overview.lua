@@ -69,7 +69,7 @@ StartMenuStateOverview.on_enter = function (self, params)
 	self._init_menu_views(self)
 
 	local parent = self.parent
-	local input_service = parent.input_service(parent)
+	local input_service = self.input_service(self, true)
 	local gui_layer = UILayer.default + 30
 	self.menu_input_description = MenuInputDescriptionUI:new(ingame_ui_context, self.ui_top_renderer, input_service, 3, gui_layer, generic_input_actions.default)
 
@@ -208,7 +208,7 @@ StartMenuStateOverview.draw = function (self, dt)
 	local ui_scenegraph = self.ui_scenegraph
 	local input_manager = self.input_manager
 	local parent = self.parent
-	local input_service = parent.input_service(parent)
+	local input_service = self.input_service(self, true)
 	local render_settings = self.render_settings
 	local snap_pixel_positions = render_settings.snap_pixel_positions
 
@@ -245,7 +245,7 @@ StartMenuStateOverview._spawn_hero_unit = function (self, hero_name)
 	local career_index = self.career_index
 	local callback = callback(self, "cb_hero_unit_spawned", hero_name)
 
-	world_previewer.spawn_hero_unit(world_previewer, hero_name, self.career_index, true, callback)
+	world_previewer.request_spawn_hero_unit(world_previewer, hero_name, self.career_index, true, callback)
 
 	return 
 end
@@ -336,7 +336,7 @@ StartMenuStateOverview._set_select_button_enabled = function (self, enabled)
 	return 
 end
 StartMenuStateOverview._handle_input = function (self, dt, t)
-	local input_service = self.parent:input_service()
+	local input_service = self.input_service(self, true)
 	local widgets_by_name = self._widgets_by_name
 	local play_button = widgets_by_name.play_button
 	local hero_button = widgets_by_name.hero_button
@@ -554,7 +554,7 @@ StartMenuStateOverview.exit_current_view = function (self)
 	end
 
 	self._active_view = nil
-	local input_service = self.parent:input_service()
+	local input_service = self.input_service(self, true)
 	local input_service_name = input_service.name
 	local input_manager = Managers.input
 
@@ -563,6 +563,19 @@ StartMenuStateOverview.exit_current_view = function (self)
 	input_manager.block_device_except_service(input_manager, input_service_name, "gamepad")
 
 	return 
+end
+StartMenuStateOverview.input_service = function (self, ignore_view_input)
+	if not ignore_view_input then
+		local active_view = self._active_view
+		local views = self._views
+		local view = views[active_view]
+
+		if view then
+			return view.input_service(view)
+		end
+	end
+
+	return self.parent:input_service(true)
 end
 
 return 

@@ -20,6 +20,13 @@ PlayerBotUnitFirstPerson.init = function (self, extension_init_context, unit, ex
 	Unit.set_flow_variable(fp_unit, "sound_character", career.sound_character)
 	Unit.set_flow_variable(fp_unit, "is_bot", true)
 	Unit.flow_event(fp_unit, "character_vo_set")
+
+	local flow_unit_attachments = Unit.get_data(self.unit, "flow_unit_attachments") or {}
+
+	Unit.set_data(self.unit, "flow_unit_attachments", flow_unit_attachments)
+
+	self.flow_unit_attachments = flow_unit_attachments
+
 	AttachmentUtils.link(extension_init_context.world, fp_unit, self.first_person_attachment_unit, attachment_node_linking)
 
 	self.look_rotation = QuaternionBox(Unit.local_rotation(unit, 0))
@@ -200,6 +207,10 @@ PlayerBotUnitFirstPerson.set_first_person_mode = function (self, active)
 	return 
 end
 PlayerBotUnitFirstPerson.debug_set_first_person_mode = function (self, active, override)
+	for k, v in pairs(self.flow_unit_attachments) do
+		Unit.set_unit_visibility(v, not active)
+	end
+
 	if active then
 		Unit.set_unit_visibility(self.unit, not override)
 		Unit.set_unit_visibility(self.first_person_attachment_unit, override)
@@ -224,9 +235,19 @@ PlayerBotUnitFirstPerson.unhide_weapons = function (self)
 	return 
 end
 PlayerBotUnitFirstPerson.animation_set_variable = function (self, variable_name, value)
+	if self.first_person_debug then
+		local variable = Unit.animation_find_variable(self.first_person_unit, variable_name)
+
+		Unit.animation_set_variable(self.first_person_unit, variable, value)
+	end
+
 	return 
 end
 PlayerBotUnitFirstPerson.animation_event = function (self, event)
+	if self.first_person_debug then
+		Unit.animation_event(self.first_person_unit, event)
+	end
+
 	return 
 end
 PlayerBotUnitFirstPerson.increase_aim_assist_multiplier = function (self)
@@ -267,6 +288,15 @@ end
 PlayerBotUnitFirstPerson.play_sound_event = function (self, event, position)
 	local sound_position = position or self.current_position(self)
 	local wwise_source_id, wwise_world = WwiseUtils.make_position_auto_source(self.world, sound_position)
+
+	WwiseWorld.set_switch(wwise_world, "husk", "true", wwise_source_id)
+	WwiseWorld.trigger_event(wwise_world, event, wwise_source_id)
+
+	return 
+end
+PlayerUnitFirstPerson.play_unit_sound_event = function (self, event, unit, node_id, play_on_husk)
+	local event_id = NetworkLookup.sound_events[event]
+	local wwise_source_id, wwise_world = WwiseUtils.make_unit_auto_source(self.world, unit, node_id)
 
 	WwiseWorld.set_switch(wwise_world, "husk", "true", wwise_source_id)
 	WwiseWorld.trigger_event(wwise_world, event, wwise_source_id)

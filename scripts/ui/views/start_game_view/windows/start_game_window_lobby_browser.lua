@@ -143,17 +143,6 @@ StartGameWindowLobbyBrowser.create_ui_elements = function (self, params, offset)
 
 	self._server_widgets = server_widgets
 	self._server_widgets_by_name = server_widgets_by_name
-	local password_popup_widgets = {}
-	local password_popup_widgets_by_name = {}
-
-	for name, widget_definition in pairs(widget_definitions.password_popup) do
-		local widget = UIWidget.init(widget_definition)
-		password_popup_widgets[#password_popup_widgets + 1] = widget
-		password_popup_widgets_by_name[name] = widget
-	end
-
-	self._password_popup_widgets = password_popup_widgets
-	self._password_popup_widgets_by_name = password_popup_widgets_by_name
 	local lobby_info_box_base_widgets = {}
 	local lobby_info_box_base_widgets_by_name = {}
 
@@ -241,7 +230,6 @@ StartGameWindowLobbyBrowser.update = function (self, dt, t)
 
 	local input_service = self.parent:window_input_service()
 	local input_manager = self.input_manager
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
 
 	self.lobby_finder:update(dt)
 	self.game_server_finder:update(dt)
@@ -306,23 +294,12 @@ StartGameWindowLobbyBrowser.update = function (self, dt, t)
 
 	local join_lobby_data_id = self.join_lobby_data_id
 
-	if not join_button_hotspot.disable_button and (join_button_hotspot.on_release or (gamepad_active and input_service.get(input_service, "confirm") and not self.join_lobby_data_id)) then
+	if not join_button_hotspot.disable_button and join_button_hotspot.on_release and not self.join_lobby_data_id then
 		local lobby_data = lobby_list.selected_lobby(lobby_list)
 
 		if lobby_data then
 			self._play_sound(self, "Play_hud_select")
-
-			local is_dedicated_server = lobby_data.server_info
-
-			if is_dedicated_server then
-				if lobby_data.server_info.password then
-					self._show_password_popup(self)
-				else
-					self._join(self, lobby_data)
-				end
-			else
-				self._join(self, lobby_data)
-			end
+			self._join(self, lobby_data)
 		end
 	end
 
@@ -340,7 +317,7 @@ StartGameWindowLobbyBrowser.update = function (self, dt, t)
 		self._switch_lobby_type(self, new_lobby_type)
 	end
 
-	if (gamepad_active and input_service.get(input_service, "refresh")) or search_button_hotspot.on_release then
+	if search_button_hotspot.on_release then
 		self._play_sound(self, "Play_hud_select")
 
 		search_button_hotspot.on_release = nil
@@ -348,15 +325,13 @@ StartGameWindowLobbyBrowser.update = function (self, dt, t)
 		self._search(self)
 	end
 
-	if (gamepad_active and input_service.get(input_service, "special_1")) or reset_button_hotspot.on_release then
+	if reset_button_hotspot.on_release then
 		self._play_sound(self, "Play_hud_select")
 
 		reset_button_hotspot.on_release = nil
 
 		self._reset_filters(self)
 	end
-
-	self._handle_password_input(self, dt, t)
 
 	if self.search_timer then
 		self.search_timer = self.search_timer - dt
@@ -556,47 +531,6 @@ StartGameWindowLobbyBrowser._handle_input = function (self, dt, t)
 
 	return 
 end
-StartGameWindowLobbyBrowser._handle_password_input = function (self, dt, t)
-	if not self._showing_password_popup then
-		return 
-	end
-
-	local input_service = self.parent:window_input_service()
-	local password_popup_widgets = self._password_popup_widgets_by_name
-	local input_box = password_popup_widgets.input_box.content
-
-	if input_service.get(input_service, "left_release") or Managers.chat:chat_is_focused() then
-		input_box.active = false
-	end
-
-	if input_box.on_release then
-		input_box.active = true
-	end
-
-	local ok_button_hotspot = password_popup_widgets.ok_button.content.button_hotspot
-
-	if ok_button_hotspot.on_release then
-		ok_button_hotspot.on_release = nil
-		local password = password_popup_widgets.input_box.content.input
-		local join_params = {
-			password = password
-		}
-		local lobby_data = self.lobby_list:selected_lobby()
-
-		self._join(self, lobby_data, join_params)
-		self._hide_password_popup(self)
-	end
-
-	local cancel_button_hotspot = password_popup_widgets.cancel_button.content.button_hotspot
-
-	if cancel_button_hotspot.on_release then
-		cancel_button_hotspot.on_release = nil
-
-		self._hide_password_popup(self)
-	end
-
-	return 
-end
 StartGameWindowLobbyBrowser._handle_name_input_box = function (self, dt, t)
 	local input_service = self.parent:window_input_service()
 	local name_input_box_content = self._server_widgets_by_name.name_input_box.content
@@ -661,16 +595,6 @@ StartGameWindowLobbyBrowser._remove_server_from_favorites = function (self, lobb
 
 	return 
 end
-StartGameWindowLobbyBrowser._show_password_popup = function (self)
-	self._showing_password_popup = true
-
-	return 
-end
-StartGameWindowLobbyBrowser._hide_password_popup = function (self)
-	self._showing_password_popup = false
-
-	return 
-end
 StartGameWindowLobbyBrowser.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -711,12 +635,6 @@ StartGameWindowLobbyBrowser.draw = function (self, dt)
 	elseif current_lobby_type == "servers" then
 		for _, widget in ipairs(self._server_widgets) do
 			UIRenderer.draw_widget(ui_renderer, widget)
-		end
-
-		if self._showing_password_popup then
-			for _, widget in ipairs(self._password_popup_widgets) do
-				UIRenderer.draw_widget(ui_renderer, widget)
-			end
 		end
 	else
 		ferror("Unknown lobby type (%s)", current_lobby_type)
@@ -1188,7 +1106,6 @@ StartGameWindowLobbyBrowser._handle_stepper_input = function (self, stepper_name
 	local stepper_hotspot = stepper_content.button_hotspot
 	local stepper_left_hotspot = stepper_content.button_hotspot_left
 	local stepper_right_hotspot = stepper_content.button_hotspot_right
-	local gamepad_active = self.input_manager:is_device_active("gamepad")
 
 	if stepper_left_hotspot.on_hover_enter then
 		self._on_stepper_arrow_hover(self, stepper_widget, stepper_name, "left_button_icon_clicked")
@@ -1211,21 +1128,15 @@ StartGameWindowLobbyBrowser._handle_stepper_input = function (self, stepper_name
 
 		step_function(-1)
 		self._play_sound(self, "Play_hud_select")
-
-		if not gamepad_active then
-			self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "left_button_icon")
-			self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "left_button_icon_clicked")
-		end
+		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "left_button_icon")
+		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "left_button_icon_clicked")
 	elseif stepper_right_hotspot.on_release then
 		stepper_right_hotspot.on_release = nil
 
 		step_function(1)
 		self._play_sound(self, "Play_hud_select")
-
-		if not gamepad_active then
-			self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "right_button_icon")
-			self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "right_button_icon_clicked")
-		end
+		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "right_button_icon")
+		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "right_button_icon_clicked")
 	end
 
 	return 
@@ -1288,84 +1199,6 @@ StartGameWindowLobbyBrowser._on_stepper_arrow_dehover = function (self, widget, 
 		ui_animations[animation_name .. "_hover"] = self._animate_element_by_time(self, pass_style.color, 1, current_alpha, target_alpha, animation_duration)
 	else
 		pass_style.color[1] = target_alpha
-	end
-
-	return 
-end
-StartGameWindowLobbyBrowser._on_gamepad_activated = function (self)
-	local index = self.selected_gamepad_widget_index
-
-	self._set_selected_gamepad_widget(self, index)
-
-	return 
-end
-StartGameWindowLobbyBrowser._on_gamepad_deactivated = function (self)
-	self._set_selected_gamepad_widget(self, nil)
-
-	return 
-end
-StartGameWindowLobbyBrowser._get_selected_gamepad_widget = function (self)
-	local index = self.selected_gamepad_widget_index
-	local selected_gamepad_widget = self.gamepad_widgets[index]
-
-	return selected_gamepad_widget
-end
-StartGameWindowLobbyBrowser._cycle_next_gamepad_widget = function (self)
-	local num_widgets = #self.gamepad_widgets
-	local index = self.selected_gamepad_widget_index + 1
-
-	if num_widgets < index then
-		index = 1
-	end
-
-	self._set_selected_gamepad_widget(self, index)
-
-	return 
-end
-StartGameWindowLobbyBrowser._cycle_previous_gamepad_widget = function (self)
-	local num_widgets = #self.gamepad_widgets
-	local index = self.selected_gamepad_widget_index - 1
-
-	if index < 1 then
-		index = num_widgets
-	end
-
-	self._set_selected_gamepad_widget(self, index)
-
-	return 
-end
-StartGameWindowLobbyBrowser._set_selected_gamepad_widget = function (self, index)
-	return 
-end
-StartGameWindowLobbyBrowser.handle_gamepad_navigation_input = function (self, dt)
-	local controller_cooldown = self.controller_cooldown
-
-	if controller_cooldown and 0 < controller_cooldown then
-		self.controller_cooldown = controller_cooldown - dt
-
-		return 
-	end
-
-	local input_service = self._input_service(self)
-
-	if input_service.get(input_service, "cycle_previous") then
-		self._cycle_previous_gamepad_widget(self)
-	end
-
-	if input_service.get(input_service, "cycle_next") then
-		self._cycle_next_gamepad_widget(self)
-	end
-
-	local selected_gamepad_widget = self._get_selected_gamepad_widget(self)
-	local data = selected_gamepad_widget.data
-	local widget = selected_gamepad_widget.widget
-	local input_function = data.input_function
-	local input_handled = input_function(widget, input_service)
-
-	if input_handled then
-		self.controller_cooldown = GamepadSettings.menu_cooldown
-
-		return 
 	end
 
 	return 

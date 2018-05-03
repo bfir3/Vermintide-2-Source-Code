@@ -1,3 +1,4 @@
+require("scripts/game_state/server_join_state_machine")
 require("scripts/game_state/loading_sub_states/win32/state_loading_running")
 require("scripts/game_state/loading_sub_states/win32/state_loading_restart_network")
 require("scripts/game_state/loading_sub_states/win32/state_loading_migrate_host")
@@ -62,6 +63,11 @@ StateLoading.on_enter = function (self, param_block)
 	self._setup_first_time_ui(self)
 	self._setup_init_network_view(self)
 	Managers.popup:set_input_manager(self._input_manager)
+
+	if Managers.rcon ~= nil then
+		Managers.rcon:set_input_manager(self._input_manager)
+	end
+
 	Managers.chat:set_input_manager(self._input_manager)
 	self._setup_level_transition(self)
 	self._setup_state_machine(self)
@@ -111,6 +117,15 @@ StateLoading.on_enter = function (self, param_block)
 			self._wanted_state = StateTitleScreen
 			self.parent.loading_context.skip_signin = true
 			self._teardown_network = true
+		end
+	end
+
+	if BUILD == "dev" or BUILD == "debug" then
+		local debug_resource_package = "resource_packages/debug/ui_debug"
+
+		if script_data.load_ui_debug_package and not Managers.package:has_loaded(debug_resource_package, "global") then
+			GlobalResources.loaded = nil
+			GlobalResources[#GlobalResources + 1] = debug_resource_package
 		end
 	end
 
@@ -426,11 +441,11 @@ StateLoading._setup_state_machine = function (self)
 	}
 
 	if self.parent.loading_context.restart_network then
-		self._machine = StateMachine:new(self, StateLoadingRestartNetwork, params, true)
+		self._machine = GameStateMachine:new(self, StateLoadingRestartNetwork, params, true)
 	elseif self.parent.loading_context.host_migration_info then
-		self._machine = StateMachine:new(self, StateLoadingMigrateHost, params, true)
+		self._machine = GameStateMachine:new(self, StateLoadingMigrateHost, params, true)
 	else
-		self._machine = StateMachine:new(self, StateLoadingRunning, params, true)
+		self._machine = GameStateMachine:new(self, StateLoadingRunning, params, true)
 	end
 
 	return 
@@ -452,7 +467,7 @@ StateLoading.update = function (self, dt, t)
 	Network.update_receive(dt, self._network_event_delegate.event_table)
 	self._update_network(self, dt)
 
-	if PLATFORM == "ps4" and not self._popup_id and not self._handled_psn_client_error and self._level_transition_handler:all_packages_loaded() and Managers.backend:profiles_loaded() and self.global_packages_loaded(self) then
+	if PLATFORM == "ps4" and not self._popup_id and not self._handled_psn_client_error and self._level_transition_handler:all_packages_loaded() and self._level_transition_handler.enemy_package_loader:loading_completed() and Managers.backend:profiles_loaded() and self.global_packages_loaded(self) then
 		local psn_client_error = Managers.account:psn_client_error()
 
 		if psn_client_error then
@@ -526,6 +541,10 @@ StateLoading.update = function (self, dt, t)
 		end
 	end
 
+	if Managers.rcon ~= nil then
+		Managers.rcon:update(dt, t, menu_active, menu_input_service)
+	end
+
 	Managers.chat:update(dt, t, menu_active, menu_input_service)
 	Network.update_transmit(dt)
 
@@ -534,6 +553,19 @@ end
 StateLoading._update_network = function (self, dt)
 	if self._network_server then
 		self._network_server:update(dt)
+
+		local disconnected = self._network_server:disconnected()
+
+		if disconnected and not self._popup_id then
+			local text_id = self._get_lost_connection_text_id(self)
+
+			self.create_popup(self, text_id, "popup_error_topic", "restart_as_server", "menu_accept")
+			self._destroy_lobby_host(self)
+			self._network_server:disconnect_all_peers("unknown_error")
+			self._network_server:destroy()
+
+			self._network_server = nil
+		end
 	elseif self._network_client then
 		self._network_client:update(dt)
 
@@ -550,30 +582,55 @@ StateLoading._update_network = function (self, dt)
 			self._in_post_game_popup_id = nil
 		end
 
-		local bad_state = self._network_client.state == "denied_enter_game" or self._network_client.state == "lost_connection_to_host" or self._network_client.state == "eac_match_failed"
+		local state = self._network_client.state
+		local bad_state = state == "denied_enter_game" or state == "lost_connection_to_host" or state == "eac_match_failed"
 
-		if bad_state and not self._popup_id and not self._permission_to_go_to_next_state then
+		if bad_state and not self._popup_id then
 			self._wanted_state = StateTitleScreen
 
-			self.create_popup(self, self._network_client.fail_reason or "fail reason is nil", "popup_error_topic", "restart_as_server", "menu_accept")
+			if self._in_post_game_popup_id then
+				Managers.popup:cancel_popup(self._in_post_game_popup_id)
 
-			if PLATFORM == "ps4" then
-				self._network_client:destroy()
+				self._in_post_game_popup_id = nil
+			end
 
-				self._network_client = nil
+			local fail_reason = self._network_client.fail_reason or "broken_connection"
 
+			self._network_client:destroy()
+
+			self._network_client = nil
+
+			if self._lobby_client then
+				self.create_popup(self, fail_reason, "popup_error_topic", "restart_as_server", "menu_accept")
 				self._destroy_lobby_client(self)
-
-				if self._in_post_game_popup_id then
-					Managers.popup:cancel_popup(self._in_post_game_popup_id)
-
-					self._in_post_game_popup_id = nil
-				end
 			end
 		end
 	end
 
 	return 
+end
+StateLoading._get_lost_connection_text_id = function (self)
+	local text_id = nil
+
+	if PLATFORM == "win32" then
+		if rawget(_G, "Steam") then
+			text_id = "failure_start_no_steam"
+		else
+			text_id = "broken_connection"
+		end
+	elseif PLATFORM == "xb1" then
+		if not Network.xboxlive_client_exists() then
+			text_id = "failure_start_xbox_live_client"
+		else
+			text_id = "failure_start_xbox_lobby_create"
+		end
+	elseif PLATFORM == "ps4" then
+		text_id = "failure_psn_client_error"
+	else
+		text_id = "failure_start"
+	end
+
+	return text_id
 end
 StateLoading._update_lobbies = function (self, dt, t)
 	if not self.global_packages_loaded(self) then
@@ -582,6 +639,26 @@ StateLoading._update_lobbies = function (self, dt, t)
 
 	if self._network_transmit then
 		self._network_transmit:transmit_local_rpcs()
+	end
+
+	if self._password_request ~= nil then
+		self._password_request:update(dt)
+
+		local action, user_data, password = self._password_request:result()
+
+		if action ~= nil then
+			if action == "join" then
+				self._server_lobby = GameServerLobbyClient:new(user_data.network_options, user_data.game_server_data, password)
+			else
+				self._teardown_network = true
+				self._permission_to_go_to_next_state = true
+				self._wanted_state = StateTitleScreen
+			end
+
+			self._password_request:destroy()
+
+			self._password_request = nil
+		end
 	end
 
 	if self._lobby_host then
@@ -597,6 +674,7 @@ StateLoading._update_lobbies = function (self, dt, t)
 
 			self.setup_chat_manager(self, lobby_host, host_peer_id, own_peer_id, true)
 			self.setup_deed_manager(self, lobby_host, host_peer_id, own_peer_id)
+			self.setup_enemy_package_loader(self, lobby_host, host_peer_id, own_peer_id)
 
 			if not self._network_server then
 				self.host_joined(self)
@@ -669,6 +747,7 @@ StateLoading._update_lobbies = function (self, dt, t)
 
 					self.setup_chat_manager(self, self._lobby_client, host, own_peer_id, false)
 					self.setup_deed_manager(self, self._lobby_client, host, own_peer_id)
+					self.setup_enemy_package_loader(self, self._lobby_client, host, own_peer_id)
 				else
 					self._destroy_lobby_client(self)
 					self.create_popup(self, "failure_start_join_server_incorrect_hash", "popup_error_topic", "restart_as_server", "menu_accept", client_network_hash, lobby_network_hash)
@@ -962,8 +1041,14 @@ StateLoading._try_next_state = function (self)
 			return 
 		end
 
+		local eac_allowed_to_play = true
+
+		if self._network_client then
+			eac_allowed_to_play = self._network_client:eac_allowed_to_play()
+		end
+
 		local packages_loaded = self._packages_loaded(self)
-		local can_go_to_next_state = self._wanted_state and ui_done and not self._popup_id
+		local can_go_to_next_state = self._wanted_state and ui_done and eac_allowed_to_play and not self._popup_id
 
 		if can_go_to_next_state then
 			local ready_to_go_to_next_state = self._permission_to_go_to_next_state and packages_loaded
@@ -1140,6 +1225,12 @@ StateLoading.on_exit = function (self, application_shutdown)
 		self._unregister_rpcs(self)
 	end
 
+	if self._password_request ~= nil then
+		self._password_request:destroy()
+
+		self._password_request = nil
+	end
+
 	local skip_signin = self.parent.loading_context.skip_signin
 
 	if application_shutdown then
@@ -1174,6 +1265,10 @@ StateLoading.on_exit = function (self, application_shutdown)
 			stored_lobby_host_data.country_code = country_code
 
 			self._lobby_host:set_lobby_data(stored_lobby_host_data)
+
+			if self._lobby_host:is_dedicated_server() then
+				self._lobby_host:set_level_name(Localize(LevelSettings[level_key].display_name))
+			end
 
 			loading_context.network_server = self._network_server
 
@@ -1228,18 +1323,15 @@ StateLoading.on_exit = function (self, application_shutdown)
 		end
 	end
 
-	local package_manager = Managers.package
-
-	if self._ui_package_name and (package_manager.has_loaded(package_manager, self._ui_package_name, "global_loading_screens") or package_manager.is_loading(package_manager, self._ui_package_name)) then
-		if package_manager.can_unload(package_manager, self._ui_package_name) then
-			package_manager.unload(package_manager, self._ui_package_name, "global_loading_screens")
-		else
-			Application.error(string.format("Tried to unload locked package %s. Free all resources before unloading the package.", self._ui_package_name))
-		end
-	end
-
 	ScriptWorld.destroy_viewport(self._world, self._viewport_name)
 	Managers.world:destroy_world(self._world)
+
+	local package_manager = Managers.package
+
+	if self._ui_package_name and (package_manager.has_loaded(package_manager, self._ui_package_name, "global_loading_screens") or package_manager.is_loading(package_manager, self._ui_package_name)) and package_manager.can_unload(package_manager, self._ui_package_name) then
+		package_manager.unload(package_manager, self._ui_package_name, "global_loading_screens")
+	end
+
 	Managers.music:trigger_event("Stop_loading_screen_music")
 	fassert(application_shutdown or self._popup_id == nil, "StateLoading added a popup right before exiting")
 	Managers.popup:remove_input_manager(application_shutdown)
@@ -1302,6 +1394,10 @@ StateLoading._packages_loaded = function (self)
 			if not package_manager.has_loaded(package_manager, name) then
 				return false
 			end
+		end
+
+		if not self._level_transition_handler.enemy_package_loader:loading_completed() then
+			return false
 		end
 
 		if self._ui_loading_package_path and self._ui_loading_package_reference_name and not package_manager.has_loaded(package_manager, self._ui_loading_package_path, self._ui_loading_package_reference_name) then
@@ -1395,16 +1491,21 @@ end
 StateLoading._load_level = function (self, level_key)
 	self._load_global_packages(self)
 
-	local level_key = level_key or self._level_transition_handler:get_next_level_key()
+	local level_transition_handler = self._level_transition_handler
+	local level_key = level_key or level_transition_handler.get_next_level_key(level_transition_handler)
 
-	assert(level_key, "No level key was set")
+	fassert(level_key, "No level key was set")
 
-	local loaded_level_key = self._level_transition_handler:get_current_level_keys()
+	local loaded_level_key = level_transition_handler.get_current_level_keys(level_transition_handler)
 
 	if level_key ~= loaded_level_key then
 		printf("[StateLoading] Need to unload %s and start load %s", tostring(loaded_level_key), level_key)
-		self._level_transition_handler:release_level_resources(loaded_level_key)
-		self._level_transition_handler:load_level(level_key)
+		level_transition_handler.release_level_resources(level_transition_handler, loaded_level_key)
+		level_transition_handler.load_level(level_transition_handler, level_key)
+	else
+		local enemy_package_loader = level_transition_handler.enemy_package_loader
+
+		enemy_package_loader.setup_startup_enemies(enemy_package_loader, level_key)
 	end
 
 	return 
@@ -1431,7 +1532,7 @@ StateLoading.setup_network_options = function (self)
 		development_port = development_port + LOBBY_PORT_INCREMENT
 		local lobby_port = (LEVEL_EDITOR_TEST and GameSettingsDevelopment.editor_lobby_port) or development_port
 		local network_options = {
-			map = "game",
+			map = "None",
 			project_hash = "bulldozer",
 			max_members = 4,
 			config_file_name = "global",
@@ -1439,7 +1540,7 @@ StateLoading.setup_network_options = function (self)
 			server_port = script_data.server_port or script_data.settings.server_port,
 			query_port = script_data.query_port or script_data.settings.query_port,
 			steam_port = script_data.steam_port or script_data.settings.steam_port,
-			ip_address = script_data.ip_address or script_data.settings.ip_address
+			ip_address = Network.default_network_address()
 		}
 		self._network_options = network_options
 	end
@@ -1535,7 +1636,11 @@ StateLoading.setup_join_lobby = function (self)
 		if loading_context.join_lobby_data then
 			self._lobby_client = LobbyClient:new(self._network_options, self.parent.loading_context.join_lobby_data)
 		elseif loading_context.join_server_data then
-			self._lobby_client = GameServerLobbyClient:new(self._network_options, self.parent.loading_context.join_server_data)
+			local user_data = {
+				network_options = self._network_options,
+				game_server_data = self.parent.loading_context.join_server_data
+			}
+			self._password_request = ServerJoinStateMachine:new(self._network_options, self.parent.loading_context.join_server_data.server_info.ip_port, user_data)
 		else
 			ferror("no join lobby data")
 		end
@@ -1553,6 +1658,10 @@ StateLoading.setup_lobby_finder = function (self, lobby_joined_callback, lobby_t
 		Managers.package:load("resource_packages/inventory", "global")
 	end
 
+	if Managers.package:is_loading("resource_packages/careers", "global") then
+		Managers.package:load("resource_packages/careers", "global")
+	end
+
 	if lobby_is_server then
 		local network_options = {
 			config_file_name = "global",
@@ -1563,7 +1672,11 @@ StateLoading.setup_lobby_finder = function (self, lobby_joined_callback, lobby_t
 				ip_port = lobby_to_join
 			}
 		}
-		self._server_lobby = GameServerLobbyClient:new(network_options, game_server_data)
+		local user_data = {
+			network_options = network_options,
+			game_server_data = game_server_data
+		}
+		self._password_request = ServerJoinStateMachine:new(network_options, game_server_data.server_info.ip_port, user_data)
 	else
 		self._lobby_finder = LobbyFinder:new(self._network_options, nil, true)
 		self._lobby_to_join = lobby_to_join
@@ -1671,6 +1784,11 @@ StateLoading.setup_chat_manager = function (self, lobby, host_peer_id, my_peer_i
 end
 StateLoading.setup_deed_manager = function (self, lobby, host_peer_id, my_peer_id, is_server)
 	Managers.deed:network_context_created(lobby, host_peer_id, my_peer_id, is_server)
+
+	return 
+end
+StateLoading.setup_enemy_package_loader = function (self, lobby, host_peer_id, my_peer_id)
+	self._level_transition_handler.enemy_package_loader:network_context_created(lobby, host_peer_id, my_peer_id)
 
 	return 
 end

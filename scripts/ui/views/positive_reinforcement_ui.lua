@@ -192,8 +192,8 @@ PositiveReinforcementUI.event_add_positive_enforcement = function (self, hash, i
 	local player_2_career_extension = Unit.alive(player_2_unit) and ScriptUnit.extension(player_2_unit, "career_system")
 	local player_1_profile_index = (player1 and player1.profile_index(player1)) or nil
 	local player_2_profile_index = (player2 and player2.profile_index(player2)) or nil
-	local player_1_career_index = (player_1_career_extension and player_1_career_extension.career_index(player_1_career_extension)) or (player1 and player1.profile_index(player1))
-	local player_2_career_index = (player_2_career_extension and player_2_career_extension.career_index(player_2_career_extension)) or (player2 and player2.profile_index(player2))
+	local player_1_career_index = (player_1_career_extension and player_1_career_extension.career_index(player_1_career_extension)) or (player1 and player1.career_index(player1))
+	local player_2_career_index = (player_2_career_extension and player_2_career_extension.career_index(player_2_career_extension)) or (player2 and player2.career_index(player2))
 	local player_1_profile_image = player_1_profile_index and player_1_career_index and self._get_hero_portrait(self, player_1_profile_index, player_1_career_index)
 	local player_2_profile_image = player_2_profile_index and player_2_career_index and self._get_hero_portrait(self, player_2_profile_index, player_2_career_index)
 

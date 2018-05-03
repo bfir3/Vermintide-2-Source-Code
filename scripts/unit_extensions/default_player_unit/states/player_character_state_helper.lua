@@ -297,12 +297,6 @@ CharacterStateHelper.do_common_state_transitions = function (status_extension, c
 		return true
 	end
 
-	if status_extension.do_leap then
-		csm.change_state(csm, "leaping")
-
-		return true
-	end
-
 	if status_extension.in_hanging_cage then
 		local animations = status_extension.in_hanging_cage_animations
 		local cage_unit = status_extension.in_hanging_cage_unit

@@ -47,6 +47,11 @@ local function trigger_enemy_armor_hit_dialogue(enemy_unit, player_unit, damage_
 	return 
 end
 
+local dot_hit_types = {
+	bleed = true,
+	burninating = true,
+	arrow_poison_dot = true
+}
 HitReactions.templates = {
 	ai_default = {
 		unit = function (unit, dt, context, t, hit)
@@ -115,20 +120,38 @@ HitReactions.templates = {
 	},
 	dummy = {
 		unit = function (unit, dt, context, t, hit)
-			local health_extension = ScriptUnit.extension(unit, "health_system")
-			local current_health = health_extension.current_health(health_extension)
+			local hit_type = hit[2]
+			local ignore_damage_taken_flow_event = false
 
-			Unit.set_flow_variable(unit, "current_health", current_health)
-			Unit.flow_event(unit, "lua_on_damage_taken")
+			if hit_type then
+				ignore_damage_taken_flow_event = dot_hit_types[hit_type]
+			end
+
+			if not ignore_damage_taken_flow_event then
+				local health_extension = ScriptUnit.extension(unit, "health_system")
+				local current_health = health_extension.current_health(health_extension)
+
+				Unit.set_flow_variable(unit, "current_health", current_health)
+				Unit.flow_event(unit, "lua_on_damage_taken")
+			end
 
 			return 
 		end,
 		husk = function (unit, dt, context, t, hit)
-			local health_extension = ScriptUnit.extension(unit, "health_system")
-			local current_health = health_extension.current_health(health_extension)
+			local hit_type = hit[2]
+			local ignore_damage_taken_flow_event = false
 
-			Unit.set_flow_variable(unit, "current_health", current_health)
-			Unit.flow_event(unit, "lua_on_damage_taken")
+			if hit_type then
+				ignore_damage_taken_flow_event = dot_hit_types[hit_type]
+			end
+
+			if not ignore_damage_taken_flow_event then
+				local health_extension = ScriptUnit.extension(unit, "health_system")
+				local current_health = health_extension.current_health(health_extension)
+
+				Unit.set_flow_variable(unit, "current_health", current_health)
+				Unit.flow_event(unit, "lua_on_damage_taken")
+			end
 
 			return 
 		end,

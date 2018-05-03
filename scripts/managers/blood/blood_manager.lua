@@ -274,7 +274,7 @@ BloodManager.clear_blood_decals = function (self)
 end
 BloodManager.spawn_blood_ball = function (self, position, direction, damage_type, hit_unit)
 	if BloodSettings.blood_decals.enabled then
-		if 0 < BloodSettings.blood_decals.num_decals then
+		if 0 < BloodSettings.blood_decals.num_decals and Vector3.is_valid(position) then
 			local rotation = Quaternion.look(direction, Vector3.up())
 			local unit = World.spawn_unit(self._world, "units/decals/blood_ball", position, rotation)
 			local actor = Unit.actor(unit, "blood_ball")

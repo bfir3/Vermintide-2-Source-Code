@@ -413,8 +413,10 @@ StartGameStateSettingsOverview._is_button_hover_enter = function (self, widget)
 end
 StartGameStateSettingsOverview._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
+	local gamepad_active = Managers.input:is_device_active("gamepad")
 	local input_service = self.parent:input_service()
 	local input_pressed = input_service.get(input_service, "toggle_menu")
+	local back_pressed = (gamepad_active and input_service.get(input_service, "back")) or input_pressed
 	local close_on_exit = self._close_on_exit
 	local reset_on_exit = self._reset_on_exit
 	local back_button = widgets_by_name.back_button
@@ -427,17 +429,17 @@ StartGameStateSettingsOverview._handle_input = function (self, dt, t)
 		self.play_sound(self, "play_gui_equipment_button_hover")
 	end
 
-	if reset_on_exit and (input_pressed or self._is_button_pressed(self, back_button)) then
+	if reset_on_exit and (input_pressed or back_pressed or self._is_button_pressed(self, back_button)) then
 		self.play_sound(self, "play_gui_lobby_back")
 
 		local start_layout = PlayerData.mission_selection.start_layout or 1
 
 		self.set_layout(self, start_layout)
-	elseif close_on_exit and (input_pressed or self._is_button_pressed(self, exit_button)) then
+	elseif close_on_exit and (input_pressed or back_pressed or self._is_button_pressed(self, exit_button)) then
 		self.parent:close_menu()
 
 		return 
-	elseif input_pressed or self._is_button_pressed(self, back_button) then
+	elseif back_pressed or self._is_button_pressed(self, back_button) then
 		self.play_sound(self, "Play_hud_select")
 
 		local previous_layout_key = self.get_previous_selected_game_mode_index(self)
@@ -610,6 +612,10 @@ StartGameStateSettingsOverview.is_strict_matchmaking_option_enabled = function (
 	return self._use_strict_matchmaking
 end
 StartGameStateSettingsOverview.is_difficulty_approved = function (self, difficulty_key)
+	if script_data.disable_hero_power_requirement then
+		return true
+	end
+
 	if not difficulty_key then
 		return false
 	end

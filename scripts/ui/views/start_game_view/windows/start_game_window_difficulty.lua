@@ -18,6 +18,7 @@ StartGameWindowDifficulty.on_enter = function (self, params, offset)
 	self.render_settings = {
 		snap_pixel_positions = true
 	}
+	self._has_exited = false
 	local player_manager = Managers.player
 	local local_player = player_manager.local_player(player_manager)
 	self._stats_id = local_player.stats_id(local_player)
@@ -31,6 +32,7 @@ StartGameWindowDifficulty.on_enter = function (self, params, offset)
 	local difficulty_key = self.parent:get_difficulty_option() or Managers.state.difficulty:get_difficulty()
 
 	self._update_selected_difficulty_option(self, difficulty_key)
+	self.parent.parent:set_input_description("select_difficulty")
 
 	return 
 end
@@ -95,6 +97,10 @@ StartGameWindowDifficulty.on_exit = function (self, params)
 	print("[StartGameWindow] Exit Substate StartGameWindowDifficulty")
 
 	self.ui_animator = nil
+
+	self.parent.parent:set_input_description(nil)
+
+	self._has_exited = true
 
 	return 
 end
@@ -219,13 +225,16 @@ StartGameWindowDifficulty._handle_input = function (self, dt, t)
 
 	UIWidgetUtils.animate_default_button(select_button, dt)
 
+	local input_service = self.parent:window_input_service()
+	local gamepad_active = Managers.input:is_device_active("gamepad")
+	local gamepad_confirm_pressed = gamepad_active and not select_button.content.button_hotspot.disable_button and input_service.get(input_service, "refresh_press", true)
 	local parent = self.parent
 
 	if self._is_button_hover_enter(self, select_button) then
 		self._play_sound(self, "play_gui_lobby_button_01_difficulty_confirm_hover")
 	end
 
-	if self._is_button_released(self, select_button) then
+	if self._is_button_released(self, select_button) or gamepad_confirm_pressed then
 		if self._selected_difficulty_key then
 			parent.set_difficulty_option(parent, self._selected_difficulty_key)
 			self._play_sound(self, "play_gui_lobby_button_01_difficulty_confirm_click")
@@ -287,13 +296,25 @@ StartGameWindowDifficulty._update_difficulty_lock = function (self)
 			local difficulty_lock_text = Localize("required_power_level")
 			widgets_by_name.difficulty_lock_text.content.text = string.format("%s: %s", difficulty_lock_text, tostring(UIUtils.presentable_hero_power_level(required_power_level)))
 			widgets_by_name.difficulty_is_locked_text.content.text = Localize("required_power_level_not_met_in_party")
+
+			if not self._has_exited then
+				self.parent.parent:set_input_description(nil)
+			end
 		else
 			select_button.content.button_hotspot.disable_button = false
 			widgets_by_name.difficulty_lock_text.content.text = ""
 			widgets_by_name.difficulty_is_locked_text.content.text = ""
+
+			if not self._has_exited then
+				self.parent.parent:set_input_description("select_difficulty")
+			end
 		end
 	else
 		select_button.content.button_hotspot.disable_button = true
+
+		if not self._has_exited then
+			self.parent.parent:set_input_description(nil)
+		end
 	end
 
 	return 

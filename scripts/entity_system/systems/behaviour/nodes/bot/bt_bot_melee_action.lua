@@ -96,6 +96,10 @@ BTBotMeleeAction.leave = function (self, unit, blackboard, t, reason, destroy)
 
 	self._clear_pending_attack(self, blackboard)
 
+	if self._should_stop_attack_on_leave(self, blackboard) then
+		self._stop_attack(self, blackboard)
+	end
+
 	return 
 end
 BTBotMeleeAction.run = function (self, unit, blackboard, t, dt)
@@ -318,20 +322,21 @@ BTBotMeleeAction._is_targeting_me = function (self, self_unit, enemy_unit)
 	return bb.target_unit == self_unit, bb.breed
 end
 BTBotMeleeAction._allow_engage = function (self, self_unit, target_unit, blackboard, action_data, already_engaged, aim_position, follow_pos)
-	local num_enemies = Managers.state.entity:system("ai_system").number_ordinary_aggroed_enemies
+	local conflict_director = Managers.state.conflict
+	local threat_value = conflict_director.get_threat_value(conflict_director)
 	local override_range_default = action_data.override_engage_range_to_follow_pos
-	local horde_override_range = action_data.override_engage_range_to_follow_pos_horde
-	local START_HORDE = 10
-	local MAX_HORDE = 30
-	local lerp_t = (num_enemies - START_HORDE) / (MAX_HORDE - START_HORDE)
+	local threat_override_range = action_data.override_engage_range_to_follow_pos_threat
+	local START_THREAT_VALUE = 10
+	local MAX_THREAT_VALUE = 30
+	local lerp_t = (threat_value - START_THREAT_VALUE) / (MAX_THREAT_VALUE - START_THREAT_VALUE)
 	local override_range = nil
 
 	if lerp_t <= 0 then
 		override_range = override_range_default
 	elseif 1 <= lerp_t then
-		override_range = horde_override_range
+		override_range = threat_override_range
 	else
-		override_range = math.lerp(override_range_default, horde_override_range, lerp_t * lerp_t)
+		override_range = math.lerp(override_range_default, threat_override_range, lerp_t * lerp_t)
 	end
 
 	local distance_to_follow_pos = Vector3.distance(aim_position, follow_pos)
@@ -341,7 +346,6 @@ BTBotMeleeAction._allow_engage = function (self, self_unit, target_unit, blackbo
 		return false
 	end
 
-	local conflict_director = Managers.state.conflict
 	local target_ally_unit = blackboard.target_ally_unit
 	local follow_unit = (blackboard.target_ally_need_type and target_ally_unit) or blackboard.ai_bot_group_extension.data.follow_unit
 
@@ -555,8 +559,9 @@ BTBotMeleeAction._time_to_next_attack = function (self, attack_input, blackboard
 
 	if weapon_extension then
 		local wielded_item_template = blackboard.wielded_item_template
+		local attack_meta_data = wielded_item_template.attack_meta_data[attack_input]
 
-		return weapon_extension.time_to_next_attack(weapon_extension, attack_input, wielded_item_template.actions, wielded_item_template.name, t)
+		return weapon_extension.time_to_next_attack(weapon_extension, attack_input, wielded_item_template.actions, wielded_item_template.name, t, attack_meta_data.attack_chain)
 	end
 
 	return 
@@ -566,8 +571,27 @@ BTBotMeleeAction._attack = function (self, attack_input, blackboard)
 
 	if weapon_extension then
 		local wielded_item_template = blackboard.wielded_item_template
+		local attack_meta_data = wielded_item_template.attack_meta_data[attack_input]
 
-		weapon_extension.request_bot_attack_action(weapon_extension, attack_input, wielded_item_template.actions, wielded_item_template.name)
+		weapon_extension.request_bot_attack_action(weapon_extension, attack_input, wielded_item_template.actions, wielded_item_template.name, attack_meta_data.attack_chain)
+	end
+
+	return 
+end
+BTBotMeleeAction._should_stop_attack_on_leave = function (self, blackboard)
+	local weapon_extension = self._get_current_weapon_extension(self, blackboard)
+
+	if weapon_extension then
+		return weapon_extension.bot_should_stop_attack_on_leave(weapon_extension)
+	end
+
+	return 
+end
+BTBotMeleeAction._stop_attack = function (self, blackboard)
+	local weapon_extension = self._get_current_weapon_extension(self, blackboard)
+
+	if weapon_extension then
+		weapon_extension.stop_action(weapon_extension)
 	end
 
 	return 

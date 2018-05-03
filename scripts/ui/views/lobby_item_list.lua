@@ -698,7 +698,7 @@ local function create_lobby_list_entry_style()
 		title_text = {
 			vertical_alignment = "center",
 			horizontal_alignment = "left",
-			font_type = "hell_shark",
+			font_type = "arial",
 			size = {
 				element_settings.width,
 				element_settings.height
@@ -710,7 +710,7 @@ local function create_lobby_list_entry_style()
 		level_text = {
 			vertical_alignment = "center",
 			horizontal_alignment = "left",
-			font_type = "hell_shark",
+			font_type = "arial",
 			size = {
 				element_settings.width,
 				element_settings.height
@@ -722,7 +722,7 @@ local function create_lobby_list_entry_style()
 		difficulty_text = {
 			vertical_alignment = "center",
 			horizontal_alignment = "left",
-			font_type = "hell_shark",
+			font_type = "arial",
 			size = {
 				element_settings.width,
 				element_settings.height
@@ -734,7 +734,7 @@ local function create_lobby_list_entry_style()
 		num_players_text = {
 			vertical_alignment = "center",
 			horizontal_alignment = "left",
-			font_type = "hell_shark",
+			font_type = "arial",
 			size = {
 				element_settings.width,
 				element_settings.height
@@ -750,7 +750,7 @@ local function create_lobby_list_entry_style()
 		status_text = {
 			vertical_alignment = "center",
 			horizontal_alignment = "left",
-			font_type = "hell_shark",
+			font_type = "arial",
 			size = {
 				element_settings.width,
 				element_settings.height
@@ -762,7 +762,7 @@ local function create_lobby_list_entry_style()
 		country_text = {
 			vertical_alignment = "center",
 			horizontal_alignment = "right",
-			font_type = "hell_shark",
+			font_type = "arial",
 			size = {
 				element_settings.width,
 				element_settings.height

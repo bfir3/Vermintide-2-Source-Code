@@ -142,42 +142,6 @@ local mutator_settings = {
 			skaven_clan_rat = "skaven_storm_vermin",
 			chaos_marauder = "chaos_raider"
 		},
-		horde_override_lookup = {
-			chaos_fanatic = "chaos_marauder",
-			skaven_slave = "skaven_clan_rat"
-		},
-		server_start_function = function (context, data)
-			local horde_override_lookup = data.template.horde_override_lookup
-			local vanilla_horde_compositions = {}
-
-			for name, composition in pairs(HordeCompositions) do
-				vanilla_horde_compositions[name] = table.clone(composition)
-				local i = 1
-
-				while composition[i] ~= nil do
-					local variant = composition[i]
-					local breeds = variant.breeds
-					local num_breeds = #breeds
-
-					for j = 1, num_breeds, 2 do
-						local breed_name = breeds[j]
-						local new_breed_name = horde_override_lookup[breed_name]
-
-						if new_breed_name then
-							mutator_dprint("Switching horde composition(%s) variant(%i), breed_name(%s) to (%s)", name, i, breed_name, new_breed_name)
-
-							breeds[j] = new_breed_name
-						end
-					end
-
-					i = i + 1
-				end
-			end
-
-			data.vanilla_horde_compositions = vanilla_horde_compositions
-
-			return 
-		end,
 		server_start_game_mode_function = function (context, data)
 			local roamer_override_lookup = data.template.roamer_override_lookup
 
@@ -187,23 +151,6 @@ local mutator_settings = {
 			return 
 		end,
 		server_stop_function = function (context, data)
-			local vanilla_horde_compositions = data.vanilla_horde_compositions
-
-			for name, composition in pairs(HordeCompositions) do
-				local vanilla_composition = vanilla_horde_compositions[name]
-				local i = 1
-
-				while composition[i] ~= nil do
-					local variant = composition[i]
-					local breeds = variant.breeds
-					local num_breeds = #breeds
-					variant.breeds = vanilla_composition[i].breeds
-					i = i + 1
-				end
-
-				mutator_dprint("Switching back horde composition for %s", name)
-			end
-
 			return 
 		end
 	},

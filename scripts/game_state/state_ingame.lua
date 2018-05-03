@@ -15,7 +15,6 @@ require("scripts/managers/room/room_manager_server")
 require("scripts/managers/room/room_manager_client")
 require("scripts/managers/difficulty/difficulty_manager")
 require("scripts/managers/matchmaking/matchmaking_manager")
-require("scripts/managers/achievements/achievement_manager")
 require("scripts/helpers/locomotion_utils")
 require("scripts/helpers/damage_utils")
 require("scripts/helpers/action_utils")
@@ -46,11 +45,18 @@ require("scripts/game_state/components/dice_keeper")
 require("foundation/scripts/util/datacounter")
 require("scripts/managers/blood/blood_manager")
 require("scripts/managers/crafting/crafting_manager")
-require("scripts/managers/quest/quest_manager")
 require("scripts/managers/performance/performance_manager")
 require("scripts/managers/world_interaction/world_interaction_manager")
 require("scripts/managers/decal/decal_manager")
 require("scripts/managers/performance_title/performance_title_manager")
+require("scripts/settings/quest_settings")
+
+if Development.parameter("v2_achievements") then
+	require("scripts/managers/achievements/achievement_manager2")
+	require("scripts/managers/quest/quest_manager")
+else
+	require("scripts/managers/achievements/achievement_manager")
+end
 
 StateIngame = class(StateIngame)
 StateIngame.NAME = "StateIngame"
@@ -95,15 +101,6 @@ StateIngame.on_enter = function (self)
 		input_manager.map_device_to_service(input_manager, "DebugMenu", "keyboard")
 		input_manager.map_device_to_service(input_manager, "DebugMenu", "mouse")
 		input_manager.map_device_to_service(input_manager, "DebugMenu", "gamepad")
-
-		if PLATFORM == "win32" and (BUILD == "dev" or BUILD == "debug") then
-			input_manager.initialize_device(input_manager, "synergy_keyboard")
-			input_manager.initialize_device(input_manager, "synergy_mouse")
-			input_manager.map_device_to_service(input_manager, "Debug", "synergy_keyboard")
-			input_manager.map_device_to_service(input_manager, "Debug", "synergy_mouse")
-			input_manager.map_device_to_service(input_manager, "DebugMenu", "synergy_keyboard")
-			input_manager.map_device_to_service(input_manager, "DebugMenu", "synergy_mouse")
-		end
 	end
 
 	Managers.popup:set_input_manager(input_manager)
@@ -360,7 +357,7 @@ StateIngame.on_enter = function (self)
 			StatisticsUtil.register_played_quickplay_level(self.statistics_db, player, level_key)
 		end
 
-		self.machines[i] = StateMachine:new(self, StateInGameRunning, params, true)
+		self.machines[i] = GameStateMachine:new(self, StateInGameRunning, params, true)
 	end
 
 	if checkpoint_data then
@@ -786,11 +783,13 @@ StateIngame.update = function (self, dt, main_t)
 
 	self._update_deed_manager(self, dt)
 	Managers.deed:update(dt)
+
+	if Managers.state.quest then
+		Managers.state.quest:update(dt, t)
+	end
+
 	Managers.state.achievement:update(dt, t)
 	Managers.state.decal:update(dt, t)
-
-	if GameSettingsDevelopment.backend_settings.quests_enabled then
-	end
 
 	if Managers.eac ~= nil then
 		Managers.eac:update(dt, t)
@@ -1609,6 +1608,7 @@ StateIngame.on_exit = function (self, application_shutdown)
 	VisualAssertLog.cleanup()
 	self._teardown_world(self)
 	ScriptUnit.check_all_units_deleted()
+	self.level_transition_handler.enemy_package_loader:unload_enemy_packages(application_shutdown)
 	self.statistics_db:unregister_network_event_delegate()
 	Managers.time:unregister_timer("game")
 
@@ -1659,6 +1659,7 @@ StateIngame.on_exit = function (self, application_shutdown)
 
 		Managers.chat:unregister_channel(1)
 		Managers.deed:network_context_destroyed()
+		self.level_transition_handler.enemy_package_loader:network_context_destroyed()
 
 		local network_event_meta_table = {
 			__index = function (event_table, event_key)
@@ -1719,7 +1720,7 @@ StateIngame.on_exit = function (self, application_shutdown)
 	else
 		self.profile_synchronizer:unregister_network_events()
 
-		if self.is_server and not self.is_in_inn and not self.is_in_tutorial and PLATFORM == "xb1" then
+		if self.is_server and not self.is_in_inn and not self.is_in_tutorial and PLATFORM == "xb1" and not script_data.honduras_demo then
 			local level_key = self.level_transition_handler:get_next_level_key()
 			local difficulty = current_difficulty
 
@@ -1788,7 +1789,7 @@ StateIngame._check_and_add_end_game_telemetry = function (self, application_shut
 	local reason = self.exit_type
 
 	if application_shutdown then
-		local controlled_exit = Boot:is_controlled_exit()
+		local controlled_exit = Boot.is_controlled_exit
 
 		if controlled_exit then
 			reason = "controlled_exit"
@@ -1915,6 +1916,7 @@ StateIngame._setup_state_context = function (self, world, is_server, network_eve
 	local unit_spawner = UnitSpawner:new(world, entity_manager, is_server)
 	Managers.state.unit_spawner = unit_spawner
 
+	self.level_transition_handler.enemy_package_loader:set_unit_spawner(unit_spawner)
 	unit_spawner.set_unit_template_lookup_table(unit_spawner, unit_templates)
 
 	local unit_storage = NetworkUnitStorage:new()
@@ -1999,6 +2001,11 @@ StateIngame._setup_state_context = function (self, world, is_server, network_eve
 	Managers.state.network:set_unit_spawner(unit_spawner)
 
 	Managers.state.bot_nav_transition = BotNavTransitionManager:new(self.world, is_server, network_event_delegate)
+
+	if Development.parameter("v2_achievements") then
+		Managers.state.quest = QuestManager:new(self.statistics_db)
+	end
+
 	Managers.state.achievement = AchievementManager:new(self.world, self.statistics_db, self.is_in_inn)
 	Managers.state.blood = BloodManager:new(self.world)
 	Managers.state.performance_title = PerformanceTitleManager:new(self.network_transmit, self.statistics_db, is_server)

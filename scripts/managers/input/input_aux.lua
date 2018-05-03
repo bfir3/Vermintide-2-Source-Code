@@ -1,39 +1,5 @@
 InputAux = InputAux or {}
 local InputAux = InputAux
-
-local function synergy_wrapper(device_name)
-	local wrapper = {}
-	local device = rawget(_G, device_name)
-
-	if not device then
-		return nil
-	end
-
-	for k, v in pairs(device) do
-		wrapper[k] = v
-	end
-
-	wrapper.button_index = function (key)
-		local index = device.button_index(key)
-
-		if index == nil then
-			index = 1
-		end
-
-		return index
-	end
-	wrapper.pressed = function (key)
-		local pressed = device.pressed(key)
-
-		if pressed and key ~= 0 and key ~= 22 then
-		end
-
-		return pressed
-	end
-
-	return wrapper
-end
-
 InputAux.input_device_mapping = InputAux.input_device_mapping or {
 	gamepad = {
 		rawget(_G, "Pad1"),
@@ -56,12 +22,6 @@ InputAux.input_device_mapping = InputAux.input_device_mapping or {
 	},
 	recording = {
 		PlayRecordingInputDevice
-	},
-	synergy_mouse = {
-		rawget(_G, "SynergyMouse")
-	},
-	synergy_keyboard = {
-		synergy_wrapper("SynergyKeyboard")
 	}
 }
 

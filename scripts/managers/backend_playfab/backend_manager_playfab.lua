@@ -6,14 +6,20 @@ require("scripts/managers/backend_playfab/tutorial_backend/backend_interface_ite
 require("scripts/managers/backend_playfab/tutorial_backend/backend_interface_hero_attributes_tutorial")
 require("scripts/managers/backend_playfab/backend_interface_loot_playfab")
 require("scripts/managers/backend_playfab/backend_interface_talents_playfab")
+require("scripts/managers/backend_playfab/backend_interface_quests_playfab")
 require("scripts/managers/backend_playfab/backend_interface_hero_attributes_playfab")
 require("scripts/managers/backend_playfab/backend_interface_statistics_playfab")
 require("scripts/managers/backend_playfab/backend_interface_keep_decorations_playfab")
 require("scripts/managers/backend/script_backend")
-require("scripts/managers/backend_playfab/script_backend_playfab")
-require("scripts/managers/backend_playfab/script_backend_playfab_dedicated")
 require("scripts/settings/equipment/item_master_list")
 require("backend/error_codes")
+
+if PLATFORM == "win32" then
+	require("scripts/managers/backend_playfab/script_backend_playfab_dedicated")
+	require("scripts/managers/backend_playfab/script_backend_playfab")
+elseif PLATFORM == "xb1" then
+	require("scripts/managers/backend_playfab/script_backend_playfab_xbox")
+end
 
 if GameSettingsDevelopment.backend_settings.allow_local then
 	require("backend/local_backend/local_backend")
@@ -31,7 +37,8 @@ BackendManagerPlayFab.init = function (self, signin_name, mirror_name, server_qu
 	self._server_queue = rawget(_G, server_queue_name)
 	self._interfaces = {}
 	self._errors = {}
-	self._button_retry = "button_ok"
+	self._button_retry = "button_retry"
+	self._button_ok = "button_ok"
 	self._button_quit = "button_quit"
 	self._button_local_backend = "button_local_backend"
 	self._button_disconnected = "button_disconnected"
@@ -139,6 +146,7 @@ BackendManagerPlayFab._create_interfaces = function (self, force_local)
 	local settings = GameSettingsDevelopment.backend_settings
 
 	self._create_items_interface(self, settings, force_local)
+	self._create_quests_interface(self, settings, force_local)
 	self._create_crafting_interface(self, settings, force_local)
 	self._create_talents_interface(self, settings, force_local)
 	self._create_loot_interface(self, settings, force_local)
@@ -372,8 +380,21 @@ BackendManagerPlayFab.playfab_api_error = function (self, result, error_override
 	return 
 end
 BackendManagerPlayFab.playfab_eac_error = function (self)
+	local reason = BACKEND_PLAYFAB_ERRORS.ERR_PLAYFAB_EAC_ERROR
+	local details = nil
 	local error_data = {
-		reason = BACKEND_PLAYFAB_ERRORS.ERR_PLAYFAB_EAC_ERROR
+		reason = reason,
+		details = details
+	}
+
+	self._post_error(self, error_data)
+
+	return 
+end
+BackendManagerPlayFab.playfab_error = function (self, reason, details)
+	local error_data = {
+		reason = reason,
+		details = details
 	}
 
 	self._post_error(self, error_data)
@@ -498,18 +519,18 @@ BackendManagerPlayFab._format_error_message_windows = function (self, reason)
 		else
 			error_text = "backend_err_connecting"
 		end
-	elseif reason == BACKEND_PLAYFAB_ERRORS.ERR_PLAYFAB_ERROR then
+	elseif reason == BACKEND_PLAYFAB_ERRORS.ERR_PLAYFAB_ERROR or reason == BACKEND_PLAYFAB_ERRORS.ERR_PLAYFAB_EAC_ERROR then
 		button_1 = {
 			id = self._button_quit,
 			text = Localize("menu_quit")
 		}
-		error_text = "backend_err_playfab"
-	elseif reason == BACKEND_PLAYFAB_ERRORS.ERR_PLAYFAB_EAC_ERROR then
+		error_text = ERROR_CODES[reason]
+	elseif reason == BACKEND_PLAYFAB_ERRORS.ERR_PLAYFAB_ACHIEVEMENT_REWARD_CLAIMED or reason == BACKEND_PLAYFAB_ERRORS.ERR_PLAYFAB_QUEST_REFRESH_UNAVAILABLE then
 		button_1 = {
-			id = self._button_quit,
-			text = Localize("menu_quit")
+			id = self._button_ok,
+			text = Localize("button_ok")
 		}
-		error_text = "backend_err_playfab_eac"
+		error_text = ERROR_CODES[reason]
 	else
 		button_1 = {
 			id = self._button_disconnected,
@@ -569,6 +590,8 @@ BackendManagerPlayFab.available = function (self)
 
 	if PLATFORM == "win32" then
 		return rawget(_G, "Steam") ~= nil or DEDICATED_SERVER
+	elseif PLATFORM == "xb1" then
+		return true
 	end
 
 	return false
@@ -746,11 +769,15 @@ BackendManagerPlayFab._create_boons_interface = function (self, settings, force_
 	return 
 end
 BackendManagerPlayFab._create_quests_interface = function (self, settings, force_local)
-	if settings.quests_enabled then
-		if force_local then
-			self._interfaces.quests = BackendInterfaceQuestsLocal:new(self._save_data)
-		else
-			self._interfaces.quests = BackendInterfaceQuestsLocal:new(self._save_data)
+	if force_local then
+		self._interfaces.quests = BackendInterfaceQuestsLocal:new(self._save_data)
+	else
+		local implementation = self._backend_implementation
+
+		if implementation == "playfab" then
+			self._interfaces.quests = BackendInterfaceQuestsPlayfab:new(self._backend_mirror)
+		elseif implementation == "fishtank" then
+			self._interfaces.quests = BackendInterfaceQuests:new()
 		end
 	end
 

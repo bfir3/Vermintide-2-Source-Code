@@ -102,8 +102,14 @@ end
 StateTitleScreenMainMenu._setup_sound = function (self)
 	local master_bus_volume = Application.user_setting("master_bus_volume") or 90
 	local music_bus_volume = Application.user_setting("music_bus_volume") or 90
-	local music_world = Managers.world:world("music_world")
-	local wwise_world = Managers.world:wwise_world(music_world)
+	local wwise_world = nil
+
+	if GLOBAL_MUSIC_WORLD then
+		wwise_world = MUSIC_WWISE_WORLD
+	else
+		local music_world = Managers.world:world("music_world")
+		wwise_world = Managers.world:wwise_world(music_world)
+	end
 
 	WwiseWorld.set_global_parameter(wwise_world, "master_bus_volume", master_bus_volume)
 	Managers.music:set_master_volume(master_bus_volume)

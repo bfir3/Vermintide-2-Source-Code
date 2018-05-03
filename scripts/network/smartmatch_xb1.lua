@@ -19,13 +19,20 @@ local HOPPER_PARAMS_LUT = {
 	},
 	new_stage_hopper = {
 		"difficulty",
-		"level"
+		"level",
+		"powerlevel",
+		"strict_matchmaking"
 	}
 }
 local HOPPER_PARAM_TYPE_LUT = {
+	powerlevel = "number",
+	strict_matchmaking = "number",
 	stage = "number",
 	difficulty = "number",
 	level = "collection"
+}
+local OPTIONAL_HOPPER_PARAM_LUT = {
+	strict_matchmaking = true
 }
 local SMARTMATCH_STATUS_LUT = {
 	[SmartMatchStatus.UNKNOWN] = "UNKNOWN",
@@ -187,24 +194,26 @@ SmartMatch._convert_to_json = function (self, hopper_name, params)
 		local var_type = HOPPER_PARAM_TYPE_LUT[var]
 		local val = params[var]
 
-		fassert(val, "[SmartMatch::_convert_to_json] Missing variable [%s] in params", var)
+		fassert(val or OPTIONAL_HOPPER_PARAM_LUT[var], "[SmartMatch::_convert_to_json] Missing variable [%s] in params", var)
 
-		if var_type == "number" then
-			str = str .. string.format("%q:%i,", var, val)
-		elseif var_type == "string" then
-			str = str .. string.format("%q:%q,", var, val)
-		elseif var_type == "collection" then
-			str = str .. string.format("%q:[", var)
+		if val then
+			if var_type == "number" then
+				str = str .. string.format("%q:%i,", var, val)
+			elseif var_type == "string" then
+				str = str .. string.format("%q:%q,", var, val)
+			elseif var_type == "collection" then
+				str = str .. string.format("%q:[", var)
 
-			for idx, value in ipairs(val) do
-				if idx == 1 then
-					str = str .. string.format("%q", tostring(value))
-				else
-					str = str .. string.format(",%q", tostring(value))
+				for idx, value in ipairs(val) do
+					if idx == 1 then
+						str = str .. string.format("%q", tostring(value))
+					else
+						str = str .. string.format(",%q", tostring(value))
+					end
 				end
-			end
 
-			str = str .. "],"
+				str = str .. "],"
+			end
 		end
 	end
 

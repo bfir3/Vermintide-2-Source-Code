@@ -237,6 +237,7 @@ UIRenderer.destroy = function (self, world)
 	end
 
 	World.destroy_gui(world, self.gui)
+	World.destroy_gui(world, self.gui_retained)
 
 	return 
 end
@@ -364,11 +365,16 @@ UIRenderer.draw_element = function (self, ui_element, ui_style, ui_style_global,
 	local widget_optional_scale = ui_style_global and ui_style_global.scale
 	local size = UISceneGraph.get_size_scaled(ui_scenegraph, scenegraph_id, widget_optional_scale)
 	local input_service = self.input_service
+	local global_visible = true
 	local input_manager = Managers.input
 
 	if input_manager then
 		local gamepad_active = Managers.input:is_device_active("gamepad")
 		ui_content.is_gamepad_active = gamepad_active
+
+		if ui_content.disable_with_gamepad then
+			global_visible = not gamepad_active
+		end
 	end
 
 	local dt = self.dt
@@ -383,7 +389,7 @@ UIRenderer.draw_element = function (self, ui_element, ui_style, ui_style_global,
 		local pass_type = pass_info.pass_type
 		local content_id = pass_info.content_id
 		local element_content = (content_id and ui_content[content_id]) or ui_content
-		local visible = true
+		local visible = global_visible
 
 		if ui_content then
 			if ui_content.visible == false then
@@ -1127,7 +1133,7 @@ UIRenderer.draw_justified_text = function (self, text, font_material, font_size,
 	return 
 end
 UIRenderer.word_wrap = function (self, text, font_material, size, width, option)
-	local whitespace = " "
+	local whitespace = " \u3002\uff0c"
 	local soft_dividers = "-+&/*"
 	local return_dividers = "\n"
 	local reuse_global_table = true

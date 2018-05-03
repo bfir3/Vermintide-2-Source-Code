@@ -165,6 +165,9 @@ end
 CareerExtension.current_ability_cooldown = function (self)
 	return self._cooldown, self._max_cooldown
 end
+CareerExtension.get_max_ability_cooldown = function (self)
+	return self._max_cooldown
+end
 CareerExtension.current_ability_paused = function (self)
 	return self._cooldown_paused
 end

@@ -1,6 +1,6 @@
 BTConditions = BTConditions or {}
 
-require("scripts/entity_system/systems/behaviour/nodes/bt_bot_conditions")
+require("scripts/entity_system/systems/behaviour/nodes/bot/bt_bot_conditions")
 
 local unit_alive = Unit.alive
 local ScriptUnit = ScriptUnit

@@ -430,6 +430,10 @@ VoteManager._server_update = function (self, dt, t)
 		return 
 	end
 
+	if not Managers.state.network:game() then
+		return 
+	end
+
 	local active_peers = self._active_peers(self)
 	local changed = self._update_voter_list_by_active_peers(self, active_peers, active_voting.voters, active_voting.votes)
 

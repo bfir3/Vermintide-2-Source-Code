@@ -467,7 +467,7 @@ SimpleInventoryExtension.show_first_person_inventory_lights = function (self, sh
 	self._show_first_person_lights = show
 	local right_hand_wielded_unit = self._equipment.right_hand_wielded_unit
 
-	if right_hand_wielded_unit and Unit.has_visibility_group(right_hand_wielded_unit, "normal") then
+	if right_hand_wielded_unit and Unit.alive(right_hand_wielded_unit) and Unit.has_visibility_group(right_hand_wielded_unit, "normal") then
 		local num_lights = Unit.num_lights(right_hand_wielded_unit)
 
 		for i = 1, num_lights, 1 do
@@ -477,7 +477,7 @@ SimpleInventoryExtension.show_first_person_inventory_lights = function (self, sh
 
 	local left_hand_wielded_unit = self._equipment.left_hand_wielded_unit
 
-	if left_hand_wielded_unit and Unit.has_visibility_group(left_hand_wielded_unit, "normal") then
+	if left_hand_wielded_unit and Unit.alive(left_hand_wielded_unit) and Unit.has_visibility_group(left_hand_wielded_unit, "normal") then
 		local num_lights = Unit.num_lights(left_hand_wielded_unit)
 
 		for i = 1, num_lights, 1 do
@@ -1132,21 +1132,11 @@ SimpleInventoryExtension._update_selected_consumable_slot = function (self)
 	if self._selected_consumable_slot then
 		local input_extension = ScriptUnit.extension(self._unit, "input_system")
 
-		if input_extension.get(input_extension, "action_select_consumable_left") then
-			if self._selected_consumable_slot == "slot_grenade" and slots.slot_potion then
-				self._selected_consumable_slot = "slot_potion"
-			elseif self._selected_consumable_slot == "slot_healthkit" and slots.slot_grenade then
-				self._selected_consumable_slot = "slot_grenade"
-			elseif self._selected_consumable_slot == "slot_healthkit" and slots.slot_potion then
-				self._selected_consumable_slot = "slot_potion"
-			end
-		elseif input_extension.get(input_extension, "action_select_consumable_right") then
-			if self._selected_consumable_slot == "slot_grenade" and slots.slot_healthkit then
-				self._selected_consumable_slot = "slot_healthkit"
-			elseif self._selected_consumable_slot == "slot_potion" and slots.slot_grenade then
-				self._selected_consumable_slot = "slot_grenade"
-			elseif self._selected_consumable_slot == "slot_potion" and slots.slot_healthkit then
-				self._selected_consumable_slot = "slot_healthkit"
+		for _, slot_input_data in pairs(InventorySettings.slots_by_wield_input) do
+			if not slot_input_data.loadout_slot and input_extension.get(input_extension, slot_input_data.wield_input) and slots[slot_input_data.name] then
+				self._selected_consumable_slot = slot_input_data.name
+
+				break
 			end
 		end
 	end

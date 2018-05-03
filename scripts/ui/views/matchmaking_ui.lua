@@ -172,7 +172,7 @@ MatchmakingUI.update = function (self, dt, t, show_detailed_matchmaking_info)
 		self._update_show_timer(self, has_mission_vote)
 
 		if is_matchmaking then
-			self._update_matchmaking_info(self)
+			self._update_matchmaking_info(self, t)
 			self._sync_players_ready_state(self, dt)
 
 			if self._allow_cancel_matchmaking and not has_mission_vote then
@@ -271,9 +271,28 @@ MatchmakingUI._update_background = function (self, is_matchmaking, has_mission_v
 
 	return 
 end
-MatchmakingUI._update_matchmaking_info = function (self)
+MatchmakingUI._update_matchmaking_info = function (self, t)
 	local matchmaking_info = self.matchmaking_manager:search_info()
 	local cached_matchmaking_info = self._cached_matchmaking_info
+
+	if PLATFORM == "xb1" and matchmaking_info.no_lobby_data then
+		local dots = ""
+		local num_dots = math.floor((t * 5 + 0.5) % 4)
+
+		for i = 0, num_dots, 1 do
+			dots = dots .. "."
+		end
+
+		local widget = self._get_widget(self, "status_text")
+		widget.content.text = Localize("loading_fetching_matchmaking_data")
+		local widget = self._get_detail_widget(self, "title_text")
+		widget.content.text = dots
+		local widget = self._get_detail_widget(self, "difficulty_text")
+		widget.content.text = ""
+
+		return 
+	end
+
 	local difficulty = matchmaking_info.difficulty
 
 	if difficulty ~= cached_matchmaking_info.difficulty then

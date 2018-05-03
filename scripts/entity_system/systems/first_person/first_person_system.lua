@@ -4,7 +4,8 @@ require("scripts/unit_extensions/human/player_bot_unit/player_bot_unit_first_per
 FirstPersonSystem = class(FirstPersonSystem, ExtensionSystemBase)
 local RPCS = {
 	"rpc_play_first_person_sound",
-	"rpc_play_husk_sound_event"
+	"rpc_play_husk_sound_event",
+	"rpc_play_husk_unit_sound_event"
 }
 local EXTENSIONS = {
 	"PlayerUnitFirstPerson",
@@ -59,6 +60,27 @@ FirstPersonSystem.rpc_play_husk_sound_event = function (self, sender, unit_id, e
 	local sound_position = POSITION_LOOKUP[unit]
 	local event = NetworkLookup.sound_events[event_id]
 	local wwise_source_id, wwise_world = WwiseUtils.make_position_auto_source(self.world, sound_position)
+
+	WwiseWorld.set_switch(wwise_world, "husk", "true", wwise_source_id)
+	WwiseWorld.trigger_event(wwise_world, event, wwise_source_id)
+
+	return 
+end
+FirstPersonSystem.rpc_play_husk_unit_sound_event = function (self, sender, unit_id, node_id, event_id)
+	if self.is_server then
+		self.network_transmit:send_rpc_clients_except("rpc_play_husk_unit_sound_event", sender, unit_id, node_id, event_id)
+	end
+
+	local unit = self.unit_storage:unit(unit_id)
+
+	if not unit then
+		printf("unit from game_object_id %d is nil", unit_id)
+
+		return 
+	end
+
+	local event = NetworkLookup.sound_events[event_id]
+	local wwise_source_id, wwise_world = WwiseUtils.make_unit_auto_source(self.world, unit, node_id)
 
 	WwiseWorld.set_switch(wwise_world, "husk", "true", wwise_source_id)
 	WwiseWorld.trigger_event(wwise_world, event, wwise_source_id)

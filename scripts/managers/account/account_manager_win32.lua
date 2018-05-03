@@ -92,5 +92,8 @@ AccountManager.show_player_profile = function (self, id)
 
 	return 
 end
+AccountManager.friends_list_initiated = function (self)
+	return 
+end
 
 return 

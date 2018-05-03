@@ -214,7 +214,7 @@ if rawget(_G, "EAC") == nil then
 			return 
 		end,
 		state = function ()
-			return "untrusted", "No Steam"
+			return "untrusted", "No Steam", "", "not_running"
 		end,
 		set_host = function ()
 			return 

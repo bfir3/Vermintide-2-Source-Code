@@ -7,6 +7,28 @@ BTMeleeOverlapAttackAction.init = function (self, ...)
 	return 
 end
 BTMeleeOverlapAttackAction.name = "BTMeleeOverlapAttackAction"
+local Vector3_dot = Vector3.dot
+
+local function closest_point_on_line(p, p1, p2)
+	local diff = p - p1
+	local dir = p2 - p1
+	local dot1 = Vector3_dot(diff, dir)
+
+	if dot1 <= 0 then
+		return p1, dot1 < 0
+	end
+
+	local dot2 = Vector3_dot(dir, dir)
+
+	if dot2 <= dot1 then
+		return p2, dot2 < dot1
+	end
+
+	local t = dot1 / dot2
+
+	return p1 + t * dir, false
+end
+
 BTMeleeOverlapAttackAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -574,7 +596,7 @@ BTMeleeOverlapAttackAction.hit_player = function (self, unit, blackboard, hit_un
 
 	return 
 end
-BTMeleeOverlapAttackAction.hit_ai = function (self, unit, hit_unit, action, attack, t)
+BTMeleeOverlapAttackAction.hit_ai = function (self, unit, hit_unit, action, attack, blackboard, t)
 	local push_data = attack.push_ai
 	local immune_breeds = attack.immune_breeds
 	local hit_unit_blackboard = BLACKBOARDS[hit_unit]
@@ -601,6 +623,10 @@ BTMeleeOverlapAttackAction.hit_ai = function (self, unit, hit_unit, action, atta
 
 	if not action.ignore_ai_damage then
 		AiUtils.damage_target(hit_unit, unit, action, action.damage)
+	end
+
+	if attack.hit_ai_func then
+		attack.hit_ai_func(unit, blackboard, hit_unit, action, attack)
 	end
 
 	return 
@@ -639,7 +665,7 @@ BTMeleeOverlapAttackAction.anim_cb_damage = function (self, unit, blackboard)
 	local push_units_data = attack.push_units_in_the_way
 
 	if attack.push_close_units_during_attack and push_units_data then
-		BTMeleeOverlapAttackAction:push_close_units(unit, blackboard, t, push_units_data)
+		self.push_close_units(self, unit, blackboard, t, push_units_data)
 	end
 
 	return 
@@ -648,10 +674,12 @@ BTMeleeOverlapAttackAction.push_close_units = function (self, unit, blackboard, 
 	local self_rotation = Unit.local_rotation(unit, 0)
 	local self_forward = Quaternion.forward(self_rotation)
 	local self_pos = POSITION_LOOKUP[unit]
-	local push_pos = self_pos + self_forward * data.push_forward_offset
-	local forward_pos = self_pos + self_forward * 3
-	local radius = data.push_width * 1.5
-	local radius_sq = radius^2
+	local forward_offset = data.push_forward_offset
+	local push_pos = self_pos + self_forward * forward_offset
+	local dist = data.ahead_dist
+	local forward_pos = push_pos + self_forward * dist
+	local radius = math.max(data.push_width, dist) * 1.5
+	local radius_sq = radius * radius
 	local hit_units = FrameTable.alloc_table()
 	local num_results = AiUtils.broadphase_query(push_pos, radius, hit_units)
 	local push_width_sq = data.push_width^2
@@ -662,10 +690,10 @@ BTMeleeOverlapAttackAction.push_close_units = function (self, unit, blackboard, 
 
 		if hit_unit ~= unit then
 			local hit_unit_pos = POSITION_LOOKUP[hit_unit]
-			local pos_projected_on_forward_move_dir = Geometry.closest_point_on_line(hit_unit_pos, self_pos, forward_pos)
+			local pos_projected_on_forward_move_dir, outside_interval = closest_point_on_line(hit_unit_pos, push_pos, forward_pos)
 			local side_vector = hit_unit_pos - pos_projected_on_forward_move_dir
 
-			if Vector3.length_squared(side_vector) < push_width_sq then
+			if not outside_interval and Vector3.length_squared(side_vector) < push_width_sq then
 				local stagger_type, stagger_duration = DamageUtils.calculate_stagger(data.push_stagger_impact, data.push_stagger_duration, hit_unit, unit)
 
 				if 0 < stagger_type then
@@ -684,21 +712,17 @@ BTMeleeOverlapAttackAction.push_close_units = function (self, unit, blackboard, 
 		local to_target = hit_unit_pos - push_pos
 
 		if Vector3.length_squared(to_target) < radius_sq then
-			local pos_projected_on_forward_move_dir = Geometry.closest_point_on_line(hit_unit_pos, self_pos, forward_pos)
+			local pos_projected_on_forward_move_dir, outside_interval = closest_point_on_line(hit_unit_pos, push_pos, forward_pos)
 			local side_vector = hit_unit_pos - pos_projected_on_forward_move_dir
 
-			if Vector3.length_squared(side_vector) < push_width_sq then
-				local ahead_dist = Vector3.distance(self_pos, pos_projected_on_forward_move_dir)
+			if not outside_interval and Vector3.length_squared(side_vector) < push_width_sq then
+				local hit_unit_status_extension = ScriptUnit.has_extension(hit_unit, "status_system")
 
-				if ahead_dist < data.ahead_dist then
-					local hit_unit_status_extension = ScriptUnit.has_extension(hit_unit, "status_system")
+				if not hit_unit_status_extension.knocked_down then
+					local pushed_velocity = data.player_pushed_speed * Vector3.normalize(to_target)
+					local locomotion_extension = ScriptUnit.extension(hit_unit, "locomotion_system")
 
-					if not hit_unit_status_extension.knocked_down then
-						local pushed_velocity = data.player_pushed_speed * Vector3.normalize(to_target)
-						local locomotion_extension = ScriptUnit.extension(hit_unit, "locomotion_system")
-
-						locomotion_extension.add_external_velocity(locomotion_extension, pushed_velocity)
-					end
+					locomotion_extension.add_external_velocity(locomotion_extension, pushed_velocity)
 				end
 			end
 		end
@@ -793,7 +817,7 @@ BTMeleeOverlapAttackAction.overlap_checks = function (self, unit, blackboard, ph
 							break
 						end
 					elseif Unit.has_data(hit_unit, "breed") then
-						self.hit_ai(self, unit, hit_unit, action, attack, t)
+						self.hit_ai(self, unit, hit_unit, action, attack, blackboard, t)
 
 						hit_units[hit_unit] = true
 						num_hit_units = num_hit_units + 1

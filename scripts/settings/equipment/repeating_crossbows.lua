@@ -265,32 +265,24 @@ weapon_template.tooltip_keywords = {
 	"weapon_keyword_piercing_bolts",
 	"weapon_keyword_rapid_fire"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.2,
-			range = 0.8,
-			damage = 0.75,
-			targets = 0.4,
-			stagger = 0.6
-		},
-		heavy_attack = {
-			speed = 0.2,
-			range = 0.9,
-			damage = 0.75,
-			targets = 0.4,
-			stagger = 0.6
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
 	},
-	perks = {
-		light_attack = {
-			"head_shot",
-			"armor_penetration"
-		},
-		heavy_attack = {
-			"head_shot",
-			"armor_penetration"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "zoomed_shot"
+	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_two",
+		sub_action_name = "default"
 	}
 }
 Weapons = Weapons or {}

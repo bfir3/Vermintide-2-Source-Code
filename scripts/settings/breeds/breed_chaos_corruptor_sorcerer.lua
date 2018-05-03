@@ -82,8 +82,8 @@ local action_data = {
 		skulk_foreshadowing_sound = "chaos_corruptor_spawning",
 		preferred_distance = 20,
 		skulk_time = {
-			1,
-			3
+			10,
+			12
 		},
 		teleport_cooldown = {
 			15,

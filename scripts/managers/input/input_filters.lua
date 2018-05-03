@@ -286,7 +286,7 @@ InputFilters.gamepad_cursor = {
 		return internal_filter_data
 	end,
 	update = function (filter_data, input_service)
-		if filter_data.frame_index < GLOBAL_FRAME_INDEX then
+		if filter_data.frame_index < GLOBAL_FRAME_INDEX and not input_service.is_blocked(input_service) then
 			local val = Vector3(Vector3.to_elements(input_service.get(input_service, filter_data.input_mapping)))
 
 			input_threshold(val, filter_data.input_threshold or 0)
@@ -319,6 +319,9 @@ InputFilters.gamepad_cursor = {
 				y = val.y * speed_y * mean_dt
 			end
 
+			local x_pos, y_pos = Managers.input:get_gamepad_cursor_pos()
+			filter_data.pos_x = x_pos or filter_data.pos_x
+			filter_data.pos_y = y_pos or filter_data.pos_y
 			local res_x, res_y = UIResolution()
 			local inv_scale = RESOLUTION_LOOKUP.inv_scale
 			res_x = res_x * inv_scale

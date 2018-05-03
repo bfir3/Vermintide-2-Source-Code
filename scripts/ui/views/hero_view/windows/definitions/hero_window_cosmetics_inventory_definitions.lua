@@ -901,9 +901,9 @@ local category_settings = {
 	{
 		wield = true,
 		name = "hats",
-		display_name = "Hats",
 		item_filter = "slot_type == hat",
 		hero_specific_filter = true,
+		display_name = Localize("inventory_screen_hats_title"),
 		item_types = {
 			"hat"
 		},
@@ -912,19 +912,19 @@ local category_settings = {
 	{
 		wield = true,
 		name = "skin",
-		display_name = "Skins",
 		item_filter = "slot_type == skin",
 		hero_specific_filter = true,
+		display_name = Localize("inventory_screen_skins_title"),
 		item_types = {
 			"skin"
 		},
 		icon = UISettings.slot_icons.skins
 	},
 	{
-		display_name = "Frames",
 		name = "frames",
 		item_filter = "slot_type == frame",
 		hero_specific_filter = true,
+		display_name = Localize("inventory_screen_frames_title"),
 		item_types = {
 			"frame"
 		},
@@ -978,6 +978,32 @@ local widgets = {
 		0
 	})
 }
+local generic_input_actions = {
+	default = {
+		{
+			input_action = "d_vertical",
+			priority = 1,
+			description_text = "input_description_navigate",
+			ignore_keybinding = true
+		},
+		{
+			input_action = "l1_r1",
+			priority = 2,
+			description_text = "input_description_change_tab",
+			ignore_keybinding = true
+		},
+		{
+			input_action = "confirm",
+			priority = 3,
+			description_text = "input_description_select"
+		},
+		{
+			input_action = "back",
+			priority = 4,
+			description_text = "input_description_close"
+		}
+	}
+}
 local animation_definitions = {
 	on_enter = {
 		{
@@ -1027,5 +1053,6 @@ return {
 	widgets = widgets,
 	category_settings = category_settings,
 	scenegraph_definition = scenegraph_definition,
-	animation_definitions = animation_definitions
+	animation_definitions = animation_definitions,
+	generic_input_actions = generic_input_actions
 }

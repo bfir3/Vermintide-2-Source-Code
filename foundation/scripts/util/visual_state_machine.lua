@@ -55,7 +55,9 @@ VisualStateMachine.destroy = function (self)
 			state.leave(state)
 		end
 
-		state.destroy(state)
+		if state.destroy ~= nil then
+			state.destroy(state)
+		end
 	end
 
 	local stack = self._state_machine_stack
@@ -289,7 +291,9 @@ VisualStateMachine._leave_state = function (self)
 
 		state_machine._current_state = nil
 
-		state.destroy(state)
+		if state.destroy ~= nil then
+			state.destroy(state)
+		end
 	end
 
 	return 

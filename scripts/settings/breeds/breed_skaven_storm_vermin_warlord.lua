@@ -82,6 +82,7 @@ local breed_data = {
 	hit_effect_template = "HitEffectsStormVerminChampion",
 	using_combo = true,
 	unit_template = "ai_unit_storm_vermin_warlord",
+	difficulty_kill_achievement = "kill_skaven_storm_vermin_warlord_difficulty_rank",
 	has_running_attack = true,
 	perception = "perception_rat_ogre",
 	player_locomotion_constrain_radius = 1,
@@ -420,7 +421,6 @@ local action_data = {
 		rotation_time = 1,
 		hit_react_type = "heavy",
 		player_push_speed = 10,
-		increment_stat_on_attack_dodged = "dodged_storm_vermin_champion",
 		offset_up = 0,
 		attack_anim = "attack_special",
 		range = 4,
@@ -544,7 +544,6 @@ local action_data = {
 		range = 3.2,
 		bot_threat_duration = 1,
 		action_weight = 1,
-		increment_stat_on_attack_dodged = "dodged_storm_vermin_champion",
 		player_push_speed_blocked = 8,
 		width = 2.25,
 		throw_dialogue_system_event_on_dodged_attack = true,
@@ -608,18 +607,19 @@ local action_data = {
 	special_attack_spin = {
 		height = 4,
 		offset_forward = -4,
-		hit_react_type = "heavy",
 		radius = 4.25,
 		collision_type = "cylinder",
 		rotation_time = 0,
-		fatigue_type = "blocked_slam",
+		hit_react_type = "heavy",
+		collision_filter = "filter_player_and_enemy_hit_box_check",
 		bot_threat_duration = 2.3333333333333335,
 		shove_speed = 9,
+		damage_type = "grenade",
 		shove_z_speed = 6,
-		damage_type = "cutting",
-		player_push_speed = 20,
 		offset_up = 0,
 		offset_right = 0,
+		player_push_speed = 20,
+		fatigue_type = "blocked_slam",
 		action_weight = 4,
 		player_push_speed_blocked = 15,
 		ignore_abort_on_blocked_attack = true,
@@ -734,23 +734,51 @@ local action_data = {
 			false,
 			false,
 			false
-		}
+		},
+		hit_ai_func = function (unit, blackboard, hit_unit)
+			local stat_name = "storm_vermin_warlord_kills_enemies"
+			local current_difficulty = Managers.state.difficulty:get_difficulty()
+			local allowed_difficulties = QuestSettings.allowed_difficulties[stat_name]
+			local allowed_difficulty = allowed_difficulties[current_difficulty]
+			local achievements_enabled = Development.parameter("v2_achievements")
+
+			if achievements_enabled and allowed_difficulty and not blackboard.kill_skaven_challenge_completed then
+				local hit_unit_blackboard = BLACKBOARDS[hit_unit]
+				local is_skaven = hit_unit_blackboard.breed.race == "skaven"
+				local num_times_hit_skaven = blackboard.num_times_hit_skaven
+
+				if is_skaven then
+					blackboard.num_times_hit_skaven = num_times_hit_skaven + 1
+				end
+
+				if QuestSettings.storm_vermin_warlord_kills_enemies <= blackboard.num_times_hit_skaven then
+					local statistics_db = Managers.player:statistics_db()
+
+					statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+
+					blackboard.kill_skaven_challenge_completed = true
+				end
+			end
+
+			return 
+		end
 	},
 	defensive_mode_spin = {
 		height = 4,
 		offset_forward = -4,
-		hit_react_type = "heavy",
 		radius = 4.25,
 		collision_type = "cylinder",
 		rotation_time = 0,
-		fatigue_type = "blocked_slam",
+		hit_react_type = "heavy",
+		collision_filter = "filter_player_and_enemy_hit_box_check",
 		bot_threat_duration = 2.6666666666666665,
 		shove_speed = 9,
+		damage_type = "grenade",
 		shove_z_speed = 6,
-		damage_type = "cutting",
-		player_push_speed = 20,
 		offset_up = 0,
 		offset_right = 0,
+		player_push_speed = 20,
+		fatigue_type = "blocked_slam",
 		action_weight = 4,
 		player_push_speed_blocked = 15,
 		ignore_abort_on_blocked_attack = true,
@@ -869,7 +897,29 @@ local action_data = {
 			true,
 			true,
 			true
-		}
+		},
+		hit_ai_func = function (unit, blackboard, hit_unit)
+			if not blackboard.kill_skaven_challenge_completed then
+				local hit_unit_blackboard = BLACKBOARDS[hit_unit]
+				local is_skaven = hit_unit_blackboard.breed.race == "skaven"
+				local num_times_hit_skaven = blackboard.num_times_hit_skaven
+
+				if is_skaven then
+					blackboard.num_times_hit_skaven = num_times_hit_skaven + 1
+				end
+
+				if QuestSettings.storm_vermin_warlord_kills_enemies <= blackboard.num_times_hit_skaven then
+					local stat_name = "storm_vermin_warlord_kills_enemies"
+					local statistics_db = Managers.player:statistics_db()
+
+					statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+
+					blackboard.kill_skaven_challenge_completed = true
+				end
+			end
+
+			return 
+		end
 	},
 	special_attack_sweep_left = {
 		height = 2,

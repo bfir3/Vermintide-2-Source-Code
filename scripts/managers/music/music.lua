@@ -11,7 +11,6 @@ Music.init = function (self, wwise_world, start_event, stop, name, group_states,
 	self._wwise_world = wwise_world
 	self._stop = stop
 	self._name = name
-	self._source = 0
 	self._game_state_voice_thresholds = game_state_voice_thresholds
 
 	self._init_group_states(self, group_states)
@@ -42,11 +41,6 @@ Music.stop = function (self)
 	end
 
 	self._stopped = true
-
-	return 
-end
-Music.set_parameter = function (self, parameter, value)
-	WwiseWorld.set_source_parameter(self._wwise_world, self._source, parameter, value)
 
 	return 
 end
@@ -82,11 +76,11 @@ end
 Music._trigger_event = function (self, event)
 	dprint("trigger event", event)
 
-	return WwiseWorld.trigger_event(self._wwise_world, event, self._source)
+	return WwiseWorld.trigger_event(self._wwise_world, event)
 end
 Music.post_trigger = function (self, trigger)
 	dprint("post trigger", trigger)
-	WwiseWorld.trigger_event(self._wwise_world, trigger, self._source)
+	WwiseWorld.trigger_event(self._wwise_world, trigger)
 
 	return 
 end

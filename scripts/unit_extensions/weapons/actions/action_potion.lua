@@ -34,22 +34,30 @@ ActionPotion.finish = function (self, reason)
 	local targets = {
 		owner_unit
 	}
+	local smallest_distance = TrinketSpreadDistance
+	local additional_target = nil
 
 	if potion_spread then
-		local num_other_players_to_spread_to = 1
+		local num_players = #PLAYER_AND_BOT_UNITS
 		local owner_player_position = POSITION_LOOKUP[owner_unit]
 
-		for i = 1, num_other_players_to_spread_to, 1 do
+		for i = 1, num_players, 1 do
 			local other_player_unit = PLAYER_AND_BOT_UNITS[i]
 
-			if other_player_unit and other_player_unit ~= owner_unit then
+			if Unit.alive(other_player_unit) and other_player_unit ~= owner_unit then
 				local other_player_position = POSITION_LOOKUP[other_player_unit]
+				local distance = Vector3.distance(owner_player_position, other_player_position)
 
-				if Vector3.distance(owner_player_position, other_player_position) < TrinketSpreadDistance then
-					targets[#targets + 1] = other_player_unit
+				if distance <= smallest_distance then
+					smallest_distance = distance
+					additional_target = other_player_unit
 				end
 			end
 		end
+	end
+
+	if additional_target then
+		targets[#targets + 1] = additional_target
 	end
 
 	if buff_extension.has_buff_perk(buff_extension, "potion_duration") then

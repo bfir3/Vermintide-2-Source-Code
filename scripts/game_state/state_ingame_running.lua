@@ -38,6 +38,7 @@ StateInGameRunning.on_enter = function (self, params)
 	self.is_in_inn = params.is_in_inn
 	self.is_in_tutorial = params.is_in_tutorial
 	self.end_conditions_met = false
+	self._booted_eac_untrusted = script_data["eac-untrusted"]
 
 	if self.is_in_tutorial then
 		input_manager.create_input_service(input_manager, "Tutorial", "TutorialPlayerControllerKeymaps", "TutorialPlayerControllerFilters")
@@ -204,6 +205,10 @@ StateInGameRunning.on_enter = function (self, params)
 		self._benchmark_handler = BenchmarkHandler:new(self.ingame_ui, self.world)
 	end
 
+	if self.is_in_inn and Development.parameter("v2_achievements") then
+		Managers.state.achievement:setup_achievement_data()
+	end
+
 	return 
 end
 StateInGameRunning.create_ingame_ui = function (self, ingame_ui_context)
@@ -243,15 +248,19 @@ StateInGameRunning._setup_end_of_level_UI = function (self)
 		level_end_view_context.game_won = game_won
 		level_end_view_context.game_mode_key = Managers.state.game_mode:game_mode_key()
 		level_end_view_context.difficulty = Managers.state.difficulty:get_difficulty()
-		local level, base_experience = self.rewards:get_level_start()
-		level_end_view_context.rewards = {
-			end_of_level_rewards = table.clone(self.rewards:get_rewards()),
-			level_start = {
-				level,
-				base_experience
-			},
-			mission_results = table.clone(self.rewards:get_mission_results())
-		}
+
+		if not self._booted_eac_untrusted then
+			local level, base_experience = self.rewards:get_level_start()
+			level_end_view_context.rewards = {
+				end_of_level_rewards = table.clone(self.rewards:get_rewards()),
+				level_start = {
+					level,
+					base_experience
+				},
+				mission_results = table.clone(self.rewards:get_mission_results())
+			}
+		end
+
 		local mission_system = Managers.state.entity:system("mission_system")
 		level_end_view_context.mission_system_data = {
 			tome_mission_data = mission_system.get_level_end_mission_data(mission_system, "tome_bonus_mission"),
@@ -472,6 +481,8 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 		self.checkpoint_available = checkpoint_available
 	end
 
+	local is_booted_unstrusted = self._booted_eac_untrusted
+
 	if game_mode_key ~= "inn" then
 		local profile_synchronizer = self.profile_synchronizer
 		local peer_id = Network.peer_id()
@@ -480,15 +491,20 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 		local profile = SPProfiles[profile_index]
 		local hero_name = profile.display_name
 
-		self.rewards:award_end_of_level_rewards(game_won, hero_name)
+		if not is_booted_unstrusted then
+			self.rewards:award_end_of_level_rewards(game_won, hero_name)
+		end
+
 		ingame_ui.activate_end_screen_ui(ingame_ui, game_won, checkpoint_available, level_key, previous_completed_difficulty_index)
 
-		local difficulty_key = Managers.state.difficulty:get_difficulty()
-		local chest_settings = LootChestData.chests_by_category[difficulty_key]
-		local chests_package_name = chest_settings.package_name
-		self.chests_package_name = chests_package_name
+		if not is_booted_unstrusted then
+			local difficulty_key = Managers.state.difficulty:get_difficulty()
+			local chest_settings = LootChestData.chests_by_category[difficulty_key]
+			local chests_package_name = chest_settings.package_name
+			self.chests_package_name = chests_package_name
 
-		Managers.package:load(chests_package_name, "global")
+			Managers.package:load(chests_package_name, "global")
+		end
 	end
 
 	self.game_lost = game_lost
@@ -504,7 +520,9 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 			self._xbone_end_of_round_events(self, statistics_db)
 		end
 
-		Managers.state.achievement:write_hero_stats()
+		if not self.is_in_inn and not self.is_in_tutorial then
+			Managers.xbox_stats:update_hero_stats()
+		end
 	end
 
 	return 
@@ -599,8 +617,10 @@ StateInGameRunning.update = function (self, dt, t)
 	end
 
 	local ingame_ui = self.ingame_ui
+	local ui_ready = not ingame_ui.survey_active and not self.has_setup_end_of_level and ingame_ui.end_screen_active(ingame_ui) and ingame_ui.end_screen_fade_in_complete(ingame_ui)
+	local rewards_ready = self._booted_eac_untrusted or (self.rewards:rewards_generated() and not self.rewards:consuming_deed() and self.chests_package_name and Managers.package:has_loaded(self.chests_package_name, "global"))
 
-	if not ingame_ui.survey_active and not self.has_setup_end_of_level and ingame_ui.end_screen_active(ingame_ui) and ingame_ui.end_screen_fade_in_complete(ingame_ui) and self.rewards:rewards_generated() and not self.rewards:consuming_deed() and self.chests_package_name and Managers.package:has_loaded(self.chests_package_name, "global") then
+	if ui_ready and rewards_ready then
 		self._setup_end_of_level_UI(self)
 	end
 
@@ -990,10 +1010,6 @@ StateInGameRunning.game_actually_starts = function (self)
 
 		if self.is_in_inn or self.is_in_tutorial then
 			return 
-		end
-
-		if PLATFORM == "xb1" then
-			Managers.state.achievement:initialize_hero_stats()
 		end
 	end
 

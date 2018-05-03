@@ -350,6 +350,7 @@ GameModeManager.disable_lose_condition = function (self)
 	return 
 end
 GameModeManager.complete_level = function (self)
+	print("Complete level triggered.")
 	self._game_mode:complete_level(self._level_key)
 
 	for unit, data in pairs(self._end_level_areas) do

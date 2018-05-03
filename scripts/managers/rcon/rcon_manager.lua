@@ -47,12 +47,12 @@ RconManager.init = function (self)
 
 	return 
 end
-RconManager.update = function (self, dt, t)
+RconManager.update = function (self, dt, t, menu_active, menu_input_service, no_unblock)
 	if not self._enabled then
 		return 
 	end
 
-	self._rcon_ui:update(dt)
+	self._rcon_ui:update(dt, menu_active, menu_input_service, no_unblock)
 
 	if self._connection_id ~= nil then
 		RConClient.update(dt, self)

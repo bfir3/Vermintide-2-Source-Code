@@ -1456,6 +1456,288 @@ UIWidgets.create_menu_button_medium_with_timer = function (text_field_id, timer_
 		scenegraph_id = scenegraph_id
 	}
 end
+UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
+	return {
+		element = {
+			passes = {
+				{
+					style_id = "thumb_middle",
+					pass_type = "texture",
+					texture_id = "thumb_middle",
+					content_change_function = function (content, style)
+						local is_hover = content.scroll_bar_info.is_hover
+						local color = style.color
+						local color_value = (is_hover and 255) or 200
+						color[2] = color_value
+						color[3] = color_value
+						color[4] = color_value
+
+						return 
+					end,
+					content_check_function = function (content)
+						return content.scroll_bar_info.bar_height_percentage < 1
+					end
+				},
+				{
+					style_id = "thumb_top",
+					pass_type = "texture",
+					texture_id = "thumb_top",
+					content_change_function = function (content, style)
+						local is_hover = content.scroll_bar_info.is_hover
+						local color = style.color
+						local color_value = (is_hover and 255) or 200
+						color[2] = color_value
+						color[3] = color_value
+						color[4] = color_value
+
+						return 
+					end,
+					content_check_function = function (content)
+						return content.scroll_bar_info.bar_height_percentage < 1
+					end
+				},
+				{
+					style_id = "thumb_bottom",
+					pass_type = "texture",
+					texture_id = "thumb_bottom",
+					content_change_function = function (content, style)
+						local is_hover = content.scroll_bar_info.is_hover
+						local color = style.color
+						local color_value = (is_hover and 255) or 200
+						color[2] = color_value
+						color[3] = color_value
+						color[4] = color_value
+
+						return 
+					end,
+					content_check_function = function (content)
+						return content.scroll_bar_info.bar_height_percentage < 1
+					end
+				},
+				{
+					pass_type = "tiled_texture",
+					style_id = "background",
+					texture_id = "background"
+				},
+				{
+					pass_type = "local_offset",
+					content_check_function = function (content)
+						return content.scroll_bar_info.bar_height_percentage < 1
+					end,
+					offset_function = function (ui_scenegraph, ui_style, ui_content, input_service)
+						local scroll_bar_info = ui_content.scroll_bar_info
+						local thumb_middle = ui_style.thumb_middle
+						local thumb_bottom = ui_style.thumb_bottom
+						local thumb_top = ui_style.thumb_top
+						local hotspot = ui_style.hotspot
+						local scroll_size_y = thumb_middle.scroll_size_y
+						local min_height = thumb_top.size[2] + thumb_bottom.size[2]
+						local min_percentage = min_height / scroll_size_y
+						local percentage = math.max(scroll_bar_info.bar_height_percentage, min_percentage)
+						thumb_middle.size[2] = math.max(math.floor(scroll_size_y * percentage) - min_height, 0)
+						hotspot.size[2] = min_height + thumb_middle.size[2]
+
+						return 
+					end
+				},
+				{
+					style_id = "hotspot",
+					pass_type = "hotspot",
+					content_id = "scroll_bar_info"
+				},
+				{
+					style_id = "thumb_middle",
+					pass_type = "held",
+					content_id = "scroll_bar_info",
+					content_check_function = function (content)
+						return content.bar_height_percentage < 1
+					end,
+					held_function = function (ui_scenegraph, ui_style, ui_content, input_service)
+						local cursor = UIInverseScaleVectorToResolution(input_service.get(input_service, "cursor"))
+						local cursor_y = cursor[2]
+						local world_pos = UISceneGraph.get_world_position(ui_scenegraph, ui_content.scenegraph_id)
+						local world_pos_y = world_pos[2]
+						local offset = ui_style.offset
+						local scroll_box_start = world_pos_y + offset[2]
+						local cursor_y_norm = cursor_y - scroll_box_start
+
+						if not ui_content.click_pos_y then
+							ui_content.click_pos_y = cursor_y_norm
+						end
+
+						local click_pos_y = ui_content.click_pos_y
+						local delta = cursor_y_norm - click_pos_y
+						local start_y = ui_style.start_offset[2]
+						local end_y = (start_y + ui_style.scroll_size_y) - ui_style.size[2]
+						local offset_y = math.clamp(offset[2] + delta, start_y, end_y)
+						local scroll_size = end_y - start_y
+						local scroll = end_y - offset_y
+						ui_content.value = (scroll ~= 0 and scroll / scroll_size) or 0
+
+						return 
+					end,
+					release_function = function (ui_scenegraph, ui_style, ui_content, input_service)
+						ui_content.click_pos_y = nil
+
+						return 
+					end
+				},
+				{
+					pass_type = "local_offset",
+					content_id = "scroll_bar_info",
+					content_check_function = function (content)
+						return content.bar_height_percentage < 1
+					end,
+					offset_function = function (ui_scenegraph, ui_style, ui_content, input_service)
+						local thumb_middle = ui_style.thumb_middle
+						local thumb_bottom = ui_style.thumb_bottom
+						local thumb_top = ui_style.thumb_top
+						local hotspot = ui_style.hotspot
+						local thumb_top_height = thumb_top.size[2]
+						local thumb_middle_height = thumb_middle.size[2]
+						local thumb_bottom_height = thumb_bottom.size[2]
+						local start_y = thumb_middle.start_offset[2]
+						local end_y = (start_y + thumb_middle.scroll_size_y) - thumb_middle_height
+						local scroll_size = end_y - start_y
+						local value = ui_content.value
+						local offset_y = start_y + scroll_size * (1 - value)
+						thumb_middle.offset[2] = offset_y
+						thumb_bottom.offset[2] = offset_y - thumb_bottom_height
+						thumb_top.offset[2] = offset_y + thumb_middle_height
+						hotspot.offset[2] = thumb_bottom.offset[2]
+
+						return 
+					end
+				}
+			}
+		},
+		content = {
+			thumb_top = "achievement_scrollbutton_top",
+			background = "chain_link_01",
+			thumb_bottom = "achievement_scrollbutton_bottom",
+			thumb_middle = "achievement_scrollbutton_middle",
+			disable_frame = false,
+			scroll_bar_info = {
+				button_scroll_step = 0.1,
+				value = 0,
+				bar_height_percentage = 1,
+				scenegraph_id = scenegraph_id
+			}
+		},
+		style = {
+			background = {
+				offset = {
+					0,
+					0,
+					0
+				},
+				texture_tiling_size = {
+					16,
+					19
+				},
+				color = {
+					255,
+					255,
+					255,
+					255
+				}
+			},
+			hotspot = {
+				offset = {
+					size[1] / 2 - 16,
+					0,
+					1
+				},
+				size = {
+					32,
+					size[2]
+				}
+			},
+			thumb_top = {
+				offset = {
+					size[1] / 2 - 16,
+					0,
+					1
+				},
+				size = {
+					32,
+					28
+				},
+				color = {
+					255,
+					255,
+					255,
+					255
+				}
+			},
+			thumb_bottom = {
+				offset = {
+					size[1] / 2 - 16,
+					0,
+					1
+				},
+				size = {
+					32,
+					27
+				},
+				color = {
+					255,
+					255,
+					255,
+					255
+				}
+			},
+			thumb_middle = {
+				offset = {
+					size[1] / 2 - 16,
+					0,
+					1
+				},
+				start_offset = {
+					size[1] / 2 - 16,
+					27,
+					1
+				},
+				size = {
+					32,
+					size[2]
+				},
+				color = {
+					255,
+					255,
+					255,
+					255
+				},
+				scroll_size_y = size[2] - 55
+			},
+			scroll_bar_box = {
+				corner_radius = 2,
+				offset = {
+					0,
+					0,
+					1
+				},
+				size = {
+					size[1],
+					size[2]
+				},
+				color = {
+					255,
+					255,
+					255,
+					255
+				},
+				start_offset = {
+					0,
+					0,
+					0
+				},
+				scroll_size_y = size[2]
+			}
+		},
+		scenegraph_id = scenegraph_id
+	}
+end
 UIWidgets.create_scrollbar = function (scenegraph_id, size)
 	return {
 		element = {
@@ -1618,7 +1900,7 @@ UIWidgets.create_scrollbar = function (scenegraph_id, size)
 				offset = {
 					0,
 					0,
-					100
+					1
 				},
 				size = {
 					size[1],
@@ -4517,6 +4799,7 @@ UIWidgets.create_simple_multi_texture = function (textures, texture_sizes, axis,
 		},
 		style = {
 			texture_id = {
+				draw_count = (textures and #textures) or 0,
 				axis = axis or 1,
 				spacing = spacing or {
 					0,
@@ -6582,7 +6865,10 @@ UIWidgets.create_splash_texture = function (input)
 					style_id = "texture_style",
 					pass_type = "texture",
 					content_id = "texture_content",
-					scenegraph_id = input.scenegraph_id
+					scenegraph_id = input.scenegraph_id,
+					content_check_function = function (content)
+						return content.material_name
+					end
 				},
 				{
 					style_id = "texts_style",

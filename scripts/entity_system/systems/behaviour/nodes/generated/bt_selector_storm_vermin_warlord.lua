@@ -186,7 +186,7 @@ BTSelector_storm_vermin_warlord.run = function (self, unit, blackboard, t, dt)
 	end
 
 	local node_has_target = children[9]
-	local condition_result = unit_alive(blackboard.target_unit) and not blackboard.defensive_mode_duration
+	local condition_result = unit_alive(blackboard.target_unit)
 
 	if condition_result then
 		self.set_running_child(self, unit, blackboard, t, node_has_target, "aborted")

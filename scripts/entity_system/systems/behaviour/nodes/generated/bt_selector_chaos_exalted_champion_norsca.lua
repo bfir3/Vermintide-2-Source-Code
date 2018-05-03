@@ -62,7 +62,26 @@ BTSelector_chaos_exalted_champion_norsca.run = function (self, unit, blackboard,
 		self.set_running_child(self, unit, blackboard, t, nil, "failed")
 	end
 
-	local node_stagger = children[3]
+	local node_transform = children[3]
+	local condition_result = blackboard.current_phase == 2
+
+	if condition_result then
+		self.set_running_child(self, unit, blackboard, t, node_transform, "aborted")
+
+		local result, evaluate = node_transform.run(node_transform, unit, blackboard, t, dt)
+
+		if result ~= "running" then
+			self.set_running_child(self, unit, blackboard, t, nil, result)
+		end
+
+		if result ~= "failed" then
+			return result, evaluate
+		end
+	elseif node_transform == child_running then
+		self.set_running_child(self, unit, blackboard, t, nil, "failed")
+	end
+
+	local node_stagger = children[4]
 	local condition_result = nil
 
 	if blackboard.stagger then
@@ -82,25 +101,6 @@ BTSelector_chaos_exalted_champion_norsca.run = function (self, unit, blackboard,
 			return result, evaluate
 		end
 	elseif node_stagger == child_running then
-		self.set_running_child(self, unit, blackboard, t, nil, "failed")
-	end
-
-	local node_transform = children[4]
-	local condition_result = blackboard.current_phase == 2
-
-	if condition_result then
-		self.set_running_child(self, unit, blackboard, t, node_transform, "aborted")
-
-		local result, evaluate = node_transform.run(node_transform, unit, blackboard, t, dt)
-
-		if result ~= "running" then
-			self.set_running_child(self, unit, blackboard, t, nil, result)
-		end
-
-		if result ~= "failed" then
-			return result, evaluate
-		end
-	elseif node_transform == child_running then
 		self.set_running_child(self, unit, blackboard, t, nil, "failed")
 	end
 

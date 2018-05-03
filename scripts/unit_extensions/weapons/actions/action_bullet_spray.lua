@@ -231,13 +231,14 @@ ActionBulletSpray._select_targets = function (self, world, show_outline)
 
 			if not hit_units[hit_unit] then
 				local breed = Unit.get_data(hit_unit, "breed")
+				local dummy = not breed and Unit.get_data(hit_unit, "is_dummy")
 
 				if table.contains(PLAYER_AND_BOT_UNITS, hit_unit) and not ignore_hitting_allies then
 					if self._is_infront_player(self, player_position, player_direction, hit_position) and self._check_within_cone(self, player_position, player_direction, hit_unit, true) then
 						targets[#targets + 1] = hit_unit
 						hit_units[hit_unit] = true
 					end
-				elseif breed and self._is_infront_player(self, player_position, player_direction, hit_position) and self._check_within_cone(self, player_position, player_direction, hit_unit) then
+				elseif (breed or dummy) and self._is_infront_player(self, player_position, player_direction, hit_position) and self._check_within_cone(self, player_position, player_direction, hit_unit) then
 					targets[#targets + 1] = hit_unit
 					hit_units[hit_unit] = true
 

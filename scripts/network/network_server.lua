@@ -49,22 +49,18 @@ NetworkServer.init = function (self, player_manager, lobby_host, initial_level, 
 	self.voip = Voip:new(voip_params)
 	self._reserved_slots = {}
 	self.wanted_profile_index = wanted_profile_index
+	local server_name = nil
 
-	if rawget(_G, "EAC") then
-		local server_name = nil
-
-		if DEDICATED_SERVER then
-			server_name = self.lobby_host:server_name()
-		elseif rawget(_G, "Steam") then
-			server_name = Steam.user_name()
-		else
-			server_name = "lan"
-		end
-
-		self._eac_server = EACServer.create(server_name)
-		self._eac_peer_ids = {}
-		self._using_eac = true
+	if DEDICATED_SERVER then
+		server_name = self.lobby_host:server_name()
+	elseif rawget(_G, "Steam") then
+		server_name = Steam.user_name()
+	else
+		server_name = "lan"
 	end
+
+	self._eac_server = EACServer.create(server_name)
+	self._eac_peer_ids = {}
 
 	rawset(_G, "server", self)
 
@@ -237,11 +233,9 @@ NetworkServer.rpc_client_respawn_player = function (self, sender)
 	return 
 end
 NetworkServer.destroy = function (self)
-	if self._using_eac then
-		EACServer.destroy(self._eac_server)
+	EACServer.destroy(self._eac_server)
 
-		self._eac_server = nil
-	end
+	self._eac_server = nil
 
 	if self.network_event_delegate then
 		self.unregister_rpcs(self)
@@ -410,9 +404,13 @@ NetworkServer.rpc_notify_lobby_joined = function (self, sender, wanted_profile_i
 	else
 		peer_state_machine.rpc_notify_lobby_joined(wanted_profile_index, clan_tag)
 
-		if self._using_eac and sender ~= self.my_peer_id then
+		if sender ~= self.my_peer_id then
 			self._add_peer_to_eac(self, sender)
 		end
+
+		local enemy_package_loader = self.level_transition_handler.enemy_package_loader
+
+		enemy_package_loader.client_connected(enemy_package_loader, sender)
 	end
 
 	return 
@@ -457,18 +455,6 @@ NetworkServer.rpc_want_to_spawn_player = function (self, sender)
 		RPC.rpc_connection_failed(sender, NetworkLookup.connection_fails.no_peer_data_on_enter_game)
 	else
 		peer_state_machine.rpc_want_to_spawn_player()
-	end
-
-	return 
-end
-NetworkServer.cb_eac_auth = function (self, peer_id, info)
-	local peer_state_machine = self.peer_state_machines[peer_id]
-
-	if not peer_state_machine or not peer_state_machine.has_function(peer_state_machine, "cb_eac_auth") then
-		network_printf("EAC auth failed")
-		RPC.rpc_connection_failed(sender, NetworkLookup.connection_fails.eac_authorize_failed)
-	else
-		peer_state_machine.cb_eac_auth(info)
 	end
 
 	return 
@@ -519,6 +505,10 @@ NetworkServer.update = function (self, dt)
 			local sender = (rawget(_G, "Steam") and Steam.user_name(peer_id)) or tostring(peer_id)
 
 			Managers.chat:send_system_chat_message_to_all_except(1, "system_chat_player_left_the_game", sender, peer_id, true)
+
+			local enemy_package_loader = self.level_transition_handler.enemy_package_loader
+
+			enemy_package_loader.client_disconnected(enemy_package_loader, peer_id)
 
 			local peer_state_machine = peer_state_machines[peer_id]
 
@@ -585,11 +575,8 @@ NetworkServer.update = function (self, dt)
 
 	self._update_reserve_slots(self, dt)
 	self.update_disconnect_kicked_peers_by_time(self, dt)
-
-	if self._using_eac then
-		EACServer.update(self._eac_server)
-		self._update_eac_match(self, dt)
-	end
+	EACServer.update(self._eac_server)
+	self._update_eac_match(self, dt)
 
 	if self.lobby_host:is_joined() then
 		local lobby_members = self.lobby_host:members()
@@ -894,6 +881,22 @@ NetworkServer.all_client_peers_disconnected = function (self)
 	end
 
 	return true
+end
+NetworkServer.disconnected = function (self)
+	local peer_state_machines = self.peer_state_machines
+	local my_peer_id = self.my_peer_id
+
+	for peer_id, peer_state_machine in pairs(peer_state_machines) do
+		if peer_id == my_peer_id then
+			local state_name = peer_state_machine.current_state.state_name
+
+			if state_name == "Disconnected" or state_name == "Disconnecting" then
+				return true
+			end
+		end
+	end
+
+	return false
 end
 
 return 

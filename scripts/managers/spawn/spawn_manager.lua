@@ -105,6 +105,7 @@ SpawnManager._default_player_statuses = function (self)
 
 	for i = 1, NUM_PLAYERS, 1 do
 		local status = {
+			temporary_health_percentage = 0,
 			spawn_state = "not_spawned",
 			health_percentage = 1,
 			health_state = "alive",
@@ -357,6 +358,7 @@ SpawnManager._update_respawns = function (self, dt, t)
 					status.health_state = "respawning"
 					status.respawn_unit = respawn_unit
 					status.health_percentage = Managers.state.difficulty:get_difficulty_settings().respawn.health_percentage
+					status.temporary_health_percentage = Managers.state.difficulty:get_difficulty_settings().respawn.temporary_health_percentage
 				end
 			end
 		end
@@ -469,7 +471,8 @@ SpawnManager._update_player_status = function (self, dt, t)
 					local health_ext = ScriptUnit.extension(player_unit, "health_system")
 
 					if not is_dead or status.health_state ~= "respawning" then
-						status.health_percentage = health_ext.current_health_percent(health_ext)
+						status.health_percentage = health_ext.current_permanent_health_percent(health_ext)
+						status.temporary_health_percentage = health_ext.current_temporary_health_percent(health_ext)
 					end
 
 					status.last_update = t
@@ -500,7 +503,7 @@ SpawnManager._update_player_status = function (self, dt, t)
 				Debug.text("    position: " .. position .. " rotation: " .. rotation)
 			end
 
-			Debug.text("    health_state: " .. status.health_state .. " health_percentage: " .. status.health_percentage)
+			Debug.text("    health_state: " .. status.health_state .. " health_percentage: " .. status.health_percentage .. " temporary_health_percentage: " .. status.temporary_health_percentage)
 			Debug.text("    ammo, melee: " .. status.ammo.slot_melee * 100 .. "%% ranged:" .. status.ammo.slot_ranged * 100 .. "%%")
 
 			if status.profile_index then
@@ -765,7 +768,7 @@ SpawnManager.get_status = function (self, _player)
 			local player = player_manager.player(player_manager, peer_id, local_player_id)
 
 			if player == _player then
-				return status.health_state, status.health_percentage, status.ammo.slot_melee, status.ammo.slot_ranged
+				return status.health_state, status.health_percentage, status.temporary_health_percentage, status.ammo.slot_melee, status.ammo.slot_ranged
 			end
 		end
 	end
@@ -852,7 +855,8 @@ SpawnManager._take_status_slot = function (self, i, peer_id, local_player_id, pr
 
 	if status.health_state == "disabled" then
 		status.health_state = "knocked_down"
-		status.health_percentage = 1
+		status.health_percentage = 0
+		status.temporary_health_percentage = 1
 	end
 
 	return 

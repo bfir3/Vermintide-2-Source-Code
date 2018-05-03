@@ -998,7 +998,10 @@ local function create_loot_widget(index, size)
 		{
 			style_id = "button_hotspot",
 			pass_type = "hotspot",
-			content_id = "button_hotspot"
+			content_id = "button_hotspot",
+			content_check_function = function (content)
+				return not content.parent.presentation_complete
+			end
 		},
 		{
 			style_id = "item_icon",
@@ -1175,7 +1178,9 @@ local function create_loot_widget(index, size)
 		lock_glow_2 = "loot_presentation_glow_03",
 		frame = frame_settings.texture,
 		item_hotspot = {},
-		item_hotspot_2 = {},
+		item_hotspot_2 = {
+			allow_multi_hover = true
+		},
 		button_hotspot = {
 			hover_type = "circle"
 		}
@@ -1889,6 +1894,7 @@ local function create_vertical_window_divider(scenegraph_id, size)
 	return widget
 end
 
+local disable_with_gamepad = true
 local widgets = {
 	chest_title = UIWidgets.create_simple_text("chest_title", "chest_title", nil, nil, title_text_style),
 	chest_sub_title = UIWidgets.create_simple_text("chest_sub_title", "chest_sub_title", nil, nil, sub_title_text_style),
@@ -1920,8 +1926,8 @@ local widgets = {
 		0,
 		0
 	}),
-	open_button = UIWidgets.create_default_button("open_button", scenegraph_definition.open_button.size, nil, nil, Localize("interaction_action_open"), 32, "green"),
-	close_button = UIWidgets.create_default_button("close_button", scenegraph_definition.close_button.size, nil, nil, Localize("interaction_action_close"), 32),
+	open_button = UIWidgets.create_default_button("open_button", scenegraph_definition.open_button.size, nil, nil, Localize("interaction_action_open"), 32, "green", nil, nil, disable_with_gamepad),
+	close_button = UIWidgets.create_default_button("close_button", scenegraph_definition.close_button.size, nil, nil, Localize("interaction_action_close"), 32, nil, nil, nil, disable_with_gamepad),
 	item_cap_warning_text = UIWidgets.create_simple_text(Localize("item_cap_warning_text"), "item_cap_warning_text", nil, nil, warning_text_style)
 }
 local option_background_widgets = {
@@ -1939,7 +1945,7 @@ local preview_widgets = {
 	loot_option_2 = create_loot_preview_widget("loot_option_2", scenegraph_definition.loot_option_2.size),
 	loot_option_3 = create_loot_preview_widget("loot_option_3", scenegraph_definition.loot_option_3.size)
 }
-local continue_button = UIWidgets.create_default_button("continue_button", scenegraph_definition.continue_button.size, nil, nil, Localize("continue"), 32)
+local continue_button = UIWidgets.create_default_button("continue_button", scenegraph_definition.continue_button.size, nil, nil, Localize("continue"), 32, nil, nil, nil, disable_with_gamepad)
 local debug_button_widgets = {
 	debug_add_chest_1 = UIWidgets.create_default_button("debug_add_chest_1", scenegraph_definition.debug_add_chest_1.size, nil, nil, "DEBUG: Normal Chest", nil, "green"),
 	debug_add_chest_2 = UIWidgets.create_default_button("debug_add_chest_2", scenegraph_definition.debug_add_chest_2.size, nil, nil, "DEBUG: Hard Chest", nil, "green"),
@@ -1947,34 +1953,56 @@ local debug_button_widgets = {
 	debug_add_chest_4 = UIWidgets.create_default_button("debug_add_chest_4", scenegraph_definition.debug_add_chest_4.size, nil, nil, "DEBUG: Cataclysm Chest", nil, "green")
 }
 local generic_input_actions = {
-	default = {
-		{
-			input_action = "confirm",
-			priority = 2,
-			description_text = "input_description_select"
-		},
-		{
-			input_action = "back",
-			priority = 3,
-			description_text = "input_description_close"
+	default = {},
+	chest_selected = {
+		actions = {
+			{
+				input_action = "confirm",
+				priority = 1,
+				description_text = "input_description_select"
+			},
+			{
+				input_action = "refresh",
+				priority = 2,
+				description_text = "interaction_action_open"
+			},
+			{
+				input_action = "back",
+				priority = 3,
+				description_text = "input_description_close"
+			}
 		}
 	},
-	quick_play = {
-		{
-			input_action = "d_vertical",
-			priority = 1,
-			description_text = "map_screen_increase_decrease_difficulty",
-			ignore_keybinding = true
-		},
-		{
-			input_action = "confirm",
-			priority = 2,
-			description_text = "input_description_select"
-		},
-		{
-			input_action = "back",
-			priority = 3,
-			description_text = "input_description_close"
+	chest_not_selected = {
+		actions = {
+			{
+				input_action = "confirm",
+				priority = 1,
+				description_text = "input_description_select"
+			},
+			{
+				input_action = "back",
+				priority = 3,
+				description_text = "input_description_close"
+			}
+		}
+	},
+	chest_opened = {
+		actions = {
+			{
+				input_action = "confirm",
+				priority = 1,
+				description_text = "input_description_select"
+			}
+		}
+	},
+	loot_presented = {
+		actions = {
+			{
+				input_action = "back",
+				priority = 1,
+				description_text = "input_description_close"
+			}
 		}
 	}
 }

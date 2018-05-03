@@ -61,14 +61,6 @@ MusicPlayer.set_enabled = function (self, enabled)
 
 	return 
 end
-MusicPlayer.set_parameter = function (self, name, value)
-	if self._playing then
-		dprint(self._name, "set_parameter", name, value)
-		self._playing:set_parameter(name, value)
-	end
-
-	return 
-end
 MusicPlayer.is_playing = function (self)
 	return self._playing and not table.is_empty(self._old_music)
 end
@@ -87,7 +79,7 @@ MusicPlayer.post_trigger = function (self, event)
 
 	return 
 end
-MusicPlayer.update = function (self, flags, game_object_id, parameters)
+MusicPlayer.update = function (self, flags, game_object_id)
 	local should_play = self._should_play(self, flags)
 
 	if not self._playing and should_play then
@@ -108,16 +100,6 @@ MusicPlayer.update = function (self, flags, game_object_id, parameters)
 			local state = NetworkLookup.music_group_states[state_id]
 
 			self._playing:set_group_state(group, state)
-		end
-	end
-
-	if self._playing and parameters and self._parameters then
-		for _, parameter_name in ipairs(self._parameters) do
-			local parameter_value = parameters[parameter_name]
-
-			if parameter_value then
-				self.set_parameter(self, parameter_name, parameter_value)
-			end
 		end
 	end
 

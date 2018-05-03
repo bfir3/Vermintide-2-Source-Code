@@ -370,6 +370,23 @@ LevelUnlockUtils.all_acts_completed = function (statistics_db, player_stats_id)
 
 	return true
 end
+LevelUnlockUtils.all_dlc_levels_completed = function (statistics_db, player_stats_id, dlc_name)
+	local level_keys = DLCProgressionOrder[dlc_name]
+
+	fassert(level_keys ~= nil, "DLC %s does not exist in DLCProgressionOrder.", dlc_name)
+
+	for i = 1, #level_keys, 1 do
+		local level_key = level_keys[i]
+		local level_stat = statistics_db.get_persistent_stat(statistics_db, player_stats_id, "completed_levels", level_key)
+		local level_completed = level_stat and level_stat ~= 0
+
+		if not level_completed then
+			return false
+		end
+	end
+
+	return true
+end
 LevelUnlockUtils.set_all_acts_incompleted = function ()
 	local player_manager = Managers.player
 	local statistics_db = player_manager.statistics_db(player_manager)

@@ -15,6 +15,10 @@ AiHuskBaseExtension.init = function (self, extension_init_context, unit, extensi
 		Managers.music:music_trigger("combat_music", breed.combat_spawn_stinger)
 	end
 
+	if breed.special_spawn_stinger then
+		WwiseUtils.trigger_unit_event(extension_init_context.world, breed.special_spawn_stinger, unit, 0)
+	end
+
 	local run_on_husk_spawn = breed.run_on_husk_spawn
 
 	if run_on_husk_spawn then

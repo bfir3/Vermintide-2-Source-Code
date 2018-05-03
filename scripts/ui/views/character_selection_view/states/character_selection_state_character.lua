@@ -7,6 +7,14 @@ local generic_input_actions = definitions.generic_input_actions
 local animation_definitions = definitions.animation_definitions
 local scenegraph_definition = definitions.scenegraph_definition
 local DO_RELOAD = false
+local fake_input_service = {
+	get = function ()
+		return 
+	end,
+	has = function ()
+		return 
+	end
+}
 CharacterSelectionStateCharacter = class(CharacterSelectionStateCharacter)
 CharacterSelectionStateCharacter.NAME = "CharacterSelectionStateCharacter"
 CharacterSelectionStateCharacter.on_enter = function (self, params)
@@ -26,6 +34,7 @@ CharacterSelectionStateCharacter.on_enter = function (self, params)
 	self.world_previewer = params.world_previewer
 	self.wwise_world = params.wwise_world
 	self.platform = PLATFORM
+	self.allow_back_button = params.allow_back_button
 	local player_manager = Managers.player
 	local local_player = player_manager.local_player(player_manager)
 	self._stats_id = local_player.stats_id(local_player)
@@ -37,9 +46,9 @@ CharacterSelectionStateCharacter.on_enter = function (self, params)
 	self._ui_animations = {}
 	self._available_profiles = {}
 	local parent = self.parent
-	local input_service = parent.input_service(parent)
+	local input_service = self.input_service(self)
 	local gui_layer = UILayer.default + 30
-	self.menu_input_description = MenuInputDescriptionUI:new(ingame_ui_context, self.ui_top_renderer, input_service, 3, gui_layer, generic_input_actions.default)
+	self.menu_input_description = MenuInputDescriptionUI:new(ingame_ui_context, self.ui_top_renderer, input_service, 3, gui_layer, (params.allow_back_button and generic_input_actions.default_back) or generic_input_actions.default)
 
 	self.menu_input_description:set_input_description(nil)
 	self.create_ui_elements(self, params)
@@ -49,6 +58,7 @@ CharacterSelectionStateCharacter.on_enter = function (self, params)
 	local profile_index = self.profile_synchronizer:profile_by_peer(self.peer_id, self.local_player_id)
 
 	self._select_hero_tab_by_profile_index(self, profile_index)
+	self.parent:set_input_blocked(false)
 
 	return 
 end
@@ -225,6 +235,7 @@ CharacterSelectionStateCharacter.on_exit = function (self, params)
 
 	self.ui_animator = nil
 
+	self.parent:set_input_blocked(false)
 	print("[HeroViewState] Exit Substate CharacterSelectionStateCharacter")
 
 	return 
@@ -332,8 +343,9 @@ CharacterSelectionStateCharacter.draw = function (self, dt)
 	local ui_scenegraph = self.ui_scenegraph
 	local input_manager = self.input_manager
 	local parent = self.parent
-	local input_service = parent.input_service(parent)
+	local input_service = self.input_service(self)
 	local render_settings = self.render_settings
+	local gamepad_active = Managers.input:is_device_active("gamepad")
 
 	UIRenderer.begin_pass(ui_top_renderer, ui_scenegraph, input_service, dt, nil, render_settings)
 
@@ -354,6 +366,10 @@ CharacterSelectionStateCharacter.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
+
+	if gamepad_active then
+		self.menu_input_description:draw(ui_top_renderer, dt)
+	end
 
 	return 
 end
@@ -376,7 +392,7 @@ CharacterSelectionStateCharacter._spawn_hero_unit = function (self, hero_name)
 	local career_index = self.career_index
 	local callback = callback(self, "cb_hero_unit_spawned", hero_name)
 
-	world_previewer.spawn_hero_unit(world_previewer, hero_name, career_index, true, callback, nil, 0.5)
+	world_previewer.request_spawn_hero_unit(world_previewer, hero_name, career_index, true, callback, nil, 0.5)
 
 	return 
 end
@@ -693,7 +709,13 @@ CharacterSelectionStateCharacter._handle_input = function (self, dt, t)
 		self._play_sound(self, "play_gui_start_menu_button_hover")
 	end
 
-	if self._is_button_pressed(self, select_button) then
+	local gamepad_active = Managers.input:is_device_active("gamepad")
+	local confirm_available = not select_button.content.button_hotspot.disable_button
+	local input_service = self.input_service(self)
+	local confirm_pressed = gamepad_active and confirm_available and input_service.get(input_service, "refresh_press", true)
+	local back_pressed = gamepad_active and self.allow_back_button and input_service.get(input_service, "back_menu", true)
+
+	if self._is_button_pressed(self, select_button) or confirm_pressed then
 		self._play_sound(self, "play_gui_start_menu_button_click")
 
 		if current_profile_index ~= self._selected_profile_index then
@@ -701,6 +723,10 @@ CharacterSelectionStateCharacter._handle_input = function (self, dt, t)
 		else
 			self._change_career(self, self._selected_profile_index, self.career_index)
 		end
+
+		self.parent:set_input_blocked(true)
+	elseif back_pressed then
+		self.parent:close_menu()
 	end
 
 	local widgets_by_name = self._widgets_by_name
@@ -721,6 +747,12 @@ CharacterSelectionStateCharacter._set_select_button_enabled = function (self, en
 	local button_content = self._widgets_by_name.select_button.content
 	button_content.title_text = (enabled and Localize("input_description_confirm")) or Localize("dlc1_2_difficulty_unavailable")
 	button_content.button_hotspot.disable_button = not enabled
+
+	if enabled then
+		self.menu_input_description:set_input_description(generic_input_actions.available)
+	else
+		self.menu_input_description:set_input_description(nil)
+	end
 
 	return 
 end
@@ -949,6 +981,9 @@ CharacterSelectionStateCharacter._animate_element_by_catmullrom = function (self
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
+end
+CharacterSelectionStateCharacter.input_service = function (self)
+	return ((self._pending_profile_request or self._resync_id) and fake_input_service) or self.parent:input_service(true)
 end
 
 return 

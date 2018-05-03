@@ -22,7 +22,7 @@ RconUI.init = function (self, ui_context, callback_object)
 
 	return 
 end
-RconUI.update = function (self, dt)
+RconUI.update = function (self, dt, menu_active, menu_input_service, no_unblock)
 	if RELOAD_UI then
 		self._create_ui_elements(self)
 	end
@@ -30,7 +30,7 @@ RconUI.update = function (self, dt)
 	if self._input_manager ~= nil then
 		local input_service = self._input_manager:get_service("rcon_input")
 
-		self._update_input(self, dt, input_service)
+		self._update_input(self, dt, input_service, menu_active, menu_input_service, no_unblock)
 		self._draw_widgets(self, dt, input_service)
 	end
 
@@ -109,12 +109,12 @@ RconUI._animate_element_pulse = function (self, target, target_index, from, to, 
 
 	return new_animation
 end
-RconUI._update_input = function (self, dt, input_service)
+RconUI._update_input = function (self, dt, input_service, menu_active, menu_input_service, no_unblock)
 	local activate_menu_was_pressed = input_service.get(input_service, "activate_menu")
 
 	if activate_menu_was_pressed then
 		if self._visible then
-			self._unblock_input(self)
+			self._handle_input_service_release(self, menu_active, menu_input_service, no_unblock)
 
 			self._visible = false
 		else
@@ -130,7 +130,7 @@ RconUI._update_input = function (self, dt, input_service)
 		local exit_pressed = input_service.get(input_service, "deactivate_menu")
 
 		if exit_pressed then
-			self._unblock_input(self)
+			self._handle_input_service_release(self, menu_active, menu_input_service, no_unblock)
 
 			self._visible = false
 		elseif send_pressed then
@@ -176,23 +176,62 @@ RconUI._draw_widgets = function (self, dt, input_service)
 
 	return 
 end
-RconUI._block_input = function (self)
-	local input_manager = self._input_manager
+RconUI._handle_input_service_release = function (self, menu_active, menu_input_service, no_unblock)
+	if menu_active then
+		local input_service_name = menu_input_service.name
 
-	input_manager.block_device_except_service(input_manager, "rcon_input", "keyboard", nil, "rcon")
-	input_manager.block_device_except_service(input_manager, "rcon_input", "mouse")
-	input_manager.block_device_except_service(input_manager, "rcon_input", "gamepad")
-	Window.set_show_cursor(true)
+		self._block_input(self, input_service_name)
+		Window.set_show_cursor(false)
+	elseif menu_input_service and menu_input_service.name ~= "rcon_input" then
+		local input_service_name = menu_input_service.name
+
+		self._block_input(self, input_service_name)
+		Window.set_show_cursor(false)
+	else
+		self._unblock_input(self, no_unblock)
+	end
 
 	return 
 end
-RconUI._unblock_input = function (self)
+RconUI._block_input = function (self, input_service_name)
 	local input_manager = self._input_manager
 
-	input_manager.device_unblock_all_services(input_manager, "keyboard")
-	input_manager.device_unblock_all_services(input_manager, "mouse")
-	input_manager.device_unblock_all_services(input_manager, "gamepad")
-	Window.set_show_cursor(false)
+	if input_service_name then
+		if Managers.popup:has_popup() then
+			input_manager.block_device_except_service(input_manager, "popup", "keyboard", 1)
+			input_manager.block_device_except_service(input_manager, "popup", "mouse", 1)
+			input_manager.block_device_except_service(input_manager, "popup", "gamepad", 1)
+		else
+			input_manager.block_device_except_service(input_manager, input_service_name, "keyboard", 1)
+			input_manager.block_device_except_service(input_manager, input_service_name, "mouse", 1)
+			input_manager.block_device_except_service(input_manager, input_service_name, "gamepad", 1)
+		end
+	else
+		input_manager.block_device_except_service(input_manager, "rcon_input", "keyboard", 1, "rcon")
+		input_manager.block_device_except_service(input_manager, "rcon_input", "mouse", 1)
+		input_manager.block_device_except_service(input_manager, "rcon_input", "gamepad", 1)
+		Window.set_show_cursor(true)
+	end
+
+	return 
+end
+RconUI._unblock_input = function (self, no_unblock)
+	local input_manager = self._input_manager
+
+	if Managers.popup:has_popup() then
+		input_manager.block_device_except_service(input_manager, "popup", "keyboard", 1)
+		input_manager.block_device_except_service(input_manager, "popup", "mouse", 1)
+		input_manager.block_device_except_service(input_manager, "popup", "gamepad", 1)
+	elseif no_unblock then
+		input_manager.block_device_except_service(input_manager, nil, "keyboard", 1)
+		input_manager.block_device_except_service(input_manager, nil, "mouse", 1)
+		input_manager.block_device_except_service(input_manager, nil, "gamepad", 1)
+	else
+		input_manager.device_unblock_all_services(input_manager, "keyboard", 1)
+		input_manager.device_unblock_all_services(input_manager, "mouse", 1)
+		input_manager.device_unblock_all_services(input_manager, "gamepad", 1)
+		Window.set_show_cursor(false)
+	end
 
 	return 
 end

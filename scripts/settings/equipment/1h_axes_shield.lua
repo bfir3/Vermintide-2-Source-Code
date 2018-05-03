@@ -935,28 +935,28 @@ weapon_template.tooltip_keywords = {
 	"weapon_keyword_armour_piercing",
 	"weapon_keyword_powerful_blocks"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.6,
-			stagger = 0.2,
-			damage = 0.375,
-			targets = 0.2
-		},
-		heavy_attack = {
-			speed = 0.4,
-			stagger = 0.8,
-			damage = 0.3125,
-			targets = 1
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "light_attack_left"
 	},
-	perks = {
-		light_attack = {
-			"armor_penetration"
-		},
-		heavy_attack = {
-			"armor_penetration"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "heavy_attack"
+	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	push = {
+		action_name = "action_one",
+		sub_action_name = "push"
 	}
 }
 weapon_template.wwise_dep_right_hand = {

@@ -29,7 +29,7 @@ else
 			this._input_disabled = true
 
 			Managers.transition:show_loading_icon(false)
-			Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done", "tutorial"))
+			Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done", "prologue"))
 			Managers.music:trigger_event("hud_menu_start_game")
 
 			return 
@@ -88,6 +88,7 @@ StateTitleScreenMainMenu.on_enter = function (self, params)
 	self._setup_sound()
 	self._setup_input(self)
 	self._init_menu_views(self)
+	self._init_managers(self)
 	self.parent:show_menu(true)
 
 	if params.skip_signin then
@@ -118,8 +119,14 @@ end
 StateTitleScreenMainMenu._setup_sound = function (self)
 	local master_bus_volume = Application.user_setting("master_bus_volume") or 90
 	local music_bus_volume = Application.user_setting("music_bus_volume") or 90
-	local music_world = Managers.world:world("music_world")
-	local wwise_world = Managers.world:wwise_world(music_world)
+	local wwise_world = nil
+
+	if GLOBAL_MUSIC_WORLD then
+		wwise_world = MUSIC_WWISE_WORLD
+	else
+		local music_world = Managers.world:world("music_world")
+		wwise_world = Managers.world:wwise_world(music_world)
+	end
 
 	WwiseWorld.set_global_parameter(wwise_world, "master_bus_volume", master_bus_volume)
 	Managers.music:set_master_volume(master_bus_volume)
@@ -148,6 +155,7 @@ StateTitleScreenMainMenu._init_menu_views = function (self)
 	local ui_renderer = self._title_start_ui:get_ui_renderer()
 	local view_context = {
 		ui_renderer = ui_renderer,
+		ui_top_renderer = ui_renderer,
 		input_manager = Managers.input,
 		world_manager = Managers.world
 	}
@@ -170,6 +178,12 @@ StateTitleScreenMainMenu._init_menu_views = function (self)
 			return 
 		end
 	end
+
+	return 
+end
+StateTitleScreenMainMenu._init_managers = function (self)
+	local user_id = Managers.account:user_id()
+	Managers.xbox_stats = StatsManager2017:new(user_id)
 
 	return 
 end
@@ -278,7 +292,7 @@ StateTitleScreenMainMenu._update_input = function (self, dt, t)
 				error, device_id, user_id_from, user_id_to = XboxLive.show_account_picker_result()
 			end
 
-			if user_id_to == user_id_from and not user_id_to ~= AccountManager.SIGNED_OUT then
+			if user_id_to == user_id_from and user_id_to == AccountManager.SIGNED_OUT then
 				return 
 			elseif user_id_to ~= AccountManager.SIGNED_OUT then
 				self._params.switch_user_auto_sign_in = true
@@ -393,12 +407,11 @@ StateTitleScreenMainMenu.cb_fade_in_done = function (self, level_key, disable_tr
 		loading_context.level_transition_handler:set_next_level(level_key)
 	end
 
-	if level_key == "tutorial" then
+	if level_key == "prologue" then
 		Managers.backend:start_tutorial()
 
-		loading_context.wanted_profile_index = 4
 		loading_context.gamma_correct = not SaveData.gamma_corrected
-		loading_context.play_trailer = false
+		loading_context.play_trailer = true
 	elseif script_data.honduras_demo then
 		self.parent.parent.loading_context.wanted_profile_index = (profile_name and FindProfileIndex(profile_name)) or DemoSettings.wanted_profile_index
 		GameSettingsDevelopment.disable_free_flight = DemoSettings.disable_free_flight

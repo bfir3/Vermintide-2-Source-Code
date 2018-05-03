@@ -284,6 +284,9 @@ AccountManager._update_friends = function (self, dt)
 
 	return 
 end
+AccountManager.friends_list_initiated = function (self)
+	return 
+end
 AccountManager.region = function (self)
 	return PS4.user_country(self._initial_user_id)
 end

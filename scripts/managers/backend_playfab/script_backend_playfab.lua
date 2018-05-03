@@ -1,9 +1,9 @@
 require("scripts/managers/backend_playfab/playfab_mirror")
 
 local IPlayFabHttps = require("PlayFab.IPlayFabHttps")
-local playfab_https_curl = require("scripts/managers/backend/playfab_https_curl")
+local playfab_https = require("scripts/managers/backend/playfab_https_curl")
 
-IPlayFabHttps.SetHttp(playfab_https_curl)
+IPlayFabHttps.SetHttp(playfab_https)
 
 local PlayFabClientApi = require("PlayFab.PlayFabClientApi")
 PlayFabClientApi.settings.titleId = GameSettingsDevelopment.backend_settings.title_id

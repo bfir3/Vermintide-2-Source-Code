@@ -35,6 +35,69 @@ SpawnerSystem.init = function (self, context, system_name)
 
 	return 
 end
+local spawn_list = {
+	"skaven_slave",
+	"skaven_clan_rat",
+	"skaven_slave",
+	"skaven_clan_rat",
+	"skaven_slave",
+	"skaven_clan_rat",
+	"skaven_slave",
+	"skaven_clan_rat",
+	"skaven_slave",
+	"skaven_clan_rat"
+}
+SpawnerSystem.update_test_all_spawners = function (self, t)
+	local spawner_units = self._enabled_spawners
+	local index = self._test_data.index
+	local j = 0
+
+	while index <= #spawner_units and self.tests_running < 6 and j < 10 do
+		local spawner_unit = spawner_units[index]
+		local breeds = nil
+		local group_template = {
+			template = "spawn_test",
+			size = 10,
+			id = Managers.state.entity:system("ai_group_system"):generate_group_id(),
+			spawner_unit = spawner_unit,
+			group_data = {
+				spawner_unit = spawner_unit
+			}
+		}
+		local pos = Unit.local_position(spawner_unit, 0)
+
+		QuickDrawerStay:sphere(pos, 0.66, Color(60, 200, 0))
+		Debug.world_sticky_text(pos, group_template.id, "green")
+		print("START TEST for ", group_template.id)
+		self.spawn_horde(self, spawner_unit, 10, breeds, spawn_list, group_template)
+
+		index = index + 1
+		j = j + 1
+		self.tests_running = self.tests_running + 1
+	end
+
+	if #spawner_units < index then
+		print("All spawners tested")
+
+		self._test_data = nil
+	else
+		self._test_data.index = index
+	end
+
+	return 
+end
+SpawnerSystem.test_all_spawners = function (self)
+	self.tests_running = 0
+
+	print("")
+	print(string.format("Starting spawner test. Found %d spawners.", #self._enabled_spawners))
+
+	self._test_data = {
+		index = 1
+	}
+
+	return 
+end
 SpawnerSystem.running_spawners = function (self)
 	return self._active_spawners
 end
@@ -428,7 +491,7 @@ SpawnerSystem.change_spawner_id = function (self, unit, spawner_id, new_spawner_
 
 		if not new_spawners then
 			new_spawners = {}
-			self._id_lookup[new_spawners] = new_spawners
+			self._id_lookup[new_spawner_id] = new_spawners
 		end
 
 		new_spawners[#new_spawners + 1] = unit
@@ -443,7 +506,7 @@ SpawnerSystem.change_spawner_id = function (self, unit, spawner_id, new_spawner_
 
 	if not new_spawners then
 		new_spawners = {}
-		self._id_lookup[new_spawners] = new_spawners
+		self._id_lookup[new_spawner_id] = new_spawners
 	end
 
 	if spawners then
@@ -530,10 +593,6 @@ local found_hidden_spawners = {}
 SpawnerSystem.update = function (self, context, t, dt)
 	for unit, extension in pairs(self._active_spawners) do
 		extension.update(extension, unit, dummy_input, dt, context, t)
-	end
-
-	if script_data.show_hidden_spawners then
-		self.show_hidden_spawners(self, t)
 	end
 
 	return 

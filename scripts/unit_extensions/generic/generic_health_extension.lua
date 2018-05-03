@@ -167,18 +167,6 @@ GenericHealthExtension._should_die = function (self)
 	return self.health <= self.damage
 end
 GenericHealthExtension.add_damage = function (self, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike, added_dot)
-	if Managers.player:is_player_unit(attacker_unit) then
-		local owner_player = Managers.player:owner(attacker_unit)
-
-		if owner_player.local_player and not owner_player.bot_player then
-			local breed = Unit.get_data(self.unit, "breed")
-
-			if breed and breed.boss then
-				Managers.state.event:trigger("show_boss_health_bar", self.unit)
-			end
-		end
-	end
-
 	local unit = self.unit
 	local network_manager = Managers.state.network
 	local unit_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, unit)

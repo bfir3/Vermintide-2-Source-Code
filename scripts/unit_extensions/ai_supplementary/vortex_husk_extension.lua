@@ -36,6 +36,7 @@ VortexHuskExtension.init = function (self, extension_init_context, unit, extensi
 	if inner_decal_unit then
 		World.link_unit(world, inner_decal_unit, unit, 0)
 		Unit.set_local_scale(inner_decal_unit, 0, Vector3(inner_scale_xy, inner_scale_xy, 1))
+		Unit.flow_event(inner_decal_unit, "vortex_spawned")
 
 		self._inner_decal_unit = inner_decal_unit
 	end
@@ -45,6 +46,7 @@ VortexHuskExtension.init = function (self, extension_init_context, unit, extensi
 	if outer_decal_unit then
 		World.link_unit(world, outer_decal_unit, unit, 0)
 		Unit.set_local_scale(outer_decal_unit, 0, Vector3(outer_scale_xy, outer_scale_xy, 1))
+		Unit.flow_event(outer_decal_unit, "vortex_spawned")
 
 		self._outer_decal_unit = outer_decal_unit
 	end
@@ -65,6 +67,18 @@ VortexHuskExtension.destroy = function (self)
 	local unit = self.unit
 
 	WwiseUtils.trigger_unit_event(world, "Stop_enemy_sorcerer_vortex_loop", unit)
+
+	local inner_decal_unit = self._inner_decal_unit
+
+	if Unit.alive(inner_decal_unit) then
+		Unit.flow_event(inner_decal_unit, "vortex_despawned")
+	end
+
+	local outer_decal_unit = self._outer_decal_unit
+
+	if Unit.alive(outer_decal_unit) then
+		Unit.flow_event(outer_decal_unit, "vortex_despawned")
+	end
 
 	return 
 end

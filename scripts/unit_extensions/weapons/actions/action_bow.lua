@@ -141,7 +141,7 @@ ActionBow.fire = function (self, current_action, add_spread)
 		end
 	end
 
-	local angle = DamageUtils.pitch_from_rotation(rotation)
+	local angle = ActionUtils.pitch_from_rotation(rotation)
 	local position = first_person_extension.current_position(first_person_extension)
 	local target_vector = Vector3.normalize(Vector3.flat(Quaternion.forward(rotation)))
 	local projectile_info = current_action.projectile_info

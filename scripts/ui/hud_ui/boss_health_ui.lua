@@ -87,38 +87,11 @@ BossHealthUI._update_targeted_boss = function (self, dt, t)
 		return 
 	end
 
-	local time_to_look_at = (self._boss_unit and 1) or 0
-	local smart_targeting_extension = ScriptUnit.extension(player_unit, "smart_targeting_system")
-	local data = smart_targeting_extension.get_targeting_data(smart_targeting_extension)
-	local look_at_target_unit = data.unit
-	local look_at_boss_unit = nil
+	local proximity_system = Managers.state.entity:system("proximity_system")
+	local proximity_boss_unit = proximity_system.closest_boss_unit
 
-	if look_at_target_unit then
-		if self._last_look_at_boss_unit == look_at_target_unit then
-			self._look_at_boss_unit_timer = self._look_at_boss_unit_timer + dt
-
-			if time_to_look_at <= self._look_at_boss_unit_timer then
-				look_at_boss_unit = look_at_target_unit
-				self._look_at_boss_unit_timer = 0
-			end
-		end
-
-		self._last_look_at_boss_unit = look_at_target_unit
-	else
-		self._look_at_boss_unit_timer = 0
-	end
-
-	local proximity_boss_unit = nil
-
-	if not self._boss_unit and 0 < #Managers.state.conflict:alive_bosses() then
-		local proximity_system = Managers.state.entity:system("proximity_system")
-		proximity_boss_unit = proximity_system.closest_boss_unit
-	end
-
-	new_target = look_at_boss_unit or proximity_boss_unit
-
-	if new_target and self._boss_unit ~= new_target then
-		self.event_show_boss_health_bar(self, new_target)
+	if proximity_boss_unit and self._boss_unit ~= proximity_boss_unit then
+		self.event_show_boss_health_bar(self, proximity_boss_unit)
 	end
 
 	return 

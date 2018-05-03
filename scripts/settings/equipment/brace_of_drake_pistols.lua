@@ -187,17 +187,18 @@ weapon_template.actions = {
 	action_two = {
 		default = {
 			charge_sound_stop_event = "player_combat_weapon_drakepistol_charge_down",
-			charge_time = 3,
+			anim_end_event = "attack_finished",
 			fire_at_gaze_setting = false,
 			crosshair_style = "shotgun",
 			kind = "charge",
+			charge_time = 3,
 			charge_effect_material_variable_name = "intensity",
-			anim_end_event = "attack_finished",
 			spread_template_override = "drake_pistol_charged",
 			overcharge_interval = 0.3,
 			charge_effect_material_name = "Fire",
 			minimum_hold_time = 0.2,
 			overcharge_type = "drakegun_charging",
+			weapon_action_hand = "both",
 			charge_sound_switch = "projectile_charge_sound",
 			charge_effect_name = "fx/wpnfx_drake_pistol_charge",
 			hold_input = "action_two_hold",
@@ -239,9 +240,10 @@ weapon_template.actions = {
 	weapon_reload = {
 		default = {
 			charge_sound_stop_event = "stop_weapon_drakegun_cooldown_loop",
+			weapon_action_hand = "both",
 			fire_at_gaze_setting = false,
-			uninterruptible = true,
 			kind = "charge",
+			uninterruptible = true,
 			do_not_validate_with_hold = true,
 			minimum_hold_time = 0.5,
 			vent_overcharge = true,
@@ -343,31 +345,24 @@ weapon_template.tooltip_keywords = {
 	"weapon_keyword_crowd_control",
 	"weapon_keyword_damage_over_time"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.4,
-			range = 0.4,
-			damage = 0.5,
-			targets = 0.2,
-			stagger = 0.6
-		},
-		heavy_attack = {
-			speed = 0.2,
-			range = 0.25,
-			damage = 0.525,
-			targets = 0.9,
-			stagger = 0.4
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
 	},
-	perks = {
-		light_attack = {
-			"armor_penetration"
-		},
-		heavy_attack = {
-			"armor_penetration",
-			"burn"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "shoot_charged"
+	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "shoot_charged"
 	}
 }
 Weapons = Weapons or {}

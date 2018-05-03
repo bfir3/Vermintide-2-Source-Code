@@ -81,6 +81,11 @@ GameServer.remove_peer = function (self, peer_id)
 
 	return 
 end
+GameServer.set_level_name = function (self, name)
+	GameServerInternal.set_level_name(self._game_server, name)
+
+	return 
+end
 GameServer.set_lobby_data = function (self, data)
 	print("Set lobby begin:")
 
@@ -128,9 +133,6 @@ GameServer.id = function (self)
 end
 GameServer.server_name = function (self)
 	return self._server_name
-end
-GameServer.eac_state = function (self, peer)
-	return self._game_server:eac_state(peer)
 end
 
 return 

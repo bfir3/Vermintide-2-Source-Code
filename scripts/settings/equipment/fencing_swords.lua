@@ -941,29 +941,28 @@ weapon_template.tooltip_keywords = {
 	"weapon_keyword_headshotting",
 	"weapon_keyword_versatile"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.8,
-			stagger = 0.15,
-			damage = 0.16666666666666666,
-			targets = 0.4
-		},
-		heavy_attack = {
-			speed = 0.6,
-			stagger = 0.4,
-			damage = 0.375,
-			targets = 0.4
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "light_attack_left"
 	},
-	perks = {
-		light_attack = {
-			"head_shot"
-		},
-		heavy_attack = {
-			"head_shot",
-			"armor_penetration"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "heavy_attack"
+	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	push = {
+		action_name = "action_one",
+		sub_action_name = "push"
 	}
 }
 weapon_template.right_hand_unit = "units/weapons/player/wpn_fencingsword_t1/wpn_fencingsword_t1"

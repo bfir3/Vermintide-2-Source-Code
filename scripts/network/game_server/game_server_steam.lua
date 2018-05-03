@@ -35,5 +35,10 @@ end
 GameServerInternal.server_id = function (game_server)
 	return SteamGameServer.id(game_server)
 end
+GameServerInternal.set_level_name = function (game_server, name)
+	SteamGameServer.set_map(game_server, name)
+
+	return 
+end
 
 return 

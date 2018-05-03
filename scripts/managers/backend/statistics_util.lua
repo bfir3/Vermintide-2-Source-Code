@@ -326,10 +326,17 @@ StatisticsUtil.register_complete_level = function (statistics_db)
 
 	statistics_db.increment_stat(statistics_db, stats_id, "completed_levels", level_id)
 
+	if Managers.deed and Managers.deed:has_deed() then
+		statistics_db.increment_stat(statistics_db, stats_id, "completed_heroic_deeds")
+	end
+
 	local difficulty_manager = Managers.state.difficulty
 	local difficulty_name = difficulty_manager.get_difficulty(difficulty_manager)
+	local career_index = local_player.career_index(local_player)
+	local career_data = profile.careers[career_index]
+	local career_name = career_data.name
 
-	StatisticsUtil._register_completed_level_difficulty(statistics_db, level_id, difficulty_name)
+	StatisticsUtil._register_completed_level_difficulty(statistics_db, level_id, career_name, difficulty_name)
 
 	return 
 end
@@ -382,7 +389,7 @@ StatisticsUtil.get_game_progress = function (statistics_db)
 
 	return game_progress
 end
-StatisticsUtil._register_completed_level_difficulty = function (statistics_db, level_id, difficulty_name)
+StatisticsUtil._register_completed_level_difficulty = function (statistics_db, level_id, career_name, difficulty_name)
 	local local_player = Managers.player:local_player()
 	local stats_id = local_player.stats_id(local_player)
 	local level_difficulty_name = LevelDifficultyDBNames[level_id]
@@ -393,6 +400,10 @@ StatisticsUtil._register_completed_level_difficulty = function (statistics_db, l
 
 	if current_completed_difficulty < difficulty then
 		statistics_db.set_stat(statistics_db, stats_id, "completed_levels_difficulty", level_difficulty_name, difficulty)
+	end
+
+	if Development.parameter("v2_achievements") then
+		statistics_db.increment_stat(statistics_db, stats_id, "completed_career_levels", career_name, level_id, difficulty_name)
 	end
 
 	return 

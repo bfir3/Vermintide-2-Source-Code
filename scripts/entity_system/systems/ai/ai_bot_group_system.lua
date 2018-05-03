@@ -1,5 +1,7 @@
 -- WARNING: Error occurred during decompilation.
 --   Code may be incomplete or incorrect.
+require("scripts/settings/player_bots_settings")
+
 AIBotGroupSystem = class(AIBotGroupSystem, ExtensionSystemBase)
 local extensions = {
 	"AIBotGroupExtension",
@@ -50,8 +52,10 @@ AIBotGroupSystem.init = function (self, context, system_name)
 
 	entity_manager.register_system(entity_manager, self, system_name, extensions)
 
+	local world = context.world
 	self._is_server = context.is_server
-	self._world = context.world
+	self._world = world
+	self._physics_world = World.physics_world(world)
 	self._bot_ai_data = {}
 	self._num_bots = 0
 	self._last_move_target_rotations = {}
@@ -841,7 +845,7 @@ AIBotGroupSystem._update_urgent_targets = function (self, dt, t)
 
 			if 0 < time_left then
 				if AiUtils.unit_alive(target_unit) then
-					local utility, distance = self._calculate_opportunity_utility(self, bot_unit, self_pos, old_target, target_unit, t, true)
+					local utility, distance = self._calculate_opportunity_utility(self, bot_unit, self_pos, old_target, target_unit, t, false, false)
 
 					if best_utility < utility then
 						best_utility = utility
@@ -860,7 +864,7 @@ AIBotGroupSystem._update_urgent_targets = function (self, dt, t)
 				local pos = POSITION_LOOKUP[target_unit]
 
 				if AiUtils.unit_alive(target_unit) and not AiUtils.unit_invincible(target_unit) and Vector3.distance_squared(pos, self_pos) < BOSS_ENGAGE_DISTANCE_SQ and not BLACKBOARDS[target_unit].defensive_mode_duration then
-					local utility, distance = self._calculate_opportunity_utility(self, bot_unit, self_pos, old_target, target_unit, t, false)
+					local utility, distance = self._calculate_opportunity_utility(self, bot_unit, self_pos, old_target, target_unit, t, false, false)
 
 					if best_utility < utility then
 						best_utility = utility
@@ -936,7 +940,7 @@ AIBotGroupSystem._update_opportunity_targets = function (self, dt, t)
 			local target_pos = POSITION_LOOKUP[target_unit]
 
 			if AiUtils.unit_alive(target_unit) and Vector3.distance_squared(target_pos, self_pos) < FALLBACK_OPPORTUNITY_DISTANCE_SQ then
-				local utility, distance = self._calculate_opportunity_utility(self, bot_unit, self_pos, old_target, target_unit, t, false)
+				local utility, distance = self._calculate_opportunity_utility(self, bot_unit, self_pos, old_target, target_unit, t, false, true)
 
 				if best_utility < utility then
 					best_utility = utility
@@ -954,7 +958,8 @@ AIBotGroupSystem._update_opportunity_targets = function (self, dt, t)
 end
 local OPPORTUNITY_TARGET_MIN_REACTION_TIME = 0.2
 local OPPORTUNITY_TARGET_MAX_REACTION_TIME = 0.65
-AIBotGroupSystem._calculate_opportunity_utility = function (self, bot_unit, self_position, current_target, potential_target, t, force_seen)
+local OPPORTUNITY_TARGET_DIFFICULTY_REACTION_TIMES = BotConstants.default.OPPORTUNITY_TARGET_REACTION_TIMES
+AIBotGroupSystem._calculate_opportunity_utility = function (self, bot_unit, self_position, current_target, potential_target, t, force_seen, use_difficulty_reaction_times)
 	local prox_ext = ScriptUnit.has_extension(potential_target, "proximity_system")
 	local distance = math.max(Vector3.distance(self_position, POSITION_LOOKUP[potential_target]), 1)
 
@@ -964,7 +969,19 @@ AIBotGroupSystem._calculate_opportunity_utility = function (self, bot_unit, self
 		local react_at = prox_ext.bot_reaction_times[bot_unit]
 
 		if not react_at then
-			prox_ext.bot_reaction_times[bot_unit] = t + Math.random(OPPORTUNITY_TARGET_MIN_REACTION_TIME, OPPORTUNITY_TARGET_MAX_REACTION_TIME)
+			local min_reaction_time, max_reaction_time = nil
+
+			if use_difficulty_reaction_times then
+				local current_difficulty = Managers.state.difficulty:get_difficulty()
+				local reaction_times = OPPORTUNITY_TARGET_DIFFICULTY_REACTION_TIMES[current_difficulty]
+				min_reaction_time = reaction_times.min
+				max_reaction_time = reaction_times.max
+			else
+				min_reaction_time = OPPORTUNITY_TARGET_MIN_REACTION_TIME
+				max_reaction_time = OPPORTUNITY_TARGET_MAX_REACTION_TIME
+			end
+
+			prox_ext.bot_reaction_times[bot_unit] = t + Math.random(min_reaction_time, max_reaction_time)
 
 			return -math.huge, math.huge
 		elseif t < react_at then
@@ -1279,8 +1296,10 @@ AIBotGroupSystem._update_health_pickups = function (self, dt, t)
 				local closest_dist = math.huge
 				local closest_item = nil
 				local pos = POSITION_LOOKUP[player_unit]
+				local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+				local has_heal_disable_buff = buff_extension.has_buff_type(buff_extension, "trait_necklace_no_healing_health_regen")
 
-				if 0 < num_health_items then
+				if 0 < num_health_items and not has_heal_disable_buff then
 					for unit, item_pos in pairs(HEALTH_ITEMS_TEMP) do
 						local dist = Vector3.distance_squared(pos, item_pos)
 
@@ -1537,20 +1556,23 @@ AIBotGroupSystem._update_weapon_debug = function (self)
 	Debug.text("BOT RANGED WEAPON")
 
 	for unit, data in pairs(self._bot_ai_data) do
-		local player_bot = player_manager.owner(player_manager, unit)
-		local bot_name = player_bot.profile_display_name(player_bot)
 		local blackboard = data.blackboard
 		local inventory_extension = blackboard.inventory_extension
-		local overcharge_extension = blackboard.overcharge_extension
-		local current_ammo, max_ammo = inventory_extension.current_ammo_status(inventory_extension, "slot_ranged")
-		local current_oc, threshold_oc, max_oc = overcharge_extension.current_overcharge_status(overcharge_extension)
 		local slot_data = inventory_extension.get_slot_data(inventory_extension, "slot_ranged")
-		local item_template = inventory_extension.get_item_template(inventory_extension, slot_data)
-		local weapon_name = item_template.name
-		local ammo_substring = (current_ammo and string.format(" %d|%d", current_ammo, max_ammo)) or ""
-		local oc_substring = (current_oc and string.format(" %02d|%d|%d", current_oc, threshold_oc, max_oc)) or ""
 
-		Debug.text("%-16s:%s%s [%s]", bot_name, ammo_substring, oc_substring, weapon_name)
+		if slot_data then
+			local player_bot = player_manager.owner(player_manager, unit)
+			local bot_name = player_bot.profile_display_name(player_bot)
+			local overcharge_extension = blackboard.overcharge_extension
+			local current_ammo, max_ammo = inventory_extension.current_ammo_status(inventory_extension, "slot_ranged")
+			local current_oc, threshold_oc, max_oc = overcharge_extension.current_overcharge_status(overcharge_extension)
+			local item_template = inventory_extension.get_item_template(inventory_extension, slot_data)
+			local weapon_name = item_template.name
+			local ammo_substring = (current_ammo and string.format(" %d|%d", current_ammo, max_ammo)) or ""
+			local oc_substring = (current_oc and string.format(" %02d|%d|%d", current_oc, threshold_oc, max_oc)) or ""
+
+			Debug.text("%-16s:%s%s [%s]", bot_name, ammo_substring, oc_substring, weapon_name)
+		end
 	end
 
 	return 
@@ -1643,11 +1665,22 @@ AIBotGroupSystem.first_person_debug = function (self, bot_number)
 		return 
 	end
 
+	local world = self._world
+
 	if not Managers.state.camera:has_viewport(new_player.viewport_name) then
 		Managers.state.entity:system("camera_system"):local_player_created(new_player)
-	end
+	else
+		for player, camera_unit in pairs(Managers.state.entity:system("camera_system").camera_units) do
+			if player.viewport_name == new_player.viewport_name then
+				if player ~= new_player then
+					local camera_extension = ScriptUnit.extension(camera_unit, "camera_system")
+					camera_extension.player = new_player
+				end
 
-	local world = self._world
+				break
+			end
+		end
+	end
 
 	ScriptWorld.activate_viewport(world, ScriptWorld.viewport(world, new_player.viewport_name))
 	ScriptWorld.deactivate_viewport(world, ScriptWorld.viewport(world, old_player.viewport_name))
@@ -1660,6 +1693,9 @@ AIBotGroupSystem.first_person_debug = function (self, bot_number)
 end
 AIBotGroupSystem.ranged_attack_started = function (self, attacker_unit, victim_unit, attack_type)
 	if DamageUtils.is_player_unit(victim_unit) then
+		local proximity_extension = ScriptUnit.extension(attacker_unit, "proximity_system")
+		proximity_extension.has_been_seen = true
+
 		for unit, data in pairs(self._bot_ai_data) do
 			local ai_ext = ScriptUnit.extension(unit, "ai_system")
 
@@ -1682,6 +1718,26 @@ AIBotGroupSystem.ranged_attack_ended = function (self, attacker_unit, victim_uni
 	end
 
 	self._urgent_targets[attacker_unit] = self._t + OPPORTUNITY_TARGET_COOLDOWN
+
+	return 
+end
+local OPPORTUNITY_TARGET_TELEPORT_DETECTION_DISTANCE = 7
+local OPPORTUNITY_TARGET_TELEPORT_DETECTION_DISTANCE_SQ = OPPORTUNITY_TARGET_TELEPORT_DETECTION_DISTANCE^2
+AIBotGroupSystem.enemy_teleported = function (self, enemy_unit, teleport_position)
+	local proximity_extension = ScriptUnit.extension(enemy_unit, "proximity_system")
+	proximity_extension.has_been_seen = false
+	local physics_world = self._physics_world
+
+	for unit, data in pairs(self._bot_ai_data) do
+		local position = POSITION_LOOKUP[unit]
+		local distance_squared = Vector3.distance_squared(position, teleport_position)
+
+		if distance_squared < OPPORTUNITY_TARGET_TELEPORT_DETECTION_DISTANCE_SQ and PerceptionUtils.raycast_spine_to_spine(unit, enemy_unit, physics_world) then
+			proximity_extension.has_been_seen = true
+
+			break
+		end
+	end
 
 	return 
 end

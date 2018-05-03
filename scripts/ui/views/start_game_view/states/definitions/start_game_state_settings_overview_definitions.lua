@@ -361,6 +361,7 @@ local title_text_style = {
 		2
 	}
 }
+local disable_with_gamepad = true
 local widgets = {
 	window = UIWidgets.create_frame("window", scenegraph_definition.window.size, "menu_frame_11"),
 	window_background = UIWidgets.create_tiled_texture("window_background", "menu_frame_bg_01", {
@@ -376,8 +377,8 @@ local widgets = {
 		960,
 		1080
 	}, nil, true),
-	exit_button = UIWidgets.create_default_button("exit_button", scenegraph_definition.exit_button.size, nil, nil, Localize("menu_close"), 24, nil, "button_detail_04", 34),
-	back_button = UIWidgets.create_default_button("exit_button", scenegraph_definition.exit_button.size, nil, nil, Localize("menu_back"), 24, nil, "button_detail_04", 34),
+	exit_button = UIWidgets.create_default_button("exit_button", scenegraph_definition.exit_button.size, nil, nil, Localize("menu_close"), 24, nil, "button_detail_04", 34, disable_with_gamepad),
+	back_button = UIWidgets.create_default_button("exit_button", scenegraph_definition.exit_button.size, nil, nil, Localize("menu_back"), 24, nil, "button_detail_04", 34, disable_with_gamepad),
 	title = UIWidgets.create_simple_texture("frame_title_bg", "title"),
 	title_bg = UIWidgets.create_background("title_bg", scenegraph_definition.title_bg.size, "menu_frame_bg_02"),
 	title_text = UIWidgets.create_simple_text(Localize("start_game_view_title"), "title_text", nil, nil, title_text_style)

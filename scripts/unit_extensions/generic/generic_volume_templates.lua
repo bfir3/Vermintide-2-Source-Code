@@ -36,6 +36,27 @@ GenericVolumeTemplates.functions = {
 
 				return 
 			end
+		},
+		catacombs_corpse_pit = {
+			on_enter = function (unit, dt, t, data)
+				local buff_extension = ScriptUnit.extension(unit, "buff_system")
+				local params = {
+					t = t,
+					attacker_unit = unit
+				}
+				data.buff_id = buff_extension.add_buff(buff_extension, "catacombs_corpse_pit", params)
+
+				return 
+			end,
+			on_exit = function (unit, data)
+				local buff_extension = ScriptUnit.extension(unit, "buff_system")
+
+				buff_extension.remove_buff(buff_extension, data.buff_id)
+
+				data.buff_id = nil
+
+				return 
+			end
 		}
 	},
 	movement_volume = {
@@ -210,7 +231,6 @@ GenericVolumeTemplates.functions.damage_volume.ai_insta_kill_no_cost = GenericVo
 GenericVolumeTemplates.functions.damage_volume.player_insta_kill_no_cost = GenericVolumeTemplates.functions.damage_volume.generic_insta_kill
 GenericVolumeTemplates.functions.damage_volume.ai_kill_dot = GenericVolumeTemplates.functions.damage_volume.generic_dot
 GenericVolumeTemplates.functions.damage_volume.ai_kill_dot_no_cost = GenericVolumeTemplates.functions.damage_volume.generic_dot
-GenericVolumeTemplates.functions.damage_volume.catacombs_corpse_pit = GenericVolumeTemplates.functions.damage_volume.generic_dot
 GenericVolumeTemplates.functions.damage_volume.skaven_molten_steel = GenericVolumeTemplates.functions.damage_volume.generic_dot
 GenericVolumeTemplates.filters = {
 	unit_disabled = function (unit)

@@ -2,6 +2,7 @@ require("scripts/settings/attachment_node_linking")
 require("scripts/unit_extensions/generic/interactions")
 require("scripts/utils/action_assert_funcs")
 require("scripts/settings/profiles/career_settings")
+require("scripts/helpers/weapon_utils")
 dofile("scripts/settings/explosion_templates")
 dofile("scripts/settings/equipment/attack_templates")
 dofile("scripts/settings/equipment/power_level_templates")
@@ -121,11 +122,13 @@ Dots = {
 		end
 
 		local do_dot = true
-		local breed_armor = DamageUtils.get_unit_armor(target_unit, hit_zone_name)
+		local breed = AiUtils.unit_breed(target_unit)
+		local dummy_unit_armor = Unit.get_data(target_unit, "armor")
+		local breed_armor = ActionUtils.get_target_armor(hit_zone_name, breed, dummy_unit_armor)
 
 		if breed_armor == 2 then
 			local boost_curve = BoostCurves[target_settings.boost_curve_type]
-			local predicted_damage = DamageUtils.calculate_damage(DamageOutput, target_unit, attacker_unit, hit_zone_name, power_level, boost_curve, boost_curve_multiplier, is_critical_strike, damage_profile, target_index)
+			local predicted_damage = DamageUtils.calculate_damage(DamageOutput, target_unit, attacker_unit, hit_zone_name, power_level, boost_curve, boost_curve_multiplier, is_critical_strike, damage_profile, target_index, false, damage_source)
 
 			if predicted_damage <= 0 then
 				do_dot = false

@@ -191,8 +191,6 @@ SplitscreenTester._update_input = function (self, dt, t)
 	local input_service = self.input_manager:get_service("splitscreen_tester")
 
 	if input_service and input_service.get(input_service, "toggle_splitscreen") then
-		print("hej")
-
 		self._splitscreen_active = not self._splitscreen_active
 
 		self._resize_viewports(self)

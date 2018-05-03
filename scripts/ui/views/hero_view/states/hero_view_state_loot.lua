@@ -276,7 +276,7 @@ HeroViewStateLoot.on_enter = function (self, params, optional_ignore_item_popula
 	local gui_layer = UILayer.default + 30
 	self.menu_input_description = MenuInputDescriptionUI:new(ingame_ui_context, self.loot_ui_renderer, input_service, 3, gui_layer, generic_input_actions.default)
 
-	self.menu_input_description:set_input_description(nil)
+	self.menu_input_description:set_input_description(generic_input_actions.chest_not_selected)
 	self.create_ui_elements(self, params)
 
 	self.viewport_widget = UIWidget.init(viewport_widget_definition)
@@ -715,10 +715,10 @@ HeroViewStateLoot.post_update = function (self, dt, t)
 
 	if open_loot_chest_id then
 		local backend_loot = Managers.backend:get_interface("loot")
-		local loot_chest_opened = backend_loot.is_loot_chest_opened(backend_loot, open_loot_chest_id)
+		local loot_chest_opened = backend_loot.is_loot_generated(backend_loot, open_loot_chest_id)
 
 		if loot_chest_opened then
-			local loot = backend_loot.get_loot_chest_rewards(backend_loot, open_loot_chest_id)
+			local loot = backend_loot.get_loot(backend_loot, open_loot_chest_id)
 
 			self.loot_chest_opened(self, loot)
 
@@ -828,6 +828,7 @@ HeroViewStateLoot.draw = function (self, dt)
 	local input_manager = self.input_manager
 	local render_settings = self.render_settings
 	local input_service = input_manager.get_service(input_manager, "hero_view")
+	local gamepad_active = Managers.input:is_device_active("gamepad")
 	render_settings.alpha_multiplier = 1
 
 	UIRenderer.begin_pass(loot_ui_renderer, ui_scenegraph, input_service, dt, nil, render_settings)
@@ -894,6 +895,10 @@ HeroViewStateLoot.draw = function (self, dt)
 		end
 
 		UIRenderer.end_pass(ui_top_renderer)
+	end
+
+	if gamepad_active then
+		self.menu_input_description:draw(loot_ui_renderer, dt)
 	end
 
 	return 
@@ -1001,8 +1006,10 @@ HeroViewStateLoot._select_grid_item = function (self, item, t)
 		widgets_by_name.chest_sub_title.content.text = Localize(item_type)
 
 		self.set_chest_title_alpha_progress(self, 1)
+		self.menu_input_description:set_input_description(generic_input_actions.chest_selected)
 	else
 		self.set_chest_title_alpha_progress(self, 0)
+		self.menu_input_description:set_input_description(generic_input_actions.chest_not_selected)
 	end
 
 	self._selected_item = item
@@ -1016,6 +1023,7 @@ HeroViewStateLoot._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local input_manager = self.input_manager
 	local input_service = input_manager.get_service(input_manager, "hero_view")
+	local gamepad_active = Managers.input:is_device_active("gamepad")
 	local parent = self.parent
 	local item_grid = self._item_grid
 	local open_button = widgets_by_name.open_button
@@ -1025,6 +1033,8 @@ HeroViewStateLoot._handle_input = function (self, dt, t)
 	UIWidgetUtils.animate_default_button(open_button, dt)
 	UIWidgetUtils.animate_default_button(close_button, dt)
 	UIWidgetUtils.animate_default_button(continue_button, dt)
+
+	local back_button_pressed = gamepad_active and input_service.get(input_service, "back_menu")
 
 	if self._wait_for_backend_reload then
 		self._wait_for_backend_reload = math.max(self._wait_for_backend_reload - dt, 0)
@@ -1048,7 +1058,7 @@ HeroViewStateLoot._handle_input = function (self, dt, t)
 			end
 		end
 
-		if self._rewards_presented and (self._is_button_pressed(self, continue_button) or input_service.get(input_service, "toggle_menu")) then
+		if self._rewards_presented and (self._is_button_pressed(self, continue_button) or input_service.get(input_service, "toggle_menu") or back_button_pressed) then
 			self.play_sound(self, "play_gui_chest_opening_return")
 
 			self._opening_chest = nil
@@ -1125,9 +1135,11 @@ HeroViewStateLoot._handle_input = function (self, dt, t)
 			self._select_grid_item(self, item, t)
 		end
 
-		if self._is_button_pressed(self, open_button) and self._selected_item then
+		local open_button_pressed = gamepad_active and input_service.get(input_service, "refresh")
+
+		if (self._is_button_pressed(self, open_button) or open_button_pressed) and self._selected_item then
 			self._open_chest(self, self._selected_item)
-		elseif self._is_button_pressed(self, close_button) or input_service.get(input_service, "toggle_menu") then
+		elseif self._is_button_pressed(self, close_button) or input_service.get(input_service, "toggle_menu") or back_button_pressed then
 			parent.close_menu(parent)
 			self.play_sound(self, "Play_hud_select")
 		end
@@ -1215,6 +1227,8 @@ HeroViewStateLoot.open_reward_option = function (self, index)
 	if self._num_rewards_opened == #reward_options then
 		self._rewards_presented = true
 		self._continue_button_animation_duration = 0
+
+		self.menu_input_description:set_input_description(generic_input_actions.loot_presented)
 	end
 
 	return 
@@ -1259,6 +1273,7 @@ HeroViewStateLoot._setup_rewards = function (self, rewards)
 		table.clear(content.item_hotspot)
 		table.clear(content.item_hotspot_2)
 
+		content.item_hotspot_2.allow_multi_hover = true
 		style.item_name.text_color[1] = 0
 		style.item_name_shadow.text_color[1] = 0
 		style.item_type.text_color[1] = 0
@@ -1382,7 +1397,7 @@ end
 HeroViewStateLoot._spawn_hero_skin_unit = function (self, world_previewer, hero_name, career_index, optional_skin)
 	local callback = callback(self, "cb_hero_unit_spawned", world_previewer, hero_name, career_index)
 
-	world_previewer.spawn_hero_unit(world_previewer, hero_name, career_index, false, callback, 0.01, nil, optional_skin)
+	world_previewer.request_spawn_hero_unit(world_previewer, hero_name, career_index, false, callback, 0.01, nil, optional_skin)
 
 	return 
 end
@@ -1468,6 +1483,9 @@ HeroViewStateLoot._open_chest = function (self, selected_item)
 	local hero_name = self.hero_name
 	local backend_id = selected_item.backend_id
 	self._open_loot_chest_id = backend_loot.open_loot_chest(backend_loot, hero_name, backend_id)
+
+	self.menu_input_description:set_input_description(nil)
+
 	self._chest_zoom_in_duration = 0
 	self._chest_zoom_out_duration = nil
 
@@ -1554,6 +1572,8 @@ HeroViewStateLoot._animate_reward_options_entry = function (self, dt)
 
 	if progress == 1 then
 		self._reward_options_entry_progress = nil
+
+		self.menu_input_description:set_input_description(generic_input_actions.chest_opened)
 	else
 		self._reward_options_entry_progress = progress
 	end

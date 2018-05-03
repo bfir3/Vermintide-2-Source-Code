@@ -97,7 +97,7 @@ StartMenuView._setup_state_machine = function (self, state_machine_params, optio
 	local start_state = optional_start_state or StartMenuStateOverview
 	local profiling_debugging_enabled = false
 	state_machine_params.start_state = optional_start_sub_state
-	self._machine = StateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
+	self._machine = GameStateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
 	self._state_machine_params = state_machine_params
 
 	return 
@@ -110,7 +110,17 @@ StartMenuView.clear_wanted_state = function (self)
 
 	return 
 end
-StartMenuView.input_service = function (self)
+StartMenuView.input_service = function (self, ignore_state_input)
+	if not ignore_state_input then
+		local state_machine = self._machine
+
+		if state_machine then
+			local current_state = state_machine.state(state_machine)
+
+			return current_state.input_service(current_state)
+		end
+	end
+
 	return self.input_manager:get_service("start_menu_view")
 end
 StartMenuView.set_input_blocked = function (self, blocked)

@@ -31,18 +31,53 @@ local scenegraph_definition = {
 		horizontal_alignment = "center",
 		position = {
 			0,
-			30,
-			1
+			0,
+			2
 		},
 		size = {
 			1800,
 			80
 		}
+	},
+	background = {
+		vertical_alignment = "bottom",
+		parent = "screen",
+		horizontal_alignment = "center"
 	}
 }
 
 local function sort_input_actions(a, b)
 	return a.priority < b.priority
+end
+
+local texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name("tab_menu_bg_02")
+
+function create_background_widget(num_elements)
+	return {
+		scenegraph_id = "background",
+		element = {
+			passes = {
+				{
+					pass_type = "texture",
+					style_id = "background",
+					texture_id = "background_id"
+				}
+			}
+		},
+		content = {
+			background_id = "tab_menu_bg_02"
+		},
+		style = {
+			background = {
+				vertical_alignment = "bottom",
+				horizontal_alignment = "center",
+				texture_size = {
+					texture_settings.size[1] * num_elements,
+					texture_settings.size[2] * 1.2
+				}
+			}
+		}
+	}
 end
 
 local function create_input_description_widgets(amount)
@@ -174,7 +209,8 @@ MenuInputDescriptionUI.init = function (self, ingame_ui_context, ui_renderer, in
 	return 
 end
 MenuInputDescriptionUI.create_ui_elements = function (self, ui_renderer, number_of_elements)
-	self.console_input_description_widgets = create_input_description_widgets(number_of_elements or 4)
+	self.console_input_description_widgets = create_input_description_widgets(number_of_elements or 5)
+	self.background_widget = UIWidget.init(create_background_widget(number_of_elements or 3))
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 
 	UIRenderer.clear_scenegraph_queue(ui_renderer)
@@ -195,6 +231,8 @@ MenuInputDescriptionUI.draw = function (self, ui_renderer, dt)
 		for i = 1, number_of_descriptions_in_use, 1 do
 			UIRenderer.draw_widget(ui_renderer, console_description_widgets[i])
 		end
+
+		UIRenderer.draw_widget(ui_renderer, self.background_widget)
 	end
 
 	UIRenderer.end_pass(ui_renderer)

@@ -8,7 +8,8 @@ RewardPopupUI.init = function (self, level_end_view_context)
 	self.ui_top_renderer = level_end_view_context.ui_top_renderer
 	self.input_manager = level_end_view_context.input_manager
 	self.world = level_end_view_context.world
-	self.wwise_world = Managers.world:wwise_world(self.world)
+	local wwise_world = level_end_view_context.wwise_world
+	self.wwise_world = wwise_world or Managers.world:wwise_world(self.world)
 	self.render_settings = {
 		snap_pixel_positions = true
 	}

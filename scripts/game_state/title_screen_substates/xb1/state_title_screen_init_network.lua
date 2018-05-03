@@ -80,6 +80,10 @@ StateTitleScreenInitNetwork._create_session = function (self)
 			Managers.package:load("resource_packages/inventory", "global")
 		end
 
+		if Managers.package:is_loading("resource_packages/careers", "global") then
+			Managers.package:load("resource_packages/careers", "global")
+		end
+
 		assert(unique_server_name, "No unique_server_name in %%appdata%%\\Roaming\\Fatshark\\Bulldozer\\user_settings.config")
 
 		self._lobby_finder = LobbyFinder:new(self._network_options, nil, true)

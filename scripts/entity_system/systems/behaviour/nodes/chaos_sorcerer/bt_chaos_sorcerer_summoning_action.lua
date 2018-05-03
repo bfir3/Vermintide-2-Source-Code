@@ -309,12 +309,38 @@ BTChaosSorcererSummoningAction._launch_vortex_dummy_missile = function (self, ow
 	return 
 end
 BTChaosSorcererSummoningAction._spawn_boss_vortex = function (self, unit, blackboard, t, dt, target_position)
+	local action = blackboard.action
+	local vortex_template_name = action.vortex_template_name
+	local vortex_template = VortexTemplates[vortex_template_name]
 	local boss_vortex_data = blackboard.boss_vortex_data
+	local spawn_radius = 6
 	local spawn_pos = POSITION_LOOKUP[unit]
 
 	boss_vortex_data.vortex_spawn_pos:store(spawn_pos)
 
-	boss_vortex_data.vortex_spawn_radius = 6
+	boss_vortex_data.vortex_spawn_radius = spawn_radius
+	local inner_radius_p = math.min(spawn_radius / vortex_template.full_inner_radius, 1)
+	local inner_decal_unit_name = action.inner_decal_unit_name
+
+	if inner_decal_unit_name then
+		local inner_spawn_pose = Matrix4x4.from_quaternion_position(Quaternion.identity(), spawn_pos)
+		local inner_radius = math.max(vortex_template.min_inner_radius, inner_radius_p * vortex_template.full_inner_radius)
+
+		Matrix4x4.set_scale(inner_spawn_pose, Vector3(inner_radius, inner_radius, inner_radius))
+
+		boss_vortex_data.inner_decal_unit = Managers.state.unit_spawner:spawn_network_unit(inner_decal_unit_name, "network_synched_dummy_unit", nil, inner_spawn_pose)
+	end
+
+	local outer_decal_unit_name = action.outer_decal_unit_name
+
+	if outer_decal_unit_name then
+		local outer_spawn_pose = Matrix4x4.from_quaternion_position(Quaternion.identity(), spawn_pos)
+		local outer_radius = math.max(vortex_template.min_outer_radius, inner_radius_p * vortex_template.full_outer_radius)
+
+		Matrix4x4.set_scale(outer_spawn_pose, Vector3(outer_radius, outer_radius, outer_radius))
+
+		boss_vortex_data.outer_decal_unit = Managers.state.unit_spawner:spawn_network_unit(outer_decal_unit_name, "network_synched_dummy_unit", nil, outer_spawn_pose)
+	end
 
 	self._spawn_vortex(self, unit, blackboard, t, dt, target_position, boss_vortex_data)
 
@@ -330,21 +356,30 @@ BTChaosSorcererSummoningAction._spawn_vortex = function (self, unit, blackboard,
 	local vortex_units = vortex_data.vortex_units
 	local spawn_category = "vortex"
 	local link_decal_units = action.link_decal_units_to_vortex
+	local inner_decal_unit = vortex_data.inner_decal_unit
+	local outer_decal_unit = vortex_data.outer_decal_unit
 	local optional_data = {
 		prepare_func = function (breed, extension_init_data)
 			extension_init_data.ai_supplementary_system = {
 				vortex_template_name = vortex_template_name or "standard",
-				inner_decal_unit = link_decal_units and vortex_data.inner_decal_unit,
-				outer_decal_unit = link_decal_units and vortex_data.outer_decal_unit
+				inner_decal_unit = link_decal_units and inner_decal_unit,
+				outer_decal_unit = link_decal_units and outer_decal_unit
 			}
+
+			return 
+		end,
+		spawned_func = function (vortex_unit, breed, optional_data)
+			vortex_units[#vortex_units + 1] = vortex_unit
+			local vortex_blackboard = BLACKBOARDS[vortex_unit]
+			vortex_blackboard.master_unit = unit
+
+			Managers.state.entity:system("surrounding_aware_system"):add_system_event(vortex_unit, "enemy_attack", DialogueSettings.see_vortex_distance, "attack_tag", "chaos_vortex_spawned")
 
 			return 
 		end
 	}
-	local vortex_unit = Managers.state.conflict:spawn_unit(breed, vortex_pos, Quaternion.identity(), spawn_category, nil, nil, optional_data)
-	vortex_units[#vortex_units + 1] = vortex_unit
-	local vortex_blackboard = BLACKBOARDS[vortex_unit]
-	vortex_blackboard.master_unit = unit
+
+	Managers.state.conflict:spawn_queued_unit(breed, Vector3Box(vortex_pos), QuaternionBox(Quaternion.identity()), spawn_category, nil, nil, optional_data)
 
 	if link_decal_units then
 		vortex_data.inner_decal_unit = nil
@@ -352,8 +387,6 @@ BTChaosSorcererSummoningAction._spawn_vortex = function (self, unit, blackboard,
 	end
 
 	blackboard.attack_finished = true
-
-	Managers.state.entity:system("surrounding_aware_system"):add_system_event(vortex_unit, "enemy_attack", DialogueSettings.see_vortex_distance, "attack_tag", "chaos_vortex_spawned")
 
 	return true
 end
@@ -382,14 +415,20 @@ BTChaosSorcererSummoningAction.spawn_portal = function (self, unit, blackboard, 
 			}
 
 			return 
-		end
+		end,
+		spawned_func = function (portal_unit, breed, optional_data)
+			optional_data.sorcerer_blackboard.portal_unit = portal_unit
+
+			return 
+		end,
+		sorcerer_blackboard = blackboard
 	}
 	local spawn_category = "portal"
 
 	if portal_type == "wall" then
-		blackboard.portal_unit = Managers.state.conflict:spawn_unit(breed, tentacle_pos, portal_rot, spawn_category, nil, nil, optional_data)
+		Managers.state.conflict:spawn_queued_unit(breed, Vector3Box(tentacle_pos), QuaternionBox(portal_rot), spawn_category, nil, nil, optional_data)
 	elseif portal_type == "floor" then
-		blackboard.portal_unit = Managers.state.conflict:spawn_unit(breed, tentacle_pos, portal_rot, spawn_category, nil, nil, optional_data)
+		Managers.state.conflict:spawn_queued_unit(breed, Vector3Box(tentacle_pos), QuaternionBox(portal_rot), spawn_category, nil, nil, optional_data)
 	end
 
 	blackboard.portal_search_active = false
@@ -408,12 +447,19 @@ BTChaosSorcererSummoningAction.boss_sorcerer_spawn_tentacle_in_arena = function 
 	local inside_wall_spawn_distance = breed.inside_wall_spawn_distance
 	local spawn_category = "portal"
 	local tentacle_pos = portal_pos - normal * inside_wall_spawn_distance
-	local portal_unit = Managers.state.conflict:spawn_unit(breed, tentacle_pos, portal_rot, spawn_category, nil)
-	blackboard.tentacle_portal_units[portal_unit] = true
-	local tentacle_blackboard = BLACKBOARDS[portal_unit]
-	tentacle_blackboard.boss_master_unit = unit
-	blackboard.num_portals_alive = blackboard.num_portals_alive + 1
-	blackboard.portal_unit = portal_unit
+	local optional_data = {
+		spawned_func = function (portal_unit, breed, optional_data)
+			blackboard.tentacle_portal_units[portal_unit] = true
+			local tentacle_blackboard = BLACKBOARDS[portal_unit]
+			tentacle_blackboard.boss_master_unit = unit
+			blackboard.num_portals_alive = blackboard.num_portals_alive + 1
+			blackboard.portal_unit = portal_unit
+
+			return 
+		end
+	}
+
+	Managers.state.conflict:spawn_queued_unit(breed, Vector3Box(tentacle_pos), QuaternionBox(portal_rot), spawn_category, nil, nil, optional_data)
 
 	return 
 end

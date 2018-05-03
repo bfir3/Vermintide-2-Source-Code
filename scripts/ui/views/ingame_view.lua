@@ -47,6 +47,13 @@ if PLATFORM == "ps4" then
 					disable_when_matchmaking = true
 				},
 				{
+					display_name = "interact_open_inventory_chest",
+					requires_player_unit = true,
+					fade = true,
+					transition_state = "overview",
+					transition = "hero_view_force"
+				},
+				{
 					fade = true,
 					transition = "options_menu",
 					display_name = "options_menu_button_name",
@@ -71,6 +78,13 @@ if PLATFORM == "ps4" then
 					transition_state = "character",
 					transition = "character_selection",
 					disable_when_matchmaking = true
+				},
+				{
+					display_name = "interact_open_inventory_chest",
+					requires_player_unit = true,
+					fade = true,
+					transition_state = "overview",
+					transition = "hero_view_force"
 				},
 				{
 					fade = true,
@@ -102,6 +116,13 @@ if PLATFORM == "ps4" then
 					transition_state = "character",
 					transition = "character_selection",
 					disable_when_matchmaking = true
+				},
+				{
+					display_name = "interact_open_inventory_chest",
+					requires_player_unit = true,
+					fade = true,
+					transition_state = "overview",
+					transition = "hero_view_force"
 				},
 				{
 					fade = true,
@@ -261,6 +282,13 @@ elseif PLATFORM == "xb1" then
 					disable_when_matchmaking = true
 				},
 				{
+					display_name = "interact_open_inventory_chest",
+					requires_player_unit = true,
+					fade = true,
+					transition_state = "overview",
+					transition = "hero_view_force"
+				},
+				{
 					fade = true,
 					transition = "options_menu",
 					display_name = "options_menu_button_name",
@@ -292,6 +320,13 @@ elseif PLATFORM == "xb1" then
 					disable_when_matchmaking = true
 				},
 				{
+					display_name = "interact_open_inventory_chest",
+					requires_player_unit = true,
+					fade = true,
+					transition_state = "overview",
+					transition = "hero_view_force"
+				},
+				{
 					fade = true,
 					transition = "options_menu",
 					display_name = "options_menu_button_name",
@@ -321,6 +356,13 @@ elseif PLATFORM == "xb1" then
 					transition_state = "character",
 					transition = "character_selection",
 					disable_when_matchmaking = true
+				},
+				{
+					display_name = "interact_open_inventory_chest",
+					requires_player_unit = true,
+					fade = true,
+					transition_state = "overview",
+					transition = "hero_view_force"
 				},
 				{
 					fade = true,
@@ -903,6 +945,16 @@ IngameView.update_menu_options = function (self)
 					display_name = "quit_menu_button_name"
 				}
 			}
+
+			if Development.parameter("v2_achievements") then
+				full_access_layout[#full_access_layout + 1] = {
+					display_name = "achievements",
+					requires_player_unit = true,
+					fade = true,
+					transition_state = "achievements",
+					transition = "hero_view"
+				}
+			end
 
 			self.setup_button_layout(self, full_access_layout)
 		end

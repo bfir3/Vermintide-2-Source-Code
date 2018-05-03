@@ -137,7 +137,7 @@ ActionFlamepatch.client_owner_post_update = function (self, dt, t, world, can_da
 				local potential_hit_position = hit[INDEX_POSITION]
 				local hit_actor = hit[INDEX_ACTOR]
 				local potential_hit_unit = Actor.unit(hit_actor)
-				potential_hit_unit, hit_actor = DamageUtils.redirect_shield_hit(potential_hit_unit, hit_actor)
+				potential_hit_unit, hit_actor = ActionUtils.redirect_shield_hit(potential_hit_unit, hit_actor)
 
 				if potential_hit_unit ~= self.owner_unit then
 					local breed = Unit.get_data(potential_hit_unit, "breed")

@@ -3,6 +3,7 @@ local widget_definitions = definitions.widgets
 local category_settings = definitions.category_settings
 local scenegraph_definition = definitions.scenegraph_definition
 local animation_definitions = definitions.animation_definitions
+local generic_input_actions = definitions.generic_input_actions
 local DO_RELOAD = false
 HeroWindowLoadoutInventory = class(HeroWindowLoadoutInventory)
 HeroWindowLoadoutInventory.NAME = "HeroWindowLoadoutInventory"
@@ -79,6 +80,16 @@ HeroWindowLoadoutInventory.on_enter = function (self, params, offset)
 	item_grid.disable_item_drag(item_grid)
 	item_grid.apply_item_sorting_function(item_grid, item_sort_func)
 
+	local player_unit = local_player and local_player.player_unit
+
+	if player_unit then
+		local inventory_extension = ScriptUnit.has_extension(player_unit, "inventory_system")
+
+		if inventory_extension then
+			inventory_extension.check_and_drop_pickups(inventory_extension, "enter_inventory")
+		end
+	end
+
 	return 
 end
 HeroWindowLoadoutInventory.create_ui_elements = function (self, params, offset)
@@ -94,7 +105,11 @@ HeroWindowLoadoutInventory.create_ui_elements = function (self, params, offset)
 
 	self._widgets = widgets
 	self._widgets_by_name = widgets_by_name
+	local input_service = Managers.input:get_service("hero_view")
+	local gui_layer = UILayer.default + 30
+	self._menu_input_description = MenuInputDescriptionUI:new(nil, self.ui_top_renderer, input_service, 4, gui_layer, generic_input_actions.default)
 
+	self._menu_input_description:set_input_description(nil)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
@@ -320,7 +335,7 @@ HeroWindowLoadoutInventory._handle_input = function (self, dt, t)
 
 	if item and not is_equipped then
 		parent._set_loadout_item(parent, item, self._strict_slot_type)
-		self._play_sound(self, "play_gui_lobby_button_04_heroic_deed_inventory_click")
+		self._play_sound(self, "play_gui_equipment_equip_hero")
 	end
 
 	local item_tabs = widgets_by_name.item_tabs
@@ -338,6 +353,18 @@ HeroWindowLoadoutInventory._handle_input = function (self, dt, t)
 	if tab_index_pressed and tab_index_pressed ~= self._internal_slot_index then
 		parent.set_selected_loadout_slot_index(parent, tab_index_pressed)
 		self._play_sound(self, "play_gui_inventory_tab_click")
+	elseif Managers.input:is_device_active("gamepad") then
+		local input_service = Managers.input:get_service("hero_view")
+		local current_index = parent._selected_loadout_slot_index or 1
+		local num_tabs = #self._career_category_settings_index_lookup
+
+		if input_service.get(input_service, "cycle_previous") and 1 < current_index then
+			parent.set_selected_loadout_slot_index(parent, current_index - 1)
+			self._play_sound(self, "play_gui_inventory_tab_click")
+		elseif input_service.get(input_service, "cycle_next") and current_index < num_tabs then
+			parent.set_selected_loadout_slot_index(parent, current_index + 1)
+			self._play_sound(self, "play_gui_inventory_tab_click")
+		end
 	end
 
 	local page_button_next = widgets_by_name.page_button_next
@@ -421,6 +448,7 @@ HeroWindowLoadoutInventory.draw = function (self, dt)
 	local ui_top_renderer = self.ui_top_renderer
 	local ui_scenegraph = self.ui_scenegraph
 	local input_service = self.parent:window_input_service()
+	local gamepad_active = Managers.input:is_device_active("gamepad")
 
 	UIRenderer.begin_pass(ui_top_renderer, ui_scenegraph, input_service, dt, nil, self.render_settings)
 
@@ -437,6 +465,10 @@ HeroWindowLoadoutInventory.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
+
+	if gamepad_active then
+		self._menu_input_description:draw(ui_top_renderer, dt)
+	end
 
 	return 
 end

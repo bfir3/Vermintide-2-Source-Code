@@ -279,11 +279,7 @@ PlayerUnitFirstPerson.update_rotation = function (self, t, dt)
 	local first_person_unit = self.first_person_unit
 	local aim_assist_data = self.smart_targeting_extension:get_targeting_data()
 
-	if Bulldozer.rift then
-		local new_rotation = Oculus.get_orientation(Bulldozer.rift_info.hmd_device)
-
-		Unit.set_local_rotation(first_person_unit, 0, new_rotation)
-	elseif self.forced_look_rotation ~= nil then
+	if self.forced_look_rotation ~= nil then
 		local total_lerp_time = self.forced_total_lerp_time or 0.3
 		self.forced_lerp_timer = self.forced_lerp_timer + dt
 		local p = 1 - self.forced_lerp_timer / total_lerp_time
@@ -705,6 +701,29 @@ end
 PlayerUnitFirstPerson.play_sound_event = function (self, event, position)
 	local sound_position = position or self.current_position(self)
 	local wwise_source_id, wwise_world = WwiseUtils.make_position_auto_source(self.world, sound_position)
+
+	WwiseWorld.set_switch(wwise_world, "husk", "false", wwise_source_id)
+	WwiseWorld.trigger_event(wwise_world, event, wwise_source_id)
+
+	return 
+end
+PlayerUnitFirstPerson.play_unit_sound_event = function (self, event, unit, node_id, play_on_husk)
+	local event_id = NetworkLookup.sound_events[event]
+
+	if play_on_husk and not LEVEL_EDITOR_TEST then
+		local network_manager = Managers.state.network
+		local network_transmit = network_manager.network_transmit
+		local is_server = Managers.player.is_server
+		local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+
+		if is_server then
+			network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+		else
+			network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+		end
+	end
+
+	local wwise_source_id, wwise_world = WwiseUtils.make_unit_auto_source(self.world, unit, node_id)
 
 	WwiseWorld.set_switch(wwise_world, "husk", "false", wwise_source_id)
 	WwiseWorld.trigger_event(wwise_world, event, wwise_source_id)

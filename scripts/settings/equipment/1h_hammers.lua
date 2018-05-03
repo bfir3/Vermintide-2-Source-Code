@@ -896,28 +896,28 @@ weapon_template.tooltip_keywords = {
 	"weapon_keyword_wide_sweeps",
 	"weapon_keyword_crowd_control"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.9,
-			stagger = 0.9,
-			damage = 0.28125,
-			targets = 0.8
-		},
-		heavy_attack = {
-			speed = 0.4,
-			stagger = 0.4,
-			damage = 0.625,
-			targets = 0.2
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "light_attack_left"
 	},
-	perks = {
-		light_attack = {
-			"head_shot"
-		},
-		heavy_attack = {
-			"armor_penetration"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "heavy_attack_left"
+	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	push = {
+		action_name = "action_one",
+		sub_action_name = "push"
 	}
 }
 weapon_template.wwise_dep_right_hand = {

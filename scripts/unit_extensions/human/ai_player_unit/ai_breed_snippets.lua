@@ -328,6 +328,7 @@ AiBreedSnippets.on_chaos_troll_spawn = function (unit, blackboard)
 	blackboard.crouch_sticky_timer = 0
 	blackboard.displaced_units = {}
 	blackboard.next_move_check = 0
+	blackboard.next_rage_time = 0
 	local breed = blackboard.breed
 	local difficulty_rank = Managers.state.difficulty:get_difficulty_rank()
 	blackboard.health_regen_per_sec = breed.health_regen_per_sec[difficulty_rank]
@@ -437,6 +438,7 @@ AiBreedSnippets.on_storm_vermin_champion_spawn = function (unit, blackboard)
 	blackboard.switching_weapons = 2
 	blackboard.dual_wield_timer = Managers.time:time("game") + 30
 	blackboard.dual_wield_mode = true
+	blackboard.num_times_hit_skaven = 0
 
 	if breed.displace_players_data then
 		blackboard.displaced_units = {}
@@ -1137,6 +1139,7 @@ AiBreedSnippets.on_chaos_exalted_champion_spawn = function (unit, blackboard)
 	end
 
 	blackboard.is_valid_target_func = GenericStatusExtension.is_lord_target
+	blackboard.num_times_hit_chaos_warrior = 0
 
 	return 
 end
@@ -1300,7 +1303,7 @@ AiBreedSnippets.on_chaos_exalted_champion_norsca_update = function (unit, blackb
 	local breed = blackboard.breed
 	local hp = ScriptUnit.extension(blackboard.unit, "health_system"):current_health_percent()
 
-	if blackboard.current_phase == 1 and hp < 0.85 then
+	if blackboard.current_phase == 1 and hp < 0.7 then
 		blackboard.current_phase = 2
 	end
 
@@ -1385,6 +1388,19 @@ AiBreedSnippets.on_stormfiend_boss_update = function (unit, blackboard)
 	local breed = blackboard.breed
 	local hp = ScriptUnit.extension(blackboard.unit, "health_system"):current_health_percent()
 	local hp_at_mounted = blackboard.hp_at_mounted
+	local self_pos = POSITION_LOOKUP[unit]
+	local num = 0
+	local range = 4
+
+	for i, position in ipairs(PLAYER_AND_BOT_POSITIONS) do
+		local player_unit = PLAYER_AND_BOT_UNITS[i]
+
+		if Vector3.distance(self_pos, position) < range and not ScriptUnit.extension(player_unit, "status_system"):is_disabled() then
+			num = num + 1
+		end
+	end
+
+	blackboard.surrounding_players = num
 
 	if 0.25 <= hp_at_mounted - hp then
 		AiBreedSnippets.on_stormfiend_boss_dismount(unit, blackboard)
@@ -1395,7 +1411,7 @@ end
 AiBreedSnippets.on_stormfiend_boss_dismount = function (unit, blackboard)
 	local grey_seer_unit = blackboard.linked_unit
 
-	if grey_seer_unit then
+	if AiUtils.unit_alive(grey_seer_unit) then
 		local grey_seer_blackboard = BLACKBOARDS[grey_seer_unit]
 		local mounted_data = grey_seer_blackboard.mounted_data
 		local network_manager = Managers.state.network
@@ -1586,7 +1602,9 @@ AiBreedSnippets.on_grey_seer_update = function (unit, blackboard, t)
 		end
 	end
 
-	if mounted_data.knocked_off_mounted_timer and blackboard.hp_at_knocked_off and 0.15 <= blackboard.hp_at_knocked_off - hp then
+	local call_mount_hp_threshold = 0.25
+
+	if mounted_data.knocked_off_mounted_timer and blackboard.hp_at_knocked_off and call_mount_hp_threshold <= blackboard.hp_at_knocked_off - hp then
 		mounted_data.knocked_off_mounted_timer = t
 	end
 

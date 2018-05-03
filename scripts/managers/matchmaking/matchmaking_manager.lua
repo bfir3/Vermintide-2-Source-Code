@@ -10,10 +10,6 @@ require("scripts/managers/matchmaking/matchmaking_state_friend_client")
 require("scripts/managers/matchmaking/matchmaking_state_wait_for_countdown")
 require("scripts/managers/matchmaking/matchmaking_handshaker")
 
-if PLATFORM == "xb1" then
-	require("scripts/managers/matchmaking/matchmaking_state_start_host_game")
-end
-
 MatchmakingManager = class(MatchmakingManager)
 script_data.matchmaking_debug = script_data.matchmaking_debug or Development.parameter("matchmaking_debug")
 
@@ -111,6 +107,7 @@ MatchmakingManager.init = function (self, params)
 	self.network_server = params.network_server
 	self.slot_allocator = params.slot_allocator
 	self._network_hash = self.lobby.network_hash
+	self._host_matchmaking_data = {}
 	self._quick_game = params.quick_game
 	self.handshaker_host = MatchmakingHandshakerHost:new(self.network_transmit)
 
@@ -383,12 +380,18 @@ MatchmakingManager.update = function (self, dt, t)
 
 	if self.is_server then
 		local is_matchmaking, private_game = self.is_game_matchmaking(self)
+		local search_info = self.search_info(self)
+		local level_key = search_info.level_key
+		local difficulty = search_info.difficulty
+		local quick_game = search_info.quick_game or false
+		local level_key_lookup = (level_key and NetworkLookup.level_keys[level_key]) or NetworkLookup.level_keys["n/a"]
+		local difficulty_lookup = (difficulty and NetworkLookup.difficulties[difficulty]) or NetworkLookup.difficulties.normal
 
 		for peer_id, _ in pairs(self.peers_to_sync) do
 			if self.handshaker_host:handshake_done(peer_id) then
 				self.peers_to_sync[peer_id] = nil
 
-				self.handshaker_host:send_rpc_to_client("rpc_set_matchmaking", peer_id, is_matchmaking, private_game)
+				self.handshaker_host:send_rpc_to_client("rpc_set_matchmaking", peer_id, is_matchmaking, private_game, level_key_lookup, difficulty_lookup, quick_game)
 			end
 		end
 
@@ -831,7 +834,7 @@ MatchmakingManager.set_matchmaking_data = function (self, next_level_key, diffic
 	lobby_data.difficulty = difficulty
 	lobby_data.quick_game = (quick_game and "true") or "false"
 	lobby_data.country_code = rawget(_G, "Steam") and Steam.user_country_code()
-	lobby_data.twitch_enabled = (Managers.twitch:is_connected() and "true") or "false"
+	lobby_data.twitch_enabled = (GameSettingsDevelopment.twitch_enabled and Managers.twitch:is_connected() and "true") or "false"
 	lobby_data.eac_authorized = (eac_authorized and "true") or "false"
 
 	print("[MATCHMAKING] - Hosting game on level:", current_level_key, next_level_key)
@@ -874,7 +877,14 @@ MatchmakingManager.find_game = function (self, search_config)
 			end
 		end
 
-		self.handshaker_host:send_rpc_to_clients("rpc_set_matchmaking", true, private_game)
+		local search_info = self.search_info(self)
+		local level_key = search_info.level_key
+		local difficulty = search_info.difficulty
+		local quick_game = search_info.quick_game
+		local level_key_lookup = (level_key and NetworkLookup.level_keys[level_key]) or NetworkLookup.level_keys["n/a"]
+		local difficulty_lookup = (difficulty and NetworkLookup.difficulties[difficulty]) or NetworkLookup.difficulties.normal
+
+		self.handshaker_host:send_rpc_to_clients("rpc_set_matchmaking", true, private_game, level_key_lookup, difficulty_lookup, quick_game)
 		self._change_state(self, next_state, self.params, self.state_context)
 
 		self.start_matchmaking_time = 1000000
@@ -897,16 +907,18 @@ MatchmakingManager.cancel_matchmaking = function (self)
 		return 
 	end
 
-	local player = Managers.player:local_player(1)
-	local connection_state = "cancelled"
-	local started_matchmaking_t = self.state_context.started_matchmaking_t
+	if PLATFORM == "win32" then
+		local player = Managers.player:local_player(1)
+		local connection_state = "cancelled"
+		local started_matchmaking_t = self.state_context.started_matchmaking_t
 
-	if started_matchmaking_t ~= nil then
-		local t = Managers.time:time("main") or started_matchmaking_t
-		local time_taken = t - started_matchmaking_t
-		local using_strict_matchmaking = self.state_context.search_config.strict_matchmaking
+		if started_matchmaking_t ~= nil then
+			local t = Managers.time:time("main") or started_matchmaking_t
+			local time_taken = t - started_matchmaking_t
+			local using_strict_matchmaking = self.state_context.search_config.strict_matchmaking
 
-		Managers.telemetry.events:matchmaking_connection(player, connection_state, time_taken, using_strict_matchmaking)
+			Managers.telemetry.events:matchmaking_connection(player, connection_state, time_taken, using_strict_matchmaking)
+		end
 	end
 
 	self.state_context = {}
@@ -926,7 +938,12 @@ MatchmakingManager.cancel_matchmaking = function (self)
 		stored_lobby_data.matchmaking = "false"
 
 		self.lobby:set_lobby_data(stored_lobby_data)
-		self.handshaker_host:send_rpc_to_clients("rpc_set_matchmaking", false, false)
+
+		local level_key_lookup = NetworkLookup.level_keys["n/a"]
+		local difficulty_lookup = NetworkLookup.difficulties.normal
+		local quick_game = false
+
+		self.handshaker_host:send_rpc_to_clients("rpc_set_matchmaking", false, false, level_key_lookup, difficulty_lookup, quick_game)
 		self.reset_lobby_filters(self)
 
 		if not DEDICATED_SERVER then
@@ -952,7 +969,7 @@ MatchmakingManager.is_game_matchmaking = function (self)
 
 	return is_matchmaking, private_game
 end
-MatchmakingManager.rpc_set_matchmaking = function (self, sender, client_cookie, host_cookie, is_matchmaking, private_game)
+MatchmakingManager.rpc_set_matchmaking = function (self, sender, client_cookie, host_cookie, is_matchmaking, private_game, level_key, difficulty, quick_game)
 	if not self.handshaker_client:validate_cookies(client_cookie, host_cookie) then
 		return 
 	end
@@ -961,6 +978,11 @@ MatchmakingManager.rpc_set_matchmaking = function (self, sender, client_cookie, 
 		mm_printf_force("Set matchmaking=%s, private_game=%s", tostring(is_matchmaking), tostring(private_game))
 
 		if is_matchmaking then
+			local level_key = NetworkLookup.level_keys[level_key]
+			local difficulty = NetworkLookup.difficulties[difficulty]
+			self._host_matchmaking_data.level_key = level_key
+			self._host_matchmaking_data.difficulty = difficulty
+			self._host_matchmaking_data.quick_game = quick_game
 			local state_context = {
 				private_game = private_game
 			}
@@ -975,6 +997,7 @@ MatchmakingManager.rpc_set_matchmaking = function (self, sender, client_cookie, 
 				current_state.lobby_client = nil
 			end
 
+			table.clear(self._host_matchmaking_data)
 			self._change_state(self, MatchmakingStateIdle, self.params, {})
 		end
 	end
@@ -1001,7 +1024,7 @@ MatchmakingManager.update_profiles_data_on_clients = function (self)
 
 	return 
 end
-MatchmakingManager.rpc_matchmaking_request_join_lobby = function (self, sender, client_cookie, host_cookie, lobby_id)
+MatchmakingManager.rpc_matchmaking_request_join_lobby = function (self, sender, client_cookie, host_cookie, lobby_id, friend_join)
 	local id = self.lobby:id()
 	id = tostring(id)
 	lobby_id = tostring(lobby_id)
@@ -1021,7 +1044,7 @@ MatchmakingManager.rpc_matchmaking_request_join_lobby = function (self, sender, 
 	local is_friend = false
 
 	if not DEDICATED_SERVER then
-		is_friend = LobbyInternal.is_friend(sender)
+		is_friend = LobbyInternal.is_friend(sender) or friend_join
 	end
 
 	if not lobby_id_match then
@@ -1509,7 +1532,9 @@ MatchmakingManager.cancel_join_lobby = function (self, reason)
 		self._lobby_browser:cancel_join_lobby(reason)
 	end
 
-	Managers.simple_popup:queue_popup(Localize(reason), Localize("popup_error_topic"), "ok", Localize("popup_choice_ok"))
+	if reason ~= "cancelled" then
+		Managers.simple_popup:queue_popup(Localize(reason), Localize("popup_error_topic"), "ok", Localize("popup_choice_ok"))
+	end
 
 	return 
 end
@@ -1678,7 +1703,7 @@ MatchmakingManager.search_info = function (self)
 				info.quick_game = quick_game
 			end
 		end
-	else
+	elseif PLATFORM ~= "xb1" then
 		local lobby = self.lobby
 		local level_key = lobby.lobby_data(lobby, "selected_level_key")
 		local difficulty = lobby.lobby_data(lobby, "difficulty")
@@ -1686,6 +1711,12 @@ MatchmakingManager.search_info = function (self)
 		info.level_key = level_key
 		info.difficulty = difficulty
 		info.quick_game = quick_game
+	elseif not table.is_empty(self._host_matchmaking_data) then
+		info.level_key = self._host_matchmaking_data.level_key
+		info.difficulty = self._host_matchmaking_data.difficulty
+		info.quick_game = self._host_matchmaking_data.quick_game
+	else
+		info.no_lobby_data = true
 	end
 
 	local status = self._matchmaking_status(self)

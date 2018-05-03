@@ -90,6 +90,10 @@ SoundEnvironmentSystem.set_source_environment = function (self, source, position
 		return 
 	end
 
+	if not Vector3.is_valid(position) then
+		return 
+	end
+
 	local volume_name = self._highest_prio_environment_at_position(self, position)
 	local environments = self._environments
 	local wwise_world = self.wwise_world

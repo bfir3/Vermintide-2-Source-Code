@@ -46,7 +46,10 @@ PlayerCharacterStateOverchargeExploding.on_exit = function (self, unit, input, d
 	CharacterStateHelper.play_animation_event(unit, "cooldown_end")
 	CharacterStateHelper.play_animation_event_first_person(self.first_person_extension, "cooldown_end")
 
-	if not self.has_exploded then
+	local career_extension = ScriptUnit.extension(unit, "career_system")
+	local career_name = career_extension.career_name(career_extension)
+
+	if not self.has_exploded and (career_name ~= "bw_unchained" or career_extension.get_state(career_extension) ~= "sienna_activate_unchained") then
 		self.explode(self)
 	end
 
@@ -123,8 +126,10 @@ PlayerCharacterStateOverchargeExploding.update = function (self, unit, input, dt
 		return 
 	end
 
-	if self.explosion_time <= t and not self.has_exploded then
-		self.explode(self)
+	if (self.explosion_time <= t and not self.has_exploded) or not status_extension.is_overcharge_exploding(status_extension) then
+		if status_extension.is_overcharge_exploding(status_extension) then
+			self.explode(self)
+		end
 
 		if locomotion_extension.is_on_ground(locomotion_extension) then
 			local is_moving = CharacterStateHelper.has_move_input(input_extension)

@@ -237,6 +237,15 @@ local scenegraph_definition = {
 	},
 	texts = {
 		parent = "background"
+	},
+	beta_disclaimer = {
+		vertical_alignment = "center",
+		parent = "background",
+		horizontal_alignment = "center",
+		size = {
+			1600,
+			528
+		}
 	}
 }
 local dead_space_filler = {
@@ -336,6 +345,46 @@ local splash_content = {
 		}
 	}
 }
+
+if Development.parameter("use_beta_overlay") or script_data.settings.use_beta_overlay then
+	splash_content[#splash_content + 1] = {
+		scenegraph_id = "background",
+		type = "texture",
+		axis = 2,
+		time = 10,
+		text_vertical_alignment = "center",
+		forced = true,
+		text_horizontal_alignment = "center",
+		spacing = 5,
+		dynamic_font = false,
+		direction = 1,
+		pixel_perfect = false,
+		texts_scenegraph_id = "texts",
+		font_type = "hell_shark",
+		localize = false,
+		font_size = 52,
+		texts = {
+			"PRE-RELEASE SOFTWARE",
+			"***",
+			"This game is in a pre-release stage of development. This means ",
+			"that some parts of the game, including Xbox Live features (like",
+			"chat and multiplayer), might not function as expected (or might",
+			"not function at all). The game might even crash. Because this is",
+			"a pre-release game, Microsoft and the publisher do not commit",
+			"to providing customer support for the game."
+		},
+		size = {
+			1920,
+			70
+		},
+		offset = {
+			0,
+			750,
+			0
+		}
+	}
+end
+
 SplashView = class(SplashView)
 SplashView.init = function (self, input_manager, world)
 	if PLATFORM == "ps4" then
@@ -481,11 +530,42 @@ SplashView.set_index = function (self, index)
 
 	return 
 end
+local DO_RELOAD = true
+SplashView._create_ui_elements = function (self)
+	print("doing_stuff")
+	table.clear(self._splash_widgets)
+
+	for _, splash in pairs(splash_content) do
+		local widget = nil
+
+		if splash.type == "video" then
+			widget = UIWidgets.create_splash_video(splash)
+		elseif splash.partner_splash then
+			widget = UIWidgets.create_partner_splash_widget(splash)
+		else
+			widget = UIWidgets.create_splash_texture(splash)
+		end
+
+		self._splash_widgets[#self._splash_widgets + 1] = UIWidget.init(widget)
+	end
+
+	self._current_index = self._current_index - 1
+
+	self._next_splash(self)
+
+	DO_RELOAD = false
+
+	return 
+end
 SplashView.update = function (self, dt)
 	if PLATFORM == "win32" and self._fram_skip_hack < 1 then
 		self._fram_skip_hack = self._fram_skip_hack + 1
 
 		return 
+	end
+
+	if DO_RELOAD then
+		self._create_ui_elements(self)
 	end
 
 	local w, h = Gui.resolution()

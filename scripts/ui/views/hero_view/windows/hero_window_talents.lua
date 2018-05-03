@@ -6,6 +6,7 @@ local definitions = local_require("scripts/ui/views/hero_view/windows/definition
 local widget_definitions = definitions.widgets
 local scenegraph_definition = definitions.scenegraph_definition
 local animation_definitions = definitions.animation_definitions
+local generic_input_actions = definitions.generic_input_actions
 local DO_RELOAD = false
 HeroWindowTalents = class(HeroWindowTalents)
 HeroWindowTalents.NAME = "HeroWindowTalents"
@@ -15,6 +16,7 @@ HeroWindowTalents.on_enter = function (self, params, offset)
 	self.parent = params.parent
 	local ingame_ui_context = params.ingame_ui_context
 	self.ui_renderer = ingame_ui_context.ui_renderer
+	self.ui_top_renderer = ingame_ui_context.ui_top_renderer
 	self.input_manager = ingame_ui_context.input_manager
 	self.statistics_db = ingame_ui_context.statistics_db
 	self.render_settings = {
@@ -78,7 +80,11 @@ HeroWindowTalents.create_ui_elements = function (self, params, offset)
 
 	self._widgets = widgets
 	self._widgets_by_name = widgets_by_name
+	local input_service = Managers.input:get_service("hero_view")
+	local gui_layer = UILayer.default + 30
+	self._menu_input_description = MenuInputDescriptionUI:new(nil, self.ui_top_renderer, input_service, 4, gui_layer, generic_input_actions.default)
 
+	self._menu_input_description:set_input_description(nil)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
@@ -209,9 +215,14 @@ HeroWindowTalents._handle_input = function (self, dt, t)
 	local row, column = self._is_talent_pressed(self)
 
 	if row and column then
+		if self._selected_talents[row] == 0 then
+			self._play_sound(self, "play_gui_talent_unlock")
+		else
+			self._play_sound(self, "play_gui_talents_selection_click")
+		end
+
 		self._selected_talents[row] = column
 
-		self._play_sound(self, "play_gui_talents_selection_click")
 		self._update_talent_sync(self)
 		parent.update_talent_sync(parent)
 	end
@@ -220,8 +231,10 @@ HeroWindowTalents._handle_input = function (self, dt, t)
 end
 HeroWindowTalents.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
+	local ui_top_renderer = self.ui_top_renderer
 	local ui_scenegraph = self.ui_scenegraph
 	local input_service = self.parent:window_input_service()
+	local gamepad_active = Managers.input:is_device_active("gamepad")
 
 	UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt, nil, self.render_settings)
 
@@ -238,6 +251,10 @@ HeroWindowTalents.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
+
+	if gamepad_active then
+		self._menu_input_description:draw(ui_top_renderer, dt)
+	end
 
 	return 
 end

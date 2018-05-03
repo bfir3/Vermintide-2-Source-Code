@@ -32,8 +32,12 @@ StateTitleScreenMain.on_enter = function (self, params)
 			Managers.account:reset()
 		end
 
-		if script_data.honduras_demo or PLATFORM == "xb1" then
-			self._update_ui_settings(self)
+		self._update_ui_settings(self)
+
+		if Managers.xbox_stats then
+			Managers.xbox_stats:destroy()
+
+			Managers.xbox_stats = nil
 		end
 	else
 		Managers.account:reset()
@@ -48,7 +52,7 @@ StateTitleScreenMain.on_enter = function (self, params)
 	Managers.input:set_all_gamepads_available()
 
 	if Managers.voice_chat and Managers.voice_chat:initiated() then
-		Managers.voice_chat:shutdown()
+		Managers.voice_chat:reset()
 	end
 
 	self._network_event_meta_table = {

@@ -84,10 +84,10 @@ PlayerUnitHealthExtension.create_health_game_object = function (self)
 end
 PlayerUnitHealthExtension.sync_health_state = function (self)
 	local player = self.player
-	local health_state, health_percentage, ammo = Managers.state.spawn:get_status(player)
+	local health_state, health_percentage, temporary_health_percentage, melee_ammo, ranged_ammo = Managers.state.spawn:get_status(player)
 
 	if script_data.network_debug then
-		printf("PlayerUnitHealthExtension:sync_health_state() health_state (%s) health_percentage (%s), ammo (%s)", health_state, tostring(health_percentage), tostring(ammo))
+		printf("PlayerUnitHealthExtension:sync_health_state() health_state (%s) health_percentage (%s) temporary_health_percentage (%s) melee slot ammo (%s) ranged slot ammo (%s)", health_state, tostring(health_percentage), tostring(temporary_health_percentage), tostring(melee_ammo), tostring(ranged_ammo))
 	end
 
 	if health_state == nil then
@@ -95,6 +95,7 @@ PlayerUnitHealthExtension.sync_health_state = function (self)
 		table.dump(player)
 	else
 		self.set_health_percentage = health_percentage
+		self.set_temporary_health_percentage = temporary_health_percentage
 
 		if health_state == "knocked_down" then
 			self._knock_down(self, self.unit)
@@ -216,6 +217,13 @@ PlayerUnitHealthExtension.update = function (self, dt, context, t)
 		if set_health_percentage then
 			health = max_health * set_health_percentage
 			self.set_health_percentage = nil
+		end
+
+		local set_temporary_health_percentage = self.set_temporary_health_percentage
+
+		if set_temporary_health_percentage then
+			temporary_health = max_health * set_temporary_health_percentage
+			self.set_temporary_health_percentage = nil
 		end
 
 		health = DamageUtils.networkify_health(health)

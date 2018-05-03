@@ -218,9 +218,13 @@ SurroundingAwareSystem.update_lookat = function (self, context, t)
 	local Broadphase = Broadphase
 	local broadphase = self.broadphase
 	local extension = observers[unit]
-	local observer_wp = POSITION_LOOKUP[unit]
+	local observer_world_pos = POSITION_LOOKUP[unit]
 
-	Broadphase.move(broadphase, extension.broadphase_id, observer_wp)
+	if not observer_world_pos then
+		return 
+	end
+
+	Broadphase.move(broadphase, extension.broadphase_id, observer_world_pos)
 
 	local time_since_last = t - extension.last_lookat_trigger
 

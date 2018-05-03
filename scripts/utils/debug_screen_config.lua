@@ -102,12 +102,6 @@ local settings = {
 		category = "Allround useful stuff!"
 	},
 	{
-		description = "Will enable buttons for reloading the content and give progress for selected contracts",
-		is_boolean = true,
-		setting_name = "debug_quest_view",
-		category = "Allround useful stuff!"
-	},
-	{
 		description = "Use LAN instead of Steam",
 		is_boolean = true,
 		setting_name = "use_lan_backend",
@@ -140,12 +134,6 @@ local settings = {
 
 			return 
 		end
-	},
-	{
-		description = "shows the debug lobby broswer in the ingame menu (requires restart)",
-		is_boolean = true,
-		setting_name = "enable_debug_lobby_browser",
-		category = "Allround useful stuff!"
 	},
 	{
 		description = "Requires restart. Gives you all items of a certain rarity",
@@ -204,13 +192,12 @@ local settings = {
 		setting_name = "Make player imba kthx",
 		category = "Presets",
 		preset = {
-			disable_spread = true,
+			ledge_hanging_turned_off = true,
 			player_mechanics_goodness_debug = true,
 			infinite_ammo = true,
 			disable_gamemode_end = true,
 			disable_fatigue_system = true,
 			player_invincible = true,
-			ledge_hanging_turned_off = true,
 			use_super_jumps = true
 		}
 	},
@@ -304,8 +291,7 @@ local settings = {
 		category = "Presets",
 		preset = {
 			debug_player_position = true,
-			paste_revision_to_clipboard = true,
-			generate_svn_info = true
+			paste_revision_to_clipboard = true
 		}
 	},
 	{
@@ -388,14 +374,6 @@ local settings = {
 		}
 	},
 	{
-		description = "Prints the players current movementspeed when moving.",
-		setting_name = "Show player movementspeed",
-		category = "Presets",
-		preset = {
-			debug_player_movementspeed = true
-		}
-	},
-	{
 		description = "This is used to turn off screen effects affecting the main character in case the camera is changed into a 3rd person view.",
 		setting_name = "Replay Settings",
 		category = "Presets",
@@ -412,12 +390,6 @@ local settings = {
 			screen_space_player_camera_reactions = true,
 			fade_on_camera_ai_collision = true
 		}
-	},
-	{
-		description = "show volume of adept super",
-		is_boolean = true,
-		setting_name = "debug_adept_super_aoe",
-		category = "Player mechanics recommended"
 	},
 	{
 		description = "Make the player unkillable.",
@@ -451,7 +423,7 @@ local settings = {
 	{
 		description = [[
 Features that make player mechanics nicer to work with.
- * Enables incresing/decreasing the player run speed via ALT+MouseScroll.
+ * Enables increasing/decreasing the player run speed via ALT+MouseScroll.
  * Allows you to press 'B' to take debug damage.
  * Kill yourself on 'CTRL' + 'V'
  * Revive yourself on 'CTRL' + 'B'
@@ -479,21 +451,9 @@ Features that make player mechanics nicer to work with.
 		}
 	},
 	{
-		description = "Press i to start looping through all weapons of your current character and equipping them",
-		is_boolean = true,
-		setting_name = "debug_equip_all_weapons",
-		category = "Player mechanics"
-	},
-	{
 		description = "For enabling melee weapon debugging.",
 		is_boolean = true,
 		setting_name = "debug_weapons",
-		category = "Player mechanics"
-	},
-	{
-		description = "Disable targetting feature",
-		is_boolean = true,
-		setting_name = "debug_weapons_no_targetting",
 		category = "Player mechanics"
 	},
 	{
@@ -575,6 +535,12 @@ Features that make player mechanics nicer to work with.
 		category = "Player mechanics"
 	},
 	{
+		description = "Enable hero stats in inventory",
+		is_boolean = true,
+		setting_name = "hero_statistics",
+		category = "Player mechanics"
+	},
+	{
 		description = "Enable Animation Logging In The Console For The First Person Local Player.",
 		is_boolean = true,
 		setting_name = "debug_player_animations",
@@ -611,12 +577,6 @@ Features that make player mechanics nicer to work with.
 		category = "Player mechanics"
 	},
 	{
-		description = "Enable Charge Debug Information",
-		is_boolean = true,
-		setting_name = "charge_debug",
-		category = "Player mechanics"
-	},
-	{
 		description = "Enable OverCharge Debug Information",
 		is_boolean = true,
 		setting_name = "overcharge_debug",
@@ -629,19 +589,7 @@ Features that make player mechanics nicer to work with.
 		category = "Player mechanics"
 	},
 	{
-		description = "Disable The Spread On Ranged Weapons",
-		is_boolean = true,
-		setting_name = "disable_spread",
-		category = "Player mechanics"
-	},
-	{
-		description = "disable player walking, useful when you want to control time using shift",
-		is_boolean = true,
-		setting_name = "disable_player_walking",
-		category = "Player mechanics"
-	},
-	{
-		description = "makes it so you cant fall and hang from ledges",
+		description = "Makes it so you cant fall and hang from ledges.",
 		is_boolean = true,
 		setting_name = "ledge_hanging_turned_off",
 		category = "Player mechanics"
@@ -653,15 +601,9 @@ Features that make player mechanics nicer to work with.
 		category = "Player mechanics"
 	},
 	{
-		description = "makes it so you dont die when you hang from ledge and fall",
+		description = "Makes it so you dont die when you hang from ledge and fall.",
 		is_boolean = true,
 		setting_name = "ledge_hanging_fall_and_die_turned_off",
-		category = "Player mechanics"
-	},
-	{
-		description = "unlocks every weapon trait on all weapons",
-		is_boolean = true,
-		setting_name = "unlock_all_weapon_traits",
 		category = "Player mechanics"
 	},
 	{
@@ -674,12 +616,6 @@ Features that make player mechanics nicer to work with.
 		description = "Tutorial stuffs",
 		is_boolean = true,
 		setting_name = "tutorial_debug",
-		category = "Player mechanics"
-	},
-	{
-		description = "Unlock all tutorials without having to complete them in order",
-		is_boolean = true,
-		setting_name = "tutorial_cheat",
 		category = "Player mechanics"
 	},
 	{
@@ -720,12 +656,6 @@ Features that make player mechanics nicer to work with.
 		description = "Show the player's position on the screen",
 		is_boolean = true,
 		setting_name = "debug_player_position",
-		category = "Player mechanics"
-	},
-	{
-		description = "Shows players movementspeed",
-		is_boolean = true,
-		setting_name = "debug_player_movementspeed",
 		category = "Player mechanics"
 	},
 	{
@@ -810,12 +740,6 @@ Features that make player mechanics nicer to work with.
 		description = "Show player health",
 		is_boolean = true,
 		setting_name = "show_player_health",
-		category = "Player mechanics"
-	},
-	{
-		description = "Debug trueflight volley",
-		is_boolean = true,
-		setting_name = "debug_trueflight_volley",
 		category = "Player mechanics"
 	},
 	{
@@ -1077,12 +1001,6 @@ Features that make player mechanics nicer to work with.
 		category = "Conflict & Pacing"
 	},
 	{
-		description = "Choose between different pacing settings.",
-		setting_name = "current_pacing_setting",
-		category = "Conflict & Pacing",
-		item_source = PacingSettings
-	},
-	{
 		description = "Show all hidden spawners with vertical lines.",
 		is_boolean = true,
 		setting_name = "show_hidden_spawners",
@@ -1306,6 +1224,20 @@ Features that make player mechanics nicer to work with.
 		category = "AI"
 	},
 	{
+		description = "Policy to use for the enemy package loader (see EnemyPackageLoaderSettings). [NEED TO RESTART GAME]",
+		setting_name = "enemy_package_loader_policy",
+		category = "AI",
+		item_source = {
+			console = "console"
+		}
+	},
+	{
+		description = "Shows which dynamic packages that have been loaded or unloaded.",
+		is_boolean = true,
+		setting_name = "debug_enemy_package_loader",
+		category = "AI"
+	},
+	{
 		description = "Visual debugging for ai attacks",
 		is_boolean = true,
 		setting_name = "debug_ai_attack",
@@ -1339,12 +1271,6 @@ Features that make player mechanics nicer to work with.
 		description = "Shows the raycasts when testing trajectories",
 		is_boolean = true,
 		setting_name = "ai_debug_trajectory_raycast",
-		category = "AI"
-	},
-	{
-		description = "Use the fake players for the aoe targeting",
-		is_boolean = true,
-		setting_name = "ai_debug_use_fake_players_for_aoe_targeting",
 		category = "AI"
 	},
 	{
@@ -1547,6 +1473,61 @@ Features that make player mechanics nicer to work with.
 		category = "AI"
 	},
 	{
+		setting_name = "load_level",
+		description = "Loads the selected level.",
+		category = "Gamemode/level",
+		item_source = {},
+		load_items_source_func = function (options)
+			table.clear(options)
+
+			for key, settings in pairs(LevelSettings) do
+				if type(settings) == "table" then
+					options[#options + 1] = key
+				end
+			end
+
+			table.sort(options, function (a, b)
+				local settings_a = LevelSettings[a]
+				local settings_b = LevelSettings[b]
+				local act_a_index = table.find(GameActsOrder, settings_a.act) or math.huge
+				local act_b_index = table.find(GameActsOrder, settings_b.act) or math.huge
+
+				if act_a_index < act_b_index then
+					return true
+				elseif act_a_index == act_b_index then
+					local act_presentation_order_a = settings_a.act_presentation_order
+					local act_presentation_order_b = settings_b.act_presentation_order or math.huge
+
+					if settings_a.act_presentation_order then
+						return act_presentation_order_a < act_presentation_order_b
+					else
+						local debug_sorting_a = settings_a.map_settings and settings_a.map_settings.sorting
+						local debug_sorting_b = settings_b.map_settings and settings_b.map_settings.sorting
+
+						if debug_sorting_a or debug_sorting_b then
+							return (debug_sorting_a or math.huge) < (debug_sorting_b or math.huge)
+						else
+							return a < b
+						end
+					end
+				else
+					return false
+				end
+
+				return 
+			end)
+
+			return 
+		end,
+		func = function (options, index)
+			local level_name = options[index]
+
+			debug.load_level(level_name)
+
+			return 
+		end
+	},
+	{
 		description = "Find it annoying that the game ends every time you die? Well enable this setting then!",
 		is_boolean = true,
 		setting_name = "disable_gamemode_end",
@@ -1587,12 +1568,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "current_difficulty_setting",
 		category = "Gamemode/level",
 		item_source = DifficultySettings
-	},
-	{
-		description = "Enables/disables spawning of chests that doesn't have any pickups in them. Level restart required",
-		is_boolean = true,
-		setting_name = "spawn_no_empty_chests",
-		category = "Gamemode/level"
 	},
 	{
 		description = "Enables debug options for mutators",
@@ -4629,12 +4604,6 @@ Features that make player mechanics nicer to work with.
 		category = "Network"
 	},
 	{
-		description = "hide extra matchmaking info window",
-		is_boolean = true,
-		setting_name = "hide_matchmaking_info",
-		category = "Network"
-	},
-	{
 		description = "matchmaking debug logging",
 		is_boolean = true,
 		setting_name = "matchmaking_debug",
@@ -5027,14 +4996,10 @@ Features that make player mechanics nicer to work with.
 		category = "Input"
 	},
 	{
-		description = "Start editing the current keymaps.",
-		close_when_selected = true,
-		category = "Input",
-		setting_name = "input_debug_edit_keymap",
-		clear_when_selected = true,
-		item_source = {
-			["toggle keymap editor"] = true
-		}
+		description = "Will load the ui debug package on startup if true",
+		is_boolean = true,
+		setting_name = "load_ui_debug_package",
+		category = "UI"
 	},
 	{
 		description = "Debug UI Hover elements",
@@ -5046,12 +5011,6 @@ Features that make player mechanics nicer to work with.
 		description = "Enable/Disable the Lorebook (need to restart level to spawn page pickups)",
 		is_boolean = true,
 		setting_name = "lorebook_enabled",
-		category = "UI"
-	},
-	{
-		description = "Unlock All Lorebook Pages - Restart Required",
-		is_boolean = true,
-		setting_name = "unlock_all_lorebook",
 		category = "UI"
 	},
 	{
@@ -5134,12 +5093,6 @@ Features that make player mechanics nicer to work with.
 		is_boolean = true
 	},
 	{
-		description = "Enables friends view debug information",
-		is_boolean = true,
-		setting_name = "debug_friends_view",
-		category = "UI"
-	},
-	{
 		description = "Turns off positive reinforcement UI",
 		is_boolean = true,
 		setting_name = "disable_reinforcement_ui",
@@ -5163,7 +5116,7 @@ Features that make player mechanics nicer to work with.
 		category = "UI"
 	},
 	{
-		description = "Enables friends view debug information",
+		description = "The whole menu is unlocked, there is no end to the possibilities!",
 		is_boolean = true,
 		setting_name = "pause_menu_full_access",
 		category = "UI"
@@ -5172,18 +5125,6 @@ Features that make player mechanics nicer to work with.
 		description = "Enables option to give yourself lootboxes for free!",
 		is_boolean = true,
 		setting_name = "debug_loot_opening",
-		category = "UI"
-	},
-	{
-		description = "Ignore level cap on trinket slots",
-		is_boolean = true,
-		setting_name = "unlock_all_trinket_slots",
-		category = "UI"
-	},
-	{
-		description = "Load all menu views and textures regardless of if you are in the inn or ingame. Not turning on this will make inn-menus (forge, altar, map, etc.) unavailable from inside a level. Needs restart.",
-		is_boolean = true,
-		setting_name = "always_load_all_views",
 		category = "UI"
 	},
 	{
@@ -5199,21 +5140,9 @@ Features that make player mechanics nicer to work with.
 		category = "Misc"
 	},
 	{
-		description = "Tracks which units and how many units are currently of out world bounds.",
-		is_boolean = true,
-		setting_name = "debug_out_of_world_units",
-		category = "Misc"
-	},
-	{
 		description = "Will paste the content and engine revision to the user's clipboard.",
 		is_boolean = true,
 		setting_name = "paste_revision_to_clipboard",
-		category = "Misc"
-	},
-	{
-		description = "Will generate and read a file with the current svn revision on startup. Creates an annoying popup. Sorry about that. This is useful for lan builds.",
-		is_boolean = true,
-		setting_name = "generate_svn_info",
 		category = "Misc"
 	},
 	{
@@ -5402,12 +5331,6 @@ Features that make player mechanics nicer to work with.
 		description = "Enable asserts on mismatched profiling scopes.",
 		is_boolean = true,
 		setting_name = "validate_profiling_scopes",
-		category = "Performance"
-	},
-	{
-		description = "Enable debugging of bone lods.",
-		is_boolean = true,
-		setting_name = "bone_lod_debug",
 		category = "Performance"
 	},
 	{
@@ -5718,7 +5641,7 @@ Features that make player mechanics nicer to work with.
 		category = "Bots"
 	},
 	{
-		description = "Shows which inputs that the bots are doing at the moment.",
+		description = "Shows which inputs that the bot is doing at the moment.",
 		is_boolean = true,
 		setting_name = "ai_bots_input_debug",
 		category = "Bots"
@@ -6270,6 +6193,12 @@ Features that make player mechanics nicer to work with.
 		category = "Progression"
 	},
 	{
+		description = "Disables the hero power requirements for difficulties",
+		is_boolean = true,
+		setting_name = "disable_hero_power_requirement",
+		category = "Progression"
+	},
+	{
 		description = "",
 		category = "Rune Weapons",
 		setting_name = "Generate weapons with properties",
@@ -6605,20 +6534,16 @@ Features that make player mechanics nicer to work with.
 		end
 	},
 	{
-		description = "",
-		category = "Hero Templates",
-		setting_name = "Reload Inn",
+		{},
+		description = "Will display all active buffs on the player (max 30 at once)",
+		category = "HUD",
+		setting_name = "debug_player_buffs",
+		is_boolean = true,
 		func = function ()
 			debug.load_level("inn_level")
 
 			return 
 		end
-	},
-	{
-		description = "Will display all active buffs on the player (max 30 at once)",
-		is_boolean = true,
-		setting_name = "debug_player_buffs",
-		category = "HUD"
 	},
 	{
 		description = "Prints the number of server controlled buffs.",

@@ -62,7 +62,6 @@ Rewards._award_end_of_level_rewards = function (self, game_won, hero_name)
 	local level_end, end_experience = self.get_level_end(self)
 
 	self._generate_end_of_level_loot(self, game_won, hero_name, start_experience, end_experience, deed_item_name, deed_item_backend_id)
-	hero_attributes.set(hero_attributes, hero_name, "experience", end_experience)
 	backend_manager.commit(backend_manager)
 
 	return 

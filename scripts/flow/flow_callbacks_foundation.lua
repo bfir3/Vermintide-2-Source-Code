@@ -656,7 +656,7 @@ function flow_callback_start_fade(params)
 	end
 
 	local material = nil
-	local material_name = params.material
+	local material_name = params.material_name
 
 	if mesh and material_name then
 		assert(Mesh.has_material(mesh, material_name), string.format("[flow_callback_start_fade] The material %s doesn't exist for mesh %s", mesh_name, material_name))
@@ -676,7 +676,7 @@ function flow_callback_start_fade(params)
 			Material.set_scalar(material, fade_switch_name, fade_switch)
 			Material.set_vector2(material, start_end_time_name, Vector2(start_time, end_time))
 		end
-	elseif material then
+	elseif material_name then
 		local num_meshes = Unit.num_meshes(unit)
 
 		for i = 0, num_meshes - 1, 1 do

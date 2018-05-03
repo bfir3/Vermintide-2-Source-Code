@@ -46,6 +46,7 @@ LiquidAreaDamageExtension.init = function (self, extension_init_context, unit, e
 	self._cell_radius = cell_size / 2
 	self._do_direct_damage_ai = template.do_direct_damage_ai
 	self._do_direct_damage_player = template.do_direct_damage_player
+	self._hit_player_function = template.hit_player_function
 	local difficulty_name = Managers.state.difficulty:get_difficulty()
 	self._damage_table = extension_init_data.damage_table or template.difficulty_direct_damage[difficulty_name]
 	self._damage_type = template.damage_type
@@ -54,6 +55,7 @@ LiquidAreaDamageExtension.init = function (self, extension_init_context, unit, e
 	self._apply_buff_to_ai = template.apply_buff_to_ai
 	self._apply_buff_to_player = template.apply_buff_to_player
 	self._buff_name = template.buff_template_name
+	self._buff_type = template.buff_template_type
 	self._damage_buff_name = template.damage_buff_template_name
 	local fx_name_rim = template.fx_name_rim
 	self._fx_name_rim = fx_name_rim
@@ -72,6 +74,7 @@ LiquidAreaDamageExtension.init = function (self, extension_init_context, unit, e
 	self._immune_breeds = template.immune_breeds
 	self._colliding_units = {}
 	self._buff_affected_units = {}
+	self._affected_player_units = {}
 	self._source_unit = extension_init_data.source_unit or unit
 	self._done = false
 
@@ -321,6 +324,7 @@ LiquidAreaDamageExtension.destroy = function (self)
 		ai_system.destroy_nav_cost_map(ai_system, cost_map_id)
 	end
 
+	table.clear(self._affected_player_units)
 	self.stop_fx(self)
 
 	return 
@@ -527,6 +531,7 @@ LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 	self._check_player_units = (apply_buff_to_player or do_direct_damage_player) and self._check_player_units
 	local buff_system = self._buff_system
 	local buff_name = self._buff_name
+	local buff_template_type = self._buff_type
 	local buff_condition = self._buff_condition
 
 	if self._check_player_units then
@@ -543,7 +548,15 @@ LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 					StatusUtils.set_in_liquid_network(unit, true, liquid_unit)
 				end
 
-				if buff_name and apply_buff_to_player then
+				if not self._affected_player_units[unit] and self._hit_player_function then
+					self._affected_player_units[unit] = true
+
+					self._hit_player_function(unit, PLAYER_AND_BOT_UNITS)
+				end
+
+				local buff_extension = ScriptUnit.extension(unit, "buff_system")
+
+				if buff_name and apply_buff_to_player and not buff_extension.has_buff_type(buff_extension, buff_template_type) then
 					self._add_buff_helper_function(self, unit, liquid_unit, buff_name, buff_condition, buff_system)
 				end
 			else
@@ -583,8 +596,9 @@ LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 		if breed and not immune_breeds[breed.name] then
 			if self._is_unit_colliding(self, grid, unit) then
 				self._colliding_units[unit] = breed.armor_category or 1
+				local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
 
-				if buff_name and apply_buff_to_ai then
+				if buff_name and apply_buff_to_ai and buff_extension and not buff_extension.has_buff_type(buff_extension, buff_template_type) then
 					self._add_buff_helper_function(self, unit, liquid_unit, buff_name, buff_condition, buff_system)
 				end
 			else

@@ -6,6 +6,7 @@ local function debug_print(format, ...)
 	return 
 end
 
+local PROFILE_MANAGERS = BUILD == "dev" or BUILD == "debug"
 Managers = Managers or {
 	state = {}
 }
@@ -66,6 +67,19 @@ local mt_global = {
 		rawset(ManagersCreationOrder.global, #ManagersCreationOrder.global + 1, alias)
 		rawset(managers, alias, manager)
 
+		if manager and PROFILE_MANAGERS then
+			local scope_name = alias .. "_update"
+			local mt = getmetatable(manager)
+
+			if mt then
+				manager.update = function (...)
+					local ret1, ret2, ret3 = mt.update(...)
+
+					return ret1, ret2, ret3
+				end
+			end
+		end
+
 		return 
 	end,
 	__tostring = function (managers)
@@ -84,6 +98,16 @@ local mt_state = {
 	__newindex = function (managers, alias, manager)
 		rawset(ManagersCreationOrder.state, #ManagersCreationOrder.state + 1, alias)
 		rawset(managers, alias, manager)
+
+		if manager and PROFILE_MANAGERS then
+			local scope_name = alias .. "_update"
+			local mt = getmetatable(manager)
+			manager.update = function (...)
+				local ret1, ret2, ret3 = mt.update(...)
+
+				return ret1, ret2, ret3
+			end
+		end
 
 		return 
 	end,

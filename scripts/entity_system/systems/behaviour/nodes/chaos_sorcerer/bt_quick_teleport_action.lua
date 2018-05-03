@@ -111,6 +111,7 @@ BTQuickTeleportAction.anim_cb_teleport_start_finished = function (self, unit, bl
 	local locomotion_extension = blackboard.locomotion_extension
 
 	locomotion_extension.teleport_to(locomotion_extension, teleport_position)
+	Managers.state.entity:system("ai_bot_group_system"):enemy_teleported(unit, teleport_position)
 	self.play_teleport_effect(self, unit, blackboard, entrance_position, teleport_position)
 
 	if blackboard.action.push_close_players then

@@ -1,4 +1,3 @@
-local push_radius = 2
 local weapon_template = weapon_template or {}
 weapon_template.actions = {
 	action_one = {
@@ -283,6 +282,17 @@ weapon_template.overcharge_data = {
 	time_until_overcharge_decreases = 0.5,
 	overcharge_value_decrease_rate = 1
 }
+weapon_template.attack_meta_data = {
+	aim_at_node = "j_head",
+	obstruction_fuzzyness_range_charged = 3.5,
+	charged_attack_action_name = "geiser_launch",
+	can_charge_shot = true,
+	minimum_charge_time = 0.21,
+	aim_at_node_charged = "j_spine1",
+	ignore_enemies_for_obstruction_charged = false,
+	charge_when_obstructed = true,
+	ignore_enemies_for_obstruction = false
+}
 local action = weapon_template.actions.action_one.default
 weapon_template.default_loaded_projectile_settings = {
 	drop_multiplier = 0.03,
@@ -331,34 +341,27 @@ weapon_template.tooltip_keywords = {
 	"weapon_keyword_crowd_control",
 	"weapon_keyword_charged_attack"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.3,
-			range = 0.6,
-			damage = 0.5,
-			targets = 0.2,
-			stagger = 0.6
-		},
-		heavy_attack = {
-			speed = 0.4,
-			range = 0.4,
-			damage = 0.375,
-			targets = 1,
-			stagger = 0.9
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
 	},
-	perks = {
-		light_attack = {
-			"head_shot",
-			"armor_penetration"
-		},
-		heavy_attack = {
-			"burn"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "geiser_launch"
+	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "geiser_launch"
 	}
 }
 Weapons = Weapons or {}
-Weapons.staff_fireball_geiser_template_1 = table.clone(weapon_template)
+Weapons.staff_fireball_geiser_template_1 = table.create_copy(Weapons.staff_fireball_geiser_template_1, weapon_template)
 
 return 

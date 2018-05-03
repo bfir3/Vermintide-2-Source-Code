@@ -5,6 +5,7 @@ require("scripts/unit_extensions/generic/invincible_health_extension")
 require("scripts/unit_extensions/generic/rat_ogre_health_extension")
 require("scripts/unit_extensions/generic/chaos_troll_health_extension")
 require("scripts/unit_extensions/generic/chaos_troll_husk_health_extension")
+require("scripts/unit_extensions/generic/training_dummy_health_extension")
 require("scripts/unit_extensions/default_player_unit/player_unit_health_extension")
 require("scripts/unit_extensions/health/loot_rat_health_extension")
 require("scripts/unit_extensions/health/lure_health_extension")
@@ -33,7 +34,8 @@ local extensions = {
 	"PlayerUnitHealthExtension",
 	"RatOgreHealthExtension",
 	"LureHealthExtension",
-	"OverpoweredBlobHealthExtension"
+	"OverpoweredBlobHealthExtension",
+	"TrainingDummyHealthExtension"
 }
 HealthSystem.init = function (self, entity_system_creation_context, system_name)
 	HealthSystem.super.init(self, entity_system_creation_context, system_name, extensions)

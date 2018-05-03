@@ -130,10 +130,11 @@ local scenegraph_definition = {
 		}
 	}
 }
+local disable_with_gamepad = true
 local widgets = {
 	item_grid_bg = UIWidgets.create_simple_texture("crafting_bg_01", "item_grid", nil, nil, nil, -1),
 	item_grid = UIWidgets.create_grid("item_grid", scenegraph_definition.item_grid.size, NUM_CRAFT_SLOTS_X, NUM_CRAFT_SLOTS_Y, 20, 20),
-	craft_button = UIWidgets.create_default_button("craft_button", scenegraph_definition.craft_button.size, nil, nil, Localize("hero_view_crafting_salvage"), 24, nil, "button_detail_02"),
+	craft_button = UIWidgets.create_default_button("craft_button", scenegraph_definition.craft_button.size, nil, nil, Localize("hero_view_crafting_salvage"), 24, nil, "button_detail_02", nil, disable_with_gamepad),
 	craft_bar_fg = UIWidgets.create_simple_texture("crafting_bar_fg", "craft_bar_fg"),
 	craft_bar_bg = UIWidgets.create_simple_rect("craft_bar_bg", {
 		255,

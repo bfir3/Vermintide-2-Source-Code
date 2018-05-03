@@ -30,7 +30,7 @@ local Unit_alive = Unit.alive
 BTGreySeerMountedAction.run = function (self, unit, blackboard, t, dt)
 	local mounted_data = blackboard.mounted_data
 
-	if mounted_data.mount_unit and not mounted_data.knocked_off_mounted_timer and not blackboard.knocked_off_mount then
+	if Unit.alive(mounted_data.mount_unit) and not mounted_data.knocked_off_mounted_timer and not blackboard.knocked_off_mount then
 		local mount_rotation = Unit.local_rotation(mounted_data.mount_unit, 0)
 		local mount_position = Unit.local_position(mounted_data.mount_unit, 0)
 

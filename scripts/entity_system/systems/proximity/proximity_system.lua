@@ -385,7 +385,7 @@ ProximitySystem.physics_async_update = function (self, context, t)
 
 	return 
 end
-local MAX_ALLOWED_FX = 5
+local MAX_ALLOWED_FX = 10
 local Unit_flow_event = Unit.flow_event
 local Unit_alive = Unit.alive
 

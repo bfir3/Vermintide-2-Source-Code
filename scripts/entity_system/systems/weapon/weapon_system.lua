@@ -130,6 +130,21 @@ WeaponSystem.send_rpc_attack_hit = function (self, damage_source_id, attacker_un
 		Managers.state.network.network_transmit:send_rpc_server("rpc_attack_hit", damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, unpack(RPC_ATTACK_HIT_TEMP))
 	end
 
+	local hit_unit = self.unit_storage:unit(hit_unit_id)
+	local attacker_unit = self.unit_storage:unit(attacker_unit_id)
+
+	if Managers.player:is_player_unit(attacker_unit) then
+		local owner_player = Managers.player:owner(attacker_unit)
+
+		if owner_player.local_player and not owner_player.bot_player then
+			local breed = Unit.get_data(hit_unit, "breed")
+
+			if breed and breed.boss then
+				Managers.state.event:trigger("show_boss_health_bar", hit_unit)
+			end
+		end
+	end
+
 	return 
 end
 local BLACKBOARDS = BLACKBOARDS

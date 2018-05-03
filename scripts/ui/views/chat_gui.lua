@@ -46,6 +46,7 @@ ChatGui.set_input_manager = function (self, input_manager)
 			debug_screen = true,
 			rcon = true,
 			twitch = true,
+			popup = true,
 			free_flight = true
 		}
 

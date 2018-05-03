@@ -25,7 +25,8 @@ InteractionHelper.interactions = {
 	loot_access = {},
 	characters_access = {},
 	talents_access = {},
-	pictureframe = {}
+	pictureframe = {},
+	achievement_access = {}
 }
 
 for interaction, config_table in pairs(InteractionHelper.interactions) do

@@ -293,12 +293,7 @@ AiUtils.warpfire_explode_unit = function (unit, blackboard)
 	local damage_source = blackboard.breed.name
 	local damage_source_id = NetworkLookup.damage_sources[damage_source]
 
-	Unit.set_mesh_visibility(unit, "g_warpfire_backpack_lod0", false)
-	Unit.set_mesh_visibility(unit, "g_warpfire_backpack_lod1", false)
-	Unit.set_mesh_visibility(unit, "g_warpfire_backpack_lod2", false)
-	Unit.set_mesh_visibility(unit, "g_warpfire_tube_lod0", false)
-	Unit.set_mesh_visibility(unit, "g_warpfire_tube_lod1", false)
-	Unit.set_mesh_visibility(unit, "g_warpfire_tube_lod2", false)
+	Unit.flow_event(unit, "lua_hide_backpack")
 
 	local actor = Unit.actor(unit, "c_backpack")
 
@@ -322,7 +317,7 @@ AiUtils.warpfire_explode_unit = function (unit, blackboard)
 				source_unit = unit
 			}
 		}
-		local aoe_unit_name = "units/weapons/projectile/poison_wind_globe/poison_wind_globe"
+		local aoe_unit_name = "units/hub_elements/empty"
 		local liquid_aoe_unit = Managers.state.unit_spawner:spawn_network_unit(aoe_unit_name, "liquid_aoe_unit", extension_init_data, position_on_navmesh)
 		local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 
@@ -482,6 +477,13 @@ AiUtils.get_actual_attacker_unit = function (attacker_unit)
 	end
 
 	return attacker_unit
+end
+AiUtils.unit_breed = function (unit)
+	if not unit_alive(unit) then
+		return 
+	end
+
+	return unit_get_data(unit, "breed")
 end
 AiUtils.unit_alive = function (unit)
 	if not unit_alive(unit) then

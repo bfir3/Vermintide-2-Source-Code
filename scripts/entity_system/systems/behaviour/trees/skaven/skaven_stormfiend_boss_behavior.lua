@@ -88,6 +88,11 @@ BreedBehaviors.stormfiend_boss = {
 				action_data = ACTIONS.charge
 			},
 			{
+				"BTChampionAttackAction",
+				name = "special_attack_aoe",
+				action_data = ACTIONS.special_attack_aoe
+			},
+			{
 				"BTTargetUnreachableAction",
 				name = "target_unreachable",
 				action_data = ACTIONS.target_unreachable

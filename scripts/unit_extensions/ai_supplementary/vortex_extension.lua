@@ -44,6 +44,7 @@ VortexExtension.init = function (self, extension_init_context, unit, extension_i
 	if inner_decal_unit then
 		World.link_unit(world, inner_decal_unit, unit, 0)
 		Unit.set_local_scale(inner_decal_unit, 0, Vector3(inner_scale_xy, inner_scale_xy, 1))
+		Unit.flow_event(inner_decal_unit, "vortex_spawned")
 
 		self._inner_decal_unit = inner_decal_unit
 	end
@@ -53,6 +54,7 @@ VortexExtension.init = function (self, extension_init_context, unit, extension_i
 	if outer_decal_unit then
 		World.link_unit(world, outer_decal_unit, unit, 0)
 		Unit.set_local_scale(outer_decal_unit, 0, Vector3(outer_scale_xy, outer_scale_xy, 1))
+		Unit.flow_event(outer_decal_unit, "vortex_spawned")
 
 		self._outer_decal_unit = outer_decal_unit
 	end
@@ -192,17 +194,16 @@ VortexExtension.destroy = function (self)
 		end
 	end
 
-	local unit_spawner = Managers.state.unit_spawner
 	local inner_decal_unit = self._inner_decal_unit
 
 	if unit_alive(inner_decal_unit) then
-		unit_spawner.mark_for_deletion(unit_spawner, inner_decal_unit)
+		Unit.flow_event(inner_decal_unit, "vortex_despawned")
 	end
 
 	local outer_decal_unit = self._outer_decal_unit
 
 	if unit_alive(outer_decal_unit) then
-		unit_spawner.mark_for_deletion(unit_spawner, outer_decal_unit)
+		Unit.flow_event(outer_decal_unit, "vortex_despawned")
 	end
 
 	table.clear(vortex_data)
@@ -583,7 +584,7 @@ VortexExtension._update_attract_players = function (self, unit, blackboard, vort
 	return 
 end
 local ai_units = {}
-VortexExtension._update_attract_outside_ai = function (self, vortex_data, vortex_template, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius)
+VortexExtension._update_attract_outside_ai = function (self, vortex_data, blackboard, vortex_template, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius)
 	local vortex_height = vortex_data.height
 	local ai_attract_speed = vortex_template.ai_attract_speed
 	local ai_units_inside = vortex_data.ai_units_inside
@@ -622,6 +623,10 @@ VortexExtension._update_attract_outside_ai = function (self, vortex_data, vortex
 							target_blackboard.in_vortex = true
 							target_blackboard.eject_height = ConflictUtils.random_interval(vortex_template.ai_eject_height)
 							ai_units_inside[ai_unit] = true
+
+							if vortex_template.suck_in_ai_func then
+								vortex_template.suck_in_ai_func(vortex_template, blackboard)
+							end
 						end
 					end
 				end
@@ -682,7 +687,7 @@ VortexExtension.attract = function (self, unit, t, dt, blackboard, vortex_templa
 	local allowed_distance = inner_radius + max_allowed_inner_radius_dist
 
 	self._update_attract_players(self, unit, blackboard, vortex_data, vortex_template, t, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius, allowed_distance)
-	self._update_attract_outside_ai(self, vortex_data, vortex_template, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius)
+	self._update_attract_outside_ai(self, vortex_data, blackboard, vortex_template, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius)
 	self._update_attract_inside_ai(self, blackboard, vortex_data, vortex_template, dt, center_pos, inner_radius, allowed_distance)
 
 	return 

@@ -212,7 +212,7 @@ local scenegraph_definition = {
 		parent = "selection_info",
 		horizontal_alignment = "center",
 		size = {
-			450,
+			400,
 			25
 		},
 		position = {
@@ -226,7 +226,7 @@ local scenegraph_definition = {
 		parent = "info_career_name",
 		horizontal_alignment = "center",
 		size = {
-			450,
+			400,
 			25
 		},
 		position = {
@@ -493,13 +493,14 @@ if Development.parameter("tobii_button") then
 end
 
 local hero_career_style = {
-	word_wrap = true,
+	font_size = 36,
 	upper_case = true,
 	localize = false,
 	use_shadow = true,
-	font_size = 36,
+	word_wrap = true,
 	horizontal_alignment = "center",
 	vertical_alignment = "top",
+	dynamic_font_size = true,
 	font_type = "hell_shark_header",
 	text_color = Colors.get_color_table_with_alpha("font_title", 255),
 	offset = {
@@ -510,11 +511,12 @@ local hero_career_style = {
 }
 local hero_name_style = {
 	word_wrap = true,
-	font_size = 24,
-	localize = false,
 	use_shadow = true,
+	localize = false,
+	font_size = 24,
 	horizontal_alignment = "center",
 	vertical_alignment = "top",
+	dynamic_font_size = true,
 	font_type = "hell_shark",
 	text_color = Colors.get_color_table_with_alpha("font_default", 255),
 	offset = {

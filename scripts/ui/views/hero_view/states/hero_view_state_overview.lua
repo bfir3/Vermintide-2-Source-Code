@@ -31,6 +31,13 @@ local animation_definitions = definitions.animation_definitions
 local game_options_settings = definitions.game_options_settings
 local MAX_ACTIVE_WINDOWS = 5
 local DO_RELOAD = false
+local rarity_index = {
+	common = 2,
+	plentiful = 1,
+	exotic = 4,
+	rare = 3,
+	unique = 5
+}
 local fake_input_service = {
 	get = function ()
 		return 
@@ -334,22 +341,21 @@ HeroViewStateOverview.on_exit = function (self, params)
 		self.set_fullscreen_effect_enable_state(self, false)
 	end
 
+	self._close_active_windows(self)
+
+	return 
+end
+HeroViewStateOverview._close_active_windows = function (self)
 	local active_windows = self._active_windows
 	local params = self._window_params
-	local loadout_changed = 0 < self.loadout_sync_id
-	local talent_changed = 0 < self.talent_sync_id
-	local skin_changed = 0 < self.skin_sync_id
-	local respawn = skin_changed
-
-	if respawn then
-		self.ingame_ui:respawn()
-	end
 
 	for _, window in pairs(active_windows) do
 		if window.on_exit then
 			window.on_exit(window, params)
 		end
 	end
+
+	table.clear(active_windows)
 
 	return 
 end
@@ -397,10 +403,12 @@ HeroViewStateOverview.update = function (self, dt, t)
 			end
 		end
 
-		if wanted_state or self._new_state then
+		if wanted_state then
 			self.parent:clear_wanted_state()
 
-			return wanted_state or self._new_state
+			self._new_state = wanted_state
+		else
+			return self._new_state
 		end
 	end
 
@@ -417,6 +425,10 @@ HeroViewStateOverview.post_update = function (self, dt, t)
 	self.ui_animator:update(dt)
 	self._update_animations(self, dt)
 	self._windows_post_update(self, dt, t)
+
+	if self._new_state then
+		self._close_active_windows(self)
+	end
 
 	return 
 end
@@ -458,6 +470,8 @@ HeroViewStateOverview._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local input_service = self.parent:input_service()
 	local input_pressed = input_service.get(input_service, "toggle_menu")
+	local gamepad_active = Managers.input:is_device_active("gamepad")
+	local back_pressed = gamepad_active and input_service.get(input_service, "back_menu")
 	local close_on_exit = self._close_on_exit
 	local exit_button = widgets_by_name.exit_button
 	local back_button = widgets_by_name.back_button
@@ -469,12 +483,12 @@ HeroViewStateOverview._handle_input = function (self, dt, t)
 		self.play_sound(self, "play_gui_equipment_button_hover")
 	end
 
-	if close_on_exit and (input_pressed or self._is_button_pressed(self, exit_button)) then
+	if close_on_exit and (input_pressed or back_pressed or self._is_button_pressed(self, exit_button)) then
 		self.play_sound(self, "Play_hud_hover")
 		self.close_menu(self)
 
 		return 
-	elseif input_pressed or self._is_button_pressed(self, back_button) then
+	elseif input_pressed or back_pressed or self._is_button_pressed(self, back_button) then
 		self.play_sound(self, "Play_hud_hover")
 
 		local previous_layout_key = self.get_previous_selected_game_mode_index(self)
@@ -688,6 +702,12 @@ HeroViewStateOverview._set_loadout_item = function (self, item, strict_slot_type
 
 	self.loadout_sync_id = self.loadout_sync_id + 1
 	self.inventory_sync_id = self.inventory_sync_id + 1
+	local highest_rarity = self.statistics_db:get_persistent_stat(self._stats_id, "highest_equipped_rarity", slot_type)
+	local item_rarity = rarity_index[item.rarity]
+
+	if item_rarity and highest_rarity < item_rarity then
+		self.statistics_db:set_stat(self._stats_id, "highest_equipped_rarity", slot_type, item_rarity)
+	end
 
 	Managers.state.event:trigger("event_set_loadout_items")
 
@@ -700,6 +720,8 @@ HeroViewStateOverview.update_talent_sync = function (self)
 end
 HeroViewStateOverview.update_skin_sync = function (self)
 	self.skin_sync_id = self.skin_sync_id + 1
+
+	self.ingame_ui:respawn()
 
 	return 
 end

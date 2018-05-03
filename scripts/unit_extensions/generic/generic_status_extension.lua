@@ -586,6 +586,9 @@ GenericStatusExtension._get_current_max_fatigue_points = function (self)
 
 	return 
 end
+GenericStatusExtension.get_max_fatigue_points = function (self)
+	return self._get_current_max_fatigue_points(self)
+end
 GenericStatusExtension.can_block = function (self, attacking_unit, attack_direction)
 	local unit = self.unit
 	local inventory_extension = self.inventory_extension
@@ -1884,34 +1887,34 @@ GenericStatusExtension.set_invisible = function (self, invisible)
 	local unit = self.unit
 	local flow_event_name = nil
 	local player = self.player
-	local owner_player = Managers.player:owner(unit)
+	local is_third_person = self.is_husk or player.bot_player
 
 	if invisible then
 		flow_event_name = "lua_enabled_invisibility"
 
-		if self.is_husk and not player == owner_player then
+		if is_third_person then
 			Managers.state.entity:system("fade_system"):set_min_fade(unit, 0.8)
 		end
 	else
 		flow_event_name = "lua_disabled_invisibility"
 
-		if self.is_husk and not player == owner_player then
+		if is_third_person then
 			Managers.state.entity:system("fade_system"):set_min_fade(unit, 0)
 		end
 	end
 
-	local first_person_extension = self.first_person_extension
-
-	if first_person_extension then
-		local fp_unit = first_person_extension.get_first_person_unit(first_person_extension)
-		local fp_mesh_unit = first_person_extension.get_first_person_mesh_unit(first_person_extension)
-
-		Unit.flow_event(fp_unit, flow_event_name)
-		Unit.flow_event(fp_mesh_unit, flow_event_name)
-	end
-
-	if self.is_husk and not player == owner_player then
+	if is_third_person then
 		Unit.flow_event(unit, flow_event_name)
+	else
+		local first_person_extension = self.first_person_extension
+
+		if first_person_extension then
+			local fp_unit = first_person_extension.get_first_person_unit(first_person_extension)
+			local fp_mesh_unit = first_person_extension.get_first_person_mesh_unit(first_person_extension)
+
+			Unit.flow_event(fp_unit, flow_event_name)
+			Unit.flow_event(fp_mesh_unit, flow_event_name)
+		end
 	end
 
 	if not self.is_husk then

@@ -1,7 +1,5 @@
 -- WARNING: Error occurred during decompilation.
 --   Code may be incomplete or incorrect.
-require("scripts/ui/views/menu_input_description_ui")
-
 PopupJoinLobbyHandler = class(PopupJoinLobbyHandler)
 local hero_entry_width = 108
 local hero_entry_height = 108
@@ -20,6 +18,20 @@ local scenegraph_definition = {
 			0,
 			0,
 			UILayer.matchmaking
+		}
+	},
+	console_cursor = {
+		vertical_alignment = "center",
+		parent = "screen",
+		horizontal_alignment = "center",
+		size = {
+			1920,
+			1080
+		},
+		position = {
+			0,
+			0,
+			-10
 		}
 	},
 	window = {
@@ -374,10 +386,6 @@ PopupJoinLobbyHandler.init = function (self, ingame_ui_context)
 
 	local input_service = Managers.input:get_service("popup_join_lobby_handler")
 	local gui_layer = scenegraph_definition.window.position[3]
-	self.menu_input_description = MenuInputDescriptionUI:new(ingame_ui_context, self.ui_top_renderer, input_service, #generic_input_actions, gui_layer, generic_input_actions)
-
-	self.menu_input_description:set_input_description(nil)
-
 	self._difficulty = nil
 
 	rawset(_G, "GLOBAL_MM_JL_UI", self)
@@ -402,6 +410,8 @@ PopupJoinLobbyHandler.create_ui_elements = function (self)
 
 	self._widgets = widgets
 	self._widgets_by_name = widgets_by_name
+	local console_cursor_definition = UIWidgets.create_console_cursor("console_cursor")
+	self._console_cursor = UIWidget.init(console_cursor_definition)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 
 	UIRenderer.clear_scenegraph_queue(self.ui_top_renderer)
@@ -510,15 +520,8 @@ PopupJoinLobbyHandler.input_service = function (self)
 	return self.input_manager:get_service("popup_join_lobby_handler")
 end
 PopupJoinLobbyHandler.draw = function (self, ui_top_renderer, input_service, dt)
-	local gamepad_active = Managers.input:is_device_active("gamepad")
-
-	if gamepad_active and not self.gamepad_active_last_frame then
-		self.gamepad_active_last_frame = true
-	elseif not gamepad_active then
-		self.gamepad_active_last_frame = false
-	end
-
 	local swap_hero_active = self.swap_hero_active
+	local gamepad_active = Managers.input:is_device_active("gamepad")
 
 	UIRenderer.begin_pass(ui_top_renderer, self.ui_scenegraph, input_service, dt, nil, self.render_settings)
 
@@ -528,11 +531,11 @@ PopupJoinLobbyHandler.draw = function (self, ui_top_renderer, input_service, dt)
 		UIRenderer.draw_widget(ui_top_renderer, widget)
 	end
 
-	UIRenderer.end_pass(ui_top_renderer)
-
 	if gamepad_active then
-		self.menu_input_description:draw(ui_top_renderer, dt)
+		UIRenderer.draw_widget(ui_top_renderer, self._console_cursor)
 	end
+
+	UIRenderer.end_pass(ui_top_renderer)
 
 	return 
 end

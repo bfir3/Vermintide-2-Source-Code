@@ -123,7 +123,7 @@ BTStormfiendDualShootAction.create_firewall = function (self, unit, data)
 			source_unit = unit
 		}
 	}
-	local aoe_unit_name = "units/weapons/projectile/poison_wind_globe/poison_wind_globe"
+	local aoe_unit_name = "units/hub_elements/empty"
 	local liquid_aoe_unit = Managers.state.unit_spawner:spawn_network_unit(aoe_unit_name, "liquid_aoe_unit", extension_init_data, start_pos)
 	local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 

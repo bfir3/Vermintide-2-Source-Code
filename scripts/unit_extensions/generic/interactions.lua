@@ -127,6 +127,7 @@ InteractionDefinitions.revive = {
 		hud_verb = "revive",
 		hold = true,
 		swap_to_3p = true,
+		activate_block = true,
 		duration = 2
 	},
 	server = {
@@ -331,6 +332,7 @@ InteractionDefinitions.pull_up = {
 		hud_verb = "pull up",
 		hold = true,
 		swap_to_3p = true,
+		activate_block = true,
 		duration = 2,
 		does_not_require_line_of_sight = true
 	},
@@ -465,6 +467,7 @@ InteractionDefinitions.release_from_hook = {
 		hud_verb = "player_interaction",
 		hold = true,
 		swap_to_3p = true,
+		activate_block = true,
 		duration = 2
 	},
 	server = {
@@ -565,6 +568,7 @@ InteractionDefinitions.assisted_respawn = {
 		hud_verb = "assist respawn",
 		hold = true,
 		swap_to_3p = true,
+		activate_block = true,
 		duration = 2
 	},
 	server = {
@@ -1571,6 +1575,10 @@ InteractionDefinitions.heal = {
 
 			local owner_player = Managers.player:unit_owner(interactor_unit)
 
+			if not owner_player then
+				return 
+			end
+
 			if result == InteractionResult.SUCCESS then
 				if not owner_player.remote then
 					local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
@@ -1999,7 +2007,9 @@ InteractionDefinitions.characters_access.client.stop = function (world, interact
 	return 
 end
 InteractionDefinitions.characters_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
-	return true
+	local is_game_matchmaking = Managers.matchmaking:is_game_matchmaking()
+
+	return not is_game_matchmaking
 end
 InteractionDefinitions.characters_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
@@ -2139,6 +2149,26 @@ InteractionDefinitions.no_interaction_hud_only.client.hud_description = function
 end
 InteractionDefinitions.no_interaction_hud_only.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return false, ""
+end
+InteractionDefinitions.achievement_access = InteractionDefinitions.achievement_access or table.clone(InteractionDefinitions.smartobject)
+InteractionDefinitions.achievement_access.config.swap_to_3p = false
+InteractionDefinitions.achievement_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
+	data.start_time = nil
+
+	if result == InteractionResult.SUCCESS and not data.is_husk then
+		local menu_state = "overview"
+		local menu_sub_state = "forge"
+
+		data.ingame_ui:transition_with_fade("hero_view_force", menu_state, menu_sub_state)
+	end
+
+	return 
+end
+InteractionDefinitions.achievement_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
+	return true
+end
+InteractionDefinitions.achievement_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
+	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
 
 return 

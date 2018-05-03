@@ -708,10 +708,34 @@ InputManager.apply_saved_keymaps = function (self, specific_table_name)
 	return 
 end
 InputManager.set_hovering = function (self, is_hovering)
+	if is_hovering and not self._hovering then
+	end
+
 	self._hovering = self._hovering or is_hovering
 	self._frame_hovering = self._frame_hovering or is_hovering
 
 	return 
+end
+local GAMEPAD_CURSOR_POS = {}
+InputManager.set_gamepad_cursor_pos = function (self, pos_x, pos_y)
+	GAMEPAD_CURSOR_POS[1] = pos_x
+	GAMEPAD_CURSOR_POS[2] = pos_y
+
+	return 
+end
+InputManager.center_gamepad_cursor_pos = function (self)
+	GAMEPAD_CURSOR_POS[1] = 960
+	GAMEPAD_CURSOR_POS[2] = 540
+
+	return 
+end
+InputManager.get_gamepad_cursor_pos = function (self)
+	local x_pos = GAMEPAD_CURSOR_POS[1]
+	local y_pos = GAMEPAD_CURSOR_POS[2]
+
+	table.clear(GAMEPAD_CURSOR_POS)
+
+	return x_pos, y_pos
 end
 InputManager.is_hovering = function (self)
 	return self._hovering
@@ -819,11 +843,11 @@ InputManager.setup_keymaps = function (self, keymaps)
 				elseif input_type == "axis" then
 					key_index = input_device.axis_index(input_key_name)
 
-					assert(key_index, "No such axis %q in input device type %q.", input_key_name, input_device_type)
+					assert(key_index, string.format("No such axis %q in input device type %q.", input_key_name, input_device_type))
 				else
 					key_index = input_device.button_index(input_key_name)
 
-					assert(key_index, "No such key %q in input device type %q.", input_key_name, input_device_type)
+					assert(key_index, string.format("No such key %q in input device type %q.", input_key_name, input_device_type))
 				end
 			end
 

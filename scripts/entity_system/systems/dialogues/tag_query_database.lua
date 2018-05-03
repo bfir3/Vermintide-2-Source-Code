@@ -16,8 +16,10 @@ function DebugPrintQuery(query, user_context_list, global_context)
 	for name, context in pairs(user_context_list) do
 		print("\t" .. name)
 
-		for key, value in pairs(context) do
-			print(string.format("\t\t%-15s : %-15s", key, tostring(value)))
+		if type(context) == "table" then
+			for key, value in pairs(context) do
+				print(string.format("\t\t%-15s : %-15s", key, tostring(value)))
+			end
 		end
 	end
 

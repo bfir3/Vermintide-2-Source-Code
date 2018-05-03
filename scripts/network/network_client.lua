@@ -46,18 +46,15 @@ NetworkClient.init = function (self, level_transition_handler, server_peer_id, l
 	self.voip = Voip:new(voip_params)
 	self.connecting_timeout = 0
 
-	if rawget(_G, "EAC") then
-		EAC.before_join()
+	EAC.before_join()
 
-		self._using_eac = true
-	end
+	self._eac_state_determined = false
+	self._eac_can_play = false
 
 	return 
 end
 NetworkClient.destroy = function (self)
-	if self._using_eac then
-		EAC.after_leave()
-	end
+	EAC.after_leave()
 
 	if self.network_message_router then
 		self.unregister_rpcs(self)
@@ -116,12 +113,10 @@ NetworkClient.rpc_notify_connected = function (self, sender)
 			RPC.rpc_set_player_name(self.server_peer_id, cropped_string)
 		end
 
-		if self._using_eac then
-			EAC.set_host(self.server_peer_id)
+		EAC.set_host(self.server_peer_id)
 
-			self._eac_has_set_host = true
-			self._next_eac_match_check = 0
-		end
+		self._eac_has_set_host = true
+		self._next_eac_match_check = 0
 
 		RPC.rpc_notify_lobby_joined(self.server_peer_id, self.wanted_profile_index, Application.user_setting("clan_tag") or "0")
 
@@ -281,13 +276,16 @@ NetworkClient.update = function (self, dt)
 	local state = self.state
 	local bad_state = state == "lost_connection_to_host" or state == "denied_enter_game" or state == "eac_match_failed"
 
-	if self._using_eac and not bad_state then
+	if not bad_state then
 		self._update_eac_match(self, dt)
 	end
 
 	self.voip:update(dt)
 
 	return 
+end
+NetworkClient.eac_allowed_to_play = function (self)
+	return self._eac_state_determined and self._eac_can_play
 end
 NetworkClient._update_eac_match = function (self, dt)
 	if not self._eac_has_set_host then
@@ -303,6 +301,8 @@ NetworkClient._update_eac_match = function (self, dt)
 	end
 
 	local state_determined, can_play = self._eac_host_check(self)
+	self._eac_state_determined = state_determined
+	self._eac_can_play = can_play
 
 	if can_play then
 	else

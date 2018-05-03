@@ -3214,6 +3214,62 @@ DamageProfileTemplates.elven_ruins_finish = {
 DamageProfileTemplates.elven_ruins_finish_glance = table.clone(DamageProfileTemplates.elven_ruins_finish)
 DamageProfileTemplates.elven_ruins_finish_glance.default_target.attack_template = "arrow_poison_aoe"
 DamageProfileTemplates.elven_ruins_finish_glance.default_target.damage_type = "elven_magic_glance"
+DamageProfileTemplates.military_finish = {
+	charge_value = "aoe",
+	is_explosion = true,
+	armor_modifier = {
+		attack = {
+			1,
+			0.5,
+			100,
+			1,
+			1
+		},
+		impact = {
+			1,
+			0.5,
+			1.5,
+			1,
+			1
+		}
+	},
+	default_target = {
+		attack_template = "arrow_poison_aoe",
+		damage_type = "military_finish",
+		power_distribution = {
+			attack = 5,
+			impact = 0.5
+		}
+	}
+}
+DamageProfileTemplates.cannonball_impact = {
+	charge_value = "aoe",
+	is_explosion = true,
+	armor_modifier = {
+		attack = {
+			1,
+			0.5,
+			10,
+			1,
+			1
+		},
+		impact = {
+			1,
+			0.5,
+			1.5,
+			1,
+			1
+		}
+	},
+	default_target = {
+		attack_template = "arrow_poison_aoe",
+		damage_type = "grenade",
+		power_distribution = {
+			attack = 1,
+			impact = 0.5
+		}
+	}
+}
 DamageProfileTemplates.globadier_gas_cloud = table.clone(DamageProfileTemplates.default)
 DamageProfileTemplates.globadier_gas_cloud.default_target.attack_template = "poison_globe_ai_initial_damage"
 DamageProfileTemplates.spike_trap = table.clone(DamageProfileTemplates.default)

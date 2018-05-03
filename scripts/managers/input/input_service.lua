@@ -5,8 +5,6 @@ InputService.init = function (self, input_service_name, keymaps_name, filters_na
 		gamepad = {},
 		mouse = {},
 		keyboard = {},
-		synergy_mouse = {},
-		synergy_keyboard = {},
 		network = {},
 		recording = {}
 	}

@@ -250,12 +250,6 @@ DemoTitleUI._destroy_career_video_player = function (self)
 	local ui_renderer = self._career_video_ui_renderer
 	local widget = self._video_widget
 
-	if widget then
-		UIWidget.destroy(ui_renderer, widget)
-
-		self._video_widget = nil
-	end
-
 	if ui_renderer and ui_renderer.video_player then
 		UIRenderer.destroy_video_player(ui_renderer, self._world)
 	end

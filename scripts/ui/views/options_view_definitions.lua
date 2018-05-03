@@ -2867,7 +2867,7 @@ local function create_title_widget(text, optional_font_size, optional_text_color
 			text = {
 				upper_case = true,
 				localize = true,
-				dynamic_font = true,
+				dynamic_font_size = true,
 				font_type = "hell_shark_header_masked",
 				offset = {
 					base_offset[1] + 2,

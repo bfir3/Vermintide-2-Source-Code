@@ -176,6 +176,7 @@ LinkerTransportationExtension._link_all_transported_units = function (self, inte
 
 	if self.is_server then
 		Managers.state.spawn:disable_spawning(true, self.unit)
+		Managers.state.event:trigger("event_delay_pacing", true)
 	end
 
 	local num_transported_units = 1
@@ -482,6 +483,7 @@ LinkerTransportationExtension.destroy = function (self)
 		rotation = Unit.world_rotation(unit, node)
 
 		Managers.state.spawn:disable_spawning(false, unit, position, rotation)
+		Managers.state.event:trigger("event_delay_pacing", false)
 	end
 
 	if self.has_nav_obstacles then
@@ -531,6 +533,7 @@ LinkerTransportationExtension._unlink_all_transported_units = function (self)
 		local rotation = Unit.world_rotation(unit, node)
 
 		Managers.state.spawn:disable_spawning(false, unit, position + Vector3(0, 0, 1), rotation)
+		Managers.state.event:trigger("event_delay_pacing", false)
 	end
 
 	local transported_units = self.transported_units

@@ -60,16 +60,10 @@ PlayerProjectileHuskExtension.initialize_projectile = function (self, projectile
 		self.amount_of_mass_hit = 0
 		local damage_profile_name = impact_data.damage_profile or "default"
 		local damage_profile = DamageProfileTemplates[damage_profile_name]
-		local cleave_distribution = damage_profile.cleave_distribution or DefaultCleaveDistribution
-		local cleave_range = Cleave.max - Cleave.min
 		local owner_unit = self.owner_unit
-		local cleave_power_level = ActionUtils.scale_powerlevels(self.power_level, "cleave", owner_unit)
-		local attack_cleave_power_level = cleave_power_level * cleave_distribution.attack
-		local attack_percentage = DamageUtils.get_power_level_percentage(attack_cleave_power_level)
-		local max_mass_attack = cleave_range * attack_percentage
-		local impact_cleave_power_level = cleave_power_level * cleave_distribution.impact
-		local impact_percentage = DamageUtils.get_power_level_percentage(impact_cleave_power_level)
-		local max_mass_impact = cleave_range * impact_percentage
+		local difficulty_level = Managers.state.difficulty:get_difficulty()
+		local cleave_power_level = ActionUtils.scale_power_levels(self.power_level, "cleave", owner_unit, difficulty_level)
+		local max_mass_attack, max_mass_impact = ActionUtils.get_max_targets(damage_profile, cleave_power_level)
 		self.max_mass_attack = max_mass_attack
 		self.max_mass_impact = max_mass_impact
 		self.max_mass = (max_mass_impact < max_mass_attack and max_mass_attack) or max_mass_impact
@@ -269,7 +263,8 @@ PlayerProjectileHuskExtension.hit_enemy_damage = function (self, damage_profile,
 	local enemy_type = breed.name
 	local hit_rotation = Quaternion.look(hit_normal)
 	local power_level = self.power_level
-	local predicted_damage = DamageUtils.calculate_damage(DamageOutput, hit_unit, owner_unit, hit_zone_name, power_level, BoostCurves[target_settings.boost_curve_type], ranged_boost_curve_multiplier, is_critical_strike, damage_profile, actual_target_index)
+	local damage_source = self.item_name
+	local predicted_damage = DamageUtils.calculate_damage(DamageOutput, hit_unit, owner_unit, hit_zone_name, power_level, BoostCurves[target_settings.boost_curve_type], ranged_boost_curve_multiplier, is_critical_strike, damage_profile, actual_target_index, nil, damage_source)
 	local no_damage = predicted_damage <= 0
 
 	if no_damage then
@@ -348,7 +343,8 @@ PlayerProjectileHuskExtension.hit_player_damage = function (self, damage_profile
 	local power_level = self.power_level
 	local hit_zone_name = "torso"
 	local is_critical_strike = self._is_critical_strike
-	local predicted_damage = DamageUtils.calculate_damage(DamageOutput, hit_unit, owner_unit, hit_zone_name, power_level, BoostCurves[target_settings.boost_curve_type], ranged_boost_curve_multiplier, is_critical_strike, damage_profile, actual_target_index)
+	local damage_source = self.item_name
+	local predicted_damage = DamageUtils.calculate_damage(DamageOutput, hit_unit, owner_unit, hit_zone_name, power_level, BoostCurves[target_settings.boost_curve_type], ranged_boost_curve_multiplier, is_critical_strike, damage_profile, actual_target_index, nil, damage_source)
 	local no_damage = predicted_damage <= 0
 
 	if no_damage then

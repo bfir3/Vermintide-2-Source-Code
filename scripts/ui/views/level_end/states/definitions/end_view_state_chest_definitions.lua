@@ -296,7 +296,7 @@ local scenegraph_definition = {
 		parent = "score_entry_window",
 		horizontal_alignment = "left",
 		size = {
-			600,
+			300,
 			100
 		},
 		position = {
@@ -370,7 +370,7 @@ local widgets = {
 		255,
 		255
 	}),
-	upgrade_text = UIWidgets.create_simple_text("chest upgrade", "upgrade_background", nil, nil, upgrade_text_style),
+	upgrade_text = UIWidgets.create_simple_text(Localize("end_screen_chest_upgrade"), "upgrade_background", nil, nil, upgrade_text_style),
 	score_window_top_divider = UIWidgets.create_simple_texture("divider_01_top", "score_window_top_divider"),
 	score_entry_window = UIWidgets.create_simple_texture("info_window_background", "score_entry_window"),
 	score_entry_texture = UIWidgets.create_simple_texture("icons_placeholder", "score_entry_texture"),
@@ -557,29 +557,6 @@ local animation_definitions = {
 				size[1] = default_size[1] + size_increase * anim_progress
 				size[2] = default_size[2] + size_increase * anim_progress
 				offset[1] = -(size[1] - default_size[1]) * 0.5
-
-				return 
-			end,
-			on_complete = function (ui_scenegraph, scenegraph_definition, widgets, params)
-				return 
-			end
-		},
-		{
-			name = "text_bump",
-			start_progress = 0.3,
-			end_progress = 0.6,
-			init = function (ui_scenegraph, scenegraph_definition, widgets, params)
-				return 
-			end,
-			update = function (ui_scenegraph, scenegraph_definition, widgets, progress, params)
-				local anim_progress = math.ease_pulse(progress)
-				local font_size = 20
-				local max_font_size = 26
-				local new_font_size = font_size + (max_font_size - font_size) * anim_progress
-				local widget = params.widget
-				widget.style.text.font_size = new_font_size
-				widget.style.text_shadow.font_size = new_font_size
-				widget.style.text_disabled.font_size = new_font_size
 
 				return 
 			end,

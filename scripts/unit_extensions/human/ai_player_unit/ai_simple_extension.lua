@@ -71,6 +71,10 @@ AISimpleExtension.init = function (self, extension_init_context, unit, extension
 		Managers.music:music_trigger("combat_music", breed.combat_spawn_stinger)
 	end
 
+	if breed.special_spawn_stinger then
+		WwiseUtils.trigger_unit_event(self._world, breed.special_spawn_stinger, unit, 0)
+	end
+
 	self._init_event_handler(self)
 	self._init_brain(self, breed, is_horde)
 	self._set_size_variation(self, extension_init_data.size_variation, extension_init_data.size_variation_normalized)
@@ -109,7 +113,7 @@ AISimpleExtension.extensions_ready = function (self, world, unit)
 
 	self.init_perception(self, breed, is_horde)
 
-	if health_extension and not breed.allied then
+	if health_extension then
 		self.broadphase_id = Broadphase.add(blackboard.group_blackboard.broadphase, unit, Unit.local_position(unit, 0), 1)
 	end
 

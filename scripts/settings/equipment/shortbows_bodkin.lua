@@ -355,7 +355,7 @@ weapon_template.attack_meta_data = {
 	charge_above_range = 30,
 	charge_when_obstructed = false,
 	ignore_enemies_for_obstruction = true,
-	charge_against_armoured_enemy = true
+	charge_against_armored_enemy = true
 }
 local action = weapon_template.actions.action_one.default
 weapon_template.default_loaded_projectile_settings = {
@@ -383,41 +383,33 @@ weapon_template.buffs = {
 		external_optional_multiplier = 1.5
 	}
 }
-weapon_template.wwise_dep_left_hand = {
-	"wwise/bow"
-}
 weapon_template.tooltip_keywords = {
 	"keyword_1",
 	"keyword_2",
 	"keyword_3"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.9,
-			range = 0.4,
-			damage = 0.25,
-			targets = 0.4,
-			stagger = 0.2
-		},
-		heavy_attack = {
-			speed = 0.4,
-			range = 0.6,
-			damage = 0.5,
-			targets = 0.6,
-			stagger = 0.4
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
 	},
-	perks = {
-		light_attack = {
-			"head_shot",
-			"armor_penetration"
-		},
-		heavy_attack = {
-			"head_shot",
-			"armor_penetration"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "shoot_charged"
 	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "shoot_charged"
+	}
+}
+weapon_template.wwise_dep_left_hand = {
+	"wwise/bow"
 }
 Weapons = Weapons or {}
 Weapons.shortbow_bodkin_template_1 = table.clone(weapon_template)

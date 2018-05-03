@@ -96,8 +96,14 @@ PlayerCharacterStateGrabbedByChaosSpawn.on_exit = function (self, unit, input, d
 	self.camera_state = nil
 	self.grabbed_by_chaos_spawn_status = nil
 	self.status_count = nil
+	local inventory_extension = self.inventory_extension
 
-	self.inventory_extension:rewield_wielded_slot()
+	if inventory_extension and inventory_extension.get_wielded_slot_name(inventory_extension) == "slot_career_skill_weapon" then
+		inventory_extension.wield_previous_weapon(inventory_extension)
+	else
+		inventory_extension.rewield_wielded_slot(inventory_extension)
+	end
+
 	locomotion_extension.reset_maximum_upwards_velocity(locomotion_extension)
 	locomotion_extension.enable_script_driven_movement(locomotion_extension)
 	locomotion_extension.enable_rotation_towards_velocity(locomotion_extension, true)

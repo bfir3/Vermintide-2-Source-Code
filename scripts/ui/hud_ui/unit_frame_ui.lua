@@ -1,4 +1,4 @@
-local PLAYER_NAME_MAX_LENGTH = 16
+local PLAYER_NAME_MAX_LENGTH = 10
 UnitFrameUI = class(UnitFrameUI)
 UnitFrameUI.init = function (self, ingame_ui_context, definitions, data, frame_index)
 	self.definitions = definitions
@@ -429,7 +429,7 @@ UnitFrameUI.set_player_name = function (self, name_text)
 
 	if widget then
 		local widget_content = widget.content
-		local display_name = (widget.style.player_name and PLAYER_NAME_MAX_LENGTH < UTF8Utils.string_length(name_text) and UIRenderer.crop_text_width(self.ui_renderer, name_text, 180, widget.style.player_name)) or name_text
+		local display_name = (widget.style.player_name and PLAYER_NAME_MAX_LENGTH < UTF8Utils.string_length(name_text) and UIRenderer.crop_text_width(self.ui_renderer, name_text, 150, widget.style.player_name)) or name_text
 		widget_content.player_name = display_name
 
 		self._set_widget_dirty(self, widget)

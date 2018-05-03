@@ -37,6 +37,10 @@ FriendsUIComponent.is_active = function (self)
 	return self._active
 end
 FriendsUIComponent.activate_friends_ui = function (self)
+	if PLATFORM == "xb1" and not Managers.account:friends_list_initiated() then
+		Managers.account:setup_friendslist()
+	end
+
 	self._active = true
 
 	self._refresh_friends_list(self)
@@ -399,7 +403,7 @@ FriendsUIComponent._populate_tab = function (self, widget, list, allow_invite)
 		if allowed_to_initiate_join_lobby and playing_this_game then
 			local playing_game = friend.playing_game
 
-			if playing_game.lobby then
+			if playing_game and playing_game.lobby then
 				can_join = true
 			end
 		end

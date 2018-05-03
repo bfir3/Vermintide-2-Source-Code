@@ -882,27 +882,28 @@ weapon_template.tooltip_keywords = {
 	"weapon_keyword_damage_over_time",
 	"weapon_keyword_wide_sweeps"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.6,
-			stagger = 0.5,
-			damage = 0.28125,
-			targets = 0.4
-		},
-		heavy_attack = {
-			speed = 0.4,
-			stagger = 0.4,
-			damage = 0.625,
-			targets = 0.2
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "light_attack_last"
 	},
-	perks = {
-		light_attack = {},
-		heavy_attack = {
-			"head_shot",
-			"armor_penetration"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "heavy_attack"
+	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	push = {
+		action_name = "action_one",
+		sub_action_name = "push"
 	}
 }
 weapon_template.attack_meta_data = {
@@ -928,7 +929,7 @@ weapon_template.aim_assist_settings = {
 	}
 }
 weapon_template.right_hand_unit = "units/weapons/player/wpn_empire_short_sword/wpn_empire_short_sword"
-weapon_template.right_hand_attachment_node_linking = AttachmentNodeLinking.one_handed_melee_weapon.right
+weapon_template.right_hand_attachment_node_linking = AttachmentNodeLinking.brw_hammer
 weapon_template.display_unit = "units/weapons/weapon_display/display_1h_weapon"
 weapon_template.wield_anim = "to_brw_hammer"
 weapon_template.buff_type = "MELEE_1H"

@@ -12,12 +12,16 @@ UISettings = {
 	max_fatigue_shields = 20,
 	game_start_windows = {
 		frame = "menu_frame_09",
-		spacing = 25,
 		background = "menu_frame_bg_01",
+		spacing = 25,
 		large_window_frame = "menu_frame_08",
 		size = {
 			520,
 			820
+		},
+		large_window_size = {
+			1680,
+			900
 		}
 	},
 	mission_selection_map_size = {

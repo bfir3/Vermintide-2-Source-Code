@@ -93,6 +93,23 @@ BTLeaveHooks.stormfiend_boss_jump_down_leave = function (unit, blackboard, t)
 
 	return 
 end
+
+local function cb_grey_seer_intro_spawn_stormfiend(unit, breed, optional_data)
+	local mounted_data = optional_data.mounted_data
+	local goal_destination = optional_data.goal_destination
+	local blackboard = optional_data.blackboard
+	local t = Managers.time:time("game")
+	mounted_data.mount_unit = unit
+	mounted_data.knocked_off_mounted_timer = t
+	local mount_blackboard = BLACKBOARDS[unit]
+	mount_blackboard.goal_destination = goal_destination
+	mount_blackboard.anim_cb_move = true
+	mount_blackboard.intro_rage = true
+	blackboard.intro_timer = nil
+
+	return 
+end
+
 BTLeaveHooks.on_grey_seer_intro_leave = function (unit, blackboard, t)
 	if not blackboard.exit_last_action then
 		local conflict_director = Managers.state.conflict
@@ -104,24 +121,23 @@ BTLeaveHooks.on_grey_seer_intro_leave = function (unit, blackboard, t)
 			local pos = Unit.local_position(node_unit, 0)
 			local stormfiend_boss_breed = Breeds.skaven_stormfiend_boss
 			local spawn_category = "misc"
-			local stormfiend_unit = conflict_director.spawn_unit(conflict_director, stormfiend_boss_breed, pos, Unit.local_rotation(unit, 0), spawn_category, nil)
-			local mounted_data = blackboard.mounted_data
-			mounted_data.mount_unit = stormfiend_unit
-			mounted_data.knocked_off_mounted_timer = t
 			blackboard.knocked_off_mount = true
-			local mount_blackboard = BLACKBOARDS[stormfiend_unit]
-			mount_blackboard.goal_destination = Vector3Box(POSITION_LOOKUP[unit])
-			mount_blackboard.anim_cb_move = true
-			mount_blackboard.intro_rage = true
+			local optional_data = {
+				spawned_func = cb_grey_seer_intro_spawn_stormfiend,
+				mounted_data = blackboard.mounted_data,
+				goal_destination = Vector3Box(POSITION_LOOKUP[unit]),
+				blackboard = blackboard
+			}
+
+			conflict_director.spawn_queued_unit(conflict_director, stormfiend_boss_breed, Vector3Box(pos), QuaternionBox(Unit.local_rotation(unit, 0)), spawn_category, nil, nil, optional_data)
+
 			local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
 			local event_data = FrameTable.alloc_table()
 
-			dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_calls_mount_battle", event_data)
+			dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_call_mount_intro", event_data)
 		else
 			print("Found no generic AI node (grey_seer_intro_stormfiend_spawn) for grey_seer_intro_leave")
 		end
-
-		blackboard.intro_timer = nil
 
 		conflict_director.add_angry_boss(conflict_director, 1, blackboard)
 

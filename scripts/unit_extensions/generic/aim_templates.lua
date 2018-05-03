@@ -384,7 +384,7 @@ AimTemplates.chaos_warrior = {
 
 			local blackboard = data.blackboard
 			local target_unit = blackboard.target_unit
-			local previous_target_unit = blackboard.previous_target_unit
+			local previous_aim_target_unit = data.previous_aim_target_unit
 			local constraint_target = data.constraint_target
 
 			if not target_unit or not Unit.alive(target_unit) then
@@ -411,16 +411,17 @@ AimTemplates.chaos_warrior = {
 				use_head_constraint = true
 			end
 
-			if use_head_constraint then
+			if not DEDICATED_SERVER and use_head_constraint then
 				look_at_target_unit(unit, data, dt, target_unit, target_distance, constraint_target, true)
 			end
 
-			local have_new_target = target_unit ~= previous_target_unit
+			local have_new_target = target_unit ~= previous_aim_target_unit
 
 			if have_new_target then
 				local game = Managers.state.network:game()
 				local go_id = Managers.state.unit_storage:go_id(unit)
 				local target_go_id = Managers.state.unit_storage:go_id(target_unit)
+				data.previous_aim_target_unit = target_unit
 
 				if game and go_id and target_go_id then
 					GameSession.set_game_object_field(game, go_id, "target_unit_id", target_go_id)
@@ -453,7 +454,7 @@ AimTemplates.chaos_warrior = {
 				local target_unit_id = GameSession.game_object_field(game, go_id, "target_unit_id")
 				local target_unit = Managers.state.unit_storage:unit(target_unit_id)
 
-				if not target_unit or not Unit.alive(target_unit) then
+				if not target_unit or not Unit.alive(target_unit) or target_unit_id <= 0 then
 					AiUtils.set_default_anim_constraint(unit, constraint_target)
 
 					return 
@@ -469,7 +470,6 @@ AimTemplates.chaos_warrior = {
 					aim_target = Unit.world_position(target_unit, head_index)
 				end
 
-				local target_unit_id = GameSession.game_object_field(game, go_id, "target_unit_id")
 				local target_unit = Managers.state.unit_storage:unit(target_unit_id)
 				local target_distance = target_unit and Vector3.distance(POSITION_LOOKUP[unit], POSITION_LOOKUP[target_unit])
 				local use_head_constraint = nil
@@ -515,8 +515,9 @@ AimTemplates.chaos_marauder = {
 			local use_head_constraint = false
 			local target_distance = blackboard.target_dist
 			local breed = blackboard.breed
+			local is_correct_action = current_action == "follow" or current_action == "combat_step"
 
-			if (current_action == "follow" or current_action == "combat_step") and target_distance < (breed.look_at_range or 30) then
+			if is_correct_action and target_distance < (breed.look_at_range or 30) then
 				use_head_constraint = true
 			end
 
@@ -528,17 +529,21 @@ AimTemplates.chaos_marauder = {
 
 			if use_head_constraint then
 				local target_unit = blackboard.target_unit
-				local previous_target_unit = blackboard.previous_target_unit
+				local previous_aim_target_unit = data.previous_aim_target_unit
 				local head_constraint_target = data.head_constraint_target
 				data.lerp_aiming_disabled = true
 
-				look_at_target_unit(unit, data, dt, target_unit, target_distance, head_constraint_target)
+				if not DEDICATED_SERVER then
+					look_at_target_unit(unit, data, dt, target_unit, target_distance, head_constraint_target)
+				end
 
-				if target_unit ~= previous_target_unit then
+				if target_unit ~= previous_aim_target_unit then
 					local target_go_id = Managers.state.unit_storage:go_id(target_unit)
 
 					if game and go_id and target_go_id then
 						GameSession.set_game_object_field(game, go_id, "target_unit_id", target_go_id)
+
+						data.previous_aim_target_unit = target_unit
 					end
 				end
 			elseif data.is_using_head_constraint then
@@ -582,12 +587,15 @@ AimTemplates.chaos_marauder = {
 
 				if use_head_constraint then
 					local target_unit_id = GameSession.game_object_field(game, go_id, "target_unit_id")
-					local target_unit = unit_storage.unit(unit_storage, target_unit_id)
-					local target_distance = target_unit and Vector3.distance(POSITION_LOOKUP[unit], POSITION_LOOKUP[target_unit])
-					local head_constraint_target = data.head_constraint_target
-					data.lerp_aiming_disabled = true
 
-					look_at_target_unit(unit, data, dt, target_unit, target_distance, head_constraint_target)
+					if 0 < target_unit_id then
+						local target_unit = unit_storage.unit(unit_storage, target_unit_id)
+						local target_distance = target_unit and Vector3.distance(POSITION_LOOKUP[unit], POSITION_LOOKUP[target_unit])
+						local head_constraint_target = data.head_constraint_target
+						data.lerp_aiming_disabled = true
+
+						look_at_target_unit(unit, data, dt, target_unit, target_distance, head_constraint_target)
+					end
 				elseif data.is_using_head_constraint then
 					data.is_using_head_constraint = false
 
@@ -672,16 +680,17 @@ AimTemplates.stormfiend = {
 
 			if use_head_constraint then
 				local target_unit = blackboard.target_unit
-				local previous_target_unit = blackboard.previous_target_unit
+				local previous_aim_target_unit = data.previous_aim_target_unit
 				local target_distance = blackboard.target_dist
 				local head_constraint_target = data.head_constraint_target
 
-				if target_distance < 50 then
+				if target_distance < 50 and not DEDICATED_SERVER then
 					look_at_target_unit(unit, data, dt, target_unit, target_distance, head_constraint_target)
 				end
 
-				if target_unit ~= previous_target_unit then
+				if target_unit ~= previous_aim_target_unit then
 					local target_go_id = Managers.state.unit_storage:go_id(target_unit)
+					data.previous_aim_target_unit = target_unit
 
 					if game and go_id and target_go_id then
 						GameSession.set_game_object_field(game, go_id, "target_unit_id", target_go_id)
@@ -758,11 +767,14 @@ AimTemplates.stormfiend = {
 
 				if use_head_constraint then
 					local target_unit_id = GameSession.game_object_field(game, go_id, "target_unit_id")
-					local target_unit = unit_storage.unit(unit_storage, target_unit_id)
-					local target_distance = target_unit and Vector3.distance(POSITION_LOOKUP[unit], POSITION_LOOKUP[target_unit])
-					local head_constraint_target = data.head_constraint_target
 
-					look_at_target_unit(unit, data, dt, target_unit, target_distance, head_constraint_target)
+					if 0 < target_unit_id then
+						local target_unit = unit_storage.unit(unit_storage, target_unit_id)
+						local target_distance = target_unit and Vector3.distance(POSITION_LOOKUP[unit], POSITION_LOOKUP[target_unit])
+						local head_constraint_target = data.head_constraint_target
+
+						look_at_target_unit(unit, data, dt, target_unit, target_distance, head_constraint_target)
+					end
 				elseif data.is_using_head_constraint then
 					data.is_using_head_constraint = false
 

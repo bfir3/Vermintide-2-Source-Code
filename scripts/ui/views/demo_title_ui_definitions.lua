@@ -560,11 +560,11 @@ local scenegraph_definition = {
 }
 local attract_mode_video = {
 	video_name = "video/vermintide_2_reveal",
-	sound_start = "Play_vermintide_2_reveal",
 	scenegraph_id = "splash_video",
 	loop = false,
 	material_name = "vermintide_2_reveal",
-	sound_stop = "Stop_vermintide_2_reveal"
+	sound_start = (PLATFORM == "xb1" and "Play_reveal_trailer") or "Play_vermintide_2_reveal",
+	sound_stop = (PLATFORM == "xb1" and "Stop_reveal_trailer") or "Stop_vermintide_2_reveal"
 }
 local skill_title_style = {
 	vertical_alignment = "bottom",

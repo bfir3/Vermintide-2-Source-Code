@@ -114,16 +114,10 @@ local function init_stat(stat, backend_stats)
 
 			if backend_raw_value then
 				stat.persistent_value = convert_from_backend(backend_raw_value, stat.database_type)
-			else
-				if Managers.backend:profiles_loaded() and not Managers.backend:is_local() then
-					Application.error("Statistic %-25s should have existed in the backend with name %-25s but didn't.", name, database_name)
-				end
-
-				if stat.database_type == nil then
-					stat.persistent_value = 0
-				elseif stat.database_type == "hexarray" then
-					stat.persistent_value = table.clone(stat.value)
-				end
+			elseif stat.database_type == nil then
+				stat.persistent_value = 0
+			elseif stat.database_type == "hexarray" then
+				stat.persistent_value = table.clone(stat.value)
 			end
 		end
 	else
@@ -221,7 +215,7 @@ end
 
 local function sync_stat_to_server(network_transmit, stat_peer_id, stat_local_player_id, path, path_step, stat)
 	if stat.value then
-		if stat.sync_to_server then
+		if stat.sync_to_host then
 			fassert(type(stat.persistent_value) == "number", "Not supporting hot join syncing of value %q", type(stat.persistent_value))
 			fassert(path_step <= NetworkConstants.statistics_path_max_size, "statistics path is longer than max size, increase in global.networks_config")
 
@@ -328,6 +322,12 @@ StatisticsDatabase.increment_stat = function (self, id, ...)
 		stat.persistent_value = stat.persistent_value + 1
 	end
 
+	local event_manager = Managers.state.event
+
+	if event_manager then
+		event_manager.trigger(event_manager, "event_stat_incremented", id, ...)
+	end
+
 	dbprintf("StatisticsDatabase: Incremented stat %s for id=%s to %f", stat.name, tostring(id), stat.value)
 
 	return 
@@ -349,6 +349,23 @@ StatisticsDatabase.decrement_stat = function (self, id, ...)
 	end
 
 	dbprintf("StatisticsDatabase: Decremented stat %s for id=%s to %f", stat.name, tostring(id), stat.value)
+
+	return 
+end
+StatisticsDatabase.increment_stat_and_sync_to_clients = function (self, stat_name)
+	local player_manager = Managers.player
+	local player = player_manager.local_player(player_manager)
+
+	if player then
+		local saved_stat = self.get_persistent_stat(self, player.stats_id(player), stat_name)
+
+		self.set_stat(self, player.stats_id(player), stat_name, saved_stat + 1)
+	end
+
+	local network_manager = Managers.state.network
+	local stat_id = NetworkLookup.statistics[stat_name]
+
+	network_manager.network_transmit:send_rpc_clients("rpc_increment_stat", stat_id)
 
 	return 
 end
@@ -540,6 +557,7 @@ StatisticsDatabase.rpc_increment_stat = function (self, sender, stat_id)
 
 	local stats_id = player.stats_id(player)
 
+	print("Incremented stat ", stat)
 	self.increment_stat(self, stats_id, stat)
 
 	return 

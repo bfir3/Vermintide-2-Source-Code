@@ -60,6 +60,31 @@ BenchmarkHandler.init = function (self, ingame_ui, world)
 
 	Development.set_parameter("disable_loading_icon", true)
 
+	if PLATFORM == "win32" then
+		local package_name = "resource_packages/breeds/chaos_troll"
+		local async = true
+		local prioritize = false
+
+		Managers.package:load(package_name, "global", nil, async, prioritize)
+	end
+
+	return 
+end
+BenchmarkHandler.story_spawn_and_animate_troll = function (self, element, t)
+	local level_analysis = Managers.state.conflict.level_analysis
+	local node_units = level_analysis.generic_ai_node_units[element.ai_node_id]
+	local position = Unit.local_position(node_units[1], 0)
+	local rotation = Unit.local_rotation(node_units[1], 0)
+	local unit_name = "units/beings/enemies/chaos_troll/chr_chaos_troll"
+	local troll_unit = World.spawn_unit(self._world, unit_name, position, rotation)
+	local wpn_unit_name = "units/weapons/enemy/wpn_chaos_troll/wpn_chaos_troll_01"
+	local wpn_unit = World.spawn_unit(self._world, wpn_unit_name, position, rotation)
+	local troll_node_index = Unit.node(troll_unit, "j_leftweaponattach")
+	local wpn_node_index = 0
+
+	World.link_unit(self._world, wpn_unit, wpn_node_index, troll_unit, troll_node_index)
+	Unit.animation_event(troll_unit, "benchmark_attack")
+
 	return 
 end
 BenchmarkHandler.story_destroy_close_units = function (self, element, t)
@@ -95,6 +120,20 @@ BenchmarkHandler.story_teleport_party = function (self, element, t)
 	end
 
 	self.run_func_on_bots(self, f)
+
+	return 
+end
+BenchmarkHandler.recycler_spawn_at = function (self, element, t)
+	local p = element.position
+	local position = Vector3Box(p[1], p[2], p[3])
+	local ends_at = t + element.duration
+
+	Managers.state.conflict:set_recycler_extra_pos(position, ends_at)
+
+	return 
+end
+BenchmarkHandler.story_troll_sound = function (self, element, t)
+	WwiseUtils.trigger_position_event(self._world, "Play_military_benchmark_troll", Vector3(0, 0, 0))
 
 	return 
 end

@@ -99,7 +99,7 @@ StateTitleScreenLoadSave._update_network = function (self, dt, t)
 end
 StateTitleScreenLoadSave._signin = function (self)
 	Managers.unlock = UnlockManager:new()
-	Managers.backend = BackendManagerPlayFab:new("ScriptBackendPlayFab", "PlayFabMirror", "DataServerQueue")
+	Managers.backend = BackendManagerPlayFab:new("ScriptBackendPlayFabXbox", "PlayFabMirror", "DataServerQueue")
 
 	Managers.backend:signin(self._xsts_result)
 
@@ -305,7 +305,7 @@ StateTitleScreenLoadSave.cb_load_done = function (self, data)
 		if input_service.get(input_service, "show_support_info") then
 			self._show_support_info(self)
 		else
-			self._state = "signin_to_backend"
+			self._state = "signin_to_xsts"
 		end
 	end
 
@@ -365,7 +365,7 @@ StateTitleScreenLoadSave._check_popup = function (self)
 	elseif result == "verified_guest" then
 		self._state = "enumerate_dlc"
 	elseif result == "support_info_done" then
-		self._state = "signin_to_backend"
+		self._state = "signin_to_xsts"
 	elseif result then
 		fassert(false, "[StateTitleScreenLoadSave] The popup result doesn't exist (%s)", result)
 	end
@@ -399,7 +399,7 @@ StateTitleScreenLoadSave.cb_save_done = function (self, data)
 	else
 		populate_save_data(SaveData)
 
-		self._state = "signin_to_backend"
+		self._state = "signin_to_xsts"
 	end
 
 	return 

@@ -64,7 +64,13 @@ PlayerCharacterStateGrabbedByCorruptor.on_exit = function (self, unit, input, dt
 
 	local inventory_extension = self.inventory_extension
 
-	inventory_extension.rewield_wielded_slot(inventory_extension)
+	if inventory_extension then
+		if inventory_extension.get_wielded_slot_name(inventory_extension) == "slot_career_skill_weapon" then
+			inventory_extension.wield_previous_weapon(inventory_extension)
+		else
+			inventory_extension.rewield_wielded_slot(inventory_extension)
+		end
+	end
 
 	return 
 end
@@ -147,12 +153,22 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 			elseif CharacterStateHelper.is_knocked_down(status_extension) then
 				local inventory_extension = parent.inventory_extension
 
-				inventory_extension.rewield_wielded_slot(inventory_extension)
+				if inventory_extension and inventory_extension.get_wielded_slot_name(inventory_extension) == "slot_career_skill_weapon" then
+					inventory_extension.wield_previous_weapon(inventory_extension)
+				else
+					inventory_extension.rewield_wielded_slot(inventory_extension)
+				end
+
 				csm.change_state(csm, "knocked_down", parent.temp_params)
 			else
 				local inventory_extension = parent.inventory_extension
 
-				inventory_extension.rewield_wielded_slot(inventory_extension)
+				if inventory_extension and inventory_extension.get_wielded_slot_name(inventory_extension) == "slot_career_skill_weapon" then
+					inventory_extension.wield_previous_weapon(inventory_extension)
+				else
+					inventory_extension.rewield_wielded_slot(inventory_extension)
+				end
+
 				csm.change_state(csm, "standing")
 			end
 

@@ -348,4 +348,21 @@ function flow_query_leader_owns_vt1(params)
 	return flow_return_table
 end
 
+function flow_query_leader_completed_all_dlc_levels(params)
+	local leader_peer_id = Managers.party:leader()
+	local local_peer_id = Network.peer_id()
+
+	fassert(leader_peer_id == local_peer_id, "Flow node \"Leader Completed All DLC Levels\" should only be called by the leader player")
+
+	local dlc_name = params.dlc_name
+	local player_manager = Managers.player
+	local statistics_db = player_manager.statistics_db(player_manager)
+	local leader_player = player_manager.player(player_manager, leader_peer_id, 1)
+	local stats_id = leader_player.stats_id(leader_player)
+	local all_completed = LevelUnlockUtils.all_dlc_levels_completed(statistics_db, stats_id, dlc_name)
+	flow_return_table.value = all_completed
+
+	return flow_return_table
+end
+
 return 

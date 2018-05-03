@@ -10,6 +10,7 @@ weapon_template.actions = {
 			aim_assist_ramp_decay_delay = 0.1,
 			anim_end_event = "attack_finished",
 			kind = "melee_start",
+			stop_action_on_leave_for_bot = true,
 			aim_assist_max_ramp_multiplier = 0.4,
 			aim_assist_ramp_multiplier = 0.2,
 			anim_event = "attack_swing_charge",
@@ -58,6 +59,7 @@ weapon_template.actions = {
 			aim_assist_ramp_multiplier = 0.2,
 			anim_end_event = "attack_finished",
 			kind = "melee_start",
+			stop_action_on_leave_for_bot = true,
 			aim_assist_ramp_decay_delay = 0.1,
 			aim_assist_max_ramp_multiplier = 0.4,
 			uninterruptible = true,
@@ -114,6 +116,7 @@ weapon_template.actions = {
 			aim_assist_ramp_multiplier = 0.2,
 			anim_end_event = "attack_finished",
 			kind = "melee_start",
+			stop_action_on_leave_for_bot = true,
 			aim_assist_ramp_decay_delay = 0.1,
 			aim_assist_max_ramp_multiplier = 0.4,
 			uninterruptible = true,
@@ -169,6 +172,7 @@ weapon_template.actions = {
 			aim_assist_ramp_decay_delay = 0.1,
 			anim_end_event = "attack_finished",
 			kind = "melee_start",
+			stop_action_on_leave_for_bot = true,
 			aim_assist_max_ramp_multiplier = 0.4,
 			aim_assist_ramp_multiplier = 0.2,
 			anim_event = "attack_swing_charge",
@@ -216,6 +220,7 @@ weapon_template.actions = {
 			aim_assist_ramp_decay_delay = 0.1,
 			anim_end_event = "attack_finished",
 			kind = "melee_start",
+			stop_action_on_leave_for_bot = true,
 			aim_assist_max_ramp_multiplier = 0.4,
 			aim_assist_ramp_multiplier = 0.2,
 			anim_event = "attack_swing_charge_left",
@@ -263,6 +268,7 @@ weapon_template.actions = {
 			aim_assist_ramp_decay_delay = 0.1,
 			anim_end_event = "attack_finished",
 			kind = "melee_start",
+			stop_action_on_leave_for_bot = true,
 			aim_assist_max_ramp_multiplier = 0.4,
 			aim_assist_ramp_multiplier = 0.2,
 			anim_event = "attack_swing_charge",
@@ -957,9 +963,85 @@ weapon_template.attack_meta_data = {
 	},
 	hold_attack = {
 		penetrating = true,
-		arc = 0
+		arc = 2,
+		attack_chain = {
+			start_sub_action_name = "default",
+			start_action_name = "action_one",
+			transitions = {
+				action_one = {
+					default = {
+						wanted_sub_action_name = "default_charge",
+						wanted_action_name = "action_one",
+						bot_wait_input = "hold_attack",
+						bot_wanted_input = "hold_attack"
+					},
+					default_charge = {
+						wanted_sub_action_name = "heavy_attack",
+						wanted_action_name = "action_one",
+						bot_wait_input = "hold_attack"
+					},
+					default_charge_2 = {
+						wanted_sub_action_name = "heavy_attack_left",
+						wanted_action_name = "action_one",
+						bot_wait_input = "hold_attack"
+					},
+					default_right = {
+						wanted_sub_action_name = "default_charge",
+						wanted_action_name = "action_one",
+						bot_wait_input = "hold_attack",
+						bot_wanted_input = "hold_attack"
+					},
+					default_left = {
+						wanted_sub_action_name = "default_charge_2",
+						wanted_action_name = "action_one",
+						bot_wait_input = "hold_attack",
+						bot_wanted_input = "hold_attack"
+					},
+					default_last = {
+						wanted_sub_action_name = "default_charge",
+						wanted_action_name = "action_one",
+						bot_wait_input = "hold_attack",
+						bot_wanted_input = "hold_attack"
+					},
+					heavy_attack = {
+						wanted_sub_action_name = "default_charge_2",
+						wanted_action_name = "action_one",
+						bot_wanted_input = "hold_attack"
+					},
+					heavy_attack_left = {
+						wanted_sub_action_name = "default",
+						wanted_action_name = "action_one",
+						bot_wanted_input = "hold_attack"
+					},
+					light_attack_left = {
+						wanted_sub_action_name = "default_left",
+						wanted_action_name = "action_one",
+						bot_wanted_input = "tap_attack"
+					},
+					light_attack_right = {
+						wanted_sub_action_name = "default_right",
+						wanted_action_name = "action_one",
+						bot_wanted_input = "tap_attack"
+					},
+					light_attack_last = {
+						wanted_sub_action_name = "default_last",
+						wanted_action_name = "action_one",
+						bot_wanted_input = "tap_attack"
+					},
+					light_attack_down = {
+						wanted_sub_action_name = "default",
+						wanted_action_name = "action_one",
+						bot_wanted_input = "tap_attack"
+					}
+				},
+				action_two = {}
+			}
+		}
 	}
 }
+
+WeaponUtils.add_bot_meta_data_chain_actions(weapon_template.actions, weapon_template.attack_meta_data.hold_attack.attack_chain.transitions)
+
 weapon_template.aim_assist_settings = {
 	max_range = 5,
 	no_aim_input_multiplier = 0,
@@ -977,36 +1059,22 @@ weapon_template.tooltip_keywords = {
 	"weapon_keyword_wide_sweeps",
 	"weapon_keyword_crowd_control"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.6,
-			stagger = 0.6,
-			damage = 0.28125,
-			targets = 0.8
-		},
-		heavy_attack = {
-			speed = 0.4,
-			stagger = 0.4,
-			damage = 0.625,
-			targets = 0.2
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "light_attack_left"
 	},
-	perks = {
-		light_attack = {
-			"head_shot"
-		},
-		heavy_attack = {
-			"armor_penetration"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "heavy_attack"
 	}
 }
 weapon_template.wwise_dep_right_hand = {
 	"wwise/flail"
 }
 Weapons = Weapons or {}
-Weapons.one_handed_flail_template_1 = table.clone(weapon_template)
-Weapons.one_handed_flail_template_1_t3_un = table.clone(Weapons.one_handed_flail_template_1)
+Weapons.one_handed_flail_template_1 = table.create_copy(Weapons.one_handed_flail_template_1, weapon_template)
+Weapons.one_handed_flail_template_1_t3_un = table.create_copy(Weapons.one_handed_flail_template_1_t3_un, weapon_template)
 Weapons.one_handed_flail_template_1_t3_un.actions.action_inspect.default.anim_event = "inspect_start_2"
 Weapons.one_handed_flail_template_1_t3_un.actions.action_inspect.default.anim_end_event = "inspect_end_2"
 

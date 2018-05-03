@@ -5,8 +5,8 @@ require("scripts/network/lobby_finder")
 require("scripts/network/lobby_members")
 require("scripts/network/smartmatch_xb1")
 require("scripts/network/lobby_unclaimed")
-require("scripts/network/voice_chat_xb1")
 require("scripts/network_lookup/network_lookup")
+require("scripts/network/voice_chat_xb1")
 
 LobbyInternal = LobbyInternal or {}
 LobbyInternal.HOPPER_NAME = "new_stage_hopper"
@@ -39,20 +39,19 @@ LobbyInternal.create_lobby = function (network_options)
 	local session_id = Network.create_multiplayer_session_host(Managers.account:user_id(), name, session_template_name, {
 		"server_name:" .. name
 	})
-	local enable_chat = true
 	local is_hosting = true
 
-	return XboxLiveLobby:new(session_id, name, session_template_name, enable_chat, is_hosting)
+	return XboxLiveLobby:new(session_id, name, session_template_name, is_hosting)
 end
 LobbyInternal.network_initialized = function ()
 	return not not LobbyInternal.client
 end
-LobbyInternal.leave_lobby = function (xboxlive_lobby, skip_voice_chat)
-	xboxlive_lobby.leave(xboxlive_lobby, skip_voice_chat)
+LobbyInternal.leave_lobby = function (xboxlive_lobby)
+	xboxlive_lobby.leave(xboxlive_lobby)
 
 	return 
 end
-LobbyInternal.join_lobby = function (lobby_data, skip_voice_chat)
+LobbyInternal.join_lobby = function (lobby_data)
 	print("JOINING LOBBY")
 
 	for name, value in pairs(lobby_data) do
@@ -65,10 +64,9 @@ LobbyInternal.join_lobby = function (lobby_data, skip_voice_chat)
 	local name = lobby_data.name or Application.guid()
 	local session_template_name = lobby_data.session_template_name or LobbyInternal.SESSION_TEMPLATE_NAME
 	local session_id = Network.create_multiplayer_session_client(Managers.account:user_id(), name, session_template_name)
-	local enable_chat = not skip_voice_chat
 	local is_hosting = false
 
-	return XboxLiveLobby:new(session_id, name, session_template_name, enable_chat, is_hosting)
+	return XboxLiveLobby:new(session_id, name, session_template_name, is_hosting)
 end
 LobbyInternal.shutdown_client = function ()
 	if LobbyInternal.xbox_live_lobby_browser then
@@ -162,17 +160,21 @@ local HOPPER_PARAMS_LUT = {
 	},
 	new_stage_hopper = {
 		"difficulty",
-		"level"
+		"level",
+		"powerlevel",
+		"strict_matchmaking"
 	}
 }
 local HOPPER_PARAM_TYPE_LUT = {
+	powerlevel = "number",
+	strict_matchmaking = "number",
 	stage = "number",
 	difficulty = "number",
 	level = "collection"
 }
 local SECONDS_BETWEEN_LOBBY_DATA_READS = 30
 XboxLiveLobby = class(XboxLiveLobby)
-XboxLiveLobby.init = function (self, session_id, unique_server_name, session_template_name, enable_voice_chat, is_hosting)
+XboxLiveLobby.init = function (self, session_id, unique_server_name, session_template_name, is_hosting)
 	self._user_id = Managers.account:user_id()
 	self._session_id = session_id
 	self._data = {
@@ -190,13 +192,18 @@ XboxLiveLobby.init = function (self, session_id, unique_server_name, session_tem
 
 	dprintf("Lobby created Session ID: %s - Name: %s - Template: %s", tostring(session_id), tostring(unique_server_name), tostring(session_template_name))
 
-	if enable_voice_chat and Managers.account:has_privilege(UserPrivilege.COMMUNICATION_VOICE_INGAME) then
+	if Managers.account:has_privilege(UserPrivilege.COMMUNICATION_VOICE_INGAME) and not script_data.honduras_demo then
 		if not Managers.voice_chat then
 			Managers.voice_chat = VoiceChatXboxOneManager:new()
-		elseif Managers.voice_chat then
-			Managers.voice_chat:initate_voice_chat()
 		end
+
+		Managers.voice_chat:add_local_user()
 	end
+
+	return 
+end
+XboxLiveLobby.set_hosting = function (self, hosting)
+	self._is_hosting = hosting
 
 	return 
 end
@@ -207,9 +214,7 @@ XboxLiveLobby.enable_smartmatch = function (self, enable, params, timeout)
 	self._smartmatch_ticket_params = params
 	self._timeout = timeout
 
-	if not self._smartmatch_enabled then
-		self._cancel_matchmaking(self)
-	end
+	self._cancel_matchmaking(self)
 
 	return 
 end
@@ -280,6 +285,10 @@ XboxLiveLobby.invite_friends_list = function (self, friends_to_invite)
 	return 
 end
 XboxLiveLobby.update_data = function (self, dt)
+	if Managers.account:user_detached() then
+		return 
+	end
+
 	if self._is_hosting then
 		if self._data_needs_update and MultiplayerSession.status(self._session_id) == MultiplayerSession.READY then
 			MultiplayerSession.set_custom_property_json(self._session_id, "data", cjson.encode(self._data))
@@ -317,7 +326,7 @@ XboxLiveLobby.update_data = function (self, dt)
 		if 0 <= self._data_update_time_left then
 			self._data_update_time_left = self._data_update_time_left - dt
 
-			if self._data_update_time_left < 0 then
+			if self._data_update_time_left < 0 and not self._data_update_status_id then
 				self._data_update_status_id = MultiplayerSession.custom_property_json(self._session_id, "data")
 			end
 		end
@@ -537,12 +546,8 @@ end
 XboxLiveLobby.session_id = function (self)
 	return self._session_id
 end
-XboxLiveLobby.leave = function (self, skip_voice_chat)
+XboxLiveLobby.leave = function (self)
 	dprintf("Destroying Lobby --> session_id: %s - session_name: %s", self._session_id, self._data.session_name)
-
-	if not skip_voice_chat then
-		Managers.voice_chat:shutdown()
-	end
 
 	self._activity_set = false
 	local session_data = {

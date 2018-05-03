@@ -152,7 +152,7 @@ ActionChargedProjectile.client_owner_post_update = function (self, dt, t, world,
 			end
 		end
 
-		local angle = DamageUtils.pitch_from_rotation(rotation)
+		local angle = ActionUtils.pitch_from_rotation(rotation)
 		local speed = current_action.speed
 		local target_vector = Vector3.normalize(Vector3.flat(Quaternion.forward(rotation)))
 		local projectile_info = current_action.projectile_info
@@ -212,12 +212,7 @@ ActionChargedProjectile.client_owner_post_update = function (self, dt, t, world,
 		local sub_action_name = lookup_data.sub_action_name
 		local charge_level = self.charge_level
 		local scale = math.round(math.max(charge_level, 0) * 100)
-		local projectile_power_level = self.power_level
-
-		if current_action.scale_power_level then
-			projectile_power_level = math.max(current_action.scale_power_level, self.charge_level) * projectile_power_level
-		end
-
+		local projectile_power_level = ActionUtils.scale_charged_projectile_power_level(self.power_level, current_action, self.charge_level)
 		local item_data = ItemMasterList[item_name]
 		local item_template = BackendUtils.get_item_template(item_data)
 

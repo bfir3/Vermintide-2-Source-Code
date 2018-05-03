@@ -1,3 +1,5 @@
+require("scripts/game_state/components/enemy_package_loader")
+
 local function check_bool_string(text)
 	if text == "false" then
 		return false
@@ -19,6 +21,7 @@ LevelTransitionHandler.init = function (self)
 	self.loading_packages = {}
 	self.has_loaded_all_packages = false
 	self.loaded_levels = {}
+	self.enemy_package_loader = EnemyPackageLoader:new()
 
 	return 
 end
@@ -30,6 +33,7 @@ LevelTransitionHandler.register_rpcs = function (self, network_event_delegate)
 	self.network_event_delegate = network_event_delegate
 
 	network_event_delegate.register(network_event_delegate, self, unpack(rpcs))
+	self.enemy_package_loader:register_rpcs(network_event_delegate)
 
 	return 
 end
@@ -52,6 +56,8 @@ LevelTransitionHandler.unregister_rpcs = function (self)
 
 	self.network_event_delegate = nil
 
+	self.enemy_package_loader:unregister_rpcs()
+
 	return 
 end
 LevelTransitionHandler.default_level_key = function (self)
@@ -70,7 +76,7 @@ LevelTransitionHandler.load_default_level = function (self)
 end
 LevelTransitionHandler.load_level = function (self, level_key)
 	printf("[LevelTransitionHandler] load_level %s", level_key)
-	assert(LevelSettings[level_key], "The level named %q does not exist in LevelSettings.", tostring(level_key))
+	fassert(LevelSettings[level_key], "The level named %q does not exist in LevelSettings.", tostring(level_key))
 
 	local current_level = self.level_key
 
@@ -80,7 +86,7 @@ LevelTransitionHandler.load_level = function (self, level_key)
 
 	local level_package_name = LevelSettings[level_key].package_name
 
-	if self.level_key ~= level_key or not Managers.package:has_loaded(level_package_name) then
+	if self.level_key ~= level_key or (not Managers.package:has_loaded(level_package_name, "LevelTransitionHandler") and not Managers.package:is_loading(level_package_name)) then
 		self.last_level_key = self.level_key
 		self.level_key = level_key
 		self.level_name = LevelSettings[level_key].level_name
@@ -97,6 +103,8 @@ LevelTransitionHandler.load_level = function (self, level_key)
 	else
 		self.last_level_key = self.level_key
 	end
+
+	self.enemy_package_loader:setup_startup_enemies(level_key)
 
 	return 
 end
@@ -202,12 +210,6 @@ LevelTransitionHandler.update = function (self)
 		print("[LevelTransitionHandler] Level load completed!")
 
 		self.has_loaded_all_packages = not has_loading_packages
-	end
-
-	if script_data.debug_level_packages then
-		for level_name, is_loaded in pairs(self.loaded_levels) do
-			Debug.text("Level %q is_loaded: %s", level_name, tostring(is_loaded))
-		end
 	end
 
 	return 

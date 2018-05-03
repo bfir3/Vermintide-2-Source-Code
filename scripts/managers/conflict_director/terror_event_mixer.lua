@@ -8,6 +8,7 @@ local amount = {
 }
 TerrorEventMixer.active_events = TerrorEventMixer.active_events or {}
 TerrorEventMixer.start_event_list = TerrorEventMixer.start_event_list or {}
+TerrorEventMixer.optional_data = TerrorEventMixer.optional_data or {}
 TerrorEventMixer.init_functions = {
 	text = function (event, element, t)
 		event.ends_at = t + ConflictUtils.random_interval(element.duration)
@@ -177,6 +178,17 @@ TerrorEventMixer.init_functions = {
 
 		return 
 	end,
+	force_load_breed_package = function (event, element, t)
+		local enemy_package_loader = Managers.state.game_mode.level_transition_handler.enemy_package_loader
+
+		if not enemy_package_loader.breed_processed[breed_name] then
+			local ignore_breed_limits = true
+
+			enemy_package_loader.request_breed(enemy_package_loader, element.breed_name, ignore_breed_limits)
+		end
+
+		return 
+	end,
 	enable_bots_in_carry_event = function (event, element, t)
 		Managers.state.entity:system("ai_bot_group_system"):set_in_carry_event(true)
 
@@ -297,6 +309,64 @@ TerrorEventMixer.init_functions = {
 		script_data.benchmark[func_name](script_data.benchmark, element, t)
 
 		return 
+	end,
+	set_time_challenge = function (event, element, t, dt)
+		local optional_data = TerrorEventMixer.optional_data
+		local time_challenge_name = element.time_challenge_name
+		local challenge_threshold = QuestSettings[time_challenge_name]
+		local duration = t + challenge_threshold
+		local current_difficulty = Managers.state.difficulty:get_difficulty()
+		local allowed_difficulties = QuestSettings.allowed_difficulties[time_challenge_name]
+		local allowed_difficulty = allowed_difficulties[current_difficulty]
+		local achievements_enabled = Development.parameter("v2_achievements")
+
+		if achievements_enabled and allowed_difficulty and not optional_data[time_challenge_name] then
+			optional_data[time_challenge_name] = duration
+		end
+
+		return 
+	end,
+	has_completed_time_challenge = function (event, element, t, dt)
+		local optional_data = TerrorEventMixer.optional_data
+		local time_challenge_name = element.time_challenge_name
+		local duration = optional_data[time_challenge_name]
+
+		if duration then
+			local completed = t < duration
+			local time_left = math.abs(t - duration)
+
+			if completed then
+				optional_data[time_challenge_name] = nil
+				local stat_name = time_challenge_name
+				local statistics_db = Managers.player:statistics_db()
+
+				statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+			else
+				optional_data[time_challenge_name] = nil
+			end
+		end
+
+		return 
+	end,
+	do_volume_challenge = function (event, element, t, dt)
+		local optional_data = TerrorEventMixer.optional_data
+		local volume_name = element.volume_name
+
+		fassert(optional_data[volume_name] == nil, "Already started a volume challenge for volume_name=(%s)", volume_name)
+
+		local challenge_duration = QuestSettings[volume_name]
+		local allowed_difficulties = QuestSettings.allowed_difficulties[volume_name]
+		local difficulty = Managers.state.difficulty:get_difficulty()
+		local on_allowed_difficulty = allowed_difficulties[difficulty]
+		local achievements_enabled = Development.parameter("v2_achievements")
+		local terminate = not on_allowed_difficulty or not achievements_enabled
+		optional_data[volume_name] = {
+			time_inside = 0,
+			duration = challenge_duration,
+			terminate = terminate
+		}
+
+		return 
 	end
 }
 TerrorEventMixer.run_functions = {
@@ -319,13 +389,10 @@ TerrorEventMixer.run_functions = {
 		local conflict_director = Managers.state.conflict
 		local group_data = data.group_data
 		local breed_name = element.breed_name
-		local unit_queue_id = conflict_director.spawn_one(conflict_director, Breeds[breed_name], position, group_data, optional_data)
 
-		if unit_queue_id then
-			return true
-		end
+		conflict_director.spawn_one(conflict_director, Breeds[breed_name], position, group_data, optional_data)
 
-		return 
+		return true
 	end,
 	spawn_at_raw = function (event, element, t, dt)
 		return true
@@ -531,6 +598,9 @@ TerrorEventMixer.run_functions = {
 	play_stinger = function (event, element, t)
 		return true
 	end,
+	force_load_breed_package = function (event, element, t)
+		return true
+	end,
 	set_master_event_running = function (event, element, t, dt)
 		return true
 	end,
@@ -569,6 +639,60 @@ TerrorEventMixer.run_functions = {
 	end,
 	run_benchmark_func = function (event, element, t, dt)
 		return true
+	end,
+	set_time_challenge = function (event, element, t, dt)
+		return true
+	end,
+	has_completed_time_challenge = function (event, element, t, dt)
+		return true
+	end,
+	do_volume_challenge = function (event, element, t, dt)
+		local volume_name = element.volume_name
+		local optional_data = TerrorEventMixer.optional_data[volume_name]
+
+		if optional_data.terminate then
+			return true
+		end
+
+		local all_inside = true
+		local human_players = Managers.player:human_players()
+
+		for _, player in pairs(human_players) do
+			local player_unit = player.player_unit
+
+			if not AiUtils.unit_alive(player_unit) then
+				all_inside = false
+
+				break
+			end
+
+			local volume_extension = ScriptUnit.extension(player_unit, "volume_system")
+
+			if not volume_extension.is_inside_volume(volume_extension, volume_name) then
+				all_inside = false
+
+				break
+			end
+		end
+
+		if all_inside then
+			optional_data.time_inside = optional_data.time_inside + dt
+		else
+			optional_data.time_inside = 0
+		end
+
+		if optional_data.duration <= optional_data.time_inside then
+			local increment_stat_name = element.increment_stat_name
+			local statistics_db = Managers.player:statistics_db()
+
+			statistics_db.increment_stat_and_sync_to_clients(statistics_db, increment_stat_name)
+
+			return true
+		else
+			return false
+		end
+
+		return 
 	end
 }
 TerrorEventMixer.debug_functions = {
@@ -621,7 +745,15 @@ TerrorEventMixer.debug_functions = {
 		return element.breed_name
 	end,
 	spawn_at_raw = function (event, element, t, dt)
-		return element.spawner_id .. " -> " .. element.breed_name
+		local debug_text = nil
+
+		if type(element.breed_name) == "table" then
+			debug_text = table.dump_string(element.breed_name)
+		else
+			debug_text = element.breed_name
+		end
+
+		return element.spawner_id .. " -> " .. debug_text
 	end,
 	spawn_patrol = function (event, element, t, dt)
 		return element.breed_name
@@ -652,6 +784,9 @@ TerrorEventMixer.debug_functions = {
 
 		return 
 	end,
+	force_load_breed_package = function (event, element, t, dt)
+		return "breed_name: " .. element.breed_name
+	end,
 	stop_master_event = function (event, element, t, dt)
 		return ""
 	end,
@@ -663,11 +798,24 @@ TerrorEventMixer.debug_functions = {
 	end,
 	run_benchmark_func = function (event, element, t, dt)
 		return "func_name:" .. element.func_name
+	end,
+	set_time_challenge = function (event, element, t, dt)
+		return "Time challenge started "
+	end,
+	do_volume_challenge = function (event, element, t, dt)
+		local volume_name = element.volume_name
+		local optional_data = TerrorEventMixer.optional_data[volume_name]
+		local time_inside = optional_data.time_inside
+		local duration = optional_data.duration
+		local complete_status = time_inside / duration
+
+		return string.format("%.2f/%.2f - %.2f", time_inside, duration, complete_status)
 	end
 }
 TerrorEventMixer.reset = function ()
 	table.clear(TerrorEventMixer.active_events)
 	table.clear(TerrorEventMixer.start_event_list)
+	table.clear(TerrorEventMixer.optional_data)
 
 	return 
 end
@@ -850,6 +998,14 @@ TerrorEventMixer.debug = function (gui, active_events, t, dt)
 			TerrorEventMixer.debug_event(gui, event, t, dt, x, y, debug_x * resx, i == 1)
 
 			x = x + debug_win_width + 15
+		end
+	end
+
+	for name, value in pairs(TerrorEventMixer.optional_data) do
+		if type(value) == "number" then
+			local duration = math.abs(t - value)
+
+			Debug.text("Time challenge running: %s Time left: %0.1f ", name, duration)
 		end
 	end
 

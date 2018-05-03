@@ -128,7 +128,7 @@ BTMoveToPlayersAction._find_target_globadier = function (self, unit, blackboard,
 		throw_globe_data.next_throw_at = -math.huge
 	end
 
-	if self._valid_globadier_target(self, blackboard.target_dist, action) and self._has_line_of_sight(self, unit, next_target_unit, blackboard.world, t) then
+	if self._valid_globadier_target(self, next_target_unit, blackboard.target_dist, action) and self._has_line_of_sight(self, unit, next_target_unit, blackboard.world, t) then
 		local has_trajectory, angle, speed, throw_from_pos, target_vector = self._calculate_trajectory_to_target(self, unit, blackboard.world, next_target_unit, action.attack_throw_offset, blackboard.breed.max_globe_throw_speed)
 
 		if has_trajectory then
@@ -228,8 +228,8 @@ BTMoveToPlayersAction._calculate_trajectory_to_target = function (self, unit, wo
 
 	return hit, angle, speed, throw_pos, target_vector
 end
-BTMoveToPlayersAction._valid_globadier_target = function (self, target_distance, action)
-	return target_distance < action.attack_distance
+BTMoveToPlayersAction._valid_globadier_target = function (self, target_unit, target_distance, action)
+	return VALID_TARGETS_PLAYERS_AND_BOTS[target_unit] and target_distance < action.attack_distance
 end
 BTMoveToPlayersAction._has_line_of_sight = function (self, unit, target_unit, world, t)
 	local start_pos = POSITION_LOOKUP[unit] + Vector3.up()

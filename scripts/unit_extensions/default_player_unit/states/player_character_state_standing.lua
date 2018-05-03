@@ -81,6 +81,12 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 		return 
 	end
 
+	if not csm.state_next and status_extension.do_leap then
+		csm.change_state(csm, "leaping")
+
+		return 
+	end
+
 	CharacterStateHelper.update_dodge_lock(unit, input_extension, status_extension)
 
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
@@ -136,6 +142,7 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 			local params = self.temp_params
 			params.swap_to_3p = config.swap_to_3p
 			params.show_weapons = config.show_weapons
+			params.activate_block = config.activate_block
 
 			csm.change_state(csm, "interacting", params)
 		end
@@ -150,6 +157,7 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 			local params = self.temp_params
 			params.swap_to_3p = config.swap_to_3p
 			params.show_weapons = config.show_weapons
+			params.activate_block = config.activate_block
 
 			csm.change_state(csm, "interacting", params)
 		end

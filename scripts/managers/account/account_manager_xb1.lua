@@ -69,7 +69,13 @@ AccountManager.cb_is_suspending = function (self, ...)
 		Managers.state.event:trigger("trigger_xbox_round_end")
 	end
 
-	Managers.xbox_events:flush()
+	if Managers.xbox_events then
+		Managers.xbox_events:flush()
+	end
+
+	if Managers.xbox_stats then
+		Managers.xbox_stats:flush()
+	end
 
 	return 
 end
@@ -214,6 +220,9 @@ AccountManager.setup_friendslist = function (self)
 
 	return 
 end
+AccountManager.friends_list_initiated = function (self)
+	return self._added_local_user_to_graph
+end
 AccountManager.user_cache_changed = function (self)
 	return self._user_cache_changed
 end
@@ -290,15 +299,9 @@ AccountManager._verify_user_profile = function (self)
 		local wrong_profile_str = string.format(Localize("controller_pairing"), cropped_profile)
 
 		if Managers.matchmaking then
-			Managers.matchmaking:cancel_matchmaking()
 		end
 
 		self._verify_user_in_cache(self)
-
-		if Managers.voice_chat then
-			Managers.voice_chat:remove_current_user()
-		end
-
 		self._create_popup(self, wrong_profile_str, "controller_pairing_header", "verify_profile", "menu_retry", "restart", "menu_return_to_title_screen", "show_profile_picker", "menu_select_profile", true)
 	end
 
@@ -344,11 +347,13 @@ AccountManager.user_exists = function (self, user_id)
 	return false
 end
 AccountManager._update_bandwidth_query = function (self, dt)
-	if self._query_bandwidth_timer <= 0 then
-		self.query_bandwidth(self)
-	end
+	if GameSettingsDevelopment.bandwidth_queries_enabled then
+		if self._query_bandwidth_timer <= 0 then
+			self.query_bandwidth(self)
+		end
 
-	self._query_bandwidth_timer = self._query_bandwidth_timer - dt
+		self._query_bandwidth_timer = self._query_bandwidth_timer - dt
+	end
 
 	return 
 end
@@ -436,7 +441,7 @@ AccountManager._handle_popup_result = function (self, result)
 		Managers.input:set_exclusive_gamepad(self._active_controller)
 
 		if Managers.voice_chat then
-			Managers.voice_chat:join_channel()
+			Managers.voice_chat:add_local_user()
 		end
 
 		self._verify_user_in_cache(self)
@@ -491,13 +496,12 @@ AccountManager.verify_profile = function (self)
 		Managers.input:set_exclusive_gamepad(self._active_controller)
 
 		if Managers.voice_chat then
-			Managers.voice_chat:join_channel()
+			Managers.voice_chat:add_local_user()
 		end
 
 		self._verify_user_in_cache(self)
 
 		if Managers.matchmaking then
-			Managers.matchmaking:cancel_countdown()
 		end
 	else
 		show_wrong_profile_popup(self)
@@ -516,7 +520,7 @@ AccountManager.cb_profile_signed_out = function (self)
 		Managers.input:set_exclusive_gamepad(self._active_controller)
 
 		if Managers.voice_chat then
-			Managers.voice_chat:join_channel()
+			Managers.voice_chat:add_local_user()
 		end
 	else
 		print(string.format("Wrong profile: Had user_id %s - wanted user_id %s", user_info.xbox_user_id, self._user_info.xbox_user_id))
@@ -844,6 +848,11 @@ AccountManager.cb_bandwidth_query = function (self, data)
 	end
 
 	self._querying_bandwidth = nil
+
+	return 
+end
+AccountManager.show_player_profile = function (self, id)
+	XboxLive.show_gamercard(self._user_id, id)
 
 	return 
 end

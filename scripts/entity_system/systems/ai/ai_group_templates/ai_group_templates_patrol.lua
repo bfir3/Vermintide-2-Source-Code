@@ -1642,7 +1642,7 @@ function enter_state_combat(group)
 		local anchor = anchors[i]
 		local target_unit = anchor.target_unit
 
-		print("enter_state_combat", i, target_unit, "alive:", AiUtils.unit_alive(target_unit))
+		debug_print("enter_state_combat", i, target_unit, "alive:", AiUtils.unit_alive(target_unit))
 
 		if AiUtils.unit_alive(target_unit) then
 			local anchor_units = anchor.units
@@ -1654,7 +1654,7 @@ function enter_state_combat(group)
 				blackboard.target_unit_found_time = Managers.time:time("game")
 
 				AiUtils.activate_unit(blackboard)
-				print("\tactivated", j)
+				debug_print("\tactivated", j)
 
 				if ScriptUnit.has_extension(unit, "ai_slot_system") then
 					local ai_slot_system = Managers.state.entity:system("ai_slot_system")

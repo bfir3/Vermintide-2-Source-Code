@@ -393,8 +393,12 @@ local function create_window(scenegraph_id, size)
 		},
 		login_hint = Localize("start_game_window_twitch_login_hint"),
 		text_input_hotspot = {},
-		screen_hotspot = {},
-		frame_hotspot = {}
+		screen_hotspot = {
+			allow_multi_hover = true
+		},
+		frame_hotspot = {
+			allow_multi_hover = true
+		}
 	}
 	local style = {
 		background = {
@@ -463,7 +467,7 @@ local function create_window(scenegraph_id, size)
 			pixel_perfect = true,
 			horizontal_alignment = "center",
 			vertical_alignment = "center",
-			dynamic_font = true,
+			dynamic_font_size = true,
 			font_type = "hell_shark",
 			text_color = {
 				60,
@@ -475,6 +479,10 @@ local function create_window(scenegraph_id, size)
 				5,
 				0,
 				10
+			},
+			size = {
+				290,
+				42
 			}
 		},
 		connecting = {
@@ -820,22 +828,26 @@ function create_button(scenegraph_id, size, text, font_size, content_check_funct
 		content_check_function = content_check_function
 	}
 	style[text_name] = {
+		word_wrap = true,
 		upper_case = true,
 		localize = false,
 		horizontal_alignment = "center",
-		word_wrap = false,
 		vertical_alignment = "center",
+		dynamic_font_size = true,
 		font_type = "hell_shark",
 		font_size = font_size,
 		text_color = Colors.get_color_table_with_alpha("font_button_normal", 255),
 		default_text_color = Colors.get_color_table_with_alpha("font_button_normal", 255),
 		select_text_color = Colors.get_color_table_with_alpha("white", 255),
 		offset = {
-			offset[1],
+			10 + offset[1],
 			offset[2] + 3,
 			4
 		},
-		size = size
+		size = {
+			size[1] - 20,
+			size[2]
+		}
 	}
 	hotspot_content[text_name] = text
 	local text_shadow_name = "text_shadow"
@@ -847,20 +859,24 @@ function create_button(scenegraph_id, size, text, font_size, content_check_funct
 		content_check_function = content_check_function
 	}
 	style[text_shadow_name] = {
+		word_wrap = true,
 		upper_case = true,
 		localize = false,
-		word_wrap = false,
 		horizontal_alignment = "center",
 		vertical_alignment = "center",
+		dynamic_font_size = true,
 		font_type = "hell_shark",
 		font_size = font_size,
 		text_color = Colors.get_color_table_with_alpha("black", 255),
 		offset = {
-			offset[1] + 2,
+			10 + offset[1] + 2,
 			offset[2] + 2,
 			3
 		},
-		size = size
+		size = {
+			size[1] - 20,
+			size[2]
+		}
 	}
 	widget.element.passes = passes
 	widget.content = content

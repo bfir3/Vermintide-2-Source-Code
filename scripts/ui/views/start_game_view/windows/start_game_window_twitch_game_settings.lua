@@ -33,6 +33,7 @@ StartGameWindowTwitchGameSettings.on_enter = function (self, params, offset)
 	self._stats_id = local_player.stats_id(local_player)
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
+	self._enable_play = false
 	self._animations = {}
 	self._ui_animations = {}
 
@@ -274,6 +275,8 @@ end
 StartGameWindowTwitchGameSettings._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local widgets_by_name = self._widgets_by_name
+	local gamepad_active = Managers.input:is_device_active("gamepad")
+	local input_service = self.parent:window_input_service()
 
 	if self._additional_option_enabled then
 		local private_button = widgets_by_name.private_button
@@ -315,7 +318,9 @@ StartGameWindowTwitchGameSettings._handle_input = function (self, dt, t)
 		parent.set_layout(parent, 11)
 	end
 
-	if self._is_button_released(self, widgets_by_name.play_button) then
+	local play_pressed = gamepad_active and self._enable_play and input_service.get(input_service, "refresh_press")
+
+	if self._is_button_released(self, widgets_by_name.play_button) or play_pressed then
 		parent.play(parent, t)
 	end
 
@@ -413,8 +418,14 @@ StartGameWindowTwitchGameSettings._update_difficulty_option = function (self)
 		local enable_play = DifficultySettings[difficulty_key] ~= nil
 		local twitch_active = Managers.twitch and Managers.twitch:is_connected()
 		local widgets_by_name = self._widgets_by_name
-		local enable_button = enable_play and twitch_active
-		widgets_by_name.play_button.content.button_hotspot.disable_button = not enable_button
+		self._enable_play = enable_play and twitch_active
+		widgets_by_name.play_button.content.button_hotspot.disable_button = not self._enable_play
+
+		if self._enable_play then
+			self.parent.parent:set_input_description("play_available")
+		else
+			self.parent.parent:set_input_description(nil)
+		end
 	end
 
 	return 

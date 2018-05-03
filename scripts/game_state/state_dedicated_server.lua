@@ -74,7 +74,7 @@ StateDedicatedServer._setup_network = function (self)
 end
 StateDedicatedServer._setup_state_machine = function (self)
 	local params = {}
-	self._machine = StateMachine:new(self, StateDedicatedServerInit, params, true)
+	self._machine = GameStateMachine:new(self, StateDedicatedServerInit, params, true)
 
 	return 
 end
@@ -187,9 +187,9 @@ StateDedicatedServer.setup_network_options = function (self)
 		local server_port = script_data.server_port or script_data.settings.server_port or GameSettingsDevelopment.network_port
 		local query_port = script_data.query_port or script_data.settings.query_port
 		local steam_port = script_data.steam_port or script_data.settings.steam_port
-		local ip_address = script_data.ip_address or script_data.settings.ip_address
+		local ip_address = Network.default_network_address()
 		local network_options = {
-			map = "game",
+			map = "None",
 			max_members = 4,
 			config_file_name = "global",
 			project_hash = "bulldozer",
@@ -267,6 +267,13 @@ StateDedicatedServer.setup_chat_manager = function (self, game_server)
 	end
 
 	Managers.chat:register_channel(1, member_func)
+
+	return 
+end
+StateDedicatedServer.setup_enemy_package_loader = function (self, game_server)
+	local peer_id = Network.peer_id()
+
+	self._level_transition_handler.enemy_package_loader:network_context_created(game_server, peer_id, peer_id)
 
 	return 
 end

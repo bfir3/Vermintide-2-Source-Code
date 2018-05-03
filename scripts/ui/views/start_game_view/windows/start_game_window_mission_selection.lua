@@ -30,6 +30,7 @@ StartGameWindowMissionSelection.on_enter = function (self, params, offset)
 	self.render_settings = {
 		snap_pixel_positions = true
 	}
+	self._has_exited = false
 	local player_manager = Managers.player
 	local local_player = player_manager.local_player(player_manager)
 	self._stats_id = local_player.stats_id(local_player)
@@ -45,6 +46,7 @@ StartGameWindowMissionSelection.on_enter = function (self, params, offset)
 	self._setup_level_acts(self)
 	self._present_act_levels(self)
 	self._update_level_option(self)
+	self.parent.parent:set_input_description("select_mission")
 
 	return 
 end
@@ -389,6 +391,10 @@ StartGameWindowMissionSelection.on_exit = function (self, params)
 
 	self.ui_animator = nil
 
+	self.parent.parent:set_input_description(nil)
+
+	self._has_exited = true
+
 	return 
 end
 StartGameWindowMissionSelection.update = function (self, dt, t)
@@ -503,11 +509,15 @@ StartGameWindowMissionSelection._handle_input = function (self, dt, t)
 
 	UIWidgetUtils.animate_default_button(select_button, dt)
 
+	local input_service = self.parent:window_input_service()
+	local gamepad_active = Managers.input:is_device_active("gamepad")
+	local gamepad_confirm_pressed = gamepad_active and not select_button.content.button_hotspot.disable_button and input_service.get(input_service, "refresh_press", true)
+
 	if self._is_button_hovered(self, select_button) then
 		self._play_sound(self, "play_gui_lobby_button_01_difficulty_confirm_hover")
 	end
 
-	if self._is_button_pressed(self, select_button) then
+	if self._is_button_pressed(self, select_button) or gamepad_confirm_pressed then
 		self._play_sound(self, "play_gui_lobby_button_02_mission_select")
 
 		local previous_game_mode_index = parent.get_previous_selected_game_mode_index(parent)

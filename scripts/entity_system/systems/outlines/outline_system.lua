@@ -307,10 +307,6 @@ OutlineSystem.outline_unit = function (self, unit, flag, channel, do_outline, ap
 					local material = Mesh.material(mesh, j)
 
 					Material.set_color(material, "outline_color", channel)
-
-					if not is_reapply then
-						Material.set_scalar(material, "outline_time", Managers.time:time("game"))
-					end
 				end
 			end
 
@@ -319,17 +315,9 @@ OutlineSystem.outline_unit = function (self, unit, flag, channel, do_outline, ap
 	elseif apply_method == "unit_and_childs" then
 		Unit.set_shader_pass_flag_for_meshes_in_unit_and_childs(unit, flag, do_outline)
 		Unit.set_color_for_materials_in_unit_and_childs(unit, "outline_color", channel)
-
-		if not is_reapply then
-			Unit.set_scalar_for_materials_in_unit_and_childs(unit, "outline_time", Managers.time:time("game"))
-		end
 	elseif apply_method == "unit" then
 		Unit.set_shader_pass_flag_for_meshes(unit, flag, do_outline)
 		Unit.set_color_for_materials(unit, "outline_color", channel)
-
-		if not is_reapply then
-			Unit.set_scalar_for_materials(unit, "outline_time", Managers.time:time("game"))
-		end
 	else
 		error(sprintf("Non-existant apply method %s", apply_method))
 	end

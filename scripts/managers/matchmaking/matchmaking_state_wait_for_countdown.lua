@@ -20,7 +20,9 @@ MatchmakingStateWaitForCountdown.on_exit = function (self)
 	return 
 end
 MatchmakingStateWaitForCountdown.update = function (self, dt, t)
-	self._capture_telemetry(self)
+	if not DEDICATED_SERVER then
+		self._capture_telemetry(self)
+	end
 
 	local manager = Managers.matchmaking
 

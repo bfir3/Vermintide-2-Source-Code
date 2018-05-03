@@ -7,6 +7,10 @@ require("scripts/settings/game_settings")
 require("scripts/ui/views/beta_overlay")
 require("foundation/scripts/managers/chat/chat_manager")
 
+if PLATFORM == "xb1" then
+	require("scripts/managers/stats/stats_manager_2017")
+end
+
 StateTitleScreen = class(StateTitleScreen)
 StateTitleScreen.NAME = "StateTitleScreen"
 StateTitleScreen.on_enter = function (self, params)
@@ -61,7 +65,7 @@ StateTitleScreen.on_enter = function (self, params)
 		Managers.eac = Managers.eac or EacManager:new()
 	end
 
-	if Development.parameter("use_beta_overlay") then
+	if Development.parameter("use_beta_overlay") or script_data.settings.use_beta_overlay then
 		self._init_beta_overlay(self)
 	end
 
@@ -156,7 +160,13 @@ StateTitleScreen._setup_world = function (self)
 	self._world_name = "title_screen_world"
 	self._viewport_name = "title_screen_viewport"
 	self._world = Managers.world:create_world(self._world_name, GameSettingsDevelopment.default_environment, nil, 100, Application.ENABLE_UMBRA, Application.ENABLE_VOLUMETRICS)
-	self._viewport = ScriptWorld.create_viewport(self._world, self._viewport_name, "default", 1)
+
+	if script_data.honduras_demo then
+		self._viewport = ScriptWorld.create_viewport(self._world, self._viewport_name, "default", 1)
+	else
+		self._viewport = ScriptWorld.create_viewport(self._world, self._viewport_name, "overlay", 1)
+	end
+
 	local camera = ScriptViewport.camera(self._viewport)
 
 	Camera.set_vertical_fov(camera, (math.pi * 65) / 180)
@@ -193,7 +203,7 @@ StateTitleScreen._setup_state_machine = function (self)
 
 	if loading_context.skip_signin then
 		loading_context.skip_signin = nil
-		self._machine = StateMachine:new(self, StateTitleScreenMainMenu, {
+		self._machine = GameStateMachine:new(self, StateTitleScreenMainMenu, {
 			skip_signin = true,
 			world = self._world,
 			ui = self._title_start_ui,
@@ -201,7 +211,7 @@ StateTitleScreen._setup_state_machine = function (self)
 			auto_start = self._auto_start
 		}, true)
 	else
-		self._machine = StateMachine:new(self, StateTitleScreenMain, {
+		self._machine = GameStateMachine:new(self, StateTitleScreenMain, {
 			world = self._world,
 			ui = self._title_start_ui,
 			viewport = self._viewport,

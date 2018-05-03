@@ -4226,25 +4226,31 @@ UIWidgets.create_chest_score_entry = function (scenegraph_id, size, index)
 				}
 			},
 			text = {
-				vertical_alignment = "center",
+				font_size = 20,
 				upper_case = false,
 				word_wrap = true,
 				horizontal_alignment = "left",
-				font_size = 20,
+				vertical_alignment = "center",
+				dynamic_font_size = false,
 				font_type = "hell_shark",
 				text_color = Colors.get_color_table_with_alpha("white", 0),
 				offset = {
 					80,
 					0,
 					2
+				},
+				size = {
+					size[1] - 80,
+					size[2]
 				}
 			},
 			text_disabled = {
-				vertical_alignment = "center",
+				font_size = 20,
 				upper_case = false,
 				word_wrap = true,
 				horizontal_alignment = "left",
-				font_size = 20,
+				vertical_alignment = "center",
+				dynamic_font_size = false,
 				font_type = "hell_shark",
 				text_color = {
 					255,
@@ -4256,20 +4262,29 @@ UIWidgets.create_chest_score_entry = function (scenegraph_id, size, index)
 					80,
 					0,
 					2
+				},
+				size = {
+					size[1] - 80,
+					size[2]
 				}
 			},
 			text_shadow = {
-				vertical_alignment = "center",
+				font_size = 20,
 				upper_case = false,
 				word_wrap = true,
 				horizontal_alignment = "left",
-				font_size = 20,
+				vertical_alignment = "center",
+				dynamic_font_size = false,
 				font_type = "hell_shark",
 				text_color = Colors.get_color_table_with_alpha("black", 255),
 				offset = {
 					82,
 					-2,
 					1
+				},
+				size = {
+					size[1] - 80,
+					size[2]
 				}
 			}
 		},
@@ -5070,6 +5085,279 @@ UIWidgets.create_experience_bar = function (scenegraph_id, size, masked)
 					size[1] + 10,
 					0,
 					0
+				}
+			}
+		},
+		scenegraph_id = scenegraph_id,
+		offset = {
+			0,
+			0,
+			0
+		}
+	}
+end
+UIWidgets.create_statistics_bar = function (scenegraph_id, size, optional_detail_texture, optional_detail_offset)
+	local frame_settings = UIFrameSettings.menu_frame_06
+	local side_detail_texture = optional_detail_texture or "button_detail_03"
+	local side_detail_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(side_detail_texture)
+	local side_detail_texture_size = side_detail_texture_settings.size
+
+	return {
+		element = {
+			passes = {
+				{
+					texture_id = "frame",
+					style_id = "frame",
+					pass_type = "texture_frame",
+					content_check_function = function (content)
+						return content.draw_frame
+					end
+				},
+				{
+					texture_id = "glass",
+					style_id = "glass",
+					pass_type = "texture"
+				},
+				{
+					style_id = "title_text",
+					pass_type = "text",
+					text_id = "title_text"
+				},
+				{
+					style_id = "title_text_shadow",
+					pass_type = "text",
+					text_id = "title_text"
+				},
+				{
+					style_id = "value_text",
+					pass_type = "text",
+					text_id = "value_text"
+				},
+				{
+					style_id = "value_text_shadow",
+					pass_type = "text",
+					text_id = "value_text"
+				},
+				{
+					pass_type = "texture",
+					style_id = "background",
+					texture_id = "background"
+				},
+				{
+					style_id = "experience_bar_edge",
+					texture_id = "experience_bar_edge",
+					pass_type = "texture",
+					content_change_function = function (content, style)
+						local parent_style = style.parent
+						local experience_bar_style = parent_style.experience_bar
+						local start_offset = experience_bar_style.offset[1]
+						style.offset[1] = math.floor(experience_bar_style.size[1] + start_offset)
+						style.size[1] = math.min(40, experience_bar_style.default_size[1] - style.offset[1] - start_offset)
+
+						return 
+					end
+				},
+				{
+					style_id = "experience_bar",
+					pass_type = "texture_uv",
+					content_id = "experience_bar"
+				},
+				{
+					style_id = "side_detail_right",
+					pass_type = "texture_uv",
+					content_id = "side_detail"
+				},
+				{
+					texture_id = "texture_id",
+					style_id = "side_detail_left",
+					pass_type = "texture",
+					content_id = "side_detail"
+				}
+			}
+		},
+		content = {
+			title_text = "n/a",
+			experience_bar_edge = "experience_bar_edge_glow",
+			background = "xp_bar_bg",
+			glass = "xp_bar_glass",
+			value_text = "n/a",
+			draw_frame = true,
+			side_detail = {
+				uvs = {
+					{
+						1,
+						0
+					},
+					{
+						0,
+						1
+					}
+				},
+				texture_id = side_detail_texture
+			},
+			experience_bar = {
+				texture_id = "experience_bar_fill",
+				uvs = {
+					{
+						0,
+						0
+					},
+					{
+						1,
+						1
+					}
+				}
+			},
+			frame = frame_settings.texture
+		},
+		style = {
+			background = {
+				color = Colors.get_color_table_with_alpha("white", 255),
+				size = {
+					size[1] - frame_settings.texture_sizes.horizontal[2] * 2,
+					size[2] - frame_settings.texture_sizes.vertical[1] * 2
+				},
+				offset = {
+					frame_settings.texture_sizes.horizontal[2],
+					frame_settings.texture_sizes.vertical[1],
+					0
+				}
+			},
+			experience_bar = {
+				color = Colors.get_color_table_with_alpha("white", 255),
+				size = {
+					size[1] - frame_settings.texture_sizes.horizontal[2] * 2,
+					size[2] - frame_settings.texture_sizes.vertical[1] * 2
+				},
+				default_size = {
+					size[1] - frame_settings.texture_sizes.horizontal[2],
+					size[2] - frame_settings.texture_sizes.vertical[1] * 2
+				},
+				offset = {
+					frame_settings.texture_sizes.horizontal[2],
+					frame_settings.texture_sizes.vertical[1],
+					2
+				}
+			},
+			experience_bar_edge = {
+				color = Colors.get_color_table_with_alpha("white", 255),
+				size = {
+					40,
+					size[2] - frame_settings.texture_sizes.vertical[1] * 2
+				},
+				offset = {
+					0,
+					frame_settings.texture_sizes.vertical[1],
+					2
+				}
+			},
+			glass = {
+				color = Colors.get_color_table_with_alpha("white", 255),
+				size = {
+					size[1] - frame_settings.texture_sizes.horizontal[2] * 2,
+					size[2] - frame_settings.texture_sizes.vertical[1] * 2
+				},
+				offset = {
+					frame_settings.texture_sizes.horizontal[2],
+					frame_settings.texture_sizes.vertical[1],
+					3
+				}
+			},
+			frame = {
+				texture_size = frame_settings.texture_size,
+				texture_sizes = frame_settings.texture_sizes,
+				color = {
+					255,
+					255,
+					255,
+					255
+				},
+				offset = {
+					0,
+					0,
+					4
+				}
+			},
+			title_text = {
+				vertical_alignment = "center",
+				font_type = "hell_shark",
+				font_size = 26,
+				horizontal_alignment = "left",
+				text_color = Colors.get_color_table_with_alpha("font_default", 255),
+				offset = {
+					20,
+					0,
+					6
+				}
+			},
+			title_text_shadow = {
+				vertical_alignment = "center",
+				font_type = "hell_shark",
+				font_size = 26,
+				horizontal_alignment = "left",
+				text_color = Colors.get_color_table_with_alpha("black", 255),
+				offset = {
+					22,
+					-2,
+					5
+				}
+			},
+			value_text = {
+				vertical_alignment = "center",
+				font_type = "hell_shark",
+				font_size = 26,
+				horizontal_alignment = "right",
+				text_color = Colors.get_color_table_with_alpha("font_default", 255),
+				offset = {
+					-20,
+					0,
+					6
+				}
+			},
+			value_text_shadow = {
+				vertical_alignment = "center",
+				font_type = "hell_shark",
+				font_size = 26,
+				horizontal_alignment = "right",
+				text_color = Colors.get_color_table_with_alpha("black", 255),
+				offset = {
+					-18,
+					-2,
+					5
+				}
+			},
+			side_detail_left = {
+				color = {
+					255,
+					255,
+					255,
+					255
+				},
+				offset = {
+					(optional_detail_offset and -optional_detail_offset) or -9,
+					size[2] / 2 - side_detail_texture_size[2] / 2,
+					5
+				},
+				size = {
+					side_detail_texture_size[1],
+					side_detail_texture_size[2]
+				}
+			},
+			side_detail_right = {
+				color = {
+					255,
+					255,
+					255,
+					255
+				},
+				offset = {
+					size[1] - side_detail_texture_size[1] + (optional_detail_offset or 9),
+					size[2] / 2 - side_detail_texture_size[2] / 2,
+					5
+				},
+				size = {
+					side_detail_texture_size[1],
+					side_detail_texture_size[2]
 				}
 			}
 		},
@@ -6283,7 +6571,7 @@ UIWidgets.create_career_summary_window = function (scenegraph_id, size)
 		scenegraph_id = scenegraph_id
 	}
 end
-UIWidgets.create_default_button = function (scenegraph_id, size, frame_name, background_texture, text, font_size, optional_color_name, optional_detail_texture, optional_detail_offset)
+UIWidgets.create_default_button = function (scenegraph_id, size, frame_name, background_texture, text, font_size, optional_color_name, optional_detail_texture, optional_detail_offset, disable_with_gamepad)
 	background_texture = background_texture or "button_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
 	local frame_settings = (frame_name and UIFrameSettings[frame_name]) or UIFrameSettings.button_frame_01
@@ -6413,7 +6701,8 @@ UIWidgets.create_default_button = function (scenegraph_id, size, frame_name, bac
 					}
 				},
 				texture_id = background_texture
-			}
+			},
+			disable_with_gamepad = disable_with_gamepad
 		},
 		style = {
 			background = {
@@ -6494,13 +6783,18 @@ UIWidgets.create_default_button = function (scenegraph_id, size, frame_name, bac
 				word_wrap = true,
 				horizontal_alignment = "center",
 				vertical_alignment = "center",
+				dynamic_font_size = true,
 				font_type = "hell_shark",
 				font_size = font_size or 24,
 				text_color = Colors.get_color_table_with_alpha("font_button_normal", 255),
 				default_text_color = Colors.get_color_table_with_alpha("font_button_normal", 255),
 				select_text_color = Colors.get_color_table_with_alpha("white", 255),
+				size = {
+					size[1] - 40,
+					size[2]
+				},
 				offset = {
-					0,
+					20,
 					0,
 					6
 				}
@@ -6510,12 +6804,17 @@ UIWidgets.create_default_button = function (scenegraph_id, size, frame_name, bac
 				word_wrap = true,
 				horizontal_alignment = "center",
 				vertical_alignment = "center",
+				dynamic_font_size = true,
 				font_type = "hell_shark",
 				font_size = font_size or 24,
 				text_color = Colors.get_color_table_with_alpha("gray", 255),
 				default_text_color = Colors.get_color_table_with_alpha("gray", 255),
+				size = {
+					size[1] - 40,
+					size[2]
+				},
 				offset = {
-					0,
+					20,
 					0,
 					6
 				}
@@ -6525,12 +6824,17 @@ UIWidgets.create_default_button = function (scenegraph_id, size, frame_name, bac
 				word_wrap = true,
 				horizontal_alignment = "center",
 				vertical_alignment = "center",
+				dynamic_font_size = true,
 				font_type = "hell_shark",
 				font_size = font_size or 24,
 				text_color = Colors.get_color_table_with_alpha("black", 255),
 				default_text_color = Colors.get_color_table_with_alpha("black", 255),
+				size = {
+					size[1] - 40,
+					size[2]
+				},
 				offset = {
-					2,
+					22,
 					-2,
 					5
 				}
@@ -8254,6 +8558,8 @@ end
 UIWidgets.create_window_category_button = function (scenegraph_id, size, button_text, icon_name, background_icon)
 	icon_name = icon_name or "options_button_icon_quickplay"
 	local icon_glow_name = icon_name .. "_glow"
+	local icon_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(icon_name)
+	local icon_size = icon_settings.size
 	local background_texture = "button_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
 	local frame_name = "menu_frame_08"
@@ -8552,7 +8858,7 @@ UIWidgets.create_window_category_button = function (scenegraph_id, size, button_
 					6
 				},
 				size = {
-					size[1] - 130,
+					size[1] - 140,
 					size[2]
 				}
 			},
@@ -8571,7 +8877,7 @@ UIWidgets.create_window_category_button = function (scenegraph_id, size, button_
 					6
 				},
 				size = {
-					size[1] - 130,
+					size[1] - 140,
 					size[2]
 				}
 			},
@@ -8590,7 +8896,7 @@ UIWidgets.create_window_category_button = function (scenegraph_id, size, button_
 					5
 				},
 				size = {
-					size[1] - 130,
+					size[1] - 140,
 					size[2]
 				}
 			},
@@ -8744,13 +9050,10 @@ UIWidgets.create_window_category_button = function (scenegraph_id, size, button_
 				color = Colors.get_color_table_with_alpha("font_button_normal", 255),
 				default_color = Colors.get_color_table_with_alpha("font_button_normal", 255),
 				select_color = Colors.get_color_table_with_alpha("white", 255),
-				texture_size = {
-					60,
-					60
-				},
+				texture_size = icon_size,
 				offset = {
-					24,
-					24,
+					54 - icon_size[1] / 2,
+					54 - icon_size[2] / 2,
 					12
 				}
 			},
@@ -8773,13 +9076,10 @@ UIWidgets.create_window_category_button = function (scenegraph_id, size, button_
 					40,
 					40
 				},
-				texture_size = {
-					60,
-					60
-				},
+				texture_size = icon_size,
 				offset = {
-					24,
-					24,
+					54 - icon_size[1] / 2,
+					54 - icon_size[2] / 2,
 					12
 				}
 			},
@@ -8790,13 +9090,10 @@ UIWidgets.create_window_category_button = function (scenegraph_id, size, button_
 					255,
 					255
 				},
-				texture_size = {
-					60,
-					60
-				},
+				texture_size = icon_size,
 				offset = {
-					24,
-					24,
+					54 - icon_size[1] / 2,
+					54 - icon_size[2] / 2,
 					13
 				}
 			},
@@ -10044,7 +10341,7 @@ UIWidgets.create_title_and_tooltip = function (scenegraph_id, size, text, toolti
 		scenegraph_id = scenegraph_id
 	}
 end
-UIWidgets.create_icon_selector = function (scenegraph_id, icon_size, slot_icons, slot_spacing, use_frame, optional_frame_size)
+UIWidgets.create_icon_selector = function (scenegraph_id, icon_size, slot_icons, slot_spacing, use_frame, optional_frame_size, optional_allow_multi_hover)
 	local default_color = {
 		255,
 		255,
@@ -10088,7 +10385,9 @@ UIWidgets.create_icon_selector = function (scenegraph_id, icon_size, slot_icons,
 			size = icon_size,
 			offset = offset
 		}
-		content[hotspot_name] = {}
+		content[hotspot_name] = {
+			allow_multi_hover = optional_allow_multi_hover
+		}
 		local hotspot_content = content[hotspot_name]
 		local icon_texture = slot_icons[k]
 		local icon_name = "icon" .. name_suffix
@@ -12171,10 +12470,10 @@ UIWidgets.create_score_entry = function (scenegraph_id, size, num_rows, side)
 		}
 		style[score_text_name] = {
 			vertical_alignment = "center",
-			font_size = 24,
+			font_size = 22,
 			horizontal_alignment = "center",
 			word_wrap = true,
-			font_type = "hell_shark",
+			font_type = "arial",
 			text_color = (k == 1 and select_color) or Colors.get_color_table_with_alpha("font_default", 255),
 			size = row_size,
 			offset = {
@@ -12193,10 +12492,10 @@ UIWidgets.create_score_entry = function (scenegraph_id, size, num_rows, side)
 		}
 		style[score_text_shadow_name] = {
 			vertical_alignment = "center",
-			font_size = 24,
+			font_size = 22,
 			horizontal_alignment = "center",
 			word_wrap = true,
-			font_type = "hell_shark",
+			font_type = "arial",
 			text_color = Colors.get_color_table_with_alpha("black", 255),
 			size = row_size,
 			offset = {
@@ -12221,10 +12520,10 @@ UIWidgets.create_score_entry = function (scenegraph_id, size, num_rows, side)
 			}
 			style[score_text_highlight_name] = {
 				vertical_alignment = "center",
-				font_size = 24,
+				font_size = 22,
 				horizontal_alignment = "center",
 				word_wrap = true,
-				font_type = "hell_shark",
+				font_type = "arial",
 				text_color = Colors.get_color_table_with_alpha("font_title", 255),
 				size = row_size,
 				offset = {

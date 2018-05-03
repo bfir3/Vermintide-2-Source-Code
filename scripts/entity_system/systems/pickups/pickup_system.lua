@@ -782,7 +782,7 @@ end
 PickupSystem.hot_join_sync = function (self, sender)
 	return 
 end
-PickupSystem.debug_spawn_pickup = function (self, pickup_name, optional_pos, raycast_down)
+PickupSystem.debug_spawn_pickup = function (self, pickup_name, optional_pos)
 	local pickup_settings = AllPickups[pickup_name]
 	local player_manager = Managers.player
 	local player = player_manager.local_player(player_manager)
@@ -793,7 +793,27 @@ PickupSystem.debug_spawn_pickup = function (self, pickup_name, optional_pos, ray
 		return 
 	end
 
-	if position and raycast_down then
+	local rotation = Quaternion(Vector3.up(), math.degrees_to_radians(Math.random(1, 360)))
+	local with_physics = false
+	local spawn_type = "debug"
+	local pickup_unit = self._spawn_pickup(self, pickup_settings, pickup_name, position, rotation, with_physics, spawn_type)
+
+	if pickup_unit then
+		self._debug_spawned_pickup[#self._debug_spawned_pickup + 1] = pickup_unit
+
+		return pickup_unit
+	end
+
+	return 
+end
+PickupSystem.buff_spawn_pickup = function (self, pickup_name, position, raycast_down)
+	if not position then
+		return 
+	end
+
+	local pickup_settings = AllPickups[pickup_name]
+
+	if raycast_down then
 		local physics_world = World.physics_world(self.world)
 		local direction = Vector3.down()
 		local length = 15
@@ -806,12 +826,10 @@ PickupSystem.debug_spawn_pickup = function (self, pickup_name, optional_pos, ray
 
 	local rotation = Quaternion(Vector3.up(), math.degrees_to_radians(Math.random(1, 360)))
 	local with_physics = false
-	local spawn_type = "debug"
+	local spawn_type = "buff"
 	local pickup_unit = self._spawn_pickup(self, pickup_settings, pickup_name, position, rotation, with_physics, spawn_type)
 
 	if pickup_unit then
-		self._debug_spawned_pickup[#self._debug_spawned_pickup + 1] = pickup_unit
-
 		return pickup_unit
 	end
 
@@ -939,7 +957,7 @@ PickupSystem.training_dummy = function (self, pickup_settings, position, rotatio
 	local network_rotation = AiAnimUtils.rotation_network_scale(rotation, true)
 	local network_velocity = AiAnimUtils.velocity_network_scale(Vector3(0, 0, 0), true)
 	local network_angular_velocity = network_velocity
-	local item_name = "explosive_barrel"
+	local item_name = "training_dummy"
 	local extension_init_data = {
 		projectile_locomotion_system = {
 			network_position = network_position,

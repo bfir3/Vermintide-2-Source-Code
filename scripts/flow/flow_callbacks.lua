@@ -463,6 +463,7 @@ end
 
 function flow_callback_complete_level(params)
 	if Managers.player.is_server then
+		print("Level flags level completed.")
 		Managers.state.game_mode:complete_level()
 	end
 
@@ -1041,6 +1042,16 @@ function flow_callback_set_door_state_and_duration(params)
 	return 
 end
 
+function flow_callback_set_door_state(params)
+	local unit = params.unit
+	local new_door_state = params.new_door_state
+	local door_extension = ScriptUnit.extension(unit, "door_system")
+
+	door_extension.set_door_state(door_extension, new_door_state)
+
+	return 
+end
+
 function flow_callback_door_animation_played(params)
 	local unit = params.unit
 	local frames = params.frames
@@ -1079,6 +1090,50 @@ function flow_callback_objective_entered_socket_zone(params)
 		local objective_socket_extension = ScriptUnit.extension(socket_unit, "objective_socket_system")
 
 		objective_socket_extension.objective_entered_zone_server(objective_socket_extension, objective_unit)
+	end
+
+	return 
+end
+
+function flow_callback_ussingen_barrel_challenge(params)
+	print("[flow_callback_ussingen_barrel_challenge]", params.barrel_unit)
+
+	if Managers.player.is_server then
+		local barrel_unit = params.barrel_unit
+		local num_valid_barrels = params.num_valid_barrels
+		local is_event_spawned = ScriptUnit.has_extension(barrel_unit, "limited_item_track_system")
+
+		if not is_event_spawned then
+			flow_return_table.is_valid_barrel = 1
+
+			return flow_return_table
+		end
+	end
+
+	flow_return_table.is_valid_barrel = 0
+
+	return flow_return_table
+end
+
+function flow_callback_ussingen_barrel_challenge_completed(params)
+	print("[flow_callback_ussingen_barrel_challenge_completed]")
+
+	if Managers.player.is_server then
+		local stat_name = "ussingen_used_no_barrels"
+		local current_difficulty = Managers.state.difficulty:get_difficulty()
+		local allowed_difficulties = QuestSettings.allowed_difficulties[stat_name]
+		local allowed_difficulty = allowed_difficulties[current_difficulty]
+		local achievements_enabled = Development.parameter("v2_achievements")
+
+		if achievements_enabled and allowed_difficulty then
+			local num_valid_barrels = params.num_valid_barrels
+
+			if 3 <= num_valid_barrels then
+				local statistics_db = Managers.player:statistics_db()
+
+				statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+			end
+		end
 	end
 
 	return 
@@ -2092,7 +2147,7 @@ function flow_callback_start_fade(params)
 	end
 
 	local material = nil
-	local material_name = params.material
+	local material_name = params.material_name
 
 	if mesh and material_name then
 		assert(Mesh.has_material(mesh, material_name), string.format("[flow_callback_start_fade] The material %s doesn't exist for mesh %s", mesh_name, material_name))
@@ -2112,7 +2167,7 @@ function flow_callback_start_fade(params)
 			Material.set_scalar(material, fade_switch_name, fade_switch)
 			Material.set_vector2(material, start_end_time_name, Vector2(start_time, end_time))
 		end
-	elseif material then
+	elseif material_name then
 		local num_meshes = Unit.num_meshes(unit)
 
 		for i = 0, num_meshes - 1, 1 do

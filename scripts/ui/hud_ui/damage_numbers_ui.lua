@@ -89,27 +89,36 @@ DamageNumbersUI.update = function (self, dt, viewport_name)
 	return 
 end
 DamageNumbersUI.event_add_damage_number = function (self, damage, size, unit, time, color, is_critical_strike)
-	local size = size or 1
-	local color = color or Vector3(255, 255, 255)
-	local new_text = {
-		floating_speed = 150,
-		alpha = 255,
-		size = size,
-		text = damage * 100,
-		color = {
-			255,
-			color.x,
-			color.y,
-			color.z
-		},
-		time = self._time + (time or self._unit_text_time),
-		starting_time = self._time,
-		random_x_offset = math.random(-40, 40),
-		random_y_offset = math.random(-40, 40),
-		is_critical_strike = is_critical_strike
-	}
-	self._unit_texts[unit] = self._unit_texts[unit] or {}
-	self._unit_texts[unit][#self._unit_texts[unit] + 1] = new_text
+	local camera_position = Camera.world_position(self.camera)
+	local unit_position = Unit.world_position(unit, 0)
+	local cam_to_unit_dir = Vector3.normalize(unit_position - camera_position)
+	local cam_direction = Quaternion.forward(Camera.world_rotation(self.camera))
+	local forward_dot = Vector3.dot(cam_direction, cam_to_unit_dir)
+	local is_infront = 0.55 <= forward_dot and forward_dot <= 1
+
+	if is_infront then
+		local size = size or 1
+		local color = color or Vector3(255, 255, 255)
+		local new_text = {
+			floating_speed = 150,
+			alpha = 255,
+			size = size,
+			text = damage * 100,
+			color = {
+				255,
+				color.x,
+				color.y,
+				color.z
+			},
+			time = self._time + (time or self._unit_text_time),
+			starting_time = self._time,
+			random_x_offset = math.random(-60, 60),
+			random_y_offset = math.random(-40, 40),
+			is_critical_strike = is_critical_strike
+		}
+		self._unit_texts[unit] = self._unit_texts[unit] or {}
+		self._unit_texts[unit][#self._unit_texts[unit] + 1] = new_text
+	end
 
 	return 
 end
@@ -185,8 +194,8 @@ DamageNumbersUI.draw = function (self, dt)
 					local font_size = unit_text.size
 
 					if is_critical_strike then
-						local size_progress = easeOutCubic(math.min(progress * 10, 1))
-						font_size = font_size + math.ease_pulse(size_progress) * 30
+						local size_progress = easeOutCubic(math.min(progress * 7, 1))
+						font_size = font_size + math.ease_pulse(size_progress) * 60
 					end
 
 					damage_text_widget.style.text.font_size = font_size

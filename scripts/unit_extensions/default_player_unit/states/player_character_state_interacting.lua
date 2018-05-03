@@ -32,6 +32,25 @@ PlayerCharacterStateInteracting.on_enter = function (self, unit, input, dt, cont
 		CharacterStateHelper.show_inventory_3p(unit, false, include_local_player, self.is_server, self.inventory_extension)
 	end
 
+	self.deactivate_block_on_exit = false
+
+	if params.activate_block then
+		local status_extension = self.status_extension
+		self.deactivate_block_on_exit = not status_extension.is_blocking(status_extension)
+
+		if not LEVEL_EDITOR_TEST then
+			local game_object_id = Managers.state.unit_storage:go_id(unit)
+
+			if self.is_server then
+				Managers.state.network.network_transmit:send_rpc_clients("rpc_set_blocking", game_object_id, true)
+			else
+				Managers.state.network.network_transmit:send_rpc_server("rpc_set_blocking", game_object_id, true)
+			end
+		end
+
+		status_extension.set_blocking(status_extension, true)
+	end
+
 	return 
 end
 PlayerCharacterStateInteracting.on_exit = function (self, unit, input, dt, context, t, next_state)
@@ -46,6 +65,22 @@ PlayerCharacterStateInteracting.on_exit = function (self, unit, input, dt, conte
 		local include_local_player = false
 
 		CharacterStateHelper.show_inventory_3p(unit, true, include_local_player, self.is_server, self.inventory_extension)
+	end
+
+	local status_extension = self.status_extension
+
+	if self.deactivate_block_on_exit then
+		if not LEVEL_EDITOR_TEST then
+			local game_object_id = Managers.state.unit_storage:go_id(unit)
+
+			if self.is_server then
+				Managers.state.network.network_transmit:send_rpc_clients("rpc_set_blocking", game_object_id, false)
+			else
+				Managers.state.network.network_transmit:send_rpc_server("rpc_set_blocking", game_object_id, false)
+			end
+		end
+
+		status_extension.set_blocking(status_extension, false)
 	end
 
 	return 
@@ -63,6 +98,12 @@ PlayerCharacterStateInteracting.update = function (self, unit, input, dt, contex
 
 	if CharacterStateHelper.is_using_transport(status_extension) then
 		csm.change_state(csm, "using_transport")
+
+		return 
+	end
+
+	if not csm.state_next and status_extension.do_leap then
+		csm.change_state(csm, "leaping")
 
 		return 
 	end

@@ -156,7 +156,7 @@ ActionTrueFlightBow.fire = function (self, current_action, add_spread)
 			end
 		end
 
-		local angle = DamageUtils.pitch_from_rotation(fire_rotation)
+		local angle = ActionUtils.pitch_from_rotation(fire_rotation)
 		local target_vector = Vector3.normalize(Quaternion.forward(fire_rotation))
 
 		if 1 < i then

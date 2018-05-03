@@ -187,7 +187,7 @@ CreditsView.update = function (self, dt)
 
 		if current_offset < -84 then
 			break
-		elseif current_offset < 1080 then
+		elseif current_offset < h then
 			offset[2] = current_offset
 
 			UIRenderer.draw_element(ui_top_renderer, self.ui_element, ui_style, nil, scenegraph_id, ui_content, nil, offset)

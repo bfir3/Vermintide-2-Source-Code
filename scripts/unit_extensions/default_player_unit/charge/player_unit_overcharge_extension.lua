@@ -36,8 +36,9 @@ PlayerUnitOverchargeExtension.init = function (self, extension_init_context, uni
 	self.inventory_extension = ScriptUnit.extension(self.unit, "inventory_system")
 	self.update_overcharge_flow_timer = 0
 	self.is_exploding = false
+	local overcharge_opacity = Application.user_setting("overcharge_opacity") or 100
 
-	self.set_screen_particle_opacity_modifier(self, Application.user_setting("overcharge_opacity"))
+	self.set_screen_particle_opacity_modifier(self, overcharge_opacity)
 
 	self._overcharge_rumble_effect_id = nil
 	self._overcharge_rumble_critical_effect_id = nil

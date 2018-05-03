@@ -56,14 +56,7 @@ StateLoadingRunning._init_network = function (self)
 		if network_client_setup_successful then
 			self.parent:setup_chat_manager(lobby_client, lobby_client.lobby_host(lobby_client), Network.peer_id(), false)
 			self.parent:setup_deed_manager(lobby_client, lobby_client.lobby_host(lobby_client), Network.peer_id())
-		end
-
-		if loading_context.start_lobby_data.initialize_voip and PLATFORM == "xb1" and Managers.account:has_privilege(UserPrivilege.COMMUNICATION_VOICE_INGAME) then
-			if not Managers.voice_chat then
-				Managers.voice_chat = VoiceChatXboxOneManager:new()
-			elseif Managers.voice_chat then
-				Managers.voice_chat:initate_voice_chat()
-			end
+			self.parent:setup_enemy_package_loader(lobby_client, lobby_client.lobby_host(lobby_client), Network.peer_id())
 		end
 
 		loading_context.start_lobby_data = nil

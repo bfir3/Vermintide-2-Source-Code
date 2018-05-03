@@ -256,7 +256,87 @@ local allowed_equipment_slots = {
 local sorted_buffs = {}
 local widgets_to_remove = {}
 local verified_widgets = {}
+GamePadEquipmentUI._update_equipment_lookup = function (self, equipment)
+	self._equipment_lookup = self._equipment_lookup or {}
+	local equipment_lookup = self._equipment_lookup
+	equipment_lookup.wielded_slot = equipment.wielded_slot
+	local item_template = nil
+	local equipment_slots = equipment.slots
+
+	for slot_name, _ in pairs(allowed_equipment_slots) do
+		item_template = equipment_slots[slot_name] and equipment_slots[slot_name].item_template
+		equipment_lookup[slot_name] = item_template and item_template.name
+	end
+
+	local ranged_slot_data = equipment_slots.slot_ranged
+
+	if ranged_slot_data and ranged_slot_data.item_data then
+		local item_template = BackendUtils.get_item_template(ranged_slot_data.item_data)
+		local ammo_count, remaining_ammo, using_single_clip = self._get_ammunition_count(self, ranged_slot_data.left_unit_1p, ranged_slot_data.right_unit_1p, item_template)
+		equipment_lookup.ammo_count = ammo_count
+		equipment_lookup.remaining_ammo = remaining_ammo
+	end
+
+	return 
+end
+GamePadEquipmentUI._check_equipment_changed = function (self, equipment)
+	if not self._equipment_lookup then
+		self._update_equipment_lookup(self, equipment)
+
+		return true
+	end
+
+	if self._equipment_lookup.wielded_slot ~= equipment.wielded_slot then
+		self._update_equipment_lookup(self, equipment)
+
+		return true
+	end
+
+	local item_template, item_name, saved_item_name = nil
+	local equipment_slots = equipment.slots
+	local equipment_lookup = self._equipment_lookup
+
+	for slot_name, _ in pairs(allowed_equipment_slots) do
+		local slot_data = equipment_slots[slot_name]
+		item_template = slot_data and slot_data.item_template
+		item_name = item_template and item_template.name
+		saved_item_name = equipment_lookup[slot_name]
+
+		if item_name ~= saved_item_name then
+			self._update_equipment_lookup(self, equipment)
+
+			return true
+		end
+	end
+
+	local ranged_slot_data = equipment_slots.slot_ranged
+
+	if ranged_slot_data and ranged_slot_data.item_data then
+		local item_template = BackendUtils.get_item_template(ranged_slot_data.item_data)
+		local ammo_count, remaining_ammo, using_single_clip = self._get_ammunition_count(self, ranged_slot_data.left_unit_1p, ranged_slot_data.right_unit_1p, item_template)
+
+		if equipment_lookup.ammo_count ~= ammo_count then
+			self._update_equipment_lookup(self, equipment)
+
+			return true
+		end
+
+		if equipment_lookup.remaining_ammo ~= remaining_ammo then
+			self._update_equipment_lookup(self, equipment)
+
+			return true
+		end
+	end
+
+	return false
+end
 GamePadEquipmentUI._sync_player_equipment = function (self)
+	local gamepad_active = Managers.input:is_device_active("gamepad")
+
+	if not gamepad_active then
+		return 
+	end
+
 	local player_manager = self.player_manager
 	local player = player_manager.local_player(player_manager, 1)
 	local player_unit = player.player_unit
@@ -270,6 +350,10 @@ GamePadEquipmentUI._sync_player_equipment = function (self)
 	local equipment = inventory_extension.equipment(inventory_extension)
 
 	if not equipment then
+		return 
+	end
+
+	if not self._check_equipment_changed(self, equipment) then
 		return 
 	end
 
@@ -1005,7 +1089,6 @@ GamePadEquipmentUI._on_resolution_modified = function (self)
 	return 
 end
 GamePadEquipmentUI._handle_gamepad = function (self)
-	local should_render = true
 	local gamepad_active = Managers.input:is_device_active("gamepad")
 
 	if not gamepad_active then

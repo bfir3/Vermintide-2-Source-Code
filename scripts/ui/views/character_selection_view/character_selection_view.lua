@@ -51,6 +51,7 @@ CharacterSelectionView.init = function (self, ingame_ui_context)
 
 	self.world_previewer = MenuWorldPreviewer:new(ingame_ui_context)
 	local state_machine_params = {
+		allow_back_button = true,
 		wwise_world = self.wwise_world,
 		ingame_ui_context = ingame_ui_context,
 		parent = self,
@@ -83,7 +84,7 @@ CharacterSelectionView._setup_state_machine = function (self, state_machine_para
 	local start_state = optional_start_state or CharacterSelectionStateCharacter
 	local profiling_debugging_enabled = false
 	state_machine_params.start_state = optional_start_sub_state
-	self._machine = StateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
+	self._machine = GameStateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
 	self._state_machine_params = state_machine_params
 
 	return 
@@ -97,7 +98,7 @@ CharacterSelectionView.clear_wanted_state = function (self)
 	return 
 end
 CharacterSelectionView.input_service = function (self)
-	return self.input_manager:get_service("character_selection_view")
+	return (self._input_blocked and fake_input_service) or self.input_manager:get_service("character_selection_view")
 end
 CharacterSelectionView.set_input_blocked = function (self, blocked)
 	self._input_blocked = blocked
@@ -290,6 +291,18 @@ CharacterSelectionView.on_enter = function (self, menu_state_name, menu_sub_stat
 
 	self.play_sound(self, "hud_in_inventory_state_on")
 	self.play_sound(self, "play_gui_amb_hero_screen_loop_begin")
+
+	local player_manager = Managers.player
+	local local_player = player_manager.local_player(player_manager)
+	local player_unit = local_player and local_player.player_unit
+
+	if player_unit then
+		local inventory_extension = ScriptUnit.has_extension(player_unit, "inventory_system")
+
+		if inventory_extension then
+			inventory_extension.check_and_drop_pickups(inventory_extension, "enter_inventory")
+		end
+	end
 
 	return 
 end

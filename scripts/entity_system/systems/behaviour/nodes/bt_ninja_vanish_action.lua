@@ -81,6 +81,7 @@ BTNinjaVanishAction.vanish = function (unit, blackboard)
 
 	ai_navigation.move_to(ai_navigation, vanish_pos)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
+	Managers.state.entity:system("ai_bot_group_system"):enemy_teleported(unit, vanish_pos)
 
 	local ping_system = Managers.state.entity:system("ping_system")
 

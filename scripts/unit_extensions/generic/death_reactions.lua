@@ -40,6 +40,64 @@ local function play_screen_space_blood(world, unit, attacker_unit, killing_blow,
 	return 
 end
 
+local function handle_boss_difficulty_kill_achievement_tracking(breed, statistics_db)
+	local difficulty_kill_achievement = breed.difficulty_kill_achievement
+
+	if difficulty_kill_achievement then
+		local current_rank = Managers.state.difficulty:get_difficulty_rank()
+		local player_manager = Managers.player
+		local local_player_id = 1
+
+		while player_manager.local_player(player_manager, local_player_id) ~= nil do
+			if 4 < local_player_id then
+				ferror("Sanity check, how did we get above 4 here?")
+
+				break
+			end
+
+			local player = player_manager.local_player(player_manager, local_player_id)
+
+			if not player.bot_player then
+				local saved_rank = statistics_db.get_persistent_stat(statistics_db, player.stats_id(player), difficulty_kill_achievement)
+
+				if saved_rank < current_rank then
+					statistics_db.set_stat(statistics_db, player.stats_id(player), difficulty_kill_achievement, current_rank)
+				end
+			end
+
+			local_player_id = local_player_id + 1
+		end
+	end
+
+	return 
+end
+
+local function handle_military_event_achievement(damage_type, breed_name, statistics_db)
+	if damage_type == "military_finish" and breed_name == "chaos_warrior" then
+		local allowed_difficulties = QuestSettings.allowed_difficulties.military_statue_kill_chaos_warriors
+		local difficulty = Managers.state.difficulty:get_difficulty()
+
+		if allowed_difficulties[difficulty] then
+			local local_player = Managers.player:local_player()
+
+			if local_player then
+				local stats_id = local_player.stats_id(local_player)
+
+				statistics_db.increment_stat(statistics_db, stats_id, "military_statue_kill_chaos_warriors_session")
+
+				local num_chaos_warriors_killed = statistics_db.get_stat(statistics_db, stats_id, "military_statue_kill_chaos_warriors_session")
+
+				if 3 <= num_chaos_warriors_killed then
+					statistics_db.increment_stat(statistics_db, stats_id, "military_statue_kill_chaos_warriors")
+					Managers.state.network.network_transmit:send_rpc_clients("rpc_increment_stat", NetworkLookup.statistics.military_statue_kill_chaos_warriors)
+				end
+			end
+		end
+	end
+
+	return 
+end
+
 local function ai_default_unit_start(unit, context, t, killing_blow, is_server)
 	local killer_unit = killing_blow[DamageDataIndex.ATTACKER]
 	local death_hit_zone = killing_blow[DamageDataIndex.HIT_ZONE]
@@ -74,6 +132,15 @@ local function ai_default_unit_start(unit, context, t, killing_blow, is_server)
 		local inventory_system = Managers.state.entity:system("ai_inventory_system")
 
 		inventory_system.drop_item(inventory_system, unit)
+	end
+
+	local achievements_enabled = Development.parameter("v2_achievements")
+
+	if achievements_enabled then
+		local statistics_db = context.statistics_db
+
+		handle_boss_difficulty_kill_achievement_tracking(breed, statistics_db)
+		handle_military_event_achievement(damage_type, breed.name, statistics_db)
 	end
 
 	local owner_unit = AiUtils.get_actual_attacker_unit(killer_unit)
@@ -323,6 +390,12 @@ local function ai_default_husk_start(unit, context, t, killing_blow, is_server)
 		if hit_reaction_extension then
 			hit_reaction_extension.set_death_sound_event_id(hit_reaction_extension, playing_id)
 		end
+	end
+
+	local achievements_enabled = Development.parameter("v2_achievements")
+
+	if achievements_enabled then
+		handle_boss_difficulty_kill_achievement_tracking(breed, context.statistics_db)
 	end
 
 	local player = Managers.player:owner(owner_unit)
@@ -886,6 +959,7 @@ DeathReactions.templates = {
 
 				trigger_unit_dialogue_death_event(unit, killing_blow[DamageDataIndex.ATTACKER], killing_blow[DamageDataIndex.HIT_ZONE], killing_blow[DamageDataIndex.DAMAGE_TYPE])
 				trigger_player_killing_blow_ai_buffs(unit, killing_blow, true)
+				WwiseUtils.trigger_unit_event(Managers.world:world("level_world"), "Stop_enemy_vo_warpfire", unit, Unit.node(unit, "a_voice"))
 
 				if killing_blow[DamageDataIndex.HIT_ZONE] == "aux" then
 					local hit_ragdoll_actor = killing_blow[DamageDataIndex.HIT_RAGDOLL_ACTOR_NAME]
@@ -933,12 +1007,7 @@ DeathReactions.templates = {
 				local death_hit_zone = killing_blow[DamageDataIndex.HIT_ZONE]
 
 				if death_hit_zone == "aux" then
-					Unit.set_mesh_visibility(unit, "g_warpfire_backpack_lod0", false)
-					Unit.set_mesh_visibility(unit, "g_warpfire_backpack_lod1", false)
-					Unit.set_mesh_visibility(unit, "g_warpfire_backpack_lod2", false)
-					Unit.set_mesh_visibility(unit, "g_warpfire_tube_lod0", false)
-					Unit.set_mesh_visibility(unit, "g_warpfire_tube_lod1", false)
-					Unit.set_mesh_visibility(unit, "g_warpfire_tube_lod2", false)
+					Unit.flow_event(unit, "lua_hide_backpack")
 
 					local death_extension = ScriptUnit.extension(unit, "death_system")
 					death_extension.actor_to_disable_on_death = "j_backpack"
@@ -949,6 +1018,8 @@ DeathReactions.templates = {
 					trigger_unit_dialogue_death_event(unit, killing_blow[DamageDataIndex.ATTACKER], killing_blow[DamageDataIndex.HIT_ZONE], killing_blow[DamageDataIndex.DAMAGE_TYPE])
 					trigger_player_killing_blow_ai_buffs(unit, killing_blow, false)
 				end
+
+				WwiseUtils.trigger_unit_event(Managers.world:world("level_world"), "Stop_enemy_vo_warpfire", unit, Unit.node(unit, "a_voice"))
 
 				return data, result
 			end,
@@ -1306,7 +1377,7 @@ DeathReactions.templates = {
 									source_unit = unit
 								}
 							}
-							local aoe_unit_name = "units/weapons/projectile/poison_wind_globe/poison_wind_globe"
+							local aoe_unit_name = "units/hub_elements/empty"
 							local liquid_aoe_unit = Managers.state.unit_spawner:spawn_network_unit(aoe_unit_name, "liquid_aoe_unit", extension_init_data, position_on_navmesh)
 							local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 
@@ -1403,7 +1474,7 @@ DeathReactions.templates = {
 								source_unit = unit
 							}
 						}
-						local aoe_unit_name = "units/weapons/projectile/poison_wind_globe/poison_wind_globe"
+						local aoe_unit_name = "units/hub_elements/empty"
 						local liquid_aoe_unit = Managers.state.unit_spawner:spawn_network_unit(aoe_unit_name, "liquid_aoe_unit", extension_init_data, position_on_navmesh)
 						local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 

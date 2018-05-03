@@ -204,14 +204,18 @@ StartGameWindowMutatorList._is_button_selected = function (self, widget)
 end
 StartGameWindowMutatorList._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
+	local gamepad_active = Managers.input:is_device_active("gamepad")
+	local input_service = self.parent:window_input_service()
 
 	if self._is_button_hover_enter(self, widgets_by_name.overlay_button) or self._is_button_hover_enter(self, widgets_by_name.play_button) then
 		self._play_sound(self, "play_gui_lobby_button_01_difficulty_confirm_hover")
 	end
 
+	local play_pressed = gamepad_active and input_service.get(input_service, "refresh_press")
+
 	if self._is_button_pressed(self, widgets_by_name.overlay_button) then
 		self.parent:set_layout(7)
-	elseif self._is_button_pressed(self, widgets_by_name.play_button) and self._selected_backend_id then
+	elseif (self._is_button_pressed(self, widgets_by_name.play_button) or play_pressed) and self._selected_backend_id then
 		self.parent:play(t)
 	end
 
@@ -224,6 +228,12 @@ StartGameWindowMutatorList._update_selected_item_backend_id = function (self)
 		self._selected_backend_id = backend_id
 
 		self._present_item_by_backend_id(self, backend_id)
+	end
+
+	if self._selected_backend_id then
+		self.parent.parent:set_input_description("play_available")
+	else
+		self.parent.parent:set_input_description(nil)
 	end
 
 	return 

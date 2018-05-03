@@ -25,8 +25,6 @@ ControllerFeaturesImplementation.event_end_conditions_met = function (self)
 end
 local EFFECTS_TO_REMOVE = {}
 ControllerFeaturesImplementation.update = function (self, dt, t)
-	return 
-
 	for user, effects in pairs(self._effects) do
 		table.clear(EFFECTS_TO_REMOVE)
 
@@ -46,7 +44,7 @@ ControllerFeaturesImplementation.update = function (self, dt, t)
 	return 
 end
 ControllerFeaturesImplementation.add_effect = function (self, effect_name, params, user_id)
-	if self._game_mode_ended or not Application.user_setting("gamepad_rumble_enabled") or (effect_name == "camera_shake" and self._is_in_inn) then
+	if self._game_mode_ended or not Application.user_setting("gamepad_rumble_enabled") or (effect_name == "camera_shake" and self._is_in_inn) or script_data.honduras_demo then
 		return 
 	end
 

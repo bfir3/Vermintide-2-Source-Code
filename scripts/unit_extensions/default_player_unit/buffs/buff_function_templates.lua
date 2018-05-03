@@ -69,6 +69,17 @@ local function is_bot(unit)
 	return player and player.bot_player
 end
 
+local function is_server()
+	return Managers.state.network.is_server
+end
+
+local function is_husk(unit)
+	local player = Managers.player:owner(unit)
+	local is_husk = (player and (player.remote or player.bot_player)) or false
+
+	return is_husk
+end
+
 BuffFunctionTemplates.functions = {
 	apply_action_lerp_movement_buff = function (unit, buff, params)
 		local bonus = params.bonus
@@ -395,8 +406,9 @@ BuffFunctionTemplates.functions = {
 					local can_stagger = false
 					local blocking = false
 					local shield_breaking_hit = false
+					local backstab_multiplier = nil
 
-					DamageUtils.server_apply_hit(t, attacker_unit, target_unit, hit_zone_name, attack_direction, hit_ragdoll_actor, damage_source, power_level, damage_profile, target_index, boost_curve_multiplier, is_critical_strike, can_damage, can_stagger, blocking, shield_breaking_hit)
+					DamageUtils.server_apply_hit(t, attacker_unit, target_unit, hit_zone_name, attack_direction, hit_ragdoll_actor, damage_source, power_level, damage_profile, target_index, boost_curve_multiplier, is_critical_strike, can_damage, can_stagger, blocking, shield_breaking_hit, backstab_multiplier)
 				end
 			end
 		end
@@ -519,6 +531,45 @@ BuffFunctionTemplates.functions = {
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.vomit_particle_id)
 		end
 
+		return 
+	end,
+	apply_catacombs_corpse_pit = function (unit, buff, params, world)
+		buff.next_tick = params.t + 0
+
+		return 
+	end,
+	update_catacombs_corpse_pit = function (unit, buff, params, world)
+		local t = params.t
+		local next_tick = buff.next_tick
+		local buff_template = buff.template
+
+		if next_tick < t then
+			local fatigue_type = buff_template.fatigue_type
+			local status_extension = ScriptUnit.has_extension(unit, "status_system")
+
+			if status_extension then
+				status_extension.add_fatigue_points(status_extension, fatigue_type)
+			end
+
+			local buff_extension = ScriptUnit.extension(unit, "buff_system")
+			local slowdown_buff_name = buff_template.slowdown_buff_name
+
+			if slowdown_buff_name then
+				buff_extension.add_buff(buff_extension, slowdown_buff_name, params)
+			end
+
+			local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
+
+			if first_person_extension then
+				first_person_extension.play_hud_sound_event(first_person_extension, "Play_player_damage_puke")
+			end
+
+			buff.next_tick = t + buff_template.time_between_ticks
+		end
+
+		return 
+	end,
+	remove_catacombs_corpse_pit = function (unit, buff, params, world)
 		return 
 	end,
 	apply_ai_movement_debuff = function (unit, buff, params, world)
@@ -1148,7 +1199,7 @@ BuffFunctionTemplates.functions = {
 		if first_person_extension then
 			buff.warpfire_particle_id = first_person_extension.create_screen_particles(first_person_extension, "fx/screenspace_warpfire_hit_inface")
 
-			first_person_extension.play_hud_sound_event(first_person_extension, "Play_player_hit_puke")
+			first_person_extension.play_hud_sound_event(first_person_extension, "Play_player_hit_warpfire_thrower")
 		end
 
 		local pushed_direction = nil
@@ -1219,6 +1270,7 @@ BuffFunctionTemplates.functions = {
 
 		if first_person_extension then
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.warpfire_particle_id)
+			first_person_extension.play_hud_sound_event(first_person_extension, "Stop_player_hit_warpfire_thrower")
 		end
 
 		return 
@@ -2496,19 +2548,52 @@ BuffFunctionTemplates.functions = {
 
 		return 
 	end,
-	end_shade_activated_ability = function (unit, buff, params)
+	apply_shade_activated_ability = function (unit, buff, params, world)
+		if is_husk(unit) or (is_server() and is_bot(unit)) then
+			Unit.flow_event(unit, "vfx_career_ability_start")
+		end
+
+		return 
+	end,
+	end_shade_activated_ability = function (unit, buff, params, world)
 		if is_local(unit) then
-			local career_extension = ScriptUnit.extension(unit, "career_system")
-			local status_extension = ScriptUnit.extension(unit, "status_system")
 			local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
 
-			status_extension.set_invisible(status_extension, false)
-			status_extension.set_noclip(status_extension, false)
-			first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_kerillian_shade_exit", nil, true)
+			first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_kerillian_shade_exit")
 			first_person_extension.play_hud_sound_event(first_person_extension, "Stop_career_ability_kerillian_shade_loop")
+
+			local career_extension = ScriptUnit.extension(unit, "career_system")
+
 			career_extension.set_state(career_extension, "default")
 
 			MOOD_BLACKBOARD.skill_shade = false
+		end
+
+		if is_local(unit) or (is_server() and is_bot(unit)) then
+			local status_extension = ScriptUnit.extension(unit, "status_system")
+
+			status_extension.set_invisible(status_extension, false)
+			status_extension.set_noclip(status_extension, false)
+
+			local events = {
+				"Play_career_ability_kerillian_shade_exit",
+				"Stop_career_ability_kerillian_shade_loop_husk"
+			}
+			local network_manager = Managers.state.network
+			local network_transmit = network_manager.network_transmit
+			local is_server = Managers.player.is_server
+			local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+			local node_id = 0
+
+			for _, event in ipairs(events) do
+				local event_id = NetworkLookup.sound_events[event]
+
+				if is_server then
+					network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+				else
+					network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+				end
+			end
 		end
 
 		return 
@@ -2521,14 +2606,8 @@ BuffFunctionTemplates.functions = {
 			Managers.state.camera:set_additional_fov_multiplier_with_lerp_time(fov_multiplier, lerp_time)
 		end
 
-		return 
-	end,
-	add_victor_zealot_invulnerability_cooldown = function (unit, buff, params)
-		local player_unit = unit
-		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-
-		if Unit.alive(player_unit) then
-			buff_extension.add_buff(buff_extension, "victor_zealot_invulnerability_cooldown")
+		if is_husk(unit) or (is_server() and is_bot(unit)) then
+			Unit.flow_event(unit, "vfx_career_ability_start")
 		end
 
 		return 
@@ -2544,19 +2623,46 @@ BuffFunctionTemplates.functions = {
 
 			local career_extension = ScriptUnit.extension(unit, "career_system")
 			local status_extension = ScriptUnit.extension(unit, "status_system")
-			local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
 
 			if status_extension.is_invisible(status_extension) then
-				status_extension.set_invisible(status_extension, false)
-				first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_markus_huntsman_exit")
-				first_person_extension.play_hud_sound_event(first_person_extension, "Stop_career_ability_markus_huntsman_loop")
-
 				MOOD_BLACKBOARD.skill_huntsman_stealth = false
 			else
 				MOOD_BLACKBOARD.skill_huntsman_surge = false
 			end
+		end
 
-			career_extension.set_state(career_extension, "default")
+		if is_local(unit) or (is_server() and is_bot(unit)) then
+			local status_extension = ScriptUnit.extension(unit, "status_system")
+
+			if status_extension.is_invisible(status_extension) then
+				local career_extension = ScriptUnit.extension(unit, "career_system")
+				local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
+
+				career_extension.set_state(career_extension, "default")
+				status_extension.set_invisible(status_extension, false)
+				first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_markus_huntsman_exit")
+				first_person_extension.play_hud_sound_event(first_person_extension, "Stop_career_ability_markus_huntsman_loop")
+
+				local events = {
+					"Play_career_ability_markus_huntsman_exit",
+					"Stop_career_ability_markus_huntsman_loop_husk"
+				}
+				local network_manager = Managers.state.network
+				local network_transmit = network_manager.network_transmit
+				local is_server = Managers.player.is_server
+				local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+				local node_id = 0
+
+				for _, event in ipairs(events) do
+					local event_id = NetworkLookup.sound_events[event]
+
+					if is_server then
+						network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+					else
+						network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+					end
+				end
+			end
 		end
 
 		return 
@@ -2573,6 +2679,16 @@ BuffFunctionTemplates.functions = {
 			career_extension.set_state(career_extension, "default")
 
 			MOOD_BLACKBOARD.skill_slayer = false
+		end
+
+		return 
+	end,
+	add_victor_zealot_invulnerability_cooldown = function (unit, buff, params)
+		local player_unit = unit
+		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+
+		if Unit.alive(player_unit) then
+			buff_extension.add_buff(buff_extension, "victor_zealot_invulnerability_cooldown")
 		end
 
 		return 
@@ -2613,9 +2729,7 @@ BuffFunctionTemplates.functions = {
 	end_bardin_ironbreaker_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
 			params.next_vo_time = nil
-			local career_extension = ScriptUnit.extension(unit, "career_system")
-
-			career_extension.start_activated_ability_cooldown(career_extension)
+			slot3 = ScriptUnit.extension(unit, "career_system")
 		end
 
 		return 

@@ -93,6 +93,7 @@ end
 MutatorHandler._activate_mutator = function (self, name, active_mutators, mutator_context)
 	fassert(active_mutators[name] == nil, "Can't have multiple of same mutator running at the same time (%s)", name)
 	fassert(MutatorTemplates[name], "No such template (%s)", name)
+	mutator_dprint("Activating mutator '%s'", name)
 
 	local template = MutatorTemplates[name]
 	local mutator_data = {
@@ -121,6 +122,7 @@ MutatorHandler._activate_mutator = function (self, name, active_mutators, mutato
 end
 MutatorHandler._deactivate_mutator = function (self, name, active_mutators, mutator_context)
 	fassert(active_mutators[name], "Trying to deactivate mutator (%s) but it isn't active", name)
+	mutator_dprint("Deactivating mutator '%s'", name)
 
 	local template = MutatorTemplates[name]
 	local mutator_data = active_mutators[name]

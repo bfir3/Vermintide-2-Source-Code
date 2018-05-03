@@ -496,6 +496,10 @@ IngameHud._update_always = function (self, dt, t, player, context)
 		self.tutorial_intro_ui:update(dt, t)
 	end
 
+	if self.twitch_vote_ui then
+		self.twitch_vote_ui:update(dt, t)
+	end
+
 	return 
 end
 IngameHud._update_while_alive = function (self, dt, t, player, context)
@@ -541,10 +545,6 @@ IngameHud._update_while_alive = function (self, dt, t, player, context)
 
 		if self.buff_presentation_ui then
 			self.buff_presentation_ui:update(dt, t)
-		end
-
-		if self.twitch_vote_ui then
-			self.twitch_vote_ui:update(dt, t)
 		end
 
 		if self.equipment_ui then

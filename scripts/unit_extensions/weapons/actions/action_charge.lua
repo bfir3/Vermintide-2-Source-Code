@@ -35,6 +35,7 @@ ActionCharge.client_owner_start_action = function (self, new_action, t)
 	self.current_action = new_action
 	self.charge_ready_sound_event = self.current_action.charge_ready_sound_event
 	self.venting_overcharge = nil
+	self._max_charge = false
 	local overcharge_extension = self.overcharge_extension
 
 	if new_action.vent_overcharge and overcharge_extension and 0 < overcharge_extension.get_overcharge_value(overcharge_extension) then
@@ -50,6 +51,11 @@ ActionCharge.client_owner_start_action = function (self, new_action, t)
 	self.charge_time = buff_extension.apply_buffs_to_value(buff_extension, new_action.charge_time, StatBuffIndex.REDUCED_RANGED_CHARGE_TIME)
 	self.charge_complete_time = self.charge_time + t
 	self.overcharge_timer = 0
+
+	if not new_action.vent_overcharge then
+		Unit.flow_event(self.first_person_unit, "lua_charge_start")
+	end
+
 	local charge_effect_name = new_action.charge_effect_name
 
 	if charge_effect_name then
@@ -121,6 +127,13 @@ ActionCharge.client_owner_post_update = function (self, dt, t, world, can_damage
 	end
 
 	local charge_level = math.max(math.min(current_charge_time, 1), 0)
+
+	if not current_action.vent_overcharge and 1 <= charge_level and not self._max_charge then
+		self._max_charge = true
+
+		Unit.flow_event(self.first_person_unit, "lua_max_charge")
+	end
+
 	local overcharge_extension = self.overcharge_extension
 	local inventory_extension = ScriptUnit.extension(self.owner_unit, "inventory_system")
 
@@ -244,6 +257,8 @@ ActionCharge.finish = function (self, reason)
 	if reason == "hold_input_released" or reason == "weapon_wielded" then
 		Unit.flow_event(first_person_unit, "lua_charge_cancel")
 	end
+
+	Unit.flow_event(first_person_unit, "lua_charge_stop")
 
 	if self._rumble_effect_id then
 		Managers.state.controller_features:stop_effect(self._rumble_effect_id)

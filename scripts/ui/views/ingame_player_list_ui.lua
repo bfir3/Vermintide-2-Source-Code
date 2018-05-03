@@ -617,7 +617,11 @@ IngamePlayerListUI.remove_ignore_chat_message_from_peer_id = function (self, pee
 end
 IngamePlayerListUI.muted_peer_id = function (self, peer_id)
 	if PLATFORM == "xb1" then
-		return Managers.voice_chat:is_peer_muted(peer_id)
+		if Managers.voice_chat then
+			return Managers.voice_chat:is_peer_muted(peer_id)
+		else
+			return false
+		end
 	else
 		return self.voip:peer_muted(peer_id)
 	end
@@ -626,7 +630,9 @@ IngamePlayerListUI.muted_peer_id = function (self, peer_id)
 end
 IngamePlayerListUI.ignore_voice_message_from_peer_id = function (self, peer_id)
 	if PLATFORM == "xb1" then
-		Managers.voice_chat:mute_peer(peer_id)
+		if Managers.voice_chat then
+			Managers.voice_chat:mute_peer(peer_id)
+		end
 	else
 		self.voip:mute_member(peer_id)
 	end
@@ -635,7 +641,9 @@ IngamePlayerListUI.ignore_voice_message_from_peer_id = function (self, peer_id)
 end
 IngamePlayerListUI.remove_ignore_voice_message_from_peer_id = function (self, peer_id)
 	if PLATFORM == "xb1" then
-		Managers.voice_chat:unmute_peer(peer_id)
+		if Managers.voice_chat then
+			Managers.voice_chat:unmute_peer(peer_id)
+		end
 	else
 		self.voip:unmute_member(peer_id)
 	end

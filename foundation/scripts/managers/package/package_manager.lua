@@ -19,9 +19,10 @@ PackageManager.init = function (self)
 end
 PackageManager.load = function (self, package_name, reference_name, callback, asynchronous, prioritize)
 	debug_print("Load:  %s, %s, %s, %s", package_name, reference_name, (asynchronous and "async-read") or "sync-read", (prioritize and "prioritized") or "")
+	assert(reference_name ~= nil, "No reference name passed when loading package")
 
 	if self._references[package_name] then
-		self._references[package_name][reference_name] = true
+		self._references[package_name][reference_name] = (self._references[package_name][reference_name] or 0) + 1
 
 		if not asynchronous and self._asynch_packages[package_name] then
 			self.force_load(self, package_name)
@@ -57,7 +58,7 @@ PackageManager.load = function (self, package_name, reference_name, callback, as
 		assert(self._queued_async_packages[package_name] == nil, "Package '" .. tostring(package_name) .. "' is already queued")
 
 		self._references[package_name] = {
-			[reference_name] = true
+			[reference_name] = 1
 		}
 
 		if next(self._asynch_packages) and asynchronous then
@@ -186,13 +187,17 @@ PackageManager._pop_queue = function (self)
 	return 
 end
 PackageManager.unload = function (self, package_name, reference_name)
-	debug_print("Unload:  %s, %s", package_name, reference_name)
-
 	local references = self._references[package_name]
 
-	assert(references[reference_name] == true, "[PackageManager] Trying to unload package with unknown reference name")
+	assert(references[reference_name] ~= nil, "[PackageManager] Trying to unload package with unknown reference name")
 
-	references[reference_name] = nil
+	local reference_count = references[reference_name] - 1
+
+	if reference_count == 0 then
+		references[reference_name] = nil
+	else
+		references[reference_name] = reference_count
+	end
 
 	if table.is_empty(references) then
 		local resource_handle = self._packages[package_name]
@@ -216,6 +221,10 @@ PackageManager.unload = function (self, package_name, reference_name)
 		if table.is_empty(self._asynch_packages) then
 			self._pop_queue(self)
 		end
+
+		debug_print("Unload:  %s, %s", package_name, reference_name)
+	else
+		debug_print("Unload:  %s, %s -> Package still referenced, NOT unloaded:", package_name, reference_name)
 	end
 
 	return 
@@ -259,12 +268,21 @@ PackageManager.has_loaded = function (self, package, reference_name)
 	local loaded = self._packages[package] ~= nil and self._asynch_packages[package] == nil and self._queued_async_packages[package] == nil
 
 	if reference_name then
-		return loaded and self._references[package][reference_name] == true
+		return loaded and self._references[package][reference_name] ~= nil
 	else
 		return loaded
 	end
 
 	return 
+end
+PackageManager.reference_count = function (self, package, reference_name)
+	local reference_count = 0
+
+	if self._references[package] then
+		reference_count = self._references[package][reference_name]
+	end
+
+	return reference_count
 end
 PackageManager.update = function (self)
 	for package_name, package in pairs(self._asynch_packages) do
@@ -277,6 +295,21 @@ PackageManager.update = function (self)
 			break
 		end
 	end
+
+	return 
+end
+PackageManager.dump_reference_counter = function (self, reference_name)
+	printf("[PackageManager] Dumping reference counters for %s", reference_name)
+
+	for package_name, references in pairs(self._references) do
+		local referenced = references[reference_name]
+
+		if referenced then
+			printf("%s - referenced %i", package_name, referenced)
+		end
+	end
+
+	printf("[PackageManager] Done!")
 
 	return 
 end
@@ -297,6 +330,13 @@ if PM_UNIT_TEST then
 	table.is_empty = function (t)
 		return next(t) == nil
 	end
+	table.clear = function (t)
+		for key, _ in pairs(t) do
+			t[key] = nil
+		end
+
+		return 
+	end
 
 	debug_print("Running package manager unit test")
 
@@ -305,8 +345,10 @@ if PM_UNIT_TEST then
 	pm.init(pm)
 	pm.load(pm, "resource_packages/strings", "unit_test_1")
 	assert(pm.has_loaded(pm, "resource_packages/strings") == true)
+	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == true)
 	pm.unload(pm, "resource_packages/strings", "unit_test_1")
 	assert(pm.has_loaded(pm, "resource_packages/strings") == false)
+	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == false)
 	pm.load(pm, "resource_packages/strings", "unit_test_1")
 	pm.load(pm, "resource_packages/strings", "unit_test_2")
 	pm.unload(pm, "resource_packages/strings", "unit_test_1")
@@ -317,7 +359,17 @@ if PM_UNIT_TEST then
 	pm.load(pm, "resource_packages/strings", "unit_test_1")
 	pm.load(pm, "resource_packages/strings", "unit_test_1")
 	pm.unload(pm, "resource_packages/strings", "unit_test_1")
+	assert(pm.has_loaded(pm, "resource_packages/strings") == true)
+	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == true)
+	assert(pm.reference_count(pm, "resource_packages/strings", "unit_test_1") == 2)
+	pm.unload(pm, "resource_packages/strings", "unit_test_1")
+	assert(pm.has_loaded(pm, "resource_packages/strings") == true)
+	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == true)
+	assert(pm.reference_count(pm, "resource_packages/strings", "unit_test_1") == 1)
+	pm.unload(pm, "resource_packages/strings", "unit_test_1")
 	assert(pm.has_loaded(pm, "resource_packages/strings") == false)
+	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == false)
+	assert(pm.reference_count(pm, "resource_packages/strings", "unit_test_1") == 0)
 	pm.load(pm, "resource_packages/strings", "unit_test_1")
 	pm.destroy(pm)
 	assert(pm.is_loading(pm, "resource_packages/strings") == false)
@@ -326,6 +378,7 @@ if PM_UNIT_TEST then
 	assert(pm.is_loading(pm, "resource_packages/strings") == false)
 
 	table.is_empty = nil
+	table.clear = nil
 
 	rawset(_G, "printf", nil)
 

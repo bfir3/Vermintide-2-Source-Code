@@ -650,6 +650,11 @@ local function has_reached_ally_aid_destination(self_position, blackboard)
 
 	if has_target_ally_aid_destination then
 		return navigation_extension.destination_reached(navigation_extension)
+	elseif navigation_extension.destination_reached(navigation_extension) then
+		local bot_ai_extension = blackboard.ai_extension
+		local is_near = not bot_ai_extension.new_destination_distance_check(bot_ai_extension, self_position, destination, target_ally_aid_destination, navigation_extension)
+
+		return is_near
 	else
 		local offset = target_ally_aid_destination - self_position
 
@@ -810,9 +815,11 @@ end
 BTConditions.bot_should_heal = function (blackboard)
 	local self_unit = blackboard.unit
 	local inventory_ext = blackboard.inventory_extension
+	local buff_extension = ScriptUnit.extension(self_unit, "buff_system")
 	local health_slot_data = inventory_ext.get_slot_data(inventory_ext, "slot_healthkit")
 	local template = health_slot_data and inventory_ext.get_item_template(inventory_ext, health_slot_data)
-	local can_heal_self = template and template.can_heal_self
+	local has_heal_disable_buff = buff_extension.has_buff_type(buff_extension, "trait_necklace_no_healing_health_regen")
+	local can_heal_self = template and template.can_heal_self and not has_heal_disable_buff
 
 	if not can_heal_self then
 		return false
@@ -891,8 +898,8 @@ BTConditions.bot_in_melee_range = function (blackboard)
 	end
 
 	local offset = target_aim_position - POSITION_LOOKUP[self_unit]
-	local dist = Vector3.length(offset)
-	local in_range = dist < melee_range
+	local distance_squared = Vector3.length_squared(offset)
+	local in_range = distance_squared < melee_range^2
 	local z_offset = offset.z
 
 	return in_range and -1.5 < z_offset and z_offset < 2
@@ -925,6 +932,27 @@ BTConditions.has_target_and_ammo_greater_than = function (blackboard, args)
 	local obstructed = obstruction and obstruction.unit == blackboard.target_unit and obstruction.timer + 3 < t
 
 	return ammo_ok and overcharge_ok and not obstructed
+end
+BTConditions.should_vent_overcharge = function (blackboard, args)
+	local overcharge_extension = blackboard.overcharge_extension
+	local overcharge_limit_type = args.overcharge_limit_type
+	local current_oc, threshold_oc, max_oc = overcharge_extension.current_overcharge_status(overcharge_extension)
+	local should_vent = false
+	local overcharge_percentage = 0
+
+	if overcharge_limit_type == "threshold" then
+		overcharge_percentage = current_oc / threshold_oc
+	elseif overcharge_limit_type == "maximum" then
+		overcharge_percentage = current_oc / max_oc
+	end
+
+	if blackboard.venting then
+		should_vent = args.stop_percentage <= overcharge_percentage
+	else
+		should_vent = args.start_min_percentage <= overcharge_percentage and overcharge_percentage <= args.start_max_percentage
+	end
+
+	return should_vent
 end
 BTConditions.can_open_door = function (blackboard)
 	local can_interact = false

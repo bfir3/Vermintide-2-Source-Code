@@ -32,6 +32,7 @@ local script_data = script_data
 script_data.debug_behaviour_trees = (script_data.debug_behaviour_trees ~= nil and script_data.debug_behaviour_trees) or false
 GameSettingsDevelopment.use_backend = not Development.parameter("use_local_backend")
 GameSettingsDevelopment.backend_settings = BackendSettings.dev_steam_playfab
+GameSettingsDevelopment.twitch_enabled = true
 GameSettingsDevelopment.disable_intro_trailer = false
 GameSettingsDevelopment.use_new_pickup_spawning = true
 GameSettingsDevelopment.fade_environments = true
@@ -72,6 +73,9 @@ end
 
 local settings = script_data.settings
 
+print(settings.steam)
+print(rawget(_G, "Steam"))
+
 if settings.steam or Development.parameter("force_steam") then
 	if rawget(_G, "Steam") or DEDICATED_SERVER then
 		local app_id = nil
@@ -107,7 +111,7 @@ elseif BUILD == "dev" or BUILD == "debug" then
 	script_data.unlock_all_levels = Development.parameter("unlock-all-levels")
 elseif not script_data.honduras_demo and not Development.parameter("attract_mode") and not DEDICATED_SERVER then
 	print("Running release game without content revision, quitting.")
-	Application.quit()
+	Application.quit("FAIL")
 end
 
 if Development.parameter("give-all-lan-backend-items") then

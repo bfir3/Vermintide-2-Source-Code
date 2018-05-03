@@ -953,6 +953,7 @@ local function create_window_button(scenegraph_id, size, button_text, font_size,
 	return widget
 end
 
+local disable_with_gamepad = true
 local widgets = {
 	background_fade = UIWidgets.create_simple_texture("options_window_fade_01", "info_window"),
 	background_mask = UIWidgets.create_simple_texture("mask_rect", "info_window"),
@@ -969,7 +970,7 @@ local widgets = {
 	xp_multiplier = UIWidgets.create_simple_text("", "difficulty_xp_multiplier", nil, nil, difficulty_xp_multiplier_style),
 	difficulty_lock_text = UIWidgets.create_simple_text("difficulty_lock_text", "difficulty_lock_text", nil, nil, difficulty_lock_text_style),
 	difficulty_is_locked_text = UIWidgets.create_simple_text("Some people in your party do not meet the required Hero Power.", "difficulty_is_locked_text", nil, nil, difficulty_is_locked_text_style),
-	select_button = UIWidgets.create_default_button("select_button", scenegraph_definition.select_button.size, nil, nil, Localize("confirm_menu_button_name"), 32)
+	select_button = UIWidgets.create_default_button("select_button", scenegraph_definition.select_button.size, nil, nil, Localize("confirm_menu_button_name"), 32, nil, nil, nil, disable_with_gamepad)
 }
 local animation_definitions = {
 	on_enter = {

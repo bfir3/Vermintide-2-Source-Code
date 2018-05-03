@@ -179,6 +179,8 @@ PlayerCharacterStateJumping.update = function (self, unit, input, dt, context, t
 		if not config.allow_movement then
 			local params = self.temp_params
 			params.swap_to_3p = config.swap_to_3p
+			params.show_weapons = config.show_weapons
+			params.activate_block = config.activate_block
 
 			csm.change_state(csm, "interacting", params)
 		end
@@ -192,6 +194,8 @@ PlayerCharacterStateJumping.update = function (self, unit, input, dt, context, t
 		if not config.allow_movement then
 			local params = self.temp_params
 			params.swap_to_3p = config.swap_to_3p
+			params.show_weapons = config.show_weapons
+			params.activate_block = config.activate_block
 
 			csm.change_state(csm, "interacting", params)
 		end

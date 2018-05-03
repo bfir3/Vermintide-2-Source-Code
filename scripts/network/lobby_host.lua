@@ -170,14 +170,5 @@ LobbyHost.set_lobby = function (self, lobby)
 
 	return 
 end
-LobbyHost.eac_state = function (self, peer)
-	if self.lobby.eac_state == nil then
-		return "untrusted"
-	else
-		return self.lobby:eac_state(peer)
-	end
-
-	return 
-end
 
 return 

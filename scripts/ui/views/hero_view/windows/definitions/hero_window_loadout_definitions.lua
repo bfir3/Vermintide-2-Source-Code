@@ -82,7 +82,7 @@ local scenegraph_definition = {
 		position = {
 			0,
 			0,
-			1
+			10
 		}
 	},
 	loadout_grid = {

@@ -779,16 +779,33 @@ local action_data = {
 		stagger_anims = {
 			{
 				fwd = {
-					"stagger_bwd_open"
+					"stun_fwd_open"
+				},
+				bwd = {
+					"stun_bwd_open"
+				},
+				left = {
+					"stun_left_open"
+				},
+				right = {
+					"stun_right_open"
+				},
+				dwn = {
+					"stun_bwd_open"
+				}
+			},
+			{
+				fwd = {
+					"stagger_fwd_open"
 				},
 				bwd = {
 					"stagger_bwd_open"
 				},
 				left = {
-					"stagger_bwd_open"
+					"stagger_left_open"
 				},
 				right = {
-					"stagger_bwd_open"
+					"stagger_right_open"
 				},
 				dwn = {
 					"stagger_bwd_open"
@@ -796,61 +813,44 @@ local action_data = {
 			},
 			{
 				fwd = {
-					"stagger_bwd_open"
+					"stagger_fwd_open"
 				},
 				bwd = {
 					"stagger_bwd_open"
 				},
 				left = {
-					"stagger_bwd_open"
+					"stagger_left_open"
 				},
 				right = {
-					"stagger_bwd_open"
-				},
-				dwn = {
-					"stagger_bwd_open"
+					"stagger_right_open"
 				}
 			},
 			{
 				fwd = {
-					"stagger_bwd_open"
+					"stun_fwd_open"
 				},
 				bwd = {
-					"stagger_bwd_open"
+					"stun_bwd_open"
 				},
 				left = {
-					"stagger_bwd_open"
+					"stun_left_open"
 				},
 				right = {
-					"stagger_bwd_open"
+					"stun_right_open"
 				}
 			},
 			{
 				fwd = {
-					"stagger_bwd_open"
+					"stagger_fwd_open"
 				},
 				bwd = {
 					"stagger_bwd_open"
 				},
 				left = {
-					"stagger_bwd_open"
+					"stagger_left_open"
 				},
 				right = {
-					"stagger_bwd_open"
-				}
-			},
-			{
-				fwd = {
-					"stagger_bwd_open"
-				},
-				bwd = {
-					"stagger_bwd_open"
-				},
-				left = {
-					"stagger_bwd_open"
-				},
-				right = {
-					"stagger_bwd_open"
+					"stagger_right_open"
 				}
 			},
 			{
@@ -869,16 +869,16 @@ local action_data = {
 			},
 			{
 				fwd = {
-					"stagger_bwd_open"
+					"stagger_fwd_open"
 				},
 				bwd = {
 					"stagger_bwd_open"
 				},
 				left = {
-					"stagger_bwd_open"
+					"stagger_left_open"
 				},
 				right = {
-					"stagger_bwd_open"
+					"stagger_right_open"
 				}
 			}
 		},

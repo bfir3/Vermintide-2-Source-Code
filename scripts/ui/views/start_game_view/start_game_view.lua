@@ -7,6 +7,7 @@ local scenegraph_definition = definitions.scenegraph_definition
 local settings_by_screen = definitions.settings_by_screen
 local attachments = definitions.attachments
 local flow_events = definitions.flow_events
+local generic_input_actions = definitions.generic_input_actions
 
 local function dprint(...)
 	print("[StartGameView]", ...)
@@ -94,7 +95,7 @@ StartGameView._setup_state_machine = function (self, state_machine_params, optio
 	local start_state = optional_start_state or StartGameStateSettingsOverview
 	local profiling_debugging_enabled = false
 	state_machine_params.start_state = optional_start_sub_state
-	self._machine = StateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
+	self._machine = GameStateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
 	self._state_machine_params = state_machine_params
 
 	return 
@@ -131,10 +132,22 @@ StartGameView.create_ui_elements = function (self)
 		text = UIWidget.init(widget_definitions.loading_text)
 	}
 	self._console_cursor_widget = UIWidget.init(widget_definitions.console_cursor)
+	local input_service = Managers.input:get_service("start_game_view")
+	local gui_layer = UILayer.default + 30
+	self._menu_input_description = MenuInputDescriptionUI:new(nil, self.ui_top_renderer, input_service, 4, gui_layer, generic_input_actions.default)
 
+	self._menu_input_description:set_input_description(nil)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, definitions.animations)
+
+	return 
+end
+StartGameView.set_input_description = function (self, input_description)
+	local test = generic_input_actions
+
+	fassert(not input_description or generic_input_actions[input_description], "[StartGameView:set_input_description] There is no such input_description (%s)", input_description)
+	self._menu_input_description:set_input_description(generic_input_actions[input_description])
 
 	return 
 end
@@ -168,6 +181,10 @@ StartGameView.draw = function (self, dt, input_service)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
+
+	if gamepad_active then
+		self._menu_input_description:draw(ui_top_renderer, dt)
+	end
 
 	return 
 end

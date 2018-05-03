@@ -267,8 +267,14 @@ OptionsView.init = function (self, ingame_ui_context)
 
 	self.input_manager = input_manager
 	self.controller_cooldown = 0
-	local world = ingame_ui_context.world_manager:world("music_world")
-	self.wwise_world = Managers.world:wwise_world(world)
+
+	if GLOBAL_MUSIC_WORLD then
+		self.wwise_world = MUSIC_WWISE_WORLD
+	else
+		local world = ingame_ui_context.world_manager:world("music_world")
+		self.wwise_world = Managers.world:wwise_world(world)
+	end
+
 	self.ui_animations = {}
 
 	self.reset_changed_settings(self)
@@ -731,7 +737,7 @@ OptionsView.create_ui_elements = function (self)
 		settings_lists.video_settings.hide_reset = true
 		settings_lists.video_settings.needs_apply_confirmation = true
 	else
-		if (Managers.voice_chat and Managers.voice_chat:initiated()) or self.voip then
+		if Managers.voice_chat or self.voip then
 			settings_lists.audio_settings = self.build_settings_list(self, settings_definitions.audio_settings_definition, "audio_settings_list")
 		else
 			settings_lists.audio_settings = self.build_settings_list(self, settings_definitions.audio_settings_definition_without_voip, "audio_settings_list")
@@ -1483,6 +1489,10 @@ OptionsView.apply_changes = function (self, user_settings, render_settings, pend
 		network_manager.set_max_upload_speed(network_manager, max_upload)
 	end
 
+	if network_manager then
+		network_manager.set_small_network_packets(network_manager, user_settings.small_network_packets)
+	end
+
 	local max_stacking_frames = user_settings.max_stacking_frames
 
 	if max_stacking_frames then
@@ -1536,7 +1546,7 @@ OptionsView.apply_changes = function (self, user_settings, render_settings, pend
 	if voip_enabled ~= nil then
 		self.voip:set_enabled(voip_enabled)
 
-		if PLATFORM == "xb1" then
+		if PLATFORM == "xb1" and Managers.voice_chat then
 			Managers.voice_chat:set_enabled(voip_enabled)
 		end
 	end
@@ -3053,30 +3063,31 @@ OptionsView.handle_controller_navigation_input = function (self, dt, input_servi
 		local in_settings_sub_menu = self.in_settings_sub_menu
 
 		if in_settings_sub_menu then
-			local new_tab_index = nil
-
-			if input_service.get(input_service, "cycle_next") then
-				new_tab_index = self._find_next_title_tab(self)
-			elseif input_service.get(input_service, "cycle_previous") then
-				new_tab_index = self._find_previous_title_tab(self)
-			end
-
-			if new_tab_index then
-				if self.changes_been_made(self) then
-					local text = Localize("unapplied_changes_popup_text")
-					self.title_popup_id = Managers.popup:queue_popup(text, Localize("popup_discard_changes_topic"), "apply_changes", Localize("menu_settings_apply"), "revert_changes", Localize("popup_choice_discard"))
-					self.delayed_title_change = new_tab_index
-				else
-					self.select_settings_title(self, new_tab_index)
-
-					self.in_settings_sub_menu = true
-				end
-			end
 		elseif input_service.get(input_service, "confirm") then
 			in_settings_sub_menu = true
 			self.in_settings_sub_menu = in_settings_sub_menu
 
 			self.set_console_setting_list_selection(self, 1, true, false)
+		end
+
+		local new_tab_index = nil
+
+		if input_service.get(input_service, "cycle_next") then
+			new_tab_index = self._find_next_title_tab(self)
+		elseif input_service.get(input_service, "cycle_previous") then
+			new_tab_index = self._find_previous_title_tab(self)
+		end
+
+		if new_tab_index then
+			if self.changes_been_made(self) then
+				local text = Localize("unapplied_changes_popup_text")
+				self.title_popup_id = Managers.popup:queue_popup(text, Localize("popup_discard_changes_topic"), "apply_changes", Localize("menu_settings_apply"), "revert_changes", Localize("popup_choice_discard"))
+				self.delayed_title_change = new_tab_index
+			else
+				self.select_settings_title(self, new_tab_index)
+
+				self.in_settings_sub_menu = true
+			end
 		end
 
 		if input_service.get(input_service, "back", true) then
@@ -4995,7 +5006,6 @@ OptionsView.reload_language = function (self, language_id)
 
 	Application.set_resource_property_preference_order(language_id)
 	Managers.package:load("resource_packages/strings", "boot")
-	Managers.package:load("resource_packages/post_localization_boot", "boot")
 
 	Managers.localizer = LocalizationManager:new("localization/game", language_id)
 
@@ -5354,6 +5364,37 @@ OptionsView.cb_max_upload_speed_saved_value = function (self, widget)
 	end
 
 	widget.content.current_selection = selected_option
+
+	return 
+end
+OptionsView.cb_small_network_packets = function (self, content)
+	local options_values = content.options_values
+	local current_selection = content.current_selection
+	self.changed_user_settings.small_network_packets = options_values[current_selection]
+
+	return 
+end
+OptionsView.cb_small_network_packets_setup = function (self)
+	local options = {
+		{
+			value = false,
+			text = Localize("menu_settings_off")
+		},
+		{
+			value = true,
+			text = Localize("menu_settings_on")
+		}
+	}
+	local default_value = DefaultUserSettings.get("user_settings", "small_network_packets")
+	local small_network_packets = Application.user_setting("small_network_packets")
+	local selection = (small_network_packets and 2) or 1
+	local default_option = (default_value and 2) or 1
+
+	return selection, options, "menu_settings_small_network_packets", default_option
+end
+OptionsView.cb_small_network_packets_saved_value = function (self, widget)
+	local small_network_packets = assigned(self.changed_user_settings.small_network_packets, Application.user_setting("small_network_packets")) or false
+	widget.content.current_selection = (small_network_packets and 2) or 1
 
 	return 
 end
@@ -6312,10 +6353,6 @@ OptionsView.cb_ambient_light_quality_setup = function (self)
 			text = Localize("menu_settings_low")
 		},
 		{
-			value = "medium",
-			text = Localize("menu_settings_medium")
-		},
-		{
 			value = "high",
 			text = Localize("menu_settings_high")
 		}
@@ -6367,11 +6404,40 @@ OptionsView.cb_ambient_light_quality = function (self, content, called_from_grap
 
 	return 
 end
+OptionsView.cb_auto_exposure_speed_setup = function (self)
+	local min = 0.1
+	local max = 2
+	local auto_exposure_speed = Application.user_setting("render_settings", "eye_adaptation_speed") or 1
+	local value = get_slider_value(min, max, auto_exposure_speed)
+	local default_value = math.clamp(DefaultUserSettings.get("render_settings", "eye_adaptation_speed"), min, max)
+
+	return value, min, max, 1, "menu_settings_auto_exposure_speed"
+end
+OptionsView.cb_auto_exposure_speed_saved_value = function (self, widget)
+	local content = widget.content
+	local min = content.min
+	local max = content.max
+	local auto_exposure_speed = assigned(self.changed_render_settings.eye_adaptation_speed, Application.user_setting("render_settings", "eye_adaptation_speed"))
+	auto_exposure_speed = math.clamp(auto_exposure_speed, min, max)
+	content.internal_value = get_slider_value(min, max, auto_exposure_speed)
+	content.value = auto_exposure_speed
+
+	return 
+end
+OptionsView.cb_auto_exposure_speed = function (self, content, called_from_graphics_quality)
+	self.changed_render_settings.eye_adaptation_speed = content.value
+
+	if not called_from_graphics_quality then
+		self.force_set_widget_value(self, "graphics_quality_settings", "custom")
+	end
+
+	return 
+end
 OptionsView.cb_volumetric_fog_quality_setup = function (self)
 	local options = {
 		{
-			value = "off",
-			text = Localize("menu_settings_off")
+			value = "lowest",
+			text = Localize("menu_settings_lowest")
 		},
 		{
 			value = "low",

@@ -256,6 +256,13 @@ local video_settings_definition = {
 		widget_type = "stepper"
 	},
 	{
+		setup = "cb_auto_exposure_speed_setup",
+		saved_value = "cb_auto_exposure_speed_saved_value",
+		callback = "cb_auto_exposure_speed",
+		tooltip_text = "tooltip_auto_exposure",
+		widget_type = "slider"
+	},
+	{
 		size_y = 30,
 		widget_type = "empty"
 	},
@@ -1199,6 +1206,13 @@ local network_settings_definition = {
 		callback = "cb_max_upload_speed",
 		tooltip_text = "tooltip_max_upload_speed",
 		widget_type = "drop_down"
+	},
+	{
+		setup = "cb_small_network_packets_setup",
+		saved_value = "cb_small_network_packets_saved_value",
+		callback = "cb_small_network_packets",
+		tooltip_text = "tooltip_small_network_packets",
+		widget_type = "stepper"
 	}
 }
 local needs_reload_settings = {
@@ -1232,8 +1246,7 @@ local needs_reload_settings = {
 	"ambient_light_quality",
 	"particles_quality",
 	"ao_quality",
-	"reflection_probes_enabled",
-	"radiance_probes_enabled",
+	"local_probes_enabled",
 	"volumetric_fog_quality"
 }
 local needs_restart_settings = {

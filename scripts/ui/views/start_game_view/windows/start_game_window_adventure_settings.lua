@@ -21,6 +21,7 @@ StartGameWindowAdventureSettings.on_enter = function (self, params, offset)
 	self._stats_id = local_player.stats_id(local_player)
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
+	self._enable_play = false
 	self._animations = {}
 	self._ui_animations = {}
 
@@ -178,6 +179,8 @@ end
 StartGameWindowAdventureSettings._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local widgets_by_name = self._widgets_by_name
+	local gamepad_active = Managers.input:is_device_active("gamepad")
+	local input_service = self.parent:window_input_service()
 
 	if self._is_button_hover_enter(self, widgets_by_name.game_option_1) or self._is_button_hover_enter(self, widgets_by_name.play_button) then
 		self._play_sound(self, "play_gui_lobby_button_01_difficulty_confirm_hover")
@@ -187,7 +190,9 @@ StartGameWindowAdventureSettings._handle_input = function (self, dt, t)
 		parent.set_layout(parent, 9)
 	end
 
-	if self._is_button_released(self, widgets_by_name.play_button) then
+	local play_pressed = gamepad_active and self._enable_play and input_service.get(input_service, "refresh_press")
+
+	if self._is_button_released(self, widgets_by_name.play_button) or play_pressed then
 		parent.set_private_option_enabled(parent, false)
 		parent.play(parent, t)
 	end
@@ -207,9 +212,15 @@ StartGameWindowAdventureSettings._update_difficulty_option = function (self)
 		self._set_difficulty_option(self, difficulty_key)
 
 		self._difficulty_key = difficulty_key
-		local enable_play = DifficultySettings[difficulty_key] ~= nil
-		self._widgets_by_name.play_button.content.button_hotspot.disable_button = not enable_play
-		self._widgets_by_name.game_option_reward.content.button_hotspot.disable_button = not enable_play
+		self._enable_play = DifficultySettings[difficulty_key] ~= nil
+		self._widgets_by_name.play_button.content.button_hotspot.disable_button = not self._enable_play
+		self._widgets_by_name.game_option_reward.content.button_hotspot.disable_button = not self._enable_play
+
+		if self._enable_play then
+			self.parent.parent:set_input_description("play_available")
+		else
+			self.parent.parent:set_input_description(nil)
+		end
 	end
 
 	return 

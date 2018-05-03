@@ -120,6 +120,19 @@ UnitSpawner.prioritize_death_watch_unit = function (self, unit, t)
 
 	return 
 end
+UnitSpawner.breed_in_death_watch = function (self, breed_name)
+	local unit_death_watch_list = self.unit_death_watch_list
+
+	for i = 1, self.unit_death_watch_list_n, 1 do
+		local death_data = unit_death_watch_list[i]
+
+		if breed_name == BLACKBOARDS[death_data.unit].breed.name then
+			return true
+		end
+	end
+
+	return 
+end
 UnitSpawner.update_death_watch_list = function (self)
 	if self.unit_death_watch_list_dirty then
 		table.sort(self.unit_death_watch_list, function (a, b)

@@ -75,11 +75,7 @@ ExplosiveBarrelHealthExtension.update = function (self, dt, context, t)
 	return 
 end
 ExplosiveBarrelHealthExtension.add_damage = function (self, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike)
-	damage_amount = (self.instaexplode and damage_amount) or 0
-
-	ExplosiveBarrelHealthExtension.super.add_damage(self, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike)
-
-	if self.damage < self.health and not self.ignited then
+	if 0 < damage_amount and self.damage < self.health and not self.ignited then
 		local unit = self.unit
 		local network_time = Managers.state.network:network_time()
 		local fuse_time = (Unit.has_data(unit, "fuse_time") and Unit.get_data(unit, "fuse_time")) or 4
@@ -100,6 +96,10 @@ ExplosiveBarrelHealthExtension.add_damage = function (self, attacker_unit, damag
 			Unit.flow_event(self.unit, "exploding_barrel_remove_fuse")
 		end
 	end
+
+	damage_amount = (self.instaexplode and damage_amount) or 0
+
+	ExplosiveBarrelHealthExtension.super.add_damage(self, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike)
 
 	return 
 end

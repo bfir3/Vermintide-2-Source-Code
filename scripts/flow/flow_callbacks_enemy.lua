@@ -231,6 +231,8 @@ local function enemy_dismember_spawn_stump(unit, world, gibsettings, pulp)
 	local stump_link_nodes = gibsettings.stump_link_nodes
 	local parent_link_nodes = gibsettings.parent_link_nodes
 
+	World.link_unit(world, stump_unit, Script.index_offset(), unit, Unit.node(unit, parent_link_nodes[1]))
+
 	for i = 1, #parent_link_nodes, 1 do
 		local parent_node_id = Unit.node(unit, parent_link_nodes[i])
 		local stump_node_id = Unit.node(stump_unit, stump_link_nodes[i])

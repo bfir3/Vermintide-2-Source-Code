@@ -246,6 +246,8 @@ DebugScreen.setup = function (world, settings, callbacks)
 	return 
 end
 DebugScreen.destroy = function ()
+	World.destroy_gui(DebugScreen.world, DebugScreen.gui)
+
 	DebugScreen.world = nil
 	DebugScreen.gui = nil
 

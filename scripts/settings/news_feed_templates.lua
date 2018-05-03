@@ -20,6 +20,20 @@ NewsFeedTemplates = {
 		end
 	},
 	{
+		description = "news_feed_unclaimed_challenge_description",
+		name = "unclaimed_challenge",
+		duration = 5,
+		cooldown = -1,
+		infinite = false,
+		title = "news_feed_unclaimed_challenge_title",
+		condition_func = function (params)
+			local achievements_enabled = Development.parameter("v2_achievements")
+			local has_any_unclaimed_achievement = achievements_enabled and Managers.state.achievement:has_any_unclaimed_achievement()
+
+			return has_any_unclaimed_achievement
+		end
+	},
+	{
 		description = "news_feed_equipment_description",
 		name = "equipment",
 		duration = 5,

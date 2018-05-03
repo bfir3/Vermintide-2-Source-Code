@@ -54,6 +54,7 @@ CraftPageApplySkin.on_enter = function (self, params, settings)
 	self._item_grid_2:disable_item_drag()
 	self.super_parent:clear_disabled_backend_ids()
 	self._weapon_slot_updated(self)
+	self.parent:set_input_description(nil)
 
 	return 
 end
@@ -102,6 +103,10 @@ CraftPageApplySkin.on_exit = function (self, params)
 	print("[HeroWindowCraft] Exit Substate CraftPageApplySkin")
 
 	self.ui_animator = nil
+
+	if self._craft_input_time then
+		self._play_sound(self, "play_gui_craft_forge_button_aborted")
+	end
 
 	return 
 end
@@ -183,10 +188,15 @@ CraftPageApplySkin._handle_input = function (self, dt, t)
 
 	local widgets_by_name = self._widgets_by_name
 	local super_parent = self.super_parent
+	local gamepad_active = Managers.input:is_device_active("gamepad")
+	local input_service = self.super_parent:window_input_service()
+	local widget = widgets_by_name.craft_button
+	local is_button_enabled = not widget.content.button_hotspot.disable_button
 	local craft_input = self._is_button_held(self, widgets_by_name.craft_button)
+	local craft_input_gamepad = is_button_enabled and gamepad_active and input_service.get(input_service, "refresh_hold")
 	local craft_input_accepted = false
 
-	if craft_input == 0 and self._craft_item and self._skin_item then
+	if (craft_input == 0 or craft_input_gamepad) and self._craft_item and self._skin_item then
 		if not self._craft_input_time then
 			self._craft_input_time = 0
 
@@ -374,6 +384,8 @@ CraftPageApplySkin._add_item = function (self, item_grid, backend_id, ignore_sou
 end
 CraftPageApplySkin._set_craft_button_disabled = function (self, disabled)
 	self._widgets_by_name.craft_button.content.button_hotspot.disable_button = disabled
+
+	self.parent:set_input_description((not disabled and self.settings.name) or nil)
 
 	return 
 end

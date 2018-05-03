@@ -318,6 +318,10 @@ UnlockManager.poll_script_startup_data = function (self)
 	return data
 end
 UnlockManager.is_dlc_unlocked = function (self, name)
+	if PLATFORM == "xb1" then
+		return true
+	end
+
 	local unlock = self._unlocks[name]
 
 	fassert(unlock, "No such unlock %q", name or "nil")

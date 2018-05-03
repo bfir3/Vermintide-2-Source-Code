@@ -16,7 +16,6 @@ ActionCareerDRRanger.client_owner_start_action = function (self, new_action, t, 
 	local slot = new_action.slot_to_wield
 
 	self.inventory_extension:wield(slot)
-	self._play_vo(self)
 
 	self.power_level = power_level
 
@@ -96,6 +95,7 @@ ActionCareerDRRanger.client_owner_post_update = function (self, dt, t, world, ca
 	if throw_time <= t then
 		self._create_smoke_screen(self)
 		self._stagger_explosion(self)
+		self._play_vo(self)
 
 		self.thrown = true
 	end

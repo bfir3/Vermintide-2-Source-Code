@@ -370,10 +370,10 @@ weapon_template.attack_meta_data = {
 	can_charge_shot = true,
 	aim_at_node_charged = "j_head",
 	minimum_charge_time = 0.55,
+	charge_against_armored_enemy = true,
 	charge_above_range = 30,
 	charge_when_obstructed = false,
-	ignore_enemies_for_obstruction = false,
-	charge_against_armoured_enemy = true
+	ignore_enemies_for_obstruction = false
 }
 local action = weapon_template.actions.action_one.default
 weapon_template.default_loaded_projectile_settings = {
@@ -409,30 +409,24 @@ weapon_template.tooltip_keywords = {
 	"keyword_2",
 	"keyword_3"
 }
-weapon_template.compare_statistics = {
-	attacks = {
-		light_attack = {
-			speed = 0.6,
-			range = 0.6,
-			damage = 0.296875,
-			targets = 0.7,
-			stagger = 0.2
-		},
-		heavy_attack = {
-			speed = 0.4,
-			range = 0.8,
-			damage = 0.4125,
-			targets = 1,
-			stagger = 0.2
-		}
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
 	},
-	perks = {
-		light_attack = {
-			"poison"
-		},
-		heavy_attack = {
-			"poison"
-		}
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "shoot_charged"
+	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "shoot_charged"
 	}
 }
 Weapons = Weapons or {}

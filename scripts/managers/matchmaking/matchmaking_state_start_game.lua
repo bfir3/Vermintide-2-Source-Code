@@ -70,6 +70,32 @@ MatchmakingStateStartGame._setup_lobby_data = function (self)
 		end
 	end
 
+	if PLATFORM == "xb1" then
+		local DIFFICULTY_LUT = {
+			"easy",
+			"normal",
+			"hard",
+			"harder",
+			"hardest"
+		}
+		local search_config = self.search_config
+		level_key = search_config.level_key
+		difficulty = search_config.difficulty
+		local difficulty_id = table.find(DIFFICULTY_LUT, difficulty)
+		local powerlevel = self._matchmaking_manager:get_average_power_level()
+		local strict_matchmaking = 0
+		local ticket_params = {
+			level = {
+				level_key
+			},
+			difficulty = difficulty_id,
+			powerlevel = powerlevel,
+			strict_matchmaking = strict_matchmaking
+		}
+
+		self._lobby:enable_matchmaking(not search_config.private_game, ticket_params, 600)
+	end
+
 	self._matchmaking_manager:set_matchmaking_data(level_key, difficulty, act_key, game_mode, private_game, quick_game, eac_authorized)
 	Managers.state.difficulty:set_difficulty(difficulty)
 

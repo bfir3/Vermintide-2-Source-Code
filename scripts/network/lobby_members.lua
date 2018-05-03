@@ -12,6 +12,7 @@ LobbyMembers.init = function (self, lobby)
 	end
 
 	self.members = my_members
+	self._members_changed = true
 
 	return 
 end
@@ -36,6 +37,8 @@ LobbyMembers.update = function (self)
 
 			if PLATFORM == "xb1" then
 				Managers.account:query_bandwidth()
+
+				self._members_changed = true
 			end
 		end
 
@@ -51,9 +54,12 @@ LobbyMembers.update = function (self)
 			members_left[#members_left + 1] = peer_id
 			members[peer_id] = nil
 
-			if PLATFORM == "xb1" and table.size(members) <= 1 then
-				Managers.voice_chat:initate_voice_chat()
-				Managers.account:reset_bandwidth_query()
+			if PLATFORM == "xb1" then
+				if table.size(members) <= 1 then
+					Managers.account:reset_bandwidth_query()
+				end
+
+				self._members_changed = true
 			end
 		end
 	end
@@ -71,6 +77,15 @@ LobbyMembers.get_members = function (self)
 end
 LobbyMembers.members_map = function (self)
 	return self.members
+end
+
+if PLATFORM == "xb1" then
+	LobbyMembers.check_members_changed = function (self)
+		local members_changed = self._members_changed
+		self._members_changed = nil
+
+		return members_changed
+	end
 end
 
 return 

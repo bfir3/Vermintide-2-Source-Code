@@ -2,6 +2,7 @@ require("scripts/ui/views/menu_world_previewer")
 require("scripts/ui/views/hero_view/item_grid_ui")
 require("scripts/ui/views/hero_view/states/hero_view_state_overview")
 require("scripts/ui/views/hero_view/states/hero_view_state_loot")
+require("scripts/ui/views/hero_view/states/hero_view_state_achievements")
 require("scripts/settings/news_feed_templates")
 
 local definitions = local_require("scripts/ui/views/hero_view/hero_view_definitions")
@@ -97,7 +98,7 @@ HeroView._setup_state_machine = function (self, state_machine_params, optional_s
 	local start_state = optional_start_state or HeroViewStateOverview
 	local profiling_debugging_enabled = false
 	state_machine_params.start_state = optional_start_sub_state
-	self._machine = StateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
+	self._machine = GameStateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
 	self._state_machine_params = state_machine_params
 
 	return 

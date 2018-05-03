@@ -962,7 +962,9 @@ local function create_reward_presentation(scenegraph_id, size)
 		content = {
 			title_bg = "playername_bg_02",
 			title_edge = "game_option_divider",
-			button_hotspot = {},
+			button_hotspot = {
+				allow_multi_hover = true
+			},
 			frame = frame_settings.texture,
 			option_text = Localize("start_game_window_adventure_reward_desc"),
 			title_text = Localize("start_game_window_adventure_reward_title"),

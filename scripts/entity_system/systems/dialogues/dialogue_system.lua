@@ -1157,10 +1157,10 @@ DialogueSystem.update_debug = function (self, t)
 	end
 
 	if debug_vo_by_file then
-		local tick_add = 0.5
+		local tick_add = 0.1
 
 		if debug_text.fast_play then
-			tick_add = 0.4
+			tick_add = 1
 		end
 
 		if debug_tick_time + tick_add < t then

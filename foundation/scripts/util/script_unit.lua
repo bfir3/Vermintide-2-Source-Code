@@ -24,7 +24,7 @@ end
 local function local_remove_extension(unit, system_name)
 	local unit_extensions = Entities[unit]
 
-	assert(unit_extensions)
+	fassert(unit_extensions)
 	fassert(unit_extensions[system_name], "Tried to remove system %s extension for unit %s", system_name, unit)
 
 	unit_extensions[system_name] = nil
@@ -61,7 +61,7 @@ ScriptUnit.extension_input = function (unit, system_name)
 	local extension = local_extension(unit, system_name)
 
 	if not extension then
-		assert(extension, "No extension found belonging to system %q for unit %q", tostring(system_name), tostring(unit))
+		fassert(extension, "No extension found belonging to system %q for unit %q", tostring(system_name), tostring(unit))
 	end
 
 	return extension.input
@@ -71,7 +71,7 @@ ScriptUnit.extension = function (unit, system_name)
 	local extension = unit_extensions and unit_extensions[system_name]
 
 	if not extension then
-		assert(extension, "No extension found belonging to system %q for unit %q", tostring(system_name), tostring(unit))
+		fassert(extension, "No extension found belonging to system %q for unit %q", tostring(system_name), tostring(unit))
 	end
 
 	return extension
@@ -95,7 +95,7 @@ ScriptUnit.check_all_units_deleted = function ()
 			print(unit, Unit.alive(unit), info)
 		end
 
-		assert(false, "Some units have not been cleaned up properly!")
+		fassert(false, "Some units have not been cleaned up properly!")
 	end
 
 	return 
@@ -108,12 +108,12 @@ end
 ScriptUnit.add_extension = function (extension_init_context, unit, extension_name, extension_alias, extension_init_data, extension_pool_table)
 	local extension_class = rawget(_G, extension_name)
 
-	assert(extension_class, "No class found for extension with name %q", extension_name)
+	fassert(extension_class, "No class found for extension with name %q", extension_name)
 
 	local extension = nil
 	extension = extension_class.new(extension_class, extension_init_context, unit, extension_init_data)
 
-	assert(not ScriptUnit.has_extension(unit, extension_alias), "An extension already exists with name %q belonging to unit %s", extension_alias, unit)
+	fassert(not ScriptUnit.has_extension(unit, extension_alias), "An extension already exists with name %q belonging to unit %s", extension_alias, unit)
 	set_extension_script(unit, extension_alias, extension)
 
 	return extension

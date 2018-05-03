@@ -18,7 +18,9 @@ PlayerBotInput.init = function (self, extension_init_context, unit, extension_in
 	self._soft_aiming = false
 	self._charge_shot = false
 	self._charge_shot_held = false
+	self._fire_hold = false
 	self._fire = false
+	self._fire_held = false
 	self._defend = false
 	self._defend_held = false
 	self._melee_push = false
@@ -29,6 +31,7 @@ PlayerBotInput.init = function (self, extension_init_context, unit, extension_in
 	self._interact_held = false
 	self._activate_ability = false
 	self._activate_ability_held = false
+	self._weapon_reload = false
 	self._dodge = false
 	self._bot_in_attract_mode_focus = false
 	self._avoiding_aoe_threat = false
@@ -76,7 +79,18 @@ end
 PlayerBotInput._update_actions = function (self)
 	local input = self._input
 
-	if self._fire then
+	if self._fire_hold then
+		self._fire_hold = false
+		input.action_one_hold = true
+
+		if not self._fire_held then
+			input.action_one = true
+			self._fire_held = true
+		end
+	elseif self._fire_held then
+		self._fire_held = false
+		input.action_one_release = true
+	elseif self._fire then
 		self._fire = false
 		input.action_one = true
 	end
@@ -119,6 +133,12 @@ PlayerBotInput._update_actions = function (self)
 	elseif self._activate_ability_held then
 		self._activate_ability_held = false
 		input.action_career_release = true
+	end
+
+	if self._weapon_reload then
+		self._weapon_reload = false
+		input.weapon_reload = true
+		input.weapon_reload_hold = true
 	end
 
 	if self._hold_attack then
@@ -281,8 +301,18 @@ PlayerBotInput.fire = function (self)
 
 	return 
 end
+PlayerBotInput.fire_hold = function (self)
+	self._fire_hold = true
+
+	return 
+end
 PlayerBotInput.interact = function (self)
 	self._interact = true
+
+	return 
+end
+PlayerBotInput.weapon_reload = function (self)
+	self._weapon_reload = true
 
 	return 
 end
@@ -371,6 +401,8 @@ PlayerBotInput._update_movement = function (self, dt, t)
 	local status_extension = self._status_extension
 	local on_ladder, ladder_unit = status_extension.get_is_on_ladder(status_extension)
 	local transition_jump = nil
+	local look_at_player_unit = self._look_at_player
+	local look_at_player_has_moved = look_at_player_unit and ScriptUnit.extension(look_at_player_unit, "locomotion_system").has_moved_from_start_position
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 	local has_intro_cutscene_finished = cutscene_system.has_intro_cutscene_finished_playing(cutscene_system)
 	local up = Vector3.up()
@@ -396,9 +428,8 @@ PlayerBotInput._update_movement = function (self, dt, t)
 		wanted_rotation = Quaternion.lerp(rotation, Quaternion_look(direction, up), math.min(dt * 5, 1))
 	elseif self._aiming then
 		wanted_rotation = Quaternion_look(self._aim_target:unbox() - camera_position, up)
-	elseif self._look_at_player and self._game and has_intro_cutscene_finished and (not current_goal or not player_bot_navigation.is_in_transition(player_bot_navigation)) then
-		local player_unit = self._look_at_player
-		local unit_id = Managers.state.network:unit_game_object_id(player_unit)
+	elseif look_at_player_unit and self._game and (has_intro_cutscene_finished or look_at_player_has_moved) and (not current_goal or not player_bot_navigation.is_in_transition(player_bot_navigation)) then
+		local unit_id = Managers.state.network:unit_game_object_id(look_at_player_unit)
 		local player_camera_position = GameSession.game_object_field(self._game, unit_id, "aim_position")
 		local direction = player_camera_position - camera_position
 		local look_rotation = Quaternion_look(direction, up)

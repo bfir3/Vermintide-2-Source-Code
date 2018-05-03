@@ -409,5 +409,115 @@ Debug.visualize_level_unit = function (level_unit_id)
 
 	return 
 end
+Debug.aim_position = function ()
+	local player_manager = Managers.player
+	local player = player_manager.local_player(player_manager, 1)
+	local player_unit = player.player_unit
+	local camera_position = Managers.state.camera:camera_position(player.viewport_name)
+	local camera_rotation = Managers.state.camera:camera_rotation(player.viewport_name)
+	local camera_direction = Quaternion.forward(camera_rotation)
+	local filter = "filter_ray_projectile"
+	local world = Managers.state.spawn.world
+	local physics_world = World.get_data(world, "physics_world")
+	local result = PhysicsWorld.immediate_raycast(physics_world, camera_position, camera_direction, 100, "all", "collision_filter", filter)
+
+	if result then
+		local num_hits = #result
+
+		for i = 1, num_hits, 1 do
+			local hit = result[i]
+			local hit_actor = hit[4]
+			local hit_unit = Actor.unit(hit_actor)
+			local attack_hit_self = hit_unit == player_unit
+
+			if not attack_hit_self then
+				return hit[1], hit[2], hit[3], hit[4]
+			end
+		end
+	end
+
+	return 
+end
+Debug.test_spawn_unit = function (profile_name, career_index)
+	profile_name = profile_name or "wood_elf"
+	career_index = career_index or 1
+	local profile_index = FindProfileIndex(profile_name)
+	local profile = SPProfiles[profile_index]
+	local career = profile.careers[career_index]
+	local career_name = career.name
+	local skin_item = BackendUtils.get_loadout_item(career_name, "slot_skin")
+	local item_data = skin_item and skin_item.data
+	local skin_name = (item_data and item_data.name) or career.base_skin
+	local package_names = {}
+	local skin_data = Cosmetics[skin_name]
+	local unit_name = skin_data.third_person
+	local material_changes = skin_data.material_changes
+	package_names[#package_names + 1] = unit_name
+
+	if material_changes then
+		local material_package = material_changes.package_name
+		package_names[#package_names + 1] = material_package
+	end
+
+	for index, package_name in ipairs(package_names) do
+		Managers.package:load(package_name, "debug", nil, false)
+	end
+
+	local world = Managers.state.spawn.world
+	local position = Debug.aim_position()
+	local unit_name = skin_data.third_person
+	local tint_data = skin_data.color_tint
+	local character_unit = World.spawn_unit(world, unit_name, position)
+	local material_changes = skin_data.material_changes
+
+	if material_changes then
+		local third_person_changes = material_changes.third_person
+
+		for slot_name, material_name in pairs(third_person_changes) do
+			Unit.set_material(character_unit, slot_name, material_name)
+			Unit.set_material(character_unit, slot_name, material_name)
+		end
+	end
+
+	Debug.test_unit = character_unit
+
+	return 
+end
+Debug.test_despawn_unit = function (profile_name, career_index)
+	local world = Managers.state.spawn.world
+	local character_unit = Debug.test_unit
+
+	if not character_unit then
+		return 
+	end
+
+	World.destroy_unit(world, character_unit)
+
+	profile_name = profile_name or "wood_elf"
+	career_index = career_index or 1
+	local profile_index = FindProfileIndex(profile_name)
+	local profile = SPProfiles[profile_index]
+	local career = profile.careers[career_index]
+	local career_name = career.name
+	local skin_item = BackendUtils.get_loadout_item(career_name, "slot_skin")
+	local item_data = skin_item and skin_item.data
+	local skin_name = (item_data and item_data.name) or career.base_skin
+	local package_names = {}
+	local skin_data = Cosmetics[skin_name]
+	local unit_name = skin_data.third_person
+	local material_changes = skin_data.material_changes
+	package_names[#package_names + 1] = unit_name
+
+	if material_changes then
+		local material_package = material_changes.package_name
+		package_names[#package_names + 1] = material_package
+	end
+
+	for index, package_name in ipairs(package_names) do
+		Managers.package:unload(package_name, "debug", nil, false)
+	end
+
+	return 
+end
 
 return 

@@ -667,7 +667,7 @@ LevelAnalysis.spawn_all_boss_spline_patrols = function (self, optional_id)
 					spline_way_points = spline_waypoints
 				}
 
-				self.enemy_recycler:add_terror_event_in_area(spline_waypoints[1], "boss_event_spline_patrol", event_data)
+				self.enemy_recycler:add_main_path_terror_event(spline_waypoints[1], "boss_event_spline_patrol", 65, event_data)
 				print("INJECTING BOSS SPLINE ID", waypoints_table.id)
 			end
 		end

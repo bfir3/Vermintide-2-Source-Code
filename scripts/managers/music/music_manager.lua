@@ -28,10 +28,15 @@ MusicManager.panning_rules = {
 	PANNING_RULE_HEADPHONES = 1
 }
 MusicManager.init = function (self)
-	self._world = Managers.world:create_world("music_world", nil, nil, nil, Application.DISABLE_PHYSICS, Application.DISABLE_RENDERING)
-	self._wwise_world = Managers.world:wwise_world(self._world)
+	if GLOBAL_MUSIC_WORLD then
+		self._world = MUSIC_WORLD
+		self._wwise_world = MUSIC_WWISE_WORLD
+	else
+		self._world = Managers.world:create_world("music_world", nil, nil, nil, Application.DISABLE_PHYSICS, Application.DISABLE_RENDERING)
+		self._wwise_world = Managers.world:wwise_world(self._world)
 
-	ScriptWorld.deactivate(self._world)
+		ScriptWorld.deactivate(self._world)
+	end
 
 	self._music_players = {}
 	self._bus_transitions = {}
@@ -72,6 +77,8 @@ MusicManager.trigger_event = function (self, event_name)
 
 	local wwise_world = self._wwise_world
 	local wwise_playing_id, wwise_source_id = WwiseWorld.trigger_event(wwise_world, event_name)
+
+	print("MUSIC MANAGER", event_name, wwise_playing_id, wwise_source_id)
 
 	return wwise_playing_id, wwise_source_id
 end

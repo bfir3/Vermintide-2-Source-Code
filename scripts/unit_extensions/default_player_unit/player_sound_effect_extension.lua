@@ -84,6 +84,12 @@ PlayerSoundEffectExtension._update_recent_kills = function (self, dt)
 	return 
 end
 PlayerSoundEffectExtension._update_aggro_ranges = function (self, dt)
+	if not self._aggro_unit then
+		local wwise_world = self._wwise_world
+
+		WwiseWorld.set_global_parameter(wwise_world, "combat_combo_has_aggro", 0)
+	end
+
 	if self._aggro_unit and not AiUtils.unit_alive(self._aggro_unit) then
 		self._aggro_unit = nil
 		local wwise_world = self._wwise_world

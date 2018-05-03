@@ -440,9 +440,6 @@ AIDebugger.update_mouse_input = function (self, input)
 
 	if mouse_released then
 		local breed = Unit.get_data(self.hot_unit, "breed")
-		local node = Actor.node(self.hot_actor)
-		local hit_zone = breed.hit_zones_lookup[node]
-		local hit_zone_name = hit_zone.name
 
 		DamageUtils.debug_deal_damage(self.hot_unit, "basic_debug_damage_ai")
 	end

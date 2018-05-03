@@ -86,6 +86,11 @@ BTEnterHooks.on_grey_seer_intro_enter = function (unit, blackboard, t)
 
 	network_transmit.send_rpc_clients(network_transmit, "rpc_set_hit_reaction_template", go_id, "HitEffectsSkavenGreySeerMounted")
 
+	local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
+	local event_data = FrameTable.alloc_table()
+
+	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_intro", event_data)
+
 	return 
 end
 BTEnterHooks.grey_seer_death_sequence_teleport = function (unit, blackboard, t)

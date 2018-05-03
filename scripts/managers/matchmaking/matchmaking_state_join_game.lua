@@ -285,7 +285,7 @@ MatchmakingStateJoinGame._request_profile_from_host = function (self, hero_index
 	end
 
 	self._matchmaking_manager.debug.text = "requesting_profile"
-	self._matchmaking_manager.debug.state = "hosted by: " .. host_name
+	self._matchmaking_manager.debug.state = "hosted by: " .. (host_name or "unknown")
 	self._matchmaking_manager.debug.level = lobby_client.lobby_data(lobby_client, "selected_level_key")
 
 	return 

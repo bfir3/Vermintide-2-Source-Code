@@ -249,7 +249,7 @@ ProjectileTrueFlightLocomotionExtension.update = function (self, unit, input, dt
 	self.target_vector_boxed:store(Vector3.normalize(Vector3.flat(direction_norm)))
 	self.initial_position_boxed:store(new_position)
 
-	self.angle = math.degrees_to_radians(DamageUtils.pitch_from_rotation(rotation))
+	self.angle = math.degrees_to_radians(ActionUtils.pitch_from_rotation(rotation))
 	self.moved = true
 
 	return 

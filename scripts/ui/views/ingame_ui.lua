@@ -34,7 +34,6 @@ local settings = require("scripts/ui/views/ingame_ui_settings")
 local view_settings = settings.view_settings
 local transitions = settings.transitions
 IngameUI = class(IngameUI)
-local ALWAYS_LOAD_ALL_VIEWS = script_data.always_load_all_views or Development.parameter("always_load_all_views")
 IngameUI.init = function (self, ingame_ui_context)
 	printf("[IngameUI] init")
 
@@ -449,7 +448,7 @@ IngameUI.update = function (self, dt, t, disable_ingame_ui, end_of_level_ui)
 		end
 	end
 
-	self._update_rcon_ui(self, dt, t, input_service)
+	self._update_rcon_ui(self, dt, t, input_service, end_of_level_ui)
 	self._update_chat_ui(self, dt, t, input_service, end_of_level_ui)
 	self._render_debug_ui(self, dt, t)
 	self._update_fade_transition(self)
@@ -542,6 +541,20 @@ IngameUI._update_ingame_hud = function (self, visible, dt, t)
 	return 
 end
 IngameUI._update_chat_ui = function (self, dt, t, input_service, end_of_level_ui)
+	local in_view, menu_input_service, no_unblock = self._menu_blocking_information(self, input_service, end_of_level_ui)
+
+	Managers.chat:update(dt, t, in_view, menu_input_service, no_unblock)
+
+	return 
+end
+IngameUI._update_rcon_ui = function (self, dt, t, input_service, end_of_level_ui)
+	local in_view, menu_input_service, no_unblock = self._menu_blocking_information(self, input_service, end_of_level_ui)
+
+	Managers.rcon:update(dt, t, in_view, menu_input_service, no_unblock)
+
+	return 
+end
+IngameUI._menu_blocking_information = function (self, input_service, end_of_level_ui)
 	local ingame_player_list_ui = self.ingame_hud.ingame_player_list_ui
 	local player_list_focused = ingame_player_list_ui.is_focused(ingame_player_list_ui)
 	local ingame_hud = self.ingame_hud
@@ -558,47 +571,42 @@ IngameUI._update_chat_ui = function (self, dt, t, input_service, end_of_level_ui
 		local active_view = self.views[self.current_view]
 		local view_input_service = active_view.input_service(active_view)
 
-		Managers.chat:update(dt, t, in_view, view_input_service)
+		return in_view, view_input_service, false
 	elseif mission_vote_active then
 		local mission_vote_input_service = self.mission_voting_ui:active_input_service()
 
-		Managers.chat:update(dt, t, in_view, mission_vote_input_service)
+		return in_view, mission_vote_input_service, false
 	elseif end_of_level_ui then
 		local end_of_level_input_service = end_of_level_ui.active_input_service(end_of_level_ui)
 
-		Managers.chat:update(dt, t, in_view, end_of_level_input_service)
+		return in_view, end_of_level_input_service, false
 	elseif gift_popup_active then
 		local gift_popup_input_service = gift_popup_ui.active_input_service(gift_popup_ui)
 
-		Managers.chat:update(dt, t, in_view, gift_popup_input_service)
+		return in_view, gift_popup_input_service, false
 	elseif unavailable_hero_popup_active then
 		local join_popup_input_service = self.popup_join_lobby_handler:input_service()
 
-		Managers.chat:update(dt, t, in_view, join_popup_input_service)
+		return in_view, join_popup_input_service, false
 	elseif player_list_focused then
 		local ingame_player_list_input_service = ingame_player_list_ui.input_service(ingame_player_list_ui)
 
-		Managers.chat:update(dt, t, in_view, ingame_player_list_input_service)
+		return in_view, ingame_player_list_input_service, false
 	elseif self.menu_active then
-		Managers.chat:update(dt, t, in_view, input_service)
+		return in_view, input_service, false
 	elseif active_cutscene then
 		local cutscene_input_service = self.cutscene_ui:input_service()
 
-		Managers.chat:update(dt, t, in_view, cutscene_input_service)
+		return in_view, cutscene_input_service, false
 	elseif end_screen_active then
 		local end_screen_input_service = self.end_screen:input_service()
 
-		Managers.chat:update(dt, t, in_view, end_screen_input_service)
+		return in_view, end_screen_input_service, false
 	else
 		local no_unblock = self.countdown_ui:is_enter_game()
 
-		Managers.chat:update(dt, t, in_view, nil, no_unblock)
+		return in_view, nil, no_unblock
 	end
-
-	return 
-end
-IngameUI._update_rcon_ui = function (self, dt, t, input_service)
-	Managers.rcon:update(dt, t)
 
 	return 
 end

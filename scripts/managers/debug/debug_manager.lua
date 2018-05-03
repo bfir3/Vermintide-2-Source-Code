@@ -9,7 +9,7 @@ QuickDrawerStay = QuickDrawerStay or true
 local RPCS = {
 	"rpc_debug_command"
 }
-GLOBAL_TIME_SCALE = 1
+GLOBAL_TIME_SCALE = GLOBAL_TIME_SCALE or 1
 local time_scale_list = {
 	1e-05,
 	0.0001,
@@ -135,6 +135,10 @@ DebugManager.update = function (self, dt, t)
 
 			Debug.text(speed_scale_string)
 		end
+	end
+
+	if script_data.debug_enemy_package_loader then
+		Managers.state.game_mode.level_transition_handler.enemy_package_loader:debug_loaded_breeds()
 	end
 
 	self._update_actor_draw(self, dt)
@@ -333,7 +337,12 @@ DebugManager._update_actor_draw = function (self, dt)
 			local drawer = self._actor_drawer
 
 			for _, actor in ipairs(data.actors) do
-				drawer.actor(drawer, actor, data.color:unbox(), pose)
+				local box = ActorBox(actor)
+				local unboxed = box.unbox(box)
+
+				if unboxed then
+					drawer.actor(drawer, actor, data.color:unbox(), pose)
+				end
 			end
 		end
 	end

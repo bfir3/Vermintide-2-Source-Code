@@ -855,6 +855,30 @@ weapon_template.tooltip_keywords = {
 	"weapon_keyword_high_damage",
 	"weapon_keyword_versatile"
 }
+weapon_template.tooltip_compare = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "light_attack_left"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "heavy_attack"
+	}
+}
+weapon_template.tooltip_detail = {
+	light = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	heavy = {
+		action_name = "action_one",
+		sub_action_name = "default"
+	},
+	push = {
+		action_name = "action_one",
+		sub_action_name = "push"
+	}
+}
 weapon_template.compare_statistics = {
 	attacks = {
 		light_attack = {

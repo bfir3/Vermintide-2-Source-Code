@@ -282,6 +282,12 @@ ActionFlamethrower.client_owner_post_update = function (self, dt, t, world, can_
 		end
 
 		self.vfx_stopped = true
+
+		if self._rumble_effect_id then
+			Managers.state.controller_features:stop_effect(self._rumble_effect_id)
+
+			self._rumble_effect_id = nil
+		end
 	end
 
 	return 
@@ -321,6 +327,12 @@ ActionFlamethrower.finish = function (self, reason)
 		if hud_extension then
 			hud_extension.show_critical_indication = false
 		end
+	end
+
+	if self._rumble_effect_id then
+		Managers.state.controller_features:stop_effect(self._rumble_effect_id)
+
+		self._rumble_effect_id = nil
 	end
 
 	return 

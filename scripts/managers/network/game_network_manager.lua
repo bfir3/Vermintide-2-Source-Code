@@ -43,6 +43,7 @@ GameNetworkManager.init = function (self, world, lobby, is_server, event_delegat
 	debug_print("My own peer_id = ", tostring(self.peer_id))
 	debug_print("self.is_server = %s", tostring(self.is_server))
 	self.set_max_upload_speed(self, Application.user_setting("max_upload_speed") or DefaultUserSettings.get("user_settings", "max_upload_speed"))
+	self.set_small_network_packets(self, Application.user_setting("small_network_packets") or DefaultUserSettings.get("user_settings", "small_network_packets"))
 
 	self._event_delegate = event_delegate
 
@@ -66,6 +67,15 @@ GameNetworkManager.set_max_upload_speed = function (self, max_speed)
 	else
 		debug_print("Network caps: min/peer %d kbps, total %d kbps", max_speed, max_speed)
 		Network.enable_qos(max_speed, max_speed, max_speed)
+	end
+
+	return 
+end
+GameNetworkManager.set_small_network_packets = function (self, enable)
+	if enable then
+		Network.limit_mtu(576)
+	else
+		Network.limit_mtu(65536)
 	end
 
 	return 
@@ -469,7 +479,7 @@ GameNetworkManager.game_object_destroyed_player_sync_data = function (self, go_i
 	local local_player_id = GameSession.game_object_field(self.game_session, go_id, "local_player_id")
 	local player = self.player_manager:player(peer_id, local_player_id)
 
-	if player then
+	if player and player.remote then
 		player.set_sync_data_game_object_id(player, nil)
 	end
 
@@ -743,10 +753,12 @@ GameNetworkManager.gm_event_end_conditions_met = function (self, reason, checkpo
 	return 
 end
 GameNetworkManager.rpc_gm_event_end_conditions_met = function (self, sender, reason_id, checkpoint_available, percentage_completed)
-	local end_reason = NetworkLookup.game_end_reasons[reason_id]
+	if not self.is_server then
+		local end_reason = NetworkLookup.game_end_reasons[reason_id]
 
-	Managers.state.game_mode:set_end_reason(end_reason)
-	Managers.state.game_mode:trigger_event("end_conditions_met", end_reason, checkpoint_available, percentage_completed)
+		Managers.state.game_mode:set_end_reason(end_reason)
+		Managers.state.game_mode:trigger_event("end_conditions_met", end_reason, checkpoint_available, percentage_completed)
+	end
 
 	return 
 end

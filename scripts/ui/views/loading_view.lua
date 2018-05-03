@@ -49,7 +49,7 @@ LoadingView.init = function (self, ui_context)
 
 	VisualAssertLog.setup(world)
 
-	self.ui_renderer = UIRenderer.create(self.world, "material", "materials/ui/loading_screens/" .. self.default_loading_screen, "material", "materials/fonts/gw_fonts", "material", "materials/ui/ui_1080p_popup", "material", "materials/ui/ui_1080p_chat")
+	self.ui_renderer = UIRenderer.create(self.world, "material", "materials/ui/loading_screens/" .. self.default_loading_screen, "material", "materials/fonts/gw_fonts", "material", "materials/ui/ui_1080p_common", "material", "materials/ui/ui_1080p_hud_atlas_textures", "material", "materials/ui/ui_1080p_chat")
 
 	self.create_ui_elements(self)
 
@@ -73,7 +73,7 @@ LoadingView.texture_resource_loaded = function (self, level_key, act_progression
 	local loading_ui_package_name = level_settings.loading_ui_package_name
 	local game_mode = level_settings.game_mode or "adventure"
 	local bg_material = "materials/ui/loading_screens/" .. (loading_ui_package_name or self.default_loading_screen)
-	self.ui_renderer = UIRenderer.create(self.world, "material", "materials/ui/loading_screens/" .. self.default_loading_screen, "material", bg_material, "material", "materials/fonts/gw_fonts", "material", "materials/ui/ui_1080p_popup", "material", "materials/ui/ui_1080p_chat")
+	self.ui_renderer = UIRenderer.create(self.world, "material", "materials/ui/loading_screens/" .. self.default_loading_screen, "material", bg_material, "material", "materials/fonts/gw_fonts", "material", "materials/ui/ui_1080p_common", "material", "materials/ui/ui_1080p_hud_atlas_textures", "material", "materials/ui/ui_1080p_chat")
 	self.bg_widget.content.bg_texture = "loading_screen"
 
 	if level_key ~= "inn_level" and level_settings.level_type ~= "survival" then

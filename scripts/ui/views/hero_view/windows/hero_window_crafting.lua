@@ -12,6 +12,8 @@ local widget_definitions = definitions.widgets
 local category_settings = definitions.category_settings
 local scenegraph_definition = definitions.scenegraph_definition
 local animation_definitions = definitions.animation_definitions
+local generic_input_actions = definitions.generic_input_actions
+local input_actions = definitions.input_actions
 local DO_RELOAD = false
 local page_settings = {
 	{
@@ -114,7 +116,11 @@ HeroWindowCrafting.create_ui_elements = function (self, params, offset)
 
 	self._widgets = widgets
 	self._widgets_by_name = widgets_by_name
+	local input_service = Managers.input:get_service("hero_view")
+	local gui_layer = UILayer.default + 30
+	self._menu_input_description = MenuInputDescriptionUI:new(nil, self.ui_top_renderer, input_service, 5, gui_layer, generic_input_actions.default)
 
+	self._menu_input_description:set_input_description(nil)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
@@ -134,6 +140,21 @@ HeroWindowCrafting.on_exit = function (self, params)
 	print("[HeroViewWindow] Exit Substate HeroWindowCrafting")
 
 	self.ui_animator = nil
+
+	if self._active_page then
+		local params = self._page_params
+
+		self._active_page:on_exit(params)
+	end
+
+	return 
+end
+HeroWindowCrafting.set_input_description = function (self, input_desc_name)
+	if not input_desc_name or input_actions[input_desc_name] then
+		self._menu_input_description:set_input_description(input_desc_name and input_actions[input_desc_name])
+	else
+		Application.warning("[HeroWindowCrafting:set_input_description] Could not set input desc: " .. tostring(input_desc_name))
+	end
 
 	return 
 end
@@ -253,6 +274,25 @@ HeroWindowCrafting._handle_input = function (self, dt, t)
 
 		self._change_recipe_page(self, next_page_index)
 		self._play_sound(self, "play_gui_craft_recipe_next")
+	elseif Managers.input:is_device_active("gamepad") then
+		local input_service = Managers.input:get_service("hero_view")
+		local total_pages = #page_settings
+
+		if input_service.get(input_service, "cycle_next") then
+			local next_page_index = self._current_page + 1
+
+			if next_page_index <= total_pages then
+				self._change_recipe_page(self, next_page_index)
+				self._play_sound(self, "play_gui_craft_recipe_next")
+			end
+		elseif input_service.get(input_service, "cycle_previous") then
+			local next_page_index = self._current_page - 1
+
+			if 0 < next_page_index then
+				self._change_recipe_page(self, next_page_index)
+				self._play_sound(self, "play_gui_craft_recipe_next")
+			end
+		end
 	end
 
 	return 
@@ -268,6 +308,7 @@ HeroWindowCrafting.draw = function (self, dt)
 	local ui_top_renderer = self.ui_top_renderer
 	local ui_scenegraph = self.ui_scenegraph
 	local input_service = self.parent:window_input_service()
+	local gamepad_active = Managers.input:is_device_active("gamepad")
 
 	UIRenderer.begin_pass(ui_top_renderer, ui_scenegraph, input_service, dt, nil, self.render_settings)
 
@@ -284,6 +325,10 @@ HeroWindowCrafting.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
+
+	if gamepad_active then
+		self._menu_input_description:draw(ui_top_renderer, dt)
+	end
 
 	return 
 end

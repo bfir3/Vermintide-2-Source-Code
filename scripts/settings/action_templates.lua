@@ -574,17 +574,20 @@ ActionTemplates.action_career_bw_1 = {
 ActionTemplates.action_career_dr_3 = {
 	default = {
 		slot_to_wield = "slot_career_skill_weapon",
-		throw_time = 0.65,
 		input_override = "action_career",
 		weapon_action_hand = "either",
-		kind = "career_dr_three",
-		total_time = 0.75,
+		kind = "instant_wield",
+		total_time = 0,
 		condition_func = function (action_user, input_extension)
 			local career_extension = ScriptUnit.extension(action_user, "career_system")
 			local activated_ability_data = career_extension.get_activated_ability_data(career_extension)
 
 			return activated_ability_data.action_name == "action_career_dr_3" and career_extension.can_use_activated_ability(career_extension)
 		end,
+		action_on_wield = {
+			action = "action_career",
+			sub_action = "default"
+		},
 		allowed_chain_actions = {}
 	}
 }

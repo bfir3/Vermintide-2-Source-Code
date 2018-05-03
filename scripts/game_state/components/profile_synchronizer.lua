@@ -401,15 +401,17 @@ local inventory_list_first_person = {}
 ProfileSynchronizer.rpc_client_select_inventory = function (self, sender, local_player_id, network_inventory_list, network_inventory_list_first_person, client_sync_id)
 	local profile_index = self.profile_by_peer(self, sender, local_player_id)
 
-	for i, package_id in ipairs(network_inventory_list) do
-		inventory_list[i] = NetworkLookup.inventory_packages[package_id]
-	end
+	if profile_index then
+		for i, package_id in ipairs(network_inventory_list) do
+			inventory_list[i] = NetworkLookup.inventory_packages[package_id]
+		end
 
-	for i, package_id in ipairs(network_inventory_list_first_person) do
-		inventory_list_first_person[i] = NetworkLookup.inventory_packages[package_id]
-	end
+		for i, package_id in ipairs(network_inventory_list_first_person) do
+			inventory_list_first_person[i] = NetworkLookup.inventory_packages[package_id]
+		end
 
-	self._profile_select_inventory(self, profile_index, inventory_list, inventory_list_first_person, sender, local_player_id, client_sync_id)
+		self._profile_select_inventory(self, profile_index, inventory_list, inventory_list_first_person, sender, local_player_id, client_sync_id)
+	end
 
 	return 
 end

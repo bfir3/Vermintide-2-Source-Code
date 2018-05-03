@@ -603,7 +603,10 @@ BTChampionAttackAction.anim_cb_damage = function (self, unit, blackboard)
 		self._deal_damage(self, unit, blackboard, action, self_pos, hit_actors, actor_count, true)
 	elseif action.collision_type == "cylinder" then
 		local cylinder_center, size, rotation = self._calculate_cylinder_collision(self, action, self_pos, self_rot)
-		local hit_actors, actor_count = PhysicsWorld.immediate_overlap(pw, "position", cylinder_center, "rotation", rotation, "size", size, "shape", "capsule", "types", "dynamics", "collision_filter", "filter_player_hit_box_check", "use_global_table")
+
+		PhysicsWorld.prepare_actors_for_overlap(pw, cylinder_center, action.radius)
+
+		local hit_actors, actor_count = PhysicsWorld.immediate_overlap(pw, "position", cylinder_center, "rotation", rotation, "size", size, "shape", "capsule", "types", "dynamics", "collision_filter", action.collision_filter or "filter_player_hit_box_check", "use_global_table")
 
 		if Development.parameter("debug_ai_attack") then
 			local drawer = Managers.state.debug:drawer(debug_drawer_info)
@@ -752,14 +755,16 @@ BTChampionAttackAction._deal_damage = function (self, unit, blackboard, action, 
 	for i = 1, actor_count, 1 do
 		local actor = hit_actors[i]
 		local target_unit = Actor_unit(actor)
+		local is_a_character = DamageUtils.is_character(target_unit)
 
-		if Unit_alive(target_unit) and not hit_players[target_unit] then
+		if is_a_character and Unit_alive(target_unit) and not hit_players[target_unit] then
 			hit_players[target_unit] = true
 			local attack_direction = action.attack_directions and action.attack_directions[blackboard.attack_anim]
 			local blocked = DamageUtils.check_block(unit, target_unit, action.fatigue_type, attack_direction)
 			local target_pos = POSITION_LOOKUP[target_unit]
+			local is_player_unit = DamageUtils.is_player_unit(target_unit)
 
-			if shove_speed then
+			if shove_speed and is_player_unit then
 				local direction = Vector3.normalize(target_pos - self_pos)
 
 				if is_animation_callback then
@@ -780,7 +785,7 @@ BTChampionAttackAction._deal_damage = function (self, unit, blackboard, action, 
 				end
 			end
 
-			if blocked then
+			if is_player_unit and blocked then
 				local push_speed = action.player_push_speed_blocked
 
 				if push_speed then
@@ -801,6 +806,12 @@ BTChampionAttackAction._deal_damage = function (self, unit, blackboard, action, 
 				end
 			else
 				AiUtils_damage_target(target_unit, unit, action, action.damage)
+
+				local is_ai_unit = DamageUtils.is_enemy(target_unit)
+
+				if is_ai_unit and action.hit_ai_func then
+					action.hit_ai_func(unit, blackboard, target_unit)
+				end
 			end
 		end
 	end

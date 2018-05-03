@@ -248,6 +248,10 @@ local function is_local(unit)
 	return player and not player.remote
 end
 
+local function is_server()
+	return Managers.player.is_server
+end
+
 local function is_bot(unit)
 	local player = Managers.player:owner(unit)
 
@@ -660,18 +664,21 @@ ProcFunctions = {
 	ranged_crits_increase_dmg_vs_armour_type = function (player, buff, params)
 		local player_unit = player.player_unit
 		local target_unit = params[1]
-		local armour_type = DamageUtils.get_unit_armor(target_unit)
+		local hit_zone_name = nil
+		local breed = AiUtils.unit_breed(target_unit)
+		local dummy_unit_armor = Unit.get_data(target_unit, "armor")
+		local armor_type = ActionUtils.get_target_armor(hit_zone_name, breed, dummy_unit_armor)
 
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			if armour_type == 1 then
+			if armor_type == 1 then
 				buff_extension.add_buff(buff_extension, "ranged_power_vs_unarmored")
-			elseif armour_type == 2 then
+			elseif armor_type == 2 then
 				buff_extension.add_buff(buff_extension, "ranged_power_vs_armored")
-			elseif armour_type == 3 then
+			elseif armor_type == 3 then
 				buff_extension.add_buff(buff_extension, "ranged_power_vs_large")
-			elseif armour_type == 5 then
+			elseif armor_type == 5 then
 				buff_extension.add_buff(buff_extension, "ranged_power_vs_frenzy")
 			end
 		end
@@ -747,24 +754,24 @@ ProcFunctions = {
 
 				if talent_extension.has_talent(talent_extension, "bardin_ranger_passive_spawn_healing_draught", "dwarf_ranger", true) then
 					if 1 < math.random(1, 4) then
-						pickup_system.debug_spawn_pickup(pickup_system, "ammo_ranger", enemy_pos, raycast_down)
+						pickup_system.buff_spawn_pickup(pickup_system, "ammo_ranger", enemy_pos, raycast_down)
 					else
-						pickup_system.debug_spawn_pickup(pickup_system, "frag_grenade_t1", enemy_pos, raycast_down)
+						pickup_system.buff_spawn_pickup(pickup_system, "frag_grenade_t1", enemy_pos, raycast_down)
 					end
 				elseif talent_extension.has_talent(talent_extension, "bardin_ranger_passive_spawn_potions", "dwarf_ranger", true) then
 					local drop_result = math.random(1, 6)
 
 					if drop_result == 1 then
-						pickup_system.debug_spawn_pickup(pickup_system, "damage_boost_potion", enemy_pos, raycast_down)
+						pickup_system.buff_spawn_pickup(pickup_system, "damage_boost_potion", enemy_pos, raycast_down)
 					elseif drop_result == 2 then
-						pickup_system.debug_spawn_pickup(pickup_system, "speed_boost_potion", enemy_pos, raycast_down)
+						pickup_system.buff_spawn_pickup(pickup_system, "speed_boost_potion", enemy_pos, raycast_down)
 					else
-						pickup_system.debug_spawn_pickup(pickup_system, "ammo_ranger", enemy_pos, raycast_down)
+						pickup_system.buff_spawn_pickup(pickup_system, "ammo_ranger", enemy_pos, raycast_down)
 					end
 				elseif talent_extension.has_talent(talent_extension, "bardin_ranger_passive_improved_ammo") then
-					pickup_system.debug_spawn_pickup(pickup_system, "ammo_ranger_improved", enemy_pos, raycast_down)
+					pickup_system.buff_spawn_pickup(pickup_system, "ammo_ranger_improved", enemy_pos, raycast_down)
 				else
-					pickup_system.debug_spawn_pickup(pickup_system, "ammo_ranger", enemy_pos, raycast_down)
+					pickup_system.buff_spawn_pickup(pickup_system, "ammo_ranger", enemy_pos, raycast_down)
 				end
 			end
 		end
@@ -980,19 +987,43 @@ ProcFunctions = {
 	end_huntsman_stealth = function (player, buff, params)
 		local player_unit = player.player_unit
 
-		if Unit.alive(player_unit) and is_local(player_unit) then
-			local first_person_extension = ScriptUnit.extension(player_unit, "first_person_system")
-			local status_extension = ScriptUnit.extension(player_unit, "status_system")
-
-			if status_extension.is_invisible(status_extension) then
-				status_extension.set_invisible(status_extension, false)
-				first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_markus_huntsman_exit")
-				first_person_extension.play_hud_sound_event(first_person_extension, "Stop_career_ability_markus_huntsman_loop")
-			end
-
-			if not is_bot(player_unit) then
+		if Unit.alive(player_unit) then
+			if is_local(player_unit) and not is_bot(player_unit) then
 				MOOD_BLACKBOARD.skill_huntsman_stealth = false
 				MOOD_BLACKBOARD.skill_huntsman_surge = true
+			end
+
+			if is_local(player_unit) or (is_server() and is_bot(player_unit)) then
+				local status_extension = ScriptUnit.extension(player_unit, "status_system")
+
+				if status_extension.is_invisible(status_extension) then
+					status_extension.set_invisible(status_extension, false)
+
+					local first_person_extension = ScriptUnit.extension(player_unit, "first_person_system")
+
+					first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_markus_huntsman_exit")
+					first_person_extension.play_hud_sound_event(first_person_extension, "Stop_career_ability_markus_huntsman_loop")
+
+					local events = {
+						"Play_career_ability_markus_huntsman_exit",
+						"Stop_career_ability_markus_huntsman_loop_husk"
+					}
+					local network_manager = Managers.state.network
+					local network_transmit = network_manager.network_transmit
+					local is_server = Managers.player.is_server
+					local unit_id = network_manager.unit_game_object_id(network_manager, player_unit)
+					local node_id = 0
+
+					for _, event in ipairs(events) do
+						local event_id = NetworkLookup.sound_events[event]
+
+						if is_server then
+							network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+						else
+							network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+						end
+					end
+				end
 			end
 		end
 
@@ -1915,30 +1946,7 @@ BuffTemplates = {
 		}
 	},
 	overcharged_critical_no_attack_penalty = {
-		buffs = {
-			{
-				remove_buff_name = "planted_return_to_normal_movement",
-				name = "increase speed",
-				lerp_time = 0.2,
-				multiplier = 0.85,
-				update_func = "update_action_lerp_movement_buff",
-				remove_buff_func = "remove_action_lerp_movement_buff",
-				apply_buff_func = "apply_action_lerp_movement_buff",
-				path_to_movement_setting_to_modify = {
-					"move_speed"
-				}
-			},
-			{
-				name = "change dodge speed",
-				multiplier = 0.85,
-				remove_buff_func = "remove_movement_buff",
-				apply_buff_func = "apply_movement_buff",
-				path_to_movement_setting_to_modify = {
-					"dodging",
-					"speed_modifier"
-				}
-			}
-		}
+		buffs = {}
 	},
 	change_dodge_speed = {
 		buffs = {
@@ -2512,6 +2520,24 @@ BuffTemplates = {
 				name = "damage_volume_generic_dot",
 				apply_buff_func = "apply_volume_dot_damage",
 				damage_type = "volume_generic_dot"
+			}
+		}
+	},
+	catacombs_corpse_pit = {
+		buffs = {
+			{
+				slowdown_buff_name = "bile_troll_vomit_ground_slowdown",
+				name = "catacombs_corpse_pit",
+				update_func = "update_catacombs_corpse_pit",
+				dormant = true,
+				fatigue_type = "vomit_ground",
+				remove_buff_func = "remove_catacombs_corpse_pit",
+				apply_buff_func = "apply_catacombs_corpse_pit",
+				refresh_durations = true,
+				time_between_ticks = 0.75,
+				debuff = true,
+				max_stacks = 1,
+				icon = "troll_vomit_debuff"
 			}
 		}
 	},

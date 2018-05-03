@@ -3,6 +3,7 @@ local widget_definitions = definitions.widgets
 local deed_game_widget_definitions = definitions.deed_game_widgets
 local custom_game_widget_definitions = definitions.custom_game_widgets
 local adventure_game_widget_definitions = definitions.adventure_game_widgets
+local console_cursor_definition = definitions.console_cursor_definition
 
 local function get_text_height(ui_renderer, size, ui_style, ui_content, text, ui_style_global)
 	local widget_scale = nil
@@ -129,6 +130,7 @@ MissionVotingUI.create_ui_elements = function (self)
 
 	self._adventure_game_widgets = adventure_game_widgets
 	self._adventure_game_widgets_by_name = adventure_game_widgets_by_name
+	self._console_cursor = UIWidget.init(console_cursor_definition)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 	self.scenegraph_definition = definitions.scenegraph_definition
 	RELOAD_UI = false
@@ -154,13 +156,13 @@ MissionVotingUI.get_text_width = function (self, text, text_style)
 
 	return text_width
 end
-MissionVotingUI.setup_option_input = function (self, option_widget, option, gamepad_active)
+MissionVotingUI.setup_option_input = function (self, option_widget, option)
 	local total_width = 35
 	local text = option.text
 	local input_action = option.input
 	local input_manager = self.input_manager
 	local input_service = input_manager.get_service(input_manager, "mission_voting")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local gamepad_active = false
 	local button_texture_data, input_text = UISettings.get_gamepad_input_texture_data(input_service, input_action, gamepad_active)
 
 	if not gamepad_active then
@@ -233,15 +235,10 @@ MissionVotingUI.start_vote = function (self, active_voting)
 	self.vote_started = true
 	self.has_voted = false
 	local gamepad_active = self.input_manager:is_device_active("gamepad")
+	local vote_options = vote_template.vote_options
 
-	if gamepad_active then
-		self.on_gamepad_activated(self, active_voting)
-	else
-		local vote_options = vote_template.vote_options
-
-		self.setup_option_input(self, widgets_by_name.button_confirm, vote_options[1], gamepad_active)
-		self.setup_option_input(self, widgets_by_name.button_abort, vote_options[2], gamepad_active)
-	end
+	self.setup_option_input(self, widgets_by_name.button_confirm, vote_options[1])
+	self.setup_option_input(self, widgets_by_name.button_abort, vote_options[2])
 
 	self.gamepad_active = self.input_manager:is_device_active("gamepad")
 
@@ -506,34 +503,13 @@ MissionVotingUI.update = function (self, menu_active, dt, t)
 
 	return 
 end
-MissionVotingUI.on_gamepad_activated = function (self, active_voting)
-	if not self.has_voted then
-	end
-
-	if active_voting then
-		local vote_template = active_voting.template
-		slot3 = vote_template.vote_options
-	end
-
-	return 
-end
-MissionVotingUI.on_gamepad_deactivated = function (self, active_voting)
-	if not self.has_voted then
-	end
-
-	if active_voting then
-		local vote_template = active_voting.template
-		slot3 = vote_template.vote_options
-	end
-
-	return 
-end
 MissionVotingUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
 	local render_settings = self.render_settings
 	local ui_scenegraph = self.ui_scenegraph
 	local input_service = self.input_manager:get_service("mission_voting")
+	local gamepad_active = self.input_manager:is_device_active("gamepad")
 
 	self.update_pulse_animations(self, dt)
 
@@ -590,6 +566,10 @@ MissionVotingUI.draw = function (self, dt)
 				render_settings.snap_pixel_positions = snap_pixel_positions
 			end
 		end
+	end
+
+	if gamepad_active then
+		UIRenderer.draw_widget(ui_top_renderer, self._console_cursor)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)

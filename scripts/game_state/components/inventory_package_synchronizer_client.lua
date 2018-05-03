@@ -121,6 +121,8 @@ local function profile_packages(profile_index, career_index, packages_list, is_f
 		packages_list[skin_materials.package_name] = false
 	end
 
+	packages_list[career.package_name] = false
+
 	return packages_list
 end
 

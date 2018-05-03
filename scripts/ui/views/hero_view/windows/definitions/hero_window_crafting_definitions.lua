@@ -582,6 +582,104 @@ local widgets = {
 	}, "item_grid_fg"),
 	crafting_fg_glow = UIWidgets.create_simple_texture("crafting_fg_glow", "item_grid_fg", nil, nil, nil, 1)
 }
+local generic_input_actions = {
+	default = {
+		{
+			input_action = "d_vertical",
+			priority = 1,
+			description_text = "input_description_navigate",
+			ignore_keybinding = true
+		},
+		{
+			input_action = "l1_r1",
+			priority = 2,
+			description_text = "input_description_toggle_forge_tab",
+			ignore_keybinding = true
+		},
+		{
+			input_action = "confirm",
+			priority = 4,
+			description_text = "input_description_select"
+		},
+		{
+			input_action = "back",
+			priority = 5,
+			description_text = "input_description_close"
+		}
+	}
+}
+input_actions = {
+	salvage = {
+		actions = {
+			{
+				input_action = "y",
+				priority = 3,
+				description_text = "hero_view_crafting_salvage",
+				ignore_keybinding = true
+			}
+		}
+	},
+	craft_random_item = {
+		actions = {
+			{
+				input_action = "y",
+				priority = 3,
+				description_text = "hero_view_crafting_craft",
+				ignore_keybinding = true
+			}
+		}
+	},
+	reroll_weapon_properties = {
+		actions = {
+			{
+				input_action = "y",
+				priority = 3,
+				description_text = "hero_view_crafting_properties",
+				ignore_keybinding = true
+			}
+		}
+	},
+	reroll_weapon_traits = {
+		actions = {
+			{
+				input_action = "y",
+				priority = 3,
+				description_text = "hero_view_crafting_trait",
+				ignore_keybinding = true
+			}
+		}
+	},
+	upgrade_item_rarity_common = {
+		actions = {
+			{
+				input_action = "y",
+				priority = 3,
+				description_text = "hero_view_crafting_upgrade",
+				ignore_keybinding = true
+			}
+		}
+	},
+	extract_weapon_skin = {
+		actions = {
+			{
+				input_action = "y",
+				priority = 3,
+				description_text = "hero_view_crafting_extract_skin",
+				ignore_keybinding = true
+			}
+		}
+	},
+	apply_weapon_skin = {
+		actions = {
+			{
+				input_action = "y",
+				priority = 3,
+				description_text = "hero_view_crafting_apply_skin",
+				ignore_keybinding = true
+			}
+		}
+	}
+}
 local animation_definitions = {
 	on_enter = {
 		{
@@ -631,5 +729,7 @@ return {
 	widgets = widgets,
 	node_widgets = node_widgets,
 	scenegraph_definition = scenegraph_definition,
-	animation_definitions = animation_definitions
+	animation_definitions = animation_definitions,
+	generic_input_actions = generic_input_actions,
+	input_actions = input_actions
 }

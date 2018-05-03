@@ -12,8 +12,10 @@ weapon_template.actions = {
 			hit_effect = "melee_hit_slashing",
 			attack_template = "basic_sweep_push",
 			weapon_action_hand = "left",
+			damage_profile_inner = "medium_push",
 			push_angle = 100,
 			anim_event = "attack_push",
+			damage_profile_outer = "light_push",
 			total_time = 0.8,
 			allowed_chain_actions = {
 				{
