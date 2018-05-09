@@ -2579,8 +2579,6 @@ function create_command_entry(command, description, parameter, description_offse
 
 					return true
 				end
-
-				return 
 			end
 		},
 		{
@@ -3559,7 +3557,7 @@ local function create_channels_window(scenegraph_id, size)
 			texture_id = "search_icon_id",
 			content_check_function = function (content, style)
 				if content.text_field_active then
-					return 
+					return
 				end
 
 				if content.input_hotspot.is_hover then
@@ -3616,7 +3614,7 @@ local function create_channels_window(scenegraph_id, size)
 			text_id = "chat_text_id",
 			content_check_function = function (content, style)
 				if not content.text_field_active then
-					return 
+					return
 				end
 
 				local on = math.floor(Managers.time:time("main") * 2) % 2
@@ -4067,7 +4065,7 @@ local function create_create_channel_window(scenegraph_id, size)
 			text_id = "chat_text_id",
 			content_check_function = function (content, style)
 				if not content.text_field_active then
-					return 
+					return
 				end
 
 				local on = math.floor(Managers.time:time("main") * 2) % 2
@@ -4413,7 +4411,7 @@ local function create_send_invite_window(scenegraph_id, size)
 			text_id = "chat_text_id",
 			content_check_function = function (content, style)
 				if not content.text_field_active then
-					return 
+					return
 				end
 
 				local on = math.floor(Managers.time:time("main") * 2) % 2

@@ -413,4 +413,4 @@ Weapons.longbow_empire_tutorial_template.actions.action_one.default.impact_data.
 Weapons.longbow_empire_tutorial_template.actions.action_one.shoot_charged.impact_data.damage_profile = "tutorial_longbow_charged"
 Weapons.longbow_empire_tutorial_template.actions.action_one.shoot_charged_heavy.impact_data.damage_profile = "tutorial_longbow_charged"
 
-return 
+return

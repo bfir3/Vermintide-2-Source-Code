@@ -8,8 +8,6 @@ local function input_threshold(input_axis, threshold)
 		input_axis.y = 0
 		input_axis.z = 0
 	end
-
-	return 
 end
 
 InputFilters.virtual_axis = {
@@ -355,8 +353,6 @@ InputFilters.threshhold = {
 		else
 			return true
 		end
-
-		return 
 	end
 }
 InputFilters.move_filter = {
@@ -406,8 +402,6 @@ InputFilters.or = {
 				return true
 			end
 		end
-
-		return 
 	end
 }
 InputFilters.and = {
@@ -547,4 +541,4 @@ InputFilters.axis_check = {
 	end
 }
 
-return 
+return

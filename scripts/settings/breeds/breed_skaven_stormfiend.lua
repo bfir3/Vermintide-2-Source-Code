@@ -931,8 +931,6 @@ local action_data = {
 			if 4 <= blackboard.weakspot_hits then
 				blackboard.weakspot_rage = true
 			end
-
-			return 
 		end
 	},
 	target_rage = {
@@ -968,4 +966,4 @@ local action_data = {
 }
 BreedActions.skaven_stormfiend = table.create_copy(BreedActions.skaven_stormfiend, action_data)
 
-return 
+return

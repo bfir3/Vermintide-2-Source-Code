@@ -2030,4 +2030,4 @@ UnitGibSettings.chaos_zombie = {
 	}
 }
 
-return 
+return

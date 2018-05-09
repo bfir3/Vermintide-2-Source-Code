@@ -53,8 +53,6 @@ local function setup_parameters(parameters)
 	for parameter, value in pairs(parameters) do
 		Development.set_parameter(parameter, value)
 	end
-
-	return 
 end
 
 local function override_display_name(mode_settings)
@@ -63,8 +61,6 @@ local function override_display_name(mode_settings)
 	level_settings.display_name = mode_settings.display_name
 	level_settings.loading_screen_wwise_events = mode_settings.loading_screen_wwise_events
 	script_data.no_loading_screen_tip_texts = true
-
-	return 
 end
 
 local DEMO_MODE = false
@@ -123,8 +119,6 @@ BenchmarkSettings.demo_mode_overrides = function ()
 			"skaven_warpfire_thrower"
 		}
 	end
-
-	return 
 end
 
-return 
+return

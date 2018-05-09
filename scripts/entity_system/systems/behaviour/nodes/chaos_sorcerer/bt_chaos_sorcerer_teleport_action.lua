@@ -2,11 +2,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTChaosSorcererTeleportAction = class(BTChaosSorcererTeleportAction, BTNode)
 BTChaosSorcererTeleportAction.name = "BTChaosSorcererTeleportAction"
+
 BTChaosSorcererTeleportAction.init = function (self, ...)
 	BTChaosSorcererTeleportAction.super.init(self, ...)
-
-	return 
 end
+
 BTChaosSorcererTeleportAction.enter = function (self, unit, blackboard, t)
 	local next_smart_object_data = blackboard.next_smart_object_data
 	local entrance_pos = next_smart_object_data.entrance_pos:unbox()
@@ -24,9 +24,8 @@ BTChaosSorcererTeleportAction.enter = function (self, unit, blackboard, t)
 
 	navigation_extension.set_enabled(navigation_extension, false)
 	Managers.state.network:anim_event(unit, "teleport_start")
-
-	return 
 end
+
 BTChaosSorcererTeleportAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.teleport_position = nil
 	blackboard.entrance_position = nil
@@ -38,9 +37,8 @@ BTChaosSorcererTeleportAction.leave = function (self, unit, blackboard, t, reaso
 	navigation_extension.set_enabled(navigation_extension, true)
 
 	slot7 = navigation_extension.is_using_smart_object(navigation_extension) and navigation_extension.use_smart_object(navigation_extension, false)
-
-	return 
 end
+
 BTChaosSorcererTeleportAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.smart_object_data ~= blackboard.next_smart_object_data.smart_object_data then
 		return "failed"
@@ -71,9 +69,8 @@ BTChaosSorcererTeleportAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "running"
 	end
-
-	return 
 end
+
 BTChaosSorcererTeleportAction.play_teleport_effect = function (self, unit, start_position, end_position)
 	local network_manager = Managers.state.network
 	local effect_name_id = NetworkLookup.effects["fx/chr_chaos_sorcerer_teleport"]
@@ -83,13 +80,10 @@ BTChaosSorcererTeleportAction.play_teleport_effect = function (self, unit, start
 
 	network_manager.rpc_play_particle_effect(network_manager, nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, start_position, rotation_offset, false)
 	network_manager.rpc_play_particle_effect(network_manager, nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, end_position, rotation_offset, false)
-
-	return 
 end
+
 BTChaosSorcererTeleportAction.anim_cb_teleport_start_finished = function (self, unit, blackboard)
 	blackboard.anim_cb_teleport_finished = true
-
-	return 
 end
 
-return 
+return

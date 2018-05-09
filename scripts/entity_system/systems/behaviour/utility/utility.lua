@@ -2,6 +2,7 @@ require("scripts/entity_system/systems/behaviour/utility/utility_considerations"
 
 Utility = Utility or {}
 local Utility = Utility
+
 Utility.GetUtilityValueFromSpline = function (spline, norm_value)
 	for i = 3, #spline, 2 do
 		if norm_value <= spline[i] then
@@ -18,6 +19,7 @@ Utility.GetUtilityValueFromSpline = function (spline, norm_value)
 
 	return spline[#spline]
 end
+
 Utility.get_action_utility = function (breed_action, action_name, blackboard, from_draw_ai_behavior)
 	if not from_draw_ai_behavior then
 		slot4 = true
@@ -70,4 +72,4 @@ Utility.get_action_utility = function (breed_action, action_name, blackboard, fr
 	return total_utility
 end
 
-return 
+return

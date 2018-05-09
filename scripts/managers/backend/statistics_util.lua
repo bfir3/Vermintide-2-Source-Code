@@ -2,6 +2,7 @@ local Unit_alive = Unit.alive
 local Unit_get_data = Unit.get_data
 StatisticsUtil = {}
 local StatisticsUtil = StatisticsUtil
+
 StatisticsUtil.register_kill = function (victim_unit, damage_data, statistics_db, is_server)
 	local attacker_unit = AiUtils.get_actual_attacker_unit(damage_data[DamageDataIndex.ATTACKER])
 	local damaging_unit = damage_data[DamageDataIndex.DAMAGING_UNIT]
@@ -57,30 +58,29 @@ StatisticsUtil.register_kill = function (victim_unit, damage_data, statistics_db
 			end
 		end
 	end
-
-	return 
 end
+
 StatisticsUtil.check_save = function (savior_unit, enemy_unit)
 	local blackboard = BLACKBOARDS[enemy_unit]
 	local saved_unit = blackboard.target_unit
 	local player_manager = Managers.player
 
 	if not savior_unit or not saved_unit then
-		return 
+		return
 	end
 
 	local savior_is_player = player_manager.is_player_unit(player_manager, savior_unit)
 	local saved_is_player = player_manager.is_player_unit(player_manager, saved_unit)
 
 	if not savior_is_player or not saved_is_player then
-		return 
+		return
 	end
 
 	local savior_player = player_manager.owner(player_manager, savior_unit)
 	local saved_player = player_manager.owner(player_manager, saved_unit)
 
 	if savior_player == saved_player then
-		return 
+		return
 	end
 
 	local saved_unit_dir = nil
@@ -139,9 +139,8 @@ StatisticsUtil.check_save = function (savior_unit, enemy_unit)
 
 		network_transmit.send_rpc_clients(network_transmit, "rpc_assist", savior_player_id, savior_local_player_id, saved_player_id, saved_local_player_id, predicate_id, enemy_unit_id)
 	end
-
-	return 
 end
+
 StatisticsUtil.register_pull_up = function (puller_up_unit, pulled_up_unit, statistics_db)
 	local player_manager = Managers.player
 	local player1 = player_manager.owner(player_manager, puller_up_unit)
@@ -153,9 +152,8 @@ StatisticsUtil.register_pull_up = function (puller_up_unit, pulled_up_unit, stat
 
 		Managers.state.event:trigger("add_coop_feedback", player1.stats_id(player1) .. player2.stats_id(player2), local_human, predicate, player1, player2)
 	end
-
-	return 
 end
+
 StatisticsUtil.register_assisted_respawn = function (reviver_unit, revivee_unit, statistics_db)
 	local player_manager = Managers.player
 	local player1 = player_manager.owner(player_manager, reviver_unit)
@@ -167,9 +165,8 @@ StatisticsUtil.register_assisted_respawn = function (reviver_unit, revivee_unit,
 
 		Managers.state.event:trigger("add_coop_feedback", player1.stats_id(player1) .. player2.stats_id(player2), local_human, predicate, player1, player2)
 	end
-
-	return 
 end
+
 StatisticsUtil.register_revive = function (reviver_unit, revivee_unit, statistics_db)
 	local player_manager = Managers.player
 	local player1 = player_manager.owner(player_manager, reviver_unit)
@@ -194,9 +191,8 @@ StatisticsUtil.register_revive = function (reviver_unit, revivee_unit, statistic
 
 		Managers.state.event:trigger("add_coop_feedback", player1.stats_id(player1) .. player2.stats_id(player2), local_human, predicate, player1, player2)
 	end
-
-	return 
 end
+
 StatisticsUtil.register_heal = function (healer_unit, healed_unit, statistics_db)
 	local player_manager = Managers.player
 	local player1 = player_manager.owner(player_manager, healer_unit)
@@ -212,9 +208,8 @@ StatisticsUtil.register_heal = function (healer_unit, healed_unit, statistics_db
 
 		statistics_db.increment_stat(statistics_db, stats_id, "times_friend_healed")
 	end
-
-	return 
 end
+
 StatisticsUtil.register_damage = function (victim_unit, damage_data, statistics_db)
 	local damage_amount = damage_data[DamageDataIndex.DAMAGE_AMOUNT]
 	local player_manager = Managers.player
@@ -247,9 +242,8 @@ StatisticsUtil.register_damage = function (victim_unit, damage_data, statistics_
 			end
 		end
 	end
-
-	return 
 end
+
 StatisticsUtil.won_games = function (statistics_db)
 	local local_player = Managers.player:local_player()
 	local stats_id = local_player.stats_id(local_player)
@@ -261,12 +255,13 @@ StatisticsUtil.won_games = function (statistics_db)
 
 	return completed
 end
+
 StatisticsUtil.register_collected_grimoires = function (collected_grimoires, statistics_db)
 	local level_settings = LevelHelper:current_level_settings()
 	local level_id = level_settings.level_id
 
 	if not table.find(UnlockableLevels, level_id) then
-		return 
+		return
 	end
 
 	local local_player = Managers.player:local_player()
@@ -276,15 +271,14 @@ StatisticsUtil.register_collected_grimoires = function (collected_grimoires, sta
 	if current_collected_grimoires < collected_grimoires then
 		statistics_db.set_stat(statistics_db, stats_id, "collected_grimoires", level_id, collected_grimoires)
 	end
-
-	return 
 end
+
 StatisticsUtil.register_collected_tomes = function (collected_tomes, statistics_db)
 	local level_settings = LevelHelper:current_level_settings()
 	local level_id = level_settings.level_id
 
 	if not table.find(UnlockableLevels, level_id) then
-		return 
+		return
 	end
 
 	local local_player = Managers.player:local_player()
@@ -294,15 +288,14 @@ StatisticsUtil.register_collected_tomes = function (collected_tomes, statistics_
 	if current_collected_tomes < collected_tomes then
 		statistics_db.set_stat(statistics_db, stats_id, "collected_tomes", level_id, collected_tomes)
 	end
-
-	return 
 end
+
 StatisticsUtil.register_complete_level = function (statistics_db)
 	local level_settings = LevelHelper:current_level_settings()
 	local level_id = level_settings.level_id
 
 	if not table.find(UnlockableLevels, level_id) then
-		return 
+		return
 	end
 
 	local local_player = Managers.player:local_player()
@@ -337,9 +330,8 @@ StatisticsUtil.register_complete_level = function (statistics_db)
 	local career_name = career_data.name
 
 	StatisticsUtil._register_completed_level_difficulty(statistics_db, level_id, career_name, difficulty_name)
-
-	return 
 end
+
 StatisticsUtil.register_complete_tutorial = function (statistics_db)
 	local level_settings = LevelHelper:current_level_settings()
 	local local_player = Managers.player:local_player()
@@ -347,28 +339,25 @@ StatisticsUtil.register_complete_tutorial = function (statistics_db)
 	local level_id = level_settings.level_id
 
 	statistics_db.increment_stat(statistics_db, stats_id, "completed_levels", level_id)
-
-	return 
 end
+
 StatisticsUtil.register_played_quickplay_level = function (statistics_db, player, level_key)
 	if not table.find(UnlockableLevels, level_key) then
-		return 
+		return
 	end
 
 	statistics_db.increment_stat(statistics_db, player.stats_id(player), "played_levels_quickplay", level_key)
 	StatisticsUtil.register_last_played_level_id(statistics_db, player, level_key)
-
-	return 
 end
+
 StatisticsUtil.register_last_played_level_id = function (statistics_db, player, level_key)
 	local unlockable_level_id = table.find(UnlockableLevels, level_key)
 
 	if unlockable_level_id then
 		statistics_db.set_stat(statistics_db, player.stats_id(player), "last_played_level_id", unlockable_level_id)
 	end
-
-	return 
 end
+
 StatisticsUtil.get_game_progress = function (statistics_db)
 	local local_player = Managers.player:local_player()
 	local stats_id = local_player.stats_id(local_player)
@@ -389,6 +378,7 @@ StatisticsUtil.get_game_progress = function (statistics_db)
 
 	return game_progress
 end
+
 StatisticsUtil._register_completed_level_difficulty = function (statistics_db, level_id, career_name, difficulty_name)
 	local local_player = Managers.player:local_player()
 	local stats_id = local_player.stats_id(local_player)
@@ -405,9 +395,8 @@ StatisticsUtil._register_completed_level_difficulty = function (statistics_db, l
 	if Development.parameter("v2_achievements") then
 		statistics_db.increment_stat(statistics_db, stats_id, "completed_career_levels", career_name, level_id, difficulty_name)
 	end
-
-	return 
 end
+
 StatisticsUtil.unlock_lorebook_page = function (page_id, statistics_db)
 	local player = Managers.player:local_player()
 
@@ -421,8 +410,6 @@ StatisticsUtil.unlock_lorebook_page = function (page_id, statistics_db)
 
 		LoreBookHelper.mark_page_id_as_new(category_name)
 	end
-
-	return 
 end
 
 local function survival_stat_name(level_id, difficulty, stat_suffix)
@@ -442,6 +429,7 @@ StatisticsUtil.get_survival_stat = function (statistics_db, level_id, difficulty
 
 	return value
 end
+
 StatisticsUtil._set_survival_stat = function (statistics_db, level_id, difficulty, stat_name, value)
 	local stat = survival_stat_name(level_id, difficulty, stat_name)
 	local player_manager = Managers.player
@@ -449,9 +437,8 @@ StatisticsUtil._set_survival_stat = function (statistics_db, level_id, difficult
 	local stats_id = local_player.stats_id(local_player)
 
 	statistics_db.set_stat(statistics_db, stats_id, stat, value)
-
-	return 
 end
+
 StatisticsUtil._modify_survival_stat = function (statistics_db, level_id, difficulty, stat_name, value)
 	local stat = survival_stat_name(level_id, difficulty, stat_name)
 	local player_manager = Managers.player
@@ -459,16 +446,15 @@ StatisticsUtil._modify_survival_stat = function (statistics_db, level_id, diffic
 	local stats_id = local_player.stats_id(local_player)
 
 	statistics_db.modify_stat_by_amount(statistics_db, stats_id, stat, value)
-
-	return 
 end
+
 StatisticsUtil.register_complete_survival_level = function (statistics_db)
 	local mission_system = Managers.state.entity:system("mission_system")
 	local active_missions, completed_missions = mission_system.get_missions(mission_system)
 	local mission_data = active_missions.survival_wave
 
 	if not mission_data then
-		return 
+		return
 	end
 
 	local player_manager = Managers.player
@@ -543,8 +529,6 @@ StatisticsUtil.register_complete_survival_level = function (statistics_db)
 			StatisticsUtil._register_completed_level_difficulty(statistics_db, level_id, completed_difficulty)
 		end
 	end
-
-	return 
 end
 
-return 
+return

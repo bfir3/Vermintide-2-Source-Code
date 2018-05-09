@@ -46,8 +46,6 @@ function curl_callback(success, code, headers, data, user_data)
 
 		request.onError(error_data, tostring(data))
 	end
-
-	return 
 end
 
 local PlayFabHttpsCurl = {
@@ -68,8 +66,6 @@ local PlayFabHttpsCurl = {
 			local backend_manager = Managers.backend
 
 			backend_manager.playfab_api_error(backend_manager, result, error_override)
-
-			return 
 		end
 
 		local id = #active_requests + 1
@@ -84,8 +80,6 @@ local PlayFabHttpsCurl = {
 		curl_manager.post(curl_manager, full_url, json_request, headers, curl_callback, id, {
 			[curl_manager._curl.OPT_SSL_VERIFYPEER] = false
 		})
-
-		return 
 	end
 }
 

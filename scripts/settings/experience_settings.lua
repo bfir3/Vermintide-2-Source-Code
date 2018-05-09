@@ -59,6 +59,7 @@ ExperienceSettings = {
 		return level
 	end
 }
+
 ExperienceSettings.get_account_level = function ()
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 	local best_class, best_xp = nil
@@ -66,11 +67,13 @@ ExperienceSettings.get_account_level = function ()
 
 	return level, best_xp, best_class
 end
+
 ExperienceSettings.get_experience = function (hero_name)
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 
 	return hero_attributes.get(hero_attributes, hero_name, "experience") or 0
 end
+
 ExperienceSettings.get_level = function (experience)
 	experience = experience or 0
 
@@ -107,6 +110,7 @@ ExperienceSettings.get_level = function (experience)
 
 	return level, progress, experience_into_level, 0
 end
+
 ExperienceSettings.get_experience_required_for_level = function (level)
 	local experience = 0
 
@@ -118,6 +122,7 @@ ExperienceSettings.get_experience_required_for_level = function (level)
 
 	return experience
 end
+
 ExperienceSettings.get_total_experience_required_for_level = function (level)
 	local experience = 0
 
@@ -128,6 +133,7 @@ ExperienceSettings.get_total_experience_required_for_level = function (level)
 
 	return experience
 end
+
 ExperienceSettings.get_highest_character_level = function ()
 	local highest_level = 0
 
@@ -144,6 +150,7 @@ ExperienceSettings.get_highest_character_level = function ()
 
 	return highest_level
 end
+
 ExperienceSettings.max_experience = total_experience_for_main_levels
 ExperienceSettings.max_level = #experience_levels_main
 ExperienceSettings.multiplier = 1
@@ -152,4 +159,4 @@ ExperienceSettings.level_length_experience_multiplier = {
 	long = 1
 }
 
-return 
+return

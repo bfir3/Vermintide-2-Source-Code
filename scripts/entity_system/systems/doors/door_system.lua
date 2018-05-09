@@ -14,6 +14,7 @@ local extensions = {
 	"BossDoorExtension",
 	"BigBoyDestructibleExtension"
 }
+
 DoorSystem.init = function (self, entity_system_creation_context, system_name)
 	DoorSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -26,9 +27,8 @@ DoorSystem.init = function (self, entity_system_creation_context, system_name)
 	self._broadphase = Broadphase(127, 1.5)
 	self._boss_doors = {}
 	self._active_groups = {}
-
-	return 
 end
+
 DoorSystem.on_add_extension = function (self, world, unit, extension_name, ...)
 	local door_extension = DoorSystem.super.on_add_extension(self, world, unit, extension_name)
 	self.unit_extension_data[unit] = door_extension
@@ -57,7 +57,9 @@ DoorSystem.on_add_extension = function (self, world, unit, extension_name, ...)
 
 	return door_extension
 end
+
 local sections_to_open = {}
+
 DoorSystem.update = function (self, context, t)
 	DoorSystem.super.update(self, context, t)
 
@@ -113,12 +115,12 @@ DoorSystem.update = function (self, context, t)
 			self._active_groups[map_section] = nil
 		end
 	end
-
-	return 
 end
+
 DoorSystem.get_doors = function (self, position, radius, result)
 	return Broadphase.query(self._broadphase, position, radius, result)
 end
+
 DoorSystem.on_remove_extension = function (self, unit, extension_name)
 	DoorSystem.super.on_remove_extension(self, unit, extension_name)
 
@@ -127,18 +129,16 @@ DoorSystem.on_remove_extension = function (self, unit, extension_name)
 	Broadphase.remove(self._broadphase, extension.__broadphase_id)
 
 	self.unit_extension_data[unit] = nil
-
-	return 
 end
+
 DoorSystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
 
 	self.network_event_delegate = nil
 	self.unit_extension_data = nil
 	self._broadphase = nil
-
-	return 
 end
+
 DoorSystem.close_boss_doors = function (self, map_section, group_id, breed_name)
 	local boss_doors = self._boss_doors[map_section]
 	local network_manager = Managers.state.network
@@ -169,9 +169,8 @@ DoorSystem.close_boss_doors = function (self, map_section, group_id, breed_name)
 			group_id = group_id
 		}
 	end
-
-	return 
 end
+
 DoorSystem.open_boss_doors = function (self, map_section)
 	local boss_doors = self._boss_doors[map_section]
 	local network_manager = Managers.state.network
@@ -190,9 +189,8 @@ DoorSystem.open_boss_doors = function (self, map_section)
 
 		network_transmit.send_rpc_clients(network_transmit, "rpc_sync_boss_door_state", level_index, door_state_id, breed_id)
 	end
-
-	return 
 end
+
 DoorSystem.rpc_sync_door_state = function (self, sender, level_object_id, door_state_id)
 	local level = LevelHelper:current_level(self.world)
 	local door_unit = Level.unit_by_index(level, level_object_id)
@@ -205,9 +203,8 @@ DoorSystem.rpc_sync_door_state = function (self, sender, level_object_id, door_s
 	else
 		Application.warning(string.format("[DoorSystem:rpc_sync_door_state] The synced level_object_id (%s) doesn't correspond to a unit with a 'door_system' extension. Unit: %s", level_object_id, tostring(door_unit)))
 	end
-
-	return 
 end
+
 DoorSystem.rpc_sync_boss_door_state = function (self, sender, level_object_id, door_state_id, breed_id)
 	local level = LevelHelper:current_level(self.world)
 	local door_unit = Level.unit_by_index(level, level_object_id)
@@ -221,8 +218,6 @@ DoorSystem.rpc_sync_boss_door_state = function (self, sender, level_object_id, d
 	else
 		Application.warning(string.format("[DoorSystem:rpc_sync_boss_door_state] The synced level_object_id (%s) doesn't correspond to a unit with a 'door_system' extension. Unit: %s", level_object_id, tostring(door_unit)))
 	end
-
-	return 
 end
 
-return 
+return

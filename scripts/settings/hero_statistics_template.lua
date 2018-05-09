@@ -510,4 +510,4 @@ HeroStatisticsTemplate = {
 	}
 }
 
-return 
+return

@@ -53,4 +53,4 @@ QuestSettings = {
 	}
 }
 
-return 
+return

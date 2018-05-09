@@ -1,11 +1,11 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTMeleeSlamAction = class(BTMeleeSlamAction, BTNode)
+
 BTMeleeSlamAction.init = function (self, ...)
 	BTMeleeSlamAction.super.init(self, ...)
-
-	return 
 end
+
 BTMeleeSlamAction.name = "BTMeleeSlamAction"
 
 local function randomize(event)
@@ -14,8 +14,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTMeleeSlamAction.enter = function (self, unit, blackboard, t)
@@ -33,9 +31,8 @@ BTMeleeSlamAction.enter = function (self, unit, blackboard, t)
 	blackboard.keep_target = true
 
 	Managers.state.conflict:freeze_intensity_decay(15)
-
-	return 
 end
+
 BTMeleeSlamAction.init_attack = function (self, unit, blackboard, action, t)
 	local attack_anim, anim_driven = LocomotionUtils.get_attack_anim(unit, blackboard, action.attack_anims)
 	anim_driven = anim_driven or action.anim_driven or false
@@ -70,9 +67,8 @@ BTMeleeSlamAction.init_attack = function (self, unit, blackboard, action, t)
 		blackboard.current_bot_threat_index = current_threat_index
 		blackboard.bot_threats_data = bot_threats
 	end
-
-	return 
 end
+
 BTMeleeSlamAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if blackboard.attack_anim_driven then
 		local locomotion_extension = blackboard.locomotion_extension
@@ -91,9 +87,8 @@ BTMeleeSlamAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.create_bot_threat_at_t = nil
 	blackboard.current_bot_threat_index = nil
 	blackboard.bot_threats_data = nil
-
-	return 
 end
+
 BTMeleeSlamAction._calculate_collision = function (self, action, self_pos, forward_direction)
 	local height = action.height
 	local pos = self_pos + forward_direction * action.forward_offset + Vector3(0, 0, height * 0.5)
@@ -103,6 +98,7 @@ BTMeleeSlamAction._calculate_collision = function (self, action, self_pos, forwa
 
 	return pos, rotation, size
 end
+
 BTMeleeSlamAction._calculate_cylinder_collision = function (self, action, bot_threat, self_pos, self_rot)
 	local radius = bot_threat.radius or action.radius
 	local height = bot_threat.height or action.height
@@ -116,6 +112,7 @@ BTMeleeSlamAction._calculate_cylinder_collision = function (self, action, bot_th
 
 	return cylinder_center, rotation, size
 end
+
 BTMeleeSlamAction._create_bot_aoe_threat = function (self, unit, attack_rotation, action, bot_threat)
 	local bot_threat_duration = bot_threat.duration
 	local unit_position = POSITION_LOOKUP[unit]
@@ -123,9 +120,8 @@ BTMeleeSlamAction._create_bot_aoe_threat = function (self, unit, attack_rotation
 	local obstacle_position, _, obstacle_size = self._calculate_cylinder_collision(self, action, bot_threat, unit_position, attack_rotation)
 
 	ai_bot_group_system.aoe_threat_created(ai_bot_group_system, obstacle_position, "cylinder", obstacle_size, nil, bot_threat_duration)
-
-	return 
 end
+
 BTMeleeSlamAction.anim_cb_damage = function (self, unit, blackboard)
 	local world = blackboard.world
 	local physics_world = World.get_data(world, "physics_world")
@@ -203,9 +199,8 @@ BTMeleeSlamAction.anim_cb_damage = function (self, unit, blackboard)
 	end
 
 	blackboard.attacking_target = nil
-
-	return 
 end
+
 BTMeleeSlamAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.attack_finished then
 		return "done"
@@ -250,4 +245,4 @@ BTMeleeSlamAction.run = function (self, unit, blackboard, t, dt)
 	return "done"
 end
 
-return 
+return

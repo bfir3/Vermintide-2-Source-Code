@@ -9,6 +9,7 @@ local consumable_slots = {
 	"slot_grenade",
 	"slot_healthkit"
 }
+
 SimpleInventoryExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self._world = extension_init_context.world
 	self._unit = unit
@@ -42,9 +43,8 @@ SimpleInventoryExtension.init = function (self, extension_init_context, unit, ex
 	self._selected_consumable_slot = nil
 	self._previously_wielded_weapon_slot = "slot_melee"
 	self._backend_items = Managers.backend:get_interface("items")
-
-	return 
 end
+
 SimpleInventoryExtension.extensions_ready = function (self, world, unit)
 	local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
 	self.first_person_extension = first_person_extension
@@ -87,9 +87,8 @@ SimpleInventoryExtension.extensions_ready = function (self, world, unit)
 	end
 
 	self._equipment.wielded_slot = profile.default_wielded_slot
-
-	return 
 end
+
 SimpleInventoryExtension.game_object_initialized = function (self, unit, unit_go_id)
 	local network_manager = Managers.state.network
 	local is_server = self.is_server
@@ -123,9 +122,8 @@ SimpleInventoryExtension.game_object_initialized = function (self, unit, unit_go
 	else
 		network_manager.network_transmit:send_rpc_server("rpc_wield_equipment", unit_go_id, slot_id)
 	end
-
-	return 
 end
+
 SimpleInventoryExtension._send_rpc_add_equipment_buffs = function (self, unit_go_id, slot_id, item_id, backend_id)
 	local buffs = self._get_property_and_trait_buffs(self, backend_id)
 	local server_buffs = {}
@@ -170,9 +168,8 @@ SimpleInventoryExtension._send_rpc_add_equipment_buffs = function (self, unit_go
 
 		network_transmit.send_rpc_server(network_transmit, "rpc_add_equipment_buffs", unit_go_id, slot_id, buff_1_id, buff_data_type_1_id, buff_value_1 or 1, buff_2_id, buff_data_type_2_id, buff_value_2 or 1, buff_3_id, buff_data_type_3_id, buff_value_3 or 1, buff_4_id, buff_data_type_4_id, buff_value_4 or 1)
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.override_career_skill_item_template = function (self, item_data)
 	local override_item_template = nil
 	local slot_to_use = item_data.slot_to_use
@@ -192,6 +189,7 @@ SimpleInventoryExtension.override_career_skill_item_template = function (self, i
 
 	return override_item_template
 end
+
 SimpleInventoryExtension.add_equipment_by_category = function (self, category)
 	local career_name = self.career_extension:career_name()
 	local category_slots = InventorySettings[category]
@@ -205,21 +203,20 @@ SimpleInventoryExtension.add_equipment_by_category = function (self, category)
 		local item = BackendUtils.get_loadout_item(career_name, slot_name)
 		local item_data = nil
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.destroy = function (self)
 	for slot_id, slot_data in pairs(self._equipment.slots) do
 		GearUtils.destroy_slot(self._world, self._unit, slot_data, self._equipment, true)
 	end
 
 	self._despawn_attached_units(self)
-
-	return 
 end
+
 SimpleInventoryExtension.equipment = function (self)
 	return self._equipment
 end
+
 SimpleInventoryExtension.update = function (self, unit, input, dt, context, t)
 	self._update_selected_consumable_slot(self)
 	self._update_loaded_projectile_settings(self)
@@ -238,20 +235,20 @@ SimpleInventoryExtension.update = function (self, unit, input, dt, context, t)
 	ammo_percentage = math.min(1, ammo_percentage)
 
 	GameSession.set_game_object_field(game, go_id, "ammo_percentage", ammo_percentage)
-
-	return 
 end
+
 SimpleInventoryExtension.recently_acquired = function (self, slot_name)
 	local slot_data = self.recently_acquired_list[slot_name]
 	self.recently_acquired_list[slot_name] = nil
 
 	return slot_data
 end
+
 SimpleInventoryExtension._update_resync_loadout = function (self)
 	local _, equipment_to_spawn = next(self._items_to_spawn)
 
 	if not equipment_to_spawn then
-		return 
+		return
 	end
 
 	if self.resync_loadout_needed then
@@ -274,9 +271,8 @@ SimpleInventoryExtension._update_resync_loadout = function (self)
 	if #self.resync_ids == 0 then
 		self._is_resyncing_loadout = nil
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.can_wield = function (self)
 	local equipment = self._equipment
 	local current_wielded_slot = self._equipment.wielded_slot
@@ -291,27 +287,26 @@ SimpleInventoryExtension.can_wield = function (self)
 
 	return can_wield
 end
+
 SimpleInventoryExtension.wield_previous_weapon = function (self)
 	local slot_name = self._previously_wielded_weapon_slot
 
 	self.wield(self, slot_name)
-
-	return 
 end
+
 SimpleInventoryExtension.rewield_wielded_slot = function (self)
 	local equipment = self._equipment
 	local wielded_slot = equipment.wielded_slot
 
 	self.wield(self, wielded_slot)
-
-	return 
 end
+
 SimpleInventoryExtension.wield = function (self, slot_name)
 	local equipment = self._equipment
 	local slot_data = equipment.slots[slot_name]
 
 	if slot_data == nil then
-		return 
+		return
 	end
 
 	if equipment.wielded_slot ~= slot_name then
@@ -362,9 +357,8 @@ SimpleInventoryExtension.wield = function (self, slot_name)
 	if slot_name == "slot_melee" or slot_name == "slot_ranged" then
 		self._previously_wielded_weapon_slot = slot_name
 	end
-
-	return 
 end
+
 SimpleInventoryExtension._despawn_attached_units = function (self)
 	local attached_units = self._attached_units
 	local world = self._world
@@ -374,12 +368,11 @@ SimpleInventoryExtension._despawn_attached_units = function (self)
 
 		attached_units[index] = nil
 	end
-
-	return 
 end
+
 SimpleInventoryExtension._spawn_attached_units = function (self, attached_units)
 	if attached_units == nil then
-		return 
+		return
 	end
 
 	local unit = self._unit
@@ -390,10 +383,10 @@ SimpleInventoryExtension._spawn_attached_units = function (self, attached_units)
 		local spawned_unit = AttachmentUtils.create_weapon_visual_attachment(world, unit, attached_unit.unit, attached_unit.attachment_node_linking)
 		own_attached_units[index] = spawned_unit
 	end
-
-	return 
 end
+
 local params = {}
+
 SimpleInventoryExtension.apply_buffs = function (self, buffs_by_buffer, reason, item_name, slot_name)
 	local buff_extension = self.buff_extension
 	local current_item_buffs = self.current_item_buffs[reason]
@@ -439,9 +432,8 @@ SimpleInventoryExtension.apply_buffs = function (self, buffs_by_buffer, reason, 
 			end
 		end
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.add_equipment = function (self, slot_name, item_data, unit_template, extra_extension_data, ammo_percent)
 	local world = self._world
 	local equipment = self._equipment
@@ -460,9 +452,8 @@ SimpleInventoryExtension.add_equipment = function (self, slot_name, item_data, u
 	slot_equipment_data.master_item = item_data
 	equipment.slots[slot_name] = slot_equipment_data
 	self.recently_acquired_list[slot_name] = slot_equipment_data
-
-	return 
 end
+
 SimpleInventoryExtension.show_first_person_inventory_lights = function (self, show)
 	self._show_first_person_lights = show
 	local right_hand_wielded_unit = self._equipment.right_hand_wielded_unit
@@ -484,9 +475,8 @@ SimpleInventoryExtension.show_first_person_inventory_lights = function (self, sh
 			Light.set_enabled(Unit.light(left_hand_wielded_unit, i - 1), show)
 		end
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.show_first_person_inventory = function (self, show)
 	self._show_first_person = show
 	local right_hand_wielded_unit = self._equipment.right_hand_wielded_unit
@@ -574,9 +564,8 @@ SimpleInventoryExtension.show_first_person_inventory = function (self, show)
 	else
 		Unit.flow_event(self._first_person_unit, "lua_unwield")
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.show_third_person_inventory = function (self, show)
 	self._show_third_person = show
 	local right_hand_wielded_unit = self._equipment.right_hand_wielded_unit_3p
@@ -658,23 +647,22 @@ SimpleInventoryExtension.show_third_person_inventory = function (self, show)
 			end
 		end
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.is_showing_third_person_inventory = function (self)
 	return self._show_third_person
 end
+
 SimpleInventoryExtension.hot_join_sync = function (self, sender)
 	GearUtils.hot_join_sync(sender, self._unit, self._equipment)
-
-	return 
 end
+
 SimpleInventoryExtension.destroy_slot = function (self, slot_name, allow_destroy_weapon)
 	local equipment = self._equipment
 	local slot_data = equipment.slots[slot_name]
 
 	if slot_data == nil then
-		return 
+		return
 	end
 
 	local weapon_unit_1p = slot_data.right_unit_1p or slot_data.left_unit_1p
@@ -708,14 +696,13 @@ SimpleInventoryExtension.destroy_slot = function (self, slot_name, allow_destroy
 	end
 
 	GearUtils.destroy_slot(self._world, self._unit, slot_data, equipment, allow_destroy_weapon)
-
-	return 
 end
+
 SimpleInventoryExtension.current_ammo_status = function (self, slot_name)
 	local slot_data = self._equipment.slots[slot_name]
 
 	if not slot_data then
-		return 
+		return
 	end
 
 	local item_data = slot_data.item_data
@@ -732,9 +719,8 @@ SimpleInventoryExtension.current_ammo_status = function (self, slot_name)
 			return ammo_extension.total_remaining_ammo(ammo_extension), max
 		end
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.add_ammo_from_pickup = function (self, pickup_settings)
 	local equipment = self._equipment
 	local slots = equipment.slots
@@ -749,9 +735,8 @@ SimpleInventoryExtension.add_ammo_from_pickup = function (self, pickup_settings)
 			self._add_ammo_to_slot(self, slot_name, slot_data, refill_amount)
 		end
 	end
-
-	return 
 end
+
 SimpleInventoryExtension._add_ammo_to_slot = function (self, slot_name, slot_data, amount)
 	local left_hand_unit = slot_data.left_unit_1p
 	local right_hand_unit = slot_data.right_unit_1p
@@ -765,10 +750,10 @@ SimpleInventoryExtension._add_ammo_to_slot = function (self, slot_name, slot_dat
 		if ScriptUnit.has_extension(right_hand_unit, "ammo_system") then
 			ammo_extension = ScriptUnit.extension(right_hand_unit, "ammo_system")
 		elseif not ammo_extension then
-			return 
+			return
 		end
 	elseif not ammo_extension then
-		return 
+		return
 	end
 
 	local max_ammo = ammo_extension.get_max_ammo(ammo_extension)
@@ -787,15 +772,15 @@ SimpleInventoryExtension._add_ammo_to_slot = function (self, slot_name, slot_dat
 
 		ammo_extension.start_reload(ammo_extension, play_reload_animation)
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.get_item_template = function (self, slot_data)
 	local item_data = slot_data.item_data
 	local item_template = slot_data.item_template or BackendUtils.get_item_template(item_data)
 
 	return item_template
 end
+
 SimpleInventoryExtension.get_wielded_slot_item_template = function (self)
 	local slot_name = self.get_wielded_slot_name(self)
 	local slot_data = self.get_slot_data(self, slot_name)
@@ -806,24 +791,28 @@ SimpleInventoryExtension.get_wielded_slot_item_template = function (self)
 
 	return self.get_item_template(self, slot_data)
 end
+
 SimpleInventoryExtension.get_wielded_slot_name = function (self)
 	local equipment = self._equipment
 	local wielded_slot = equipment.wielded_slot
 
 	return wielded_slot
 end
+
 SimpleInventoryExtension.get_slot_data = function (self, slot_id)
 	local equipment = self._equipment
 	local slots = equipment.slots
 
 	return slots[slot_id]
 end
+
 SimpleInventoryExtension.get_wielded_slot_data = function (self)
 	local slot_name = self.get_wielded_slot_name(self)
 	local slot_data = self.get_slot_data(self, slot_name)
 
 	return slot_data
 end
+
 SimpleInventoryExtension.get_item_name = function (self, slot_name)
 	local slot_data = self.get_slot_data(self, slot_name)
 	local item_data = slot_data and slot_data.item_data
@@ -831,15 +820,17 @@ SimpleInventoryExtension.get_item_name = function (self, slot_name)
 
 	return item_name
 end
+
 SimpleInventoryExtension.get_item_data = function (self, slot_name)
 	local slot_data = self.get_slot_data(self, slot_name)
 	local item_data = slot_data and slot_data.item_data
 
 	return item_data
 end
+
 SimpleInventoryExtension.resync_loadout = function (self, equipment_to_spawn)
 	if not equipment_to_spawn then
-		return 
+		return
 	end
 
 	local career_extension = self.career_extension
@@ -849,6 +840,7 @@ SimpleInventoryExtension.resync_loadout = function (self, equipment_to_spawn)
 
 	return resync_id
 end
+
 SimpleInventoryExtension.create_equipment_in_slot = function (self, slot_id, backend_id)
 	local item_data = BackendUtils.get_item_from_masterlist(backend_id)
 	local slot_data = self._equipment.slots[slot_id]
@@ -858,7 +850,7 @@ SimpleInventoryExtension.create_equipment_in_slot = function (self, slot_id, bac
 	local item_units = BackendUtils.get_item_units(item_data)
 
 	if weapon_already_equiped then
-		return 
+		return
 	end
 
 	self.destroy_slot(self, slot_id, true)
@@ -887,9 +879,8 @@ SimpleInventoryExtension.create_equipment_in_slot = function (self, slot_id, bac
 	end
 
 	self.resync_loadout_needed = true
-
-	return 
 end
+
 SimpleInventoryExtension._spawn_resynced_loadout = function (self, equipment_to_spawn)
 	local item_data = equipment_to_spawn.item_data
 	local slot_name = equipment_to_spawn.slot_id
@@ -917,19 +908,20 @@ SimpleInventoryExtension._spawn_resynced_loadout = function (self, equipment_to_
 	if slot_name ~= "slot_career_skill_weapon" then
 		self.wield(self, slot_name)
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.all_clients_loaded_resource = function (self, resync_id)
 	local profile_synchronizer = Managers.state.network.profile_synchronizer
 	local all_clients_have_loaded_resources = profile_synchronizer.all_clients_have_loaded_sync_id(profile_synchronizer, resync_id)
 
 	return all_clients_have_loaded_resources
 end
+
 local slots_to_check = {
 	slot_ranged = true,
 	slot_melee = true
 }
+
 SimpleInventoryExtension.has_ammo_consuming_weapon_equipped = function (self)
 	local equipment = self._equipment
 	local inventory_slots = equipment.slots
@@ -947,6 +939,7 @@ SimpleInventoryExtension.has_ammo_consuming_weapon_equipped = function (self)
 
 	return false
 end
+
 SimpleInventoryExtension.reset_ammo = function (self, slot_name)
 	local slot_data = self._equipment.slots[slot_name]
 	local right_hand_unit = slot_data.right_unit_1p
@@ -962,9 +955,8 @@ SimpleInventoryExtension.reset_ammo = function (self, slot_name)
 	if left_ammo_extension then
 		left_ammo_extension.reset(left_ammo_extension)
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.has_full_ammo = function (self)
 	local equipment = self._equipment
 	local inventory_slots = equipment.slots
@@ -987,6 +979,7 @@ SimpleInventoryExtension.has_full_ammo = function (self)
 
 	return full_ammo
 end
+
 SimpleInventoryExtension.apply_buffs_to_ammo = function (self)
 	local equipment = self._equipment
 	local inventory_slots = equipment.slots
@@ -1008,9 +1001,8 @@ SimpleInventoryExtension.apply_buffs_to_ammo = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.drop_level_event_item = function (self, slot_data)
 	local item_template = self.get_item_template(self, slot_data)
 	local weapon_unit = slot_data.right_unit_1p or slot_data.left_unit_1p
@@ -1031,9 +1023,8 @@ SimpleInventoryExtension.drop_level_event_item = function (self, slot_data)
 	end
 
 	self.destroy_slot(self, "slot_level_event")
-
-	return 
 end
+
 SimpleInventoryExtension.check_and_drop_pickups = function (self, drop_reason, override_pos, override_dir)
 	local unit = self._unit
 	local equipment = self._equipment
@@ -1081,14 +1072,12 @@ SimpleInventoryExtension.check_and_drop_pickups = function (self, drop_reason, o
 			end
 		end
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.set_loaded_projectile_override = function (self, settings)
 	self._loaded_projectile_settings_override = settings
-
-	return 
 end
+
 SimpleInventoryExtension._update_loaded_projectile_settings = function (self)
 	local loaded_projectile_settings = nil
 	local weapon_template = self.get_wielded_slot_item_template(self)
@@ -1103,12 +1092,12 @@ SimpleInventoryExtension._update_loaded_projectile_settings = function (self)
 	end
 
 	self._loaded_projectile_settings = loaded_projectile_settings
-
-	return 
 end
+
 SimpleInventoryExtension.get_loaded_projectile_settings = function (self)
 	return self._loaded_projectile_settings
 end
+
 SimpleInventoryExtension._update_selected_consumable_slot = function (self)
 	local slots = self._equipment.slots
 
@@ -1140,9 +1129,8 @@ SimpleInventoryExtension._update_selected_consumable_slot = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 SimpleInventoryExtension.get_selected_consumable_slot_template = function (self)
 	local slot_name = self._selected_consumable_slot
 	local slot_data = self._equipment.slots[slot_name]
@@ -1155,12 +1143,15 @@ SimpleInventoryExtension.get_selected_consumable_slot_template = function (self)
 
 	return item_template
 end
+
 SimpleInventoryExtension.get_selected_consumable_slot_name = function (self)
 	return self._selected_consumable_slot
 end
+
 SimpleInventoryExtension.resyncing_loadout = function (self)
 	return self._is_resyncing_loadout
 end
+
 SimpleInventoryExtension.get_item_slot_extension = function (self, slot_name, system_name)
 	local slot_data = self.get_slot_data(self, slot_name)
 	local right_unit_1p = slot_data.right_unit_1p
@@ -1175,6 +1166,7 @@ SimpleInventoryExtension.get_item_slot_extension = function (self, slot_name, sy
 
 	return extension
 end
+
 SimpleInventoryExtension.get_num_grimoires = function (self)
 	local buff_extension = ScriptUnit.extension(self._unit, "buff_system")
 	local num_grimoires = buff_extension.num_buff_perk(buff_extension, "skaven_grimoire")
@@ -1182,11 +1174,13 @@ SimpleInventoryExtension.get_num_grimoires = function (self)
 
 	return num_grimoires, num_twitch_grimoires
 end
+
 local buffs = {
 	client = {},
 	server = {},
 	both = {}
 }
+
 SimpleInventoryExtension._get_property_and_trait_buffs = function (self, backend_id)
 	local backend_items = self._backend_items
 
@@ -1196,6 +1190,7 @@ SimpleInventoryExtension._get_property_and_trait_buffs = function (self, backend
 
 	return GearUtils.get_property_and_trait_buffs(backend_items, backend_id, buffs)
 end
+
 SimpleInventoryExtension._wield_slot = function (self, equipment, slot_data, unit_1p, unit_3p, buff_extension)
 	Unit.flow_event(unit_1p, "lua_unwield")
 
@@ -1389,6 +1384,7 @@ SimpleInventoryExtension._wield_slot = function (self, equipment, slot_data, uni
 
 	return true
 end
+
 SimpleInventoryExtension.get_equipped_item_names = function (self)
 	local equipped = {}
 
@@ -1399,4 +1395,4 @@ SimpleInventoryExtension.get_equipped_item_names = function (self)
 	return equipped
 end
 
-return 
+return

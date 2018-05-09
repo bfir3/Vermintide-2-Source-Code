@@ -1775,4 +1775,4 @@ action_data.frenzy_attack.combo_attacks.attack_1 = {
 }
 BreedActions.chaos_berzerker = table.create_copy(BreedActions.chaos_berzerker, action_data)
 
-return 
+return

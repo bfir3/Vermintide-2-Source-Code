@@ -6,6 +6,7 @@ local PUSH_UPGRADES = {
 	heavy_sweep_push = "super_heavy_sweep_push",
 	weak_sweep_push = "upgraded_sweep_push"
 }
+
 ActionPushStagger.init = function (self, world, item_name, is_server, owner_unit, weapon_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.owner_unit_first_person = first_person_unit
@@ -24,9 +25,8 @@ ActionPushStagger.init = function (self, world, item_name, is_server, owner_unit
 	if ScriptUnit.has_extension(weapon_unit, "ammo_system") then
 		self.ammo_extension = ScriptUnit.extension(weapon_unit, "ammo_system")
 	end
-
-	return 
 end
+
 ActionPushStagger.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level, action_init_data)
 	local owner_unit = self.owner_unit
 	local first_person_unit = self.owner_unit_first_person
@@ -113,9 +113,8 @@ ActionPushStagger.client_owner_start_action = function (self, new_action, t, cha
 	status_extension.set_blocking(status_extension, true)
 	buff_extension.trigger_procs(buff_extension, "on_push_used")
 	Unit.animation_event(self.owner_unit_first_person, "hitreaction_defend_reset")
-
-	return 
 end
+
 local callback_context = {
 	has_gotten_callback = false,
 	overlap_units = {}
@@ -134,8 +133,6 @@ local function callback(actors)
 
 		overlap_units[callback_context.num_hits]:store(actor)
 	end
-
-	return 
 end
 
 ActionPushStagger.client_owner_post_update = function (self, dt, t, world, can_damage)
@@ -288,9 +285,8 @@ ActionPushStagger.client_owner_post_update = function (self, dt, t, world, can_d
 			})
 		end
 	end
-
-	return 
 end
+
 ActionPushStagger.finish = function (self, reason)
 	local hud_extension = ScriptUnit.has_extension(self.owner_unit, "hud_system")
 
@@ -325,8 +321,6 @@ ActionPushStagger.finish = function (self, reason)
 
 	status_extension.set_blocking(status_extension, false)
 	status_extension.set_has_blocked(status_extension, false)
-
-	return 
 end
 
-return 
+return

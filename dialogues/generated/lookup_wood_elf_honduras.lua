@@ -337,4 +337,4 @@ DialogueLookup[DialogueLookup_n + 167] = "pwe_gameplay_parry_bright_wizard"
 DialogueLookup[DialogueLookup_n + 168] = "pwe_gameplay_parry_empire_soldier"
 DialogueLookup_n = DialogueLookup_n + 168
 
-return 
+return

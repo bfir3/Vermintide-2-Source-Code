@@ -4,23 +4,22 @@ local unit_alive = Unit.alive
 local Profiler = Profiler
 
 local function nop()
-	return 
+	return
 end
 
 BTSelector_shield_marauder = class(BTSelector_shield_marauder, BTNode)
 BTSelector_shield_marauder.name = "BTSelector_shield_marauder"
+
 BTSelector_shield_marauder.init = function (self, ...)
 	BTSelector_shield_marauder.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTSelector_shield_marauder.leave = function (self, unit, blackboard, t, reason)
 	self.set_running_child(self, unit, blackboard, t, nil, reason)
-
-	return 
 end
+
 BTSelector_shield_marauder.run = function (self, unit, blackboard, t, dt)
 	local child_running = self.current_running_child(self, blackboard)
 	local children = self._children
@@ -276,13 +275,10 @@ BTSelector_shield_marauder.run = function (self, unit, blackboard, t, dt)
 	if result ~= "failed" then
 		return result, evaluate
 	end
-
-	return 
 end
+
 BTSelector_shield_marauder.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

@@ -594,4 +594,4 @@ weapon_template.tooltip_detail = {
 Weapons = Weapons or {}
 Weapons.staff_firefly_flamewave_template_1 = table.create_copy(Weapons.staff_firefly_flamewave, weapon_template)
 
-return 
+return

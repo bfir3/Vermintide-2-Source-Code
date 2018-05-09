@@ -308,4 +308,4 @@ weapon_template.wwise_dep_left_hand = {
 Weapons = Weapons or {}
 Weapons.shortbow_hagbane_template_1 = table.create_copy(Weapons.shortbow_hagbane_template_1, weapon_template)
 
-return 
+return

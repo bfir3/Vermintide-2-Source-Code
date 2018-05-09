@@ -1,5 +1,6 @@
 PlayerCharacterStateGrabbedByPackMaster = class(PlayerCharacterStateGrabbedByPackMaster, PlayerCharacterState)
 local position_lookup = POSITION_LOOKUP
+
 PlayerCharacterStateGrabbedByPackMaster.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "grabbed_by_pack_master")
 
@@ -14,9 +15,8 @@ PlayerCharacterStateGrabbedByPackMaster.init = function (self, character_state_i
 	for i = 1, self.bread_crumb_trail_n, 1 do
 		self.bread_crumb_trail[i] = Vector3Box()
 	end
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByPackMaster.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	local inventory_extension = self.inventory_extension
 
@@ -56,9 +56,8 @@ PlayerCharacterStateGrabbedByPackMaster.on_enter = function (self, unit, input, 
 	if states[self.pack_master_status].enter then
 		states[self.pack_master_status].enter(self, unit)
 	end
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByPackMaster.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local first_person_extension = self.first_person_extension
 	local status_extension = self.status_extension
@@ -83,8 +82,6 @@ PlayerCharacterStateGrabbedByPackMaster.on_exit = function (self, unit, input, d
 		local wwise_world = Managers.world:wwise_world(self.world)
 		slot11, slot12 = WwiseWorld.trigger_event(wwise_world, "stop_strangled_state", first_person_extension.get_first_person_unit(first_person_extension))
 	end
-
-	return 
 end
 
 function fix_mover(parent, unit)
@@ -101,16 +98,12 @@ function fix_mover(parent, unit)
 		QuickDrawerStay:line(pos, new_pos, Color(245, 0, 0))
 		QuickDrawerStay:sphere(new_pos, 0.3, Color(245, 245, 0))
 	end
-
-	return 
 end
 
 function update_mover(parent, unit)
 	local mover = Unit.mover(unit)
 
 	Mover.move(mover, Vector3(0, 0, -1.5), 0.03333333333333333)
-
-	return 
 end
 
 PlayerCharacterStateGrabbedByPackMaster.states = {
@@ -127,13 +120,9 @@ PlayerCharacterStateGrabbedByPackMaster.states = {
 			end
 
 			Managers.state.network:anim_event(unit, "packmaster_hooked")
-
-			return 
 		end,
 		run = function (parent, unit)
 			parent.last_valid_position:store(position_lookup[unit])
-
-			return 
 		end
 	},
 	pack_master_dragging = {
@@ -149,8 +138,6 @@ PlayerCharacterStateGrabbedByPackMaster.states = {
 			end
 
 			CharacterStateHelper.play_animation_event_first_person(parent.first_person_extension, "move_bwd")
-
-			return 
 		end,
 		run = function (parent, unit)
 			return true
@@ -159,8 +146,6 @@ PlayerCharacterStateGrabbedByPackMaster.states = {
 	pack_master_unhooked = {
 		run = function (parent, unit)
 			parent.last_valid_position:store(position_lookup[unit])
-
-			return 
 		end,
 		enter = function (parent, unit)
 			CharacterStateHelper.show_inventory_3p(unit, false, true, Managers.player.is_server, parent.inventory_extension)
@@ -179,26 +164,22 @@ PlayerCharacterStateGrabbedByPackMaster.states = {
 			end
 
 			parent.locomotion_extension:enable_animation_driven_movement()
-
-			return 
 		end
 	},
 	pack_master_hoisting = {
 		enter = function (parent, unit)
 			fix_mover(parent, unit)
-
-			return 
 		end,
 		run = function (parent, unit)
-			return 
+			return
 		end
 	},
 	pack_master_hanging = {
 		enter = function (parent, unit)
-			return 
+			return
 		end,
 		run = function (parent, unit)
-			return 
+			return
 		end
 	},
 	pack_master_dropping = {
@@ -219,16 +200,14 @@ PlayerCharacterStateGrabbedByPackMaster.states = {
 			end
 
 			parent.locomotion_extension:enable_animation_driven_movement()
-
-			return 
 		end,
 		run = function (parent, unit)
-			return 
+			return
 		end
 	},
 	pack_master_released = {
 		run = function (parent, unit)
-			return 
+			return
 		end,
 		enter = function (parent, unit)
 			parent.locomotion_extension:enable_script_driven_movement()
@@ -252,11 +231,10 @@ PlayerCharacterStateGrabbedByPackMaster.states = {
 
 				csm.change_state(csm, "standing")
 			end
-
-			return 
 		end
 	}
 }
+
 PlayerCharacterStateGrabbedByPackMaster.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -284,7 +262,7 @@ PlayerCharacterStateGrabbedByPackMaster.update = function (self, unit, input, dt
 	end
 
 	if not states[pack_master_status].run(self, unit) then
-		return 
+		return
 	end
 
 	local packmaster_unit = status_extension.get_pack_master_grabber(status_extension)
@@ -358,8 +336,6 @@ PlayerCharacterStateGrabbedByPackMaster.update = function (self, unit, input, dt
 			QuickDrawer:sphere(bread_crumb_position, 0.1, Colors.get("blue"))
 		end
 	end
-
-	return 
 end
 
-return 
+return

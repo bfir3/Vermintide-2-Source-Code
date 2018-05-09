@@ -1,14 +1,15 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTLootRatDodgeAction = class(BTLootRatDodgeAction, BTNode)
+
 BTLootRatDodgeAction.init = function (self, ...)
 	BTLootRatDodgeAction.super.init(self, ...)
-
-	return 
 end
+
 BTLootRatDodgeAction.name = "BTLootRatDodgeAction"
 local position_lookup = POSITION_LOOKUP
 local script_data = script_data
+
 BTLootRatDodgeAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -46,9 +47,8 @@ BTLootRatDodgeAction.enter = function (self, unit, blackboard, t)
 			QuickDrawerStay:line(unit_position, dodge_position, Color(255, 255, 0))
 		end
 	end
-
-	return 
 end
+
 BTLootRatDodgeAction.run = function (self, unit, blackboard, t, dt)
 	if not blackboard.is_dodging then
 		return "done"
@@ -79,6 +79,7 @@ BTLootRatDodgeAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTLootRatDodgeAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
 	blackboard.is_dodging = nil
@@ -98,9 +99,8 @@ BTLootRatDodgeAction.leave = function (self, unit, blackboard, t, reason, destro
 
 		QuickDrawerStay:sphere(unit_position, 0.25, Color(0, 255, 0))
 	end
-
-	return 
 end
+
 BTLootRatDodgeAction.dodge = function (self, unit, blackboard, dodge_vector, threat_vector)
 	local unit_position = position_lookup[unit]
 	local velocity = blackboard.locomotion_extension:current_velocity()
@@ -132,9 +132,8 @@ BTLootRatDodgeAction.dodge = function (self, unit, blackboard, dodge_vector, thr
 
 		return dodge_position, pass_check_position, 0 < Vector3.cross(-dodge_direction, normalized_velocity).z
 	end
-
-	return 
 end
+
 BTLootRatDodgeAction.try_dodge_position = function (self, unit, blackboard, unit_position, dodge_position)
 	local success, altitude = GwNavQueries.triangle_from_position(blackboard.nav_world, dodge_position, 3, 3)
 
@@ -147,8 +146,6 @@ BTLootRatDodgeAction.try_dodge_position = function (self, unit, blackboard, unit
 			return dodge_position
 		end
 	end
-
-	return 
 end
 
-return 
+return

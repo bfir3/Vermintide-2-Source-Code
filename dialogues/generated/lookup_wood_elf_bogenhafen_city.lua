@@ -81,4 +81,4 @@ DialogueLookup[DialogueLookup_n + 39] = "pwe_level_bogenhafen_city _intro_b"
 DialogueLookup[DialogueLookup_n + 40] = "pwe_level_bogenhafen_city _intro_c"
 DialogueLookup_n = DialogueLookup_n + 40
 
-return 
+return

@@ -8,6 +8,7 @@ local extensions = {
 	"PayloadExtension",
 	"PayloadGizmoExtension"
 }
+
 PayloadSystem.init = function (self, entity_system_creation_context, system_name)
 	PayloadSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -18,14 +19,12 @@ PayloadSystem.init = function (self, entity_system_creation_context, system_name
 
 	self._payloads = {}
 	self._payload_gizmos = {}
-
-	return 
 end
+
 PayloadSystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
-
-	return 
 end
+
 PayloadSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data, ...)
 	local payload_gizmos = self._payload_gizmos
 	local extension = nil
@@ -49,6 +48,7 @@ PayloadSystem.on_add_extension = function (self, world, unit, extension_name, ex
 
 	return extension
 end
+
 PayloadSystem.init_payloads = function (self)
 	local payloads = self._payloads
 	local num_payloads = #payloads
@@ -62,20 +62,18 @@ PayloadSystem.init_payloads = function (self)
 
 		extension.init_payload(extension, gizmos)
 	end
-
-	return 
 end
+
 PayloadSystem.rpc_payload_flow_event = function (self, sender, payload_unit_id, spline_index)
 	local level = LevelHelper:current_level(self.world)
 	local unit = Level.unit_by_index(level, payload_unit_id)
 	local extension = ScriptUnit.extension(unit, "payload_system")
 
 	extension.payload_flow_event(extension, spline_index)
-
-	return 
 end
+
 PayloadSystem.hot_join_sync = function (self)
-	return 
+	return
 end
 
-return 
+return

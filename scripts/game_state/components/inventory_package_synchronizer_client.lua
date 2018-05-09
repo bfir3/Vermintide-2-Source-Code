@@ -3,10 +3,10 @@ require("scripts/managers/backend/backend_utils")
 
 script_data.profile_package_loading_debug = script_data.profile_package_loading_debug or Development.parameter("profile_package_loading_debug")
 local profile_printf = (script_data.profile_package_loading_debug and printf) or function ()
-	return 
+	return
 end
 local network_printf = (script_data.network_debug and printf) or function ()
-	return 
+	return
 end
 InventoryPackageSynchronizerClient = class(InventoryPackageSynchronizerClient)
 
@@ -130,19 +130,18 @@ InventoryPackageSynchronizerClient.init = function (self, is_server)
 	self.packages_map = {}
 	self.unload_package_map = {}
 	self.is_server = is_server
-
-	return 
 end
+
 InventoryPackageSynchronizerClient.destroy = function (self)
 	local package_manager = Managers.package
 
 	for package_name, _ in pairs(self.packages_map) do
 		package_manager.unload(package_manager, package_name, "InventoryPackageSynchronizerClient")
 	end
-
-	return 
 end
+
 local empty_table = {}
+
 InventoryPackageSynchronizerClient.build_inventory_lists = function (self, profile_index, career_index)
 	if not profile_index or profile_index == 0 then
 		return empty_table, empty_table
@@ -153,14 +152,14 @@ InventoryPackageSynchronizerClient.build_inventory_lists = function (self, profi
 
 	return inventory_list, inventory_list_first_player
 end
+
 InventoryPackageSynchronizerClient.register_rpc = function (self, network_transmit, network_event_delegate)
 	self.network_transmit = network_transmit
 	self.network_event_delegate = network_event_delegate
 
 	network_event_delegate.register(network_event_delegate, self, "rpc_server_set_inventory_packages")
-
-	return 
 end
+
 InventoryPackageSynchronizerClient.unregister = function (self)
 	if self.network_event_delegate then
 		self.network_event_delegate:unregister(self)
@@ -168,8 +167,6 @@ InventoryPackageSynchronizerClient.unregister = function (self)
 		self.network_event_delegate = nil
 		self.network_transmit = nil
 	end
-
-	return 
 end
 
 local function inventory_array_to_set(array, destination)
@@ -179,17 +176,16 @@ local function inventory_array_to_set(array, destination)
 		local inventory_package_name = inventory_packages_lut[value]
 		destination[inventory_package_name] = true
 	end
-
-	return 
 end
 
 local temp_package_map = {}
+
 InventoryPackageSynchronizerClient.rpc_server_set_inventory_packages = function (self, sender, inventory_sync_id, inventory_package_list)
 	local network_manager = Managers.state and Managers.state.network
 	local ignore_lobby_rpcs = network_manager and network_manager.ignore_lobby_rpcs
 
 	if ignore_lobby_rpcs then
-		return 
+		return
 	end
 
 	local peer_id = Network:peer_id()
@@ -197,7 +193,7 @@ InventoryPackageSynchronizerClient.rpc_server_set_inventory_packages = function 
 	if self.is_server and sender ~= peer_id then
 		network_printf("[NETWORK] got rpc_server_set_inventory_packages from " .. sender .. ", is_server:" .. tostring(self.is_server) .. "  --> ignogering")
 
-		return 
+		return
 	end
 
 	network_printf("[NETWORK] rpc_server_set_inventory_packages, sender:%s inventory_sync_id:%d my_peer_id:%s", sender, inventory_sync_id, peer_id)
@@ -240,9 +236,8 @@ InventoryPackageSynchronizerClient.rpc_server_set_inventory_packages = function 
 	self.all_loaded = false
 
 	table.clear(temp_package_map)
-
-	return 
 end
+
 InventoryPackageSynchronizerClient.update = function (self, dt)
 	local package_manager = Managers.package
 	local unload_package_map = self.unload_package_map
@@ -316,11 +311,10 @@ InventoryPackageSynchronizerClient.update = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 InventoryPackageSynchronizerClient.is_package_required = function (self, package_name)
 	return self.packages_map[package_name] ~= nil
 end
 
-return 
+return

@@ -9,7 +9,7 @@ local scenegraph_definition = definitions.scenegraph_definition
 local debug_widget_definitions = definitions.debug_widget_definitions
 
 local function dprint(...)
-	return 
+	return
 end
 
 local function get_portrait_name_by_profile_index(profile_index, career_index)
@@ -24,6 +24,7 @@ local function get_portrait_name_by_profile_index(profile_index, career_index)
 end
 
 MatchmakingUI = class(MatchmakingUI)
+
 MatchmakingUI.init = function (self, ingame_ui_context)
 	self.level_transition_handler = ingame_ui_context.level_transition_handler
 	self.network_event_delegate = ingame_ui_context.network_event_delegate
@@ -56,9 +57,8 @@ MatchmakingUI.init = function (self, ingame_ui_context)
 		self._enable_cancel_matchmaking(self)
 		self._update_button_prompts(self)
 	end
-
-	return 
 end
+
 MatchmakingUI.create_ui_elements = function (self)
 	self.ui_animations = {}
 	local widgets = {}
@@ -104,9 +104,8 @@ MatchmakingUI.create_ui_elements = function (self)
 	end
 
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
-
-	return 
 end
+
 MatchmakingUI._enable_cancel_matchmaking = function (self)
 	self._allow_cancel_matchmaking = true
 
@@ -115,21 +114,24 @@ MatchmakingUI._enable_cancel_matchmaking = function (self)
 			widget.content.visible = true
 		end
 	end
-
-	return 
 end
+
 MatchmakingUI._get_widget = function (self, name)
 	return self._widgets_by_name[name]
 end
+
 MatchmakingUI._get_detail_widget = function (self, name)
 	return self._detail_widgets_by_name[name]
 end
+
 MatchmakingUI.is_enter_game = function (self)
 	return self.countdown_ui:is_enter_game()
 end
+
 MatchmakingUI.is_in_inn = function (self)
 	return self.is_in_inn
 end
+
 MatchmakingUI.update = function (self, dt, t, show_detailed_matchmaking_info)
 	local countdown_ui = self.countdown_ui
 	local ui_renderer = self.ui_renderer
@@ -149,7 +151,7 @@ MatchmakingUI.update = function (self, dt, t, show_detailed_matchmaking_info)
 	end
 
 	if ui_suspended and not enter_game then
-		return 
+		return
 	end
 
 	if show_detailed_matchmaking_info ~= self._show_detailed_matchmaking_info then
@@ -208,9 +210,8 @@ MatchmakingUI.update = function (self, dt, t, show_detailed_matchmaking_info)
 
 		self._draw(self, ui_top_renderer, input_service, is_matchmaking, dt)
 	end
-
-	return 
 end
+
 MatchmakingUI._draw = function (self, ui_renderer, input_service, is_matchmaking, dt)
 	local detailed_info_visibility_progress = self._detailed_info_visibility_progress
 
@@ -242,16 +243,14 @@ MatchmakingUI._draw = function (self, ui_renderer, input_service, is_matchmaking
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 MatchmakingUI.draw_debug_lobbies = function (self, ui_renderer, input_service, dt)
 	UIRenderer.begin_pass(ui_renderer, self.ui_scenegraph, input_service, dt)
 	UIRenderer.draw_widget(ui_renderer, self.debug_lobbies_widget)
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 MatchmakingUI._update_background = function (self, is_matchmaking, has_mission_vote)
 	local background_texture = nil
 
@@ -268,9 +267,8 @@ MatchmakingUI._update_background = function (self, is_matchmaking, has_mission_v
 			background_widget.content.background.texture_id = background_texture
 		end
 	end
-
-	return 
 end
+
 MatchmakingUI._update_matchmaking_info = function (self, t)
 	local matchmaking_info = self.matchmaking_manager:search_info()
 	local cached_matchmaking_info = self._cached_matchmaking_info
@@ -290,7 +288,7 @@ MatchmakingUI._update_matchmaking_info = function (self, t)
 		local widget = self._get_detail_widget(self, "difficulty_text")
 		widget.content.text = ""
 
-		return 
+		return
 	end
 
 	local difficulty = matchmaking_info.difficulty
@@ -332,9 +330,8 @@ MatchmakingUI._update_matchmaking_info = function (self, t)
 
 		self._set_status_text(self, status)
 	end
-
-	return 
 end
+
 MatchmakingUI._update_status = function (self, dt)
 	local rotation_progresss = ((self._rotation_progresss or 0) + dt * 0.2) % 1
 	self._rotation_progresss = rotation_progresss
@@ -356,9 +353,8 @@ MatchmakingUI._update_status = function (self, dt)
 		local connecting_icon_style = style.connecting_icon
 		connecting_icon_style.angle = (is_connecting and connecting_icon_style.angle + connecting_radians) or 0
 	end
-
-	return 
 end
+
 MatchmakingUI._update_mission_vote_status = function (self)
 	local voting_manager = self.voting_manager
 	local active_vote_name = voting_manager.vote_in_progress(voting_manager)
@@ -383,9 +379,8 @@ MatchmakingUI._update_mission_vote_status = function (self)
 	self._set_detail_difficulty_text(self, difficulty_display_name)
 	self._set_detail_level_text(self, level_display_name)
 	self._set_status_text(self, status)
-
-	return 
 end
+
 MatchmakingUI._update_mission_vote_player_status = function (self)
 	local voting_manager = self.voting_manager
 	local voters = self.voting_manager:get_current_voters()
@@ -401,9 +396,8 @@ MatchmakingUI._update_mission_vote_player_status = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 MatchmakingUI._update_mission_timer = function (self)
 	local voting_manager = self.voting_manager
 	local vote_template = voting_manager.active_vote_template(voting_manager)
@@ -412,9 +406,8 @@ MatchmakingUI._update_mission_timer = function (self)
 	local time_progress = math.max(vote_time_left / duration, 0)
 
 	self._set_vote_time_progress(self, time_progress)
-
-	return 
 end
+
 MatchmakingUI._update_show_timer = function (self, has_mission_vote)
 	local alpha = nil
 
@@ -430,14 +423,13 @@ MatchmakingUI._update_show_timer = function (self, has_mission_vote)
 	bg.style.texture_id.color[1] = alpha
 	fg.style.texture_id.color[1] = alpha
 	glow.style.texture_id.color[1] = alpha
-
-	return 
 end
+
 MatchmakingUI.update_debug = function (self)
 	local lobby = Managers.matchmaking:active_lobby()
 
 	if not lobby then
-		return 
+		return
 	end
 
 	local debug_text = ""
@@ -482,9 +474,8 @@ MatchmakingUI.update_debug = function (self)
 	debug_text = debug_text .. "\nWood elf: \t\t" .. wood_elf_player
 	debug_text = debug_text .. "\nEmpire Soldier: \t" .. empire_soldier_player
 	self.debug_box_widget.content.debug_text = debug_text
-
-	return 
 end
+
 MatchmakingUI.update_debug_lobbies = function (self)
 
 	-- Decompilation error in this vicinity:
@@ -509,14 +500,12 @@ MatchmakingUI.update_debug_lobbies = function (self)
 	self.debug_lobbies_widget.content.debug_host_text = debug_host_text
 	self.debug_lobbies_widget.content.debug_lobby_id_text = debug_lobby_id_text
 	self.debug_lobbies_widget.content.debug_hash_text = debug_hash_text
-
-	return 
 end
+
 MatchmakingUI.destroy = function (self)
 	rawset(_G, "GLOBAL_MMUI", nil)
-
-	return 
 end
+
 MatchmakingUI.get_input_texture_data = function (self, input_action)
 	local input_manager = self.input_manager
 	local input_service = input_manager.get_service(input_manager, "ingame_menu")
@@ -550,9 +539,10 @@ MatchmakingUI.get_input_texture_data = function (self, input_action)
 
 	return nil, ""
 end
+
 MatchmakingUI._update_button_prompts = function (self)
 	if not self._allow_cancel_matchmaking then
-		return 
+		return
 	end
 
 	local ui_scenegraph = self.ui_scenegraph
@@ -614,9 +604,8 @@ MatchmakingUI._update_button_prompts = function (self)
 			text_widget_suffix.style.text_shadow.offset[1] = offset + text_width_prefix + text_width_input + 2
 		end
 	end
-
-	return 
 end
+
 MatchmakingUI._update_portraits = function (self, has_mission_vote)
 	local profile_synchronizer = self.profile_synchronizer
 	local player_manager = Managers.player
@@ -672,9 +661,8 @@ MatchmakingUI._update_portraits = function (self, has_mission_vote)
 			end
 		end
 	end
-
-	return 
 end
+
 MatchmakingUI._get_portrait_index = function (self, peer_id)
 	local portrait_index_table = self.portrait_index_table
 
@@ -685,9 +673,8 @@ MatchmakingUI._get_portrait_index = function (self, peer_id)
 			return i
 		end
 	end
-
-	return 
 end
+
 MatchmakingUI._get_first_free_portrait_index = function (self)
 	local portrait_index_table = self.portrait_index_table
 
@@ -698,31 +685,27 @@ MatchmakingUI._get_first_free_portrait_index = function (self)
 			return i
 		end
 	end
-
-	return 
 end
+
 MatchmakingUI.large_window_set_title = function (self, title)
 	local widget = self._get_detail_widget(self, "title_text")
 	widget.content.text = Localize(title)
-
-	return 
 end
+
 MatchmakingUI.large_window_set_status_message = function (self, message)
 	assert(message ~= " ", "tried to pass empty status message to matchmaking ui")
 
 	local widget = self._get_widget(self, "status_text")
 	widget.content.text = Localize(message)
-
-	return 
 end
+
 MatchmakingUI.large_window_set_difficulty = function (self, difficulty)
 	local difficulty_setting = difficulty and DifficultySettings[difficulty]
 	local difficulty_display_name = (difficulty_setting and difficulty_setting.display_name) or "dlc1_2_difficulty_unavailable"
 	local widget = self._get_detail_widget(self, "difficulty_text")
 	widget.content.text = Localize(difficulty_display_name)
-
-	return 
 end
+
 MatchmakingUI.large_window_set_player_portrait = function (self, index, peer_id)
 	local widget = self._get_detail_widget(self, "party_slot_" .. index)
 	local status_widget = self._get_widget(self, "player_status_" .. index)
@@ -751,9 +734,8 @@ MatchmakingUI.large_window_set_player_portrait = function (self, index, peer_id)
 	status_widget.content.is_connected = portrait_texture ~= nil
 	portrait_texture = portrait_texture or "small_unit_frame_portrait_default"
 	content.portrait = portrait_texture
-
-	return 
 end
+
 MatchmakingUI._get_party_slot_index_by_peer_id = function (self, peer_id)
 	for i = 1, 4, 1 do
 		local widget_name = "party_slot_" .. i
@@ -764,9 +746,8 @@ MatchmakingUI._get_party_slot_index_by_peer_id = function (self, peer_id)
 			return i
 		end
 	end
-
-	return 
 end
+
 MatchmakingUI._sync_players_ready_state = function (self, dt)
 	local player_manager = Managers.player
 	local human_players = player_manager.human_players(player_manager)
@@ -785,56 +766,48 @@ MatchmakingUI._sync_players_ready_state = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 MatchmakingUI._set_player_ready_state = function (self, index, is_ready)
 	local widget = self._get_detail_widget(self, "party_slot_" .. index)
 	local status_widget = self._get_widget(self, "player_status_" .. index)
 	widget.content.is_ready = is_ready
 	status_widget.content.is_ready = is_ready
 	status_widget.content.texture_id = (is_ready and "matchmaking_light_01") or "matchmaking_light_02"
-
-	return 
 end
+
 MatchmakingUI.large_window_set_player_connecting = function (self, index, is_connecting)
 	local widget = self._get_detail_widget(self, "party_slot_" .. index)
 	local status_widget = self._get_widget(self, "player_status_" .. index)
 	widget.content.is_connecting = is_connecting
 	status_widget.content.is_connecting = is_connecting
-
-	return 
 end
+
 MatchmakingUI._set_player_is_voting = function (self, index, is_voting)
 	local widget = self._get_detail_widget(self, "party_slot_" .. index)
 	widget.content.is_voting = is_voting
-
-	return 
 end
+
 MatchmakingUI._set_player_voted_yes = function (self, index, voted_yes)
 	local widget = self._get_detail_widget(self, "party_slot_" .. index)
 	widget.content.voted_yes = voted_yes
-
-	return 
 end
+
 MatchmakingUI._set_detail_difficulty_text = function (self, text)
 	local widget = self._get_detail_widget(self, "difficulty_text")
 	widget.content.text = Localize(text)
-
-	return 
 end
+
 MatchmakingUI._set_detail_level_text = function (self, text)
 	local widget = self._get_detail_widget(self, "title_text")
 	widget.content.text = Localize(text)
-
-	return 
 end
+
 MatchmakingUI._set_status_text = function (self, text)
 	local widget = self._get_widget(self, "status_text")
 	widget.content.text = Localize(text)
-
-	return 
 end
+
 MatchmakingUI._set_vote_time_progress = function (self, progress)
 	local widget = self._get_detail_widget(self, "timer_fg")
 	local content = widget.content
@@ -845,106 +818,86 @@ MatchmakingUI._set_vote_time_progress = function (self, progress)
 	local current_size = self.ui_scenegraph[scenegraph_id].size
 	current_size[1] = default_size[1] * progress
 	uvs[2][1] = progress
-
-	return 
 end
+
 MatchmakingUI.large_window_set_cancel_button_text = function (self, suffix_text)
 	dprint("[MatchmakingUI] - Function ( large_window_set_cancel_button_text ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_set_ready_button_text = function (self, suffix_text)
 	dprint("[MatchmakingUI] - Function ( large_window_set_ready_button_text ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_set_action_button_text = function (self, suffix_text)
 	dprint("[MatchmakingUI] - Function ( large_window_set_action_button_text ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_start_ready_pulse = function (self)
 	dprint("[MatchmakingUI] - Function ( large_window_start_ready_pulse ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_stop_ready_pulse = function (self)
 	dprint("[MatchmakingUI] - Function ( large_window_stop_ready_pulse ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_set_time = function (self, time)
 	dprint("[MatchmakingUI] - Function ( large_window_set_time ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_set_search_zone_title = function (self, title)
 	dprint("[MatchmakingUI] - Function ( large_window_set_search_zone_title ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_set_level = function (self, level_key, optional_name, optional_image)
 	dprint("[MatchmakingUI] - Function ( large_window_set_level ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.set_zone_visible = function (self, visible)
 	dprint("[MatchmakingUI] - Function ( set_zone_visible ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.set_search_zone_host_title = function (self, text)
 	dprint("[MatchmakingUI] - Function ( set_search_zone_host_title ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.set_ready_area_enabled = function (self, enabled, error_message)
 	dprint("[MatchmakingUI] - Function ( set_ready_area_enabled ) is deprecated")
+end
 
-	return 
-end
 MatchmakingUI.set_minimize = function (self, set)
-	return 
+	return
 end
+
 MatchmakingUI.animate_large_window = function (self, minimize)
 	dprint("[MatchmakingUI] - Function ( animate_large_window ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.set_ready_progress = function (self, progress)
 	dprint("[MatchmakingUI] - Function ( set_ready_progress ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.set_start_progress = function (self, progress)
 	dprint("[MatchmakingUI] - Function ( set_start_progress ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.set_cancel_progress = function (self, progress)
 	dprint("[MatchmakingUI] - Function ( set_cancel_progress ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_ready_enable = function (self, enable)
 	dprint("[MatchmakingUI] - Function ( large_window_ready_enable ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_cancel_enable = function (self, enable)
 	dprint("[MatchmakingUI] - Function ( large_window_cancel_enable ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.set_action_area_visible = function (self, visible, instant_hide)
 	dprint("[MatchmakingUI] - Function ( set_action_area_visible ) is deprecated")
-
-	return 
 end
+
 MatchmakingUI.large_window_set_player_ready_state = function (self, index, is_ready)
 	dprint("[MatchmakingUI] - Function ( large_window_set_player_ready_state ) is deprecated")
-
-	return 
 end
 
-return 
+return

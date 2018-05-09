@@ -1,15 +1,14 @@
 SimplePopup = class(SimplePopup)
+
 SimplePopup.init = function (self)
 	self._tracked_popups = {}
-
-	return 
 end
+
 SimplePopup.queue_popup = function (self, text, topic, ...)
 	local id = Managers.popup:queue_popup(text, topic, ...)
 	self._tracked_popups[#self._tracked_popups + 1] = id
-
-	return 
 end
+
 SimplePopup.update = function (self, dt)
 	local manager = Managers.popup
 	local first = self._tracked_popups[1]
@@ -25,11 +24,10 @@ SimplePopup.update = function (self, dt)
 			table.remove(self._tracked_popups, i)
 		end
 	end
-
-	return 
 end
+
 SimplePopup.destroy = function (self)
-	return 
+	return
 end
 
-return 
+return

@@ -77,4 +77,4 @@ DialogueLookup[DialogueLookup_n + 37] = "pwe_level_bogenhafen_slum_intro_c"
 DialogueLookup[DialogueLookup_n + 38] = "pwe_level_bogenhafen_slum_fortify_prep"
 DialogueLookup_n = DialogueLookup_n + 38
 
-return 
+return

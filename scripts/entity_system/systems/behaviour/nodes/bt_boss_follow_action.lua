@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTBossFollowAction = class(BTBossFollowAction, BTNode)
+
 BTBossFollowAction.init = function (self, ...)
 	BTBossFollowAction.super.init(self, ...)
-
-	return 
 end
+
 BTBossFollowAction.name = "BTBossFollowAction"
+
 BTBossFollowAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -29,9 +30,8 @@ BTBossFollowAction.enter = function (self, unit, blackboard, t)
 
 		network_manager.network_transmit:send_rpc_all("rpc_tutorial_message", template_id, message_id)
 	end
-
-	return 
 end
+
 BTBossFollowAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
@@ -47,9 +47,8 @@ BTBossFollowAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.anim_cb_rotation_start = nil
 	blackboard.anim_cb_move = nil
 	blackboard.animation_lean = nil
-
-	return 
 end
+
 BTBossFollowAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion_extension = blackboard.locomotion_extension
 
@@ -59,6 +58,7 @@ BTBossFollowAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running", "evaluate"
 end
+
 BTBossFollowAction._go_idle = function (self, unit, blackboard, navigation_extension, locomotion_extension)
 	blackboard.move_state = "idle"
 
@@ -77,16 +77,14 @@ BTBossFollowAction._go_idle = function (self, unit, blackboard, navigation_exten
 
 		locomotion_extension.set_wanted_rotation(locomotion_extension, rot)
 	end
-
-	return 
 end
+
 BTBossFollowAction._go_moving = function (self, unit, blackboard, action)
 	blackboard.move_state = "moving"
 
 	Managers.state.network:anim_event(unit, action.move_anim)
-
-	return 
 end
+
 BTBossFollowAction.follow = function (self, unit, t, dt, blackboard, locomotion_extension)
 	local navigation_extension = blackboard.navigation_extension
 
@@ -157,10 +155,10 @@ BTBossFollowAction.follow = function (self, unit, t, dt, blackboard, locomotion_
 			locomotion_extension.set_wanted_rotation(locomotion_extension, nil)
 		end
 	end
-
-	return 
 end
+
 local broad_phase_fling_units = {}
+
 BTBossFollowAction.check_fling_skaven = function (self, unit, blackboard, t)
 	local forward = Quaternion.forward(Unit.local_rotation(unit, 0))
 	local check_pos = POSITION_LOOKUP[unit] + forward * 2.6
@@ -183,14 +181,15 @@ BTBossFollowAction.check_fling_skaven = function (self, unit, blackboard, t)
 			end
 		end
 	end
-
-	return 
 end
+
 BTBossFollowAction._follow_target_rat_ogre = function (self, unit, blackboard, t, dt)
 	return LocomotionUtils.follow_target_ogre(unit, blackboard, t, dt)
 end
+
 local STORMFIEND_TARGET_HAS_MOVED_DISTANCE_SQ = 25
 local STORMFIEND_MIN_REQUIRED_DISTANCE_CHANGE_SQ = 0.25
+
 BTBossFollowAction._follow_target_stormfiend = function (self, unit, blackboard, t, dt)
 	local nav_world = blackboard.nav_world
 	local action = blackboard.action
@@ -271,17 +270,17 @@ BTBossFollowAction._follow_target_stormfiend = function (self, unit, blackboard,
 
 	return position
 end
+
 BTBossFollowAction._follow_target_chaos_spawn = function (self, unit, blackboard, t, dt)
 	return LocomotionUtils.follow_target_ogre(unit, blackboard, t, dt)
 end
+
 BTBossFollowAction._debug_big_boy_turning = function (self, blackboard)
 	if script_data.debug_ai_movement then
 		local turning = (blackboard.is_turning and "true") or "false"
 
 		Debug.text("move_state:%s turning:%s", blackboard.move_state, turning)
 	end
-
-	return 
 end
 
-return 
+return

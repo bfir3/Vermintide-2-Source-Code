@@ -12,8 +12,6 @@ local flow_events = definitions.flow_events
 
 local function dprint(...)
 	print("[StartMenuView]", ...)
-
-	return 
 end
 
 local platform = PLATFORM
@@ -37,12 +35,13 @@ local debug_menu = true
 StartMenuView = class(StartMenuView)
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
+
 StartMenuView.init = function (self, ingame_ui_context)
 	self.world = ingame_ui_context.world
 	self.player_manager = ingame_ui_context.player_manager
@@ -81,12 +80,12 @@ StartMenuView.init = function (self, ingame_ui_context)
 	self.ui_animations = {}
 	self.ingame_ui_context = ingame_ui_context
 	DO_RELOAD = false
-
-	return 
 end
+
 StartMenuView.initial_profile_view = function (self)
 	return self.ingame_ui.initial_profile_view
 end
+
 StartMenuView._setup_state_machine = function (self, state_machine_params, optional_start_state, optional_start_sub_state)
 	if self._machine then
 		self._machine:destroy()
@@ -99,17 +98,16 @@ StartMenuView._setup_state_machine = function (self, state_machine_params, optio
 	state_machine_params.start_state = optional_start_sub_state
 	self._machine = GameStateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
 	self._state_machine_params = state_machine_params
-
-	return 
 end
+
 StartMenuView.wanted_state = function (self)
 	return self._wanted_state
 end
+
 StartMenuView.clear_wanted_state = function (self)
 	self._wanted_state = nil
-
-	return 
 end
+
 StartMenuView.input_service = function (self, ignore_state_input)
 	if not ignore_state_input then
 		local state_machine = self._machine
@@ -123,19 +121,19 @@ StartMenuView.input_service = function (self, ignore_state_input)
 
 	return self.input_manager:get_service("start_menu_view")
 end
+
 StartMenuView.set_input_blocked = function (self, blocked)
 	self._input_blocked = blocked
-
-	return 
 end
+
 StartMenuView.input_blocked = function (self)
 	return self._input_blocked
 end
+
 StartMenuView.play_sound = function (self, event)
 	WwiseWorld.trigger_event(self.wwise_world, event)
-
-	return 
 end
+
 StartMenuView.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self._static_widgets = {}
@@ -145,9 +143,8 @@ StartMenuView.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_top_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, definitions.animations)
-
-	return 
 end
+
 StartMenuView.get_background_world = function (self)
 	local previewer_pass_data = self.viewport_widget.element.pass_data[1]
 	local viewport = previewer_pass_data.viewport
@@ -155,6 +152,7 @@ StartMenuView.get_background_world = function (self)
 
 	return world, viewport
 end
+
 StartMenuView.show_hero_world = function (self)
 	if not self._draw_menu_world then
 		self._draw_menu_world = true
@@ -164,9 +162,8 @@ StartMenuView.show_hero_world = function (self)
 
 		ScriptWorld.deactivate_viewport(world, viewport)
 	end
-
-	return 
 end
+
 StartMenuView.hide_hero_world = function (self)
 	if self._draw_menu_world then
 		self._draw_menu_world = false
@@ -176,9 +173,8 @@ StartMenuView.hide_hero_world = function (self)
 
 		ScriptWorld.activate_viewport(world, viewport)
 	end
-
-	return 
 end
+
 StartMenuView.draw = function (self, dt, input_service)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -206,18 +202,16 @@ StartMenuView.draw = function (self, dt, input_service)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 StartMenuView.post_update = function (self, dt, t)
 	self._machine:post_update(dt, t)
 	self.world_previewer:post_update(dt, t)
-
-	return 
 end
+
 StartMenuView.update = function (self, dt, t)
 	if self.suspended or self.waiting_for_post_update_enter then
-		return 
+		return
 	end
 
 	local requested_screen_change_data = self._requested_screen_change_data
@@ -257,9 +251,8 @@ StartMenuView.update = function (self, dt, t)
 
 	self._machine:update(dt, t)
 	self.draw(self, dt, input_service)
-
-	return 
 end
+
 StartMenuView.on_enter = function (self, menu_state_name, menu_sub_state_name)
 	ShowCursorStack.push()
 
@@ -288,9 +281,8 @@ StartMenuView.on_enter = function (self, menu_state_name, menu_sub_state_name)
 	self.play_sound(self, "play_gui_amb_start_screen_enter")
 	self.play_sound(self, "play_gui_amb_hero_screen_loop_begin")
 	self.play_sound(self, "Play_menu_screen_music")
-
-	return 
 end
+
 StartMenuView.set_current_hero = function (self, profile_index)
 	local profile_settings = SPProfiles[profile_index]
 	local display_name = profile_settings.display_name
@@ -298,9 +290,8 @@ StartMenuView.set_current_hero = function (self, profile_index)
 	self._hero_name = display_name
 	local params = self._state_machine_params
 	params.hero_name = display_name
-
-	return 
 end
+
 StartMenuView._get_sorted_players = function (self)
 	local human_players = self.player_manager:human_players()
 	local player_order = {}
@@ -315,9 +306,11 @@ StartMenuView._get_sorted_players = function (self)
 
 	return player_order
 end
+
 StartMenuView._handle_mouse_input = function (self, dt, t, input_service)
-	return 
+	return
 end
+
 StartMenuView._is_selection_widget_pressed = function (self, widget)
 	local content = widget.content
 	local steps = content.steps
@@ -330,9 +323,8 @@ StartMenuView._is_selection_widget_pressed = function (self, widget)
 			return true, i
 		end
 	end
-
-	return 
 end
+
 StartMenuView.hotkey_allowed = function (self, input, mapping_data)
 	if self.input_blocked(self) then
 		return false
@@ -365,23 +357,22 @@ StartMenuView.hotkey_allowed = function (self, input, mapping_data)
 
 	return false
 end
+
 StartMenuView._get_screen_settings_by_state_name = function (self, state_name)
 	for index, screen_settings in ipairs(settings_by_screen) do
 		if screen_settings.state_name == state_name then
 			return screen_settings
 		end
 	end
-
-	return 
 end
+
 StartMenuView.requested_screen_change_by_name = function (self, screen_name, sub_screen_name)
 	self._requested_screen_change_data = {
 		screen_name = screen_name,
 		sub_screen_name = sub_screen_name
 	}
-
-	return 
 end
+
 StartMenuView._change_screen_by_name = function (self, screen_name, sub_screen_name)
 	local settings, settings_index = nil
 
@@ -426,17 +417,15 @@ StartMenuView._change_screen_by_name = function (self, screen_name, sub_screen_n
 		self.world_previewer:set_camera_rotation_axis_offset("y", camera_rotation[2], 0.5, math.easeOutCubic)
 		self.world_previewer:set_camera_rotation_axis_offset("z", camera_rotation[3], 0.5, math.easeOutCubic)
 	end
-
-	return 
 end
+
 StartMenuView._change_screen_by_index = function (self, index)
 	local screen_settings = settings_by_screen[index]
 	local settings_name = screen_settings.name
 
 	self._change_screen_by_name(self, settings_name)
-
-	return 
 end
+
 StartMenuView.post_update_on_enter = function (self)
 	assert(self.viewport_widget == nil)
 
@@ -454,9 +443,8 @@ StartMenuView.post_update_on_enter = function (self)
 	else
 		self._change_screen_by_index(self, 1)
 	end
-
-	return 
 end
+
 StartMenuView.post_update_on_exit = function (self)
 	self.world_previewer:prepare_exit()
 	self.world_previewer:on_exit()
@@ -480,9 +468,8 @@ StartMenuView.post_update_on_exit = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 StartMenuView.on_exit = function (self)
 	self.input_manager:device_unblock_all_services("keyboard", 1)
 	self.input_manager:device_unblock_all_services("mouse", 1)
@@ -501,9 +488,8 @@ StartMenuView.on_exit = function (self)
 	self.play_sound(self, "hud_in_inventory_state_off")
 	self.play_sound(self, "play_gui_amb_hero_screen_loop_end")
 	self.play_sound(self, "Stop_menu_screen_music")
-
-	return 
 end
+
 StartMenuView.exit = function (self, return_to_game)
 	local initial_profile_view = self.initial_profile_view(self)
 	local exit_transition = (initial_profile_view and "exit_initial_start_menu_view") or (return_to_game and "exit_menu") or "ingame_menu"
@@ -515,18 +501,16 @@ StartMenuView.exit = function (self, return_to_game)
 	self._public_game_search_time = nil
 
 	LobbyInternal.clear_filter_requirements()
-
-	return 
 end
+
 StartMenuView.transitioning = function (self)
 	if self.exiting then
 		return true
 	else
 		return false
 	end
-
-	return 
 end
+
 StartMenuView.suspend = function (self)
 	self.input_manager:device_unblock_all_services("keyboard", 1)
 	self.input_manager:device_unblock_all_services("mouse", 1)
@@ -544,9 +528,8 @@ StartMenuView.suspend = function (self)
 	local world = previewer_pass_data.world
 
 	ScriptWorld.deactivate_viewport(world, viewport)
-
-	return 
 end
+
 StartMenuView.unsuspend = function (self)
 	self.input_manager:block_device_except_service("start_menu_view", "keyboard", 1)
 	self.input_manager:block_device_except_service("start_menu_view", "mouse", 1)
@@ -567,9 +550,8 @@ StartMenuView.unsuspend = function (self)
 
 		ScriptWorld.activate_viewport(world, viewport)
 	end
-
-	return 
 end
+
 StartMenuView._handle_exit = function (self, input_service)
 	local initial_profile_view = self.initial_profile_view(self)
 
@@ -585,9 +567,8 @@ StartMenuView._handle_exit = function (self, input_service)
 			self.close_menu(self, not self.exit_to_game)
 		end
 	end
-
-	return 
 end
+
 StartMenuView._game_popup_active = function (self)
 	local state_machine = self._machine
 
@@ -599,9 +580,8 @@ StartMenuView._game_popup_active = function (self)
 			return true
 		end
 	end
-
-	return 
 end
+
 StartMenuView.close_menu = function (self, return_to_main_screen)
 	local state_machine = self._machine
 
@@ -612,16 +592,15 @@ StartMenuView.close_menu = function (self, return_to_main_screen)
 		if current_state_name ~= "StartMenuStateOverview" then
 			self._change_screen_by_name(self, "overview")
 
-			return 
+			return
 		end
 	end
 
 	local return_to_game = not return_to_main_screen
 
 	self.exit(self, return_to_game)
-
-	return 
 end
+
 StartMenuView.destroy = function (self)
 	if self.viewport_widget then
 		UIWidget.destroy(self.ui_top_renderer, self.viewport_widget)
@@ -642,9 +621,8 @@ StartMenuView.destroy = function (self)
 
 		self._machine = nil
 	end
-
-	return 
 end
+
 StartMenuView._is_button_pressed = function (self, widget)
 	local button_hotspot = widget.content.button_hotspot
 
@@ -653,8 +631,6 @@ StartMenuView._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
 
-return 
+return

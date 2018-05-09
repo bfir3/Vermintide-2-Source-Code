@@ -16,19 +16,16 @@ Mods = {
 					for mod_name, hook in pairs(hook_functions) do
 						hook(hooked_function, ...)
 					end
-
-					return 
 				end
 
 				object[function_name] = func
 				hooked_functions[func] = hook_functions
 			end
-
-			return 
 		end
 	}
 }
 local mod_name = "SmoketestBots"
+
 BTConditions.has_to_teleport_to_next_segment_on_mainpath = function (blackboard)
 	local bb_follow = blackboard.follow
 	bb_follow.needs_target_position_refresh = false
@@ -47,24 +44,24 @@ BTConditions.has_to_teleport_to_next_segment_on_mainpath = function (blackboard)
 
 	return false
 end
+
 BTBotSmoketestMainpathNavigationAction = class(BTBotSmoketestMainpathNavigationAction, BTNode)
+
 BTBotSmoketestMainpathNavigationAction.init = function (self, ...)
 	BTBotSmoketestMainpathNavigationAction.super.init(self, ...)
-
-	return 
 end
+
 BTBotSmoketestMainpathNavigationAction.name = "BTBotSmoketestMainpathNavigationAction"
+
 BTBotSmoketestMainpathNavigationAction.enter = function (self, unit, blackboard, t)
 	blackboard.has_teleported = false
 	blackboard.follow.needs_target_position_refresh = false
-
-	return 
 end
+
 BTBotSmoketestMainpathNavigationAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.follow.goal_selection_func = nil
-
-	return 
 end
+
 BTBotSmoketestMainpathNavigationAction.run = function (self, unit, blackboard, t, dt)
 	local main_path_data = Managers.state.conflict:get_main_path_player_data(unit)
 
@@ -81,14 +78,15 @@ BTBotSmoketestMainpathNavigationAction.run = function (self, unit, blackboard, t
 
 	return "running", "evaluate"
 end
+
 BTBotSmoketestTeleportToNextMainpathSegmentAction = class(BTBotSmoketestTeleportToNextMainpathSegmentAction, BTNode)
 BTBotSmoketestTeleportToNextMainpathSegmentAction.name = "BTBotSmoketestTeleportToNextMainpathSegmentAction"
 local MAX_ALLOWED_TELEPORT_DISTANCE = 10
+
 BTBotSmoketestTeleportToNextMainpathSegmentAction.init = function (self, ...)
 	BTBotSmoketestTeleportToNextMainpathSegmentAction.super.init(self, ...)
-
-	return 
 end
+
 BTBotSmoketestTeleportToNextMainpathSegmentAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local a_star = blackboard.teleport.a_star
 	blackboard.teleport = nil
@@ -98,18 +96,16 @@ BTBotSmoketestTeleportToNextMainpathSegmentAction.leave = function (self, unit, 
 	end
 
 	GwNavAStar.destroy(a_star)
-
-	return 
 end
+
 BTBotSmoketestTeleportToNextMainpathSegmentAction.enter = function (self, unit, blackboard, t)
 	blackboard.teleport = {
 		state = "init",
 		position = Vector3Box(Vector3.invalid_vector()),
 		a_star = GwNavAStar.create()
 	}
-
-	return 
 end
+
 BTBotSmoketestTeleportToNextMainpathSegmentAction.run = function (self, unit, blackboard, t, dt)
 	local target_ally_unit = blackboard.target_ally_unit
 	local tp_bb = blackboard.teleport
@@ -168,8 +164,6 @@ local function find_and_replace(node_table, node_name, new_action_name, new_node
 			find_and_replace(current_node, node_name, new_action_name, new_node_name, new_condition, new_condition_args, new_action_data)
 		end
 	end
-
-	return 
 end
 
 find_and_replace(BotBehaviors.default, "teleport_no_path", "BTBotSmoketestTeleportToNextMainpathSegmentAction", nil, "has_to_teleport_to_next_segment_on_mainpath")
@@ -198,13 +192,13 @@ Mods.hook.set(mod_name, SmoketestManager, "update", function (func, self, dt)
 	if not game_mode_manager then
 		func(self, dt)
 
-		return 
+		return
 	end
 
 	if #Managers.player:bots() == 0 then
 		func(self, dt)
 
-		return 
+		return
 	end
 
 	local level_transition_handler = game_mode_manager.level_transition_handler
@@ -213,7 +207,7 @@ Mods.hook.set(mod_name, SmoketestManager, "update", function (func, self, dt)
 	if not packages_loaded then
 		func(self, dt)
 
-		return 
+		return
 	end
 
 	local peer_id = Network:peer_id()
@@ -223,7 +217,7 @@ Mods.hook.set(mod_name, SmoketestManager, "update", function (func, self, dt)
 	if not Unit.alive(player_unit) then
 		func(self, dt)
 
-		return 
+		return
 	end
 
 	self.timer = self.timer + dt
@@ -331,8 +325,6 @@ Mods.hook.set(mod_name, SmoketestManager, "update", function (func, self, dt)
 	end
 
 	func(self, dt)
-
-	return 
 end)
 
 function smoketest_change_items()
@@ -352,11 +344,9 @@ function smoketest_change_items()
 				if v == career then
 					table.remove(tab, k)
 
-					return 
+					return
 				end
 			end
-
-			return 
 		end
 
 		local careers = {
@@ -418,8 +408,6 @@ function smoketest_change_items()
 	else
 		print("AUTO TEST : USING LOCAL BACKEND, NO CHANGES TO CAREER WEAPONS MADE")
 	end
-
-	return 
 end
 
 function smoketest_get_items(chosen_slot)
@@ -469,8 +457,6 @@ function smoketest_give_hero_all_weapons()
 			item_interface.award_item(item_interface, key)
 		end
 	end
-
-	return 
 end
 
-return 
+return

@@ -97,8 +97,6 @@ local function make_colors(fill_table, f, g)
 		0,
 		f
 	}
-
-	return 
 end
 
 local debug_colors_lookup = {}
@@ -107,6 +105,7 @@ make_colors(debug_colors_lookup, 192, 64)
 make_colors(debug_colors_lookup, 128, 255)
 
 local num_debug_colors = #debug_colors_lookup
+
 PatrolAnalysis.init = function (self, nav_world, using_editor, drawer)
 	self.nav_world = nav_world
 	self.using_editor = using_editor
@@ -144,9 +143,8 @@ PatrolAnalysis.init = function (self, nav_world, using_editor, drawer)
 			nav_cost_table = cost_table_roaming
 		}
 	}
-
-	return 
 end
+
 PatrolAnalysis.setup_nav = function (self, navtag_layer, cost_table)
 	for layer_name, layer_cost in pairs(navtag_layer) do
 		local layer_id = LAYER_ID_MAPPING[layer_name]
@@ -154,9 +152,8 @@ PatrolAnalysis.setup_nav = function (self, navtag_layer, cost_table)
 		GwNavTagLayerCostTable.allow_layer(cost_table, layer_id)
 		GwNavTagLayerCostTable.set_layer_cost_multiplier(cost_table, layer_id, layer_cost)
 	end
-
-	return 
 end
+
 PatrolAnalysis.generate_patrol_splines = function (self, level_name, main_paths, drawer)
 	print("Generating patrol splines for level", level_name)
 
@@ -195,6 +192,7 @@ PatrolAnalysis.generate_patrol_splines = function (self, level_name, main_paths,
 
 	return result
 end
+
 PatrolAnalysis._finilize_splines = function (self, main_paths, drawer)
 	local result = "success"
 	local patrol_waypoints = self.patrol_waypoints
@@ -251,6 +249,7 @@ PatrolAnalysis._finilize_splines = function (self, main_paths, drawer)
 
 	return result
 end
+
 PatrolAnalysis._generate_patrol_spline = function (self, level_name, main_paths, gizmo_unit_name, patrol_type, drawer, navbot_kind)
 	local patrol_waypoints = self.patrol_waypoints
 	local result = "success"
@@ -318,8 +317,10 @@ PatrolAnalysis._generate_patrol_spline = function (self, level_name, main_paths,
 
 	return result
 end
+
 local NAVIGATION_NAVMESH_RADIUS = 0.38
 local use_nav_bot_splines = true
+
 PatrolAnalysis.create_navbot = function (self, nav_world, pos, navbot_kind)
 	local speed = 5
 	local height = 1.6
@@ -354,7 +355,9 @@ PatrolAnalysis.create_navbot = function (self, nav_world, pos, navbot_kind)
 
 	return navbot
 end
+
 local NEAREST_POINT_DIST = 0.01
+
 PatrolAnalysis.inject_spline_path = function (self, spline, line_drawer)
 	local navbot = spline.navbot
 	local node_count = GwNavBot.get_path_nodes_count(navbot)
@@ -405,10 +408,10 @@ PatrolAnalysis.inject_spline_path = function (self, spline, line_drawer)
 
 	spline.spline_points = spline_points
 	spline.spline_points_index = spline_points_index
-
-	return 
 end
+
 local max_running_splines = 10
+
 PatrolAnalysis.compute_spline_path = function (self, spline_name, spline_way_points, navbot_kind)
 	local spline = {
 		unique_navbot = true,
@@ -425,9 +428,8 @@ PatrolAnalysis.compute_spline_path = function (self, spline_name, spline_way_poi
 	end
 
 	self.patrol_waypoints[spline_name] = spline
-
-	return 
 end
+
 PatrolAnalysis.spline = function (self, spline_name)
 	local ready_waypoints = self.ready_waypoints
 
@@ -438,9 +440,8 @@ PatrolAnalysis.spline = function (self, spline_name)
 			return spline
 		end
 	end
-
-	return 
 end
+
 PatrolAnalysis.draw_raw_spline = function (self, spline_name)
 	local spline = self.spline(self, spline_name)
 	local p1 = spline[1].pos:unbox()
@@ -455,9 +456,8 @@ PatrolAnalysis.draw_raw_spline = function (self, spline_name)
 
 		p1 = p2
 	end
-
-	return 
 end
+
 PatrolAnalysis.draw_astar_spline = function (self, points)
 	local p1 = points[1]:unbox()
 
@@ -471,11 +471,11 @@ PatrolAnalysis.draw_astar_spline = function (self, points)
 
 		p1 = p2
 	end
-
-	return 
 end
+
 local Vector3_distance = Vector3.distance
 local Vector3_length = Vector3.length
+
 PatrolAnalysis.get_path_point = function (self, points, path_length, move_percent)
 	local path_length = path_length or self.get_path_length(self, points)
 	local travel_dist = 0
@@ -501,6 +501,7 @@ PatrolAnalysis.get_path_point = function (self, points, path_length, move_percen
 
 	return points[#points]:unbox(), #points
 end
+
 PatrolAnalysis.get_path_length = function (self, points)
 	local total_len = 0
 	local p1 = points[1]:unbox()
@@ -513,6 +514,7 @@ PatrolAnalysis.get_path_length = function (self, points)
 
 	return total_len
 end
+
 PatrolAnalysis.run = function (self)
 	local line_drawer = self.line_drawer
 	local running_splines = self.running_splines
@@ -615,8 +617,6 @@ PatrolAnalysis.run = function (self)
 
 		return "success", ready_waypoints
 	end
-
-	return 
 end
 
-return 
+return

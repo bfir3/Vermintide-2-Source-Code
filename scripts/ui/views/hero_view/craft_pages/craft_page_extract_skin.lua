@@ -10,6 +10,7 @@ local DO_RELOAD = false
 local NUM_CRAFT_SLOTS = 1
 CraftPageExtractSkin = class(CraftPageExtractSkin)
 CraftPageExtractSkin.NAME = "CraftPageExtractSkin"
+
 CraftPageExtractSkin.on_enter = function (self, params, settings)
 	print("[HeroWindowCraft] Enter Substate CraftPageExtractSkin")
 
@@ -52,9 +53,8 @@ CraftPageExtractSkin.on_enter = function (self, params, settings)
 	self.super_parent:clear_disabled_backend_ids()
 	self.setup_recipe_requirements(self)
 	self.parent:set_input_description(nil)
-
-	return 
 end
+
 CraftPageExtractSkin.setup_recipe_requirements = function (self)
 	local recipe_grid = self._recipe_grid
 	local settings = self.settings
@@ -110,9 +110,8 @@ CraftPageExtractSkin.setup_recipe_requirements = function (self)
 	end
 
 	self._has_all_requirements = has_all_requirements
-
-	return 
 end
+
 CraftPageExtractSkin.create_ui_elements = function (self, params)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -133,9 +132,8 @@ CraftPageExtractSkin.create_ui_elements = function (self, params)
 
 	self._set_craft_button_disabled(self, true)
 	self._handle_craft_input_progress(self, 0)
-
-	return 
 end
+
 CraftPageExtractSkin.on_exit = function (self, params)
 	print("[HeroWindowCraft] Exit Substate CraftPageExtractSkin")
 
@@ -144,9 +142,8 @@ CraftPageExtractSkin.on_exit = function (self, params)
 	if self._craft_input_time then
 		self._play_sound(self, "play_gui_craft_forge_button_aborted")
 	end
-
-	return 
 end
+
 CraftPageExtractSkin.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -158,12 +155,12 @@ CraftPageExtractSkin.update = function (self, dt, t)
 	self._update_animations(self, dt)
 	self._update_craft_items(self)
 	self.draw(self, dt)
+end
 
-	return 
-end
 CraftPageExtractSkin.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 CraftPageExtractSkin._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -181,9 +178,8 @@ CraftPageExtractSkin._update_animations = function (self, dt)
 	local widgets_by_name = self._widgets_by_name
 
 	UIWidgetUtils.animate_default_button(widgets_by_name.craft_button, dt)
-
-	return 
 end
+
 CraftPageExtractSkin._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -193,9 +189,8 @@ CraftPageExtractSkin._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 CraftPageExtractSkin._is_button_hovered = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -203,9 +198,8 @@ CraftPageExtractSkin._is_button_hovered = function (self, widget)
 	if hotspot.on_hover_enter then
 		return true
 	end
-
-	return 
 end
+
 CraftPageExtractSkin._is_button_held = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -213,14 +207,13 @@ CraftPageExtractSkin._is_button_held = function (self, widget)
 	if hotspot.is_clicked then
 		return hotspot.is_clicked
 	end
-
-	return 
 end
+
 CraftPageExtractSkin._handle_input = function (self, dt, t)
 	local parent = self.parent
 
 	if parent.waiting_for_craft(parent) or self._craft_result then
-		return 
+		return
 	end
 
 	local widgets_by_name = self._widgets_by_name
@@ -284,9 +277,8 @@ CraftPageExtractSkin._handle_input = function (self, dt, t)
 			self._play_sound(self, "play_gui_craft_forge_begin")
 		end
 	end
-
-	return 
 end
+
 CraftPageExtractSkin._handle_craft_input_progress = function (self, progress)
 	local has_progress = progress ~= 0
 	local bard_default_width = scenegraph_definition.craft_bar.size[1]
@@ -295,24 +287,21 @@ CraftPageExtractSkin._handle_craft_input_progress = function (self, progress)
 	if progress == 1 then
 		return true
 	end
-
-	return 
 end
+
 CraftPageExtractSkin.craft_result = function (self, result, error, reset_slots)
 	if not error then
 		self._craft_result = result
 	end
-
-	return 
 end
+
 CraftPageExtractSkin.reset = function (self)
 	local item_grid = self._item_grid
 
 	item_grid.clear_locked_items(item_grid)
 	item_grid.update_items_status(item_grid)
-
-	return 
 end
+
 CraftPageExtractSkin.on_craft_completed = function (self)
 	local result = self._craft_result
 	local item_grid = self._item_grid
@@ -357,9 +346,8 @@ CraftPageExtractSkin.on_craft_completed = function (self)
 	self._craft_result = nil
 
 	self.setup_recipe_requirements(self)
-
-	return 
 end
+
 CraftPageExtractSkin._update_craft_items = function (self)
 	local super_parent = self.super_parent
 	local item_grid = self._item_grid
@@ -387,9 +375,8 @@ CraftPageExtractSkin._update_craft_items = function (self)
 
 		self._remove_craft_item(self, backend_id)
 	end
-
-	return 
 end
+
 CraftPageExtractSkin._remove_craft_item = function (self, backend_id, slot_index)
 	local craft_items = self._craft_items
 
@@ -420,9 +407,8 @@ CraftPageExtractSkin._remove_craft_item = function (self, backend_id, slot_index
 
 		self._play_sound(self, "play_gui_craft_item_drag")
 	end
-
-	return 
 end
+
 CraftPageExtractSkin._add_craft_item = function (self, backend_id, slot_index, ignore_sound)
 	if self._num_craft_items == 0 then
 		self._item_grid:clear_item_grid()
@@ -459,22 +445,19 @@ CraftPageExtractSkin._add_craft_item = function (self, backend_id, slot_index, i
 			self._play_sound(self, "play_gui_craft_item_drop")
 		end
 	end
-
-	return 
 end
+
 CraftPageExtractSkin._set_craft_button_disabled = function (self, disabled)
 	self._widgets_by_name.craft_button.content.button_hotspot.disable_button = disabled
 
 	self.parent:set_input_description((not disabled and self.settings.name) or nil)
-
-	return 
 end
+
 CraftPageExtractSkin._exit = function (self, selected_level)
 	self.exit = true
 	self.exit_level_id = selected_level
-
-	return 
 end
+
 CraftPageExtractSkin.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -488,20 +471,16 @@ CraftPageExtractSkin.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 CraftPageExtractSkin._play_sound = function (self, event)
 	self.super_parent:play_sound(event)
-
-	return 
 end
+
 CraftPageExtractSkin._set_craft_button_text = function (self, text, localize)
 	local widgets_by_name = self._widgets_by_name
 	local widget = widgets_by_name.craft_button
 	widget.content.button_text = (localize and Localize(text)) or text
-
-	return 
 end
 
-return 
+return

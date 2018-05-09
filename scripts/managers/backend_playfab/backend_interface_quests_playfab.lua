@@ -1,5 +1,6 @@
 local PlayFabClientApi = require("PlayFab.PlayFabClientApi")
 BackendInterfaceQuestsPlayfab = class(BackendInterfaceQuestsPlayfab)
+
 BackendInterfaceQuestsPlayfab.init = function (self, backend_mirror)
 	self._backend_mirror = backend_mirror
 	self._quests = {}
@@ -8,9 +9,8 @@ BackendInterfaceQuestsPlayfab.init = function (self, backend_mirror)
 	self._quest_reward_requests = {}
 
 	self._refresh(self)
-
-	return 
 end
+
 BackendInterfaceQuestsPlayfab._refresh = function (self)
 	local talents = self._talents
 	local backend_mirror = self._backend_mirror
@@ -19,28 +19,30 @@ BackendInterfaceQuestsPlayfab._refresh = function (self)
 	self._refresh_available = quest_data.refresh_available
 	self._daily_quest_update_time = quest_data.daily_quest_update_time
 	self._dirty = false
-
-	return 
 end
+
 BackendInterfaceQuestsPlayfab.ready = function (self)
 	return true
 end
+
 BackendInterfaceQuestsPlayfab._new_id = function (self)
 	self._last_id = self._last_id + 1
 
 	return self._last_id
 end
+
 BackendInterfaceQuestsPlayfab.make_dirty = function (self)
 	self._dirty = true
+end
 
-	return 
-end
 BackendInterfaceQuestsPlayfab.update = function (self, dt)
-	return 
+	return
 end
+
 BackendInterfaceQuestsPlayfab.delete = function (self)
-	return 
+	return
 end
+
 BackendInterfaceQuestsPlayfab.get_quests = function (self)
 	if self._dirty then
 		self._refresh(self)
@@ -48,6 +50,7 @@ BackendInterfaceQuestsPlayfab.get_quests = function (self)
 
 	return self._quests
 end
+
 BackendInterfaceQuestsPlayfab.get_daily_quest_update_time = function (self)
 	if self._dirty then
 		self._refresh(self)
@@ -55,6 +58,7 @@ BackendInterfaceQuestsPlayfab.get_daily_quest_update_time = function (self)
 
 	return self._daily_quest_update_time
 end
+
 BackendInterfaceQuestsPlayfab.can_refresh_quest = function (self)
 	if self._dirty then
 		self._refresh(self)
@@ -62,6 +66,7 @@ BackendInterfaceQuestsPlayfab.can_refresh_quest = function (self)
 
 	return self._refresh_available
 end
+
 BackendInterfaceQuestsPlayfab.refresh_quest = function (self, key)
 	local id = self._new_id(self)
 	local request = {
@@ -76,6 +81,7 @@ BackendInterfaceQuestsPlayfab.refresh_quest = function (self, key)
 
 	return id
 end
+
 BackendInterfaceQuestsPlayfab.refresh_quest_cb = function (self, id, key, result)
 	if result.Error then
 		table.dump(result, nil, 6)
@@ -89,7 +95,7 @@ BackendInterfaceQuestsPlayfab.refresh_quest_cb = function (self, id, key, result
 
 			self._refresh_requests[id] = {}
 
-			return 
+			return
 		end
 
 		local current_quests = function_result.current_quests
@@ -103,9 +109,8 @@ BackendInterfaceQuestsPlayfab.refresh_quest_cb = function (self, id, key, result
 		}
 		self._dirty = true
 	end
-
-	return 
 end
+
 BackendInterfaceQuestsPlayfab.is_quest_refreshed = function (self, id)
 	local refresh_request = self._refresh_requests[id]
 
@@ -115,6 +120,7 @@ BackendInterfaceQuestsPlayfab.is_quest_refreshed = function (self, id)
 
 	return false
 end
+
 BackendInterfaceQuestsPlayfab.can_claim_quest_rewards = function (self, key)
 	local quests = self._quests
 	local current_quest_name = quests[key]
@@ -125,6 +131,7 @@ BackendInterfaceQuestsPlayfab.can_claim_quest_rewards = function (self, key)
 
 	return true
 end
+
 BackendInterfaceQuestsPlayfab.claim_quest_rewards = function (self, key)
 	local id = self._new_id(self)
 	local data = {
@@ -140,6 +147,7 @@ BackendInterfaceQuestsPlayfab.claim_quest_rewards = function (self, key)
 
 	return id
 end
+
 BackendInterfaceQuestsPlayfab.claim_quest_rewards_challenge_request_cb = function (self, data, result)
 	if result.Error then
 		table.dump(result, nil, 5)
@@ -164,9 +172,8 @@ BackendInterfaceQuestsPlayfab.claim_quest_rewards_challenge_request_cb = functio
 			self._claim_quest_rewards(self, data, response)
 		end
 	end
-
-	return 
 end
+
 BackendInterfaceQuestsPlayfab._claim_quest_rewards = function (self, data, response)
 	local function_params = table.clone(data)
 	function_params.response = response
@@ -177,9 +184,8 @@ BackendInterfaceQuestsPlayfab._claim_quest_rewards = function (self, data, respo
 	local quest_rewards_request_cb = callback(self, "quest_rewards_request_cb", data)
 
 	PlayFabClientApi.ExecuteCloudScript(generate_quest_rewards_request, quest_rewards_request_cb, quest_rewards_request_cb)
-
-	return 
 end
+
 BackendInterfaceQuestsPlayfab.quest_rewards_request_cb = function (self, data, result)
 	if result.Error then
 		table.dump(result, nil, 5)
@@ -190,11 +196,11 @@ BackendInterfaceQuestsPlayfab.quest_rewards_request_cb = function (self, data, r
 		if not function_result then
 			Managers.backend:playfab_api_error(result)
 
-			return 
+			return
 		elseif function_result.eac_failed_verification then
 			Managers.backend:playfab_eac_error()
 
-			return 
+			return
 		end
 
 		local id = data.id
@@ -229,9 +235,8 @@ BackendInterfaceQuestsPlayfab.quest_rewards_request_cb = function (self, data, r
 		self._quest_reward_requests[id] = rewards
 		self._dirty = true
 	end
-
-	return 
 end
+
 BackendInterfaceQuestsPlayfab.quest_rewards_generated = function (self, id)
 	local request = self._quest_reward_requests[id]
 
@@ -241,9 +246,11 @@ BackendInterfaceQuestsPlayfab.quest_rewards_generated = function (self, id)
 
 	return false
 end
+
 BackendInterfaceQuestsPlayfab.get_quest_rewards = function (self, id)
 	return self._quest_reward_requests[id]
 end
+
 BackendInterfaceQuestsPlayfab._get_eac_response = function (self, challenge)
 	local i = 0
 	local str = ""
@@ -270,4 +277,4 @@ BackendInterfaceQuestsPlayfab._get_eac_response = function (self, challenge)
 	return eac_response, response
 end
 
-return 
+return

@@ -17,6 +17,7 @@ local extensions = {
 	"PlayerProximityExtension",
 	"AIProximityExtension"
 }
+
 ProximitySystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
@@ -43,9 +44,8 @@ ProximitySystem.init = function (self, context, system_name)
 	self._pseudo_sorted_list = {}
 	self._old_enabled_fx = {}
 	self._new_enabled_fx = {}
-
-	return 
 end
+
 ProximitySystem.destroy = function (self)
 	for unit, ext in pairs(self.unit_extension_data) do
 		Broadphase.remove(self.broadphase, ext.broadphase_id)
@@ -54,9 +54,8 @@ ProximitySystem.destroy = function (self)
 	self.broadphase = nil
 	self.unit_input_data = nil
 	self.unit_extension_data = nil
-
-	return 
 end
+
 ProximitySystem.on_add_extension = function (self, world, unit, extension_name)
 	local extension = {
 		last_num_enemies_nearby = 0,
@@ -115,17 +114,17 @@ ProximitySystem.on_add_extension = function (self, world, unit, extension_name)
 
 	return extension
 end
+
 ProximitySystem.on_remove_extension = function (self, unit, extension_name)
 	self.on_freeze_extension(self, unit, extension_name)
 	ScriptUnit.remove_extension(unit, "proximity_system")
-
-	return 
 end
+
 ProximitySystem.on_freeze_extension = function (self, unit, extension_name)
 	local extension = self.unit_extension_data[unit]
 
 	if extension == nil then
-		return 
+		return
 	end
 
 	if extension.enemy_broadphase_id then
@@ -145,8 +144,6 @@ ProximitySystem.on_freeze_extension = function (self, unit, extension_name)
 	self.player_unit_extensions_map[unit] = nil
 	self.ai_unit_extensions_map[unit] = nil
 	self.special_unit_extension_map[unit] = nil
-
-	return 
 end
 
 local function unit_world_forward(unit)
@@ -182,8 +179,6 @@ local function check_raycast_center(physics_world, unit, target)
 			end
 		end
 	end
-
-	return 
 end
 
 local near_lookup = {
@@ -195,6 +190,7 @@ local near_lookup = {
 	bright_wizard = "bright_wizard_is_near"
 }
 local nearby_units = {}
+
 ProximitySystem.update = function (self, context, t)
 	local player_unit_extensions_map = self.player_unit_extensions_map
 	local player_units_broadphase = self.player_units_broadphase
@@ -223,9 +219,8 @@ ProximitySystem.update = function (self, context, t)
 			QuickDrawer:sphere(POSITION_LOOKUP[unit] + Vector3.up(), 2, color)
 		end
 	end
-
-	return 
 end
+
 ProximitySystem.physics_async_update = function (self, context, t)
 	local nearby_units = nearby_units
 	local dt = context.dt
@@ -382,9 +377,8 @@ ProximitySystem.physics_async_update = function (self, context, t)
 
 	self._update_nearby_boss(self)
 	self._update_nearby_enemies(self)
-
-	return 
 end
+
 local MAX_ALLOWED_FX = 10
 local Unit_flow_event = Unit.flow_event
 local Unit_alive = Unit.alive
@@ -419,8 +413,6 @@ local function fx_list_add(old_list, new_list, unit)
 	end
 
 	new_list[unit] = true
-
-	return 
 end
 
 local function fx_list_remove(old_list, new_list, unit)
@@ -429,25 +421,23 @@ local function fx_list_remove(old_list, new_list, unit)
 
 		old_list[unit] = nil
 	end
-
-	return 
 end
 
 ProximitySystem._update_nearby_boss = function (self)
 	if DEDICATED_SERVER then
-		return 
+		return
 	end
 
 	local local_player = Managers.player:local_player()
 
 	if not local_player then
-		return 
+		return
 	end
 
 	local player_unit = local_player.player_unit
 
 	if not player_unit then
-		return 
+		return
 	end
 
 	local broadphase_result = self._broadphase_result
@@ -468,12 +458,11 @@ ProximitySystem._update_nearby_boss = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 ProximitySystem._update_nearby_enemies = function (self)
 	if DEDICATED_SERVER then
-		return 
+		return
 	end
 
 	local old_nearby = self._old_nearby
@@ -582,9 +571,8 @@ ProximitySystem._update_nearby_enemies = function (self)
 
 	self._old_nearby = new_nearby
 	self._new_nearby = old_nearby
-
-	return 
 end
+
 ProximitySystem._nearby_enemies_debug = function (self, list, new_nearby, new_enabled_fx)
 	if script_data.debug_proximity_fx then
 		for i, unit in ipairs(list) do
@@ -612,9 +600,8 @@ ProximitySystem._nearby_enemies_debug = function (self, list, new_nearby, new_en
 			QuickDrawer:sphere(POSITION_LOOKUP[unit], 1.2, Color(0, 255, 0))
 		end
 	end
-
-	return 
 end
+
 ProximitySystem._clear_old_enabled_fx = function (self, old_enabled_fx)
 	for unit, _ in pairs(old_enabled_fx) do
 		if Unit_alive(unit) then
@@ -623,9 +610,8 @@ ProximitySystem._clear_old_enabled_fx = function (self, old_enabled_fx)
 	end
 
 	table.clear(old_enabled_fx)
-
-	return 
 end
+
 ProximitySystem.post_update = function (self, context, t)
 	local POSITION_LOOKUP = POSITION_LOOKUP
 	local enemy_check_raycasts = self.enemy_check_raycasts
@@ -663,11 +649,10 @@ ProximitySystem.post_update = function (self, context, t)
 			end
 		end
 	end
-
-	return 
 end
+
 ProximitySystem.hot_join_sync = function (self, sender)
-	return 
+	return
 end
 
-return 
+return

@@ -2,11 +2,11 @@ BTLeaveHooks = BTHooksLeave or {}
 local BTLeaveHooks = BTLeaveHooks
 local unit_alive = Unit.alive
 local ScriptUnit = ScriptUnit
+
 BTLeaveHooks.reset_fling_skaven = function (unit, blackboard, t)
 	blackboard.fling_skaven = false
-
-	return 
 end
+
 BTLeaveHooks.check_if_victim_was_grabbed = function (unit, blackboard, t)
 	if blackboard.victim_grabbed then
 		blackboard.has_grabbed_victim = true
@@ -20,14 +20,12 @@ BTLeaveHooks.check_if_victim_was_grabbed = function (unit, blackboard, t)
 			blackboard.victim_grabbed = nil
 		end
 	end
-
-	return 
 end
+
 BTLeaveHooks.summoning_ends = function (unit, blackboard, t)
 	blackboard.is_summoning = false
-
-	return 
 end
+
 BTLeaveHooks.sorcerer_next_phase = function (unit, blackboard, t)
 	local phase = blackboard.phase
 
@@ -38,30 +36,27 @@ BTLeaveHooks.sorcerer_next_phase = function (unit, blackboard, t)
 	else
 		blackboard.phase = "defensive_completed"
 	end
-
-	return 
 end
+
 BTLeaveHooks.sorcerer_setup_done = function (unit, blackboard, t)
 	blackboard.mode = "offensive"
 	blackboard.setup_done = true
 	blackboard.phase_timer = t + 30
-
-	return 
 end
+
 BTLeaveHooks.sorcerer_evade = function (unit, blackboard, t)
 	blackboard.escape_teleport = false
-
-	return 
 end
+
 BTLeaveHooks.reset_stormfiend_charge = function (unit, blackboard, t)
 	blackboard.weakspot_hits = nil
 	blackboard.weakspot_rage = nil
+end
 
-	return 
-end
 BTLeaveHooks.stormfiend_boss_mount_leave = function (unit, blackboard, t)
-	return 
+	return
 end
+
 BTLeaveHooks.stormfiend_boss_rage_leave = function (unit, blackboard, t)
 	local network_manager = Managers.state.network
 	local game = network_manager.game(network_manager)
@@ -84,14 +79,11 @@ BTLeaveHooks.stormfiend_boss_rage_leave = function (unit, blackboard, t)
 		blackboard.goal_destination = Vector3Box(projected_wanted_pos)
 		blackboard.jump_down_intro = true
 	end
-
-	return 
 end
+
 BTLeaveHooks.stormfiend_boss_jump_down_leave = function (unit, blackboard, t)
 	blackboard.jump_down_intro = nil
 	blackboard.goal_destination = nil
-
-	return 
 end
 
 local function cb_grey_seer_intro_spawn_stormfiend(unit, breed, optional_data)
@@ -106,8 +98,6 @@ local function cb_grey_seer_intro_spawn_stormfiend(unit, breed, optional_data)
 	mount_blackboard.anim_cb_move = true
 	mount_blackboard.intro_rage = true
 	blackboard.intro_timer = nil
-
-	return 
 end
 
 BTLeaveHooks.on_grey_seer_intro_leave = function (unit, blackboard, t)
@@ -143,9 +133,8 @@ BTLeaveHooks.on_grey_seer_intro_leave = function (unit, blackboard, t)
 
 		blackboard.is_angry = true
 	end
-
-	return 
 end
+
 BTLeaveHooks.on_grey_seer_death_sequence_leave = function (unit, blackboard, t)
 	blackboard.current_phase = 6
 	local health_extension = ScriptUnit.extension(blackboard.unit, "health_system")
@@ -153,9 +142,8 @@ BTLeaveHooks.on_grey_seer_death_sequence_leave = function (unit, blackboard, t)
 
 	blackboard.navigation_extension:set_enabled(false)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
-
-	return 
 end
+
 BTLeaveHooks.leave_attack_grabbed_smash = function (unit, blackboard, t)
 	if blackboard.stagger and Unit.alive(blackboard.victim_grabbed) then
 		StatusUtils.set_grabbed_by_chaos_spawn_network(blackboard.victim_grabbed, false, unit)
@@ -165,9 +153,8 @@ BTLeaveHooks.leave_attack_grabbed_smash = function (unit, blackboard, t)
 	else
 		blackboard.wants_to_throw = true
 	end
-
-	return 
 end
+
 BTLeaveHooks.on_lord_intro_leave = function (unit, blackboard, t)
 	if AiUtils.unit_alive(unit) and not blackboard.exit_last_action then
 		local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -185,9 +172,8 @@ BTLeaveHooks.on_lord_intro_leave = function (unit, blackboard, t)
 
 		network_manager.anim_event(network_manager, unit, "to_combat")
 	end
-
-	return 
 end
+
 BTLeaveHooks.on_lord_warlord_intro_leave = function (unit, blackboard, t)
 	if AiUtils.unit_alive(unit) and not blackboard.exit_last_action then
 		local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -215,13 +201,10 @@ BTLeaveHooks.on_lord_warlord_intro_leave = function (unit, blackboard, t)
 			blackboard.exit_pos = Vector3Box(exit_pos)
 		end
 	end
-
-	return 
 end
+
 BTLeaveHooks.reset_keep_target = function (unit, blackboard, t)
 	blackboard.keep_target = nil
-
-	return 
 end
 
-return 
+return

@@ -21,17 +21,16 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTClimbAction = class(BTClimbAction, BTNode)
+
 BTClimbAction.init = function (self, ...)
 	BTClimbAction.super.init(self, ...)
-
-	return 
 end
+
 BTClimbAction.name = "BTClimbAction"
+
 BTClimbAction.enter = function (self, unit, blackboard, t)
 	local next_smart_object_data = blackboard.next_smart_object_data
 	local entrance_pos = next_smart_object_data.entrance_pos:unbox()
@@ -100,9 +99,8 @@ BTClimbAction.enter = function (self, unit, blackboard, t)
 	else
 		debug_graph():set_active(false)
 	end
-
-	return 
 end
+
 BTClimbAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
 	blackboard.climb_spline_ground = nil
@@ -147,9 +145,8 @@ BTClimbAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	end
 
 	slot10 = navigation_extension.is_using_smart_object(navigation_extension) and navigation_extension.use_smart_object(navigation_extension, false)
-
-	return 
 end
+
 BTClimbAction.run = function (self, unit, blackboard, t, dt)
 	local navigation_extension = blackboard.navigation_extension
 	local locomotion_extension = blackboard.locomotion_extension
@@ -500,6 +497,7 @@ BTClimbAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTClimbAction._catapult_players = function (self, unit, blackboard, data)
 	local shape = data.shape
 	local radius = data.radius
@@ -525,8 +523,6 @@ BTClimbAction._catapult_players = function (self, unit, blackboard, data)
 			blackboard.units_catapulted[player_unit] = player_unit
 		end
 	end
-
-	return 
 end
 
-return 
+return

@@ -2166,4 +2166,4 @@ UnitVariationSettings.chaos_fanatic_baked = table.create_copy(UnitVariationSetti
 UnitVariationSettings.chaos_fanatic_baked.enabled_from_start = {}
 UnitVariationSettings.chaos_fanatic_baked.body_parts = {}
 
-return 
+return

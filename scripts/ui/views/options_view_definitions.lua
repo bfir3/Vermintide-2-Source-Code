@@ -718,8 +718,6 @@ local background_widget_definitions = {
 						local current_scroll_value = ui_content.internal_scroll_value
 						current_scroll_value = current_scroll_value + scroll_step * -scroll_axis.y
 						ui_content.internal_scroll_value = math.clamp(current_scroll_value, 0, 1)
-
-						return 
 					end
 				}
 			}
@@ -982,8 +980,6 @@ local function create_checkbox_widget(text, scenegraph_id, base_offset)
 						else
 							ui_content.checkbox = "checkbox_unchecked"
 						end
-
-						return 
 					end
 				},
 				{
@@ -1291,13 +1287,9 @@ local function create_slider_widget(text, tooltip_text, scenegraph_id, base_offs
 						if old_value ~= value and not ui_content.callback_on_release then
 							ui_content.callback(ui_content)
 						end
-
-						return 
 					end,
 					release_function = function (ui_scenegraph, ui_style, ui_content, input_service)
 						ui_content.callback(ui_content)
-
-						return 
 					end
 				},
 				{
@@ -1326,8 +1318,6 @@ local function create_slider_widget(text, tooltip_text, scenegraph_id, base_offs
 						else
 							ui_style.value_text.text_color = ui_style.value_text.default_color
 						end
-
-						return 
 					end
 				},
 				{
@@ -1475,8 +1465,6 @@ local function create_slider_widget(text, tooltip_text, scenegraph_id, base_offs
 								on_pressed_callback("right_arrow_hover")
 							end
 						end
-
-						return 
 					end
 				}
 			}
@@ -1981,8 +1969,6 @@ local function create_drop_down_widget(text, options, selected_option, tooltip_t
 
 							return parent_content.active
 						end
-
-						return 
 					end
 				},
 				{
@@ -2001,8 +1987,6 @@ local function create_drop_down_widget(text, options, selected_option, tooltip_t
 
 							return not parent_content.active
 						end
-
-						return 
 					end
 				},
 				{
@@ -2060,8 +2044,6 @@ local function create_drop_down_widget(text, options, selected_option, tooltip_t
 								else
 									text_style.text_color = text_style.default_color
 								end
-
-								return 
 							end
 						},
 						{
@@ -2383,8 +2365,6 @@ local function create_stepper_widget(text, options, selected_option, tooltip_tex
 						if selection_text ~= ui_content.selection_text then
 							ui_content.selection_text = selection_text
 						end
-
-						return 
 					end
 				},
 				{
@@ -2472,8 +2452,6 @@ local function create_stepper_widget(text, options, selected_option, tooltip_tex
 						else
 							ui_style.selection_text.text_color = ui_style.selection_text.default_color
 						end
-
-						return 
 					end
 				},
 				{
@@ -3136,8 +3114,6 @@ local function create_option_widget(ui_renderer, text, options, selected_option,
 					ui_style[option_text_id].text_color = (is_selected and ui_style[option_text_id].highlight_color) or ui_style[option_text_id].default_color
 				end
 			end
-
-			return 
 		end
 	}
 	passes[#passes + 1] = {
@@ -3314,8 +3290,6 @@ local function create_option_widget(ui_renderer, text, options, selected_option,
 						style.text_color = Colors.get_color_table_with_alpha("font_title", 255)
 					end
 				end
-
-				return 
 			end
 		}
 		style[option_text_id] = {
@@ -3374,8 +3348,6 @@ local function create_option_widget(ui_renderer, text, options, selected_option,
 						style.color = Colors.get_color_table_with_alpha("font_title", 255)
 					end
 				end
-
-				return 
 			end
 		}
 		content.rect_texture = "rect_masked"
@@ -3457,8 +3429,6 @@ local function create_keybind_widget(selected_key, keybind_description, actions,
 						else
 							ui_style.selected_rect.color[1] = 255
 						end
-
-						return 
 					end
 				},
 				{
@@ -3796,8 +3766,6 @@ SettingsWidgetTypeTemplate = {
 
 				return true
 			end
-
-			return 
 		end,
 		input_description = {
 			name = "checkbox",
@@ -3832,8 +3800,6 @@ SettingsWidgetTypeTemplate = {
 
 				return true
 			end
-
-			return 
 		end
 	},
 	keybind = {
@@ -3850,8 +3816,6 @@ SettingsWidgetTypeTemplate = {
 			if content.active and (input_service.get(input_service, "move_up") or input_service.get(input_service, "move_down") or input_service.get(input_service, "move_up_hold") or input_service.get(input_service, "move_down_hold")) then
 				return true
 			end
-
-			return 
 		end,
 		input_description = {
 			name = "keybind",
@@ -3872,8 +3836,6 @@ SettingsWidgetTypeTemplate = {
 
 				return true
 			end
-
-			return 
 		end
 	},
 	slider = {
@@ -3924,13 +3886,11 @@ SettingsWidgetTypeTemplate = {
 
 				return true
 			end
-
-			return 
 		end
 	},
 	image = {
 		input_function = function ()
-			return 
+			return
 		end,
 		input_description = {
 			name = "image",
@@ -3940,7 +3900,7 @@ SettingsWidgetTypeTemplate = {
 	},
 	title = {
 		input_function = function ()
-			return 
+			return
 		end,
 		input_description = {
 			name = "title",
@@ -3950,7 +3910,7 @@ SettingsWidgetTypeTemplate = {
 	},
 	text_link = {
 		input_function = function ()
-			return 
+			return
 		end,
 		input_description = {
 			name = "title",
@@ -3960,7 +3920,7 @@ SettingsWidgetTypeTemplate = {
 	},
 	gamepad_layout = {
 		input_function = function ()
-			return 
+			return
 		end,
 		input_description = {
 			name = "gamepad_layout",

@@ -1,5 +1,6 @@
 CharacterStateHelper = CharacterStateHelper or {}
 local CharacterStateHelper = CharacterStateHelper
+
 CharacterStateHelper.get_movement_input = function (input_extension)
 	local move_input = input_extension.get(input_extension, "move") or Vector3(0, 0, 0)
 	local move_input_controller = input_extension.get(input_extension, "move_controller") or Vector3(0, 0, 0)
@@ -13,6 +14,7 @@ CharacterStateHelper.get_movement_input = function (input_extension)
 
 	return movement
 end
+
 CharacterStateHelper.get_square_movement_input = function (input_extension)
 	local move_input = input_extension.get(input_extension, "move") or Vector3(0, 0, 0)
 	local move_input_controller = input_extension.get(input_extension, "move_controller") or Vector3(0, 0, 0)
@@ -26,6 +28,7 @@ CharacterStateHelper.get_square_movement_input = function (input_extension)
 
 	return movement
 end
+
 CharacterStateHelper.get_look_input = function (input_extension, status_extension, inventory_extension, is_3p)
 	local hacky_unit = status_extension.unit
 	local targeting_data = nil
@@ -72,18 +75,19 @@ CharacterStateHelper.get_look_input = function (input_extension, status_extensio
 
 	return look_delta
 end
+
 CharacterStateHelper.update_dodge_lock = function (unit, input_extension, status_extension)
 	if status_extension.dodge_locked(status_extension) and not input_extension.get(input_extension, "dodge_hold") then
 		status_extension.set_dodge_locked(status_extension, false)
 	end
-
-	return 
 end
+
 local DOUBLE_TAP_DODGES = {
 	move_left_pressed = Vector3Box(-Vector3.right()),
 	move_right_pressed = Vector3Box(Vector3.right()),
 	move_back_pressed = Vector3Box(-Vector3.forward())
 }
+
 CharacterStateHelper.check_to_start_dodge = function (unit, input_extension, status_extension, t)
 	if status_extension.dodge_locked(status_extension) or not status_extension.can_dodge(status_extension, t) then
 		return false
@@ -156,6 +160,7 @@ CharacterStateHelper.check_to_start_dodge = function (unit, input_extension, sta
 
 	return start_dodge, dodge_direction
 end
+
 CharacterStateHelper.move_on_ground = function (first_person_extension, input_extension, locomotion_extension, local_move_direction, speed, unit)
 	local unit_rotation = first_person_extension.current_rotation(first_person_extension)
 	local flat_unit_rotation = Quaternion.look(Vector3.flat(Quaternion.forward(unit_rotation)), Vector3.up())
@@ -167,9 +172,8 @@ CharacterStateHelper.move_on_ground = function (first_person_extension, input_ex
 	end
 
 	locomotion_extension.set_wanted_velocity(locomotion_extension, move_direction * speed)
-
-	return 
 end
+
 CharacterStateHelper.update_soft_collision_movement = function (first_person_extension, status_extension, locomotion_extension, unit, world, current_animation)
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 	local final_velocity = Vector3(0, 0, 0)
@@ -229,6 +233,7 @@ CharacterStateHelper.update_soft_collision_movement = function (first_person_ext
 
 	return current_animation
 end
+
 CharacterStateHelper.do_common_state_transitions = function (status_extension, csm, in_state)
 	if CharacterStateHelper.is_dead(status_extension) then
 		csm.change_state(csm, "dead")
@@ -320,6 +325,7 @@ CharacterStateHelper.do_common_state_transitions = function (status_extension, c
 
 	return false
 end
+
 CharacterStateHelper.is_colliding_with_gameplay_collision_box = function (world, unit, collision_filter)
 	local physics_world = World.get_data(world, "physics_world")
 	local position = POSITION_LOOKUP[unit]
@@ -342,6 +348,7 @@ CharacterStateHelper.is_colliding_with_gameplay_collision_box = function (world,
 
 	return colliding, collided_unit
 end
+
 CharacterStateHelper.move_in_air = function (first_person_extension, input_extension, locomotion_extension, speed, unit, wait_timer_force_backwards_movement, wait_timer_force_forward_movement)
 	local movement = CharacterStateHelper.get_movement_input(input_extension)
 	local force_y_movement = 0
@@ -376,9 +383,8 @@ CharacterStateHelper.move_in_air = function (first_person_extension, input_exten
 	local new_move_direction = Vector3.normalize(new_move_velocity)
 
 	locomotion_extension.set_wanted_velocity(locomotion_extension, new_move_direction * new_move_speed)
-
-	return 
 end
+
 CharacterStateHelper.looking_up = function (first_person_extension, threshold)
 	local first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
 	local rotation = Unit.world_rotation(first_person_unit, 0)
@@ -388,6 +394,7 @@ CharacterStateHelper.looking_up = function (first_person_extension, threshold)
 
 	return (threshold < dot and true) or false
 end
+
 CharacterStateHelper.looking_down = function (first_person_extension, threshold)
 	local first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
 	local rotation = Unit.world_rotation(first_person_unit, 0)
@@ -397,6 +404,7 @@ CharacterStateHelper.looking_down = function (first_person_extension, threshold)
 
 	return (dot < threshold and true) or false
 end
+
 CharacterStateHelper.look = function (input_extension, viewport_name, first_person_extension, status_extension, inventory_extension, override_sens, override_delta)
 	local camera_manager = Managers.state.camera
 	local look_sensitivity = override_sens or (camera_manager.has_viewport(camera_manager, viewport_name) and camera_manager.fov(camera_manager, viewport_name) / 0.785) or 1
@@ -409,9 +417,8 @@ CharacterStateHelper.look = function (input_extension, viewport_name, first_pers
 	end
 
 	first_person_extension.set_look_delta(first_person_extension, look_delta)
-
-	return 
 end
+
 CharacterStateHelper.look_limited_rotation_freedom = function (input_extension, viewport_name, first_person_extension, ledge_unit, unit, max_radians_yaw, max_radians_pitch, status_extension, inventory_extension)
 	local camera_manager = Managers.state.camera
 	local look_sensitivity = (camera_manager.has_viewport(camera_manager, viewport_name) and Managers.state.camera:fov(viewport_name) / 0.785) or 1
@@ -456,9 +463,8 @@ CharacterStateHelper.look_limited_rotation_freedom = function (input_extension, 
 	end
 
 	first_person_extension.set_look_delta(first_person_extension, new_look_delta)
-
-	return 
 end
+
 CharacterStateHelper.lerp_player_rotation_radian = function (player_radian, target_radian, original_diference_radian, percentage_in_lerp)
 	local final_radian_value = nil
 
@@ -498,6 +504,7 @@ CharacterStateHelper.lerp_player_rotation_radian = function (player_radian, targ
 
 	return final_radian_value
 end
+
 CharacterStateHelper.lerp_player_pitch_rotation = function (player_start_pitch, first_person_extension, percentage_in_lerp, unit)
 	local player_rotation = Unit.local_rotation(unit, 0)
 	local new_pitch = math.lerp(player_start_pitch, 0, percentage_in_lerp)
@@ -511,9 +518,8 @@ CharacterStateHelper.lerp_player_pitch_rotation = function (player_start_pitch, 
 
 	first_person_extension.set_rotation(first_person_extension, final_roation)
 	Unit.set_local_rotation(unit, 0, final_roation)
-
-	return 
 end
+
 CharacterStateHelper.lerp_player_yaw_rotation = function (player_yaw, target_yaw, original_diference_yaw, first_person_extension, percentage_in_lerp, unit)
 	local first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
 	local player_rotation = Unit.local_rotation(first_person_unit, 0)
@@ -528,9 +534,8 @@ CharacterStateHelper.lerp_player_yaw_rotation = function (player_yaw, target_yaw
 
 	first_person_extension.set_rotation(first_person_extension, final_roation)
 	Unit.set_local_rotation(unit, 0, final_roation)
-
-	return 
 end
+
 CharacterStateHelper.time_in_ladder_move_animation = function (unit, ladder_base_height)
 	local unit_pos = Unit.world_position(unit, 0)
 	local unit_position_height = Vector3.z(unit_pos)
@@ -541,12 +546,13 @@ CharacterStateHelper.time_in_ladder_move_animation = function (unit, ladder_base
 
 	return time_in_move_animation
 end
+
 CharacterStateHelper.show_inventory_3p = function (unit, show_inventory_3p, include_local_player, is_server, inventory_extension)
 	local network_manager = Managers.state.network
 	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
 
 	if not network_manager.game_session then
-		return 
+		return
 	end
 
 	if include_local_player or (is_server and inventory_extension.is_bot) then
@@ -558,9 +564,8 @@ CharacterStateHelper.show_inventory_3p = function (unit, show_inventory_3p, incl
 	else
 		network_manager.network_transmit:send_rpc_server("rpc_show_inventory", unit_id, show_inventory_3p)
 	end
-
-	return 
 end
+
 CharacterStateHelper.set_is_on_ladder = function (ladder_unit, unit, on_ladder, is_server, status_extension)
 	local network_manager = Managers.state.network
 	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
@@ -576,9 +581,8 @@ CharacterStateHelper.set_is_on_ladder = function (ladder_unit, unit, on_ladder, 
 		status_extension.set_is_on_ladder(status_extension, on_ladder, ladder_unit)
 		network_manager.network_transmit:send_rpc_server("rpc_status_change_bool", NetworkLookup.statuses.ladder_climbing, on_ladder, unit_id, ladder_level_index)
 	end
-
-	return 
 end
+
 CharacterStateHelper.set_is_on_ledge = function (ledge_unit, unit, on_ledge, is_server, status_extension)
 	local network_manager = Managers.state.network
 	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
@@ -590,9 +594,8 @@ CharacterStateHelper.set_is_on_ledge = function (ledge_unit, unit, on_ledge, is_
 		status_extension.set_is_ledge_hanging(status_extension, on_ledge, ledge_unit)
 		network_manager.network_transmit:send_rpc_server("rpc_status_change_bool", NetworkLookup.statuses.ledge_hanging, on_ledge, unit_id, ledge_level_index)
 	end
-
-	return 
 end
+
 CharacterStateHelper.get_buffered_input = function (input_id, input_extension, no_buffer, doubleclick_window, softbutton_threshold)
 	local input = nil
 
@@ -614,6 +617,7 @@ CharacterStateHelper.get_buffered_input = function (input_id, input_extension, n
 
 	return input
 end
+
 CharacterStateHelper.wield_input = function (input_extension, inventory_extension, action_name, verify)
 	if action_name ~= "action_wield" then
 		return nil
@@ -696,13 +700,15 @@ CharacterStateHelper.wield_input = function (input_extension, inventory_extensio
 
 	return slot_to_wield, scroll_value
 end
+
 local empty_table = {}
+
 CharacterStateHelper.get_item_data_and_weapon_extensions = function (inventory_extension)
 	local equipment = inventory_extension.equipment(inventory_extension)
 	local item_data = equipment.wielded
 
 	if item_data == nil then
-		return 
+		return
 	end
 
 	local right_hand_wielded_unit = equipment.right_hand_wielded_unit
@@ -718,11 +724,12 @@ CharacterStateHelper.get_item_data_and_weapon_extensions = function (inventory_e
 	end
 
 	if not right_hand_weapon_extension and not left_hand_weapon_extension then
-		return 
+		return
 	end
 
 	return item_data, right_hand_weapon_extension, left_hand_weapon_extension
 end
+
 CharacterStateHelper.get_current_action_data = function (left_hand_weapon_extension, right_hand_weapon_extension)
 	local current_action_settings, current_action_extension, current_action_hand = nil
 
@@ -748,6 +755,7 @@ CharacterStateHelper.get_current_action_data = function (left_hand_weapon_extens
 
 	return current_action_settings, current_action_extension, current_action_hand
 end
+
 CharacterStateHelper._get_current_action_data_chain_action_end = function (left_hand_weapon_extension, right_hand_weapon_extension, current_weapon_extension)
 	local current_action_settings, current_action_extension, current_action_hand = nil
 
@@ -785,6 +793,7 @@ CharacterStateHelper._get_current_action_data_chain_action_end = function (left_
 
 	return current_action_settings, current_action_extension, current_action_hand
 end
+
 CharacterStateHelper._check_chain_action = function (wield_input, action_data, item_template, current_action_extension, input_extension, inventory_extension, unit, t)
 	local new_action, new_sub_action, send_buffer, clear_buffer = nil
 	local release_required = action_data.release_required
@@ -873,12 +882,14 @@ CharacterStateHelper._check_chain_action = function (wield_input, action_data, i
 
 	return false
 end
+
 local career_chain_action = {
 	sub_action = "default",
 	start_time = 0,
 	action = "N/A",
 	input = "action_career"
 }
+
 CharacterStateHelper._get_chain_action_data = function (item_template, current_action_extension, current_action_settings, input_extension, inventory_extension, unit, t, is_bot_player)
 	local done, _, new_action, new_sub_action, wield_input, send_buffer, clear_buffer = nil
 	local career_extension = ScriptUnit.has_extension(unit, "career_system")
@@ -951,8 +962,6 @@ local function validate_action(unit, action_name, sub_action_name, action_settin
 			return action_name, sub_action_name
 		end
 	end
-
-	return 
 end
 
 local weapon_action_interrupt_damage_types = {
@@ -960,13 +969,14 @@ local weapon_action_interrupt_damage_types = {
 	cutting = true
 }
 local interupting_action_data = {}
+
 CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension, inventory_extension, health_extension)
 	local item_data, right_hand_weapon_extension, left_hand_weapon_extension = CharacterStateHelper.get_item_data_and_weapon_extensions(inventory_extension)
 
 	table.clear(interupting_action_data)
 
 	if not item_data then
-		return 
+		return
 	end
 
 	local new_action, new_sub_action, current_action_settings, current_action_extension, current_action_hand = nil
@@ -1038,7 +1048,7 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 				end
 			end
 
-			return 
+			return
 		end
 	end
 
@@ -1144,7 +1154,7 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 			left_hand_weapon_extension.start_action(left_hand_weapon_extension, new_action, new_sub_action, item_template.actions, t, power_level, left_action_init_data)
 			right_hand_weapon_extension.start_action(right_hand_weapon_extension, new_action, new_sub_action, item_template.actions, t, power_level, right_action_init_data)
 
-			return 
+			return
 		end
 
 		if weapon_action_hand == "either" then
@@ -1164,7 +1174,7 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 
 			left_hand_weapon_extension.start_action(left_hand_weapon_extension, new_action, new_sub_action, item_template.actions, t, power_level, next_action_init_data)
 
-			return 
+			return
 		end
 
 		assert(right_hand_weapon_extension, "tried to start a right hand weapon action without a right hand wielded unit")
@@ -1175,9 +1185,8 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 
 		right_hand_weapon_extension.start_action(right_hand_weapon_extension, new_action, new_sub_action, item_template.actions, t, power_level, next_action_init_data)
 	end
-
-	return 
 end
+
 CharacterStateHelper.stop_weapon_actions = function (inventory_extension, reason)
 	local equipment = inventory_extension.equipment(inventory_extension)
 	local right_hand_wielded_unit = equipment.right_hand_wielded_unit
@@ -1192,9 +1201,8 @@ CharacterStateHelper.stop_weapon_actions = function (inventory_extension, reason
 	if left_weapon_extension and left_weapon_extension.current_action_settings then
 		left_weapon_extension.stop_action(left_weapon_extension, reason)
 	end
-
-	return 
 end
+
 CharacterStateHelper.reload = function (input_extension, inventory_extension, status_extension)
 	if not input_extension.get(input_extension, "weapon_reload") then
 		return false
@@ -1229,9 +1237,8 @@ CharacterStateHelper.reload = function (input_extension, inventory_extension, st
 	local play_reload_animation = true
 
 	ammo_extension.start_reload(ammo_extension, play_reload_animation)
-
-	return 
 end
+
 CharacterStateHelper.check_crouch = function (unit, input_extension, status_extension, toggle_crouch, first_person_extension, t)
 	local is_crouching = status_extension.is_crouching(status_extension)
 	local crouch = is_crouching
@@ -1254,30 +1261,31 @@ CharacterStateHelper.check_crouch = function (unit, input_extension, status_exte
 
 	return is_crouching
 end
+
 CharacterStateHelper.can_uncrouch = function (unit)
 	local mover = Unit.mover(unit)
 	local position = Mover.position(mover)
 
 	return Unit.mover_fits_at(unit, "standing", position)
 end
+
 CharacterStateHelper.crouch = function (unit, t, first_person_extension, status_extension)
 	CharacterStateHelper.play_animation_event(unit, "to_crouch")
 	first_person_extension.set_wanted_player_height(first_person_extension, "crouch", t)
 	ScriptUnit.extension(unit, "locomotion_system"):set_active_mover("crouch")
 	status_extension.set_crouching(status_extension, true)
-
-	return 
 end
+
 CharacterStateHelper.uncrouch = function (unit, t, first_person_extension, status_extension)
 	CharacterStateHelper.play_animation_event(unit, "to_uncrouch")
 	first_person_extension.set_wanted_player_height(first_person_extension, "stand", t)
 	ScriptUnit.extension(unit, "locomotion_system"):set_active_mover("standing")
 	status_extension.set_crouching(status_extension, false)
-
-	return 
 end
+
 local EPSILON_MOVEMENT_SPEED_TO_IDLE_ANIM = 0.05
 local SLOW_MOVEMENT_SPEED = 2.1
+
 CharacterStateHelper.get_move_animation = function (locomotion_extension, input_extension, status_extension)
 	local move_direction = CharacterStateHelper.get_movement_input(input_extension)
 	local slowed = Vector3.length(Vector3.flat(locomotion_extension.current_velocity(locomotion_extension))) < SLOW_MOVEMENT_SPEED
@@ -1292,21 +1300,25 @@ CharacterStateHelper.get_move_animation = function (locomotion_extension, input_
 
 	return "move_fwd", (slowed and "walk_fwd") or "move_fwd"
 end
+
 CharacterStateHelper.is_colliding_down = function (unit)
 	local mover = Unit.mover(unit)
 
 	return Mover.collides_down(mover)
 end
+
 CharacterStateHelper.is_colliding_sides = function (unit)
 	local mover = Unit.mover(unit)
 
 	return Mover.collides_sides(mover)
 end
+
 CharacterStateHelper.has_move_input = function (input_extension)
 	local movement = CharacterStateHelper.get_movement_input(input_extension)
 
 	return 0 < Vector3.length(movement)
 end
+
 CharacterStateHelper.is_moving = function (locomotion_extension)
 	local velocity_current = locomotion_extension.current_velocity(locomotion_extension)
 	local speed = Vector3.length_squared(velocity_current)
@@ -1314,6 +1326,7 @@ CharacterStateHelper.is_moving = function (locomotion_extension)
 
 	return moving
 end
+
 CharacterStateHelper.is_moving_backwards = function (locomotion_extension, first_person_extension)
 	local rotation_current = first_person_extension.current_rotation(first_person_extension)
 	local velocity_current = Vector3.flat(locomotion_extension.current_velocity(locomotion_extension))
@@ -1321,65 +1334,85 @@ CharacterStateHelper.is_moving_backwards = function (locomotion_extension, first
 
 	return dot < -0.1
 end
+
 CharacterStateHelper.is_knocked_down = function (status_extension)
 	return status_extension.is_knocked_down(status_extension)
 end
+
 CharacterStateHelper.is_pounced_down = function (status_extension)
 	return status_extension.is_pounced_down(status_extension)
 end
+
 CharacterStateHelper.is_catapulted = function (status_extension)
 	local is_catapulted, direction = status_extension.is_catapulted(status_extension)
 
 	return is_catapulted, direction
 end
+
 CharacterStateHelper.is_grabbed_by_pack_master = function (status_extension)
 	return status_extension.is_grabbed_by_pack_master(status_extension)
 end
+
 CharacterStateHelper.is_grabbed_by_tentacle = function (status_extension)
 	return status_extension.grabbed_by_tentacle
 end
+
 CharacterStateHelper.is_in_vortex = function (status_extension)
 	return status_extension.in_vortex
 end
+
 CharacterStateHelper.is_overcharge_exploding = function (status_extension)
 	return status_extension.is_overcharge_exploding(status_extension)
 end
+
 CharacterStateHelper.pack_master_status = function (status_extension)
 	return status_extension.pack_master_status
 end
+
 CharacterStateHelper.corruptor_status = function (status_extension)
 	return status_extension.corruptor_status
 end
+
 CharacterStateHelper.grabbed_by_tentacle_status = function (status_extension)
 	return status_extension.grabbed_by_tentacle_status
 end
+
 CharacterStateHelper.grabbed_by_chaos_spawn_status = function (status_extension)
 	return status_extension.grabbed_by_chaos_spawn_status, status_extension.grabbed_by_chaos_spawn_status_count
 end
+
 CharacterStateHelper.is_waiting_for_assisted_respawn = function (status_extension)
 	return status_extension.is_ready_for_assisted_respawn(status_extension)
 end
+
 CharacterStateHelper.is_assisted_respawning = function (status_extension)
 	return status_extension.is_assisted_respawning(status_extension)
 end
+
 CharacterStateHelper.is_pushed = function (status_extension)
 	return status_extension.is_pushed(status_extension)
 end
+
 CharacterStateHelper.is_block_broken = function (status_extension)
 	return status_extension.is_block_broken(status_extension)
 end
+
 CharacterStateHelper.is_dead = function (status_extension)
 	return status_extension.is_dead(status_extension)
 end
+
 CharacterStateHelper.is_using_transport = function (status_extension)
 	return status_extension.is_using_transport(status_extension)
 end
+
 CharacterStateHelper.is_zooming = function (status_extension)
 	return status_extension.is_zooming(status_extension)
 end
+
 CharacterStateHelper.is_crouching = function (status_extension)
 	return status_extension.is_crouching(status_extension)
 end
+
 CharacterStateHelper.is_starting_interaction = function (input_extension, interactor_extension)
 	local can_interact, fail_reason, interaction_type = interactor_extension.can_interact(interactor_extension)
 
@@ -1389,12 +1422,15 @@ CharacterStateHelper.is_starting_interaction = function (input_extension, intera
 
 	return can_interact and interaction_type ~= "heal" and interaction_type ~= "give_item" and input_extension.get(input_extension, "interact", true)
 end
+
 CharacterStateHelper.is_interacting = function (interactor_extension)
 	return interactor_extension.is_interacting(interactor_extension)
 end
+
 CharacterStateHelper.is_waiting_for_interaction_approval = function (interactor_extension)
 	return interactor_extension.is_waiting_for_interaction_approval(interactor_extension)
 end
+
 CharacterStateHelper.interact = function (input_extension, interactor_extension)
 	local config = interactor_extension.interaction_config(interactor_extension)
 
@@ -1411,6 +1447,7 @@ CharacterStateHelper.interact = function (input_extension, interactor_extension)
 
 	return true
 end
+
 CharacterStateHelper.is_ledge_hanging = function (world, unit, params)
 	if not script_data.ledge_hanging_turned_off then
 		local colliding, ledge_unit = CharacterStateHelper.is_colliding_with_gameplay_collision_box(world, unit, "filter_ledge_collision")
@@ -1431,12 +1468,14 @@ CharacterStateHelper.is_ledge_hanging = function (world, unit, params)
 
 	return false
 end
+
 CharacterStateHelper.recently_left_ladder = function (status_extension, t)
 	return status_extension.has_recently_left_ladder(status_extension, t)
 end
+
 CharacterStateHelper.change_camera_state = function (player, state)
 	if player.bot_player then
-		return 
+		return
 	end
 
 	if Development.parameter("third_person_mode") and state == "follow" then
@@ -1447,23 +1486,18 @@ CharacterStateHelper.change_camera_state = function (player, state)
 	local camera_system = entity_manager.system(entity_manager, "camera_system")
 
 	camera_system.external_state_change(camera_system, player, state)
-
-	return 
 end
+
 CharacterStateHelper.play_animation_event = function (unit, anim_event)
 	Managers.state.network:anim_event(unit, anim_event)
-
-	return 
 end
+
 CharacterStateHelper.play_animation_event_first_person = function (first_person_extension, anim_event)
 	first_person_extension.animation_event(first_person_extension, anim_event)
-
-	return 
 end
+
 CharacterStateHelper.play_animation_event_with_variable_float = function (unit, anim_event, variable_name, variable_value)
 	Managers.state.network:anim_event_with_variable_float(unit, anim_event, variable_name, variable_value)
-
-	return 
 end
 
-return 
+return

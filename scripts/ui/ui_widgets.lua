@@ -1,6 +1,7 @@
 local_require("scripts/ui/ui_widgets_honduras")
 
 UIWidgets = UIWidgets or {}
+
 UIWidgets.create_hover_button = function (scenegraph_id, normal_texture, hover_texture)
 	return {
 		element = UIElements.SimpleButton,
@@ -333,6 +334,7 @@ UIWidgets.create_gamepad_layout_win32 = function (bg_texture1, texture_size1, bg
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_gamepad_layout_xb1 = function (bg_texture, texture_size, offset, scenegraph_id)
 	return {
 		element = {
@@ -476,6 +478,7 @@ UIWidgets.create_gamepad_layout_xb1 = function (bg_texture, texture_size, offset
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_gamepad_layout_ps4 = function (bg_texture, texture_size, offset, scenegraph_id)
 	return {
 		element = {
@@ -637,6 +640,7 @@ UIWidgets.create_gamepad_layout_ps4 = function (bg_texture, texture_size, offset
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_menu_button = function (text_field_id, scenegraph_id, optional_text_size, optional_word_wrap, optional_text_area_size, optional_x_offset)
 	return {
 		element = {
@@ -896,6 +900,7 @@ UIWidgets.create_menu_button = function (text_field_id, scenegraph_id, optional_
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_menu_button_medium = function (text_field_id, scenegraph_id, disable_localization, optional_font_size)
 	return {
 		element = UIElements.ButtonMenuSteps,
@@ -975,6 +980,7 @@ UIWidgets.create_menu_button_medium = function (text_field_id, scenegraph_id, di
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_popup_button_long = function (text_field_id, scenegraph_id, disable_localization)
 	return {
 		element = UIElements.ButtonMenuSteps,
@@ -1054,6 +1060,7 @@ UIWidgets.create_popup_button_long = function (text_field_id, scenegraph_id, dis
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_quest_screen_button = function (text_field_id, scenegraph_id, disable_localization)
 	return {
 		element = UIElements.ButtonMenuSteps,
@@ -1133,6 +1140,7 @@ UIWidgets.create_quest_screen_button = function (text_field_id, scenegraph_id, d
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_menu_button_small = function (text_field_id, scenegraph_id)
 	return {
 		element = UIElements.ButtonMenuSteps,
@@ -1212,6 +1220,7 @@ UIWidgets.create_menu_button_small = function (text_field_id, scenegraph_id)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_octagon_button = function (icons, tooltips, scenegraph_id)
 	return {
 		element = UIElements.ToggleIconButton,
@@ -1326,6 +1335,7 @@ UIWidgets.create_octagon_button = function (icons, tooltips, scenegraph_id)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_menu_button_medium_with_timer = function (text_field_id, timer_text_field_id, timer_scenegraph_id, scenegraph_id)
 	return {
 		element = UIElements.ButtonMenuStepsWithTimer,
@@ -1456,6 +1466,7 @@ UIWidgets.create_menu_button_medium_with_timer = function (text_field_id, timer_
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
 	return {
 		element = {
@@ -1471,8 +1482,6 @@ UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
 						color[2] = color_value
 						color[3] = color_value
 						color[4] = color_value
-
-						return 
 					end,
 					content_check_function = function (content)
 						return content.scroll_bar_info.bar_height_percentage < 1
@@ -1489,8 +1498,6 @@ UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
 						color[2] = color_value
 						color[3] = color_value
 						color[4] = color_value
-
-						return 
 					end,
 					content_check_function = function (content)
 						return content.scroll_bar_info.bar_height_percentage < 1
@@ -1507,8 +1514,6 @@ UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
 						color[2] = color_value
 						color[3] = color_value
 						color[4] = color_value
-
-						return 
 					end,
 					content_check_function = function (content)
 						return content.scroll_bar_info.bar_height_percentage < 1
@@ -1536,8 +1541,6 @@ UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
 						local percentage = math.max(scroll_bar_info.bar_height_percentage, min_percentage)
 						thumb_middle.size[2] = math.max(math.floor(scroll_size_y * percentage) - min_height, 0)
 						hotspot.size[2] = min_height + thumb_middle.size[2]
-
-						return 
 					end
 				},
 				{
@@ -1573,13 +1576,9 @@ UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
 						local scroll_size = end_y - start_y
 						local scroll = end_y - offset_y
 						ui_content.value = (scroll ~= 0 and scroll / scroll_size) or 0
-
-						return 
 					end,
 					release_function = function (ui_scenegraph, ui_style, ui_content, input_service)
 						ui_content.click_pos_y = nil
-
-						return 
 					end
 				},
 				{
@@ -1605,8 +1604,6 @@ UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
 						thumb_bottom.offset[2] = offset_y - thumb_bottom_height
 						thumb_top.offset[2] = offset_y + thumb_middle_height
 						hotspot.offset[2] = thumb_bottom.offset[2]
-
-						return 
 					end
 				}
 			}
@@ -1738,6 +1735,7 @@ UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_scrollbar = function (scenegraph_id, size)
 	return {
 		element = {
@@ -1791,8 +1789,6 @@ UIWidgets.create_scrollbar = function (scenegraph_id, size)
 							local step = size_y / (start_y + end_y)
 							scroll_bar_info.value = math.min(scroll_bar_info.value + button_scroll_step, 1)
 						end
-
-						return 
 					end
 				},
 				{
@@ -1825,13 +1821,9 @@ UIWidgets.create_scrollbar = function (scenegraph_id, size)
 						local scroll_size = end_y - start_y
 						local scroll = end_y - offset_y
 						ui_content.value = (scroll ~= 0 and scroll / scroll_size) or 0
-
-						return 
 					end,
 					release_function = function (ui_scenegraph, ui_style, ui_content, input_service)
 						ui_content.click_pos_y = nil
-
-						return 
 					end
 				},
 				{
@@ -1846,8 +1838,6 @@ UIWidgets.create_scrollbar = function (scenegraph_id, size)
 						local value = ui_content.value
 						local offset_y = start_y + scroll_size * (1 - value)
 						box_style.offset[2] = offset_y
-
-						return 
 					end
 				}
 			}
@@ -1918,6 +1908,7 @@ UIWidgets.create_scrollbar = function (scenegraph_id, size)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_lock_icon = function (scenegraph_id, level)
 	return {
 		element = {
@@ -1973,6 +1964,7 @@ UIWidgets.create_lock_icon = function (scenegraph_id, level)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_quest_navigation_button = function (scenegraph_id, uvs, tooltip_text)
 	return {
 		element = {
@@ -2150,6 +2142,7 @@ UIWidgets.create_quest_navigation_button = function (scenegraph_id, uvs, tooltip
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_gold_button_3_state = function (text, scenegraph_id, normal_texture, hover_texture, click_texture)
 	return {
 		element = {
@@ -2212,6 +2205,7 @@ UIWidgets.create_gold_button_3_state = function (text, scenegraph_id, normal_tex
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_gamepad_bar_input_extension = function (parent_scenegraph_id)
 	return {
 		element = {
@@ -2305,6 +2299,7 @@ UIWidgets.create_gamepad_bar_input_extension = function (parent_scenegraph_id)
 		scenegraph_id = parent_scenegraph_id
 	}
 end
+
 UIWidgets.create_forge_merge_button = function (scenegraph_id, text_scenegraph_id, token_scenegraph_id, eye_glow_scenegraph_id, progress_scenegraph_id)
 	return {
 		element = {
@@ -2886,6 +2881,7 @@ UIWidgets.create_forge_merge_button = function (scenegraph_id, text_scenegraph_i
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_altar_button = function (button_text, scenegraph_id, text_scenegraph_id, token_scenegraph_id, progress_scenegraph_id)
 	return {
 		element = {
@@ -3466,6 +3462,7 @@ UIWidgets.create_altar_button = function (button_text, scenegraph_id, text_scene
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_dice_game_button = function (scenegraph_id)
 	return {
 		element = {
@@ -3618,6 +3615,7 @@ UIWidgets.create_dice_game_button = function (scenegraph_id)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_altar_craft_reagent_button = function (scenegraph_id, texture, required_hover_scenegraph_id, tooltip_text, masked)
 	return {
 		element = {
@@ -3689,6 +3687,7 @@ UIWidgets.create_altar_craft_reagent_button = function (scenegraph_id, texture, 
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_forge_upgrade_button = function (scenegraph_id, text_scenegraph_id, token_scenegraph_id, eye_glow_scenegraph_id, progress_scenegraph_id)
 	return {
 		element = {
@@ -3746,8 +3745,6 @@ UIWidgets.create_forge_upgrade_button = function (scenegraph_id, text_scenegraph
 
 							return not content.charging and not content.show_cancel_text and not content.show_title and content.texture_token_type and (not button_hotspot.is_clicked or (button_hotspot.is_clicked and 0 < button_hotspot.is_clicked)) and not button_hotspot.is_selected
 						end
-
-						return 
 					end
 				},
 				{
@@ -3760,8 +3757,6 @@ UIWidgets.create_forge_upgrade_button = function (scenegraph_id, text_scenegraph
 
 							return (not content.charging and not content.show_cancel_text and not content.show_title and content.texture_token_type and button_hotspot.is_selected) or (button_hotspot.is_clicked and button_hotspot.is_clicked == 0)
 						end
-
-						return 
 					end
 				},
 				{
@@ -4212,6 +4207,7 @@ UIWidgets.create_forge_upgrade_button = function (scenegraph_id, text_scenegraph
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_menu_selection_bar = function (scenegraph_definition, textures, icons, tooltips, offset, scenegraph_base, size, icon_size)
 	local passes = {}
 	local element = {
@@ -4398,6 +4394,7 @@ UIWidgets.create_menu_selection_bar = function (scenegraph_definition, textures,
 
 	return widget
 end
+
 UIWidgets.create_tiled_texture = function (scenegraph_id, texture, texture_size, offset, masked, color)
 	return {
 		element = {
@@ -4432,6 +4429,7 @@ UIWidgets.create_tiled_texture = function (scenegraph_id, texture, texture_size,
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_texture_with_text = function (texture, text, scenegraph_id, text_scenegraph_id, text_style)
 	return {
 		element = {
@@ -4474,6 +4472,7 @@ UIWidgets.create_texture_with_text = function (texture, text, scenegraph_id, tex
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_texture_with_text_and_tooltip = function (texture, text, tooltip_text, scenegraph_id, text_scenegraph_id, text_style, tooltip_style)
 	return {
 		element = {
@@ -4548,6 +4547,7 @@ UIWidgets.create_texture_with_text_and_tooltip = function (texture, text, toolti
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_tooltip = function (text, scenegraph_id, max_width, optional_style)
 	return {
 		element = {
@@ -4590,6 +4590,7 @@ UIWidgets.create_simple_tooltip = function (text, scenegraph_id, max_width, opti
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_hotspot = function (scenegraph_id)
 	return {
 		element = {
@@ -4607,6 +4608,7 @@ UIWidgets.create_simple_hotspot = function (scenegraph_id)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_two_state_button = function (scenegraph_id, normal_texture, hover_texture)
 	return {
 		element = UIElements.SimpleButton,
@@ -4624,6 +4626,7 @@ UIWidgets.create_simple_two_state_button = function (scenegraph_id, normal_textu
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_rect = function (scenegraph_id, color, layer)
 	return {
 		element = {
@@ -4658,6 +4661,7 @@ UIWidgets.create_simple_rect = function (scenegraph_id, color, layer)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_rounded_rect = function (scenegraph_id, corner_radius, color)
 	return {
 		element = {
@@ -4688,6 +4692,7 @@ UIWidgets.create_simple_rounded_rect = function (scenegraph_id, corner_radius, c
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_texture = function (texture, scenegraph_id, masked, retained, color, layer)
 	return {
 		element = {
@@ -4727,6 +4732,7 @@ UIWidgets.create_simple_texture = function (texture, scenegraph_id, masked, reta
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_centered_texture_amount = function (texture, texture_size, scenegraph_id, amount, masked)
 	local textures = {}
 	local texture_colors = {}
@@ -4783,6 +4789,7 @@ UIWidgets.create_simple_centered_texture_amount = function (texture, texture_siz
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_multi_texture = function (textures, texture_sizes, axis, direction, spacing, scenegraph_id, masked)
 	return {
 		element = {
@@ -4824,6 +4831,7 @@ UIWidgets.create_simple_multi_texture = function (textures, texture_sizes, axis,
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_centered_uv_texture_amount = function (texture, texture_size, amount, axis, scenegraph_id, masked)
 	local texture_uvs = {}
 	local texture_sizes = {}
@@ -4885,6 +4893,7 @@ UIWidgets.create_simple_centered_uv_texture_amount = function (texture, texture_
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_texture_with_style = function (texture, scenegraph_id, style)
 	return {
 		element = {
@@ -4905,6 +4914,7 @@ UIWidgets.create_texture_with_style = function (texture, scenegraph_id, style)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_gradient_mask_texture = function (texture, scenegraph_id)
 	return {
 		element = {
@@ -4938,6 +4948,7 @@ UIWidgets.create_simple_gradient_mask_texture = function (texture, scenegraph_id
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_rotated_texture = function (texture, angle, pivot, scenegraph_id, masked, retained, color)
 	return {
 		element = {
@@ -4979,6 +4990,7 @@ UIWidgets.create_simple_rotated_texture = function (texture, angle, pivot, scene
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_uv_texture = function (texture, uvs, scenegraph_id, masked, retained, color)
 	return {
 		element = {
@@ -5021,6 +5033,7 @@ UIWidgets.create_simple_uv_texture = function (texture, uvs, scenegraph_id, mask
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_frame = function (texture, texture_size, corner_size, vertical_size, horizontal_size, scenegraph_id, optional_style)
 	if not optional_style then
 		local style = {
@@ -5064,6 +5077,7 @@ UIWidgets.create_simple_frame = function (texture, texture_size, corner_size, ve
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_uv_texture_with_style = function (texture, uvs, scenegraph_id, style)
 	return {
 		element = {
@@ -5087,6 +5101,7 @@ UIWidgets.create_uv_texture_with_style = function (texture, uvs, scenegraph_id, 
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_text = function (text, scenegraph_id, size, color, text_style, optional_font_style, retained)
 	local text_offset = (text_style and text_style.offset) or {
 		0,
@@ -5165,6 +5180,7 @@ UIWidgets.create_simple_text = function (text, scenegraph_id, size, color, text_
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_text_tooltip = function (text, tooltip_text, scenegraph_id, size, color, text_style, tooltip_style)
 	return {
 		element = {
@@ -5228,6 +5244,7 @@ UIWidgets.create_simple_text_tooltip = function (text, tooltip_text, scenegraph_
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_rect_text = function (scenegraph_id, text, font_size, color, rect_color, text_style)
 	slot6 = {
 		element = {
@@ -5269,6 +5286,7 @@ UIWidgets.create_simple_rect_text = function (scenegraph_id, text, font_size, co
 
 	return slot6
 end
+
 UIWidgets.create_forge_toggle_button = function (normal_texture, normal_hover_texture, selected_texture, selected_hover_texture, scenegraph_id, hotspot_scenegraph_id)
 	return {
 		element = {
@@ -5323,6 +5341,7 @@ UIWidgets.create_forge_toggle_button = function (normal_texture, normal_hover_te
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_button_2_state = function (normal_texture, selected_texture, scenegraph_id, hotspot_scenegraph_id)
 	return {
 		element = {
@@ -5361,6 +5380,7 @@ UIWidgets.create_button_2_state = function (normal_texture, selected_texture, sc
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_title_text = function (text, scenegraph_id)
 	return {
 		element = {
@@ -5396,6 +5416,7 @@ UIWidgets.create_title_text = function (text, scenegraph_id)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_matchmaking_portrait = function (size, scenegraph_id)
 	return {
 		element = {
@@ -5562,6 +5583,7 @@ UIWidgets.create_matchmaking_portrait = function (size, scenegraph_id)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_small_trait_button = function (scenegraph_id, hotspot_scenegraph_id, masked)
 	return {
 		element = {
@@ -5767,6 +5789,7 @@ UIWidgets.create_small_trait_button = function (scenegraph_id, hotspot_scenegrap
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_small_reroll_trait_button = function (scenegraph_id, hotspot_scenegraph_id)
 	return {
 		element = {
@@ -5964,6 +5987,7 @@ UIWidgets.create_small_reroll_trait_button = function (scenegraph_id, hotspot_sc
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_attach_icon_button = function (background_texture, scenegraph_id, icon_scenegraph_id, drag_texture_size, animation_scenegraph_id, animation_glow_texture, disable_interaction)
 	return {
 		element = {
@@ -6164,6 +6188,7 @@ UIWidgets.create_attach_icon_button = function (background_texture, scenegraph_i
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_input_description_widgets = function (scenegraph_definition, parent_scenegraph_id, amount)
 	local input_description_widgets = {}
 
@@ -6275,6 +6300,7 @@ UIWidgets.create_input_description_widgets = function (scenegraph_definition, pa
 
 	return input_description_widgets
 end
+
 UIWidgets.create_hero_button = function (hero, scenegraph_id, hero_scenegraph_id)
 	local hero_texture_normal_id = "tabs_class_icon_" .. hero .. "_normal"
 	local hero_texture_hover_id = "tabs_class_icon_" .. hero .. "_hover"
@@ -6397,6 +6423,7 @@ UIWidgets.create_hero_button = function (hero, scenegraph_id, hero_scenegraph_id
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_trait_button = function (text, scenegraph_id, text_scenegraph_id, icon_scenegraph_id, animation_scenegraph_id)
 	return {
 		element = {
@@ -6569,6 +6596,7 @@ UIWidgets.create_trait_button = function (text, scenegraph_id, text_scenegraph_i
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_scoreboard_topic_widget = function (scenegraph_id)
 	return {
 		element = {
@@ -6582,8 +6610,6 @@ UIWidgets.create_scoreboard_topic_widget = function (scenegraph_id)
 					click_check_content_id = "button_hotspot",
 					click_function = function (ui_scenegraph, ui_style, ui_content, input_service)
 						ui_content.button_hotspot.is_selected = true
-
-						return 
 					end
 				},
 				{
@@ -6766,6 +6792,7 @@ UIWidgets.create_scoreboard_topic_widget = function (scenegraph_id)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_splash_video = function (input)
 	return {
 		element = {
@@ -6784,8 +6811,6 @@ UIWidgets.create_splash_video = function (input)
 						if 0.005 < math.abs(aspect_ratio - default_aspect_ratio) then
 							return true
 						end
-
-						return 
 					end
 				},
 				{
@@ -6810,6 +6835,7 @@ UIWidgets.create_splash_video = function (input)
 		scenegraph_id = input.scenegraph_id
 	}
 end
+
 UIWidgets.create_video = function (scenegraph_id, material_name)
 	return {
 		element = {
@@ -6840,6 +6866,7 @@ UIWidgets.create_video = function (scenegraph_id, material_name)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_splash_texture = function (input)
 	return {
 		element = {
@@ -6928,6 +6955,7 @@ UIWidgets.create_splash_texture = function (input)
 		scenegraph_id = input.scenegraph_id
 	}
 end
+
 UIWidgets.create_loader_icon = function (scenegraph_id)
 	return {
 		element = {
@@ -7002,6 +7030,7 @@ UIWidgets.create_loader_icon = function (scenegraph_id)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_partner_splash_widget = function (input)
 	return {
 		element = {
@@ -7180,6 +7209,7 @@ UIWidgets.create_partner_splash_widget = function (input)
 		scenegraph_id = input.scenegraph_id
 	}
 end
+
 UIWidgets.create_map_player_entry = function (scenegraph_id, gamepad_selection_scenegraph_id)
 	return {
 		element = {
@@ -7256,8 +7286,6 @@ UIWidgets.create_map_player_entry = function (scenegraph_id, gamepad_selection_s
 						if not content.on_console then
 							return content.button_hotspot.is_selected or content.button_hotspot.is_hover
 						end
-
-						return 
 					end
 				},
 				{
@@ -7268,8 +7296,6 @@ UIWidgets.create_map_player_entry = function (scenegraph_id, gamepad_selection_s
 						if content.on_console then
 							return content.button_hotspot.is_selected or content.button_hotspot.is_hover
 						end
-
-						return 
 					end
 				}
 			}
@@ -7457,6 +7483,7 @@ UIWidgets.create_map_player_entry = function (scenegraph_id, gamepad_selection_s
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_map_settings_stepper = function (scenegraph_id, gamepad_selection_scenegraph_id)
 	return {
 		element = {
@@ -7502,8 +7529,6 @@ UIWidgets.create_map_settings_stepper = function (scenegraph_id, gamepad_selecti
 						else
 							return true
 						end
-
-						return 
 					end
 				},
 				{
@@ -7518,8 +7543,6 @@ UIWidgets.create_map_settings_stepper = function (scenegraph_id, gamepad_selecti
 						else
 							return true
 						end
-
-						return 
 					end
 				},
 				{
@@ -7534,8 +7557,6 @@ UIWidgets.create_map_settings_stepper = function (scenegraph_id, gamepad_selecti
 						else
 							return true
 						end
-
-						return 
 					end
 				},
 				{
@@ -7550,8 +7571,6 @@ UIWidgets.create_map_settings_stepper = function (scenegraph_id, gamepad_selecti
 						else
 							return true
 						end
-
-						return 
 					end
 				}
 			}
@@ -7683,6 +7702,7 @@ UIWidgets.create_map_settings_stepper = function (scenegraph_id, gamepad_selecti
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_default_stepper = function (scenegraph_id, size)
 	return {
 		element = {
@@ -7894,6 +7914,7 @@ UIWidgets.create_default_stepper = function (scenegraph_id, size)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_map_hero_list_widget = function (scenegraph_id, gamepad_selection_scenegraph_id)
 	local icons = UISettings.hero_icons.small
 
@@ -8280,6 +8301,7 @@ UIWidgets.create_map_hero_list_widget = function (scenegraph_id, gamepad_selecti
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_checkbox_widget = function (text, tooltip_text, scenegraph_id, checkbox_offset, optional_text_offset, optional_tooltip_text_disabled)
 	local frame_settings = UIFrameSettings.menu_frame_06
 
@@ -8557,6 +8579,7 @@ UIWidgets.create_checkbox_widget = function (text, tooltip_text, scenegraph_id, 
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_story_level_map_widget = function (scenegraph_id, level_key, debug_level)
 	local show_debug_levels = UISettings.map.show_debug_levels
 	local level_data_list = {}
@@ -8573,8 +8596,6 @@ UIWidgets.create_story_level_map_widget = function (scenegraph_id, level_key, de
 					click_check_content_id = "button_hotspot",
 					click_function = function (ui_scenegraph, ui_style, ui_content, input_service)
 						ui_content.button_hotspot.is_selected = true
-
-						return 
 					end
 				},
 				{
@@ -8817,6 +8838,7 @@ UIWidgets.create_story_level_map_widget = function (scenegraph_id, level_key, de
 		widget = UIWidget.init(widget_template)
 	}
 end
+
 UIWidgets.create_text_button = function (scenegraph_id, text, font_size, optional_offset, optional_horizontal_alignment)
 	return {
 		element = {
@@ -8906,6 +8928,7 @@ UIWidgets.create_text_button = function (scenegraph_id, text, font_size, optiona
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_compare_menu_trait_widget = function (scenegraph_id, description_scenegraph_id, masked, use_divider)
 	return {
 		element = {
@@ -9086,6 +9109,7 @@ UIWidgets.create_compare_menu_trait_widget = function (scenegraph_id, descriptio
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_corner_frame_animation_widget = function (scenegraph_id, scenegraph_id_top_left, scenegraph_id_top_right, scenegraph_id_bottom_left, scenegraph_id_bottom_right)
 	local texture_color = {
 		0,
@@ -9409,6 +9433,7 @@ UIWidgets.create_corner_frame_animation_widget = function (scenegraph_id, sceneg
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_journal_tab = function (scenegraph_id, texture, masked)
 	return {
 		element = {
@@ -9497,6 +9522,7 @@ UIWidgets.create_journal_tab = function (scenegraph_id, texture, masked)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_journal_page_arrow_button = function (scenegraph_id, uvs, masked)
 	local passes = nil
 	local content = {
@@ -9639,6 +9665,7 @@ UIWidgets.create_journal_page_arrow_button = function (scenegraph_id, uvs, maske
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_journal_back_arrow_button = function (scenegraph_id, masked)
 	return {
 		element = {
@@ -9736,6 +9763,7 @@ UIWidgets.create_journal_back_arrow_button = function (scenegraph_id, masked)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_journal_reveal_mask = function (textures, scenegraph_ids, scenegraph_id)
 	local passes = {}
 	local content = {}
@@ -9803,6 +9831,7 @@ UIWidgets.create_journal_reveal_mask = function (textures, scenegraph_ids, scene
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_gamepad_selection = function (scenegraph_id, retained, masked, optional_texture_size)
 	return {
 		element = {
@@ -9930,4 +9959,4 @@ UIWidgets.create_gamepad_selection = function (scenegraph_id, retained, masked, 
 	}
 end
 
-return 
+return

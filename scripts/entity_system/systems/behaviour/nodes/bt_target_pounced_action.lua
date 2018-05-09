@@ -1,13 +1,14 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTTargetPouncedAction = class(BTTargetPouncedAction, BTNode)
+
 BTTargetPouncedAction.init = function (self, ...)
 	BTTargetPouncedAction.super.init(self, ...)
-
-	return 
 end
+
 BTTargetPouncedAction.name = "BTTargetPouncedAction"
 local POSITION_LOOKUP = POSITION_LOOKUP
+
 BTTargetPouncedAction.enter = function (self, unit, blackboard, t)
 	local locomotion_extension = blackboard.locomotion_extension
 	local action = self._tree_node.action_data
@@ -25,7 +26,7 @@ BTTargetPouncedAction.enter = function (self, unit, blackboard, t)
 		locomotion_extension.set_wanted_velocity(locomotion_extension, Vector3(0, 0, 0))
 		locomotion_extension.set_affected_by_gravity(locomotion_extension, true)
 
-		return 
+		return
 	end
 
 	local breed = blackboard.breed
@@ -82,9 +83,8 @@ BTTargetPouncedAction.enter = function (self, unit, blackboard, t)
 	if script_data.debug_player_intensity then
 		Managers.state.conflict.pacing:annotate_graph("pounced", "red")
 	end
-
-	return 
 end
+
 BTTargetPouncedAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	aiprint("LEAVE TARGET POUNCED ACTION")
 
@@ -129,9 +129,8 @@ BTTargetPouncedAction.leave = function (self, unit, blackboard, t, reason, destr
 	if blackboard.stagger then
 		blackboard.ninja_vanish = true
 	end
-
-	return 
 end
+
 BTTargetPouncedAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.already_pounced then
 		return "failed"
@@ -153,6 +152,7 @@ BTTargetPouncedAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTTargetPouncedAction.impact_pushback = function (impact_position, close_impact_radius, far_impact_radius, impact_speed_given, excluded_player_unit)
 	local player_and_bot_units = PLAYER_AND_BOT_UNITS
 
@@ -186,19 +186,19 @@ BTTargetPouncedAction.impact_pushback = function (impact_position, close_impact_
 			end
 		end
 	end
-
-	return 
 end
+
 local temp_damage_triplett = {
 	0,
 	0,
 	0
 }
+
 BTTargetPouncedAction.direct_damage = function (unit, blackboard)
 	local action = blackboard.action
 
 	if not action then
-		return 
+		return
 	end
 
 	local t = Managers.time:time("game")
@@ -211,8 +211,6 @@ BTTargetPouncedAction.direct_damage = function (unit, blackboard)
 	temp_damage_triplett[3] = base_damage[3] * multiplier
 
 	AiUtils.damage_target(blackboard.target_unit, unit, blackboard.action, temp_damage_triplett)
-
-	return 
 end
 
-return 
+return

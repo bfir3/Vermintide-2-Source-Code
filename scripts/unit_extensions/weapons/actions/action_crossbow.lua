@@ -1,4 +1,5 @@
 ActionCrossbow = class(ActionCrossbow)
+
 ActionCrossbow.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.weapon_unit = weapon_unit
@@ -13,9 +14,8 @@ ActionCrossbow.init = function (self, world, item_name, is_server, owner_unit, d
 
 	self.spread_extension = ScriptUnit.extension(weapon_unit, "spread_system")
 	self._is_critical_strike = false
-
-	return 
 end
+
 ActionCrossbow.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level)
 	local weapon_unit = self.weapon_unit
 	local owner_unit = self.owner_unit
@@ -50,9 +50,8 @@ ActionCrossbow.client_owner_start_action = function (self, new_action, t, chain_
 	end
 
 	self._is_critical_strike = is_critical_strike
-
-	return 
 end
+
 ActionCrossbow.client_owner_post_update = function (self, dt, t, world, can_damage)
 	if self.state == "waiting_to_shoot" and self.time_to_shoot <= t then
 		self.state = "shooting"
@@ -214,9 +213,8 @@ ActionCrossbow.client_owner_post_update = function (self, dt, t, world, can_dama
 			input_extension.add_buffer(input_extension, "weapon_reload", 0)
 		end
 	end
-
-	return 
 end
+
 ActionCrossbow.finish = function (self, reason)
 	local ammo_extension = self.ammo_extension
 	local current_action = self.current_action
@@ -243,8 +241,6 @@ ActionCrossbow.finish = function (self, reason)
 	if hud_extension then
 		hud_extension.show_critical_indication = false
 	end
-
-	return 
 end
 
-return 
+return

@@ -7,6 +7,7 @@ local ALIAS_TO_BREED = EnemyPackageLoaderSettings.alias_to_breed
 local BREED_TO_ALIASES = EnemyPackageLoaderSettings.breed_to_aliases
 local OPT_LOOKUP_BREED_NAMES = EnemyPackageLoaderSettings.opt_lookup_breed_names
 local UNLOAD_STARTUP_PACKAGES_BETWEEN_LEVELS = EnemyPackageLoaderSettings.unload_startup_packages_between_levels
+
 EnemyPackageLoader.init = function (self)
 	self.network_event_delegate = nil
 	self.use_optimized = script_data.use_optimized_breed_units
@@ -19,34 +20,31 @@ EnemyPackageLoader.init = function (self)
 	self.breed_processed = Script.new_map(96)
 	self._currently_loading_breeds = {}
 	self._breed_category_loaded_packages = {}
-
-	return 
 end
+
 local rpcs = {
 	"rpc_from_server_load_breed_package",
 	"rpc_from_server_load_breeds_by_bitmask",
 	"rpc_from_server_unload_breed_package",
 	"rpc_from_client_loading_breed_package_done"
 }
+
 EnemyPackageLoader.register_rpcs = function (self, network_event_delegate)
 	self.network_event_delegate = network_event_delegate
 
 	network_event_delegate.register(network_event_delegate, self, unpack(rpcs))
-
-	return 
 end
+
 EnemyPackageLoader.unregister_rpcs = function (self)
 	self.network_event_delegate:unregister(self)
 
 	self.network_event_delegate = nil
-
-	return 
 end
+
 EnemyPackageLoader.set_unit_spawner = function (self, unit_spawner)
 	self._unit_spawner = unit_spawner
-
-	return 
 end
+
 EnemyPackageLoader.network_context_created = function (self, lobby, server_peer_id, own_peer_id)
 	self._lobby = lobby
 	self._server_peer_id = server_peer_id
@@ -62,9 +60,8 @@ EnemyPackageLoader.network_context_created = function (self, lobby, server_peer_
 	else
 		self._unique_connection_key = nil
 	end
-
-	return 
 end
+
 EnemyPackageLoader.network_context_destroyed = function (self)
 	self._lobby = nil
 	self._server_peer_id = nil
@@ -76,9 +73,8 @@ EnemyPackageLoader.network_context_destroyed = function (self)
 	else
 		self._unique_connection_key = nil
 	end
-
-	return 
 end
+
 EnemyPackageLoader._find_unused_breed_to_unload = function (self, loaded_breeds)
 	local num_spawned_by_breed = Managers.state.conflict._num_spawned_by_breed
 	local package_handles = self._package_handles
@@ -90,9 +86,8 @@ EnemyPackageLoader._find_unused_breed_to_unload = function (self, loaded_breeds)
 			return breed_name
 		end
 	end
-
-	return 
 end
+
 EnemyPackageLoader._pick_breed_from_loaded_breeds = function (self, loaded_breeds, limit)
 	local wanted_index = math.random(1, limit)
 	local i = 0
@@ -104,9 +99,8 @@ EnemyPackageLoader._pick_breed_from_loaded_breeds = function (self, loaded_breed
 			return breed_name
 		end
 	end
-
-	return 
 end
+
 EnemyPackageLoader.request_breed = function (self, breed_name, ignore_breed_limits)
 	if not ALIAS_TO_BREED[breed_name] then
 	end
@@ -132,6 +126,7 @@ EnemyPackageLoader.request_breed = function (self, breed_name, ignore_breed_limi
 
 	return true
 end
+
 EnemyPackageLoader._set_breed_processed = function (self, breed_name, processed)
 	local breed_processed = self.breed_processed
 	local aliases = BREED_TO_ALIASES[breed_name]
@@ -146,9 +141,8 @@ EnemyPackageLoader._set_breed_processed = function (self, breed_name, processed)
 	end
 
 	breed_processed[breed_name] = processed
-
-	return 
 end
+
 EnemyPackageLoader._set_breed_loaded_on_all_peers = function (self, breed_name, loaded)
 	local loaded_on_all_peers = self.breed_loaded_on_all_peers
 	local aliases = BREED_TO_ALIASES[breed_name]
@@ -163,14 +157,13 @@ EnemyPackageLoader._set_breed_loaded_on_all_peers = function (self, breed_name, 
 	end
 
 	loaded_on_all_peers[breed_name] = loaded
-
-	return 
 end
+
 EnemyPackageLoader.update_breeds_loading_status = function (self)
 	local breeds_list = self._currently_loading_breeds
 
 	if not next(breeds_list) then
-		return 
+		return
 	end
 
 	local session = Managers.state.network:game()
@@ -197,9 +190,8 @@ EnemyPackageLoader.update_breeds_loading_status = function (self)
 			self._set_breed_loaded_on_all_peers(self, breed_name, true)
 		end
 	end
-
-	return 
 end
+
 EnemyPackageLoader._start_loading_package = function (self, breed_name, callback_name)
 	local state = self._package_state[breed_name]
 
@@ -214,9 +206,8 @@ EnemyPackageLoader._start_loading_package = function (self, breed_name, callback
 	local prioritize = true
 
 	Managers.package:load(package_name, "EnemyPackageLoader", callback(self, callback_name or "cb_breed_package_loaded", breed_name), async, prioritize)
-
-	return 
 end
+
 EnemyPackageLoader._load_package = function (self, breed_name, breed_category_data)
 	local dynamic_loaded_packages = self._dynamic_loaded_packages
 
@@ -238,9 +229,8 @@ EnemyPackageLoader._load_package = function (self, breed_name, breed_category_da
 
 		self._currently_loading_breeds[breed_name] = true
 	end
-
-	return 
 end
+
 EnemyPackageLoader._unload_package = function (self, breed_name, breed_category_data)
 	local is_startup_breed = self._breeds_to_load_at_startup[breed_name]
 
@@ -268,9 +258,8 @@ EnemyPackageLoader._unload_package = function (self, breed_name, breed_category_
 	self._package_state[breed_name] = "unloaded"
 
 	self._set_breed_processed(self, breed_name, false)
-
-	return 
 end
+
 EnemyPackageLoader.cb_breed_package_loaded = function (self, breed_name)
 	local breed_id = NetworkLookup.breeds[breed_name]
 	local is_server = self._is_server
@@ -287,21 +276,18 @@ EnemyPackageLoader.cb_breed_package_loaded = function (self, breed_name)
 	end
 
 	self._package_state[breed_name] = "loaded"
-
-	return 
 end
+
 EnemyPackageLoader.cb_breed_package_loaded_client_startup = function (self, breed_name)
 	self._package_state[breed_name] = "loaded"
-
-	return 
 end
+
 EnemyPackageLoader.cb_startup_breed_package_loaded = function (self, breed_name)
 	self._package_state[breed_name] = "loaded"
 
 	self._set_breed_loaded_on_all_peers(self, breed_name, true)
-
-	return 
 end
+
 EnemyPackageLoader._add_package_handles = function (self, breed_list)
 	local package_handles = self._package_handles
 
@@ -309,9 +295,8 @@ EnemyPackageLoader._add_package_handles = function (self, breed_list)
 		local breed_name = breed_list[i]
 		package_handles[breed_name] = Application.resource_package(BREED_PATH .. breed_name)
 	end
-
-	return 
 end
+
 EnemyPackageLoader._create_breed_category_lookup = function (self, breed_list, category, limit)
 	local breed_category_loaded_packages = self._breed_category_loaded_packages
 
@@ -331,9 +316,8 @@ EnemyPackageLoader._create_breed_category_lookup = function (self, breed_list, c
 		local breed = Breeds[breed_name]
 		breed_category_lookup[breed_name] = breed_category_loaded_packages[category]
 	end
-
-	return 
 end
+
 EnemyPackageLoader.setup_startup_enemies = function (self, level_key)
 	local breeds_to_load_at_startup = self._breeds_to_load_at_startup
 
@@ -345,7 +329,7 @@ EnemyPackageLoader.setup_startup_enemies = function (self, level_key)
 		if level_settings.load_no_enemies then
 			print("Load no enemies on this level")
 
-			return 
+			return
 		end
 
 		local breed_categories = EnemyPackageLoaderSettings.categories
@@ -375,9 +359,8 @@ EnemyPackageLoader.setup_startup_enemies = function (self, level_key)
 
 		self._load_startup_enemy_packages(self)
 	end
-
-	return 
 end
+
 EnemyPackageLoader._load_startup_enemy_packages = function (self)
 	local breeds_to_load_at_startup = self._breeds_to_load_at_startup
 
@@ -401,9 +384,8 @@ EnemyPackageLoader._load_startup_enemy_packages = function (self)
 	end
 
 	breeds_to_load_at_startup.loaded = true
-
-	return 
 end
+
 EnemyPackageLoader.loading_completed = function (self)
 	if not self._is_server and self._unique_connection_key == nil then
 		return false
@@ -419,6 +401,7 @@ EnemyPackageLoader.loading_completed = function (self)
 
 	return true
 end
+
 EnemyPackageLoader.unload_enemy_packages = function (self, force_unload_startup_packages)
 	local unload_startup_packages = force_unload_startup_packages or UNLOAD_STARTUP_PACKAGES_BETWEEN_LEVELS
 
@@ -455,9 +438,8 @@ EnemyPackageLoader.unload_enemy_packages = function (self, force_unload_startup_
 
 		table.clear(data.loaded_breeds)
 	end
-
-	return 
 end
+
 EnemyPackageLoader._sync_dynamic_to_client = function (self, peer_id, connection_key)
 	local package_state = self._package_state
 	local breeds_to_load_at_startup = self._breeds_to_load_at_startup
@@ -480,9 +462,8 @@ EnemyPackageLoader._sync_dynamic_to_client = function (self, peer_id, connection
 	end
 
 	self._send_rpc(self, "rpc_from_server_load_breeds_by_bitmask", peer_id, connection_key, bitmasks)
-
-	return 
 end
+
 EnemyPackageLoader.rpc_from_server_load_breeds_by_bitmask = function (self, sender, connection_key, bitmasks)
 	local num_bitmasks = #bitmasks
 	self._unique_connection_key = connection_key
@@ -505,9 +486,8 @@ EnemyPackageLoader.rpc_from_server_load_breeds_by_bitmask = function (self, send
 			end
 		end
 	end
-
-	return 
 end
+
 EnemyPackageLoader.rpc_from_server_load_breed_package = function (self, sender, connection_key, breed_id)
 	local server_peer_id = self._server_peer_id
 	local unique_connection_key = self._unique_connection_key
@@ -515,19 +495,18 @@ EnemyPackageLoader.rpc_from_server_load_breed_package = function (self, sender, 
 	if server_peer_id ~= sender then
 		printf("[EnemyPackageLoader] rpc_from_server_load_breed_package from wrong lobby (server=%s|%s)", server_peer_id or "nil", sender)
 
-		return 
+		return
 	elseif connection_key ~= unique_connection_key then
 		printf("[EnemyPackageLoader] rpc_from_server_load_breed_package from old connection (%s) (key=%s|%s)", sender, unique_connection_key or "nil", connection_key)
 
-		return 
+		return
 	end
 
 	local breed_name = NetworkLookup.breeds[breed_id]
 
 	self._start_loading_package(self, breed_name)
-
-	return 
 end
+
 EnemyPackageLoader.rpc_from_server_unload_breed_package = function (self, sender, connection_key, breed_id)
 	local server_peer_id = self._server_peer_id
 	local unique_connection_key = self._unique_connection_key
@@ -535,58 +514,54 @@ EnemyPackageLoader.rpc_from_server_unload_breed_package = function (self, sender
 	if server_peer_id ~= sender then
 		printf("[EnemyPackageLoader] rpc_from_server_unload_breed_package from wrong lobby (server=%s|%s)", server_peer_id or "nil", sender)
 
-		return 
+		return
 	elseif connection_key ~= unique_connection_key then
 		printf("[EnemyPackageLoader] rpc_from_server_unload_breed_package from old connection (%s) (key=%s|%s)", sender, unique_connection_key or "nil", connection_key)
 
-		return 
+		return
 	end
 
 	local breed_name = NetworkLookup.breeds[breed_id]
 
 	self._unload_package(self, breed_name)
-
-	return 
 end
+
 EnemyPackageLoader.rpc_from_client_loading_breed_package_done = function (self, sender, connection_key, breed_id)
 	local client_key = self._unique_connections[sender]
 
 	if client_key ~= connection_key then
 		printf("[EnemyPackageLoader] rpc_from_client_loading_breed_package_done from old connection (%s) - (key=%s|%s)", sender, client_key or "nil", connection_key)
 
-		return 
+		return
 	end
 
 	local breed_name = NetworkLookup.breeds[breed_id]
 	self._dynamic_loaded_packages[breed_name][sender] = true
-
-	return 
 end
+
 EnemyPackageLoader._send_rpc = function (self, rpc_name, peer_id, ...)
 	if not self._lobby then
-		return 
+		return
 	end
 
 	local rpc = RPC[rpc_name]
 
 	rpc(peer_id, ...)
-
-	return 
 end
+
 EnemyPackageLoader._send_rpc_to_server = function (self, rpc_name, ...)
 	if not self._lobby then
-		return 
+		return
 	end
 
 	local rpc = RPC[rpc_name]
 
 	rpc(self._server_peer_id, self._unique_connection_key, ...)
-
-	return 
 end
+
 EnemyPackageLoader._send_rpc_to_clients = function (self, rpc_name, ...)
 	if not self._lobby then
-		return 
+		return
 	end
 
 	local rpc = RPC[rpc_name]
@@ -606,12 +581,11 @@ EnemyPackageLoader._send_rpc_to_clients = function (self, rpc_name, ...)
 			end
 		end
 	end
-
-	return 
 end
+
 EnemyPackageLoader._send_rpc_to_clients_except = function (self, rpc_name, except, ...)
 	if not self._lobby then
-		return 
+		return
 	end
 
 	local rpc = RPC[rpc_name]
@@ -631,9 +605,8 @@ EnemyPackageLoader._send_rpc_to_clients_except = function (self, rpc_name, excep
 			end
 		end
 	end
-
-	return 
 end
+
 EnemyPackageLoader.client_connected = function (self, peer_id)
 	local connection_key = self._unique_connection_counter
 	self._unique_connections[peer_id] = connection_key
@@ -642,9 +615,8 @@ EnemyPackageLoader.client_connected = function (self, peer_id)
 
 	local connection_key_max = self._connection_key_max
 	self._unique_connection_counter = (connection_key + 1) % connection_key_max
-
-	return 
 end
+
 EnemyPackageLoader.client_disconnected = function (self, peer_id)
 	local dynamic_loaded_packages = self._dynamic_loaded_packages
 
@@ -653,9 +625,8 @@ EnemyPackageLoader.client_disconnected = function (self, peer_id)
 	end
 
 	self._unique_connections[peer_id] = nil
-
-	return 
 end
+
 EnemyPackageLoader.debug_loaded_breeds = function (self)
 	local num_spawned_by_breed = Managers.state.conflict._num_spawned_by_breed
 	local package_state = self._package_state
@@ -697,8 +668,6 @@ EnemyPackageLoader.debug_loaded_breeds = function (self)
 	else
 		Debug.text("Peer=%s | Server=%s | Key=%s", self._peer_id, self._server_peer_id or "nil", self._unique_connection_key or "nil")
 	end
-
-	return 
 end
 
-return 
+return

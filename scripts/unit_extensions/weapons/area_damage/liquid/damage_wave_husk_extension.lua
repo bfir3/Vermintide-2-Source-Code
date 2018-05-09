@@ -1,5 +1,6 @@
 DamageWaveHuskExtension = class(DamageWaveHuskExtension)
 local position_lookup = POSITION_LOOKUP
+
 DamageWaveHuskExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	local entity_manager = Managers.state.entity
@@ -34,9 +35,8 @@ DamageWaveHuskExtension.init = function (self, extension_init_context, unit, ext
 	self.fx_separation_dist = template.fx_separation_dist
 	self.max_height = template.max_height
 	self.overflow_dist = template.overflow_dist
-
-	return 
 end
+
 DamageWaveHuskExtension.destroy = function (self)
 	local world = self.world
 	local fx_list = self.fx_list
@@ -47,9 +47,8 @@ DamageWaveHuskExtension.destroy = function (self)
 
 		World.stop_spawning_particles(world, fx_id)
 	end
-
-	return 
 end
+
 DamageWaveHuskExtension.update = function (self, unit, input, dt, context, t)
 	local lerp_value = math.min(dt * 10, 1)
 	local current_pos = position_lookup[unit]
@@ -61,18 +60,16 @@ DamageWaveHuskExtension.update = function (self, unit, input, dt, context, t)
 	local rot = GameSession.game_object_field(self.game, self.go_id, "rotation")
 
 	Unit.set_local_rotation(unit, 0, rot)
-
-	return 
 end
+
 DamageWaveHuskExtension.add_damage_wave_fx = function (self, position)
 	local unit = self.unit
 	local rotation = Unit.local_rotation(unit, 0)
 	local fx_list = self.fx_list
 	local fx_id = World.create_particles(self.world, self.fx_name_filled, position, rotation)
 	fx_list[#fx_list + 1] = fx_id
-
-	return 
 end
+
 DamageWaveHuskExtension.set_running_wave = function (self, unit)
 	local world = self.world
 	local position = position_lookup[unit]
@@ -95,17 +92,15 @@ DamageWaveHuskExtension.set_running_wave = function (self, unit)
 		local id, source = WwiseUtils.trigger_unit_event(world, running_wave_sound, unit)
 		self.running_source_id = source
 	end
-
-	return 
 end
+
 DamageWaveHuskExtension.hide_wave = function (self, unit)
 	local world = self.world
 
 	Unit.set_unit_visibility(unit, false)
 	World.stop_spawning_particles(world, self.init_effect_id)
-
-	return 
 end
+
 DamageWaveHuskExtension.set_wave_arrived = function (self, unit)
 	self.hide_wave(self, unit)
 
@@ -129,9 +124,8 @@ DamageWaveHuskExtension.set_wave_arrived = function (self, unit)
 
 	World.stop_spawning_particles(world, self.running_wave_fx_id)
 	World.create_particles(world, self.fx_name_arrived, position_lookup[unit], rotation)
-
-	return 
 end
+
 DamageWaveHuskExtension.on_wavefront_impact = function (self, unit)
 	local world = self.world
 	local normal_rotation = Quaternion.look(Vector3.forward(), Vector3.up())
@@ -143,12 +137,12 @@ DamageWaveHuskExtension.on_wavefront_impact = function (self, unit)
 	if impact_wave_sound then
 		WwiseUtils.trigger_unit_event(world, impact_wave_sound, unit)
 	end
-
-	return 
 end
+
 local segments = 20
 local half_segments = segments / 2
 local wave_length = 1
+
 DamageWaveHuskExtension.debug_render_wave = function (self, t, dt, pos, travel_dir, height)
 	local k = 0
 
@@ -160,8 +154,6 @@ DamageWaveHuskExtension.debug_render_wave = function (self, t, dt, pos, travel_d
 
 		k = k + 1
 	end
-
-	return 
 end
 
-return 
+return

@@ -38,4 +38,4 @@ LightWeightProjectileParticleEffects = {
 	}
 }
 
-return 
+return

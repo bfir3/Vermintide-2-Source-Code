@@ -7,8 +7,6 @@ local function dprint(...)
 	if script_data.debug_music then
 		print("[MusicManager] ", ...)
 	end
-
-	return 
 end
 
 MusicManager = class(MusicManager)
@@ -27,6 +25,7 @@ MusicManager.panning_rules = {
 	PANNING_RULE_SPEAKERS = 0,
 	PANNING_RULE_HEADPHONES = 1
 }
+
 MusicManager.init = function (self)
 	if GLOBAL_MUSIC_WORLD then
 		self._world = MUSIC_WORLD
@@ -63,15 +62,13 @@ MusicManager.init = function (self)
 
 		self.set_panning_rule(self, rule)
 	end
-
-	return 
 end
+
 MusicManager.stop_all_sounds = function (self)
 	dprint("stop_all_sounds")
 	self._wwise_world:stop_all()
-
-	return 
 end
+
 MusicManager.trigger_event = function (self, event_name)
 	dprint("trigger_event", event_name)
 
@@ -82,6 +79,7 @@ MusicManager.trigger_event = function (self, event_name)
 
 	return wwise_playing_id, wwise_source_id
 end
+
 MusicManager.update = function (self, dt, t)
 	local conflict_director = Managers.state.conflict
 
@@ -102,9 +100,8 @@ MusicManager.update = function (self, dt, t)
 	for _, player in pairs(self._music_players) do
 		player.update(player, flags, self._game_object_id)
 	end
-
-	return 
 end
+
 MusicManager.on_enter_level = function (self, network_event_delegate, is_server)
 	self.set_flag(self, "in_level", true)
 	self._setup_level_music_players(self)
@@ -128,16 +125,13 @@ MusicManager.on_enter_level = function (self, network_event_delegate, is_server)
 
 		self._game_object_id = Managers.state.network:create_game_object("music_states", init_data, function (game_object_id)
 			self:server_game_session_disconnect_music_states(game_object_id)
-
-			return 
 		end)
 	end
 
 	self._is_server = is_server
 	self.last_man_standing = false
-
-	return 
 end
+
 MusicManager.on_exit_level = function (self)
 	dprint("on_exit_level")
 	self._reset_level_music_players(self)
@@ -149,40 +143,37 @@ MusicManager.on_exit_level = function (self)
 
 	self._is_server = false
 	self.last_man_standing = false
+end
 
-	return 
-end
 MusicManager.client_game_session_disconnect_music_states = function (self, game_object_id)
-	return 
+	return
 end
+
 MusicManager.server_game_session_disconnect_music_states = function (self, game_object_id)
 	self.game_object_destroyed(self, game_object_id, self._owner_id, self._go_template)
-
-	return 
 end
+
 MusicManager.game_object_created = function (self, game_object_id, owner_id, go_template)
 	self._game_object_id = game_object_id
 	self._owner_id = owner_id
 	self._go_template = go_template
-
-	return 
 end
+
 MusicManager.game_object_destroyed = function (self, game_object_id, owner_id, go_template)
 	Application.warning("[MusicManager:game_object_destroyed] Removed go_template == self._go_template check due to crash")
 
 	self._game_object_id = nil
 	self._owner_id = nil
 	self._go_template = nil
-
-	return 
 end
+
 MusicManager._update_flags = function (self)
 	self.set_flag(self, "combat_music_enabled", not script_data.debug_disable_combat_music)
 
 	local game_object_id = self._game_object_id
 
 	if self._is_server or not game_object_id then
-		return 
+		return
 	end
 
 	local session = Managers.state.network:game()
@@ -192,12 +183,11 @@ MusicManager._update_flags = function (self)
 
 		self.set_flag(self, flag, value)
 	end
-
-	return 
 end
+
 MusicManager.set_flag = function (self, flag, value)
 	if self._flags[flag] == value then
-		return 
+		return
 	end
 
 	dprint("set_flag", flag, value)
@@ -209,9 +199,8 @@ MusicManager.set_flag = function (self, flag, value)
 
 		GameSession.set_game_object_field(session, self._game_object_id, flag, value)
 	end
-
-	return 
 end
+
 MusicManager._setup_level_music_players = function (self)
 	local music_configs = MusicSettings
 
@@ -228,9 +217,8 @@ MusicManager._setup_level_music_players = function (self)
 			self._music_players[config_name] = player
 		end
 	end
-
-	return 
 end
+
 MusicManager._reset_level_music_players = function (self)
 	local music_configs = MusicSettings
 
@@ -245,15 +233,15 @@ MusicManager._reset_level_music_players = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 MusicManager._number_of_aggroed_enemies = function (self)
 	local ai_slot_system = Managers.state.entity:system("ai_slot_system")
 	local num_enemies = ai_slot_system.num_total_enemies
 
 	return num_enemies
 end
+
 MusicManager._update_flag_in_combat = function (self, conflict_director)
 	local num_aggroed_enemies = self._number_of_aggroed_enemies(self)
 	local pacing = conflict_director.pacing
@@ -261,12 +249,11 @@ MusicManager._update_flag_in_combat = function (self, conflict_director)
 	local in_combat = CombatMusic.minimum_enemies < num_aggroed_enemies and CombatMusic.minimum_intensity < intensity
 
 	self.set_flag(self, "in_combat", in_combat)
-
-	return 
 end
+
 MusicManager._update_combat_intensity = function (self, conflict_director)
 	if not self._flags.in_combat then
-		return 
+		return
 	end
 
 	local pacing = conflict_director.pacing
@@ -282,9 +269,8 @@ MusicManager._update_combat_intensity = function (self, conflict_director)
 	if highest_state then
 		self.set_music_group_state(self, "combat_music", "combat_intensity", highest_state)
 	end
-
-	return 
 end
+
 MusicManager._update_boss_state = function (self, conflict_director)
 	local music_player = self._music_players.combat_music
 
@@ -315,9 +301,8 @@ MusicManager._update_boss_state = function (self, conflict_director)
 	if not DEDICATED_SERVER then
 		self._update_boss_music_intensity(self, conflict_director)
 	end
-
-	return 
 end
+
 MusicManager._get_combat_music_state = function (self, conflict_director)
 	local state = "rat_ogre"
 	local boss_units = conflict_director.alive_bosses(conflict_director)
@@ -341,6 +326,7 @@ MusicManager._get_combat_music_state = function (self, conflict_director)
 
 	return state
 end
+
 MusicManager._update_boss_music_intensity = function (self, conflict_director)
 	local player_manager = Managers.player
 	local local_player = player_manager.local_player(player_manager)
@@ -385,9 +371,8 @@ MusicManager._update_boss_music_intensity = function (self, conflict_director)
 	end
 
 	self.set_wwise_state(self, group_name, state_name)
-
-	return 
 end
+
 MusicManager.set_wwise_state = function (self, group_name, state_name)
 	self._group_states[group_name] = self._group_states[group_name] or nil
 
@@ -396,9 +381,8 @@ MusicManager.set_wwise_state = function (self, group_name, state_name)
 	end
 
 	self._group_states[group_name] = state_name
-
-	return 
 end
+
 MusicManager.check_last_man_standing_music_state = function (self)
 	local player_manager = Managers.player
 	local num_players = player_manager.num_players(player_manager)
@@ -406,7 +390,7 @@ MusicManager.check_last_man_standing_music_state = function (self)
 	if num_players == 1 then
 		self.last_man_standing = false
 
-		return 
+		return
 	end
 
 	local local_player = player_manager.local_player(player_manager)
@@ -435,8 +419,6 @@ MusicManager.check_last_man_standing_music_state = function (self)
 	else
 		self.last_man_standing = false
 	end
-
-	return 
 end
 
 local function get_horde_music_state(state, sound_settings)
@@ -452,6 +434,7 @@ local HORDE_MUSIC_STATES = {
 	ambush = true,
 	horde = true
 }
+
 MusicManager._update_game_state = function (self, dt, t, conflict_director)
 	local music_player = self._music_players.combat_music
 
@@ -521,10 +504,10 @@ MusicManager._update_game_state = function (self, dt, t, conflict_director)
 		self.set_music_group_state(self, "combat_music", "game_state", music_state)
 		self.delay_trigger_horde_dialogue(self, t)
 	end
-
-	return 
 end
+
 local ai_units = {}
+
 MusicManager._horde_has_engaged = function (self, horde)
 	local engage_distance = (horde == "ambush" and 15) or 2
 	local pos = nil
@@ -552,6 +535,7 @@ MusicManager._horde_has_engaged = function (self, horde)
 
 	return false
 end
+
 MusicManager._update_player_state = function (self, dt, t)
 	local music_player = self._music_players.combat_music
 	local local_player_id = self._active_local_player_id
@@ -589,9 +573,8 @@ MusicManager._update_player_state = function (self, dt, t)
 	elseif music_player then
 		music_player.set_group_state(music_player, "player_state", "normal")
 	end
-
-	return 
 end
+
 MusicManager._update_career_state = function (self, dt, t)
 	local music_player = self._music_players.combat_music
 	local local_player_id = self._active_local_player_id
@@ -611,9 +594,8 @@ MusicManager._update_career_state = function (self, dt, t)
 	elseif music_player then
 		music_player.set_group_state(music_player, "career_state", "default")
 	end
-
-	return 
 end
+
 MusicManager._update_enemy_aggro_state = function (self, dt, t)
 	local music_player = self._music_players.combat_music
 	local local_player_id = self._active_local_player_id
@@ -633,23 +615,20 @@ MusicManager._update_enemy_aggro_state = function (self, dt, t)
 	elseif music_player then
 		music_player.set_group_state(music_player, "music_target_aggro", "husk")
 	end
-
-	return 
 end
+
 MusicManager.register_active_player = function (self, player_id)
 	fassert(not self._active_local_player_id, "Active player %q already registered!", player_id)
 
 	self._active_local_player_id = player_id
-
-	return 
 end
+
 MusicManager.unregister_active_player = function (self, player_id)
 	fassert(self._active_local_player_id == player_id, "Trying to unregister player %q when player %q is active player", player_id, self._player_id)
 
 	self._active_local_player_id = nil
-
-	return 
 end
+
 MusicManager.set_music_group_state = function (self, music_player, group, state)
 	local game_object_id = self._game_object_id
 
@@ -659,35 +638,31 @@ MusicManager.set_music_group_state = function (self, music_player, group, state)
 
 		GameSession.set_game_object_field(session, game_object_id, group, state_id)
 	end
-
-	return 
 end
+
 MusicManager.music_trigger = function (self, music_player, event)
 	local player = self._music_players[music_player]
 
 	player.post_trigger(player, event)
-
-	return 
 end
+
 MusicManager.set_music_volume = function (self, value)
 	WwiseWorld.set_global_parameter(self._wwise_world, "music_bus_volume", value)
-
-	return 
 end
+
 MusicManager.set_master_volume = function (self, value)
 	WwiseWorld.set_global_parameter(self._wwise_world, "master_bus_volume", value)
-
-	return 
 end
+
 MusicManager.set_panning_rule = function (self, rule)
 	fassert(MusicManager.panning_rules[rule] ~= nil, "[MusicManager] Panning rule does not exist: %q", rule)
 	Wwise.set_panning_rule(MusicManager.panning_rules[rule])
-
-	return 
 end
+
 MusicManager.is_playing = function (self, wwise_playing_id)
 	return WwiseWorld.is_playing(self._wwise_world, wwise_playing_id)
 end
+
 MusicManager.delay_trigger_horde_dialogue = function (self, t, delay, horde_name)
 	if delay ~= nil then
 		self._horde_delay = delay
@@ -700,17 +675,14 @@ MusicManager.delay_trigger_horde_dialogue = function (self, t, delay, horde_name
 		self._horde_delay = nil
 		self._horde_type = nil
 	end
-
-	return 
 end
+
 MusicManager.trigger_horde_dialogue = function (self, horde_name)
 	local dummy_unit = DialogueSystem:GetRandomPlayer()
 
 	if dummy_unit then
 		SurroundingAwareSystem.add_event(dummy_unit, "horde", DialogueSettings.discover_enemy_attack_distance, "horde_type", horde_name)
 	end
-
-	return 
 end
 
-return 
+return

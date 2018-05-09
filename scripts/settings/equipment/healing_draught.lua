@@ -128,4 +128,4 @@ weapon_template.buffs = {
 Weapons = Weapons or {}
 Weapons.healing_draught = table.clone(weapon_template)
 
-return 
+return

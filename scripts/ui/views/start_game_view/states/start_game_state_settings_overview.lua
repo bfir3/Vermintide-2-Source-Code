@@ -24,10 +24,10 @@ local MAX_ACTIVE_WINDOWS = 3
 local DO_RELOAD = false
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
 local privacy_settings = {
@@ -44,6 +44,7 @@ local privacy_settings_display_names = {
 }
 StartGameStateSettingsOverview = class(StartGameStateSettingsOverview)
 StartGameStateSettingsOverview.NAME = "StartGameStateSettingsOverview"
+
 StartGameStateSettingsOverview.on_enter = function (self, params)
 	print("[StartGameState] Enter Substate StartGameStateSettingsOverview")
 
@@ -92,9 +93,8 @@ StartGameStateSettingsOverview.on_enter = function (self, params)
 
 	self.set_confirm_button_visibility(self, false)
 	self._initial_windows_setups(self, window_params)
-
-	return 
 end
+
 StartGameStateSettingsOverview.create_ui_elements = function (self, params)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -114,9 +114,8 @@ StartGameStateSettingsOverview.create_ui_elements = function (self, params)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
-
-	return 
 end
+
 StartGameStateSettingsOverview._initial_windows_setups = function (self, params)
 	local active_windows = {}
 	self._active_windows = active_windows
@@ -129,12 +128,12 @@ StartGameStateSettingsOverview._initial_windows_setups = function (self, params)
 
 		self.set_layout(self, start_layout)
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview.window_input_service = function (self)
 	return (self._show_difficulty_option and fake_input_service) or self.input_service(self)
 end
+
 StartGameStateSettingsOverview._close_window_at_index = function (self, window_index)
 	local active_windows = self._active_windows
 	local params = self._window_params
@@ -145,9 +144,8 @@ StartGameStateSettingsOverview._close_window_at_index = function (self, window_i
 	end
 
 	active_windows[window_index] = nil
-
-	return 
 end
+
 StartGameStateSettingsOverview._change_window = function (self, window_index, window_name)
 	local active_windows = self._active_windows
 	local params = self._window_params
@@ -157,7 +155,7 @@ StartGameStateSettingsOverview._change_window = function (self, window_index, wi
 
 	if current_window then
 		if current_window.NAME == window_class_name then
-			return 
+			return
 		end
 
 		self._close_window_at_index(self, window_index)
@@ -184,9 +182,8 @@ StartGameStateSettingsOverview._change_window = function (self, window_index, wi
 	end
 
 	active_windows[window_index] = window
-
-	return 
 end
+
 StartGameStateSettingsOverview._set_new_save_data_table = function (self, table_name)
 	if table_name then
 		local mission_selection_save_data = PlayerData.mission_selection
@@ -206,9 +203,8 @@ StartGameStateSettingsOverview._set_new_save_data_table = function (self, table_
 	else
 		self._layout_save_settings = nil
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview.set_layout = function (self, index)
 	local layout_setting = self._get_layout_setting(self, index)
 	local windows = layout_setting.windows
@@ -256,27 +252,28 @@ StartGameStateSettingsOverview.set_layout = function (self, index)
 	end
 
 	self._selected_game_mode_index = index
-
-	return 
 end
+
 StartGameStateSettingsOverview.get_selected_game_mode_index = function (self)
 	return self._selected_game_mode_index
 end
+
 StartGameStateSettingsOverview.get_previous_selected_game_mode_index = function (self)
 	return self._previous_selected_game_mode_index
 end
+
 StartGameStateSettingsOverview._get_layout_setting = function (self, index)
 	return window_layouts[index]
 end
+
 StartGameStateSettingsOverview._windows_update = function (self, dt, t)
 	local active_windows = self._active_windows
 
 	for _, window in pairs(active_windows) do
 		window.update(window, dt, t)
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview.enable_widget = function (self, active_window_index, widget_name, enable)
 	local active_windows = self._active_windows
 	local active_window = active_windows[active_window_index]
@@ -290,31 +287,30 @@ StartGameStateSettingsOverview.enable_widget = function (self, active_window_ind
 			button_hotspot.disable_button = not enable
 		end
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview.transitioning = function (self)
 	if self.exiting then
 		return true
 	else
 		return false
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview._wanted_state = function (self)
 	local new_state = self.parent:wanted_state()
 
 	return new_state
 end
+
 StartGameStateSettingsOverview.wanted_menu_state = function (self)
 	return self._wanted_menu_state
 end
+
 StartGameStateSettingsOverview.clear_wanted_menu_state = function (self)
 	self._wanted_menu_state = nil
-
-	return 
 end
+
 StartGameStateSettingsOverview.on_exit = function (self, params)
 	print("[StartGameState] Exit Substate StartGameStateSettingsOverview")
 
@@ -325,12 +321,11 @@ StartGameStateSettingsOverview.on_exit = function (self, params)
 	end
 
 	Managers.save:auto_save(SaveFileName, SaveData, nil)
-
-	return 
 end
+
 StartGameStateSettingsOverview._update_transition_timer = function (self, dt)
 	if not self._transition_timer then
-		return 
+		return
 	end
 
 	if self._transition_timer == 0 then
@@ -338,12 +333,12 @@ StartGameStateSettingsOverview._update_transition_timer = function (self, dt)
 	else
 		self._transition_timer = math.max(self._transition_timer - dt, 0)
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview.input_service = function (self)
 	return self.parent:input_service()
 end
+
 StartGameStateSettingsOverview.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -368,9 +363,8 @@ StartGameStateSettingsOverview.update = function (self, dt, t)
 
 		return wanted_state or self._new_state
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview.post_update = function (self, dt, t)
 	self.ui_animator:update(dt)
 	self._update_animations(self, dt)
@@ -380,9 +374,8 @@ StartGameStateSettingsOverview.post_update = function (self, dt, t)
 	if not transitioning and not self._transition_timer then
 		self._handle_input(self, dt, t)
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview._update_animations = function (self, dt)
 	for name, animation in pairs(self._ui_animations) do
 		UIAnimation.update(animation, dt)
@@ -402,15 +395,15 @@ StartGameStateSettingsOverview._update_animations = function (self, dt)
 			animations[animation_name] = nil
 		end
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter
 end
+
 StartGameStateSettingsOverview._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local gamepad_active = Managers.input:is_device_active("gamepad")
@@ -438,7 +431,7 @@ StartGameStateSettingsOverview._handle_input = function (self, dt, t)
 	elseif close_on_exit and (input_pressed or back_pressed or self._is_button_pressed(self, exit_button)) then
 		self.parent:close_menu()
 
-		return 
+		return
 	elseif back_pressed or self._is_button_pressed(self, back_button) then
 		self.play_sound(self, "Play_hud_select")
 
@@ -448,9 +441,8 @@ StartGameStateSettingsOverview._handle_input = function (self, dt, t)
 			self.set_layout(self, previous_layout_key)
 		end
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview.play = function (self, t)
 	local layout_setting = self._get_layout_setting(self, self._selected_game_mode_index)
 	local windows = layout_setting.windows
@@ -474,12 +466,12 @@ StartGameStateSettingsOverview.play = function (self, t)
 	local deed_backend_id = self.get_selected_heroic_deed_backend_id(self)
 
 	self.parent:start_game(level_key, difficulty, is_private, quick_game, always_host, strict_matchmaking, t, deed_backend_id)
-
-	return 
 end
+
 StartGameStateSettingsOverview.is_confirm_putton_pressed = function (self)
 	return false
 end
+
 StartGameStateSettingsOverview.draw = function (self, input_service, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -502,9 +494,8 @@ StartGameStateSettingsOverview.draw = function (self, input_service, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 StartGameStateSettingsOverview._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot or content.hotspot
@@ -514,14 +505,12 @@ StartGameStateSettingsOverview._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartGameStateSettingsOverview.play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 StartGameStateSettingsOverview._start_transition_animation = function (self, key, animation_name)
 	local params = {
 		wwise_world = self.wwise_world,
@@ -530,39 +519,36 @@ StartGameStateSettingsOverview._start_transition_animation = function (self, key
 	local widgets = {}
 	local anim_id = self.ui_animator:start_animation(animation_name, widgets, scenegraph_definition, params)
 	self._animations[key] = anim_id
-
-	return 
 end
+
 StartGameStateSettingsOverview.get_selected_heroic_deed_backend_id = function (self)
 	return self._selected_heroic_deed_backend_id
 end
+
 StartGameStateSettingsOverview.set_selected_heroic_deed_backend_id = function (self, backend_id)
 	self._selected_heroic_deed_backend_id = backend_id
-
-	return 
 end
+
 StartGameStateSettingsOverview.get_selected_level_id = function (self)
 	return self._specific_level_id
 end
+
 StartGameStateSettingsOverview.set_selected_level_id = function (self, level_id)
 	if self._layout_save_settings then
 		self._layout_save_settings.level_id = level_id
 	end
 
 	self._specific_level_id = level_id
-
-	return 
 end
+
 StartGameStateSettingsOverview.show_difficulty_option = function (self)
 	self._show_difficulty_option = true
-
-	return 
 end
+
 StartGameStateSettingsOverview.hide_difficulty_option = function (self)
 	self._show_difficulty_option = false
-
-	return 
 end
+
 StartGameStateSettingsOverview.set_private_option_enabled = function (self, is_private)
 	if is_private == nil then
 		is_private = false
@@ -573,12 +559,12 @@ StartGameStateSettingsOverview.set_private_option_enabled = function (self, is_p
 	end
 
 	self._is_game_private = is_private
-
-	return 
 end
+
 StartGameStateSettingsOverview.is_private_option_enabled = function (self)
 	return self._is_game_private
 end
+
 StartGameStateSettingsOverview.set_always_host_option_enabled = function (self, always_host)
 	if always_host == nil then
 		always_host = false
@@ -589,12 +575,12 @@ StartGameStateSettingsOverview.set_always_host_option_enabled = function (self, 
 	end
 
 	self._always_host = always_host
-
-	return 
 end
+
 StartGameStateSettingsOverview.is_always_host_option_enabled = function (self)
 	return self._always_host
 end
+
 StartGameStateSettingsOverview.set_strict_matchmaking_option_enabled = function (self, use_strict_matchmaking)
 	if use_strict_matchmaking == nil then
 		use_strict_matchmaking = true
@@ -605,12 +591,12 @@ StartGameStateSettingsOverview.set_strict_matchmaking_option_enabled = function 
 	end
 
 	self._use_strict_matchmaking = use_strict_matchmaking
-
-	return 
 end
+
 StartGameStateSettingsOverview.is_strict_matchmaking_option_enabled = function (self)
 	return self._use_strict_matchmaking
 end
+
 StartGameStateSettingsOverview.is_difficulty_approved = function (self, difficulty_key)
 	if script_data.disable_hero_power_requirement then
 		return true
@@ -629,15 +615,15 @@ StartGameStateSettingsOverview.is_difficulty_approved = function (self, difficul
 
 	return true
 end
+
 StartGameStateSettingsOverview.set_difficulty_option = function (self, difficulty_key)
 	if self._layout_save_settings then
 		self._layout_save_settings.difficulty_key = difficulty_key
 	end
 
 	self._selected_difficulty_key = difficulty_key
-
-	return 
 end
+
 StartGameStateSettingsOverview.get_difficulty_option = function (self, ignore_approval)
 	local selected_difficulty_key = self._selected_difficulty_key
 
@@ -647,12 +633,15 @@ StartGameStateSettingsOverview.get_difficulty_option = function (self, ignore_ap
 
 	return selected_difficulty_key
 end
+
 StartGameStateSettingsOverview.set_play_button_enabled = function (self, enabled)
-	return 
+	return
 end
+
 StartGameStateSettingsOverview.set_confirm_button_visibility = function (self, visible)
-	return 
+	return
 end
+
 StartGameStateSettingsOverview.set_fullscreen_effect_enable_state = function (self, enabled)
 	local world = self.ui_renderer.world
 	local shading_env = World.get_data(world, "shading_environment")
@@ -664,16 +653,14 @@ StartGameStateSettingsOverview.set_fullscreen_effect_enable_state = function (se
 	end
 
 	self._fullscreen_effect_enabled = enabled
-
-	return 
 end
+
 StartGameStateSettingsOverview.set_mutator_option = function (self, mutator_key)
 	self._selected_mutator_key = mutator_key
-
-	return 
 end
+
 StartGameStateSettingsOverview.get_mutator_option = function (self)
 	return self._selected_mutator_key
 end
 
-return 
+return

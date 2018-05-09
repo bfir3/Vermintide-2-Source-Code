@@ -1,13 +1,14 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTStaggerAction = class(BTStaggerAction, BTNode)
+
 BTStaggerAction.init = function (self, ...)
 	BTStaggerAction.super.init(self, ...)
-
-	return 
 end
+
 BTStaggerAction.name = "BTStaggerAction"
 local DEFAULT_IN_AIR_MOVER_CHECK_RADIUS = 0.35
+
 BTStaggerAction.enter = function (self, unit, blackboard, t)
 	local locomotion_extension = blackboard.locomotion_extension
 	local navigation_extension = blackboard.navigation_extension
@@ -105,9 +106,8 @@ BTStaggerAction.enter = function (self, unit, blackboard, t)
 	locomotion_extension.use_lerp_rotation(locomotion_extension, false)
 
 	blackboard.spawn_to_running = nil
-
-	return 
 end
+
 BTStaggerAction._select_animation = function (self, unit, blackboard, impact_vec, stagger_anims)
 	local impact_dir = Vector3.normalize(impact_vec)
 	local my_fwd = Quaternion.forward(Unit.local_rotation(unit, 0))
@@ -167,6 +167,7 @@ BTStaggerAction._select_animation = function (self, unit, blackboard, impact_vec
 
 	return anim, impact_rot
 end
+
 BTStaggerAction.clean_blackboard = function (self, blackboard)
 	blackboard.stagger_type = nil
 	blackboard.stagger = nil
@@ -182,9 +183,8 @@ BTStaggerAction.clean_blackboard = function (self, blackboard)
 	blackboard.stagger_ignore_anim_cb = nil
 	blackboard.fallen_stagger = nil
 	blackboard.action = nil
-
-	return 
 end
+
 BTStaggerAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	self.clean_blackboard(self, blackboard)
 	LocomotionUtils.set_animation_driven_movement(unit, false, false)
@@ -228,9 +228,8 @@ BTStaggerAction.leave = function (self, unit, blackboard, t, reason, destroy)
 
 	local hit_reaction_extension = ScriptUnit.has_extension(unit, "hit_reaction_system")
 	hit_reaction_extension.force_ragdoll_on_death = nil
-
-	return 
 end
+
 BTStaggerAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.stagger ~= blackboard.staggering_id then
 		self.enter(self, unit, blackboard, t)
@@ -302,8 +301,6 @@ BTStaggerAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "running"
 	end
-
-	return 
 end
 
-return 
+return

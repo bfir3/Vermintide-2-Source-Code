@@ -13,8 +13,6 @@ local transitions = {
 			local text = Localize("leave_game_popup_text")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_leave_game_topic"), "leave_game", Localize("popup_choice_yes"), "cancel_popup", Localize("popup_choice_no"))
 		end
-
-		return 
 	end,
 	quit_game = function (self)
 		if self.popup_id then
@@ -23,8 +21,6 @@ local transitions = {
 
 		local text = Localize("exit_game_popup_text")
 		self.popup_id = Managers.popup:queue_popup(text, Localize("popup_exit_game_topic"), "end_game", Localize("popup_choice_yes"), "cancel_popup", Localize("popup_choice_no"))
-
-		return 
 	end,
 	return_to_title_screen = function (self)
 		if self.popup_id then
@@ -40,8 +36,6 @@ local transitions = {
 			local text = Localize("exit_game_popup_text_xb1")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_exit_game_topic_xb1"), "do_return_to_title_screen", Localize("popup_choice_yes"), "cancel_popup", Localize("popup_choice_no"))
 		end
-
-		return 
 	end,
 	return_to_demo_title_screen = function (self)
 		if self.popup_id then
@@ -57,8 +51,6 @@ local transitions = {
 			local text = Localize("exit_game_popup_text_xb1")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_exit_game_topic_xb1"), "do_return_to_demo_title_screen", Localize("popup_choice_yes"), "cancel_popup", Localize("popup_choice_no"))
 		end
-
-		return 
 	end,
 	restart_demo = function (self)
 		if self.popup_id then
@@ -74,8 +66,6 @@ local transitions = {
 			local text = Localize("restart_demo_popup_text")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_restart_demo_topic"), "do_restart_demo", Localize("popup_choice_yes"), "cancel_popup", Localize("popup_choice_no"))
 		end
-
-		return 
 	end,
 	demo_invert_controls = function (self)
 		local views = self.views
@@ -124,8 +114,6 @@ local transitions = {
 		local function_data = look_filter.function_data
 		function_data.filter_type = (button_name == "menu_invert_controls" and "scale_vector3_xy_accelerated_x_inverted") or "scale_vector3_xy_accelerated_x"
 		button_widget_content.title_text = (button_name == "menu_invert_controls" and "menu_non_invert_controls") or "menu_invert_controls"
-
-		return 
 	end,
 	end_game = function (self)
 		self.input_manager:block_device_except_service(nil, "keyboard", 1)
@@ -148,28 +136,18 @@ local transitions = {
 
 			telemetry_survey_view.set_transition(telemetry_survey_view, "end_game")
 		end
-
-		return 
 	end,
 	do_return_to_title_screen = function (self)
 		self.return_to_title_screen = true
-
-		return 
 	end,
 	do_return_to_demo_title_screen = function (self)
 		self.return_to_demo_title_screen = true
-
-		return 
 	end,
 	do_restart_demo = function (self)
 		self.restart_demo = true
-
-		return 
 	end,
 	do_return_to_pc_menu = function (self)
 		self.return_to_pc_menu = true
-
-		return 
 	end,
 	leave_game = function (self)
 		if self.popup_id then
@@ -188,8 +166,6 @@ local transitions = {
 
 			self.leave_game = true
 		end
-
-		return 
 	end,
 	return_to_pc_menu = function (self)
 		if self.popup_id then
@@ -205,110 +181,74 @@ local transitions = {
 			local text = Localize("exit_game_popup_text_xb1")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_exit_game_topic_xb1"), "do_return_to_pc_menu", Localize("popup_choice_yes"), "cancel_popup", Localize("popup_choice_no"))
 		end
-
-		return 
 	end,
 	ingame_menu = function (self)
 		self.menu_active = true
 		self.current_view = "ingame_menu"
-
-		return 
 	end,
 	chat_view = function (self)
 		self.current_view = "chat_view"
-
-		return 
 	end,
 	chat_view_force = function (self)
 		ShowCursorStack.push()
 
 		self.current_view = "chat_view"
 		self.views[self.current_view].exit_to_game = true
-
-		return 
 	end,
 	keep_decoration_view_force = function (self)
 		self.current_view = "keep_decoration_view"
 		self.views[self.current_view].exit_to_game = true
-
-		return 
 	end,
 	keep_decoration_view = function (self)
 		self.current_view = "keep_decoration_view"
-
-		return 
 	end,
 	hero_view_force = function (self)
 		self.current_view = "hero_view"
 		self.views[self.current_view].exit_to_game = true
-
-		return 
 	end,
 	hero_view = function (self)
 		self.current_view = "hero_view"
-
-		return 
 	end,
 	start_game_view_force = function (self)
 		self.current_view = "start_game_view"
 		self.views[self.current_view].exit_to_game = true
-
-		return 
 	end,
 	start_game_view = function (self)
 		self.current_view = "start_game_view"
-
-		return 
 	end,
 	start_menu_view_force = function (self)
 		self.current_view = "start_menu_view"
 		self.views[self.current_view].exit_to_game = true
-
-		return 
 	end,
 	start_menu_view = function (self)
 		self.current_view = "start_menu_view"
-
-		return 
 	end,
 	initial_start_menu_view_force = function (self)
 		self.current_view = "start_menu_view"
 		self.initial_profile_view = true
 		self.views[self.current_view].exit_to_game = true
-
-		return 
 	end,
 	exit_initial_start_menu_view = function (self)
 		self.menu_active = false
 		self.current_view = nil
 		self.initial_profile_view = nil
-
-		return 
 	end,
 	character_selection_force = function (self)
 		self.current_view = "character_selection"
 		self.views[self.current_view].exit_to_game = true
-
-		return 
 	end,
 	character_selection = function (self)
 		self.current_view = "character_selection"
-
-		return 
 	end,
 	initial_character_selection_force = function (self)
 		self.current_view = "character_selection"
 		self.initial_profile_view = true
 		self.views[self.current_view].exit_to_game = true
-
-		return 
 	end,
 	exit_initial_character_selection = function (self)
 		self.menu_active = false
 		self.current_view = nil
 		self.initial_profile_view = nil
-
-		return 
 	end,
 	join_lobby = function (self, lobby_client)
 		self.input_manager:block_device_except_service(nil, "keyboard", 1)
@@ -318,8 +258,6 @@ local transitions = {
 		self.join_lobby = lobby_client
 		self.menu_active = false
 		self.current_view = nil
-
-		return 
 	end,
 	exit_menu = function (self)
 		if not self.countdown_ui:is_enter_game() and not Managers.chat:chat_is_focused() and not Managers.matchmaking:is_join_popup_visible() then
@@ -330,8 +268,6 @@ local transitions = {
 
 		self.menu_active = false
 		self.current_view = nil
-
-		return 
 	end,
 	cancel_popup = function (self)
 		self.popup_id = nil
@@ -339,18 +275,12 @@ local transitions = {
 		self.input_manager:block_device_except_service("ingame_menu", "keyboard", 1)
 		self.input_manager:block_device_except_service("ingame_menu", "mouse", 1)
 		self.input_manager:block_device_except_service("ingame_menu", "gamepad", 1)
-
-		return 
 	end,
 	credits_menu = function (self)
 		self.current_view = "credits_view"
-
-		return 
 	end,
 	options_menu = function (self)
 		self.current_view = "options_view"
-
-		return 
 	end,
 	restart_game = function (self)
 		self.input_manager:device_unblock_all_services("keyboard", 1)
@@ -358,8 +288,6 @@ local transitions = {
 		self.input_manager:device_unblock_all_services("gamepad", 1)
 
 		self.restart_game = true
-
-		return 
 	end,
 	close_active = function (self)
 		if self.popup_id then
@@ -370,8 +298,6 @@ local transitions = {
 
 		self.menu_active = nil
 		self.current_view = nil
-
-		return 
 	end
 }
 view_settings = {
@@ -411,8 +337,6 @@ view_settings = {
 		else
 			return UIRenderer.create(world, unpack(materials))
 		end
-
-		return 
 	end,
 	ui_top_renderer_function = function (top_world, is_tutorial)
 		local materials = {
@@ -450,8 +374,6 @@ view_settings = {
 		else
 			return UIRenderer.create(world, unpack(materials))
 		end
-
-		return 
 	end,
 	views_function = function (ingame_ui_context)
 		return {

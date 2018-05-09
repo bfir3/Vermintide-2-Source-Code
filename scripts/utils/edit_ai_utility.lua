@@ -64,7 +64,7 @@ local function pick_action(action_name)
 	if not UtilityConsiderations[action_name] then
 		print("No utility action named:", action_name)
 
-		return 
+		return
 	end
 
 	cons_lookup = {}
@@ -80,8 +80,6 @@ local function pick_action(action_name)
 	fassert(num_condiditons <= 6, "only support for 6 edit windows, %s have %d conditions -> poke jocke w and tell him to fix this", action_name, num_condiditons)
 
 	considerations = UtilityConsiderations[action_name]
-
-	return 
 end
 
 if not considerations then
@@ -93,26 +91,25 @@ if not considerations then
 end
 
 EditAiUtility = class(EditAiUtility)
+
 EditAiUtility.init = function (self, world)
 	self.world = world
 	self.world_gui = World.create_world_gui(world, Matrix4x4.identity(), 1, 1, "immediate", "material", "materials/fonts/gw_fonts")
 	self.screen_gui = World.create_screen_gui(self.world, "material", "materials/fonts/gw_fonts", "immediate")
-
-	return 
 end
+
 EditAiUtility.activate = function (self)
 	ShowCursorStack.push()
-
-	return 
 end
+
 EditAiUtility.deactivate = function (self)
 	ShowCursorStack.pop()
+end
 
-	return 
-end
 EditAiUtility.use_breed = function (self, breed)
-	return 
+	return
 end
+
 EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 	local mouse_pos = input_service.get(input_service, "cursor")
 	status.left_pressed = input_service.get(input_service, "mouse_left_held")
@@ -146,7 +143,7 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 				status.last_selected_point = nil
 				status.hover_point = nil
 
-				return 
+				return
 			end
 		else
 			status.selected_point = nil
@@ -282,9 +279,8 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 	local bk_color = (status.hover_action_window and Color(164, 28, 44, 100)) or Color(92, 28, 44, 100)
 
 	self.draw_action_list(self, unit, t, "Actions", action_list_layout, action_list, bk_color, status.selected_action, blackboard)
-
-	return 
 end
+
 EditAiUtility.insert_spline_point = function (self, spline, win_pos, win_size, mouse_pos)
 	local x = (mouse_pos.x - win_pos.x) / win_size.x
 	local y = (mouse_pos.y - win_pos.y) / win_size.y
@@ -306,15 +302,14 @@ EditAiUtility.insert_spline_point = function (self, spline, win_pos, win_size, m
 		spline[insert_index] = x
 		spline[insert_index + 1] = y
 	end
-
-	return 
 end
+
 EditAiUtility.remove_spline_point = function (self, spline, point_index)
 	local first_point_index = 1
 	local last_point_index = #spline - 1
 
 	if point_index == first_point_index or point_index == last_point_index then
-		return 
+		return
 	end
 
 	for i = point_index, #spline - 2, 1 do
@@ -323,9 +318,8 @@ EditAiUtility.remove_spline_point = function (self, spline, point_index)
 
 	spline[#spline] = nil
 	spline[#spline] = nil
-
-	return 
 end
+
 EditAiUtility.hover_win = function (self, t, mouse_pos, window_list, win_size)
 	local x = mouse_pos.x
 	local y = mouse_pos.y
@@ -339,9 +333,8 @@ EditAiUtility.hover_win = function (self, t, mouse_pos, window_list, win_size)
 
 		k = k + 1
 	end
-
-	return 
 end
+
 EditAiUtility.move_spline_point = function (self, t, spline, win_pos, win_size, point_index, new_pos)
 	local first_point_index = 1
 	local last_point_index = #spline - 1
@@ -355,10 +348,10 @@ EditAiUtility.move_spline_point = function (self, t, spline, win_pos, win_size, 
 	if 0 <= y and y <= 1 then
 		spline[point_index + 1] = y
 	end
-
-	return 
 end
+
 local hover_dist = 20
+
 EditAiUtility.hover_spline_point = function (self, t, spline, win_pos, win_size, mouse_pos)
 	local gui = self.screen_gui
 	local resx, resy = Application.resolution()
@@ -373,9 +366,8 @@ EditAiUtility.hover_spline_point = function (self, t, spline, win_pos, win_size,
 			return i, x1, y1
 		end
 	end
-
-	return 
 end
+
 EditAiUtility.drag_point_distance = function (self, t, point, mouse_pos)
 	local x = mouse_pos.x
 	local y = mouse_pos.y
@@ -398,6 +390,7 @@ EditAiUtility.drag_point_distance = function (self, t, point, mouse_pos)
 
 	return x_dist, y_dist
 end
+
 EditAiUtility.hover_drag_points = function (self, t, point_list, mouse_pos)
 	local gui = self.screen_gui
 	local x = mouse_pos.x
@@ -413,9 +406,8 @@ EditAiUtility.hover_drag_points = function (self, t, point_list, mouse_pos)
 			return point
 		end
 	end
-
-	return 
 end
+
 EditAiUtility.draw_mouse_selection = function (self, t, spline, win_pos, win_size, point_index, selected, max_value)
 	local gui = self.screen_gui
 	local resx, resy = Application.resolution()
@@ -436,9 +428,8 @@ EditAiUtility.draw_mouse_selection = function (self, t, spline, win_pos, win_siz
 	local pos = Vector3(x1 + 20, y1, 30)
 
 	ScriptGUI.text(gui, pos_text, font_mtrl, 32, font, pos, Color(255, 0, 0, 0))
-
-	return 
 end
+
 EditAiUtility.draw_square = function (gui, t, pos, width, color, thickness)
 	thickness = thickness or 5
 	width = width * 0.5
@@ -451,9 +442,8 @@ EditAiUtility.draw_square = function (gui, t, pos, width, color, thickness)
 	ScriptGUI.hud_line(gui, Vector2(x2, y1), Vector2(x2, y2), nil, thickness, color)
 	ScriptGUI.hud_line(gui, Vector2(x2, y2), Vector2(x1, y2), nil, thickness, color)
 	ScriptGUI.hud_line(gui, Vector2(x1, y2), Vector2(x1, y1), nil, thickness, color)
-
-	return 
 end
+
 EditAiUtility.hover_action = function (self, t, layout, action_list, mouse_pos)
 	local height = #action_list * row_height
 	local x = mouse_pos.x
@@ -470,6 +460,7 @@ EditAiUtility.hover_action = function (self, t, layout, action_list, mouse_pos)
 
 	return inside_window
 end
+
 EditAiUtility.draw_action_list = function (self, unit, t, name, layout, action_list, bk_color, selected_action, blackboard)
 	local gui = self.screen_gui
 	local resx, resy = Application.resolution()
@@ -504,9 +495,8 @@ EditAiUtility.draw_action_list = function (self, unit, t, name, layout, action_l
 	local height = #action_list * row_height
 
 	Gui.rect(gui, Vector2(layout.x, layout.y), Vector2(layout.size_x, height), bk_color)
-
-	return 
 end
+
 EditAiUtility.draw_safe_drag_lane = function (self, point, safe_distance)
 	local x1 = point.x - 400
 	local x2 = point.x + 400
@@ -515,9 +505,8 @@ EditAiUtility.draw_safe_drag_lane = function (self, point, safe_distance)
 
 	ScriptGUI.hud_line(self.screen_gui, Vector2(x1, y1), Vector2(x2, y1), 40, 3, Color(255, 240, 200, 10))
 	ScriptGUI.hud_line(self.screen_gui, Vector2(x1, y2), Vector2(x2, y2), 40, 3, Color(255, 240, 200, 10))
-
-	return 
 end
+
 EditAiUtility.draw_realtime_utility = function (gui, action_name, consideration, pos, win_size, blackboard)
 	local blackboard_action_data = blackboard.utility_actions[action_name]
 
@@ -544,9 +533,11 @@ EditAiUtility.draw_realtime_utility = function (gui, action_name, consideration,
 
 	return 0
 end
+
 EditAiUtility.draw_utility_sum = function (gui, name, pos, size)
-	return 
+	return
 end
+
 EditAiUtility.draw_utility_ruler = function (self, gui, consideration_data, pos, size)
 	local font_size = 12
 	local num_divides = 10
@@ -570,9 +561,8 @@ EditAiUtility.draw_utility_ruler = function (self, gui, consideration_data, pos,
 
 		x = x + pixel_stride
 	end
-
-	return 
 end
+
 EditAiUtility.draw_utility_info = function (gui, consideration_data, temp_max_value, name, pos, size, fade_factor, tiny)
 	local font_size = font_size
 	local font = font
@@ -600,9 +590,8 @@ EditAiUtility.draw_utility_info = function (gui, consideration_data, temp_max_va
 
 	ScriptGUI.text(gui, scale_text, font_mtrl, font_size, font, scale_text_pos, (temp_max_value and Color(255 * fade_factor, 240, 200, 10)) or Color(255 * fade_factor, 255, 255, 255))
 	ScriptGUI.text(gui, name, font_mtrl, font_size, font, pos + Vector3(offset_x, axis_y, 10), Color(255 * fade_factor, 255, 255, 255))
-
-	return 
 end
+
 EditAiUtility.draw_utility_spline = function (gui, t, consideration_data, temp_max_value, name, pos, size, bk_color, fade_factor, thickness)
 	local spline = consideration_data.spline
 	local resx, resy = Application.resolution()
@@ -621,9 +610,8 @@ EditAiUtility.draw_utility_spline = function (gui, t, consideration_data, temp_m
 	end
 
 	Gui.rect(gui, pos, size, bk_color)
-
-	return 
 end
+
 EditAiUtility.draw_utility_condition = function (gui, action_name, consideration, pos, win_size, blackboard, bk_color)
 	local blackboard_action_data = blackboard.utility_actions[action_name]
 
@@ -645,14 +633,13 @@ EditAiUtility.draw_utility_condition = function (gui, action_name, consideration
 	end
 
 	Gui.rect(gui, pos, win_size, bk_color)
-
-	return 
 end
+
 EditAiUtility.save_considerations = function (self)
 	if not GameSettingsDevelopment.trunk_path then
 		print("Cannot save! No run parameter \"-trunk-path <path to my bulldozer trunk>\" has been added")
 
-		return 
+		return
 	end
 
 	print("SAVING CONSIDERATIONS!")
@@ -679,8 +666,6 @@ EditAiUtility.save_considerations = function (self)
 	assert(filehandle)
 	filehandle.write(filehandle, write_string)
 	io.close(filehandle)
-
-	return 
 end
 
-return 
+return

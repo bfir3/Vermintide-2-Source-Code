@@ -8,6 +8,7 @@ local BOT_COLORS = {
 	wood_elf = QuaternionBox(255, 50, 205, 50),
 	empire_soldier = QuaternionBox(255, 220, 20, 60)
 }
+
 PlayerBot.init = function (self, player_name, bot_profile_name, is_server, profile_index, local_player_id, unique_id)
 	self.player_name = player_name
 	self.bot_profile = PlayerBots[bot_profile_name]
@@ -24,44 +25,51 @@ PlayerBot.init = function (self, player_name, bot_profile_name, is_server, profi
 	self.bot_telemetry_id = "Bot_" .. profile.display_name
 	self._local_player_id = local_player_id
 	self._unique_id = unique_id
-
-	return 
 end
+
 PlayerBot.profile_index = function (self)
 	return self._profile_index
 end
+
 PlayerBot.stats_id = function (self)
 	return self._unique_id
 end
+
 PlayerBot.ui_id = function (self)
 	return self._unique_id
 end
+
 PlayerBot.local_player_id = function (self)
 	return self._local_player_id
 end
+
 PlayerBot.platform_id = function (self)
 	assert(false)
-
-	return 
 end
+
 PlayerBot.type = function (self)
 	return "PlayerBot"
 end
+
 PlayerBot.is_player_controlled = function (self)
 	return false
 end
+
 PlayerBot.profile_display_name = function (self)
 	local profile = SPProfiles[self._profile_index]
 	local display_name = profile and profile.display_name
 
 	return display_name
 end
+
 PlayerBot.name = function (self)
 	return self.character_name
 end
+
 PlayerBot.telemetry_id = function (self)
 	return self.bot_telemetry_id
 end
+
 PlayerBot.career_index = function (self)
 	local hero_name = self.profile_display_name(self)
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
@@ -69,6 +77,7 @@ PlayerBot.career_index = function (self)
 
 	return career_index
 end
+
 PlayerBot.spawn = function (self, position, rotation, is_initial_spawn, ammo_melee, ammo_ranged, healthkit, potion, grenade)
 	local profile_index = self._profile_index
 	local profile = SPProfiles[profile_index]
@@ -257,6 +266,7 @@ PlayerBot.spawn = function (self, position, rotation, is_initial_spawn, ammo_mel
 
 	return unit
 end
+
 PlayerBot.create_game_object = function (self)
 	local game_object_data_table = {
 		ping = 0,
@@ -268,15 +278,12 @@ PlayerBot.create_game_object = function (self)
 	local callback = callback(self, "cb_game_session_disconnect")
 	local game_object_id = Managers.state.network:create_player_game_object("bot_player", game_object_data_table, callback)
 	self.game_object_id = game_object_id
-
-	return 
 end
+
 PlayerBot.destroy = function (self)
 	if self.is_server and self.game_object_id then
 		Managers.state.network:destroy_game_object(self.game_object_id)
 	end
-
-	return 
 end
 
-return 
+return

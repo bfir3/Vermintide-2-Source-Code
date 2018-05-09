@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTMoveToGoalAction = class(BTMoveToGoalAction, BTNode)
+
 BTMoveToGoalAction.init = function (self, ...)
 	BTMoveToGoalAction.super.init(self, ...)
-
-	return 
 end
+
 BTMoveToGoalAction.name = "BTMoveToGoalAction"
+
 BTMoveToGoalAction.enter = function (self, unit, blackboard, t)
 	blackboard.action = self._tree_node.action_data
 	blackboard.time_to_next_evaluate = t + 0.5
@@ -40,9 +41,8 @@ BTMoveToGoalAction.enter = function (self, unit, blackboard, t)
 
 		navigation_extension.set_max_speed(navigation_extension, override_move_speed)
 	end
-
-	return 
 end
+
 BTMoveToGoalAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	self.toggle_start_move_animation_lock(self, unit, false, blackboard)
 
@@ -55,9 +55,8 @@ BTMoveToGoalAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 BTMoveToGoalAction.run = function (self, unit, blackboard, t, dt)
 	if not blackboard.start_anim_done then
 		if not blackboard.start_anim_locked then
@@ -106,6 +105,7 @@ BTMoveToGoalAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running", should_evaluate
 end
+
 BTMoveToGoalAction.start_move_animation = function (self, unit, blackboard)
 	self.toggle_start_move_animation_lock(self, unit, true, blackboard)
 
@@ -124,9 +124,8 @@ BTMoveToGoalAction.start_move_animation = function (self, unit, blackboard)
 
 	blackboard.move_animation_name = animation_name
 	blackboard.start_anim_locked = true
-
-	return 
 end
+
 BTMoveToGoalAction.start_move_rotation = function (self, unit, blackboard, t, dt)
 	if blackboard.move_animation_name == "move_start_fwd" or blackboard.skip_move_rotation then
 		self.toggle_start_move_animation_lock(self, unit, false, blackboard)
@@ -142,9 +141,8 @@ BTMoveToGoalAction.start_move_rotation = function (self, unit, blackboard, t, dt
 
 		LocomotionUtils.set_animation_rotation_scale(unit, rot_scale)
 	end
-
-	return 
 end
+
 BTMoveToGoalAction.toggle_start_move_animation_lock = function (self, unit, should_lock_ani, blackboard)
 	local locomotion_extension = blackboard.locomotion_extension
 
@@ -156,8 +154,6 @@ BTMoveToGoalAction.toggle_start_move_animation_lock = function (self, unit, shou
 		LocomotionUtils.set_animation_driven_movement(unit, false)
 		LocomotionUtils.set_animation_rotation_scale(unit, 1)
 	end
-
-	return 
 end
 
-return 
+return

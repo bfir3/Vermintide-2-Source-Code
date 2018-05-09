@@ -1,4 +1,5 @@
 ActionBeam = class(ActionBeam)
+
 ActionBeam.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.weapon_system = weapon_system
 	self.owner_unit = owner_unit
@@ -20,9 +21,8 @@ ActionBeam.init = function (self, world, item_name, is_server, owner_unit, damag
 	self.network_transmit = Managers.state.network.network_transmit
 	self.unit_id = Managers.state.network.unit_storage:go_id(owner_unit)
 	self._is_critical_strike = false
-
-	return 
 end
+
 ActionBeam.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level)
 	self.current_action = new_action
 	local owner_unit = self.owner_unit
@@ -83,13 +83,13 @@ ActionBeam.client_owner_start_action = function (self, new_action, t, chain_acti
 	if charge_sound_husk_name then
 		ActionUtils.play_husk_sound_event(charge_sound_husk_name, self.owner_unit)
 	end
-
-	return 
 end
+
 local INDEX_POSITION = 1
 local INDEX_DISTANCE = 2
 local INDEX_NORMAL = 3
 local INDEX_ACTOR = 4
+
 ActionBeam.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local owner_unit = self.owner_unit
 	local first_person_unit = self.first_person_unit
@@ -262,9 +262,8 @@ ActionBeam.client_owner_post_update = function (self, dt, t, world, can_damage)
 
 		self.current_target = hit_unit
 	end
-
-	return 
 end
+
 ActionBeam.finish = function (self, reason)
 	local owner_unit = self.owner_unit
 	local go_id = self.unit_id
@@ -311,6 +310,7 @@ ActionBeam.finish = function (self, reason)
 		beam_consecutive_hits = math.max(self.consecutive_hits - 1, 0)
 	}
 end
+
 ActionBeam.destroy = function (self)
 	if self.beam_end_effect then
 		World.destroy_particles(self.world, self.beam_end_effect)
@@ -338,8 +338,6 @@ ActionBeam.destroy = function (self)
 		self.wwise_source_id = nil
 		self.charging_sound_id = nil
 	end
-
-	return 
 end
 
-return 
+return

@@ -1,6 +1,7 @@
 local definitions = local_require("scripts/ui/views/bonus_dice_ui_definitions")
 local math_ease_in_cubic = math.easeInCubic
 BonusDiceUI = class(BonusDiceUI)
+
 BonusDiceUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -23,18 +24,16 @@ BonusDiceUI.init = function (self, ingame_ui_context)
 	self.die_types_n = i
 
 	self.create_ui_elements(self)
-
-	return 
 end
+
 BonusDiceUI.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 
 	for i = 1, 10, 1 do
 		self.dice_widgets[i] = UIWidget.init(definitions.dice_widget_definition)
 	end
-
-	return 
 end
+
 BonusDiceUI.add_die = function (self, die_type)
 	local active_dice_widgets = self.active_dice_widgets + 1
 	local widget = self.dice_widgets[active_dice_widgets] or UIWidget.init(definitions.dice_widget_definition)
@@ -56,16 +55,14 @@ BonusDiceUI.add_die = function (self, die_type)
 	self.die_count[die_type] = self.die_count[die_type] + 1
 	self.dice_widgets[active_dice_widgets] = widget
 	self.active_dice_widgets = active_dice_widgets
-
-	return 
 end
+
 BonusDiceUI.destroy = function (self)
 	self.dice_keeper = nil
-
-	return 
 end
+
 BonusDiceUI.update = function (self, dt)
-	return 
+	return
 
 	if DebugKeyHandler.key_pressed("f3", "asdasd", "dadsa") then
 		self.dice_keeper:add_die("normal", 1)
@@ -76,9 +73,8 @@ BonusDiceUI.update = function (self, dt)
 	if 0 < self.active_dice_widgets then
 		self.draw(self, dt)
 	end
-
-	return 
 end
+
 BonusDiceUI.update_dices = function (self)
 	local dice_keeper = self.dice_keeper
 	local die_count = self.die_count
@@ -97,9 +93,8 @@ BonusDiceUI.update_dices = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 BonusDiceUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -115,8 +110,6 @@ BonusDiceUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
 
-return 
+return

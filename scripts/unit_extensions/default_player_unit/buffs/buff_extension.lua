@@ -5,6 +5,7 @@ script_data.buff_debug = script_data.buff_debug or Development.parameter("buff_d
 BuffExtension = class(BuffExtension)
 buff_extension_function_params = buff_extension_function_params or {}
 local E = 0.001
+
 BuffExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self._unit = unit
 	self.world = extension_init_context.world
@@ -30,14 +31,13 @@ BuffExtension.init = function (self, extension_init_context, unit, extension_ini
 	self.is_husk = extension_init_data.is_husk
 	self.id = 1
 	self.individual_stat_buff_index = 1
-
-	return 
 end
+
 BuffExtension.extensions_ready = function (self, world, unit)
 	local breed = Unit.get_data(unit, "breed")
 
 	if breed then
-		return 
+		return
 	end
 
 	local buff_system = Managers.state.entity:system("buff_system")
@@ -55,9 +55,8 @@ BuffExtension.extensions_ready = function (self, world, unit)
 			recipients[unit] = id
 		end
 	end
-
-	return 
 end
+
 BuffExtension.destroy = function (self)
 	local buffs = self._buffs
 	local num_buffs = #buffs
@@ -78,9 +77,8 @@ BuffExtension.destroy = function (self)
 	end
 
 	self._buffs = nil
-
-	return 
 end
+
 BuffExtension.add_buff = function (self, template_name, params)
 	local buff_template = BuffTemplates[template_name]
 	local buffs = buff_template.buffs
@@ -260,6 +258,7 @@ BuffExtension.add_buff = function (self, template_name, params)
 
 	return id
 end
+
 BuffExtension._add_stat_buff = function (self, sub_buff_template, buff)
 	local bonus = buff.bonus or 0
 	local multiplier = buff.multiplier or 0
@@ -304,11 +303,11 @@ BuffExtension._add_stat_buff = function (self, sub_buff_template, buff)
 
 	return index
 end
+
 BuffExtension.update = function (self, unit, input, dt, context, t)
 	self._update_buffs(self, dt, t)
-
-	return 
 end
+
 BuffExtension._update_buffs = function (self, dt, t)
 	local world = self.world
 	local buffs = self._buffs
@@ -351,9 +350,8 @@ BuffExtension._update_buffs = function (self, dt, t)
 
 		num_buffs = #buffs
 	end
-
-	return 
 end
+
 BuffExtension.update_stat_buff = function (self, stat_buff_index, difference)
 	local stat_buffs = self._stat_buffs
 	local stat_buff = stat_buffs[stat_buff_index]
@@ -369,9 +367,8 @@ BuffExtension.update_stat_buff = function (self, stat_buff_index, difference)
 	else
 		fassert(false, "trying to update a stat with an incompatible application method")
 	end
-
-	return 
 end
+
 BuffExtension.remove_buff = function (self, id, handled_in_buff_update_function)
 	local buffs = self._buffs
 	local num_buffs = #buffs
@@ -400,6 +397,7 @@ BuffExtension.remove_buff = function (self, id, handled_in_buff_update_function)
 
 	return num_buffs_removed
 end
+
 BuffExtension._remove_sub_buff = function (self, buff, index, buff_extension_function_params)
 	local world = self.world
 	local template = buff.template
@@ -452,9 +450,8 @@ BuffExtension._remove_sub_buff = function (self, buff, index, buff_extension_fun
 	if deactivation_screen_effect then
 		self._play_screen_effect(self, deactivation_screen_effect)
 	end
-
-	return 
 end
+
 BuffExtension._remove_stat_buff = function (self, buff)
 	local sub_buff_template = buff.template
 	local bonus = buff.bonus or 0
@@ -479,9 +476,8 @@ BuffExtension._remove_stat_buff = function (self, buff)
 		stat_buffs[index].bonus = current_bonus - bonus
 		stat_buffs[index].multiplier = current_multiplier - multiplier
 	end
-
-	return 
 end
+
 BuffExtension.has_buff_type = function (self, buff_type)
 	local buffs = self._buffs
 	local num_buffs = #buffs
@@ -496,6 +492,7 @@ BuffExtension.has_buff_type = function (self, buff_type)
 
 	return false
 end
+
 BuffExtension.has_buff_perk = function (self, perk_name)
 	local buffs = self._buffs
 	local num_buffs = #buffs
@@ -511,6 +508,7 @@ BuffExtension.has_buff_perk = function (self, perk_name)
 
 	return false
 end
+
 BuffExtension.num_buff_perk = function (self, perk_name)
 	local buffs = self._buffs
 	local num_buffs = #buffs
@@ -527,6 +525,7 @@ BuffExtension.num_buff_perk = function (self, perk_name)
 
 	return num_buff_perk
 end
+
 BuffExtension.get_non_stacking_buff = function (self, buff_type)
 	local buffs = self._buffs
 	local num_buffs = #buffs
@@ -543,6 +542,7 @@ BuffExtension.get_non_stacking_buff = function (self, buff_type)
 
 	return nil
 end
+
 BuffExtension.num_buff_type = function (self, buff_type)
 	local buffs = self._buffs
 	local num_buffs = #buffs
@@ -558,12 +558,13 @@ BuffExtension.num_buff_type = function (self, buff_type)
 
 	return num_buff_type
 end
+
 BuffExtension.trigger_procs = function (self, event, ...)
 	local event_buffs = self._event_buffs[event]
 	local num_event_buffs = #event_buffs
 
 	if num_event_buffs == 0 then
-		return 
+		return
 	end
 
 	local player = Managers.player:owner(self._unit)
@@ -596,9 +597,8 @@ BuffExtension.trigger_procs = function (self, event, ...)
 
 		self.remove_buff(self, id)
 	end
-
-	return 
 end
+
 BuffExtension.apply_buffs_to_value = function (self, value, stat_buff)
 	local unit = self._unit
 	local stat_buffs = self._stat_buffs[stat_buff]
@@ -626,6 +626,7 @@ BuffExtension.apply_buffs_to_value = function (self, value, stat_buff)
 
 	return final_value, procced, id
 end
+
 BuffExtension._play_buff_sound = function (self, sound_event)
 	local unit = self._unit
 
@@ -634,9 +635,8 @@ BuffExtension._play_buff_sound = function (self, sound_event)
 
 		first_person_extension.play_hud_sound_event(first_person_extension, sound_event)
 	end
-
-	return 
 end
+
 BuffExtension._play_screen_effect = function (self, effect)
 	local unit = self._unit
 
@@ -649,6 +649,7 @@ BuffExtension._play_screen_effect = function (self, effect)
 
 	return nil
 end
+
 BuffExtension._stop_screen_effect = function (self, effect_id)
 	local unit = self._unit
 
@@ -657,11 +658,10 @@ BuffExtension._stop_screen_effect = function (self, effect_id)
 
 		first_person_extension.stop_spawning_screen_particles(first_person_extension, effect_id)
 	end
-
-	return 
 end
+
 BuffExtension.active_buffs = function (self)
 	return self._buffs
 end
 
-return 
+return

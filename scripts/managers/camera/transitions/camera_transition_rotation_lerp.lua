@@ -1,6 +1,7 @@
 require("scripts/managers/camera/transitions/camera_transition_base")
 
 CameraTransitionRotationLerp = class(CameraTransitionRotationLerp, CameraTransitionBase)
+
 CameraTransitionRotationLerp.init = function (self, node_1, node_2, duration, speed, settings)
 	CameraTransitionBase.init(self, node_1, node_2, duration, speed, settings)
 
@@ -10,9 +11,8 @@ CameraTransitionRotationLerp.init = function (self, node_1, node_2, duration, sp
 		local node_1_rot = node_1.rotation(node_1)
 		self._node_1_rot_table = QuaternionBox(node_1_rot)
 	end
-
-	return 
 end
+
 CameraTransitionRotationLerp.update = function (self, dt, rotation, update_time)
 	CameraTransitionBase.update(self, dt, update_time)
 
@@ -26,4 +26,4 @@ CameraTransitionRotationLerp.update = function (self, dt, rotation, update_time)
 	return rot, done
 end
 
-return 
+return

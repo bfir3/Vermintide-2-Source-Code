@@ -1,5 +1,5 @@
 if rawget(_G, "G_GAME_PATCHES_RUN") then
-	return 
+	return
 end
 
 rawset(_G, "G_GAME_PATCHES_RUN", true)
@@ -12,6 +12,7 @@ if not rawget(_G, "G_IS_PROFILING") and PLATFORM == "win32" and BUILD ~= "releas
 	local wrapped_tostring = tostring
 	local World_spawn_unit = World.spawn_unit
 	local World_destroy_unit = World.destroy_unit
+
 	World.spawn_unit = function (world, unit_name, pos, rot)
 		local unit = World_spawn_unit(world, unit_name, pos, rot)
 		G_unit_information[unit] = wrapped_tostring(unit)
@@ -21,8 +22,6 @@ if not rawget(_G, "G_IS_PROFILING") and PLATFORM == "win32" and BUILD ~= "releas
 
 	function unitaux_register_unit_info(unit)
 		G_unit_information[unit] = tostring(unit)
-
-		return 
 	end
 
 	local Unit_alive = Unit.alive
@@ -83,8 +82,6 @@ if not rawget(_G, "G_IS_PROFILING") and PLATFORM == "win32" and BUILD ~= "releas
 
 				printf("ARGS: %s", args)
 				assert(false, sprintf("[unit_deleted] tried to access function '%s' for deleted unit(%s)!", function_name, err_unit))
-
-				return 
 			end
 		end
 	end
@@ -96,12 +93,14 @@ end
 
 if not ANIMATION_HAS_VARIABLE_OVERRIDDEN then
 	local old_animation_has_variable = Unit.animation_has_variable
+
 	Unit.animation_has_variable = function (...)
 		local ret = old_animation_has_variable(...)
 
 		return (ret or 0) ~= 0
 	end
+
 	ANIMATION_HAS_VARIABLE_OVERRIDDEN = true
 end
 
-return 
+return

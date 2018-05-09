@@ -4,18 +4,15 @@ BTNinjaApproachAction = class(BTNinjaApproachAction, BTNode)
 BTNinjaApproachAction.name = "BTNinjaApproachAction"
 local position_lookup = POSITION_LOOKUP
 local script_data = script_data
+
 BTNinjaApproachAction.init = function (self, ...)
 	BTNinjaApproachAction.super.init(self, ...)
-
-	return 
 end
 
 local function debug3d(unit, text, color_name)
 	if script_data.debug_ai_movement then
 		Debug.world_sticky_text(position_lookup[unit], text, color_name)
 	end
-
-	return 
 end
 
 BTNinjaApproachAction.enter = function (self, unit, blackboard, t)
@@ -59,9 +56,8 @@ BTNinjaApproachAction.enter = function (self, unit, blackboard, t)
 
 		ai_navigation.move_to(ai_navigation, pos)
 	end
-
-	return 
 end
+
 BTNinjaApproachAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if reason == "aborted" then
 	end
@@ -73,11 +69,11 @@ BTNinjaApproachAction.leave = function (self, unit, blackboard, t, reason, destr
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 local test_points = {}
 local close_range = 8
+
 BTNinjaApproachAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion = blackboard.locomotion_extension
 	local breed = blackboard.breed
@@ -283,6 +279,7 @@ BTNinjaApproachAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 local segment_list = {}
 local relative_positions = {
 	0.4,
@@ -292,6 +289,7 @@ local relative_positions = {
 	0,
 	1.5
 }
+
 BTNinjaApproachAction.check_free_los = function (self, unit, blackboard, data)
 	local p2 = Unit.world_position(blackboard.target_unit, 0) + Vector3(0, 0, 0.2)
 	local enemy_pos = POSITION_LOOKUP[blackboard.target_unit]
@@ -313,6 +311,7 @@ BTNinjaApproachAction.check_free_los = function (self, unit, blackboard, data)
 
 	return in_los
 end
+
 BTNinjaApproachAction.try_dodge_pos = function (self, unit, blackboard, pos, dodge_pos)
 	local success, z = GwNavQueries.triangle_from_position(blackboard.nav_world, dodge_pos, 3, 3)
 
@@ -337,11 +336,11 @@ BTNinjaApproachAction.try_dodge_pos = function (self, unit, blackboard, pos, dod
 			return true
 		end
 	end
-
-	return 
 end
+
 local dodge_dist = 2
 local dodge_dist_check = dodge_dist - 0.3
+
 BTNinjaApproachAction.dodge = function (self, unit, blackboard, dodge_vec, aim_vec)
 	local pos = position_lookup[unit]
 	local velocity = blackboard.locomotion_extension:current_velocity()
@@ -360,7 +359,7 @@ BTNinjaApproachAction.dodge = function (self, unit, blackboard, dodge_vec, aim_v
 		local pass_check_pos = pos + dodge_dir * dodge_dist_check
 		blackboard.dodge_pos = Vector3Box(pass_check_pos)
 
-		return 
+		return
 	end
 
 	dodge_pos = pos - dodge_dir * dodge_dist
@@ -369,9 +368,8 @@ BTNinjaApproachAction.dodge = function (self, unit, blackboard, dodge_vec, aim_v
 		local pass_check_pos = pos - dodge_dir * dodge_dist_check
 		blackboard.dodge_pos = Vector3Box(pass_check_pos)
 	end
-
-	return 
 end
+
 BTNinjaApproachAction.in_crosshairs = function (self, unit, blackboard, t, data)
 	local units = PLAYER_AND_BOT_UNITS
 
@@ -391,14 +389,13 @@ BTNinjaApproachAction.in_crosshairs = function (self, unit, blackboard, t, data)
 			data.aiming_at_me = status_extension.aim_unit
 		end
 	end
-
-	return 
 end
+
 BTNinjaApproachAction.get_fallback_goal = function (self, unit, blackboard)
 	local target_pos = position_lookup[blackboard.target_unit]
 
 	if not target_pos then
-		return 
+		return
 	end
 
 	table.clear(test_points)
@@ -417,9 +414,8 @@ BTNinjaApproachAction.get_fallback_goal = function (self, unit, blackboard)
 
 		return true
 	end
-
-	return 
 end
+
 BTNinjaApproachAction.set_goal_at_target = function (self, unit, blackboard)
 	local pos = POSITION_LOOKUP[blackboard.target_unit] + Vector3(0, 0, 0)
 	pos = ConflictUtils.find_center_tri(blackboard.nav_world, pos)
@@ -431,9 +427,8 @@ BTNinjaApproachAction.set_goal_at_target = function (self, unit, blackboard)
 
 		blackboard.navigation_extension:move_to(pos)
 	end
-
-	return 
 end
+
 BTNinjaApproachAction.get_straight_at_goal = function (self, unit, blackboard)
 	local target_unit = blackboard.target_unit
 	local pos = POSITION_LOOKUP[unit]
@@ -459,6 +454,7 @@ BTNinjaApproachAction.get_straight_at_goal = function (self, unit, blackboard)
 
 	return true
 end
+
 BTNinjaApproachAction.check_high_point_on_line = function (self, nav_world, from_pos, dir, dist_left_to_rat, base_z, height_advantage, above, below)
 	dist_left_to_rat = dist_left_to_rat or math.floor(Vector3.distance(p1, rat_pos))
 
@@ -477,9 +473,8 @@ BTNinjaApproachAction.check_high_point_on_line = function (self, nav_world, from
 			QuickDrawer:sphere(check_height_pos, 0.3, Color(255, 0, 0))
 		end
 	end
-
-	return 
 end
+
 BTNinjaApproachAction.get_new_goal = function (self, unit, blackboard, t)
 	local target_unit = blackboard.target_unit
 
@@ -503,14 +498,12 @@ BTNinjaApproachAction.get_new_goal = function (self, unit, blackboard, t)
 			return true
 		end
 	end
-
-	return 
 end
+
 BTNinjaApproachAction.anim_cb_dodge_finished = function (self, unit, params)
 	blackboard.anim_cb_dodge_finished = nil
-
-	return 
 end
+
 BTNinjaApproachAction.debug = function (self, unit, blackboard)
 	if blackboard.skulk_pos then
 		local pos = blackboard.skulk_pos:unbox()
@@ -535,8 +528,6 @@ BTNinjaApproachAction.debug = function (self, unit, blackboard)
 
 		QuickDrawer:sphere(pos + Vector3(0, 0, 2), 0.5, Color(255, 43, 43, 207))
 	end
-
-	return 
 end
 
-return 
+return

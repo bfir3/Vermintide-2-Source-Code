@@ -47,4 +47,4 @@ DialogueLookup[DialogueLookup_n + 22] = "pdr_level_ground_zero_complete"
 DialogueLookup[DialogueLookup_n + 23] = "pdr_level_ground_zero_canal_crossing"
 DialogueLookup_n = DialogueLookup_n + 23
 
-return 
+return

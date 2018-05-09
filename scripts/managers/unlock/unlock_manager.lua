@@ -4,6 +4,7 @@ require("scripts/managers/unlock/always_unlocked")
 require("scripts/settings/unlock_settings")
 
 UnlockManager = class(UnlockManager)
+
 UnlockManager.init = function (self)
 	self._init_unlocks(self)
 
@@ -17,9 +18,8 @@ UnlockManager.init = function (self)
 
 	self._award_queue = {}
 	self._award_queue_id = 0
-
-	return 
 end
+
 UnlockManager._init_unlocks = function (self)
 	local unlocks = {}
 	local unlocks_indexed = {}
@@ -40,9 +40,8 @@ UnlockManager._init_unlocks = function (self)
 
 	self._unlocks = unlocks
 	self._unlocks_indexed = unlocks_indexed
-
-	return 
 end
+
 UnlockManager.update = function (self, dt)
 	if PLATFORM == "xb1" then
 		self._dlc_status_changed = nil
@@ -64,15 +63,13 @@ UnlockManager.update = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 UnlockManager._reinitialize_backend_dlc = function (self)
 	self._state = "query_unlocked"
 	self._query_unlocked_index = 0
-
-	return 
 end
+
 UnlockManager._check_licenses = function (self)
 	Application.warning("[UnlockManager] Checking DLC licenses")
 
@@ -115,12 +112,12 @@ UnlockManager._check_licenses = function (self)
 		self._popup_id = Managers.popup:queue_popup(removed_dlc_licenses, Localize("dlc_license_terminated"), "ok", Localize("button_ok"))
 		self._dlc_status_changed = true
 	end
-
-	return 
 end
+
 UnlockManager.dlc_status_changed = function (self)
 	return self._dlc_status_changed
 end
+
 UnlockManager._update_backend_unlocks = function (self)
 	if self._state == "poll_update_required_popup" then
 		local result = Managers.popup:query_result(self._update_required_popup_id)
@@ -135,7 +132,7 @@ UnlockManager._update_backend_unlocks = function (self)
 			if not backend_manager.available(backend_manager) then
 				self._state = "backend_not_available"
 
-				return 
+				return
 			end
 
 			if not self._startup_script_started then
@@ -175,7 +172,7 @@ UnlockManager._update_backend_unlocks = function (self)
 			if #self._unlocks_indexed < index then
 				self._state = "done"
 
-				return 
+				return
 			end
 
 			self._query_unlocked_index = index
@@ -273,9 +270,8 @@ UnlockManager._update_backend_unlocks = function (self)
 	elseif self._state == "backend_not_available" and Managers.backend:available() then
 		self._state = "query_unlocked"
 	end
-
-	return 
 end
+
 UnlockManager._executor_revision_check = function (self, revision_check_data)
 	local valid_engine = revision_check_data.valid_engine
 	local valid_content = revision_check_data.valid_content
@@ -284,9 +280,8 @@ UnlockManager._executor_revision_check = function (self, revision_check_data)
 		self._update_required_popup_id = Managers.popup:queue_popup(Localize("new_version_available_on_steam"), Localize("update_required"), "quit", Localize("menu_quit"))
 		self._state = "poll_update_required_popup"
 	end
-
-	return 
 end
+
 UnlockManager._executor_script_startup = function (self, script_startup_data)
 	for _, data in ipairs(script_startup_data) do
 		self._add_startup_award(self, data)
@@ -295,28 +290,27 @@ UnlockManager._executor_script_startup = function (self, script_startup_data)
 	local queue = Managers.backend:get_data_server_queue()
 
 	queue.unregister_executor(queue, "script_startup")
-
-	return 
 end
+
 UnlockManager._add_startup_award = function (self, data)
 	self._award_queue[#self._award_queue + 1] = data
-
-	return 
 end
+
 UnlockManager.poll_script_startup_data = function (self)
 	if #self._award_queue <= self._award_queue_id then
-		return 
+		return
 	end
 
 	self._award_queue_id = self._award_queue_id + 1
 	local data = self._award_queue[self._award_queue_id]
 
 	if data.silent then
-		return 
+		return
 	end
 
 	return data
 end
+
 UnlockManager.is_dlc_unlocked = function (self, name)
 	if PLATFORM == "xb1" then
 		return true
@@ -328,6 +322,7 @@ UnlockManager.is_dlc_unlocked = function (self, name)
 
 	return unlock.unlocked(unlock)
 end
+
 UnlockManager.dlc_id = function (self, name)
 	local unlock = self._unlocks[name]
 
@@ -335,6 +330,7 @@ UnlockManager.dlc_id = function (self, name)
 
 	return unlock.id(unlock)
 end
+
 UnlockManager.ps4_dlc_product_label = function (self, name)
 	assert(PLATFORM == "ps4", "Only call this function on a PS4")
 
@@ -345,4 +341,4 @@ UnlockManager.ps4_dlc_product_label = function (self, name)
 	return unlock.product_label(unlock)
 end
 
-return 
+return

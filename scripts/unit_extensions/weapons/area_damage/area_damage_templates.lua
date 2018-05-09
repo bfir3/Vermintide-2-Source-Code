@@ -48,14 +48,12 @@ AreaDamageTemplates.templates = {
 				local damage_source = data.damage_source
 
 				DamageUtils.add_damage_network(unit, extension_unit, damage, "torso", "damage_over_time", Vector3(1, 0, 0), damage_source)
-
-				return 
 			end
 		},
 		client = {
 			update = function (world, radius, aoe_unit, player_screen_effect_name, player_unit_particles, aoe_dot_player_take_damage)
 				if Development.parameter("screen_space_player_camera_reactions") == false then
-					return 
+					return
 				end
 
 				for _, player in pairs(Managers.player:players()) do
@@ -97,8 +95,6 @@ AreaDamageTemplates.templates = {
 						end
 					end
 				end
-
-				return 
 			end,
 			spawn_effect = function (world, unit, effect_name, particle_var_table)
 				local position = Unit.local_position(unit, 0)
@@ -116,7 +112,7 @@ AreaDamageTemplates.templates = {
 				return effect_id
 			end,
 			destroy = function ()
-				return 
+				return
 			end
 		}
 	},
@@ -165,8 +161,6 @@ AreaDamageTemplates.templates = {
 				local damage_source = data.damage_source
 
 				DamageUtils.add_damage_network(unit, unit, damage, "torso", "damage_over_time", Vector3(1, 0, 0), damage_source)
-
-				return 
 			end
 		},
 		client = {
@@ -210,8 +204,6 @@ AreaDamageTemplates.templates = {
 						end
 					end
 				end
-
-				return 
 			end,
 			spawn_effect = function (world, unit, effect_name, particle_var_table)
 				local position = Unit.local_position(unit, 0)
@@ -229,7 +221,7 @@ AreaDamageTemplates.templates = {
 				return effect_id
 			end,
 			destroy = function ()
-				return 
+				return
 			end
 		}
 	},
@@ -326,8 +318,6 @@ AreaDamageTemplates.templates = {
 
 					return true, damage_buffer
 				end
-
-				return 
 			end,
 			do_damage = function (data, extension_unit)
 				local dot_template_name = data.dot_template_name
@@ -345,13 +335,11 @@ AreaDamageTemplates.templates = {
 						dot_func(dot_template_name, nil, nil, nil, target_unit, attacker_unit, hit_zone_name, damage_source, nil, nil)
 					end
 				end
-
-				return 
 			end
 		},
 		client = {
 			update = function (world, radius, aoe_unit, player_screen_effect_name, player_unit_particles, damage_players, explosion_template_name)
-				return 
+				return
 			end,
 			spawn_effect = function (world, unit, effect_name, particle_var_table, override_position)
 				local position = override_position or Unit.world_position(unit, 0)
@@ -423,12 +411,11 @@ AreaDamageTemplates.templates = {
 				local weapon_system = Managers.state.entity:system("weapon_system")
 
 				weapon_system.send_rpc_attack_hit(weapon_system, damage_source_id, unit_id, unit_id, hit_zone_id, damage_direction, damage_profile_id, "power_level", power_level, "hit_target_index", nil, "blocking", false, "shield_break_procced", false, "boost_curve_multiplier", 0, "is_critical_strike", false)
-
-				return 
 			end
 		}
 	}
 }
+
 AreaDamageTemplates.get_template = function (area_damage_template, is_husk)
 	local templates = AreaDamageTemplates.templates
 	local husk_key = (is_husk == true and "husk") or (is_husk == false and "unit") or nil
@@ -439,4 +426,4 @@ AreaDamageTemplates.get_template = function (area_damage_template, is_husk)
 	return template
 end
 
-return 
+return

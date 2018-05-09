@@ -2,15 +2,16 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTComboAttackAction = class(BTComboAttackAction, BTNode)
 local DEFAULT_ROTATION_SPEED = 20
+
 BTComboAttackAction.init = function (self, ...)
 	BTComboAttackAction.super.init(self, ...)
 
 	self.last_attack_time = 0
 	self.dodge_timer = 0
-
-	return 
 end
+
 BTComboAttackAction.name = "BTComboAttackAction"
+
 BTComboAttackAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -99,8 +100,6 @@ BTComboAttackAction.enter = function (self, unit, blackboard, t)
 	end
 
 	self._start_attack(self, unit, blackboard, t, action, "attack_1")
-
-	return 
 end
 
 local function randomize(event, blackboard)
@@ -111,8 +110,6 @@ local function randomize(event, blackboard)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTComboAttackAction._start_attack = function (self, unit, blackboard, t, action, attack_name)
@@ -186,9 +183,8 @@ BTComboAttackAction._start_attack = function (self, unit, blackboard, t, action,
 			combo.damage_done_time = t + damage_done_time
 		end
 	end
-
-	return 
 end
+
 BTComboAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if blackboard.move_state ~= "idle" then
 		local network_manager = Managers.state.network
@@ -234,9 +230,8 @@ BTComboAttackAction.leave = function (self, unit, blackboard, t, reason, destroy
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, blackboard.breed.run_speed)
-
-	return 
 end
+
 BTComboAttackAction.run = function (self, unit, blackboard, t, dt)
 	local combo = blackboard.combo_attack_data
 	local attacking_target = combo.attacking_target
@@ -313,6 +308,7 @@ BTComboAttackAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTComboAttackAction._follow = function (self, dt, t, unit, blackboard, current_attack)
 	local breed = blackboard.breed
 	local combo = blackboard.combo_attack_data
@@ -349,14 +345,12 @@ BTComboAttackAction._follow = function (self, dt, t, unit, blackboard, current_a
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, max_speed)
-
-	return 
 end
+
 BTComboAttackAction.attack_success = function (self, unit, blackboard)
 	blackboard.combo_attack_data.successful_hit = true
-
-	return 
 end
+
 BTComboAttackAction._update_rotation_target = function (self, t, unit, blackboard, combo)
 	local target_status_extension = blackboard.target_status_extension
 	local dodging = target_status_extension and (target_status_extension.get_is_dodging(target_status_extension) or target_status_extension.is_invisible(target_status_extension))
@@ -381,9 +375,8 @@ BTComboAttackAction._update_rotation_target = function (self, t, unit, blackboar
 	local rot = LocomotionUtils.look_at_position(unit, pos)
 
 	combo.rotation_target:store(rot)
-
-	return 
 end
+
 BTComboAttackAction._set_target_position = function (self, blackboard, combo, position, t)
 	local target_locomotion_extension = blackboard.target_locomotion_extension
 
@@ -391,9 +384,8 @@ BTComboAttackAction._set_target_position = function (self, blackboard, combo, po
 	combo.last_target_velocity:store((target_locomotion_extension and target_locomotion_extension.current_velocity(target_locomotion_extension)) or Vector3.zero())
 
 	combo.last_target_position_time = t
-
-	return 
 end
+
 BTComboAttackAction._update_rotation_target_lerped = function (self, t, unit, blackboard, combo, rotation_constraint)
 	self._update_rotation_target(self, t, unit, blackboard, combo)
 
@@ -418,17 +410,15 @@ BTComboAttackAction._update_rotation_target_lerped = function (self, t, unit, bl
 	end
 
 	blackboard.locomotion_extension:set_rotation_speed(speed)
-
-	return 
 end
+
 BTComboAttackAction.attack_cooldown = function (self, unit, blackboard)
 	local t = Managers.time:time("game")
 	local cooldown, cooldown_at = self.get_attack_cooldown_finished_at(self, unit, blackboard, t)
 	blackboard.attack_cooldown_at = cooldown_at
 	blackboard.is_in_attack_cooldown = cooldown
-
-	return 
 end
+
 BTComboAttackAction._push_non_targets = function (self, self_pos, current_target, combo, forward_direction, close_impact_radius, far_impact_radius, forward_impact_speed, lateral_impact_speed)
 	local far_impact_radius_sq = far_impact_radius^2
 	local player_and_bot_units = PLAYER_AND_BOT_UNITS
@@ -457,9 +447,8 @@ BTComboAttackAction._push_non_targets = function (self, self_pos, current_target
 			end
 		end
 	end
-
-	return 
 end
+
 BTComboAttackAction.stagger_override = function (self, unit, blackboard, attacker_unit, stagger_direction, stagger_length, stagger_type, stagger_duration, stagger_animation_scale, t, is_push)
 	local combo = blackboard.combo_attack_data
 	local action = blackboard.action
@@ -471,22 +460,21 @@ BTComboAttackAction.stagger_override = function (self, unit, blackboard, attacke
 	else
 		return true
 	end
-
-	return 
 end
+
 BTComboAttackAction.anim_cb_frenzy_damage = function (self, unit, blackboard)
 	local action = blackboard.action
 	local combo = blackboard.combo_attack_data
 	local attacking_target = combo.attacking_target
 
 	if not Unit.alive(attacking_target) then
-		return 
+		return
 	end
 
 	blackboard.attack_damage_triggered = true
 
 	if not DamageUtils.check_distance(action, blackboard, unit, attacking_target) or not DamageUtils.check_infront(unit, attacking_target) then
-		return 
+		return
 	end
 
 	local current_attack_name = combo.current_attack_name
@@ -498,7 +486,7 @@ BTComboAttackAction.anim_cb_frenzy_damage = function (self, unit, blackboard)
 		blackboard.blocked = false
 		combo.blocked = true
 
-		return 
+		return
 	end
 
 	combo.successful_hit = true
@@ -515,9 +503,8 @@ BTComboAttackAction.anim_cb_frenzy_damage = function (self, unit, blackboard)
 
 	Managers.state.entity:system("surrounding_aware_system"):add_system_event(unit, "enemy_attack", DialogueSettings.armor_hit_broadcast_range, "attack_tag", "frenzy_attack_damage", "target_name", target_name)
 	AiUtils.damage_target(attacking_target, unit, action, damage)
-
-	return 
 end
+
 BTComboAttackAction.get_attack_cooldown_finished_at = function (self, unit, blackboard, t)
 	local combo = blackboard.combo_attack_data
 	local attacking_target = combo.attacking_target
@@ -552,4 +539,4 @@ BTComboAttackAction.get_attack_cooldown_finished_at = function (self, unit, blac
 	return true, cooldown + t
 end
 
-return 
+return

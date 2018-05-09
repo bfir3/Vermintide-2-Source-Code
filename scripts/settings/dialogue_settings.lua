@@ -938,4 +938,4 @@ SpecialSubtitleEvents = {
 	}
 }
 
-return 
+return

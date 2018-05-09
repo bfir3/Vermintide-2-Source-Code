@@ -4,23 +4,22 @@ local unit_alive = Unit.alive
 local Profiler = Profiler
 
 local function nop()
-	return 
+	return
 end
 
 BTSelector_grey_seer = class(BTSelector_grey_seer, BTNode)
 BTSelector_grey_seer.name = "BTSelector_grey_seer"
+
 BTSelector_grey_seer.init = function (self, ...)
 	BTSelector_grey_seer.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTSelector_grey_seer.leave = function (self, unit, blackboard, t, reason)
 	self.set_running_child(self, unit, blackboard, t, nil, reason)
-
-	return 
 end
+
 BTSelector_grey_seer.run = function (self, unit, blackboard, t, dt)
 	local child_running = self.current_running_child(self, blackboard)
 	local children = self._children
@@ -250,13 +249,10 @@ BTSelector_grey_seer.run = function (self, unit, blackboard, t, dt)
 	if result ~= "failed" then
 		return result, evaluate
 	end
-
-	return 
 end
+
 BTSelector_grey_seer.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

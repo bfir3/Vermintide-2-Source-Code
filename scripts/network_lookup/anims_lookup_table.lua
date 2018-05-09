@@ -776,4 +776,4 @@ NetworkLookup.interest_point_anims = {
 	"idle_passive_guard"
 }
 
-return 
+return

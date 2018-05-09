@@ -17,6 +17,7 @@ local RPCS = {
 local extensions = {
 	"GenericStatusExtension"
 }
+
 StatusSystem.init = function (self, entity_system_creation_context, system_name)
 	StatusSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -24,19 +25,17 @@ StatusSystem.init = function (self, entity_system_creation_context, system_name)
 	self.network_event_delegate = network_event_delegate
 
 	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
-
-	return 
 end
+
 StatusSystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
-
-	return 
 end
+
 StatusSystem.rpc_hooked_sync = function (self, sender, status_id, game_object_id, time_left)
 	local unit = self.unit_storage:unit(game_object_id)
 
 	if not unit or not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local status_ext = ScriptUnit.extension(unit, "status_system")
@@ -48,14 +47,13 @@ StatusSystem.rpc_hooked_sync = function (self, sender, status_id, game_object_id
 	elseif status == "pack_master_unhooked" then
 		status_ext.release_unhook_time_left = t + time_left
 	end
-
-	return 
 end
+
 StatusSystem.rpc_status_change_bool = function (self, sender, status_id, status_bool, game_object_id, other_object_id)
 	local unit = self.unit_storage:unit(game_object_id)
 
 	if not unit or not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local other_unit = self.unit_storage:unit(other_object_id)
@@ -148,14 +146,13 @@ StatusSystem.rpc_status_change_bool = function (self, sender, status_id, status_
 	if Managers.player.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_status_change_bool", sender, status_id, status_bool, game_object_id, other_object_id)
 	end
-
-	return 
 end
+
 StatusSystem.rpc_status_change_int = function (self, sender, status_id, status_int, game_object_id)
 	local unit = self.unit_storage:unit(game_object_id)
 
 	if not unit or not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local status_ext = ScriptUnit.extension(unit, "status_system")
@@ -176,14 +173,13 @@ StatusSystem.rpc_status_change_int = function (self, sender, status_id, status_i
 	if Managers.player.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_status_change_int", sender, status_id, status_int, game_object_id)
 	end
-
-	return 
 end
+
 StatusSystem.rpc_status_change_int_and_unit = function (self, sender, status_id, status_int, game_object_id, other_object_id)
 	local unit = self.unit_storage:unit(game_object_id)
 
 	if not unit or not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local other_unit = self.unit_storage:unit(other_object_id)
@@ -201,28 +197,26 @@ StatusSystem.rpc_status_change_int_and_unit = function (self, sender, status_id,
 	if Managers.player.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_status_change_int", sender, status_id, status_int, game_object_id, other_object_id)
 	end
-
-	return 
 end
+
 StatusSystem.rpc_set_wounded = function (self, sender, game_object_id, wounded, reason_id)
 	local unit = self.unit_storage:unit(game_object_id)
 
 	if not unit or not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local status_extension = ScriptUnit.extension(unit, "status_system")
 	local reason = NetworkLookup.set_wounded_reasons[reason_id]
 
 	status_extension.set_wounded(status_extension, wounded, reason)
-
-	return 
 end
+
 StatusSystem.rpc_set_catapulted = function (self, sender, unit_id, catapulted, velocity)
 	local unit = self.unit_storage:unit(unit_id)
 
 	if not unit or not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local status_extension = ScriptUnit.extension(unit, "status_system")
@@ -232,14 +226,13 @@ StatusSystem.rpc_set_catapulted = function (self, sender, unit_id, catapulted, v
 	if Managers.player.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_set_catapulted", sender, unit_id, catapulted, velocity)
 	end
-
-	return 
 end
+
 StatusSystem.rpc_set_blocking = function (self, sender, game_object_id, blocking)
 	local unit = self.unit_storage:unit(game_object_id)
 
 	if not unit or not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local status_extension = ScriptUnit.extension(unit, "status_system")
@@ -249,24 +242,22 @@ StatusSystem.rpc_set_blocking = function (self, sender, game_object_id, blocking
 	if self.is_server then
 		self.network_transmit:send_rpc_clients_except("rpc_set_blocking", sender, game_object_id, blocking)
 	end
-
-	return 
 end
+
 StatusSystem.rpc_player_blocked_attack = function (self, sender, game_object_id, fatigue_type_id, attacking_unit_id, fatigue_point_costs_multiplier, improved_block, attack_direction)
 	local unit = self.unit_storage:unit(game_object_id)
 	local attacking_unit = self.unit_storage:unit(attacking_unit_id)
 
 	if not unit or not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local fatigue_type = NetworkLookup.fatigue_types[fatigue_type_id]
 	local status_extension = ScriptUnit.extension(unit, "status_system")
 
 	status_extension.blocked_attack(status_extension, fatigue_type, attacking_unit, fatigue_point_costs_multiplier, improved_block, attack_direction)
-
-	return 
 end
+
 StatusSystem.rpc_hot_join_sync_health_status = function (self, sender, game_object_id, wounds, ready_for_assisted_respawn, respawn_unit_game_object_id)
 	local unit = self.unit_storage:unit(game_object_id)
 	local status_extension = ScriptUnit.extension(unit, "status_system")
@@ -275,9 +266,8 @@ StatusSystem.rpc_hot_join_sync_health_status = function (self, sender, game_obje
 	if ready_for_assisted_respawn then
 		status_extension.set_ready_for_assisted_respawn(status_extension, ready_for_assisted_respawn, self.unit_storage:unit(respawn_unit_game_object_id))
 	end
-
-	return 
 end
+
 StatusSystem.rpc_replenish_fatigue = function (self, sender, game_object_id, fatigue_type_id)
 	print("rpc_replenish_fatigue")
 
@@ -285,9 +275,8 @@ StatusSystem.rpc_replenish_fatigue = function (self, sender, game_object_id, fat
 	local fatigue_type = NetworkLookup.fatigue_types[fatigue_type_id]
 
 	StatusUtils.replenish_stamina_local_players(nil, fatigue_type)
-
-	return 
 end
+
 StatusSystem.rpc_replenish_fatigue_other_players = function (self, sender, fatigue_type_id)
 	if self.is_server then
 		self.network_transmit:send_rpc_clients_except("rpc_replenish_fatigue_other_players", sender, fatigue_type_id)
@@ -296,8 +285,6 @@ StatusSystem.rpc_replenish_fatigue_other_players = function (self, sender, fatig
 	local fatigue_type = NetworkLookup.fatigue_types[fatigue_type_id]
 
 	StatusUtils.replenish_stamina_local_players(nil, fatigue_type)
-
-	return 
 end
 
-return 
+return

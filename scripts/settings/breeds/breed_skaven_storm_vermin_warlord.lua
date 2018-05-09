@@ -759,8 +759,6 @@ local action_data = {
 					blackboard.kill_skaven_challenge_completed = true
 				end
 			end
-
-			return 
 		end
 	},
 	defensive_mode_spin = {
@@ -917,8 +915,6 @@ local action_data = {
 					blackboard.kill_skaven_challenge_completed = true
 				end
 			end
-
-			return 
 		end
 	},
 	special_attack_sweep_left = {
@@ -2280,4 +2276,4 @@ local action_data = {
 }
 BreedActions.skaven_storm_vermin_warlord = table.create_copy(BreedActions.skaven_storm_vermin_warlord, action_data)
 
-return 
+return

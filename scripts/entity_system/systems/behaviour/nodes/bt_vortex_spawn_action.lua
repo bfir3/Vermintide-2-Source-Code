@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTVortexSpawnAction = class(BTVortexSpawnAction, BTNode)
+
 BTVortexSpawnAction.init = function (self, ...)
 	BTVortexSpawnAction.super.init(self, ...)
-
-	return 
 end
+
 BTVortexSpawnAction.name = "BTVortexSpawnAction"
+
 BTVortexSpawnAction.enter = function (self, unit, blackboard, t)
 	local current_position = POSITION_LOOKUP[unit]
 	local nav_world = blackboard.nav_world
@@ -17,16 +18,14 @@ BTVortexSpawnAction.enter = function (self, unit, blackboard, t)
 
 		conflict_director.destroy_unit(conflict_director, unit, blackboard, "no_navmesh")
 	end
-
-	return 
 end
+
 BTVortexSpawnAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.spawn = false
-
-	return 
 end
+
 BTVortexSpawnAction.run = function (self, unit, blackboard, t, dt)
 	return "done"
 end
 
-return 
+return

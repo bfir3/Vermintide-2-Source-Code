@@ -1062,4 +1062,4 @@ UIPlayerPortraitFrameSettings = {
 	}
 }
 
-return 
+return

@@ -4,14 +4,13 @@ local function readonlytable(table)
 		__index = table,
 		__newindex = function (table, key, value)
 			error("Coder trying to modify EntityManager's read-only empty table. Don't do it!")
-
-			return 
 		end
 	})
 end
 
 local EMPTY_TABLE = readonlytable({})
 EntityManager2 = class(EntityManager2)
+
 EntityManager2.init = function (self)
 	self.temp_table = {}
 	self._ignore_extensions_list = {}
@@ -21,14 +20,12 @@ EntityManager2.init = function (self)
 	self._systems = {}
 	self._extension_to_system_map = {}
 	self.system_to_extension_per_unit_type_map = {}
-
-	return 
 end
+
 EntityManager2.set_extension_extractor_function = function (self, extension_extractor_function)
 	self.extension_extractor_function = extension_extractor_function
-
-	return 
 end
+
 EntityManager2.register_system = function (self, system, system_name, extension_list)
 	assert(self._systems[system_name] == nil, "Tried to register system whose name '%s' was already registered.", system_name)
 
@@ -40,20 +37,22 @@ EntityManager2.register_system = function (self, system, system_name, extension_
 	end
 
 	GarbageLeakDetector.register_object(system, system_name)
-
-	return 
 end
+
 EntityManager2.system = function (self, system_name)
 	return self._systems[system_name]
 end
+
 EntityManager2.system_by_extension = function (self, extension_name)
 	local system_name = self._extension_to_system_map[extension_name]
 
 	return system_name and self._systems[system_name]
 end
+
 EntityManager2.get_entities = function (self, extension_name)
 	return self._extensions[extension_name] or EMPTY_TABLE
 end
+
 EntityManager2.destroy = function (self)
 	self.temp_table = nil
 	self._units = nil
@@ -64,9 +63,8 @@ EntityManager2.destroy = function (self)
 	self.extension_extractor_function = nil
 
 	GarbageLeakDetector.register_object(self, "EntityManager")
-
-	return 
 end
+
 EntityManager2.add_unit_extensions = function (self, world, unit, unit_template_name, all_extension_init_data)
 	all_extension_init_data = all_extension_init_data or EMPTY_TABLE
 	local ignore_extensions_list = self._ignore_extensions_list
@@ -161,6 +159,7 @@ EntityManager2.add_unit_extensions = function (self, world, unit, unit_template_
 
 	return true
 end
+
 EntityManager2.sync_unit_extensions = function (self, unit, go_id)
 	local extensions = self._units[unit]
 
@@ -171,14 +170,13 @@ EntityManager2.sync_unit_extensions = function (self, unit, go_id)
 			end
 		end
 	end
-
-	return 
 end
+
 EntityManager2.hot_join_sync = function (self, unit)
 	local unit_extensions = ScriptUnit.extensions(unit)
 
 	if not unit_extensions then
-		return 
+		return
 	end
 
 	for system_name, extension in pairs(unit_extensions) do
@@ -186,10 +184,10 @@ EntityManager2.hot_join_sync = function (self, unit)
 			extension.hot_join_sync(extension, Managers.state.network:game_session_host())
 		end
 	end
-
-	return 
 end
+
 local TEMP_TABLE = {}
+
 EntityManager2.register_unit = function (self, world, unit, maybe_init_data, ...)
 	local extension_init_data = nil
 
@@ -207,9 +205,8 @@ EntityManager2.register_unit = function (self, world, unit, maybe_init_data, ...
 
 		self.register_units_extensions(self, TEMP_TABLE, 1)
 	end
-
-	return 
 end
+
 EntityManager2.add_and_register_units = function (self, world, unit_list, num_units)
 	num_units = num_units or #unit_list
 	local added_list = self.temp_table
@@ -228,9 +225,8 @@ EntityManager2.add_and_register_units = function (self, world, unit_list, num_un
 	if 0 < num_added then
 		self.register_units_extensions(self, added_list, num_added)
 	end
-
-	return 
 end
+
 EntityManager2.register_units_extensions = function (self, unit_list, num_units)
 	local self_units = self._units
 	local self_extensions = self._extensions
@@ -248,9 +244,8 @@ EntityManager2.register_units_extensions = function (self, unit_list, num_units)
 			end
 		end
 	end
-
-	return 
 end
+
 EntityManager2.remove_extensions_from_unit = function (self, unit, extensions_to_remove)
 	local unit_extensions_list = self._unit_extensions_list
 	local self_extensions = self._extensions
@@ -259,7 +254,7 @@ EntityManager2.remove_extensions_from_unit = function (self, unit, extensions_to
 	local extensions_list = unit_extensions_list[unit]
 
 	if not extensions_list then
-		return 
+		return
 	end
 
 	local num_ext = #extensions_list
@@ -279,9 +274,8 @@ EntityManager2.remove_extensions_from_unit = function (self, unit, extensions_to
 
 		self_extensions[extension_name][unit] = nil
 	end
-
-	return 
 end
+
 EntityManager2.freeze_extensions = function (self, unit, extensions_to_freeze)
 	for i = 1, #extensions_to_freeze, 1 do
 		local extension_name = extensions_to_freeze[i]
@@ -291,9 +285,8 @@ EntityManager2.freeze_extensions = function (self, unit, extensions_to_freeze)
 			system.on_freeze_extension(system, unit, extension_name)
 		end
 	end
-
-	return 
 end
+
 EntityManager2.unregister_units = function (self, units, num_units)
 	local self_units = self._units
 	local self_extensions = self._extensions
@@ -352,16 +345,15 @@ EntityManager2.unregister_units = function (self, units, num_units)
 			end
 		end
 	end
-
-	return 
 end
+
 EntityManager2.game_object_unit_destroyed = function (self, unit)
 	local unit_extensions_list = self._unit_extensions_list
 	local extensions_list = unit_extensions_list[unit]
 	local unit_extensions = ScriptUnit.extensions(unit)
 
 	if not unit_extensions then
-		return 
+		return
 	end
 
 	for system_name, _ in pairs(unit_extensions) do
@@ -372,9 +364,8 @@ EntityManager2.game_object_unit_destroyed = function (self, unit)
 			extension.game_object_unit_destroyed(extension)
 		end
 	end
-
-	return 
 end
+
 EntityManager2.add_ignore_extensions = function (self, ignore_extensions)
 	local ignore_extensions_list = self._ignore_extensions_list
 	local num_extensions = #ignore_extensions
@@ -385,16 +376,14 @@ EntityManager2.add_ignore_extensions = function (self, ignore_extensions)
 
 		print("ignoring extension", extension_name)
 	end
-
-	return 
 end
+
 local TEMP_UNIT_TABLE = {}
+
 EntityManager2.unregister_unit = function (self, unit)
 	TEMP_UNIT_TABLE[1] = unit
 
 	self.unregister_units(self, TEMP_UNIT_TABLE, 1)
-
-	return 
 end
 
-return 
+return

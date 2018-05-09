@@ -14,15 +14,15 @@ local token_textures = {
 }
 Rewards = class(Rewards)
 local EXPERIENCE_REWARD = 400
+
 Rewards.init = function (self, level_key, game_mode_key, quickplay_bonus)
 	self._level_key = level_key
 	self._game_mode_key = game_mode_key
 	self._multiplier = ExperienceSettings.multiplier
 	self._end_of_level_loot_id = nil
 	self._quickplay_bonus = quickplay_bonus
-
-	return 
 end
+
 Rewards.award_end_of_level_rewards = function (self, game_won, hero_name)
 	local deed_manager = Managers.deed
 
@@ -40,9 +40,8 @@ Rewards.award_end_of_level_rewards = function (self, game_won, hero_name)
 	else
 		self._award_end_of_level_rewards(self, game_won, hero_name)
 	end
-
-	return 
 end
+
 Rewards._award_end_of_level_rewards = function (self, game_won, hero_name)
 	local backend_manager = Managers.backend
 	local hero_attributes = backend_manager.get_interface(backend_manager, "hero_attributes")
@@ -63,9 +62,8 @@ Rewards._award_end_of_level_rewards = function (self, game_won, hero_name)
 
 	self._generate_end_of_level_loot(self, game_won, hero_name, start_experience, end_experience, deed_item_name, deed_item_backend_id)
 	backend_manager.commit(backend_manager)
-
-	return 
 end
+
 Rewards._mission_results = function (self, game_won)
 	local game_mode_key = self._game_mode_key
 	local mission_results = {}
@@ -102,6 +100,7 @@ Rewards._mission_results = function (self, game_won)
 
 	return mission_results
 end
+
 Rewards._add_missions_from_mission_system = function (self, mission_rewards, difficulty_rank)
 	local mission_rewards_n = 0
 	local mission_system = Managers.state.entity:system("mission_system")
@@ -174,9 +173,8 @@ Rewards._add_missions_from_mission_system = function (self, mission_rewards, dif
 			end
 		end
 	end
-
-	return 
 end
+
 Rewards._generate_end_of_level_loot = function (self, game_won, hero_name, start_experience, end_experience, deed_item_name, deed_item_backend_id)
 	local difficulty_manager = Managers.state.difficulty
 	local difficulty = difficulty_manager.get_difficulty(difficulty_manager)
@@ -197,9 +195,8 @@ Rewards._generate_end_of_level_loot = function (self, game_won, hero_name, start
 	end
 
 	self._end_of_level_loot_id = loot_interface.generate_end_of_level_loot(loot_interface, game_won, quickplay, difficulty, self._level_key, num_tomes, num_grims, num_loot_dice, hero_name, start_experience, end_experience, deed_item_name, deed_item_backend_id)
-
-	return 
 end
+
 Rewards.cb_deed_consumed = function (self)
 	print("Deed has been consumed callback!")
 
@@ -210,9 +207,8 @@ Rewards.cb_deed_consumed = function (self)
 	local hero_name = end_of_level_info.hero_name
 
 	self._award_end_of_level_rewards(self, game_won, hero_name)
-
-	return 
 end
+
 Rewards.rewards_generated = function (self)
 	local loot_interface = Managers.backend:get_interface("loot")
 	local loot_id = self._end_of_level_loot_id
@@ -235,9 +231,11 @@ Rewards.rewards_generated = function (self)
 
 	return false
 end
+
 Rewards.consuming_deed = function (self)
 	return self._consuming_deed
 end
+
 Rewards.get_rewards = function (self)
 	local loot_interface = Managers.backend:get_interface("loot")
 	local loot_id = self._end_of_level_loot_id
@@ -245,14 +243,17 @@ Rewards.get_rewards = function (self)
 
 	return loot
 end
+
 Rewards.get_mission_results = function (self)
 	return self._mission_results
 end
+
 Rewards.get_level_start = function (self)
 	local start_experience = self._start_experience or 0
 
 	return ExperienceSettings.get_level(start_experience), start_experience
 end
+
 Rewards.get_level_end = function (self)
 	local mission_results = self._mission_results
 	local gained_xp = 0
@@ -266,6 +267,7 @@ Rewards.get_level_end = function (self)
 
 	return ExperienceSettings.get_level(experience), experience
 end
+
 Rewards.difficulty_experience_multiplier = function (self)
 	local difficulty_manager = Managers.state.difficulty
 	local difficulty_settings = difficulty_manager.get_difficulty_settings(difficulty_manager)
@@ -274,4 +276,4 @@ Rewards.difficulty_experience_multiplier = function (self)
 	return xp_multiplier
 end
 
-return 
+return

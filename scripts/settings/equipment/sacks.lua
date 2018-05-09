@@ -122,4 +122,4 @@ Weapons.door_stick.actions.action_one.default.projectile_info.projectile_unit_na
 Weapons.door_stick.left_hand_unit = "units/gameplay/timed_door_base_02/wpn_timed_door_stick"
 Weapons.door_stick.wield_anim = "to_sack"
 
-return 
+return

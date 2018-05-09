@@ -195,10 +195,8 @@ VortexTemplates = {
 
 			if achievements_enabled and allowed_difficulty and not blackboard.completed_vortex_suck_in_challenge then
 			end
-
-			return 
 		end
 	}
 }
 
-return 
+return

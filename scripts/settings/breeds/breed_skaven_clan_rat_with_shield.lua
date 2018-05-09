@@ -640,8 +640,6 @@ local action_data = {
 			local ai_shield_extension = ScriptUnit.has_extension(unit, "ai_shield_system") and ScriptUnit.extension(unit, "ai_shield_system")
 
 			ai_shield_extension.set_is_blocking(ai_shield_extension, true)
-
-			return 
 		end,
 		stagger_anims = {
 			{
@@ -1186,4 +1184,4 @@ local action_data = {
 }
 BreedActions.skaven_clan_rat_with_shield = table.create_copy(BreedActions.skaven_clan_rat_with_shield, action_data)
 
-return 
+return

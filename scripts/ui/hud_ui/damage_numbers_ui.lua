@@ -61,6 +61,7 @@ local widget_definitions = {
 	damage_text = UIWidgets.create_simple_text("0", "damage_text", nil, nil, default_text_style)
 }
 DamageNumbersUI = class(DamageNumbersUI)
+
 DamageNumbersUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.camera = Managers.camera
@@ -78,16 +79,14 @@ DamageNumbersUI.init = function (self, ingame_ui_context)
 
 	self.create_ui_elements(self)
 	Managers.state.event:register(self, "add_damage_number", "event_add_damage_number")
-
-	return 
 end
+
 DamageNumbersUI.update = function (self, dt, viewport_name)
 	self._time = self._time + dt
 
 	self.draw(self, dt)
-
-	return 
 end
+
 DamageNumbersUI.event_add_damage_number = function (self, damage, size, unit, time, color, is_critical_strike)
 	local camera_position = Camera.world_position(self.camera)
 	local unit_position = Unit.world_position(unit, 0)
@@ -119,9 +118,8 @@ DamageNumbersUI.event_add_damage_number = function (self, damage, size, unit, ti
 		self._unit_texts[unit] = self._unit_texts[unit] or {}
 		self._unit_texts[unit][#self._unit_texts[unit] + 1] = new_text
 	end
-
-	return 
 end
+
 DamageNumbersUI.destroy = function (self)
 	for unit, categories in pairs(self._unit_texts) do
 		self._destroy_unit_texts(self, unit)
@@ -130,22 +128,19 @@ DamageNumbersUI.destroy = function (self)
 	if Managers.state.event then
 		Managers.state.event:unregister("add_damage_number", self)
 	end
-
-	return 
 end
+
 DamageNumbersUI._destroy_unit_texts = function (self, unit)
 	self._unit_texts[unit] = nil
-
-	return 
 end
+
 DamageNumbersUI.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self.damage_text = UIWidget.init(widget_definitions.damage_text)
 
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
-
-	return 
 end
+
 DamageNumbersUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -210,8 +205,6 @@ DamageNumbersUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
 
-return 
+return

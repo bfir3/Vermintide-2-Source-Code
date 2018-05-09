@@ -4,6 +4,7 @@ local accepted_slots = {
 	slot_ranged = true,
 	slot_melee = true
 }
+
 OverchargeBarUI.init = function (self, ingame_ui_context)
 	self.platform = PLATFORM
 	self.ui_renderer = ingame_ui_context.ui_renderer
@@ -21,8 +22,6 @@ OverchargeBarUI.init = function (self, ingame_ui_context)
 		snap_pixel_positions = true
 	}
 	self._previous_overcharge_fraction = 0
-
-	return 
 end
 
 local function get_overcharge_amount(player_unit)
@@ -37,25 +36,24 @@ end
 OverchargeBarUI._set_player_extensions = function (self, player_unit)
 	self.inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
 	self.initialize_charge_bar = true
-
-	return 
 end
+
 OverchargeBarUI._update_overcharge = function (self, player, dt)
 	if not player then
-		return 
+		return
 	end
 
 	local player_unit = player.player_unit
 
 	if not Unit.alive(player_unit) then
-		return 
+		return
 	end
 
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
 	local equipment = inventory_extension.equipment(inventory_extension)
 
 	if not equipment then
-		return 
+		return
 	end
 
 	local wielded = equipment.wielded
@@ -86,18 +84,16 @@ OverchargeBarUI._update_overcharge = function (self, player, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 OverchargeBarUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 	local widget_definitions = definitions.inventory_entry_definitions
 	self.charge_bar = UIWidget.init(definitions.widget_definitions.charge_bar)
-
-	return 
 end
+
 OverchargeBarUI.update = function (self, dt, t, player)
 	local ui_scenegraph = self.ui_scenegraph
 	local input_manager = self.input_manager
@@ -111,9 +107,8 @@ OverchargeBarUI.update = function (self, dt, t, player)
 		UIRenderer.draw_widget(ui_renderer, self.charge_bar)
 		UIRenderer.end_pass(ui_renderer)
 	end
-
-	return 
 end
+
 local colors = {
 	normal = {
 		255,
@@ -134,6 +129,7 @@ local colors = {
 		0
 	}
 }
+
 OverchargeBarUI.set_charge_bar_fraction = function (self, overcharge_fraction, min_threshold_fraction, max_threshold_fraction, anim_blend_overcharge)
 	local widget = self.charge_bar
 	local style = widget.style
@@ -177,24 +173,21 @@ OverchargeBarUI.set_charge_bar_fraction = function (self, overcharge_fraction, m
 	icon_color[2] = color[2]
 	icon_color[3] = color[3]
 	icon_color[4] = color[4]
+end
 
-	return 
-end
 OverchargeBarUI.destroy = function (self)
-	return 
+	return
 end
+
 OverchargeBarUI.set_alpha = function (self, alpha)
 	self.render_settings.alpha_multiplier = alpha
-
-	return 
 end
+
 OverchargeBarUI.apply_crosshair_position = function (self, x, y)
 	local scenegraph_id = "screen_bottom_pivot"
 	local position = self.ui_scenegraph[scenegraph_id].local_position
 	position[1] = x
 	position[2] = y
-
-	return 
 end
 
-return 
+return

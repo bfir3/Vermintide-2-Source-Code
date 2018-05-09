@@ -1,4 +1,5 @@
 BaseCamera = class(BaseCamera)
+
 BaseCamera.init = function (self, root_node)
 	self._root_node = root_node
 	self._children = {}
@@ -15,9 +16,8 @@ BaseCamera.init = function (self, root_node)
 	self._pitch_offset = nil
 	self._active = 0
 	self._active_children = 0
-
-	return 
 end
+
 BaseCamera.parse_parameters = function (self, camera_settings, parent_node)
 	if camera_settings.name then
 		self._name = camera_settings.name
@@ -51,45 +51,56 @@ BaseCamera.parse_parameters = function (self, camera_settings, parent_node)
 	self._yaw_origin = camera_settings.yaw_origin and (camera_settings.yaw_origin * math.pi) / 180
 	self._pitch_origin = camera_settings.pitch_origin and (camera_settings.pitch_origin * math.pi) / 180
 	self._constraint_function = camera_settings.constraint or parent_node.constraint_function(parent_node)
-
-	return 
 end
+
 BaseCamera.should_apply_fov_multiplier = function (self)
 	return self._should_apply_fov_multiplier
 end
+
 BaseCamera.default_fov = function (self)
 	return self._default_fov
 end
+
 BaseCamera.constraint_function = function (self)
 	return self._constraint_function
 end
+
 BaseCamera.node_transitions = function (self)
 	return self._node_transitions
 end
+
 BaseCamera.tree_transitions = function (self)
 	return self._tree_transitions
 end
+
 BaseCamera.safe_position_offset = function (self)
 	return self._safe_position_offset
 end
+
 BaseCamera.pitch_offset = function (self)
 	return self._pitch_offset
 end
+
 BaseCamera.pitch_speed = function (self)
 	return self._pitch_speed
 end
+
 BaseCamera.yaw_speed = function (self)
 	return self._yaw_speed
 end
+
 BaseCamera.pitch_min = function (self)
 	return self._pitch_min
 end
+
 BaseCamera.pitch_max = function (self)
 	return self._pitch_max
 end
+
 BaseCamera.name = function (self)
 	return self._name
 end
+
 BaseCamera.pose = function (self)
 	local pose = Matrix4x4.identity()
 
@@ -98,60 +109,73 @@ BaseCamera.pose = function (self)
 
 	return pose
 end
+
 BaseCamera.position = function (self)
 	return self._position:unbox()
 end
+
 BaseCamera.rotation = function (self)
 	return self._rotation:unbox()
 end
+
 BaseCamera.vertical_fov = function (self)
 	return self._vertical_fov or self._parent_node:vertical_fov()
 end
+
 BaseCamera.fade_to_black = function (self)
 	return self._fade_to_black or self._parent_node:fade_to_black()
 end
+
 BaseCamera.shading_environment = function (self)
 	return self._environment_params or (self._parent_node and self._parent_node:shading_environment())
 end
+
 BaseCamera.near_range = function (self)
 	return self._near_range
 end
+
 BaseCamera.far_range = function (self)
 	return self._far_range
 end
+
 BaseCamera.dof_enabled = function (self)
 	return self._environment_params.dof_enabled
 end
+
 BaseCamera.focal_distance = function (self)
 	return self._environment_params.focal_distance
 end
+
 BaseCamera.focal_region = function (self)
 	return self._environment_params.focal_region
 end
+
 BaseCamera.focal_padding = function (self)
 	return self._environment_params.focal_padding
 end
+
 BaseCamera.focal_scale = function (self)
 	return self._environment_params.focal_scale
 end
+
 BaseCamera.parent_node = function (self)
 	return self._parent_node
 end
+
 BaseCamera.root_node = function (self)
 	return self._root_node
 end
+
 BaseCamera.set_parent_node = function (self, parent)
 	self._parent_node = parent
-
-	return 
 end
+
 BaseCamera.add_child_node = function (self, node)
 	self._children[#self._children + 1] = node
 
 	node.set_parent_node(node, self)
-
-	return 
 end
+
 BaseCamera.set_active = function (self, active)
 	local old_active = self.active(self)
 
@@ -166,12 +190,12 @@ BaseCamera.set_active = function (self, active)
 	if self._parent_node and old_active ~= new_active then
 		self._parent_node:set_active_child(new_active)
 	end
-
-	return 
 end
+
 BaseCamera.active = function (self)
 	return 0 < self._active or 0 < self._active_children
 end
+
 BaseCamera.set_active_child = function (self, active)
 	local old_active = self.active(self)
 
@@ -186,9 +210,8 @@ BaseCamera.set_active_child = function (self, active)
 	if self._parent_node and old_active ~= new_active then
 		self._parent_node:set_active_child(new_active)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_unit = function (self, unit, object_name)
 	self._root_unit = unit
 	object_name = object_name or self._object_name
@@ -197,102 +220,92 @@ BaseCamera.set_root_unit = function (self, unit, object_name)
 	for _, child in ipairs(self._children) do
 		child.set_root_unit(child, unit, object_name)
 	end
-
-	return 
 end
+
 BaseCamera.root_unit = function (self)
 	return self._root_unit, self._object_name
 end
+
 BaseCamera.set_root_position = function (self, position)
 	self._root_position:store(position)
 
 	for _, child in ipairs(self._children) do
 		child.set_root_position(child, position)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_rotation = function (self, rotation)
 	self._root_rotation:store(rotation)
 
 	for _, child in ipairs(self._children) do
 		child.set_root_rotation(child, rotation)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_vertical_fov = function (self, vertical_fov)
 	self._vertical_fov = vertical_fov
 
 	for _, child in ipairs(self._children) do
 		child.set_root_vertical_fov(child, vertical_fov)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_near_range = function (self, near_range)
 	self._near_range = near_range
 
 	for _, child in ipairs(self._children) do
 		child.set_root_near_range(child, near_range)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_far_range = function (self, far_range)
 	self._far_range = far_range
 
 	for _, child in ipairs(self._children) do
 		child.set_root_far_range(child, far_range)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_dof_enabled = function (self, dof_enabled)
 	self._environment_params.dof_enabled = dof_enabled
 
 	for _, child in ipairs(self._children) do
 		child.set_root_dof_enabled(child, dof_enabled)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_focal_distance = function (self, focal_distance)
 	self._environment_params.focal_distance = focal_distance
 
 	for _, child in ipairs(self._children) do
 		child.set_root_focal_distance(child, focal_distance)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_focal_region = function (self, focal_region)
 	self._environment_params.focal_region = focal_region
 
 	for _, child in ipairs(self._children) do
 		child.set_root_focal_region(child, focal_region)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_focal_padding = function (self, focal_padding)
 	self._environment_params.focal_padding = focal_padding
 
 	for _, child in ipairs(self._children) do
 		child.set_root_focal_padding(child, focal_padding)
 	end
-
-	return 
 end
+
 BaseCamera.set_root_focal_scale = function (self, focal_scale)
 	self._environment_params.focal_scale = focal_scale
 
 	for _, child in ipairs(self._children) do
 		child.set_root_focal_scale(child, focal_scale)
 	end
-
-	return 
 end
+
 BaseCamera.update = function (self, dt, position, rotation, data)
 	assert(Vector3.is_valid(position), "Trying to set invalid camera position")
 	self._position:store(position)
@@ -307,9 +320,8 @@ BaseCamera.update = function (self, dt, position, rotation, data)
 			child.update(child, dt, position, rotation, data)
 		end
 	end
-
-	return 
 end
+
 BaseCamera.destroy = function (self)
 	for _, child in ipairs(self._children) do
 		child.destroy(child)
@@ -317,9 +329,8 @@ BaseCamera.destroy = function (self)
 
 	self._children = {}
 	self._parent_node = nil
-
-	return 
 end
+
 BaseCamera._debug_draw = function (self)
 	local parent_pos = self._parent_node and self._parent_node:position()
 	local pos = self._position
@@ -337,8 +348,6 @@ BaseCamera._debug_draw = function (self)
 	end
 
 	drawer.quaternion(drawer, pos.unbox(pos), rot.unbox(rot))
-
-	return 
 end
 
-return 
+return

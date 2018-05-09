@@ -5211,9 +5211,11 @@ WeaponSkins.skin_weights = {
 	rare = 20,
 	unique = 100
 }
+
 WeaponSkins.item_has_skin_table = function (item_master_list_key)
 	return WeaponSkins.skins[item_master_list_key] ~= nil
 end
+
 WeaponSkins.will_have_skin = function (rarity)
 	local item_rarity = rarity
 	local weight = WeaponSkins.skin_weights[item_rarity]
@@ -5221,6 +5223,7 @@ WeaponSkins.will_have_skin = function (rarity)
 
 	return rand < weight
 end
+
 WeaponSkins.is_matching_skin = function (weapon_name, skin_name)
 	local item_data = ItemMasterList[weapon_name]
 	local skin_combination_table = item_data.skin_combination_table
@@ -5234,6 +5237,7 @@ WeaponSkins.is_matching_skin = function (weapon_name, skin_name)
 
 	return false
 end
+
 WeaponSkins.debug_skin_names = function ()
 	local skins = WeaponSkins.skins
 
@@ -5244,9 +5248,8 @@ WeaponSkins.debug_skin_names = function ()
 		print(Localize(display_name))
 		print(Localize(description))
 	end
-
-	return 
 end
+
 WeaponSkins.debug_verify_skins = function ()
 	local function skin_contains_key(name, skin, key)
 		if not skin[key] then
@@ -5418,8 +5421,6 @@ WeaponSkins.debug_verify_skins = function ()
 	if found_issues and crash_on_found_issues then
 		ferror("Found issues with weapon skins!")
 	end
-
-	return 
 end
 
-return 
+return

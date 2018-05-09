@@ -6,6 +6,7 @@ local animation_definitions = definitions.animations
 local survival_start_wave_by_difficulty = SurvivalStartWaveByDifficulty
 DifficultyUnlockUI = class(DifficultyUnlockUI)
 local DO_RELOAD = false
+
 DifficultyUnlockUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -20,9 +21,8 @@ DifficultyUnlockUI.init = function (self, ingame_ui_context)
 	self.difficulty_set(self)
 	Managers.state.event:register(self, "difficulty_synced", "difficulty_set")
 	rawset(_G, "difficulty_unlock_ui", self)
-
-	return 
 end
+
 DifficultyUnlockUI.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widget_definitions = definitions.widget_definitions
@@ -45,9 +45,8 @@ DifficultyUnlockUI.create_ui_elements = function (self)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
 	self.is_visible = true
-
-	return 
 end
+
 DifficultyUnlockUI.difficulty_set = function (self)
 	local statistics_db = self.statistics_db
 	local player = Managers.player:local_player()
@@ -80,9 +79,8 @@ DifficultyUnlockUI.difficulty_set = function (self)
 		self.persentation_wave_list = persentation_wave_list
 		self.persentation_wave_difficulty_list = persentation_wave_difficulty_list
 	end
-
-	return 
 end
+
 DifficultyUnlockUI.align_icon_widgets = function (self)
 	local icon_draw_count = self.icon_draw_count
 	local icon_widgets = self.icon_widgets
@@ -103,17 +101,15 @@ DifficultyUnlockUI.align_icon_widgets = function (self)
 			widget.element.dirty = true
 		end
 	end
-
-	return 
 end
+
 DifficultyUnlockUI.destroy = function (self)
 	self.ui_animator = nil
 
 	self.set_visible(self, false)
 	rawset(_G, "difficulty_unlock_ui", nil)
-
-	return 
 end
+
 DifficultyUnlockUI.set_visible = function (self, visible)
 	self.is_visible = visible
 	local ui_renderer = self.ui_renderer
@@ -124,15 +120,14 @@ DifficultyUnlockUI.set_visible = function (self, visible)
 			UIRenderer.set_element_visible(ui_renderer, widget.element, visible)
 		end
 	end
-
-	return 
 end
+
 DifficultyUnlockUI._check_for_presentation_start = function (self, mission_data)
 	local previous_wave_completed = self.previous_wave_completed or 0
 	local wave_completed = mission_data.wave_completed - mission_data.starting_wave
 
 	if wave_completed <= previous_wave_completed then
-		return 
+		return
 	end
 
 	local next_presentation_wave = self.next_presentation_wave
@@ -149,9 +144,8 @@ DifficultyUnlockUI._check_for_presentation_start = function (self, mission_data)
 	end
 
 	self.previous_wave_completed = wave_completed
-
-	return 
 end
+
 DifficultyUnlockUI._update_start_timer = function (self, dt)
 	local time = self.presentation_start_time
 
@@ -169,9 +163,8 @@ DifficultyUnlockUI._update_start_timer = function (self, dt)
 
 		self.presentation_start_time = time
 	end
-
-	return 
 end
+
 DifficultyUnlockUI.update = function (self, dt, mission_data)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -186,7 +179,7 @@ DifficultyUnlockUI.update = function (self, dt, mission_data)
 	self._update_start_timer(self, dt)
 
 	if not self.is_visible or not self.draw_widgets then
-		return 
+		return
 	end
 
 	local is_dirty = nil
@@ -255,9 +248,8 @@ DifficultyUnlockUI.update = function (self, dt, mission_data)
 	end
 
 	self.draw(self, dt)
-
-	return 
 end
+
 DifficultyUnlockUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -286,16 +278,14 @@ DifficultyUnlockUI.draw = function (self, dt)
 	UIRenderer.draw_widget(ui_renderer, self.difficulty_text_widget)
 	UIRenderer.draw_widget(ui_renderer, self.difficulty_title_text_widget)
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 DifficultyUnlockUI.set_difficulty_amount = function (self, amount)
 	self.icon_draw_count = amount
 
 	self.align_icon_widgets(self)
-
-	return 
 end
+
 DifficultyUnlockUI.display_unlock = function (self, level_key, difficulty)
 	local difficulty_settings = DifficultySettings[difficulty]
 	local rank = difficulty_settings.rank
@@ -306,14 +296,12 @@ DifficultyUnlockUI.display_unlock = function (self, level_key, difficulty)
 	self.start_presentation_animation(self)
 
 	self.draw_widgets = true
-
-	return 
 end
+
 DifficultyUnlockUI.on_presentation_complete = function (self)
 	self.draw_widgets = false
-
-	return 
 end
+
 DifficultyUnlockUI.start_presentation_animation = function (self)
 	local params = {
 		wwise_world = self.wwise_world
@@ -335,9 +323,8 @@ DifficultyUnlockUI.start_presentation_animation = function (self)
 	widgets.difficulty_text = self.difficulty_text_widget
 	widgets.difficulty_title_text = self.difficulty_title_text_widget
 	self.presentation_anim_id = self.ui_animator:start_animation("presentation", widgets, scenegraph_definition, params)
-
-	return 
 end
+
 DifficultyUnlockUI.start_explode_animation = function (self)
 	local params = {
 		wwise_world = self.wwise_world
@@ -360,8 +347,6 @@ DifficultyUnlockUI.start_explode_animation = function (self)
 	widgets.difficulty_title_text = self.difficulty_title_text_widget
 	local animation_name = (icon_draw_count == 4 and "explode_parts_4") or "explode_parts_5"
 	self.explode_anim_id = self.ui_animator:start_animation(animation_name, widgets, scenegraph_definition, params)
-
-	return 
 end
 
-return 
+return

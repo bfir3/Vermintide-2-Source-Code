@@ -78,8 +78,6 @@ function populate_player_data_from_save(save_data, id, version_match)
 	if input_manager then
 		input_manager.apply_saved_keymaps(input_manager)
 	end
-
-	return 
 end
 
-return 
+return

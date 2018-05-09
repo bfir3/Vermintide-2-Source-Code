@@ -11,6 +11,7 @@ local extensions = {
 	"PingTargetExtension"
 }
 PingSystem = class(PingSystem, ExtensionSystemBase)
+
 PingSystem.init = function (self, context, system_name)
 	PingSystem.super.init(self, context, system_name, extensions)
 
@@ -23,14 +24,12 @@ PingSystem.init = function (self, context, system_name)
 	self._world = context.world
 	self._wwise_world = Managers.world:wwise_world(self._world)
 	self._pinged_units = {}
-
-	return 
 end
+
 PingSystem.destroy = function (self)
 	self._network_event_delegate:unregister(self)
-
-	return 
 end
+
 PingSystem.update = function (self, context, t)
 	PingSystem.super.update(self, context, t)
 
@@ -53,15 +52,14 @@ PingSystem.update = function (self, context, t)
 			self.remove_ping(self, pinger_unit)
 		end
 	end
-
-	return 
 end
+
 PingSystem.rpc_ping_unit = function (self, sender, pinger_unit_id, pinged_unit_id)
 	local pinger_unit = self._unit_storage:unit(pinger_unit_id)
 	local pinged_unit = self._unit_storage:unit(pinged_unit_id)
 
 	if not Unit.alive(pinged_unit) then
-		return 
+		return
 	end
 
 	if self.is_server then
@@ -80,14 +78,13 @@ PingSystem.rpc_ping_unit = function (self, sender, pinger_unit_id, pinged_unit_i
 	end
 
 	self.add_ping(self, pinger_unit, pinged_unit)
-
-	return 
 end
+
 PingSystem.rpc_remove_unit_ping = function (self, sender, pinged_unit_id)
 	local pinged_unit = self._unit_storage:unit(pinged_unit_id)
 
 	if not Unit.alive(pinged_unit) then
-		return 
+		return
 	end
 
 	local ping_extension = ScriptUnit.extension(pinged_unit, "ping_system")
@@ -95,9 +92,8 @@ PingSystem.rpc_remove_unit_ping = function (self, sender, pinged_unit_id)
 	if ping_extension.set_pinged then
 		ping_extension.set_pinged(ping_extension, false)
 	end
-
-	return 
 end
+
 PingSystem.add_ping = function (self, pinger_unit, pinged_unit)
 	local ping_extension = ScriptUnit.extension(pinged_unit, "ping_system")
 
@@ -118,20 +114,18 @@ PingSystem.add_ping = function (self, pinger_unit, pinged_unit)
 	if breed and breed.boss then
 		Managers.state.event:trigger("show_boss_health_bar", pinged_unit)
 	end
-
-	return 
 end
+
 PingSystem.remove_ping_from_unit = function (self, target_unit)
 	for pinger_unit, target in pairs(self._pinged_units) do
 		if target_unit == target.pinged_unit then
 			self.remove_ping(self, pinger_unit)
 
-			return 
+			return
 		end
 	end
-
-	return 
 end
+
 PingSystem.remove_ping = function (self, pinger_unit)
 	fassert(self.is_server, "only the server should remove pings")
 
@@ -151,9 +145,8 @@ PingSystem.remove_ping = function (self, pinger_unit)
 			ping_extension.set_pinged(ping_extension, false)
 		end
 	end
-
-	return 
 end
+
 PingSystem.play_ping_vo = function (self, pinger_unit, pinged_unit)
 	local event_data = FrameTable.alloc_table()
 	local dialogue_input = ScriptUnit.extension_input(pinger_unit, "dialogue_system")
@@ -184,9 +177,8 @@ PingSystem.play_ping_vo = function (self, pinger_unit, pinged_unit)
 		dialogue_input.trigger_networked_dialogue_event(dialogue_input, "seen_item", event_data)
 	elseif ScriptUnit.has_extension(pinged_unit, "interactable_system") then
 	end
-
-	return 
 end
+
 PingSystem.hot_join_sync = function (self, sender)
 	local pinged_units = self._pinged_units
 	local network_manager = Managers.state.network
@@ -199,8 +191,6 @@ PingSystem.hot_join_sync = function (self, sender)
 			RPC.rpc_ping_unit(sender, pinger_unit_id, pinged_unit_id)
 		end
 	end
-
-	return 
 end
 
-return 
+return

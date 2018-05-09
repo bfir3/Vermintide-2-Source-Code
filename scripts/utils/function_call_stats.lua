@@ -31,8 +31,6 @@ local function on_function_call(event)
 
 		CALL_DATA[index].num = CALL_DATA[index].num + 1
 	end
-
-	return 
 end
 
 local function compare(e1, e2)
@@ -41,8 +39,6 @@ end
 
 function start_function_call_collection()
 	debug.sethook(on_function_call, "c")
-
-	return 
 end
 
 function end_function_call_collection()
@@ -65,8 +61,6 @@ function end_function_call_collection()
 		COUNTER = 0
 		CALL_DATA = {}
 	end
-
-	return 
 end
 
-return 
+return

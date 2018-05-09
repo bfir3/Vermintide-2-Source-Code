@@ -3,12 +3,13 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 BTGreySeerGroundCombatAction = class(BTGreySeerGroundCombatAction, BTNode)
 local PLAYER_POSITIONS = PLAYER_POSITIONS
 local PLAYER_UNITS = PLAYER_UNITS
+
 BTGreySeerGroundCombatAction.init = function (self, ...)
 	BTGreySeerGroundCombatAction.super.init(self, ...)
-
-	return 
 end
+
 BTGreySeerGroundCombatAction.name = "BTGreySeerGroundCombatAction"
+
 BTGreySeerGroundCombatAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -35,17 +36,16 @@ BTGreySeerGroundCombatAction.enter = function (self, unit, blackboard, t)
 	final_phase_data.num_teleports = final_phase_data.num_teleports or 1
 	final_phase_data.spawn_allies_timer = final_phase_data.spawn_allies_timer or t + 3
 	final_phase_data.teleport_timer = final_phase_data.teleport_timer or t
-
-	return 
 end
+
 BTGreySeerGroundCombatAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
 
 	blackboard.navigation_extension:set_enabled(true)
-
-	return 
 end
+
 local Unit_alive = Unit.alive
+
 BTGreySeerGroundCombatAction.run = function (self, unit, blackboard, t, dt)
 	local ready_to_cast = self.update_spells(self, unit, blackboard, t)
 
@@ -56,9 +56,8 @@ BTGreySeerGroundCombatAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "running"
 	end
-
-	return 
 end
+
 BTGreySeerGroundCombatAction.update_spells = function (self, unit, blackboard, t)
 	local current_phase = blackboard.current_phase
 	local ready_to_summon = false
@@ -76,6 +75,7 @@ BTGreySeerGroundCombatAction.update_spells = function (self, unit, blackboard, t
 
 	return ready_to_summon
 end
+
 BTGreySeerGroundCombatAction.update_final_phase = function (self, unit, blackboard, t)
 	local action = blackboard.action
 	local ready_to_summon = nil
@@ -125,6 +125,7 @@ BTGreySeerGroundCombatAction.update_final_phase = function (self, unit, blackboa
 
 	return ready_to_summon
 end
+
 BTGreySeerGroundCombatAction.update_regular_spells = function (self, unit, blackboard, t)
 	local spell_data = blackboard.spell_data
 	local ready_to_summon = nil
@@ -152,6 +153,7 @@ BTGreySeerGroundCombatAction.update_regular_spells = function (self, unit, black
 
 	return ready_to_summon
 end
+
 BTGreySeerGroundCombatAction.update_warp_lightning_spell = function (self, unit, blackboard, t, position, target_unit_direction)
 	local magic_missile_spell = blackboard.magic_missile_data
 
@@ -160,9 +162,8 @@ BTGreySeerGroundCombatAction.update_warp_lightning_spell = function (self, unit,
 	if target_unit_direction then
 		magic_missile_spell.target_direction:store(target_unit_direction)
 	end
-
-	return 
 end
+
 BTGreySeerGroundCombatAction.update_vermintide_spell = function (self, unit, blackboard, t, position, target_unit_direction)
 	local plague_wave_spell = blackboard.plague_wave_data
 
@@ -171,9 +172,8 @@ BTGreySeerGroundCombatAction.update_vermintide_spell = function (self, unit, bla
 	if target_unit_direction then
 		plague_wave_spell.plague_wave_rot:store(Quaternion.look(target_unit_direction))
 	end
-
-	return 
 end
+
 BTGreySeerGroundCombatAction.update_teleport_spell = function (self, unit, blackboard, t, position)
 	local quick_teleport_timer = blackboard.quick_teleport_timer or t
 	blackboard.quick_teleport_timer = quick_teleport_timer
@@ -192,9 +192,8 @@ BTGreySeerGroundCombatAction.update_teleport_spell = function (self, unit, black
 			blackboard.quick_teleport_timer = t + 2.5
 		end
 	end
-
-	return 
 end
+
 BTGreySeerGroundCombatAction.spawn_allies = function (self, unit, blackboard, t)
 	local difficulty = Managers.state.difficulty:get_difficulty()
 	local action = blackboard.action
@@ -206,8 +205,6 @@ BTGreySeerGroundCombatAction.spawn_allies = function (self, unit, blackboard, t)
 	local conflict_director = Managers.state.conflict
 
 	conflict_director.horde_spawner:execute_event_horde(t, terror_event_id, composition_type, limit_spawners, silent, nil, strictly_not_close_to_players)
-
-	return 
 end
 
-return 
+return

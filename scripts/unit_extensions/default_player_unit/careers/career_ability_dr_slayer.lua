@@ -38,9 +38,8 @@ CareerAbilityDRSlayer.init = function (self, extension_init_context, unit, exten
 	self._effect_id = nil
 	self._is_priming = false
 	self._last_valid_landing_position = nil
-
-	return 
 end
+
 CareerAbilityDRSlayer.extensions_ready = function (self, world, unit)
 	self._first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
 	self._status_extension = ScriptUnit.extension(unit, "status_system")
@@ -52,22 +51,22 @@ CareerAbilityDRSlayer.extensions_ready = function (self, world, unit)
 	if self._first_person_extension then
 		self._first_person_unit = self._first_person_extension:get_first_person_unit()
 	end
+end
 
-	return 
-end
 CareerAbilityDRSlayer.destroy = function (self)
-	return 
+	return
 end
+
 CareerAbilityDRSlayer.update = function (self, unit, input, dt, context, t)
 	local input_extension = self._input_extension
 
 	if not input_extension then
-		return 
+		return
 	end
 
 	if not self._is_priming then
 		if not self._ability_available(self) then
-			return 
+			return
 		end
 
 		if input_extension.get(input_extension, "action_career") then
@@ -79,7 +78,7 @@ CareerAbilityDRSlayer.update = function (self, unit, input, dt, context, t)
 		if input_extension.get(input_extension, "action_two") or input_extension.get(input_extension, "jump") or input_extension.get(input_extension, "jump_only") then
 			self._stop_priming(self)
 
-			return 
+			return
 		end
 
 		if landing_position then
@@ -90,9 +89,8 @@ CareerAbilityDRSlayer.update = function (self, unit, input, dt, context, t)
 			self._run_ability(self)
 		end
 	end
-
-	return 
 end
+
 CareerAbilityDRSlayer._ability_available = function (self)
 	local career_extension = self._career_extension
 	local status_extension = self._status_extension
@@ -100,6 +98,7 @@ CareerAbilityDRSlayer._ability_available = function (self)
 
 	return career_extension.can_use_activated_ability(career_extension) and not status_extension.is_disabled(status_extension) and locomotion_extension.is_on_ground(locomotion_extension)
 end
+
 CareerAbilityDRSlayer._start_priming = function (self)
 	if self._local_player then
 		local world = self._world
@@ -108,9 +107,8 @@ CareerAbilityDRSlayer._start_priming = function (self)
 	end
 
 	self._is_priming = true
-
-	return 
 end
+
 CareerAbilityDRSlayer._update_priming = function (self)
 	local effect_id = self._effect_id
 	local owner_unit = self._owner_unit
@@ -161,6 +159,7 @@ CareerAbilityDRSlayer._update_priming = function (self)
 
 	return landing_position
 end
+
 CareerAbilityDRSlayer._stop_priming = function (self)
 	if self._effect_id then
 		World.destroy_particles(self._world, self._effect_id)
@@ -169,14 +168,13 @@ CareerAbilityDRSlayer._stop_priming = function (self)
 	end
 
 	self._is_priming = false
-
-	return 
 end
+
 CareerAbilityDRSlayer._run_ability = function (self)
 	self._stop_priming(self)
 
 	if not self._locomotion_extension:is_on_ground() then
-		return 
+		return
 	end
 
 	local world = self._world
@@ -263,24 +261,19 @@ CareerAbilityDRSlayer._run_ability = function (self)
 
 			area_damage_system.create_explosion(area_damage_system, owner_unit, position, rotation, explosion_template, scale, "career_ability", career_power_level)
 			ScriptUnit.extension(owner_unit, "status_system"):set_noclip(false)
-
-			return 
 		end
 	}
 
 	career_extension.start_activated_ability_cooldown(career_extension)
 	self._play_vo(self)
-
-	return 
 end
+
 CareerAbilityDRSlayer._play_vo = function (self)
 	local owner_unit = self._owner_unit
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
-
-	return 
 end
 
-return 
+return

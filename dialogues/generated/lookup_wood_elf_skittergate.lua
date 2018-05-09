@@ -77,4 +77,4 @@ DialogueLookup[DialogueLookup_n + 37] = "pwe_level_skittergate_dead_seer"
 DialogueLookup[DialogueLookup_n + 38] = "pwe_level_skittergate_activate_gate_01a"
 DialogueLookup_n = DialogueLookup_n + 38
 
-return 
+return

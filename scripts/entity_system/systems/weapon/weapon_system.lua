@@ -22,6 +22,7 @@ local extensions = {
 	"WeaponUnitExtension",
 	"AiWeaponUnitExtension"
 }
+
 WeaponSystem.init = function (self, entity_system_creation_context, system_name)
 	WeaponSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -36,9 +37,8 @@ WeaponSystem.init = function (self, entity_system_creation_context, system_name)
 	self.beam_particle_effects = {}
 	self.geiser_particle_effects = {}
 	self.flamethrower_particle_effects = {}
-
-	return 
 end
+
 WeaponSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	extension_init_data.weapon_system = self
 	local extension = WeaponSystem.super.on_add_extension(self, world, unit, extension_name, extension_init_data)
@@ -46,19 +46,19 @@ WeaponSystem.on_add_extension = function (self, world, unit, extension_name, ext
 
 	return extension
 end
+
 WeaponSystem.rpc_alert_enemy = function (self, sender, enemy_unit_id, player_unit_id)
 	local unit = self.unit_storage:unit(enemy_unit_id)
 
 	if not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local player_unit = self.unit_storage:unit(player_unit_id)
 
 	AiUtils.alert_unit_of_enemy(unit, player_unit)
-
-	return 
 end
+
 local ARGS = {
 	{
 		default = 0,
@@ -107,6 +107,7 @@ for i = 1, #ARGS, 1 do
 end
 
 local RPC_ATTACK_HIT_TEMP = {}
+
 WeaponSystem.send_rpc_attack_hit = function (self, damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, ...)
 	table.clear(RPC_ATTACK_HIT_TEMP)
 
@@ -144,20 +145,20 @@ WeaponSystem.send_rpc_attack_hit = function (self, damage_source_id, attacker_un
 			end
 		end
 	end
-
-	return 
 end
+
 local BLACKBOARDS = BLACKBOARDS
+
 WeaponSystem.rpc_attack_hit = function (self, sender, damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, power_level, target_index, boost_curve_multiplier, is_critical_strike, can_damage, can_stagger, hit_ragdoll_actor_id, blocking, shield_break_procced, backstab_multiplier)
 	local hit_unit = self.unit_storage:unit(hit_unit_id)
 	local attacker_unit = self.unit_storage:unit(attacker_unit_id)
 
 	if not Unit.alive(hit_unit) or not Unit.alive(attacker_unit) then
-		return 
+		return
 	end
 
 	if global_is_inside_inn and table.contains(PLAYER_AND_BOT_UNITS, hit_unit) and table.contains(PLAYER_AND_BOT_UNITS, attacker_unit) then
-		return 
+		return
 	end
 
 	local damage_source = NetworkLookup.damage_sources[damage_source_id]
@@ -200,9 +201,8 @@ WeaponSystem.rpc_attack_hit = function (self, sender, damage_source_id, attacker
 	local t = self.t
 
 	DamageUtils.server_apply_hit(t, attacker_unit, hit_unit, hit_zone_name or "full", attack_direction, hit_ragdoll_actor, damage_source, power_level, damage_profile, target_index, boost_curve_multiplier, is_critical_strike, can_damage, can_stagger, blocking, shield_breaking_hit, backstab_multiplier)
-
-	return 
 end
+
 WeaponSystem.destroy = function (self)
 	local world = self.world
 
@@ -214,9 +214,8 @@ WeaponSystem.destroy = function (self)
 	self.beam_particle_effects = nil
 
 	self.network_event_delegate:unregister(self)
-
-	return 
 end
+
 WeaponSystem.update = function (self, context, t)
 	WeaponSystem.super.update(self, context, t)
 
@@ -225,13 +224,13 @@ WeaponSystem.update = function (self, context, t)
 	self.update_synced_beam_particle_effects(self)
 	self.update_synced_geiser_particle_effects(self, context, t)
 	self.update_synced_flamethrower_particle_effects(self)
-
-	return 
 end
+
 local INDEX_POSITION = 1
 local INDEX_DISTANCE = 2
 local INDEX_NORMAL = 3
 local INDEX_ACTOR = 4
+
 WeaponSystem.update_synced_beam_particle_effects = function (self)
 	local game = self.game
 	local network_manager = self.network_manager
@@ -284,8 +283,6 @@ WeaponSystem.update_synced_beam_particle_effects = function (self)
 			World.set_particles_variable(world, data.beam_effect, data.beam_effect_length_id, Vector3(0.3, distance, 0))
 		end
 	end
-
-	return 
 end
 
 local function ballistic_raycast(physics_world, max_steps, max_time, position, velocity, gravity, collision_filter, visualize)
@@ -342,9 +339,8 @@ WeaponSystem.update_synced_geiser_particle_effects = function (self, context, t)
 			World.set_particles_variable(world, data.geiser_effect, data.geiser_effect_variable, Vector3(radius * 2, radius * 2, 1))
 		end
 	end
-
-	return 
 end
+
 WeaponSystem.update_synced_flamethrower_particle_effects = function (self)
 	local game = self.game
 	local network_manager = self.network_manager
@@ -366,9 +362,8 @@ WeaponSystem.update_synced_flamethrower_particle_effects = function (self)
 			World.move_particles(world, data.flamethrower_effect, muzzle_position, muzzle_rotation)
 		end
 	end
-
-	return 
 end
+
 WeaponSystem._update_debug = function (self)
 	if script_data.player_mechanics_goodness_debug and not DEDICATED_SERVER then
 		local player = Managers.player:player_from_peer_id(Network.peer_id())
@@ -421,14 +416,13 @@ WeaponSystem._update_debug = function (self)
 
 		drawer.reset(drawer)
 	end
-
-	return 
 end
+
 WeaponSystem.rpc_ai_weapon_shoot_start = function (self, sender, owner_unit_id, shoot_time)
 	local owner_unit = Managers.state.unit_storage:unit(owner_unit_id)
 
 	if not owner_unit then
-		return 
+		return
 	end
 
 	local breed = Unit.get_data(owner_unit, "breed")
@@ -438,14 +432,13 @@ WeaponSystem.rpc_ai_weapon_shoot_start = function (self, sender, owner_unit_id, 
 	local ai_weapon_extension = ScriptUnit.extension(weapon_unit, "weapon_system")
 
 	ai_weapon_extension.shoot_start(ai_weapon_extension, owner_unit, shoot_time / 100)
-
-	return 
 end
+
 WeaponSystem.rpc_ai_weapon_shoot = function (self, sender, owner_unit_id)
 	local owner_unit = Managers.state.unit_storage:unit(owner_unit_id)
 
 	if not owner_unit then
-		return 
+		return
 	end
 
 	local breed = Unit.get_data(owner_unit, "breed")
@@ -455,14 +448,13 @@ WeaponSystem.rpc_ai_weapon_shoot = function (self, sender, owner_unit_id)
 	local ai_weapon_extension = ScriptUnit.extension(weapon_unit, "weapon_system")
 
 	ai_weapon_extension.shoot(ai_weapon_extension, owner_unit)
-
-	return 
 end
+
 WeaponSystem.rpc_ai_weapon_shoot_end = function (self, sender, owner_unit_id)
 	local owner_unit = Managers.state.unit_storage:unit(owner_unit_id)
 
 	if not owner_unit then
-		return 
+		return
 	end
 
 	local breed = Unit.get_data(owner_unit, "breed")
@@ -472,9 +464,8 @@ WeaponSystem.rpc_ai_weapon_shoot_end = function (self, sender, owner_unit_id)
 	local ai_weapon_extension = ScriptUnit.extension(weapon_unit, "weapon_system")
 
 	ai_weapon_extension.shoot_end(ai_weapon_extension, owner_unit)
-
-	return 
 end
+
 WeaponSystem.rpc_start_beam = function (self, sender, unit_id, beam_effect_id, beam_end_effect_id, range)
 	if not LEVEL_EDITOR_TEST then
 		local unit = self.unit_storage:unit(unit_id)
@@ -498,9 +489,8 @@ WeaponSystem.rpc_start_beam = function (self, sender, unit_id, beam_effect_id, b
 			self.network_transmit:send_rpc_clients_except("rpc_start_beam", sender, unit_id, beam_effect_id, beam_end_effect_id, range)
 		end
 	end
-
-	return 
 end
+
 WeaponSystem.rpc_end_beam = function (self, sender, unit_id)
 	if not LEVEL_EDITOR_TEST then
 		local world = self.world
@@ -518,9 +508,8 @@ WeaponSystem.rpc_end_beam = function (self, sender, unit_id)
 			end
 		end
 	end
-
-	return 
 end
+
 WeaponSystem.rpc_start_geiser = function (self, sender, unit_id, geiser_effect_id, min_radius, max_radius, charge_time, angle)
 	if not LEVEL_EDITOR_TEST then
 		if self.is_server then
@@ -542,9 +531,8 @@ WeaponSystem.rpc_start_geiser = function (self, sender, unit_id, geiser_effect_i
 			start_time = Managers.time:time("game")
 		}
 	end
-
-	return 
 end
+
 WeaponSystem.rpc_end_geiser = function (self, sender, unit_id)
 	if not LEVEL_EDITOR_TEST then
 		local world = self.world
@@ -561,9 +549,8 @@ WeaponSystem.rpc_end_geiser = function (self, sender, unit_id)
 			end
 		end
 	end
-
-	return 
 end
+
 WeaponSystem.rpc_start_flamethrower = function (self, sender, unit_id, flamethrower_effect_id)
 	if not LEVEL_EDITOR_TEST then
 		local unit = self.unit_storage:unit(unit_id)
@@ -584,9 +571,8 @@ WeaponSystem.rpc_start_flamethrower = function (self, sender, unit_id, flamethro
 			self.network_transmit:send_rpc_clients_except("rpc_start_flamethrower", sender, unit_id, flamethrower_effect_id)
 		end
 	end
-
-	return 
 end
+
 WeaponSystem.rpc_end_flamethrower = function (self, sender, unit_id)
 	if not LEVEL_EDITOR_TEST then
 		local world = self.world
@@ -603,15 +589,14 @@ WeaponSystem.rpc_end_flamethrower = function (self, sender, unit_id)
 			end
 		end
 	end
-
-	return 
 end
+
 WeaponSystem.rpc_weapon_blood = function (self, sender, attacker_unit_id, attack_template_damage_type_id)
 	local world = self.world
 	local attacker_unit = self.unit_storage:unit(attacker_unit_id)
 
 	if not Unit.alive(attacker_unit) then
-		return 
+		return
 	end
 
 	Managers.state.blood:add_weapon_blood(attacker_unit, NetworkLookup.attack_templates[attack_template_damage_type_id])
@@ -619,9 +604,8 @@ WeaponSystem.rpc_weapon_blood = function (self, sender, attacker_unit_id, attack
 	if self.is_server then
 		self.network_transmit:send_rpc_clients_except("rpc_weapon_blood", sender, attacker_unit_id, attack_template_damage_type_id)
 	end
-
-	return 
 end
+
 WeaponSystem.rpc_play_fx = function (self, sender, vfx_array, sfx_array, position_array)
 	local world = self.world
 	local World_create_particles = World.create_particles
@@ -654,9 +638,8 @@ WeaponSystem.rpc_play_fx = function (self, sender, vfx_array, sfx_array, positio
 			World_create_particles(world, vfx, position_array[i])
 		end
 	end
-
-	return 
 end
+
 WeaponSystem.hot_join_sync = function (self, sender)
 	for unit, data in pairs(self.beam_particle_effects) do
 		local unit_id = Managers.state.network:unit_game_object_id(unit)
@@ -677,8 +660,6 @@ WeaponSystem.hot_join_sync = function (self, sender)
 
 		RPC.rpc_start_geiser(sender, unit_id, geiser_effect_id, min_radius, max_radius, charge_time, angle, time_to_shoot)
 	end
-
-	return 
 end
 
-return 
+return

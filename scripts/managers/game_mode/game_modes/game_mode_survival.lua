@@ -4,14 +4,14 @@ script_data.disable_gamemode_end = script_data.disable_gamemode_end or Developme
 GameModeSurvival = class(GameModeSurvival, GameModeBase)
 local COMPLETE_LEVEL_VAR = false
 local FAIL_LEVEL_VAR = false
+
 GameModeSurvival.init = function (self, settings, world, ...)
 	GameModeSurvival.super.init(self, settings, world, ...)
 
 	self.about_to_lose = false
 	self.lost_condition_timer = nil
-
-	return 
 end
+
 GameModeSurvival.evaluate_end_conditions = function (self, round_started, dt, t)
 	if script_data.disable_gamemode_end then
 		return false
@@ -81,20 +81,14 @@ GameModeSurvival.evaluate_end_conditions = function (self, round_started, dt, t)
 	else
 		return false
 	end
-
-	return 
 end
 
 function COMPLETE_LEVEL()
 	COMPLETE_LEVEL_VAR = true
-
-	return 
 end
 
 function FAIL_LEVEL()
 	FAIL_LEVEL_VAR = true
-
-	return 
 end
 
-return 
+return

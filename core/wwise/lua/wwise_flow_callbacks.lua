@@ -31,7 +31,7 @@ M.wwise_load_bank = function (t)
 	local name = t.Name or t.name or ""
 
 	if name == "" then
-		return 
+		return
 	end
 
 	Wwise.load_bank(name)
@@ -41,9 +41,8 @@ M.wwise_load_bank = function (t)
 	if use_ref_count and use_ref_count == true then
 		WwiseBankReference:add(name)
 	end
-
-	return 
 end
+
 M.wwise_unit_load_bank = function (t)
 	local name = t.Name or t.name or ""
 	local unit = t.Unit or t.unit
@@ -63,9 +62,8 @@ M.wwise_unit_load_bank = function (t)
 			end
 		end
 	end
-
-	return 
 end
+
 M.wwise_unload_bank = function (t)
 	local name = t.Name or t.name or ""
 
@@ -77,7 +75,7 @@ M.wwise_unload_bank = function (t)
 		end
 
 		if name == nil or name == "" then
-			return 
+			return
 		end
 	end
 
@@ -92,21 +90,19 @@ M.wwise_unload_bank = function (t)
 	else
 		Wwise.unload_bank(name)
 	end
-
-	return 
 end
+
 M.wwise_set_language = function (t)
 	local name = t.Name or t.name or ""
 
 	Wwise.set_language(name)
-
-	return 
 end
+
 M.wwise_set_listener_pose = function (t)
 	local position = t.Position or t.position
 
 	if not position then
-		return 
+		return
 	end
 
 	local listener = listener_map[t.Listener or t.listener]
@@ -115,14 +111,13 @@ M.wwise_set_listener_pose = function (t)
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.set_listener(wwise_world, listener, pose)
-
-	return 
 end
+
 M.wwise_move_listener_to_unit = function (t)
 	local unit = t.Unit or t.unit
 
 	if not unit then
-		return 
+		return
 	end
 
 	local listener = listener_map[t.Listener or t.listener]
@@ -136,9 +131,8 @@ M.wwise_move_listener_to_unit = function (t)
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.set_listener(wwise_world, listener, pose)
-
-	return 
 end
+
 M.wwise_trigger_event = function (t)
 	local name = t.Name or t.name or ""
 	local unit = t.Unit or t.unit
@@ -211,6 +205,7 @@ M.wwise_make_auto_source = function (t)
 		Source_Id = id
 	}
 end
+
 M.wwise_make_manual_source = function (t)
 	local id = make_source(t, WwiseWorld.make_manual_source)
 
@@ -219,47 +214,43 @@ M.wwise_make_manual_source = function (t)
 		Source_Id = id
 	}
 end
+
 M.wwise_destroy_manual_source = function (t)
 	local id = t.Source_Id or t.source_id
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.destroy_manual_source(wwise_world, id)
-
-	return 
 end
+
 M.wwise_stop_event = function (t)
 	local id = t.Playing_Id or t.playing_id
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.stop_event(wwise_world, id)
-
-	return 
 end
+
 M.wwise_pause_event = function (t)
 	local id = t.Playing_Id or t.playing_id
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.pause_event(wwise_world, id)
-
-	return 
 end
+
 M.wwise_resume_event = function (t)
 	local id = t.Playing_Id or t.playing_id
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.resume_event(wwise_world, id)
-
-	return 
 end
+
 M.wwise_set_source_position = function (t)
 	local id = t.Source_Id or t.source_id
 	local val = t.Position or t.position
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.set_source_position(wwise_world, id, val)
-
-	return 
 end
+
 M.wwise_set_source_parameter = function (t)
 	local id = t.Source_Id or t.source_id
 	local name = t.Parameter_Name or t.parameter_name or ""
@@ -267,45 +258,41 @@ M.wwise_set_source_parameter = function (t)
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.set_source_parameter(wwise_world, id, name, val)
-
-	return 
 end
+
 M.wwise_set_global_parameter = function (t)
 	local name = t.Parameter_Name or t.parameter_name or ""
 	local val = t.Value or t.value
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.set_global_parameter(wwise_world, name, val)
-
-	return 
 end
+
 M.wwise_set_state = function (t)
 	local group = t.Group or t.group
 	local state = t.State or t.state
 
 	if not group or not state then
-		return 
+		return
 	end
 
 	Wwise.set_state(group, state)
-
-	return 
 end
+
 M.wwise_set_switch = function (t)
 	local group = t.Group or t.group
 	local state = t.State or t.state
 
 	if not group or not state then
-		return 
+		return
 	end
 
 	local id = t.Source_Id or t.source_id
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.set_switch(wwise_world, group, state, id)
-
-	return 
 end
+
 M.wwise_post_trigger = function (t)
 	local id = t.Source_Id or t.source_id
 	local name = t.Name or t.name
@@ -315,9 +302,8 @@ M.wwise_post_trigger = function (t)
 
 		WwiseWorld.post_trigger(wwise_world, id, name)
 	end
-
-	return 
 end
+
 M.wwise_has_source = function (t)
 	local id = t.Source_Id or t.source_id
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
@@ -333,9 +319,8 @@ M.wwise_has_source = function (t)
 			no = true
 		}
 	end
-
-	return 
 end
+
 M.wwise_is_playing = function (t)
 	local id = t.Playing_Id or t.playing_id
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
@@ -351,9 +336,8 @@ M.wwise_is_playing = function (t)
 			no = true
 		}
 	end
-
-	return 
 end
+
 M.wwise_get_playing_elapsed = function (t)
 	local id = t.Playing_Id or t.playing_id
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
@@ -366,6 +350,7 @@ M.wwise_get_playing_elapsed = function (t)
 		Seconds = seconds
 	}
 end
+
 M.wwise_add_soundscape_source = function (t)
 	local name = t.Name or t.name or ""
 	local unit = t.Unit or t.unit
@@ -398,25 +383,25 @@ M.wwise_add_soundscape_source = function (t)
 		SS_Source_Id = result_id
 	}
 end
+
 M.wwise_remove_soundscape_source = function (t)
 	local id = t.SS_Source_Id or t.ss_source_id
 
 	if not id then
 		print("Error: nil soundscape source id, removing soundscape source failed.")
 
-		return 
+		return
 	end
 
 	if id == -1 then
-		return 
+		return
 	end
 
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.remove_soundscape_source(wwise_world, id)
-
-	return 
 end
+
 M.wwise_set_obstruction_and_occlusion_for_soundscape_source = function (t)
 	local id = t.SS_Source_Id or t.ss_source_id
 	local obstruction = t.Obstruction or t.obstruction or 0
@@ -427,18 +412,16 @@ M.wwise_set_obstruction_and_occlusion_for_soundscape_source = function (t)
 
 		WwiseWorld.set_obstruction_and_occlusion_for_soundscape_source(wwise_world, id, obstruction, occlusion)
 	end
-
-	return 
 end
+
 M.wwise_add_soundscape_render_unit = function (t)
 	local unit = t.Unit or t.unit
 
 	if unit then
 		WwiseVisualization.add_soundscape_unit(unit)
 	end
-
-	return 
 end
+
 M.wwise_set_environment = function (t)
 	local name = t.Aux_Bus or t.aux_bus
 	local value = t.Value or t.value
@@ -448,9 +431,8 @@ M.wwise_set_environment = function (t)
 
 		WwiseWorld.set_environment(wwise_world, name, value)
 	end
-
-	return 
 end
+
 M.wwise_set_dry_environment = function (t)
 	local value = t.Value or t.value
 
@@ -459,16 +441,14 @@ M.wwise_set_dry_environment = function (t)
 
 		WwiseWorld.set_dry_environment(wwise_world, value)
 	end
-
-	return 
 end
+
 M.wwise_reset_environment = function (t)
 	local wwise_world = Wwise.wwise_world(Application.flow_callback_context_world())
 
 	WwiseWorld.reset_environment(wwise_world)
-
-	return 
 end
+
 M.wwise_set_source_environment = function (t)
 	local id = t.Source_Id or t.source_id
 	local name = t.Aux_Bus or t.aux_bus
@@ -479,9 +459,8 @@ M.wwise_set_source_environment = function (t)
 
 		WwiseWorld.set_environment_for_source(wwise_world, id, name, value)
 	end
-
-	return 
 end
+
 M.wwise_set_source_dry_environment = function (t)
 	local id = t.Source_Id or t.source_id
 	local value = t.Value or t.value
@@ -491,9 +470,8 @@ M.wwise_set_source_dry_environment = function (t)
 
 		WwiseWorld.set_dry_environment_for_source(wwise_world, id, value)
 	end
-
-	return 
 end
+
 M.wwise_reset_source_environment = function (t)
 	local id = t.Source_Id or t.source_id
 
@@ -502,9 +480,8 @@ M.wwise_reset_source_environment = function (t)
 
 		WwiseWorld.reset_environment_for_source(wwise_world, id)
 	end
-
-	return 
 end
+
 M.wwise_set_obstruction_and_occlusion = function (t)
 	local id = t.Source_Id or t.source_id
 	local listener = listener_map[t.Listener or t.listener]
@@ -516,16 +493,14 @@ M.wwise_set_obstruction_and_occlusion = function (t)
 
 		WwiseWorld.set_obstruction_and_occlusion(wwise_world, listener, id, obstruction, occlusion)
 	end
-
-	return 
 end
 
 if not Wwise then
 	for k, v in pairs(M) do
 		M[k] = function (t)
-			return 
+			return
 		end
 	end
 end
 
-return 
+return

@@ -5,6 +5,7 @@ local extensions = {
 	"SurroundingObserverHuskExtension"
 }
 SurroundingAwareSystem = class(SurroundingAwareSystem, ExtensionSystemBase)
+
 SurroundingAwareSystem.init = function (self, entity_system_creation_context, system_name)
 	local entity_manager = entity_system_creation_context.entity_manager
 
@@ -29,9 +30,8 @@ SurroundingAwareSystem.init = function (self, entity_system_creation_context, sy
 
 	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
 	GarbageLeakDetector.register_object(self, "surrounding_aware_system")
-
-	return 
 end
+
 SurroundingAwareSystem.destroy = function (self)
 	for unit, ext in pairs(self.unit_extension_data) do
 		Broadphase.remove(self.broadphase, ext.broadphase_id)
@@ -39,9 +39,8 @@ SurroundingAwareSystem.destroy = function (self)
 
 	self.network_event_delegate:unregister(self)
 	table.clear(self)
-
-	return 
 end
+
 SurroundingAwareSystem.add_event = function (unit, event_name, distance, ...)
 	distance = distance or DialogueSettings.default_hear_distance
 	local input = ScriptUnit.extension_input(unit, "surrounding_aware_system")
@@ -57,9 +56,8 @@ SurroundingAwareSystem.add_event = function (unit, event_name, distance, ...)
 	local new_size = event_array_size + num_args + 4
 
 	pdArray.set_size(event_array, new_size)
-
-	return 
 end
+
 SurroundingAwareSystem.add_system_event = function (self, unit, event_name, distance, ...)
 	distance = distance or DialogueSettings.default_hear_distance
 	local event_array = self.event_array
@@ -74,10 +72,10 @@ SurroundingAwareSystem.add_system_event = function (self, unit, event_name, dist
 	local new_size = event_array_size + num_args + 4
 
 	pdArray.set_size(event_array, new_size)
-
-	return 
 end
+
 local dummy_input = {}
+
 SurroundingAwareSystem.on_add_extension = function (self, world, unit, extension_name)
 	local extension = {
 		input = MakeTableStrict({
@@ -107,6 +105,7 @@ SurroundingAwareSystem.on_add_extension = function (self, world, unit, extension
 
 	return extension
 end
+
 SurroundingAwareSystem.extensions_ready = function (self, world, unit, extension_name)
 	if extension_name ~= "SurroundingObserverExtension" then
 		if extension_name == "SurroundingObserverHuskExtension" then
@@ -115,9 +114,8 @@ SurroundingAwareSystem.extensions_ready = function (self, world, unit, extension
 			extension.collision_filter = "filter_lookat_pickup_object_ray"
 		end
 	end
-
-	return 
 end
+
 SurroundingAwareSystem.on_remove_extension = function (self, unit, extension_name)
 	Broadphase.remove(self.broadphase, self.unit_extension_data[unit].broadphase_id)
 
@@ -144,15 +142,12 @@ SurroundingAwareSystem.on_remove_extension = function (self, unit, extension_nam
 	end
 
 	ScriptUnit.remove_extension(unit, "surrounding_aware_system")
-
-	return 
 end
+
 SurroundingAwareSystem.update = function (self, context, t)
 	self.update_seen_recently(self, context, t)
 	self.update_lookat(self, context, t)
 	self.update_events(self, context, t)
-
-	return 
 end
 
 local function check_raycast_center(physics_world, unit, target, ray_position, ray_direction, ray_length, collision_filter)
@@ -199,6 +194,7 @@ local BASE_ANGLE_MULTIPLIER = 10
 local STICKINESS_MODIFIER = -1
 local VIEW_ANGLE_STICKINESS = 1.5
 local found_units = {}
+
 SurroundingAwareSystem.update_lookat = function (self, context, t)
 	local observers = self.observers
 
@@ -211,7 +207,7 @@ SurroundingAwareSystem.update_lookat = function (self, context, t)
 	local unit = self.current_observer_unit
 
 	if game == nil or unit == nil then
-		return 
+		return
 	end
 
 	local POSITION_LOOKUP = POSITION_LOOKUP
@@ -221,7 +217,7 @@ SurroundingAwareSystem.update_lookat = function (self, context, t)
 	local observer_world_pos = POSITION_LOOKUP[unit]
 
 	if not observer_world_pos then
-		return 
+		return
 	end
 
 	Broadphase.move(broadphase, extension.broadphase_id, observer_world_pos)
@@ -229,7 +225,7 @@ SurroundingAwareSystem.update_lookat = function (self, context, t)
 	local time_since_last = t - extension.last_lookat_trigger
 
 	if time_since_last <= DialogueSettings.view_event_trigger_interval then
-		return 
+		return
 	end
 
 	local Unit = Unit
@@ -329,19 +325,18 @@ SurroundingAwareSystem.update_lookat = function (self, context, t)
 
 		seen_observers[unit] = closest_observer_unit
 	end
-
-	return 
 end
+
 SurroundingAwareSystem.update_debug = function (self, context, t)
 	if not script_data.dialogue_debug_lookat then
-		return 
+		return
 	end
 
 	local game = self.game
 	local player = Managers.player:local_player()
 
 	if not player or not player.player_unit or not game then
-		return 
+		return
 	end
 
 	local outside_color = Color(255, 255, 0, 0)
@@ -443,9 +438,8 @@ SurroundingAwareSystem.update_debug = function (self, context, t)
 			drawer.sphere(drawer, target_center, 0.25, (observer_is_bot and Colors.get("blue")) or Colors.get("light_blue"))
 		end
 	end
-
-	return 
 end
+
 SurroundingAwareSystem.update_events = function (self, context, t)
 	local unit_input_data = self.unit_input_data
 	local broadphase = self.broadphase
@@ -508,9 +502,8 @@ SurroundingAwareSystem.update_events = function (self, context, t)
 	end
 
 	pdArray.set_empty(event_array)
-
-	return 
 end
+
 SurroundingAwareSystem.update_seen_recently = function (self, context, t)
 	local seen_recently = self.seen_recently
 	local threshold = DialogueSettings.seen_recently_threshold
@@ -521,11 +514,10 @@ SurroundingAwareSystem.update_seen_recently = function (self, context, t)
 			seen_recently[unit] = nil
 		end
 	end
-
-	return 
 end
+
 SurroundingAwareSystem.hot_join_sync = function (self, sender)
-	return 
+	return
 end
 
-return 
+return

@@ -10,6 +10,7 @@ local DO_RELOAD = false
 local NUM_CRAFT_SLOTS = 1
 CraftPageCraftItem = class(CraftPageCraftItem)
 CraftPageCraftItem.NAME = "CraftPageCraftItem"
+
 CraftPageCraftItem.on_enter = function (self, params, settings)
 	print("[HeroWindowCraft] Enter Substate CraftPageCraftItem")
 
@@ -50,9 +51,8 @@ CraftPageCraftItem.on_enter = function (self, params, settings)
 	self.super_parent:clear_disabled_backend_ids()
 	self.parent:set_input_description(nil)
 	self.setup_recipe_requirements(self)
-
-	return 
 end
+
 CraftPageCraftItem.setup_recipe_requirements = function (self)
 	local settings = self.settings
 	local recipe_name = settings.name
@@ -136,9 +136,8 @@ CraftPageCraftItem.setup_recipe_requirements = function (self)
 	self._has_all_requirements = has_all_requirements and can_use_added_item
 
 	self._set_craft_button_disabled(self, not self._has_all_requirements)
-
-	return 
 end
+
 CraftPageCraftItem.create_recipe_grid_by_amount = function (self, amount)
 	if self._recipe_grid then
 		self._recipe_grid:destroy()
@@ -161,9 +160,8 @@ CraftPageCraftItem.create_recipe_grid_by_amount = function (self, amount)
 	self._recipe_grid = ItemGridUI:new(category_settings, self._widgets_by_name.recipe_grid, self.hero_name, self.career_index)
 
 	self._recipe_grid:disable_item_drag()
-
-	return 
 end
+
 CraftPageCraftItem.create_ui_elements = function (self, params)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -183,9 +181,8 @@ CraftPageCraftItem.create_ui_elements = function (self, params)
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
 
 	self._handle_craft_input_progress(self, 0)
-
-	return 
 end
+
 CraftPageCraftItem.on_exit = function (self, params)
 	print("[HeroWindowCraft] Exit Substate CraftPageCraftItem")
 
@@ -194,9 +191,8 @@ CraftPageCraftItem.on_exit = function (self, params)
 	if self._craft_input_time then
 		self._play_sound(self, "play_gui_craft_forge_button_aborted")
 	end
-
-	return 
 end
+
 CraftPageCraftItem.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -208,12 +204,12 @@ CraftPageCraftItem.update = function (self, dt, t)
 	self._update_animations(self, dt)
 	self._update_craft_items(self)
 	self.draw(self, dt)
+end
 
-	return 
-end
 CraftPageCraftItem.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 CraftPageCraftItem._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -231,9 +227,8 @@ CraftPageCraftItem._update_animations = function (self, dt)
 	local widgets_by_name = self._widgets_by_name
 
 	UIWidgetUtils.animate_default_button(widgets_by_name.craft_button, dt)
-
-	return 
 end
+
 CraftPageCraftItem._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -243,9 +238,8 @@ CraftPageCraftItem._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 CraftPageCraftItem._is_button_hovered = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -253,9 +247,8 @@ CraftPageCraftItem._is_button_hovered = function (self, widget)
 	if hotspot.on_hover_enter then
 		return true
 	end
-
-	return 
 end
+
 CraftPageCraftItem._is_button_held = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -263,14 +256,13 @@ CraftPageCraftItem._is_button_held = function (self, widget)
 	if hotspot.is_clicked then
 		return hotspot.is_clicked
 	end
-
-	return 
 end
+
 CraftPageCraftItem._handle_input = function (self, dt, t)
 	local parent = self.parent
 
 	if parent.waiting_for_craft(parent) or self._craft_result then
-		return 
+		return
 	end
 
 	local widgets_by_name = self._widgets_by_name
@@ -333,9 +325,8 @@ CraftPageCraftItem._handle_input = function (self, dt, t)
 			self._play_sound(self, "play_gui_craft_forge_begin")
 		end
 	end
-
-	return 
 end
+
 CraftPageCraftItem._handle_craft_input_progress = function (self, progress)
 	local has_progress = progress ~= 0
 	local bard_default_width = scenegraph_definition.craft_bar.size[1]
@@ -344,25 +335,22 @@ CraftPageCraftItem._handle_craft_input_progress = function (self, progress)
 	if progress == 1 then
 		return true
 	end
-
-	return 
 end
+
 CraftPageCraftItem.craft_result = function (self, result, error, reset_slots)
 	if not error then
 		self._craft_result = result
 	end
-
-	return 
 end
+
 CraftPageCraftItem.reset = function (self)
 	local item_grid = self._item_grid
 
 	item_grid.clear_locked_items(item_grid)
 	item_grid.update_items_status(item_grid)
 	self._set_craft_button_disabled(self, not self._has_all_requirements)
-
-	return 
 end
+
 CraftPageCraftItem.on_craft_completed = function (self)
 	local result = self._craft_result
 	local item_grid = self._item_grid
@@ -407,9 +395,8 @@ CraftPageCraftItem.on_craft_completed = function (self)
 	self._craft_result = nil
 
 	self.setup_recipe_requirements(self)
-
-	return 
 end
+
 CraftPageCraftItem._update_craft_items = function (self)
 	local super_parent = self.super_parent
 	local item_grid = self._item_grid
@@ -439,9 +426,8 @@ CraftPageCraftItem._update_craft_items = function (self)
 
 		self._remove_craft_item(self, backend_id)
 	end
-
-	return 
 end
+
 CraftPageCraftItem._remove_craft_item = function (self, backend_id, slot_index)
 	local craft_items = self._craft_items
 
@@ -471,9 +457,8 @@ CraftPageCraftItem._remove_craft_item = function (self, backend_id, slot_index)
 
 		self._widgets_by_name.item_grid_random_icon.content.visible = true
 	end
-
-	return 
 end
+
 CraftPageCraftItem._add_craft_item = function (self, backend_id, slot_index, ignore_sound)
 	if self._num_craft_items == 0 then
 		self._item_grid:clear_item_grid()
@@ -508,22 +493,19 @@ CraftPageCraftItem._add_craft_item = function (self, backend_id, slot_index, ign
 
 		self._widgets_by_name.item_grid_random_icon.content.visible = false
 	end
-
-	return 
 end
+
 CraftPageCraftItem._set_craft_button_disabled = function (self, disabled)
 	self._widgets_by_name.craft_button.content.button_hotspot.disable_button = disabled
 
 	self.parent:set_input_description((not disabled and self.settings.name) or nil)
-
-	return 
 end
+
 CraftPageCraftItem._exit = function (self, selected_level)
 	self.exit = true
 	self.exit_level_id = selected_level
-
-	return 
 end
+
 CraftPageCraftItem.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -537,20 +519,16 @@ CraftPageCraftItem.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 CraftPageCraftItem._play_sound = function (self, event)
 	self.super_parent:play_sound(event)
-
-	return 
 end
+
 CraftPageCraftItem._set_craft_button_text = function (self, text, localize)
 	local widgets_by_name = self._widgets_by_name
 	local widget = widgets_by_name.craft_button
 	widget.content.button_text = (localize and Localize(text)) or text
-
-	return 
 end
 
-return 
+return

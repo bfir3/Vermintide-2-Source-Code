@@ -919,4 +919,4 @@ if script_data.honduras_demo then
 	CareerSettings.es_knight.preview_animation = nil
 end
 
-return 
+return

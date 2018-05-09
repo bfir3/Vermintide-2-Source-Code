@@ -1515,4 +1515,4 @@ end
 
 BuffUtils.apply_buff_tweak_data(TalentBuffTemplates.wood_elf, buff_tweak_data)
 
-return 
+return

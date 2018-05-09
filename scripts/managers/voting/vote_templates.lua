@@ -20,7 +20,7 @@ VoteTemplates = {
 			local level_transition_handler = ingame_context.level_transition_handler
 
 			if level_transition_handler.transition_in_progress(level_transition_handler) then
-				return 
+				return
 			end
 
 			if vote_result == 1 then
@@ -29,8 +29,6 @@ VoteTemplates = {
 				level_transition_handler.set_next_level(level_transition_handler, "inn_level")
 				level_transition_handler.level_completed(level_transition_handler)
 			end
-
-			return 
 		end,
 		pack_sync_data = function (data)
 			local sync_data = {}
@@ -60,13 +58,11 @@ VoteTemplates = {
 			local level_transition_handler = ingame_context.level_transition_handler
 
 			if level_transition_handler.transition_in_progress(level_transition_handler) then
-				return 
+				return
 			end
 
 			Managers.matchmaking:set_quick_game(false)
 			Managers.state.game_mode:start_specific_level("inn_level", 0)
-
-			return 
 		end,
 		pack_sync_data = function (data)
 			local sync_data = {}
@@ -112,8 +108,6 @@ VoteTemplates = {
 			else
 				Managers.state.event:trigger("checkpoint_vote_cancelled")
 			end
-
-			return 
 		end,
 		pack_sync_data = function (data)
 			local sync_data = {}
@@ -157,8 +151,6 @@ VoteTemplates = {
 
 				network_server.kick_peer(network_server, data.kick_peer_id)
 			end
-
-			return 
 		end,
 		pack_sync_data = function (data)
 			local sync_data = {
@@ -232,8 +224,6 @@ VoteTemplates = {
 
 				network_server.kick_peer(network_server, data.kick_peer_id)
 			end
-
-			return 
 		end,
 		pack_sync_data = function (data)
 			local sync_data = {
@@ -291,8 +281,6 @@ VoteTemplates = {
 
 				Managers.state.game_mode:start_specific_level(level_key)
 			end
-
-			return 
 		end,
 		pack_sync_data = function (data)
 			local sync_data = {
@@ -338,8 +326,6 @@ VoteTemplates = {
 		},
 		on_start = function (ingame_context, data)
 			Managers.matchmaking:cancel_matchmaking()
-
-			return 
 		end,
 		on_complete = function (vote_result, ingame_context, data)
 			if vote_result == 1 then
@@ -360,8 +346,6 @@ VoteTemplates = {
 
 				Managers.matchmaking:find_game(search_config)
 			end
-
-			return 
 		end,
 		pack_sync_data = function (data)
 			local level_key = data.level_key or "n/a"
@@ -436,8 +420,6 @@ VoteTemplates = {
 		},
 		on_start = function (ingame_context, data)
 			Managers.matchmaking:cancel_matchmaking()
-
-			return 
 		end,
 		on_complete = function (vote_result, ingame_context, data)
 			if vote_result == 1 then
@@ -456,8 +438,6 @@ VoteTemplates = {
 			else
 				Managers.deed:reset()
 			end
-
-			return 
 		end,
 		pack_sync_data = function (data)
 			local item_name = data.item_name
@@ -497,4 +477,4 @@ for name, template in pairs(VoteTemplates) do
 	template.name = name
 end
 
-return 
+return

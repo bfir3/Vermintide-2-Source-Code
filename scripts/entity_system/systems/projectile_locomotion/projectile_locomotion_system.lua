@@ -2,6 +2,7 @@ ProjectileLocomotionSystem = class(ProjectileLocomotionSystem, ExtensionSystemBa
 local RPCS = {
 	"rpc_set_projectile_state"
 }
+
 ProjectileLocomotionSystem.init = function (self, entity_system_creation_context, ...)
 	ProjectileLocomotionSystem.super.init(self, entity_system_creation_context, ...)
 
@@ -11,17 +12,15 @@ ProjectileLocomotionSystem.init = function (self, entity_system_creation_context
 	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
 
 	self._server_position_corrected_pickups = {}
-
-	return 
 end
+
 ProjectileLocomotionSystem.rpc_set_projectile_state = function (self, sender, projectile_unit_id, state_id)
 	local projectile_unit = self.unit_storage:unit(projectile_unit_id)
 	local extension = ScriptUnit.extension(projectile_unit, "projectile_locomotion_system")
 
 	extension.set_projectile_state(extension, projectile_unit, state_id)
-
-	return 
 end
+
 ProjectileLocomotionSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data, ...)
 	if extension_name == "ProjectilePhysicsHuskLocomotionExtension" or extension_name == "ProjectilePhysicsUnitLocomotionExtension" then
 		self._server_position_corrected_pickups[unit] = unit
@@ -29,11 +28,13 @@ ProjectileLocomotionSystem.on_add_extension = function (self, world, unit, exten
 
 	return ProjectileLocomotionSystem.super.on_add_extension(self, world, unit, extension_name, extension_init_data, ...)
 end
+
 ProjectileLocomotionSystem.on_remove_extension = function (self, unit, extension_name, ...)
 	self._server_position_corrected_pickups[unit] = nil
 
 	return ProjectileLocomotionSystem.super.on_remove_extension(self, unit, extension_name, ...)
 end
+
 ProjectileLocomotionSystem.update = function (self, dt, t)
 	ProjectileLocomotionSystem.super.update(self, dt, t)
 
@@ -42,14 +43,12 @@ ProjectileLocomotionSystem.update = function (self, dt, t)
 	else
 		self._client_validate_position_rotation(self, dt, t)
 	end
-
-	return 
 end
+
 ProjectileLocomotionSystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
-
-	return 
 end
+
 ProjectileLocomotionSystem._server_sync_position_rotation = function (self, dt, t)
 	local game = Managers.state.network:game()
 
@@ -68,11 +67,11 @@ ProjectileLocomotionSystem._server_sync_position_rotation = function (self, dt, 
 			GameSession_set_game_object_field(game, game_object_id, "rotation", rot)
 		end
 	end
-
-	return 
 end
+
 local REST_CORRECTION_DISTANCE = 0.01
 local ACTIVE_CORRECTION_DISTANCE = 5
+
 ProjectileLocomotionSystem._client_validate_position_rotation = function (self, dt, t)
 	local game = Managers.state.network:game()
 
@@ -98,8 +97,6 @@ ProjectileLocomotionSystem._client_validate_position_rotation = function (self, 
 			end
 		end
 	end
-
-	return 
 end
 
-return 
+return

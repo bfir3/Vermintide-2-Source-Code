@@ -10,13 +10,9 @@ NewsFeedTemplates = {
 			if ItemHelper.has_new_sign_in_reward("vt1_skins") then
 				return true
 			end
-
-			return 
 		end,
 		removed_func = function (params)
 			ItemHelper.unmark_sign_in_reward_as_new("vt1_skins")
-
-			return 
 		end
 	},
 	{
@@ -63,8 +59,6 @@ NewsFeedTemplates = {
 					end
 				end
 			end
-
-			return 
 		end
 	},
 	{
@@ -129,8 +123,6 @@ NewsFeedTemplates = {
 			elseif ItemHelper.has_new_backend_ids_by_career_name_and_slot_type(career_name, "hat") then
 				return true
 			end
-
-			return 
 		end
 	},
 	{
@@ -152,8 +144,6 @@ function FindNewsTemplateIndex(template_name)
 			return i
 		end
 	end
-
-	return 
 end
 
-return 
+return

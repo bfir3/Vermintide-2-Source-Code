@@ -9,8 +9,6 @@ local function network_printf(format, ...)
 	if script_data.network_debug_connections then
 		printf("[NetworkClient] " .. format, ...)
 	end
-
-	return 
 end
 
 NetworkClient.init = function (self, level_transition_handler, server_peer_id, level_index, wanted_profile_index, clear_peer_states, lobby_client)
@@ -50,9 +48,8 @@ NetworkClient.init = function (self, level_transition_handler, server_peer_id, l
 
 	self._eac_state_determined = false
 	self._eac_can_play = false
-
-	return 
 end
+
 NetworkClient.destroy = function (self)
 	EAC.after_leave()
 
@@ -73,9 +70,8 @@ NetworkClient.destroy = function (self)
 	self.lobby_client = nil
 
 	GarbageLeakDetector.register_object(self, "Network Client")
-
-	return 
 end
+
 NetworkClient.register_rpcs = function (self, network_message_router, network_transmit)
 	network_message_router.register(network_message_router, self, "rpc_loading_synced", "rpc_notify_in_post_game", "rpc_reload_level", "rpc_load_level", "rpc_game_started", "rpc_disconnect_peer", "rpc_connection_failed", "rpc_notify_connected", "rpc_set_migration_host")
 
@@ -83,9 +79,8 @@ NetworkClient.register_rpcs = function (self, network_message_router, network_tr
 
 	self.profile_synchronizer:register_rpcs(network_message_router, network_transmit)
 	self.voip:register_rpcs(network_message_router, network_transmit)
-
-	return 
 end
+
 NetworkClient.unregister_rpcs = function (self)
 	self.voip:unregister_rpcs()
 	self.network_message_router:unregister(self)
@@ -93,18 +88,16 @@ NetworkClient.unregister_rpcs = function (self)
 	self.network_message_router = nil
 
 	self.profile_synchronizer:unregister_network_events()
-
-	return 
 end
+
 NetworkClient.rpc_connection_failed = function (self, sender, reason)
 	self.fail_reason = NetworkLookup.connection_fails[reason]
 
 	network_printf("rpc_connection_failed due to %s", self.fail_reason)
 	self.set_state(self, "denied_enter_game")
 	network_printf("Connection to server failed with reason %s", self.fail_reason)
-
-	return 
 end
+
 NetworkClient.rpc_notify_connected = function (self, sender)
 	if not self._notification_sent then
 		if self.lobby_client:is_dedicated_server() then
@@ -132,43 +125,39 @@ NetworkClient.rpc_notify_connected = function (self, sender)
 			self.loaded_level_name = nil
 		end
 	end
-
-	return 
 end
+
 NetworkClient.rpc_notify_in_post_game = function (self, sender, in_post_game)
 	if self._is_in_post_game ~= in_post_game then
 		self._is_in_post_game = in_post_game
 
 		RPC.rpc_post_game_notified(self.server_peer_id, in_post_game)
 	end
-
-	return 
 end
+
 NetworkClient.is_in_post_game = function (self)
 	return self._is_in_post_game
 end
+
 NetworkClient.rpc_disconnect_peer = function (self, sender, peer_id)
 	self.connection_handler:disconnect_peers(peer_id)
-
-	return 
 end
+
 NetworkClient.rpc_loading_synced = function (self, sender)
 	if self.state ~= "game_started" then
 		self.set_state(self, "waiting_enter_game")
 	end
-
-	return 
 end
+
 NetworkClient.rpc_reload_level = function (self, sender)
 	self.set_state(self, "loading")
-
-	return 
 end
+
 NetworkClient.rpc_load_level = function (self, sender, level_index, level_seed)
 	local level_transition_handler = self.level_transition_handler
 
 	if level_transition_handler.transition_in_progress(level_transition_handler) then
-		return 
+		return
 	end
 
 	self.set_state(self, "loading")
@@ -176,9 +165,8 @@ NetworkClient.rpc_load_level = function (self, sender, level_index, level_seed)
 	local level_key = NetworkLookup.level_keys[level_index]
 
 	self.level_transition_handler:prepare_load_level(level_index, level_seed)
-
-	return 
 end
+
 NetworkClient.rpc_set_migration_host = function (self, sender, peer_id, do_migrate)
 	if do_migrate then
 		local player = Managers.player:player_from_peer_id(peer_id)
@@ -190,22 +178,19 @@ NetworkClient.rpc_set_migration_host = function (self, sender, peer_id, do_migra
 	else
 		self.host_to_migrate_to = nil
 	end
-
-	return 
 end
+
 NetworkClient.set_state = function (self, new_state)
 	network_printf("New State %s (old state %s)", new_state, tostring(self.state))
 
 	self.state = new_state
-
-	return 
 end
+
 NetworkClient.on_game_entered = function (self)
 	self.set_state(self, "is_ingame")
 	RPC.rpc_is_ingame(self.server_peer_id)
-
-	return 
 end
+
 NetworkClient.rpc_game_started = function (self, sender, round_id)
 	Application.error(string.format("SETTING ROUND ID %s", tostring(round_id)))
 
@@ -216,9 +201,8 @@ NetworkClient.rpc_game_started = function (self, sender, round_id)
 	network_printf("rpc_game_started")
 	self.set_state(self, "game_started")
 	Managers.state.event:trigger("game_started")
-
-	return 
 end
+
 NetworkClient.on_level_loaded = function (self, level_name)
 	network_printf("on_level_loaded %s", level_name)
 
@@ -227,9 +211,8 @@ NetworkClient.on_level_loaded = function (self, level_name)
 	else
 		self.loaded_level_name = level_name
 	end
-
-	return 
 end
+
 NetworkClient.update = function (self, dt)
 	self.profile_synchronizer:update()
 	self.connection_handler:update(dt)
@@ -281,15 +264,15 @@ NetworkClient.update = function (self, dt)
 	end
 
 	self.voip:update(dt)
-
-	return 
 end
+
 NetworkClient.eac_allowed_to_play = function (self)
 	return self._eac_state_determined and self._eac_can_play
 end
+
 NetworkClient._update_eac_match = function (self, dt)
 	if not self._eac_has_set_host then
-		return 
+		return
 	end
 
 	self._next_eac_match_check = math.max(0, (self._next_eac_match_check or 0) - dt)
@@ -312,9 +295,8 @@ NetworkClient._update_eac_match = function (self, dt)
 
 		self.set_state(self, "eac_match_failed")
 	end
-
-	return 
 end
+
 NetworkClient._eac_host_check = function (self)
 	if not self._eac_has_set_host then
 		return false, true
@@ -337,16 +319,17 @@ NetworkClient._eac_host_check = function (self)
 
 	return true, match
 end
+
 NetworkClient.can_enter_game = function (self)
 	return self.state == "waiting_enter_game"
 end
+
 NetworkClient.is_ingame = function (self)
 	return self.state == "is_ingame" or self.state == "game_started"
 end
+
 NetworkClient.set_wait_for_state_loading = function (self, wait)
 	self.wait_for_state_loading = wait
-
-	return 
 end
 
-return 
+return

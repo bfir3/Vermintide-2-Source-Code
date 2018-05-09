@@ -2,11 +2,12 @@ require("scripts/helpers/effect_helper")
 
 WeaponHelper = WeaponHelper or {}
 local POSITION_LOOKUP = POSITION_LOOKUP
+
 WeaponHelper.wanted_projectile_angle = function (self, distance_vector, projectile_gravity, projectile_speed)
 	local x = Vector3.length(Vector3.flat(distance_vector))
 
 	if x <= 0 then
-		return 
+		return
 	end
 
 	local y = distance_vector.z
@@ -18,7 +19,7 @@ WeaponHelper.wanted_projectile_angle = function (self, distance_vector, projecti
 	fassert(g ~= 0, "Asking for projectile angle with gravity 0, this will cause division by 0.")
 
 	if to_sqrt < 0 then
-		return 
+		return
 	end
 
 	local s = math.sqrt(to_sqrt)
@@ -27,6 +28,7 @@ WeaponHelper.wanted_projectile_angle = function (self, distance_vector, projecti
 
 	return a1, a2, x
 end
+
 WeaponHelper.wanted_projectile_speed = function (self, distance_vector, projectile_gravity, wanted_angle)
 	local x = Vector3.length(Vector3.flat(distance_vector))
 	local y = distance_vector.z
@@ -40,9 +42,8 @@ WeaponHelper.wanted_projectile_speed = function (self, distance_vector, projecti
 	if 0 <= aux then
 		return x / math.cos(wanted_angle) * math.sqrt(aux), x
 	end
-
-	return 
 end
+
 WeaponHelper.speed_to_hit_moving_target = function (p1, p2, projectile_angle, target_velocity, gravity, acceptable_accuracy)
 	local estimated_target_position = p2
 	local old_estimated_target_position = p2
@@ -61,9 +62,8 @@ WeaponHelper.speed_to_hit_moving_target = function (p1, p2, projectile_angle, ta
 
 		old_estimated_target_position = estimated_target_position
 	end
-
-	return 
 end
+
 WeaponHelper.angle_to_hit_moving_target = function (p1, p2, projectile_speed, target_velocity, gravity, acceptable_accuracy, use_greatest_angle)
 	local t = 0
 	local angle = nil
@@ -107,6 +107,7 @@ WeaponHelper.angle_to_hit_moving_target = function (p1, p2, projectile_speed, ta
 
 	return angle, estimated_target_position
 end
+
 WeaponHelper.test_angled_trajectory = function (physics_world, p1, p2, gravity, projectile_speed, angle, segment_list, sections, collision_filter, always_complete)
 	table.clear(segment_list)
 
@@ -164,9 +165,8 @@ WeaponHelper.test_angled_trajectory = function (physics_world, p1, p2, gravity, 
 
 		return true, velocity, t_total, angle
 	end
-
-	return 
 end
+
 WeaponHelper.ray_segmented_test = function (physics_world, segment_list, delta)
 	local pos1 = segment_list[1] + delta
 	local sections = #segment_list
@@ -202,6 +202,7 @@ WeaponHelper.ray_segmented_test = function (physics_world, segment_list, delta)
 
 	return true
 end
+
 WeaponHelper.multi_ray_test = function (physics_world, p1, p2, relative_positions)
 	local immediate_raycast = PhysicsWorld.immediate_raycast
 
@@ -246,6 +247,7 @@ WeaponHelper.multi_ray_test = function (physics_world, p1, p2, relative_position
 
 	return true
 end
+
 WeaponHelper.draw_ball_at_time = function (physics_world, p1, vec_flat, gravity, x_vel_0, y_vel_0, t, color)
 	local length = t * x_vel_0
 	local height = t * y_vel_0 + 0.5 * gravity * t^2
@@ -256,6 +258,7 @@ WeaponHelper.draw_ball_at_time = function (physics_world, p1, vec_flat, gravity,
 
 	return position
 end
+
 WeaponHelper.calculate_trajectory = function (self, world, initial_position, target_position, gravity, max_speed)
 	local drawer = Managers.state.debug:drawer({
 		mode = "retained",
@@ -293,6 +296,7 @@ WeaponHelper.calculate_trajectory = function (self, world, initial_position, tar
 
 	return trajectory_hits_target, angle, projectile_speed
 end
+
 WeaponHelper._trajectory_hits_target = function (self, world, radians, speed, gravity, initial_position, target_position, normalized_target_vector, drawer)
 	local points = {}
 	local physics_world = World.get_data(world, "physics_world")
@@ -330,6 +334,7 @@ WeaponHelper._trajectory_hits_target = function (self, world, radians, speed, gr
 
 	return false
 end
+
 WeaponHelper.position_on_trajectory = function (self, initial_position, normalized_target_vector, projectile_speed, radians, projectile_gravity, t)
 	local length = projectile_speed * t * math.cos(radians)
 	local height = projectile_speed * t * math.sin(radians) + 0.5 * projectile_gravity * t^2
@@ -338,12 +343,11 @@ WeaponHelper.position_on_trajectory = function (self, initial_position, normaliz
 
 	return position
 end
+
 WeaponHelper.debug_draw_trajectory_hit = function (self, position, hit_target, drawer)
 	local color = (hit_target and Color(255, 74, 247, 115)) or Color(255, 245, 108, 49)
 
 	drawer.sphere(drawer, position, 0.1, color)
-
-	return 
 end
 
-return 
+return

@@ -1,5 +1,6 @@
 StateTitleScreenLoadSave = class(StateTitleScreenLoadSave)
 StateTitleScreenLoadSave.NAME = "StateTitleScreenLoadSave"
+
 StateTitleScreenLoadSave.on_enter = function (self, params)
 	print("[Gamestate] Enter Substate StateTitleScreenLoadSave")
 
@@ -12,8 +13,6 @@ StateTitleScreenLoadSave.on_enter = function (self, params)
 		__index = function (event_table, event_key)
 			return function ()
 				Application.warning("Got RPC %s during forced network update when exiting StateTitleScreenMain", event_key)
-
-				return 
 			end
 		end
 	}
@@ -25,15 +24,13 @@ StateTitleScreenLoadSave.on_enter = function (self, params)
 	end
 
 	self._setup_input(self)
-
-	return 
 end
+
 StateTitleScreenLoadSave._setup_input = function (self)
 	local input_manager = Managers.input
 	self.input_manager = input_manager
-
-	return 
 end
+
 StateTitleScreenLoadSave.update = function (self, dt, t)
 	local title_start_ui = self._title_start_ui
 
@@ -90,13 +87,13 @@ StateTitleScreenLoadSave.update = function (self, dt, t)
 
 	return self._next_state(self)
 end
+
 StateTitleScreenLoadSave._update_network = function (self, dt, t)
 	if rawget(_G, "LobbyInternal") and LobbyInternal.network_initialized() then
 		Network.update(dt, setmetatable({}, self._network_event_meta_table))
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._signin = function (self)
 	Managers.unlock = UnlockManager:new()
 	Managers.backend = BackendManagerPlayFab:new("ScriptBackendPlayFabXbox", "PlayFabMirror", "DataServerQueue")
@@ -105,9 +102,8 @@ StateTitleScreenLoadSave._signin = function (self)
 
 	self._xsts_result = nil
 	self._state = "check_invite"
-
-	return 
 end
+
 StateTitleScreenLoadSave._check_invite = function (self)
 	if Managers.play_go:installed() then
 		if Managers.invite:has_invitation() then
@@ -126,9 +122,8 @@ StateTitleScreenLoadSave._check_invite = function (self)
 		self._new_state = StateTitleScreenMainMenu
 		self._state = "none"
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._check_guest = function (self)
 	if Managers.account:is_guest() then
 		self._popup_id = Managers.popup:queue_popup(Localize("popup_is_guest"), Localize("popup_is_guest_header"), "verified_guest", Localize("menu_ok"))
@@ -136,9 +131,8 @@ StateTitleScreenLoadSave._check_guest = function (self)
 	else
 		self._state = "enumerate_dlc"
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_fade_in_done = function (self)
 	self.parent.state = StateLoading
 	local loading_context = self.parent.parent.loading_context
@@ -146,9 +140,8 @@ StateTitleScreenLoadSave.cb_fade_in_done = function (self)
 	loading_context.gamma_correct = not SaveData.gamma_corrected
 	loading_context.play_trailer = false
 	loading_context.first_time = false
-
-	return 
 end
+
 StateTitleScreenLoadSave._signin_to_xsts = function (self)
 	local token = UserXSTS.has(Managers.account:user_id())
 	local script_xsts_token = ScriptXSTSToken:new(token)
@@ -156,9 +149,8 @@ StateTitleScreenLoadSave._signin_to_xsts = function (self)
 	Managers.token:register_token(script_xsts_token, callback(self, "cb_xsts_token_received"))
 
 	self._state = "waiting_for_xsts"
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_xsts_token_received = function (self, data)
 	print("[StateTitleScreenLoadSave] cb_xsts_token_received")
 
@@ -174,9 +166,8 @@ StateTitleScreenLoadSave.cb_xsts_token_received = function (self, data)
 		self._xsts_result = data.result
 		self._state = "signin_to_backend"
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._get_user_profile = function (self)
 	self._state = "waiting_for_profile"
 	local user_id = Managers.account:user_id()
@@ -185,9 +176,8 @@ StateTitleScreenLoadSave._get_user_profile = function (self)
 	Managers.account:get_user_profiles(user_id, {
 		xuid
 	}, callback(self, "cb_profile_acquired"))
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_profile_acquired = function (self, data)
 	if data.error then
 		self._popup_id = Managers.popup:queue_popup(Localize("popup_xboxlive_profile_acquire_error"), Localize("popup_xboxlive_profile_acquire_error_header"), "profile_error", Localize("menu_ok"))
@@ -197,17 +187,15 @@ StateTitleScreenLoadSave.cb_profile_acquired = function (self, data)
 
 		self._state = "check_guest"
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._enumerate_dlc = function (self)
 	XboxDLC.initialize()
 	XboxDLC.enumerate_dlc()
 
 	self._state = "check_multiplayer_privileges"
-
-	return 
 end
+
 StateTitleScreenLoadSave._check_prviileges = function (self)
 	if Managers.account:is_privileges_initialized() then
 		if Managers.account:has_privilege_error() then
@@ -220,16 +208,14 @@ StateTitleScreenLoadSave._check_prviileges = function (self)
 			self._state = "check_popup"
 		end
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._get_storage_space = function (self)
 	self._state = "waiting_for_storage"
 
 	Managers.account:get_storage_space(callback(self, "cb_storage_acquired"))
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_storage_acquired = function (self, data)
 	if data.error then
 		self._popup_id = Managers.popup:queue_popup(Localize("popup_storage_could_not_be_acquired"), Localize("popup_storage_could_not_be_acquired_header"), "storage_error", Localize("menu_ok"))
@@ -237,16 +223,14 @@ StateTitleScreenLoadSave.cb_storage_acquired = function (self, data)
 	else
 		self._state = "query_storage_spaces"
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._query_storage_spaces = function (self)
 	self._state = "waiting_for_query"
 
 	Managers.save:query_storage_spaces(callback(self, "cb_query_done"))
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_query_done = function (self, data)
 	print("######################## QUERY ########################")
 
@@ -267,25 +251,22 @@ StateTitleScreenLoadSave.cb_query_done = function (self, data)
 	if not GameSettingsDevelopment.disable_intro_trailer then
 		self.parent.parent.loading_context.first_time = true
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._save_data_contains = function (self, containers, name)
 	for _, container in ipairs(containers) do
 		if container.name == name and 0 < container.total_size then
 			return true
 		end
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._load_save = function (self)
 	self._state = "waiting_for_load"
 
 	Managers.save:auto_load(SaveFileName, callback(self, "cb_load_done"))
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_load_done = function (self, data)
 	print("######################## DATA LOADED ########################")
 
@@ -308,16 +289,14 @@ StateTitleScreenLoadSave.cb_load_done = function (self, data)
 			self._state = "signin_to_xsts"
 		end
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._show_support_info = function (self)
 	local support_id = BackendUtils.format_profile_hash(SaveData.backend_profile_hash, 14, 2, " ")
 	self._popup_id = Managers.popup:queue_popup(support_id, "Support ID", "support_info_done", Localize("button_back_to_title"))
 	self._state = "check_popup"
-
-	return 
 end
+
 StateTitleScreenLoadSave._check_popup = function (self)
 	local result = Managers.popup:query_result(self._popup_id)
 
@@ -373,17 +352,15 @@ StateTitleScreenLoadSave._check_popup = function (self)
 	if result then
 		self._popup_id = nil
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._create_save = function (self)
 	self._state = "waiting_for_save"
 	SaveData = table.clone(DefaultSaveData)
 
 	Managers.save:auto_save(SaveFileName, SaveData, callback(self, "cb_save_done"))
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_save_done = function (self, data)
 	print("######################## DATA SAVED ########################")
 
@@ -401,16 +378,14 @@ StateTitleScreenLoadSave.cb_save_done = function (self, data)
 
 		self._state = "signin_to_xsts"
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._delete_save = function (self)
 	self._state = "waiting_for_delete"
 
 	Managers.save:delete_save(SaveFileName, callback(self, "cb_delete_done"))
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_delete_done = function (self, data)
 	print("######################## SAVE DELETED ########################")
 
@@ -420,9 +395,8 @@ StateTitleScreenLoadSave.cb_delete_done = function (self, data)
 	else
 		self._state = "create_save"
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._close_menu = function (self)
 	self.parent:show_menu(false)
 	self._title_start_ui:set_start_pressed(false)
@@ -432,13 +406,12 @@ StateTitleScreenLoadSave._close_menu = function (self)
 	self._closing_menu = true
 
 	Managers.transition:hide_loading_icon()
-
-	return 
 end
+
 StateTitleScreenLoadSave._next_state = function (self)
 	if not Managers.popup:has_popup() and not self._popup_id then
 		if script_data.honduras_demo and not self._title_start_ui:is_ready() then
-			return 
+			return
 		end
 
 		if Managers.backend and Managers.backend:is_disconnected() then
@@ -454,15 +427,12 @@ StateTitleScreenLoadSave._next_state = function (self)
 			return nil
 		end
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave.on_exit = function (self)
 	self._title_start_ui:set_information_text("")
 
 	self._popup_id = nil
-
-	return 
 end
 
-return 
+return

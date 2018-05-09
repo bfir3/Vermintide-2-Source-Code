@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTCritterRatScurryUnderDoorAction = class(BTCritterRatScurryUnderDoorAction, BTNode)
+
 BTCritterRatScurryUnderDoorAction.init = function (self, ...)
 	BTCritterRatScurryUnderDoorAction.super.init(self, ...)
-
-	return 
 end
+
 BTCritterRatScurryUnderDoorAction.name = "BTCritterRatScurryUnderDoorAction"
+
 BTCritterRatScurryUnderDoorAction.enter = function (self, unit, blackboard, t)
 	blackboard.action = self._tree_node.action_data
 	local next_smart_object_data = blackboard.next_smart_object_data
@@ -26,9 +27,8 @@ BTCritterRatScurryUnderDoorAction.enter = function (self, unit, blackboard, t)
 	end
 
 	blackboard.scurry_state = "moving_to_door"
-
-	return 
 end
+
 BTCritterRatScurryUnderDoorAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.scurry_under_entrance_pos = nil
 	blackboard.scurry_under_exit_pos = nil
@@ -60,9 +60,8 @@ BTCritterRatScurryUnderDoorAction.leave = function (self, unit, blackboard, t, r
 			AiUtils.kill_unit(unit, nil, nil, damage_type, damage_direction)
 		end
 	end
-
-	return 
 end
+
 BTCritterRatScurryUnderDoorAction.run = function (self, unit, blackboard, t, dt)
 	local unit_position = POSITION_LOOKUP[unit]
 	local locomotion_extension = blackboard.locomotion_extension
@@ -96,6 +95,7 @@ BTCritterRatScurryUnderDoorAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTCritterRatScurryUnderDoorAction._moving_to_door_update = function (self, unit, blackboard)
 	local unit_position = POSITION_LOOKUP[unit]
 	local entrance_pos = blackboard.scurry_under_entrance_pos:unbox()
@@ -124,6 +124,7 @@ BTCritterRatScurryUnderDoorAction._moving_to_door_update = function (self, unit,
 
 	return true
 end
+
 BTCritterRatScurryUnderDoorAction._move_towards_smartobject_entrance_update = function (self, unit, blackboard, dt)
 	local unit_position = POSITION_LOOKUP[unit]
 	local entrance_pos = blackboard.scurry_under_entrance_pos:unbox()
@@ -155,9 +156,8 @@ BTCritterRatScurryUnderDoorAction._move_towards_smartobject_entrance_update = fu
 
 		blackboard.scurry_state = "waiting_to_reach_end"
 	end
-
-	return 
 end
+
 BTCritterRatScurryUnderDoorAction._waiting_to_reach_end_update = function (self, unit, blackboard)
 	if blackboard.anim_cb_scurry_under_finished then
 		local exit_pos = blackboard.scurry_under_exit_pos:unbox()
@@ -173,8 +173,6 @@ BTCritterRatScurryUnderDoorAction._waiting_to_reach_end_update = function (self,
 		blackboard.spawn_to_running = true
 		blackboard.scurry_state = "done"
 	end
-
-	return 
 end
 
-return 
+return

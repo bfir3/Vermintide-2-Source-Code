@@ -166,6 +166,7 @@ local projectile_locomotion_extensions = {
 	"ProjectileFlameWaveLocomotionExtension"
 }
 EntitySystem = class(EntitySystem)
+
 EntitySystem.init = function (self, entity_system_creation_context)
 	assert(entity_system_creation_context.entity_manager)
 	assert(entity_system_creation_context.world)
@@ -184,9 +185,8 @@ EntitySystem.init = function (self, entity_system_creation_context)
 	self.system_update_context = {}
 
 	self._init_systems(self, entity_system_creation_context)
-
-	return 
 end
+
 EntitySystem._init_systems = function (self, entity_system_creation_context)
 	local no_pre_update = false
 	local has_pre_update = true
@@ -336,12 +336,12 @@ EntitySystem._init_systems = function (self, entity_system_creation_context)
 	self._add_system(self, "surrounding_aware_system", SurroundingAwareSystem, entity_system_creation_context)
 	self._add_system(self, "dialogue_system", DialogueSystem, entity_system_creation_context, nil, no_pre_update, has_post_update)
 	self._add_system(self, "proximity_system", ProximitySystem, entity_system_creation_context, nil, no_pre_update, has_post_update)
+end
 
-	return 
-end
 EntitySystem.register_system = function (self, system_object, system_name, ...)
-	return 
+	return
 end
+
 EntitySystem._add_system = function (self, name, class, context, extension_list, has_pre_update, has_post_update, dont_run_on_dedicated_server)
 	if DEDICATED_SERVER and dont_run_on_dedicated_server then
 		local ignore_extensions = class.system_extensions or {}
@@ -358,34 +358,28 @@ EntitySystem._add_system = function (self, name, class, context, extension_list,
 
 		self.entity_system_bag:add_system(system, block_pre_update, block_post_update)
 	end
-
-	return 
 end
+
 EntitySystem.finalize_setup = function (self)
 	self.entity_manager:finalize_setup()
-
-	return 
 end
+
 EntitySystem.pre_update = function (self, dt)
 	self.system_update(self, "pre_update", dt)
-
-	return 
 end
+
 EntitySystem.update = function (self, dt)
 	self.system_update(self, "update", dt)
-
-	return 
 end
+
 EntitySystem.post_update = function (self, dt)
 	self.system_update(self, "post_update", dt)
-
-	return 
 end
+
 EntitySystem.physics_async_update = function (self)
 	self.system_update(self, "physics_async_update", self.system_update_context.dt)
-
-	return 
 end
+
 EntitySystem.system_update = function (self, update_func, dt)
 	local entity_system_update_context = self.system_update_context
 	entity_system_update_context.world = self.world
@@ -397,13 +391,12 @@ EntitySystem.system_update = function (self, update_func, dt)
 	entity_system_update_context.dice_keeper = self.dice_keeper
 
 	if World.get_data(entity_system_update_context.world, "paused") then
-		return 
+		return
 	end
 
 	self.entity_system_bag:update(entity_system_update_context, update_func)
-
-	return 
 end
+
 EntitySystem.commit_and_remove_pending_units = function (self)
 	local unit_spawner = self.unit_spawner
 	unit_spawner.locked = false
@@ -411,14 +404,12 @@ EntitySystem.commit_and_remove_pending_units = function (self)
 	unit_spawner.commit_and_remove_pending_units(unit_spawner)
 
 	unit_spawner.locked = true
-
-	return 
 end
+
 EntitySystem.hot_join_sync = function (self, sender)
 	self.entity_system_bag:hot_join_sync(sender)
-
-	return 
 end
+
 EntitySystem.destroy = function (self)
 	local units = World.units(self.world)
 
@@ -428,8 +419,6 @@ EntitySystem.destroy = function (self)
 	self.system_update_context = nil
 
 	GarbageLeakDetector.register_object(self, "EntitySystem")
-
-	return 
 end
 
-return 
+return

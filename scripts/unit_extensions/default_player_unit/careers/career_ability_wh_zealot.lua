@@ -1,4 +1,5 @@
 CareerAbilityWHZealot = class(CareerAbilityWHZealot)
+
 CareerAbilityWHZealot.init = function (self, extension_init_context, unit, extension_init_data)
 	self._owner_unit = unit
 	self._world = extension_init_context.world
@@ -13,9 +14,8 @@ CareerAbilityWHZealot.init = function (self, extension_init_context, unit, exten
 	self._decal_unit = nil
 	self._decal_unit_name = "units/decals/decal_arrow_saltzpyre"
 	self._fov_lerp_time = 0
-
-	return 
 end
+
 CareerAbilityWHZealot.extensions_ready = function (self, world, unit)
 	self._first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
 	self._status_extension = ScriptUnit.extension(unit, "status_system")
@@ -26,21 +26,21 @@ CareerAbilityWHZealot.extensions_ready = function (self, world, unit)
 	if self._first_person_extension then
 		self._first_person_unit = self._first_person_extension:get_first_person_unit()
 	end
+end
 
-	return 
-end
 CareerAbilityWHZealot.destroy = function (self)
-	return 
+	return
 end
+
 CareerAbilityWHZealot.update = function (self, unit, input, dt, context, t)
 	if not self._ability_available(self) then
-		return 
+		return
 	end
 
 	local input_extension = self._input_extension
 
 	if not input_extension then
-		return 
+		return
 	end
 
 	if not self._is_priming then
@@ -53,22 +53,22 @@ CareerAbilityWHZealot.update = function (self, unit, input, dt, context, t)
 		if input_extension.get(input_extension, "action_two") then
 			self._stop_priming(self)
 
-			return 
+			return
 		end
 
 		if input_extension.get(input_extension, "action_career_release") then
 			self._run_ability(self)
 		end
 	end
-
-	return 
 end
+
 CareerAbilityWHZealot._ability_available = function (self)
 	local career_extension = self._career_extension
 	local status_extension = self._status_extension
 
 	return career_extension.can_use_activated_ability(career_extension) and not status_extension.is_disabled(status_extension)
 end
+
 CareerAbilityWHZealot._start_priming = function (self)
 	if self._local_player then
 		local decal_unit_name = self._decal_unit_name
@@ -83,9 +83,8 @@ CareerAbilityWHZealot._start_priming = function (self)
 	}
 	self._buff_id = buff_extension.add_buff(buff_extension, buff_template_name, buff_params)
 	self._is_priming = true
-
-	return 
 end
+
 CareerAbilityWHZealot._update_priming = function (self, dt)
 	if self._local_player then
 		local first_person_extension = self._first_person_extension
@@ -104,9 +103,8 @@ CareerAbilityWHZealot._update_priming = function (self, dt)
 
 		Managers.state.camera:set_additional_fov_multiplier(fov_multiplier)
 	end
-
-	return 
 end
+
 CareerAbilityWHZealot._stop_priming = function (self)
 	if self._decal_unit then
 		local unit_spawner = Managers.state.unit_spawner
@@ -129,9 +127,8 @@ CareerAbilityWHZealot._stop_priming = function (self)
 	end
 
 	self._is_priming = false
-
-	return 
 end
+
 CareerAbilityWHZealot._run_ability = function (self)
 	self._stop_priming(self)
 
@@ -222,17 +219,14 @@ CareerAbilityWHZealot._run_ability = function (self)
 
 	career_extension.start_activated_ability_cooldown(career_extension)
 	self._play_vo(self)
-
-	return 
 end
+
 CareerAbilityWHZealot._play_vo = function (self)
 	local owner_unit = self._owner_unit
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
-
-	return 
 end
 
-return 
+return

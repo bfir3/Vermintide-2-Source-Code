@@ -795,4 +795,4 @@ Weapons.two_handed_axes_template_1_t3_un = table.clone(Weapons.two_handed_axes_t
 Weapons.two_handed_axes_template_1_t3_un.actions.action_inspect.action_inspect_hold.anim_event = "inspect_start_2"
 Weapons.two_handed_axes_template_1_t3_un.actions.action_inspect.action_inspect_hold.anim_end_event = "inspect_end_2"
 
-return 
+return

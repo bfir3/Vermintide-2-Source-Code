@@ -2,6 +2,7 @@ require("scripts/managers/player/player_boon_handler")
 require("scripts/managers/player/boon_templates")
 
 BulldozerPlayer = class(BulldozerPlayer, Player)
+
 BulldozerPlayer.init = function (self, network_manager, input_source, viewport_name, viewport_world_name, is_server, local_player_id, unique_id)
 	BulldozerPlayer.super.init(self, network_manager, input_source, viewport_name, viewport_world_name, is_server, local_player_id)
 
@@ -20,9 +21,8 @@ BulldozerPlayer.init = function (self, network_manager, input_source, viewport_n
 	Managers.free_flight:register_player(local_player_id)
 
 	self._cached_name = nil
-
-	return 
 end
+
 BulldozerPlayer.profile_index = function (self)
 	if self._profile_index then
 		return self._profile_index
@@ -33,14 +33,15 @@ BulldozerPlayer.profile_index = function (self)
 
 	return profile_index
 end
+
 BulldozerPlayer.set_profile_index = function (self, index)
 	self._profile_index = index
-
-	return 
 end
+
 BulldozerPlayer.type = function (self)
 	return "BulldozerPlayer"
 end
+
 BulldozerPlayer.profile_display_name = function (self)
 	local profile_index = self.profile_index(self)
 	local profile = SPProfiles[profile_index]
@@ -48,6 +49,7 @@ BulldozerPlayer.profile_display_name = function (self)
 
 	return display_name
 end
+
 BulldozerPlayer.despawn = function (self)
 	for mood, _ in pairs(MoodSettings) do
 		MOOD_BLACKBOARD[mood] = false
@@ -63,9 +65,8 @@ BulldozerPlayer.despawn = function (self)
 	else
 		print("bulldozer_player was already despanwed. Should not happen.")
 	end
-
-	return 
 end
+
 BulldozerPlayer.career_index = function (self)
 	local hero_name = self.profile_display_name(self)
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
@@ -73,6 +74,7 @@ BulldozerPlayer.career_index = function (self)
 
 	return career_index
 end
+
 BulldozerPlayer.career_name = function (self)
 	local profile_index = self.profile_index(self)
 	local profile = SPProfiles[profile_index]
@@ -83,15 +85,13 @@ BulldozerPlayer.career_name = function (self)
 
 		return profile.careers[career_index].name
 	end
-
-	return 
 end
+
 BulldozerPlayer.set_spawn_position_rotation = function (self, position, rotation)
 	self.spawn_position = Vector3Box(position)
 	self.spawn_rotation = QuaternionBox(rotation)
-
-	return 
 end
+
 BulldozerPlayer.spawn = function (self, optional_position, optional_rotation, is_initial_spawn, ammo_melee, ammo_ranged, healthkit, potion, grenade)
 	local profile_index = self.profile_index(self)
 	local profile = SPProfiles[profile_index]
@@ -305,14 +305,14 @@ BulldozerPlayer.spawn = function (self, optional_position, optional_rotation, is
 
 	return unit
 end
+
 BulldozerPlayer.create_boon_handler = function (self, world)
 	local backend_settings = GameSettingsDevelopment.backend_settings
 
 	if backend_settings.quests_enabled then
 	end
-
-	return 
 end
+
 BulldozerPlayer._get_initial_inventory = function (self, healthkit, potion, grenade)
 	local initial_inventory = {
 		slot_packmaster_claw = "packmaster_claw",
@@ -323,6 +323,7 @@ BulldozerPlayer._get_initial_inventory = function (self, healthkit, potion, gren
 
 	return initial_inventory
 end
+
 BulldozerPlayer.create_game_object = function (self)
 	local empty_boon_id = NetworkLookup.boons["n/a"]
 	local game_object_data_table = {
@@ -359,16 +360,14 @@ BulldozerPlayer.create_game_object = function (self)
 	self.game_object_id = game_object_id
 
 	self.create_sync_data(self)
-
-	return 
 end
+
 BulldozerPlayer.create_sync_data = function (self)
 	assert(self._player_sync_data == nil)
 
 	self._player_sync_data = PlayerSyncData:new(self, self.network_manager)
-
-	return 
 end
+
 BulldozerPlayer.cb_game_session_disconnect = function (self)
 	self.game_object_id = nil
 
@@ -377,49 +376,56 @@ BulldozerPlayer.cb_game_session_disconnect = function (self)
 	end
 
 	self._player_sync_data = nil
-
-	return 
 end
+
 BulldozerPlayer.network_id = function (self)
 	return self.peer_id
 end
+
 BulldozerPlayer.local_player_id = function (self)
 	return self._local_player_id
 end
+
 BulldozerPlayer.platform_id = function (self)
 	return self.peer_id
 end
+
 BulldozerPlayer.profile_id = function (self)
 	return self._unique_id
 end
+
 BulldozerPlayer.ui_id = function (self)
 	return self._unique_id
 end
+
 BulldozerPlayer.stats_id = function (self)
 	return self._unique_id
 end
+
 BulldozerPlayer.telemetry_id = function (self)
 	return self._unique_id
 end
+
 BulldozerPlayer.is_player_controlled = function (self)
 	return true
 end
+
 BulldozerPlayer.set_game_object_id = function (self, id)
 	self.game_object_id = id
-
-	return 
 end
+
 BulldozerPlayer.sync_data_active = function (self)
 	return self._player_sync_data and self._player_sync_data:active()
 end
+
 BulldozerPlayer.set_data = function (self, key, value)
 	self._player_sync_data:set_data(key, value)
-
-	return 
 end
+
 BulldozerPlayer.get_data = function (self, key)
 	return self._player_sync_data:get_data(key)
 end
+
 BulldozerPlayer.name = function (self)
 	if rawget(_G, "Steam") then
 		if self._cached_name then
@@ -449,9 +455,8 @@ BulldozerPlayer.name = function (self)
 	else
 		return self._debug_name
 	end
-
-	return 
 end
+
 BulldozerPlayer.destroy = function (self)
 	if self._player_sync_data then
 		self._player_sync_data:destroy()
@@ -463,9 +468,8 @@ BulldozerPlayer.destroy = function (self)
 
 	Managers.free_flight:unregister_player(self.local_player_id(self))
 	Managers.music:unregister_active_player(self._local_player_id)
-
-	return 
 end
+
 BulldozerPlayer.best_aquired_power_level = function (self)
 	local sum = Managers.backend:get_interface("items"):sum_best_power_levels()
 	local level = ExperienceSettings.get_highest_character_level()
@@ -475,4 +479,4 @@ BulldozerPlayer.best_aquired_power_level = function (self)
 	return best_aquired_power_level
 end
 
-return 
+return

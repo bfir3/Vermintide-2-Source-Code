@@ -1,12 +1,12 @@
 BackendInterfaceTalentsPlayfab = class(BackendInterfaceTalentsPlayfab)
+
 BackendInterfaceTalentsPlayfab.init = function (self, backend_mirror)
 	self._backend_mirror = backend_mirror
 	self._talents = {}
 
 	self._refresh(self)
-
-	return 
 end
+
 BackendInterfaceTalentsPlayfab._refresh = function (self)
 	local talents = self._talents
 	local backend_mirror = self._backend_mirror
@@ -25,20 +25,20 @@ BackendInterfaceTalentsPlayfab._refresh = function (self)
 	end
 
 	self._dirty = false
-
-	return 
 end
+
 BackendInterfaceTalentsPlayfab.ready = function (self)
 	return true
 end
+
 BackendInterfaceTalentsPlayfab.update = function (self, dt)
-	return 
+	return
 end
+
 BackendInterfaceTalentsPlayfab.make_dirty = function (self)
 	self._dirty = true
-
-	return 
 end
+
 BackendInterfaceTalentsPlayfab.set_talents = function (self, career_name, talents)
 	local talent_string = ""
 
@@ -55,9 +55,8 @@ BackendInterfaceTalentsPlayfab.set_talents = function (self, career_name, talent
 	self._backend_mirror:set_character_data(career_name, "talents", talent_string)
 
 	self._dirty = true
-
-	return 
 end
+
 BackendInterfaceTalentsPlayfab.get_talents = function (self, career_name)
 	if self._dirty then
 		self._refresh(self)
@@ -68,4 +67,4 @@ BackendInterfaceTalentsPlayfab.get_talents = function (self, career_name)
 	return talents
 end
 
-return 
+return

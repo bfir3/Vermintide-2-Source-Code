@@ -3,6 +3,7 @@ local animation_definitions = definitions.animation_definitions
 local widget_definitions = definitions.widget_definitions
 local scenegraph_definition = definitions.scenegraph_definition
 FloatingIconUI = class(FloatingIconUI)
+
 FloatingIconUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -24,10 +25,10 @@ FloatingIconUI.init = function (self, ingame_ui_context)
 
 	self.create_ui_elements(self)
 	rawset(_G, "floating_icon_ui", self)
-
-	return 
 end
+
 local DO_RELOAD = true
+
 FloatingIconUI.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 	local widgets = {}
@@ -47,16 +48,14 @@ FloatingIconUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	DO_RELOAD = false
-
-	return 
 end
+
 FloatingIconUI.destroy = function (self)
 	self.ui_animator = nil
 
 	rawset(_G, "floating_icon_ui", nil)
-
-	return 
 end
+
 FloatingIconUI.update = function (self, dt)
 	if DO_RELOAD then
 		self.create_ui_elements(self)
@@ -66,9 +65,8 @@ FloatingIconUI.update = function (self, dt)
 	end
 
 	self.draw(self, dt)
-
-	return 
 end
+
 FloatingIconUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -86,16 +84,15 @@ FloatingIconUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 FloatingIconUI.sync_active_missions = function (self, dt)
 	local peer_id = self.peer_id
 	local my_player = self.player_manager:player_from_peer_id(peer_id)
 	local player_unit = my_player.player_unit
 
 	if not player_unit then
-		return 
+		return
 	end
 
 	local tutorial_extension = ScriptUnit.extension(player_unit, "tutorial_system")
@@ -106,13 +103,13 @@ FloatingIconUI.sync_active_missions = function (self, dt)
 
 		self.update_objective_icon(self, objective_tooltips, player_unit, dt)
 	end
-
-	return 
 end
+
 local center_position = {
 	scenegraph_definition.screen.size[1] * 0.5,
 	scenegraph_definition.screen.size[2] * 0.5
 }
+
 FloatingIconUI.update_objective_icon = function (self, data, player_unit, dt)
 	local ui_scenegraph = self.ui_scenegraph
 	local widget = self._widgets_by_name.default
@@ -137,7 +134,7 @@ FloatingIconUI.update_objective_icon = function (self, data, player_unit, dt)
 	local objective_unit = data.unit
 
 	if not objective_unit or not Unit.alive(objective_unit) or not Unit.alive(player_unit) then
-		return 
+		return
 	end
 
 	local objective_unit_position = Unit.world_position(objective_unit, 0) + Vector3.up()
@@ -214,18 +211,16 @@ FloatingIconUI.update_objective_icon = function (self, data, player_unit, dt)
 
 	self.mission_tooltip_use_screen_position = use_screen_position
 	self.active_tooltip_widget = widget
-
-	return 
 end
+
 FloatingIconUI.convert_world_to_screen_position = function (self, camera, world_position)
 	if camera then
 		local world_to_screen = Camera.world_to_screen(camera, world_position)
 
 		return world_to_screen.x, world_to_screen.y
 	end
-
-	return 
 end
+
 FloatingIconUI.get_floating_icon_position = function (self, screen_pos_x, screen_pos_y, forward_dot, right_dot, tooltip_settings)
 	local root_size = UISceneGraph.get_size_scaled(self.ui_scenegraph, "screen")
 	local scale = RESOLUTION_LOOKUP.scale
@@ -272,6 +267,7 @@ FloatingIconUI.get_floating_icon_position = function (self, screen_pos_x, screen
 
 	return clamped_x_pos, clamped_y_pos, is_clamped, is_behind
 end
+
 FloatingIconUI.get_arrow_angle_and_offset = function (self, forward_dot, right_dot, arrow_size, icon_size, height_from_center)
 	local static_angle_value = 1.57079633
 	local offset_x = 0
@@ -297,6 +293,7 @@ FloatingIconUI.get_arrow_angle_and_offset = function (self, forward_dot, right_d
 
 	return static_angle_value, offset_x, offset_y, offset_z
 end
+
 FloatingIconUI.get_icon_size = function (self, position, player_position, current_size, original_size, tooltip_settings)
 	local size = original_size
 	local start_scale_distance = tooltip_settings.start_scale_distance
@@ -311,6 +308,7 @@ FloatingIconUI.get_icon_size = function (self, position, player_position, curren
 
 	return size, icon_scale
 end
+
 FloatingIconUI.icon_scale_by_distance = function (self, current_distance, max_distance)
 	local distance = math.min(max_distance, current_distance)
 	distance = math.max(0, distance)
@@ -319,6 +317,7 @@ FloatingIconUI.icon_scale_by_distance = function (self, current_distance, max_di
 
 	return scale
 end
+
 FloatingIconUI.get_player_first_person_extension = function (self)
 	if self._first_person_extension then
 		return self._first_person_extension
@@ -334,8 +333,6 @@ FloatingIconUI.get_player_first_person_extension = function (self)
 			return first_person_extension
 		end
 	end
-
-	return 
 end
 
-return 
+return

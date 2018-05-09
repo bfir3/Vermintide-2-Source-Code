@@ -5,8 +5,6 @@ local function debug_print(...)
 	if script_data.debug_storm_vermin_patrol then
 		print(...)
 	end
-
-	return 
 end
 
 local TURN_SPEED = math.pi * 0.7
@@ -55,8 +53,6 @@ AIGroupTemplates.storm_vermin_formation_patrol = {
 		enter_state_find_path_entry(nav_world, group)
 
 		group.resycnc_anchor_indexes_at = t + 5
-
-		return 
 	end,
 	destroy = function (world, nav_world, group, unit)
 		local nav_data = group.nav_data
@@ -89,14 +85,12 @@ AIGroupTemplates.storm_vermin_formation_patrol = {
 				name = "storm_vermin_patrol_targeting_retained"
 			}):reset()
 		end
-
-		return 
 	end,
 	update = function (world, nav_world, group, t, dt)
 		remove_dead_units(group)
 
 		if group.num_indexed_members == 0 then
-			return 
+			return
 		end
 
 		if group.resycnc_anchor_indexes_at < t then
@@ -121,7 +115,7 @@ AIGroupTemplates.storm_vermin_formation_patrol = {
 			local door_found = check_for_doors(group)
 
 			if door_found then
-				return 
+				return
 			end
 
 			update_anchor_position(nav_world, group, dt)
@@ -140,8 +134,6 @@ AIGroupTemplates.storm_vermin_formation_patrol = {
 		elseif state == "in_combat" then
 			check_if_players_dead(nav_world, group, t, dt)
 		end
-
-		return 
 	end,
 	BT_debug = function (group)
 		return {
@@ -160,16 +152,12 @@ function play_sound(group, event)
 	local audio_system = Managers.state.entity:system("audio_system")
 
 	audio_system.play_audio_unit_event(audio_system, event, group.wwise_source_unit)
-
-	return 
 end
 
 function pick_sound_source_unit(group)
 	local wanted_unit_i = math.ceil(group.num_indexed_members * 0.5)
 	local wanted_unit = group.indexed_members[wanted_unit_i]
 	group.wwise_source_unit = wanted_unit
-
-	return 
 end
 
 function update_animation_triggered_sounds(group)
@@ -189,8 +177,6 @@ function update_animation_triggered_sounds(group)
 
 		audio_system.play_audio_unit_event(audio_system, "Play_stormvermin_patrol_foley", source_unit)
 	end
-
-	return 
 end
 
 function set_state(group, state_name)
@@ -198,8 +184,6 @@ function set_state(group, state_name)
 
 	group.previous_state = group.state
 	group.state = state_name
-
-	return 
 end
 
 local dead_units = {}
@@ -272,8 +256,6 @@ function remove_dead_units(group)
 			group_targets[target_unit] = nil
 		end
 	end
-
-	return 
 end
 
 function calculate_group_middle_position(group)
@@ -351,8 +333,6 @@ function antenna_collision(nav_world, position, mid_pos, side_direction)
 
 		return distance
 	end
-
-	return 
 end
 
 function change_path_direction(group, current_node_index)
@@ -371,16 +351,12 @@ function change_path_direction(group, current_node_index)
 	end
 
 	debug_print("[StormVerminPatrol] Changed path direction:", current_node_index, "New node:", new_node_index, "New direction:", new_direction)
-
-	return 
 end
 
 function unit_animation_event(group, unit, event_name)
 	Unit.animation_event(unit, event_name)
 
 	group.animation_events[unit] = event_name
-
-	return 
 end
 
 function init_group(nav_world, group)
@@ -456,8 +432,6 @@ function init_group(nav_world, group)
 		group.anchors[i].antenna_target_pos = group.anchors[i].point
 		group.anchors[i].antenna_x_displacement = 0
 	end
-
-	return 
 end
 
 function enter_state_find_path_entry(nav_world, group)
@@ -474,8 +448,6 @@ function enter_state_find_path_entry(nav_world, group)
 	else
 		enter_state_forming(nav_world, group)
 	end
-
-	return 
 end
 
 function pick_entry_node(nav_world, group)
@@ -525,8 +497,6 @@ function pick_entry_node(nav_world, group)
 	for i = 1, #anchors, 1 do
 		anchors[i].node_index = node_index
 	end
-
-	return 
 end
 
 function set_path_direction(group, direction)
@@ -541,8 +511,6 @@ function set_path_direction(group, direction)
 		nav_data.node_list = nav_data.node_data.reversed_list
 		nav_data.node_break_list = nav_data.node_data.reversed_break_list
 	end
-
-	return 
 end
 
 function enter_state_forming(nav_world, group)
@@ -577,7 +545,7 @@ function enter_state_forming(nav_world, group)
 			drawer.sphere(drawer, goal_destination, 0.4, Colors.get("red"))
 		end
 
-		return 
+		return
 	end
 
 	goal_destination.z = altitude
@@ -647,8 +615,6 @@ function enter_state_forming(nav_world, group)
 	if script_data.debug_storm_vermin_patrol then
 		debug_draw_formation(group)
 	end
-
-	return 
 end
 
 function debug_draw_formation(group)
@@ -700,8 +666,6 @@ function debug_draw_formation(group)
 		drawer.vector(drawer, anchor_position + offset_y, anchor.wanted_direction:unbox() * 0.2, Colors.get("pink"))
 		drawer.line(drawer, target_node_position + offset_y, target_node_position, Colors.get("pink"))
 	end
-
-	return 
 end
 
 function set_forming_positions(nav_world, group)
@@ -754,8 +718,6 @@ function set_forming_positions(nav_world, group)
 		Debug.storm_vermin_patrols_done = Debug.storm_vermin_patrols_done or -1
 		Debug.storm_vermin_patrols_done = Debug.storm_vermin_patrols_done + 1
 	end
-
-	return 
 end
 
 function update_units(nav_world, group, t, dt)
@@ -796,8 +758,6 @@ function update_units(nav_world, group, t, dt)
 
 		navigation_extension.move_to(navigation_extension, destination)
 	end
-
-	return 
 end
 
 local in_formation_check_timer = 0
@@ -846,8 +806,6 @@ function check_is_in_formation(group, dt)
 	if in_formation then
 		enter_state_patrolling(group)
 	end
-
-	return 
 end
 
 function enter_state_patrolling(group)
@@ -870,8 +828,6 @@ function enter_state_patrolling(group)
 	end
 
 	play_sound(group, "Play_stormvemin_patrol_formated")
-
-	return 
 end
 
 function update_anchor_position(nav_world, group, dt)
@@ -892,7 +848,7 @@ function update_anchor_position(nav_world, group, dt)
 			change_path_direction(group, previous_node_index)
 			enter_state_forming(nav_world, group)
 
-			return 
+			return
 		end
 
 		local target_node_position = target_node.unbox(target_node)
@@ -961,7 +917,7 @@ function update_anchor_position(nav_world, group, dt)
 			if node_break_list[target_node] and (astar_data.node_index ~= target_node_index or not astar_data.path_found) then
 				enter_state_break_node(nav_world, group, target_node_index)
 
-				return 
+				return
 			end
 
 			anchor_on_path = target_node_position
@@ -1036,8 +992,6 @@ function update_anchor_position(nav_world, group, dt)
 		local path_pos, travel_dist, move_percent = MainPathUtils.closest_pos_at_main_path(main_paths, point.unbox(point))
 		group.main_path_travel_dist = travel_dist
 	end
-
-	return 
 end
 
 function update_anchor_direction(nav_world, group, dt)
@@ -1159,8 +1113,6 @@ function update_anchor_direction(nav_world, group, dt)
 			blackboard.anchor_direction = anchor.current_direction
 		end
 	end
-
-	return 
 end
 
 function antennae_check(nav_world, group, dt)
@@ -1300,8 +1252,6 @@ function antennae_check(nav_world, group, dt)
 
 		anchor.antenna_target_pos = Vector3Box(antenna_target)
 	end
-
-	return 
 end
 
 function is_valid_target_unit(target_unit)
@@ -1319,7 +1269,7 @@ function check_for_players(nav_world, group, t, dt)
 		local target_unit = blackboard.target_unit
 
 		if blackboard.climb_state then
-			return 
+			return
 		end
 
 		if is_valid_target_unit(target_unit) then
@@ -1336,8 +1286,6 @@ function check_for_players(nav_world, group, t, dt)
 	if has_targets then
 		enter_state_controlled_advance(nav_world, group, t)
 	end
-
-	return 
 end
 
 function check_for_doors(group)
@@ -1356,8 +1304,6 @@ function check_for_doors(group)
 			return true
 		end
 	end
-
-	return 
 end
 
 local function sort_anchors_asc(anchor_a, anchor_b)
@@ -1371,8 +1317,6 @@ local function sort_anchors_asc(anchor_a, anchor_b)
 	else
 		return path_percentage_b < path_percentage_a
 	end
-
-	return 
 end
 
 function resycnc_anchor_indexes(group)
@@ -1381,8 +1325,6 @@ function resycnc_anchor_indexes(group)
 	table.sort(anchors, sort_anchors_asc)
 
 	local temp_debug_stopper = math.random()
-
-	return 
 end
 
 function enter_state_opening_door(group, door_unit)
@@ -1398,8 +1340,6 @@ function enter_state_opening_door(group, door_unit)
 		blackboard.stored_goal_destination = blackboard.goal_destination
 		blackboard.goal_destination = nil
 	end
-
-	return 
 end
 
 function update_state_opening_door(group)
@@ -1419,8 +1359,6 @@ function update_state_opening_door(group)
 
 		enter_state_patrolling(group)
 	end
-
-	return 
 end
 
 function enter_state_break_node(nav_world, group, break_node_index)
@@ -1446,8 +1384,6 @@ function enter_state_break_node(nav_world, group, break_node_index)
 		change_path_direction(group, astar_data.node_index)
 		enter_state_forming(nav_world, group)
 	end
-
-	return 
 end
 
 function update_break_node_astar(nav_world, group)
@@ -1481,8 +1417,6 @@ function update_break_node_astar(nav_world, group)
 			enter_state_forming(nav_world, group)
 		end
 	end
-
-	return 
 end
 
 function debug_break_node_astar(group, astar_data, color)
@@ -1508,8 +1442,6 @@ function debug_break_node_astar(group, astar_data, color)
 	})
 
 	drawer.box(drawer, box_pose, box_extents, color)
-
-	return 
 end
 
 function enter_state_controlled_advance(nav_world, group, t)
@@ -1574,8 +1506,6 @@ function enter_state_controlled_advance(nav_world, group, t)
 
 	set_state(group, "controlled_advance")
 	play_sound(group, "storm_vermin_patrol_player_spotted")
-
-	return 
 end
 
 function acquire_targets(group)
@@ -1615,8 +1545,6 @@ function acquire_targets(group)
 			blackboard.SVP_target_unit = selected_target_unit
 		end
 	end
-
-	return 
 end
 
 function controlled_advance(nav_world, group, t, dt)
@@ -1656,8 +1584,6 @@ function controlled_advance(nav_world, group, t, dt)
 	if should_attack or group.attack_latest_t < t then
 		enter_state_combat(group)
 	end
-
-	return 
 end
 
 function enter_state_combat(group)
@@ -1687,8 +1613,6 @@ function enter_state_combat(group)
 	end
 
 	play_sound(group, "storm_vermin_patrol_charge")
-
-	return 
 end
 
 function check_if_players_dead(nav_world, group, t, dt)
@@ -1728,8 +1652,6 @@ function check_if_players_dead(nav_world, group, t, dt)
 			enter_state_find_path_entry(nav_world, group)
 		end
 	end
-
-	return 
 end
 
-return 
+return

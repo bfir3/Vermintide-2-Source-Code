@@ -345,4 +345,4 @@ DialogueLookup[DialogueLookup_n + 171] = "pwh_gameplay_hearing_a_chaos_wizard_le
 DialogueLookup[DialogueLookup_n + 172] = "pwh_gameplay_killing_a_chaos_wizard_leech"
 DialogueLookup_n = DialogueLookup_n + 172
 
-return 
+return

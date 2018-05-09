@@ -1,4 +1,5 @@
 CareerAbilityWEShade = class(CareerAbilityWEShade)
+
 CareerAbilityWEShade.init = function (self, extension_init_context, unit, extension_init_data)
 	self._owner_unit = unit
 	self._world = extension_init_context.world
@@ -10,24 +11,23 @@ CareerAbilityWEShade.init = function (self, extension_init_context, unit, extens
 	self._bot_player = player.bot_player
 	self._network_manager = Managers.state.network
 	self._input_manager = Managers.input
-
-	return 
 end
+
 CareerAbilityWEShade.extensions_ready = function (self, world, unit)
 	self._status_extension = ScriptUnit.extension(unit, "status_system")
 	self._career_extension = ScriptUnit.extension(unit, "career_system")
 	self._buff_extension = ScriptUnit.extension(unit, "buff_system")
 	self._input_extension = ScriptUnit.has_extension(unit, "input_system")
 	self._first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
+end
 
-	return 
-end
 CareerAbilityWEShade.destroy = function (self)
-	return 
+	return
 end
+
 CareerAbilityWEShade.update = function (self, unit, input, dt, context, t)
 	if not self._ability_available(self) then
-		return 
+		return
 	end
 
 	local input_extension = self._input_extension
@@ -35,15 +35,15 @@ CareerAbilityWEShade.update = function (self, unit, input, dt, context, t)
 	if input_extension and input_extension.get(input_extension, "action_career") then
 		self._run_ability(self)
 	end
-
-	return 
 end
+
 CareerAbilityWEShade._ability_available = function (self)
 	local career_extension = self._career_extension
 	local status_extension = self._status_extension
 
 	return career_extension.can_use_activated_ability(career_extension) and not status_extension.is_disabled(status_extension)
 end
+
 CareerAbilityWEShade._run_ability = function (self)
 	local owner_unit = self._owner_unit
 	local local_player = self._local_player
@@ -112,17 +112,14 @@ CareerAbilityWEShade._run_ability = function (self)
 
 	career_extension.start_activated_ability_cooldown(career_extension)
 	self._play_vo(self)
-
-	return 
 end
+
 CareerAbilityWEShade._play_vo = function (self)
 	local owner_unit = self._owner_unit
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
-
-	return 
 end
 
-return 
+return

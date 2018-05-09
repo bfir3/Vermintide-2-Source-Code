@@ -7,8 +7,6 @@ local function debug_print(...)
 	if script_data.debug_liquid_system then
 		print("[LiquidSystem]:", ...)
 	end
-
-	return 
 end
 
 LiquidAreaDamageExtension.init = function (self, extension_init_context, unit, extension_init_data)
@@ -106,9 +104,8 @@ LiquidAreaDamageExtension.init = function (self, extension_init_context, unit, e
 	if sfx_name_start then
 		WwiseUtils.trigger_unit_event(world, sfx_name_start, unit, 0)
 	end
-
-	return 
 end
+
 LiquidAreaDamageExtension.ready = function (self)
 	local unit = self._unit
 	self._unit_id = Managers.state.unit_storage:go_id(unit)
@@ -135,9 +132,8 @@ LiquidAreaDamageExtension.ready = function (self)
 
 	local flow_dir = self._flow_dir
 	self._damage_direction = flow_dir
-
-	return 
 end
+
 LiquidAreaDamageExtension._set_active = function (self, real_index)
 	local flow = self._flow
 	local liquid = flow[real_index]
@@ -180,9 +176,8 @@ LiquidAreaDamageExtension._set_active = function (self, real_index)
 			self._create_liquid(self, index, liquid.angle)
 		end
 	end
-
-	return 
 end
+
 LiquidAreaDamageExtension.stop_fx = function (self)
 	if script_data.debug_liquid_system then
 		self._fx_stopped = true
@@ -193,9 +188,8 @@ LiquidAreaDamageExtension.stop_fx = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 LiquidAreaDamageExtension._create_liquid = function (self, real_index, angle)
 	local grid = self._grid
 	local i, j, k = grid.ijk(grid, real_index)
@@ -255,9 +249,8 @@ LiquidAreaDamageExtension._create_liquid = function (self, real_index, angle)
 	}
 	self._flow[real_index] = liquid
 	self._inactive_flow[real_index] = liquid
-
-	return 
 end
+
 LiquidAreaDamageExtension._find_point = function (self, position)
 	local nav_world = self._nav_world
 	local above = 2
@@ -269,9 +262,8 @@ LiquidAreaDamageExtension._find_point = function (self, position)
 	else
 		return nil
 	end
-
-	return 
 end
+
 LiquidAreaDamageExtension.destroy = function (self)
 	local liquid_unit = self._unit
 	local sfx_name_stop = self._sfx_name_stop
@@ -326,9 +318,8 @@ LiquidAreaDamageExtension.destroy = function (self)
 
 	table.clear(self._affected_player_units)
 	self.stop_fx(self)
-
-	return 
 end
+
 local remove_list = {}
 local add_list = {}
 local fill_list = {
@@ -363,6 +354,7 @@ local fill_list = {
 		angle = 0
 	}
 }
+
 LiquidAreaDamageExtension.update = function (self, unit, input, dt, context, t)
 	local liquid_left = 1 - self._num_liquid / self._max_liquid
 	local pressure_coeff = liquid_left
@@ -376,7 +368,7 @@ LiquidAreaDamageExtension.update = function (self, unit, input, dt, context, t)
 	if self._time_to_remove < t then
 		Managers.state.unit_spawner:mark_for_deletion(self._unit)
 
-		return 
+		return
 	end
 
 	if not self._done then
@@ -495,9 +487,8 @@ LiquidAreaDamageExtension.update = function (self, unit, input, dt, context, t)
 			self._liquid_update_function = nil
 		end
 	end
-
-	return 
 end
+
 LiquidAreaDamageExtension._add_buff_helper_function = function (self, unit, liquid_unit, buff_name, buff_condition, buff_system)
 	local is_condition_fulfilled = nil
 
@@ -518,10 +509,10 @@ LiquidAreaDamageExtension._add_buff_helper_function = function (self, unit, liqu
 
 		self._buff_affected_units[unit] = nil
 	end
-
-	return 
 end
+
 local UNITS_PER_FRAME = 10
+
 LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 	local units_per_frame = UNITS_PER_FRAME
 	local grid = self._grid
@@ -623,9 +614,8 @@ LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 	else
 		self._spawned_unit_index = index
 	end
-
-	return 
 end
+
 LiquidAreaDamageExtension._is_unit_colliding = function (self, grid, unit)
 	local unit_pos = POSITION_LOOKUP[unit]
 
@@ -652,7 +642,9 @@ LiquidAreaDamageExtension._is_unit_colliding = function (self, grid, unit)
 
 	return false
 end
+
 local buff_params = {}
+
 LiquidAreaDamageExtension._pulse_damage = function (self)
 	local remove_i = 0
 	local damage_dir = self._damage_direction:unbox()
@@ -693,9 +685,8 @@ LiquidAreaDamageExtension._pulse_damage = function (self)
 		local unit = remove_list[i]
 		self._colliding_units[unit] = nil
 	end
-
-	return 
 end
+
 LiquidAreaDamageExtension.is_position_inside = function (self, position, nav_cost_map_table)
 	local grid = self._grid
 	local i, j, k = grid.find_index(grid, position)
@@ -718,12 +709,12 @@ LiquidAreaDamageExtension.is_position_inside = function (self, position, nav_cos
 	else
 		return false
 	end
-
-	return 
 end
+
 LiquidAreaDamageExtension.get_rim_nodes = function (self)
 	return self._inactive_flow, false
 end
+
 LiquidAreaDamageExtension.hot_join_sync = function (self, sender)
 	local flow = self._flow
 	local liquid_unit_id = self._unit_id
@@ -735,8 +726,6 @@ LiquidAreaDamageExtension.hot_join_sync = function (self, sender)
 
 		network_transmit.send_rpc(network_transmit, "rpc_add_liquid_damage_blob", sender, liquid_unit_id, real_index, position, is_filled)
 	end
-
-	return 
 end
 
-return 
+return

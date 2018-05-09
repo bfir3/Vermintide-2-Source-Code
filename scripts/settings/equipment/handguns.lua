@@ -52,8 +52,6 @@ weapon_template.actions = {
 			},
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end,
 			recoil_settings = {
 				horizontal_climb = 0,
@@ -299,4 +297,4 @@ weapon_template.tooltip_detail = {
 Weapons = Weapons or {}
 Weapons.handgun_template_1 = table.clone(weapon_template)
 
-return 
+return

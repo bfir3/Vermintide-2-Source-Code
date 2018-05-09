@@ -60,6 +60,7 @@ end
 
 StateIngame = class(StateIngame)
 StateIngame.NAME = "StateIngame"
+
 StateIngame.on_enter = function (self)
 	if PLATFORM == "xb1" then
 		Application.set_kinect_enabled(false)
@@ -528,9 +529,8 @@ StateIngame.on_enter = function (self)
 	end
 
 	Managers.state.event:trigger("start_game_time", Managers.state.network:network_time())
-
-	return 
 end
+
 StateIngame.peer_type = function (self)
 	if DEDICATED_SERVER then
 		return "dedicated-server"
@@ -539,22 +539,19 @@ StateIngame.peer_type = function (self)
 	else
 		return "client"
 	end
-
-	return 
 end
+
 StateIngame.event_xbox_one_hack_start_game = function (self, level_key, difficulty)
 	print(level_key, difficulty)
 	Managers.state.difficulty:set_difficulty(difficulty)
 	self.level_transition_handler:set_next_level(level_key)
 	Managers.state.game_mode:complete_level()
-
-	return 
 end
+
 StateIngame.cb_save_data = function (self)
 	print("saved data")
-
-	return 
 end
+
 StateIngame._setup_world = function (self)
 	local shading_callback = callback(self, "shading_callback")
 	local layer = 1
@@ -576,23 +573,18 @@ StateIngame._setup_world = function (self)
 		for i, machine in ipairs(self.machines) do
 			machine.state(machine):update_ui()
 		end
-
-		return 
 	end
 
 	Managers.world:set_anim_update_callback(self.world, update_ui)
 	Managers.world:set_scene_update_callback(self.world, function ()
 		self:physics_async_update(self.dt)
-
-		return 
 	end)
 
 	if Managers.splitscreen then
 		Managers.splitscreen:add_splitscreen_viewport(self.world)
 	end
-
-	return 
 end
+
 StateIngame._safe_to_do_entity_update = function (self)
 	local network_manager = Managers.state.network
 
@@ -606,6 +598,7 @@ StateIngame._safe_to_do_entity_update = function (self)
 
 	return not left_game_mode
 end
+
 StateIngame.physics_async_update = function (self, dt)
 	local t = Managers.time:time("game")
 
@@ -614,19 +607,16 @@ StateIngame.physics_async_update = function (self, dt)
 	if self._safe_to_do_entity_update(self) then
 		self.entity_system:physics_async_update()
 	end
-
-	return 
 end
+
 StateIngame.shading_callback = function (self, world, shading_env, viewport)
 	Managers.state.camera:shading_callback(world, shading_env, viewport)
-
-	return 
 end
+
 StateIngame._teardown_level = function (self)
 	World.destroy_level(self.world, self.level)
-
-	return 
 end
+
 StateIngame._teardown_world = function (self)
 	if Managers.splitscreen then
 		Managers.splitscreen:remove_splitscreen_viewport()
@@ -639,32 +629,29 @@ StateIngame._teardown_world = function (self)
 	World.destroy_gui(self.world, self._debug_gui)
 	World.destroy_gui(self.world, self._debug_gui_immediate)
 	Managers.world:destroy_world(self.world_name)
-
-	return 
 end
+
 StateIngame.spawn_unit = function (self, unit, ...)
 	if not Managers.state.entity then
 		printf("Unit %s is spawned after level destroy?", tostring(unit))
 
-		return 
+		return
 	end
 
 	Managers.state.entity:register_unit(self.world, unit, ...)
-
-	return 
 end
+
 StateIngame.unspawn_unit = function (self, unit)
 	if not Managers.state.entity then
 		printf("Unit %s has not been destroyed by entity manager or level destroy", tostring(unit))
 
-		return 
+		return
 	end
 
 	Unit.flow_event(unit, "unit_despawned")
 	Managers.state.entity:unregister_unit(unit)
-
-	return 
 end
+
 StateIngame._create_level = function (self)
 	local level_key = self.level_transition_handler:get_current_level_keys()
 	local level_name = LevelSettings[level_key].level_name
@@ -710,7 +697,9 @@ StateIngame._create_level = function (self)
 
 	return level
 end
+
 script_data.disable_ui = script_data.disable_ui or Development.parameter("disable_ui")
+
 StateIngame.pre_update = function (self, dt)
 	local t = Managers.time:time("game")
 	local network_manager = Managers.state.network
@@ -733,10 +722,10 @@ StateIngame.pre_update = function (self, dt)
 	if self._safe_to_do_entity_update(self) then
 		self.entity_system:pre_update(dt, t)
 	end
-
-	return 
 end
+
 local knoywloke = nil
+
 StateIngame.update = function (self, dt, main_t)
 	Vault.reseed()
 
@@ -869,9 +858,8 @@ StateIngame.update = function (self, dt, main_t)
 	end
 
 	self._generate_ingame_clock(self)
-
-	return 
 end
+
 StateIngame._update_deed_manager = function (self, dt)
 	local deed_manager = Managers.deed
 
@@ -888,10 +876,10 @@ StateIngame._update_deed_manager = function (self, dt)
 			level_transition_handler.level_completed(level_transition_handler)
 		end
 	end
-
-	return 
 end
+
 local CONNECTION_TIMEOUT = 30
+
 StateIngame.connected_to_network = function (self, t)
 	if Development.parameter("use_lan_backend") then
 		return true
@@ -913,16 +901,15 @@ StateIngame.connected_to_network = function (self, t)
 
 	return true
 end
+
 StateIngame.cb_transition_fade_in_done = function (self, new_state)
 	self._new_state = new_state
-
-	return 
 end
+
 StateIngame.event_start_network_timer = function (self, time)
 	self.network_timer_handler:start_timer_server(time)
-
-	return 
 end
+
 StateIngame._check_exit = function (self, t)
 	local network_manager = Managers.state.network
 	local lobby = self._lobby_host or self._lobby_client
@@ -1305,7 +1292,7 @@ StateIngame._check_exit = function (self, t)
 		local transition_manager = Managers.transition
 
 		if transition_manager.is_video_active(transition_manager) and not transition_manager.is_video_done(transition_manager) then
-			return 
+			return
 		end
 	end
 
@@ -1318,9 +1305,9 @@ StateIngame._check_exit = function (self, t)
 			print("Session leave timeout reached, force disconnecting")
 			network_manager.force_disconnect_from_session(network_manager)
 
-			return 
+			return
 		elseif not game_session_is_closed then
-			return 
+			return
 		end
 
 		if self.is_in_tutorial then
@@ -1481,9 +1468,8 @@ StateIngame._check_exit = function (self, t)
 			return StateSplashScreen
 		end
 	end
-
-	return 
 end
+
 StateIngame.wanted_profile_index = function (self)
 	local peer_id = Network.peer_id()
 	local player = Managers.player:player_from_peer_id(peer_id)
@@ -1499,6 +1485,7 @@ StateIngame.wanted_profile_index = function (self)
 
 	return wanted_profile_index
 end
+
 StateIngame.post_update = function (self, dt)
 	local t = Managers.time:time("game")
 
@@ -1523,9 +1510,8 @@ StateIngame.post_update = function (self, dt)
 	if Managers.voice_chat then
 		Managers.voice_chat:update(dt, t)
 	end
-
-	return 
 end
+
 StateIngame.on_exit = function (self, application_shutdown)
 	UPDATE_POSITION_LOOKUP()
 	UPDATE_PLAYER_LISTS()
@@ -1665,8 +1651,6 @@ StateIngame.on_exit = function (self, application_shutdown)
 			__index = function (event_table, event_key)
 				return function ()
 					Application.warning("Got RPC %s during forced network update when exiting StateIngame", event_key)
-
-					return 
 				end
 			end
 		}
@@ -1779,9 +1763,8 @@ StateIngame.on_exit = function (self, application_shutdown)
 	end
 
 	self._remove_ingame_clock(self)
-
-	return 
 end
+
 StateIngame._check_and_add_end_game_telemetry = function (self, application_shutdown)
 	local player = Managers.player:player_from_peer_id(self.peer_id)
 	local level_key = self.level_key
@@ -1809,9 +1792,8 @@ StateIngame._check_and_add_end_game_telemetry = function (self, application_shut
 	end
 
 	Managers.telemetry.events:game_ended(reason)
-
-	return 
 end
+
 StateIngame._setup_state_context = function (self, world, is_server, network_event_delegate)
 	local network_clock = nil
 
@@ -2011,30 +1993,28 @@ StateIngame._setup_state_context = function (self, world, is_server, network_eve
 	Managers.state.performance_title = PerformanceTitleManager:new(self.network_transmit, self.statistics_db, is_server)
 
 	Managers.state.performance_title:register_rpcs(network_event_delegate)
-
-	return 
 end
+
 StateIngame.rpc_kick_peer = function (self, sender)
 	if self.network_client == nil then
-		return 
+		return
 	end
 
 	if self.network_client.server_peer_id ~= sender then
-		return 
+		return
 	end
 
 	if self.is_server then
-		return 
+		return
 	end
 
 	if Managers.party:is_leader(self.peer_id) then
-		return 
+		return
 	end
 
 	self.kicked_by_server = true
-
-	return 
 end
+
 StateIngame.event_play_particle_effect = function (self, effect_name, unit, node, offset, rotation_offset, linked)
 	if linked then
 		ScriptWorld.create_particles_linked(self.world, effect_name, unit, node, "destroy", Matrix4x4.from_quaternion_position(rotation_offset, offset))
@@ -2055,9 +2035,8 @@ StateIngame.event_play_particle_effect = function (self, effect_name, unit, node
 
 		World.create_particles(self.world, effect_name, Matrix4x4.translation(transform), Matrix4x4.rotation(transform))
 	end
-
-	return 
 end
+
 StateIngame.gm_event_end_conditions_met = function (self, reason, checkpoint_available, percentage_completed)
 	LevelHelper:flow_event(self.world, "gm_event_end_conditions_met")
 
@@ -2110,9 +2089,8 @@ StateIngame.gm_event_end_conditions_met = function (self, reason, checkpoint_ava
 	for _, machine in pairs(self.machines) do
 		machine.state(machine):gm_event_end_conditions_met(reason, checkpoint_available, percentage_completed)
 	end
-
-	return 
 end
+
 StateIngame._generate_ingame_clock = function (self)
 	if self.network_server and Managers.time:time("client_ingame") == nil then
 		local peer_state_machines = self.network_server.peer_state_machines
@@ -2125,17 +2103,14 @@ StateIngame._generate_ingame_clock = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 StateIngame._remove_ingame_clock = function (self)
 	local time_system = Managers.time
 
 	if time_system.has_timer(time_system, "client_ingame") then
 		time_system.unregister_timer(time_system, "client_ingame")
 	end
-
-	return 
 end
 
-return 
+return

@@ -9,14 +9,15 @@ local scenegraph_definition = definitions.scenegraph_definition
 local DO_RELOAD = false
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
 CharacterSelectionStateCharacter = class(CharacterSelectionStateCharacter)
 CharacterSelectionStateCharacter.NAME = "CharacterSelectionStateCharacter"
+
 CharacterSelectionStateCharacter.on_enter = function (self, params)
 	self.parent:clear_wanted_state()
 	print("[HeroViewState] Enter Substate CharacterSelectionStateCharacter")
@@ -59,9 +60,8 @@ CharacterSelectionStateCharacter.on_enter = function (self, params)
 
 	self._select_hero_tab_by_profile_index(self, profile_index)
 	self.parent:set_input_blocked(false)
-
-	return 
 end
+
 CharacterSelectionStateCharacter._setup_video_player = function (self, material_name, resource)
 	self._destroy_video_player(self)
 
@@ -76,9 +76,8 @@ CharacterSelectionStateCharacter._setup_video_player = function (self, material_
 	local widget = UIWidget.init(widget_definition)
 	self._video_widget = widget
 	self._video_created = true
-
-	return 
 end
+
 CharacterSelectionStateCharacter._destroy_video_player = function (self)
 	local ui_top_renderer = self.ui_top_renderer
 	local widget = self._video_widget
@@ -96,9 +95,8 @@ CharacterSelectionStateCharacter._destroy_video_player = function (self)
 	end
 
 	self._video_created = nil
-
-	return 
 end
+
 CharacterSelectionStateCharacter.create_ui_elements = function (self, params)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -118,15 +116,15 @@ CharacterSelectionStateCharacter.create_ui_elements = function (self, params)
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
 
 	self._assign_hero_portraits(self)
-
-	return 
 end
+
 CharacterSelectionStateCharacter._get_skin_item_data = function (self, index, career_index)
 	local profile_settings = SPProfiles[index]
 	local skin_name = profile_settings.careers[career_index].base_skin
 
 	return Cosmetics[skin_name]
 end
+
 CharacterSelectionStateCharacter._align_hero_selection_frames = function (self)
 	local widgets_by_name = self._widgets_by_name
 	local spacing = 100
@@ -138,9 +136,8 @@ CharacterSelectionStateCharacter._align_hero_selection_frames = function (self)
 		local size = scenegraph_definition[scenegraph_id].size
 		widget.offset[2] = -(size[2] * (index - 1) + spacing * (index - 1))
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._assign_hero_portraits = function (self)
 	local widget = self._widgets_by_name.hero_tabs
 	local content = widget.content
@@ -170,9 +167,8 @@ CharacterSelectionStateCharacter._assign_hero_portraits = function (self)
 		selection_offset[1] = (selection_default_offset[1] + icon_size[1] / 2) - selection_texture_size[1] / 2
 		selection_offset[2] = (selection_default_offset[2] + icon_size[2] / 2) - selection_texture_size[2] / 2
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._assign_career_data_by_hero = function (self, hero_name)
 	local widget = self._widgets_by_name.career_tabs
 	local content = widget.content
@@ -215,14 +211,14 @@ CharacterSelectionStateCharacter._assign_career_data_by_hero = function (self, h
 		selection_offset[1] = (selection_default_offset[1] + icon_size[1] / 2) - selection_size[1] / 2
 		selection_offset[2] = (selection_default_offset[2] + icon_size[2] / 2) - selection_size[2] / 2
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._wanted_state = function (self)
 	local new_state = self.parent:wanted_state()
 
 	return new_state
 end
+
 CharacterSelectionStateCharacter.on_exit = function (self, params)
 	if self.menu_input_description then
 		self.menu_input_description:destroy()
@@ -237,9 +233,8 @@ CharacterSelectionStateCharacter.on_exit = function (self, params)
 
 	self.parent:set_input_blocked(false)
 	print("[HeroViewState] Exit Substate CharacterSelectionStateCharacter")
-
-	return 
 end
+
 CharacterSelectionStateCharacter._respawn_player = function (self)
 	if self._respawn_player_unit then
 		if self.is_server then
@@ -250,12 +245,11 @@ CharacterSelectionStateCharacter._respawn_player = function (self)
 
 		self._respawn_player_unit = nil
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._update_transition_timer = function (self, dt)
 	if not self._transition_timer then
-		return 
+		return
 	end
 
 	if self._transition_timer == 0 then
@@ -263,9 +257,8 @@ CharacterSelectionStateCharacter._update_transition_timer = function (self, dt)
 	else
 		self._transition_timer = math.max(self._transition_timer - dt, 0)
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -299,9 +292,8 @@ CharacterSelectionStateCharacter.update = function (self, dt, t)
 	end
 
 	self.draw(self, dt)
-
-	return 
 end
+
 CharacterSelectionStateCharacter.post_update = function (self, dt, t)
 	self.ui_animator:update(dt)
 	self._update_animations(self, dt)
@@ -335,9 +327,8 @@ CharacterSelectionStateCharacter.post_update = function (self, dt, t)
 
 		self.parent:close_menu()
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter.draw = function (self, dt)
 	local ui_top_renderer = self.ui_top_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -370,9 +361,8 @@ CharacterSelectionStateCharacter.draw = function (self, dt)
 	if gamepad_active then
 		self.menu_input_description:draw(ui_top_renderer, dt)
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._update_animations = function (self, dt)
 	local animations = self._animations
 	local ui_animator = self.ui_animator
@@ -384,18 +374,16 @@ CharacterSelectionStateCharacter._update_animations = function (self, dt)
 			animations[animation_name] = nil
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._spawn_hero_unit = function (self, hero_name)
 	local world_previewer = self.world_previewer
 	local career_index = self.career_index
 	local callback = callback(self, "cb_hero_unit_spawned", hero_name)
 
 	world_previewer.request_spawn_hero_unit(world_previewer, hero_name, career_index, true, callback, nil, 0.5)
-
-	return 
 end
+
 CharacterSelectionStateCharacter.cb_hero_unit_spawned = function (self, hero_name)
 	local world_previewer = self.world_previewer
 	local career_index = self.career_index
@@ -426,9 +414,8 @@ CharacterSelectionStateCharacter.cb_hero_unit_spawned = function (self, hero_nam
 	if preview_animation then
 		self.world_previewer:play_character_animation(preview_animation)
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -438,21 +425,22 @@ CharacterSelectionStateCharacter._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter
 end
+
 CharacterSelectionStateCharacter._is_button_hover_exit = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_exit
 end
+
 CharacterSelectionStateCharacter._is_hero_tab_selected = function (self)
 	local widget = self._widgets_by_name.hero_tabs
 	local widget_content = widget.content
@@ -467,9 +455,8 @@ CharacterSelectionStateCharacter._is_hero_tab_selected = function (self)
 			return i
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._is_tab_hovered = function (self, widget)
 	local widget_content = widget.content
 	local amount = widget_content.amount
@@ -483,9 +470,8 @@ CharacterSelectionStateCharacter._is_tab_hovered = function (self, widget)
 			return i
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._is_tab_dehovered = function (self, widget)
 	local widget_content = widget.content
 	local amount = widget_content.amount
@@ -499,9 +485,8 @@ CharacterSelectionStateCharacter._is_tab_dehovered = function (self, widget)
 			return i
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._is_career_tab_selected = function (self)
 	local widget = self._widgets_by_name.career_tabs
 	local widget_content = widget.content
@@ -516,17 +501,15 @@ CharacterSelectionStateCharacter._is_career_tab_selected = function (self)
 			return i
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._select_hero_tab_by_profile_index = function (self, profile_index)
 	self._select_hero_tab_by_index(self, ProfileIndexToPriorityIndex[profile_index])
-
-	return 
 end
+
 CharacterSelectionStateCharacter._select_hero_tab_by_index = function (self, index, play_sound)
 	if self._hero_tab_index == index then
-		return 
+		return
 	end
 
 	if play_sound then
@@ -569,12 +552,11 @@ CharacterSelectionStateCharacter._select_hero_tab_by_index = function (self, ind
 	self._hero_tab_index = index
 
 	self._select_career_tab_by_index(self, career_index, true)
-
-	return 
 end
+
 CharacterSelectionStateCharacter._select_career_tab_by_index = function (self, career_index, force_set, play_sound)
 	if not force_set and self.career_index == career_index then
-		return 
+		return
 	end
 
 	if play_sound then
@@ -626,9 +608,8 @@ CharacterSelectionStateCharacter._select_career_tab_by_index = function (self, c
 	end
 
 	widgets_by_name.locked_info_text.content.visible = is_career_locked
-
-	return 
 end
+
 CharacterSelectionStateCharacter._populate_career_page = function (self, hero_name, career_index)
 	local profile_index = FindProfileIndex(hero_name)
 	local profile_settings = SPProfiles[profile_index]
@@ -661,9 +642,8 @@ CharacterSelectionStateCharacter._populate_career_page = function (self, hero_na
 	self._setup_video_player(self, material_name, resource)
 
 	self._draw_video_next_frame = true
-
-	return 
 end
+
 CharacterSelectionStateCharacter._handle_tab_hover = function (self, widget, style_prefix)
 	local hover_index = self._is_tab_hovered(self, widget)
 
@@ -676,9 +656,8 @@ CharacterSelectionStateCharacter._handle_tab_hover = function (self, widget, sty
 	if dehover_index then
 		self._on_option_button_dehover(self, widget, style_prefix .. "_" .. dehover_index)
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._handle_input = function (self, dt, t)
 	if self._is_tab_hovered(self, self._widgets_by_name.hero_tabs) then
 		self._play_sound(self, "play_gui_hero_select_hero_hover")
@@ -733,16 +712,14 @@ CharacterSelectionStateCharacter._handle_input = function (self, dt, t)
 
 	self._handle_tab_hover(self, widgets_by_name.hero_tabs, "icon")
 	self._handle_tab_hover(self, widgets_by_name.career_tabs, "icon")
-
-	return 
 end
+
 CharacterSelectionStateCharacter._set_hero_info = function (self, name, level)
 	local widgets_by_name = self._widgets_by_name
 	widgets_by_name.info_hero_name.content.text = name
 	widgets_by_name.info_hero_level.content.text = Localize("level") .. ": " .. level
-
-	return 
 end
+
 CharacterSelectionStateCharacter._set_select_button_enabled = function (self, enabled)
 	local button_content = self._widgets_by_name.select_button.content
 	button_content.title_text = (enabled and Localize("input_description_confirm")) or Localize("dlc1_2_difficulty_unavailable")
@@ -753,33 +730,32 @@ CharacterSelectionStateCharacter._set_select_button_enabled = function (self, en
 	else
 		self.menu_input_description:set_input_description(nil)
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 CharacterSelectionStateCharacter.get_camera_position = function (self)
 	local world, viewport = self.parent:get_background_world()
 	local camera = ScriptViewport.camera(viewport)
 
 	return ScriptCamera.position(camera)
 end
+
 CharacterSelectionStateCharacter.get_camera_rotation = function (self)
 	local world, viewport = self.parent:get_background_world()
 	local camera = ScriptViewport.camera(viewport)
 
 	return ScriptCamera.rotation(camera)
 end
+
 CharacterSelectionStateCharacter.trigger_unit_flow_event = function (self, unit, event_name)
 	if unit and Unit.alive(unit) then
 		Unit.flow_event(unit, event_name)
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._start_transition_animation = function (self, key, animation_name)
 	local params = {
 		wwise_world = self.wwise_world,
@@ -788,14 +764,13 @@ CharacterSelectionStateCharacter._start_transition_animation = function (self, k
 	local widgets = {}
 	local anim_id = self.ui_animator:start_animation(animation_name, widgets, scenegraph_definition, params)
 	self._animations[key] = anim_id
-
-	return 
 end
+
 CharacterSelectionStateCharacter._change_profile = function (self, profile_index, career_index)
 	local profile_synchronizer = self.profile_synchronizer
 
 	if profile_synchronizer.has_pending_request(profile_synchronizer) then
-		return 
+		return
 	end
 
 	local peer_id = self.peer_id
@@ -817,9 +792,8 @@ CharacterSelectionStateCharacter._change_profile = function (self, profile_index
 	self._pending_profile_request = true
 	self._requested_profile_index = profile_index
 	self._requested_career_index = career_index
-
-	return 
 end
+
 CharacterSelectionStateCharacter._change_career = function (self, profile_index, career_index)
 	local player = self.local_player
 	local player_unit = player.player_unit
@@ -841,12 +815,12 @@ CharacterSelectionStateCharacter._change_career = function (self, profile_index,
 	self._save_selected_profile(self, profile_index)
 
 	self._resync_id = self.profile_synchronizer:resync_loadout(self._selected_profile_index, career_index, player)
-
-	return 
 end
+
 CharacterSelectionStateCharacter.pending_profile_request = function (self)
 	return self._pending_profile_request
 end
+
 CharacterSelectionStateCharacter._save_selected_profile = function (self, profile_index)
 	if not SaveData.first_hero_selection_made then
 		SaveData.first_hero_selection_made = true
@@ -855,9 +829,8 @@ CharacterSelectionStateCharacter._save_selected_profile = function (self, profil
 	SaveData.wanted_profile_index = profile_index
 
 	Managers.save:auto_save(SaveFileName, SaveData, nil)
-
-	return 
 end
+
 CharacterSelectionStateCharacter._update_profile_request = function (self)
 	if self._pending_profile_request then
 		local synchronizer = self.profile_synchronizer
@@ -897,9 +870,8 @@ CharacterSelectionStateCharacter._update_profile_request = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._update_available_profiles = function (self)
 	local available_profiles = self._available_profiles
 	local player = Managers.player:local_player()
@@ -926,9 +898,8 @@ CharacterSelectionStateCharacter._update_available_profiles = function (self)
 			self._set_select_button_enabled(self, button_enabled)
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._on_option_button_hover = function (self, widget, style_id)
 	local ui_animations = self._ui_animations
 	local animation_name = "option_button_" .. style_id
@@ -946,9 +917,8 @@ CharacterSelectionStateCharacter._on_option_button_hover = function (self, widge
 			pass_style.color[i] = target_color_value
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionStateCharacter._on_option_button_dehover = function (self, widget, style_id)
 	local ui_animations = self._ui_animations
 	local animation_name = "option_button_" .. style_id
@@ -966,24 +936,26 @@ CharacterSelectionStateCharacter._on_option_button_dehover = function (self, wid
 			pass_style.color[1] = target_color_value
 		end
 	end
+end
 
-	return 
-end
 CharacterSelectionStateCharacter.play_sound = function (self, event)
-	return 
+	return
 end
+
 CharacterSelectionStateCharacter._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 CharacterSelectionStateCharacter._animate_element_by_catmullrom = function (self, target, target_index, target_value, p0, p1, p2, p3, time)
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
 end
+
 CharacterSelectionStateCharacter.input_service = function (self)
 	return ((self._pending_profile_request or self._resync_id) and fake_input_service) or self.parent:input_service(true)
 end
 
-return 
+return

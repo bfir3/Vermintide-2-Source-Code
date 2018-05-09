@@ -2,6 +2,7 @@ local font_size = 26
 local font = "gw_arial_16"
 local font_mtrl = "materials/fonts/" .. font
 PlayerHud = class(PlayerHud)
+
 PlayerHud.init = function (self, extension_init_context, unit, extension_init_data)
 	self.world = extension_init_context.world
 	self.gui = World.create_screen_gui(self.world, "material", "materials/fonts/gw_fonts", "immediate")
@@ -14,24 +15,26 @@ PlayerHud.init = function (self, extension_init_context, unit, extension_init_da
 	self.hit_marker_data = {}
 
 	self.reset(self)
+end
 
-	return 
-end
 PlayerHud.extensions_ready = function (self, world, unit)
-	return 
+	return
 end
+
 PlayerHud.destroy = function (self)
-	return 
+	return
 end
+
 PlayerHud.reset = function (self)
 	self.outline_timers = {}
+end
 
-	return 
-end
 local show_intensity = true
+
 PlayerHud.update = function (self, unit, input, dt, context, t)
-	return 
+	return
 end
+
 PlayerHud.draw_player_names = function (self, unit)
 	local player_manager = Managers.player
 	local players = player_manager.players(player_manager)
@@ -69,26 +72,22 @@ PlayerHud.draw_player_names = function (self, unit)
 			end
 		end
 	end
-
-	return 
 end
+
 PlayerHud.set_current_location = function (self, location)
 	self.current_location = location
-
-	return 
 end
+
 PlayerHud.gdc_intro_active = function (self, state)
 	self.show_gdc_intro = true
-
-	return 
 end
+
 PlayerHud.set_picked_up_ammo = function (self, picked_up_ammo)
 	self.picked_up_ammo = picked_up_ammo
-
-	return 
 end
+
 PlayerHud.get_picked_up_ammo = function (self)
 	return self.picked_up_ammo
 end
 
-return 
+return

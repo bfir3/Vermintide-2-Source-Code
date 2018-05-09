@@ -62,6 +62,7 @@ local widget_definitions = {
 	news_ticker_text_widget = UIWidgets.create_simple_text("", "news_ticker_text", nil, nil, text_style),
 	news_ticker_mask_widget = UIWidgets.create_simple_texture("mask_rect", "news_ticker_mask")
 }
+
 IngameNewsTickerUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.input_manager = ingame_ui_context.input_manager
@@ -74,9 +75,8 @@ IngameNewsTickerUI.init = function (self, ingame_ui_context)
 	self.news_ticker_manager = Managers.news_ticker
 
 	self.refresh_message(self)
-
-	return 
 end
+
 IngameNewsTickerUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
@@ -86,22 +86,19 @@ IngameNewsTickerUI.create_ui_elements = function (self)
 	local text_style = self.news_ticker_text_widget.style.text
 	text_style.localize = false
 	text_style.horizontal_alignment = "left"
-
-	return 
 end
+
 IngameNewsTickerUI.destroy = function (self)
 	GarbageLeakDetector.register_object(self, "ingame_news_ticker_ui")
-
-	return 
 end
+
 IngameNewsTickerUI.refresh_message = function (self)
 	self.refreshing_message = true
 	self.news_ticker_started = nil
 
 	self.news_ticker_manager:refresh_ingame_message()
-
-	return 
 end
+
 IngameNewsTickerUI.update = function (self, dt, t)
 	local news_ticker_manager = self.news_ticker_manager
 	local news_ticker_started = self.news_ticker_started
@@ -138,9 +135,8 @@ IngameNewsTickerUI.update = function (self, dt, t)
 	if not refreshing_ingame_message and not self.handle_message_refresh_delay(self, dt) then
 		self.refresh_message(self)
 	end
-
-	return 
 end
+
 IngameNewsTickerUI.handle_delay = function (self, dt)
 	local delay_time = self.delay
 
@@ -150,9 +146,8 @@ IngameNewsTickerUI.handle_delay = function (self, dt)
 
 		return true
 	end
-
-	return 
 end
+
 IngameNewsTickerUI.handle_message_refresh_delay = function (self, dt)
 	local delay_time = self.message_refresh_delay
 
@@ -162,9 +157,8 @@ IngameNewsTickerUI.handle_message_refresh_delay = function (self, dt)
 
 		return true
 	end
-
-	return 
 end
+
 IngameNewsTickerUI.draw = function (self, dt, t)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -176,9 +170,8 @@ IngameNewsTickerUI.draw = function (self, dt, t)
 	UIRenderer.draw_widget(ui_renderer, self.news_ticker_mask_widget)
 	UIRenderer.draw_widget(ui_renderer, self.news_ticker_text_widget)
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 IngameNewsTickerUI.setup_news_ticker = function (self, text)
 	local widget = self.news_ticker_text_widget
 	local widget_content = widget.content
@@ -191,8 +184,6 @@ IngameNewsTickerUI.setup_news_ticker = function (self, text)
 	local text_width, text_height, min = UIRenderer.text_size(self.ui_renderer, text, font[1], scaled_font_size)
 	self.news_ticker_text_width = text_width
 	self.news_ticker_started = true
-
-	return 
 end
 
-return 
+return

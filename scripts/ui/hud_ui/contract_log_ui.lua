@@ -14,6 +14,7 @@ local default_color = {
 local progress_color = Colors.get_color_table_with_alpha("sky_blue", 220)
 local complete_color = Colors.get_color_table_with_alpha("pale_green", 220)
 ContractLogUI = class(ContractLogUI)
+
 ContractLogUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -34,9 +35,8 @@ ContractLogUI.init = function (self, ingame_ui_context)
 
 	self._align_widgets(self)
 	rawset(_G, "contract_log_ui", self)
-
-	return 
 end
+
 ContractLogUI._create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -56,9 +56,8 @@ ContractLogUI._create_ui_elements = function (self)
 
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 	self.set_visible(self, true)
-
-	return 
 end
+
 ContractLogUI._align_widgets = function (self)
 	local start_position = 5
 	local longest_width = 0
@@ -76,15 +75,13 @@ ContractLogUI._align_widgets = function (self)
 	end
 
 	self.set_dirty(self)
-
-	return 
 end
+
 ContractLogUI.destroy = function (self)
 	self.set_visible(self, false)
 	rawset(_G, "contract_log_ui", nil)
-
-	return 
 end
+
 ContractLogUI.set_visible = function (self, visible)
 	self._is_visible = visible
 	local ui_renderer = self.ui_renderer
@@ -95,9 +92,8 @@ ContractLogUI.set_visible = function (self, visible)
 
 	UIRenderer.set_element_visible(ui_renderer, self.title_widget.element, visible)
 	self.set_dirty(self)
-
-	return 
 end
+
 ContractLogUI._sync_active_contracts = function (self)
 	local dirty = false
 	local active_contract_ids = self.quest_manager:get_active_contract_ids()
@@ -136,6 +132,7 @@ ContractLogUI._sync_active_contracts = function (self)
 
 	return dirty
 end
+
 ContractLogUI._sync_contract_progression = function (self)
 	local log_entries = self._log_entries
 	local dirty = false
@@ -169,6 +166,7 @@ ContractLogUI._sync_contract_progression = function (self)
 
 	return dirty
 end
+
 ContractLogUI._update_contract_goal = function (self, entry_data)
 	local contract_id = entry_data.contract_id
 	local contract_session_progress = self.quest_manager:get_session_progress_by_contract_id(contract_id)
@@ -234,14 +232,13 @@ ContractLogUI._update_contract_goal = function (self, entry_data)
 
 		return make_dirty
 	end
-
-	return 
 end
+
 ContractLogUI._add_contract = function (self, contract_id)
 	local num_added_contracts = self.num_added_contracts or 0
 
 	if MAX_NUM_CONTRACT_ENTRIES <= num_added_contracts then
-		return 
+		return
 	end
 
 	local entry_data = {}
@@ -309,14 +306,13 @@ ContractLogUI._add_contract = function (self, contract_id)
 
 	self._log_entries_by_contract_id[contract_id] = entry_data
 	self.num_added_contracts = index
-
-	return 
 end
+
 ContractLogUI._remove_contract = function (self, contract_id)
 	local num_added_contracts = self.num_added_contracts or 0
 
 	if num_added_contracts <= 0 then
-		return 
+		return
 	end
 
 	local contract_data, index = nil
@@ -335,7 +331,7 @@ ContractLogUI._remove_contract = function (self, contract_id)
 	end
 
 	if not contract_data then
-		return 
+		return
 	end
 
 	local widget = table.remove(self._used_widgets, index)
@@ -352,9 +348,8 @@ ContractLogUI._remove_contract = function (self, contract_id)
 	self._log_entries_by_contract_id[contract_id] = nil
 
 	self._align_widgets(self)
-
-	return 
 end
+
 ContractLogUI._get_text_size = function (self, text_style, text)
 	local ui_renderer = self.ui_renderer
 	local size = text_style.size
@@ -381,6 +376,7 @@ ContractLogUI._get_text_size = function (self, text_style, text)
 
 	return num_texts * full_font_height, longest_width
 end
+
 ContractLogUI.update = function (self, dt, t)
 	local dirty = false
 	local realign = false
@@ -414,18 +410,16 @@ ContractLogUI.update = function (self, dt, t)
 	end
 
 	self.draw(self, dt)
-
-	return 
 end
+
 ContractLogUI._handle_resolution_modified = function (self)
 	if RESOLUTION_LOOKUP.modified then
 		self._on_resolution_modified(self)
 
 		return true
 	end
-
-	return 
 end
+
 ContractLogUI._on_resolution_modified = function (self)
 	for _, entry_data in ipairs(self._log_entries) do
 		self._update_contract_goal(self, entry_data)
@@ -440,16 +434,15 @@ ContractLogUI._on_resolution_modified = function (self)
 
 	self._set_widget_dirty(self, self.title_widget)
 	self.set_dirty(self)
-
-	return 
 end
+
 ContractLogUI.draw = function (self, dt)
 	if not self._is_visible then
-		return 
+		return
 	end
 
 	if not self._dirty then
-		return 
+		return
 	end
 
 	local ui_renderer = self.ui_renderer
@@ -466,23 +459,18 @@ ContractLogUI.draw = function (self, dt)
 	UIRenderer.end_pass(ui_renderer)
 
 	self._dirty = false
-
-	return 
 end
+
 ContractLogUI.set_dirty = function (self)
 	self._dirty = true
-
-	return 
 end
+
 ContractLogUI._set_widget_dirty = function (self, widget)
 	widget.element.dirty = true
-
-	return 
 end
+
 ContractLogUI.play_sound = function (self, event)
 	WwiseWorld.trigger_event(self.wwise_world, event)
-
-	return 
 end
 
-return 
+return

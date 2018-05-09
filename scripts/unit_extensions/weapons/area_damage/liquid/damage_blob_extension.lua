@@ -2,6 +2,7 @@ DamageBlobExtension = class(DamageBlobExtension)
 local unit_alive = Unit.alive
 local player_and_bot_units = PLAYER_AND_BOT_UNITS
 local position_lookup = POSITION_LOOKUP
+
 DamageBlobExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	local entity_manager = Managers.state.entity
@@ -64,9 +65,8 @@ DamageBlobExtension.init = function (self, extension_init_context, unit, extensi
 	if sfx_name_start then
 		WwiseUtils.trigger_unit_event(world, sfx_name_start, unit, 0)
 	end
-
-	return 
 end
+
 DamageBlobExtension.start_placing_blobs = function (self, wait_time, t)
 	self.state = "waiting"
 	self.last_blob_pos = Vector3Box()
@@ -87,10 +87,10 @@ DamageBlobExtension.start_placing_blobs = function (self, wait_time, t)
 	end
 
 	self.use_nav_cost_map_volumes = use_nav_cost_map_volumes
-
-	return 
 end
+
 local BLOB_EXTRA_SAFE_DISTANCE = 0.5
+
 DamageBlobExtension.stop_placing_blobs = function (self, t)
 	self.state = "lingering"
 	self.linger_time = t + self.time_of_life
@@ -122,9 +122,8 @@ DamageBlobExtension.stop_placing_blobs = function (self, t)
 	end
 
 	self.aborted = true
-
-	return 
 end
+
 DamageBlobExtension._remove_blob = function (self, blob, blob_index, blobs)
 	local buff_system = self.buff_system
 	local ai_units_inside = self.ai_units_inside
@@ -148,9 +147,8 @@ DamageBlobExtension._remove_blob = function (self, blob, blob_index, blobs)
 	end
 
 	table.remove(blobs, blob_index)
-
-	return 
 end
+
 DamageBlobExtension.destroy = function (self)
 	local unit = self.unit
 	local buff_system = self.buff_system
@@ -227,9 +225,8 @@ DamageBlobExtension.destroy = function (self)
 	end
 
 	self.aborted = true
-
-	return 
 end
+
 DamageBlobExtension.place_blobs = function (self, unit, t)
 	local position = position_lookup[unit]
 	local nav_world = self.nav_world
@@ -284,9 +281,8 @@ DamageBlobExtension.place_blobs = function (self, unit, t)
 
 	GameSession.set_game_object_field(game, unit_id, "position", position)
 	GameSession.set_game_object_field(game, unit_id, "rotation", rotation)
-
-	return 
 end
+
 DamageBlobExtension.update = function (self, unit, input, dt, context, t)
 	local state = self.state
 
@@ -319,9 +315,8 @@ DamageBlobExtension.update = function (self, unit, input, dt, context, t)
 	if script_data.debug_damage_blobs then
 		self._debug_render_blobs(self)
 	end
-
-	return 
 end
+
 DamageBlobExtension.insert_blob = function (self, position, radius, rotation, t, nav_world)
 	local nav_cost_map_volume_id = nil
 
@@ -375,9 +370,8 @@ DamageBlobExtension.insert_blob = function (self, position, radius, rotation, t,
 			rim_nodes[#rim_nodes + 1] = Vector3Box(rim_position_backward)
 		end
 	end
-
-	return 
 end
+
 DamageBlobExtension.insert_fx = function (self, position, rot, t)
 	local world = self.world
 	local fx_list = self.fx_list
@@ -406,9 +400,8 @@ DamageBlobExtension.insert_fx = function (self, position, rot, t)
 	end
 
 	self.last_fx_pos:store(position)
-
-	return 
 end
+
 DamageBlobExtension.update_blobs_fx_and_sfx = function (self, t, dt)
 	local world = self.world
 	local fx_name_filled = self.fx_name_filled
@@ -461,15 +454,14 @@ DamageBlobExtension.update_blobs_fx_and_sfx = function (self, t, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 DamageBlobExtension.update_blob_overlaps = function (self, t)
 	local blobs = self.blobs
 	local num_blobs = #blobs
 
 	if num_blobs < 1 then
-		return 
+		return
 	end
 
 	local unit = self.unit
@@ -490,7 +482,7 @@ DamageBlobExtension.update_blob_overlaps = function (self, t)
 	end
 
 	if not self.apply_buff_to_ai then
-		return 
+		return
 	end
 
 	local blobs_per_frame = 1
@@ -564,9 +556,8 @@ DamageBlobExtension.update_blob_overlaps = function (self, t)
 	end
 
 	self.ai_blob_index = blob_index
-
-	return 
 end
+
 DamageBlobExtension.check_overlap = function (self, unit, target_unit, blob_radius, p1, p2, buff_system, num_blobs)
 	local player_units_inside = self.player_units_inside
 	local test_pos = position_lookup[target_unit]
@@ -605,12 +596,12 @@ DamageBlobExtension.check_overlap = function (self, unit, target_unit, blob_radi
 			player_units_inside[target_unit] = buff_system.add_buff(buff_system, target_unit, buff_template_name, unit, true)
 		end
 	end
-
-	return 
 end
+
 DamageBlobExtension.get_rim_nodes = function (self)
 	return self.rim_nodes, true
 end
+
 DamageBlobExtension.is_position_inside = function (self, position, nav_cost_map_table)
 	local blobs = self.blobs
 	local num_blobs = #blobs
@@ -636,6 +627,7 @@ DamageBlobExtension.is_position_inside = function (self, position, nav_cost_map_
 
 	return distance_sq <= blob_radius_sq
 end
+
 DamageBlobExtension.hot_join_sync = function (self, sender)
 	local fx_list = self.fx_list
 	local unit_id = self.unit_id
@@ -650,9 +642,8 @@ DamageBlobExtension.hot_join_sync = function (self, sender)
 
 		network_transmit.send_rpc(network_transmit, "rpc_add_damage_blob_fx", sender, unit_id, position, life_time_percentage)
 	end
-
-	return 
 end
+
 DamageBlobExtension._debug_render_blobs = function (self)
 	local blobs = self.blobs
 
@@ -692,8 +683,6 @@ DamageBlobExtension._debug_render_blobs = function (self)
 			QuickDrawer:sphere(pos, 0.3, Color(255, 0, 60))
 		end
 	end
-
-	return 
 end
 
-return 
+return

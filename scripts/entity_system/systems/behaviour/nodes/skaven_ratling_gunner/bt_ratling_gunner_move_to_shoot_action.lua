@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTRatlingGunnerMoveToShootAction = class(BTRatlingGunnerMoveToShootAction, BTNode)
+
 BTRatlingGunnerMoveToShootAction.init = function (self, ...)
 	BTRatlingGunnerMoveToShootAction.super.init(self, ...)
-
-	return 
 end
+
 BTRatlingGunnerMoveToShootAction.name = "BTRatlingGunnerMoveToShootAction"
+
 BTRatlingGunnerMoveToShootAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local attack_pattern_data = {}
@@ -19,7 +20,7 @@ BTRatlingGunnerMoveToShootAction.enter = function (self, unit, blackboard, t)
 		attack_pattern_data.target_node_name = node_name
 		attack_pattern_data.exit_node = true
 
-		return 
+		return
 	end
 
 	local move_speed = action.move_speed
@@ -34,9 +35,8 @@ BTRatlingGunnerMoveToShootAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.move_state = "idle"
 	blackboard.move_attempts = 0
-
-	return 
 end
+
 BTRatlingGunnerMoveToShootAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if reason ~= "done" then
 		blackboard.move_pos = nil
@@ -47,9 +47,8 @@ BTRatlingGunnerMoveToShootAction.leave = function (self, unit, blackboard, t, re
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 BTRatlingGunnerMoveToShootAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.attack_pattern_data.exit_node then
 		blackboard.attack_pattern_data.exit_node = nil
@@ -100,15 +99,15 @@ BTRatlingGunnerMoveToShootAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTRatlingGunnerMoveToShootAction.move_to = function (self, position, unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.move_to(navigation_extension, position)
 
 	blackboard.move_pos = Vector3Box(position)
-
-	return 
 end
+
 BTRatlingGunnerMoveToShootAction.calculate_move_position = function (self, unit, blackboard)
 	local action = blackboard.action
 	local min_distance = action.keep_target_distance[1]
@@ -121,4 +120,4 @@ BTRatlingGunnerMoveToShootAction.calculate_move_position = function (self, unit,
 	return position
 end
 
-return 
+return

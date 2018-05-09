@@ -11,6 +11,7 @@ local event_colors = {
 }
 local breed_textures = UISettings.breed_textures
 PositiveReinforcementUI = class(PositiveReinforcementUI)
+
 PositiveReinforcementUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.input_manager = ingame_ui_context.input_manager
@@ -31,9 +32,8 @@ PositiveReinforcementUI.init = function (self, ingame_ui_context)
 
 	event_manager.register(event_manager, self, "add_coop_feedback", "event_add_positive_enforcement")
 	event_manager.register(event_manager, self, "add_coop_feedback_kill", "event_add_positive_enforcement_kill")
-
-	return 
 end
+
 PositiveReinforcementUI.destroy = function (self)
 	GarbageLeakDetector.register_object(self, "positive_reinforcement_ui")
 
@@ -41,9 +41,8 @@ PositiveReinforcementUI.destroy = function (self)
 
 	event_manager.unregister(event_manager, "add_coop_feedback", self)
 	event_manager.unregister(event_manager, "add_coop_feedback_kill", self)
-
-	return 
 end
+
 PositiveReinforcementUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
@@ -55,17 +54,14 @@ PositiveReinforcementUI.create_ui_elements = function (self)
 	end
 
 	self._unused_widgets = table.clone(self.message_widgets)
-
-	return 
 end
+
 PositiveReinforcementUI.remove_event = function (self, index)
 	local events = self._positive_enforcement_events
 	local event = table.remove(events, index)
 	local widget = event.widget
 	local unused_widgets = self._unused_widgets
 	unused_widgets[#unused_widgets + 1] = widget
-
-	return 
 end
 
 local function trigger_assist_buffs(savior_unit, saved_unit)
@@ -88,8 +84,6 @@ local function trigger_assist_buffs(savior_unit, saved_unit)
 			network_transmit.send_rpc_server(network_transmit, "rpc_request_heal", savior_unit_id, shield_amount, heal_type_id)
 		end
 	end
-
-	return 
 end
 
 PositiveReinforcementUI.add_event = function (self, hash, is_local_player, color_from, event_type, ...)
@@ -153,13 +147,13 @@ PositiveReinforcementUI.add_event = function (self, hash, is_local_player, color
 			WwiseWorld.trigger_event(wwise_world, sound_event)
 		end
 	end
-
-	return 
 end
+
 local temp_portrait_size = {
 	96,
 	112
 }
+
 PositiveReinforcementUI._assign_portrait_texture = function (self, widget, pass_name, texture)
 	widget.content[pass_name].texture_id = texture
 	local portrait_size = table.clone(temp_portrait_size)
@@ -176,12 +170,11 @@ PositiveReinforcementUI._assign_portrait_texture = function (self, widget, pass_
 	offset[1] = portrait_offset[1] - portrait_size[1] / 2
 	offset[2] = portrait_offset[2] - portrait_size[2] / 2
 	style.size = portrait_size
-
-	return 
 end
+
 PositiveReinforcementUI.event_add_positive_enforcement = function (self, hash, is_local_player, event_type, player1, player2)
 	if not event_settings[event_type] then
-		return 
+		return
 	end
 
 	local player_1_name = (player1 and player1.name(player1)) or nil
@@ -198,49 +191,44 @@ PositiveReinforcementUI.event_add_positive_enforcement = function (self, hash, i
 	local player_2_profile_image = player_2_profile_index and player_2_career_index and self._get_hero_portrait(self, player_2_profile_index, player_2_career_index)
 
 	if event_type == "aid" then
-		return 
+		return
 	end
 
 	self.add_event(self, hash, is_local_player, event_colors.default, event_type, player_1_profile_image, player_2_profile_image)
-
-	return 
 end
+
 PositiveReinforcementUI.event_add_positive_enforcement_kill = function (self, hash, is_local_player, event_type, profile_index, career_index, breed_name)
 	local breed_texture = breed_textures[breed_name]
 
 	if not event_settings[event_type] or not breed_texture then
-		return 
+		return
 	end
 
 	local attacker_texture = self._get_hero_portrait(self, profile_index, career_index)
 
 	self.add_event(self, hash, is_local_player, event_colors.kill, event_type, attacker_texture, breed_texture)
-
-	return 
 end
+
 PositiveReinforcementUI.event_add_positive_enforcement_player_knocked_down_or_killed = function (self, hash, is_local_player, event_type, profile_index, breed_name)
 	local breed_texture = breed_textures[breed_name]
 
 	if not event_settings[event_type] or not breed_texture then
-		return 
+		return
 	end
 
 	local player_texture = self._get_hero_portrait(self, profile_index)
 
 	self.add_event(self, hash, is_local_player, event_colors.kill, event_type, breed_texture, player_texture)
-
-	return 
 end
+
 PositiveReinforcementUI.event_add_lorebook_page_pickup = function (self, hash, is_local_player, event_type, page_id)
 	self.add_event(self, hash, is_local_player, event_colors.personal, event_type, page_id)
-
-	return 
 end
+
 PositiveReinforcementUI.event_add_interaction_warning = function (self, hash, message)
 	self.add_event(self, hash, true, event_colors.kill, "interaction_warning", Localize(message))
-
-	return 
 end
+
 PositiveReinforcementUI._get_hero_portrait = function (self, profile_index, career_index)
 	local scale = RESOLUTION_LOOKUP.scale
 	local profile_data = SPProfiles[profile_index]
@@ -251,6 +239,7 @@ PositiveReinforcementUI._get_hero_portrait = function (self, profile_index, care
 
 	return "small_" .. character_portrait
 end
+
 PositiveReinforcementUI.update = function (self, dt, t)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -330,8 +319,6 @@ PositiveReinforcementUI.update = function (self, dt, t)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
 
-return 
+return

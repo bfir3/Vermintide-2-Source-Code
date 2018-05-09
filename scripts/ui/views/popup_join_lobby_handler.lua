@@ -364,6 +364,7 @@ local widget_definitions = {
 	timer_title_text = UIWidgets.create_simple_text(Localize("join_popup_timer_title"), "timer_title_text", nil, nil, timer_title_text_style)
 }
 local DO_RELOAD = true
+
 PopupJoinLobbyHandler.init = function (self, ingame_ui_context)
 	self.network_event_delegate = ingame_ui_context.network_event_delegate
 	self.ui_renderer = ingame_ui_context.ui_renderer
@@ -394,9 +395,8 @@ PopupJoinLobbyHandler.init = function (self, ingame_ui_context)
 	self.unblocked_services = {}
 	self.unblocked_services_n = 0
 	DO_RELOAD = false
-
-	return 
 end
+
 PopupJoinLobbyHandler.create_ui_elements = function (self)
 	self._ui_animations = {}
 	local widgets = {}
@@ -416,12 +416,12 @@ PopupJoinLobbyHandler.create_ui_elements = function (self)
 
 	UIRenderer.clear_scenegraph_queue(self.ui_top_renderer)
 	self._assign_hero_portraits(self)
-
-	return 
 end
+
 PopupJoinLobbyHandler._get_widget = function (self, name)
 	return self._widgets_by_name[name]
 end
+
 PopupJoinLobbyHandler.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -464,9 +464,8 @@ PopupJoinLobbyHandler.update = function (self, dt, t)
 	end
 
 	self.draw(self, ui_top_renderer, input_service, dt)
-
-	return 
 end
+
 PopupJoinLobbyHandler.show = function (self, current_profile_index, current_career_index, time_until_cancel, join_by_lobby_browser, difficulty)
 	self.join_lobby_result = nil
 	self._selected_hero_disabled = nil
@@ -493,9 +492,8 @@ PopupJoinLobbyHandler.show = function (self, current_profile_index, current_care
 	input_manager.device_unblock_service(input_manager, "keyboard", 1, "popup_join_lobby_handler")
 	input_manager.device_unblock_service(input_manager, "gamepad", 1, "popup_join_lobby_handler")
 	input_manager.device_unblock_service(input_manager, "mouse", 1, "popup_join_lobby_handler")
-
-	return 
 end
+
 PopupJoinLobbyHandler.hide = function (self)
 	local input_manager = self.input_manager
 
@@ -513,12 +511,12 @@ PopupJoinLobbyHandler.hide = function (self)
 
 	self._selected_hero_name = nil
 	self._selected_career_name = nil
-
-	return 
 end
+
 PopupJoinLobbyHandler.input_service = function (self)
 	return self.input_manager:get_service("popup_join_lobby_handler")
 end
+
 PopupJoinLobbyHandler.draw = function (self, ui_top_renderer, input_service, dt)
 	local swap_hero_active = self.swap_hero_active
 	local gamepad_active = Managers.input:is_device_active("gamepad")
@@ -536,9 +534,8 @@ PopupJoinLobbyHandler.draw = function (self, ui_top_renderer, input_service, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 PopupJoinLobbyHandler.set_result = function (self, accepted)
 	local selected_hero_name = accepted and self._selected_hero_name
 	local selected_career_name = accepted and self._selected_career_name
@@ -547,18 +544,17 @@ PopupJoinLobbyHandler.set_result = function (self, accepted)
 		selected_hero_name = selected_hero_name,
 		selected_career_name = selected_career_name
 	}
-
-	return 
 end
+
 PopupJoinLobbyHandler.query_result = function (self)
 	return self.join_lobby_result
 end
+
 PopupJoinLobbyHandler.destroy = function (self)
 	rawset(_G, "GLOBAL_MM_JL_UI", nil)
 	self.network_event_delegate:unregister(self)
-
-	return 
 end
+
 PopupJoinLobbyHandler._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 
@@ -602,9 +598,8 @@ PopupJoinLobbyHandler._handle_input = function (self, dt, t)
 		self._play_sound(self, "play_gui_start_menu_button_click")
 		self.set_result(self, false)
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -614,15 +609,15 @@ PopupJoinLobbyHandler._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter
 end
+
 PopupJoinLobbyHandler._is_hero_tab_selected = function (self)
 	local widget = self._widgets_by_name.hero_tabs
 	local widget_content = widget.content
@@ -637,9 +632,8 @@ PopupJoinLobbyHandler._is_hero_tab_selected = function (self)
 			return i
 		end
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._is_tab_hovered = function (self, widget)
 	local widget_content = widget.content
 	local amount = widget_content.amount
@@ -653,9 +647,8 @@ PopupJoinLobbyHandler._is_tab_hovered = function (self, widget)
 			return i
 		end
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._is_tab_dehovered = function (self, widget)
 	local widget_content = widget.content
 	local amount = widget_content.amount
@@ -669,9 +662,8 @@ PopupJoinLobbyHandler._is_tab_dehovered = function (self, widget)
 			return i
 		end
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._is_career_tab_selected = function (self)
 	local widget = self._widgets_by_name.career_tabs
 	local widget_content = widget.content
@@ -686,9 +678,8 @@ PopupJoinLobbyHandler._is_career_tab_selected = function (self)
 			return i
 		end
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._handle_tab_hover = function (self, widget, style_prefix)
 	local hover_index = self._is_tab_hovered(self, widget)
 
@@ -701,9 +692,8 @@ PopupJoinLobbyHandler._handle_tab_hover = function (self, widget, style_prefix)
 	if dehover_index then
 		self._on_option_button_dehover(self, widget, style_prefix .. "_" .. dehover_index)
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._on_option_button_hover = function (self, widget, style_id)
 	local ui_animations = self._ui_animations
 	local animation_name = "option_button_" .. style_id
@@ -721,9 +711,8 @@ PopupJoinLobbyHandler._on_option_button_hover = function (self, widget, style_id
 			pass_style.color[i] = target_color_value
 		end
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._on_option_button_dehover = function (self, widget, style_id)
 	local ui_animations = self._ui_animations
 	local animation_name = "option_button_" .. style_id
@@ -741,19 +730,17 @@ PopupJoinLobbyHandler._on_option_button_dehover = function (self, widget, style_
 			pass_style.color[1] = target_color_value
 		end
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._select_hero_and_career = function (self, profile_index, career_index)
 	local profile_order_index = ProfileIndexToPriorityIndex[profile_index]
 
 	self._select_hero_tab_by_index(self, profile_order_index, career_index)
-
-	return 
 end
+
 PopupJoinLobbyHandler._select_hero_tab_by_index = function (self, index, optional_career_index, play_sound)
 	if self._hero_tab_index == index then
-		return 
+		return
 	end
 
 	if play_sound then
@@ -798,12 +785,11 @@ PopupJoinLobbyHandler._select_hero_tab_by_index = function (self, index, optiona
 	self.enable_career_selection(self)
 
 	self._selected_hero_disabled = false
-
-	return 
 end
+
 PopupJoinLobbyHandler._select_career_tab_by_index = function (self, career_index, force_set, play_sound)
 	if not force_set and self.career_index == career_index then
-		return 
+		return
 	end
 
 	if play_sound then
@@ -852,9 +838,8 @@ PopupJoinLobbyHandler._select_career_tab_by_index = function (self, career_index
 	self.career_index = career_index
 	self._selected_career_name = career_name
 	self._selected_career_locked = selected_career_locked
-
-	return 
 end
+
 PopupJoinLobbyHandler._assign_career_data_by_hero = function (self, hero_name)
 	local widget = self._widgets_by_name.career_tabs
 	local content = widget.content
@@ -897,9 +882,8 @@ PopupJoinLobbyHandler._assign_career_data_by_hero = function (self, hero_name)
 		selection_offset[1] = (selection_default_offset[1] + icon_size[1] / 2) - selection_size[1] / 2
 		selection_offset[2] = (selection_default_offset[2] + icon_size[2] / 2) - selection_size[2] / 2
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._assign_hero_portraits = function (self)
 	local widget = self._widgets_by_name.hero_tabs
 	local content = widget.content
@@ -929,27 +913,23 @@ PopupJoinLobbyHandler._assign_hero_portraits = function (self)
 		selection_offset[1] = (selection_default_offset[1] + icon_size[1] / 2) - selection_size[1] / 2
 		selection_offset[2] = (selection_default_offset[2] + icon_size[2] / 2) - selection_size[2] / 2
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._set_hero_info = function (self, name, level)
 	local widgets_by_name = self._widgets_by_name
 	widgets_by_name.hero_text.content.text = name
-
-	return 
 end
+
 PopupJoinLobbyHandler._set_career_info = function (self, name, power_level)
 	local widgets_by_name = self._widgets_by_name
 	widgets_by_name.career_text.content.text = name
-
-	return 
 end
+
 PopupJoinLobbyHandler._set_timer_text = function (self, timer_text)
 	local widgets_by_name = self._widgets_by_name
 	widgets_by_name.timer_text.content.text = timer_text
-
-	return 
 end
+
 PopupJoinLobbyHandler.set_unavailable_heroes = function (self, occupied_heroes)
 	local widget = self._widgets_by_name.hero_tabs
 	local content = widget.content
@@ -977,14 +957,12 @@ PopupJoinLobbyHandler.set_unavailable_heroes = function (self, occupied_heroes)
 
 		self.enable_career_selection(self)
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler.set_difficulty = function (self, difficulty)
 	self._difficulty = difficulty
-
-	return 
 end
+
 PopupJoinLobbyHandler.enable_career_selection = function (self)
 	local widget = self._widgets_by_name.career_tabs
 	local content = widget.content
@@ -996,9 +974,8 @@ PopupJoinLobbyHandler.enable_career_selection = function (self)
 		local hotspot_content = content[hotspot_name]
 		hotspot_content.disable_button = false
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler.disable_career_selection = function (self)
 	local widget = self._widgets_by_name.career_tabs
 	local content = widget.content
@@ -1017,25 +994,22 @@ PopupJoinLobbyHandler.disable_career_selection = function (self)
 			hotspot_content.disable_button = true
 		end
 	end
-
-	return 
 end
+
 PopupJoinLobbyHandler._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 PopupJoinLobbyHandler.set_select_button_enable_state = function (self, enabled)
 	local button_content = self._widgets_by_name.select_button.content
 	button_content.title_text = (enabled and Localize("input_description_confirm")) or Localize("dlc1_2_difficulty_unavailable")
 	button_content.button_hotspot.disable_button = not enabled
-
-	return 
 end
+
 PopupJoinLobbyHandler._play_sound = function (self, event)
 	WwiseWorld.trigger_event(self.wwise_world, event)
-
-	return 
 end
 
-return 
+return

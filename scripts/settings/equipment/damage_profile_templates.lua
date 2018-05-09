@@ -30,8 +30,6 @@ local function new_template(damage_profile_name, append, new_name, charge_value,
 		local new_damage_profile_name = damage_profile_name .. append
 		DamageProfileTemplates[new_damage_profile_name] = new_profile
 	end
-
-	return 
 end
 
 DamageProfileTemplates.default = {
@@ -3612,4 +3610,4 @@ end
 
 DamageProfileTemplates = table.merge(DamageProfileTemplates, no_damage_templates)
 
-return 
+return

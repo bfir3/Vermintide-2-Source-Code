@@ -1,4 +1,5 @@
 WeaponUtils = WeaponUtils or {}
+
 WeaponUtils.add_bot_meta_data_chain_actions = function (actions, attack_chain_transitions)
 	for action_name, action_data in pairs(attack_chain_transitions) do
 		for sub_action_name, sub_action_data in pairs(action_data) do
@@ -10,9 +11,8 @@ WeaponUtils.add_bot_meta_data_chain_actions = function (actions, attack_chain_tr
 			sub_action_data.chain_action = chain_action
 		end
 	end
-
-	return 
 end
+
 WeaponUtils.find_allowed_chain_action = function (allowed_chain_actions, action_name, sub_action_name, wanted_action_name, wanted_sub_action_name)
 	local found_chain_action = nil
 	local num_allowed_chain_actions = #allowed_chain_actions
@@ -32,4 +32,4 @@ WeaponUtils.find_allowed_chain_action = function (allowed_chain_actions, action_
 	return found_chain_action
 end
 
-return 
+return

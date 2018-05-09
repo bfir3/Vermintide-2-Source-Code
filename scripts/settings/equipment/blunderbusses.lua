@@ -185,4 +185,4 @@ weapon_template.wwise_dep_right_hand = {
 Weapons = Weapons or {}
 Weapons.blunderbuss_template_1 = table.create_copy(Weapons.blunderbuss_template_1, weapon_template)
 
-return 
+return

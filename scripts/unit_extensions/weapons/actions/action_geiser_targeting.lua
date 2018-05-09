@@ -1,4 +1,5 @@
 ActionGeiserTargeting = class(ActionGeiserTargeting)
+
 ActionGeiserTargeting.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.world = world
 	self.owner_unit = owner_unit
@@ -12,9 +13,8 @@ ActionGeiserTargeting.init = function (self, world, item_name, is_server, owner_
 	self.overcharge_extension = ScriptUnit.extension(owner_unit, "overcharge_system")
 	self.network_transmit = Managers.state.network.network_transmit
 	self.unit_id = Managers.state.network.unit_storage:go_id(owner_unit)
-
-	return 
 end
+
 ActionGeiserTargeting.client_owner_start_action = function (self, new_action, t)
 	local world = self.world
 	local network_transmit = self.network_transmit
@@ -81,9 +81,8 @@ ActionGeiserTargeting.client_owner_start_action = function (self, new_action, t)
 	end
 
 	self.charge_value = 0
-
-	return 
 end
+
 ActionGeiserTargeting.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local time_to_shoot = self.time_to_shoot
 	local current_action = self.current_action
@@ -197,9 +196,8 @@ ActionGeiserTargeting.client_owner_post_update = function (self, dt, t, world, c
 			self.charge_ready_sound_event = nil
 		end
 	end
-
-	return 
 end
+
 ActionGeiserTargeting.finish = function (self, reason, data)
 	local world = self.world
 	local network_transmit = self.network_transmit
@@ -248,6 +246,7 @@ ActionGeiserTargeting.finish = function (self, reason, data)
 
 	return chain_action_data
 end
+
 ActionGeiserTargeting.destroy = function (self)
 	if self.targeting_effect_id then
 		World.destroy_particles(self.world, self.targeting_effect_id)
@@ -263,8 +262,6 @@ ActionGeiserTargeting.destroy = function (self)
 		self.wwise_source_id = nil
 		self.charging_sound_id = nil
 	end
-
-	return 
 end
 
-return 
+return

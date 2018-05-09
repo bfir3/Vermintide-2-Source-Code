@@ -1,6 +1,6 @@
 local platform_functions = {
 	init = function (achievement_manager)
-		return 
+		return
 	end,
 	check_version_number = function ()
 		return true
@@ -11,8 +11,6 @@ local platform_functions = {
 		if result.done then
 			return true, result.error
 		end
-
-		return 
 	end,
 	is_unlocked = function (template)
 		assert(template.ID_STEAM, "[AchievementManager] There is no Achievement ID specified for achievement: " .. template.id)
@@ -34,13 +32,9 @@ local platform_functions = {
 		if result.done then
 			return true, result.error
 		end
-
-		return 
 	end,
 	reset = function ()
 		Achievement.reset()
-
-		return 
 	end
 }
 

@@ -1,4 +1,5 @@
 TrainingDummyHealthExtension = class(TrainingDummyHealthExtension, GenericHealthExtension)
+
 TrainingDummyHealthExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.is_server = Managers.player.is_server
@@ -13,35 +14,42 @@ TrainingDummyHealthExtension.init = function (self, extension_init_context, unit
 	self.health = NetworkConstants.health.max
 	self.damage = 0
 	self.state = "alive"
+end
 
-	return 
-end
 TrainingDummyHealthExtension.destroy = function (self)
-	return 
+	return
 end
+
 TrainingDummyHealthExtension.reset = function (self)
-	return 
+	return
 end
+
 TrainingDummyHealthExtension.hot_join_sync = function (self, sender)
-	return 
+	return
 end
+
 TrainingDummyHealthExtension.is_alive = function (self)
 	return true
 end
+
 TrainingDummyHealthExtension.current_health_percent = function (self)
 	return 1
 end
+
 TrainingDummyHealthExtension.current_health = function (self)
 	return self.health
 end
+
 TrainingDummyHealthExtension.get_max_health = function (self)
 	return self.health
 end
+
 local dot_hit_types = {
 	bleed = true,
 	burninating = true,
 	arrow_poison_dot = true
 }
+
 TrainingDummyHealthExtension.add_damage = function (self, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike, added_dot)
 	local unit = self.unit
 	local network_manager = Managers.state.network
@@ -99,28 +107,30 @@ TrainingDummyHealthExtension.add_damage = function (self, attacker_unit, damage_
 
 		network_transmit.send_rpc_clients(network_transmit, "rpc_add_damage", unit_id, is_level_unit, attacker_unit_id, attacker_is_level_unit, damage_amount, hit_zone_id, damage_type_id, damage_direction, damage_source_id, hit_ragdoll_actor_id, hit_react_type_id, is_dead, is_critical_strike, added_dot)
 	end
+end
 
-	return 
-end
 TrainingDummyHealthExtension.set_max_health = function (self, health, update_unmodfied)
-	return 
+	return
 end
+
 TrainingDummyHealthExtension.get_damage_taken = function (self)
 	return 0
 end
+
 TrainingDummyHealthExtension.set_current_damage = function (self, damage)
-	return 
+	return
 end
+
 TrainingDummyHealthExtension.die = function (self, damage_type)
 	fassert(false, "Tried to kill TrainingDummyHealthExtension")
+end
 
-	return 
-end
 TrainingDummyHealthExtension.set_dead = function (self)
-	return 
+	return
 end
+
 TrainingDummyHealthExtension.recently_damaged = function (self)
 	return self._recent_damage_type, self._recent_hit_react_type
 end
 
-return 
+return

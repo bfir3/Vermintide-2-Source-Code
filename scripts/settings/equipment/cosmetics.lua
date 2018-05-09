@@ -2487,4 +2487,4 @@ for name, cosmetic_data in pairs(Cosmetics) do
 	cosmetic_data.name = name
 end
 
-return 
+return

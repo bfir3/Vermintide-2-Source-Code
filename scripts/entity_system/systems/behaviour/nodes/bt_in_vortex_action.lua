@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTInVortexAction = class(BTInVortexAction, BTNode)
+
 BTInVortexAction.init = function (self, ...)
 	BTInVortexAction.super.init(self, ...)
-
-	return 
 end
+
 BTInVortexAction.name = "BTInVortexAction"
+
 BTInVortexAction.enter = function (self, unit, blackboard, t)
 	local navigation_extension = blackboard.navigation_extension
 
@@ -25,9 +26,8 @@ BTInVortexAction.enter = function (self, unit, blackboard, t)
 	blackboard.stagger_prohibited = true
 	local hit_reaction_extension = ScriptUnit.extension(unit, "hit_reaction_system")
 	hit_reaction_extension.force_ragdoll_on_death = true
-
-	return 
 end
+
 BTInVortexAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	LocomotionUtils.set_animation_driven_movement(unit, false, false)
 
@@ -48,9 +48,8 @@ BTInVortexAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.stagger_prohibited = nil
 	local hit_reaction_extension = ScriptUnit.extension(unit, "hit_reaction_system")
 	hit_reaction_extension.force_ragdoll_on_death = nil
-
-	return 
 end
+
 BTInVortexAction.run = function (self, unit, blackboard, t, dt)
 	local state = blackboard.in_vortex_state
 
@@ -124,4 +123,4 @@ BTInVortexAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

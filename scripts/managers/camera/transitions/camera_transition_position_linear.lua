@@ -1,6 +1,7 @@
 require("scripts/managers/camera/transitions/camera_transition_base")
 
 CameraTransitionPositionLinear = class(CameraTransitionPositionLinear, CameraTransitionBase)
+
 CameraTransitionPositionLinear.init = function (self, node_1, node_2, duration, speed, settings)
 	CameraTransitionBase.init(self, node_1, node_2, duration, speed, settings)
 
@@ -12,9 +13,8 @@ CameraTransitionPositionLinear.init = function (self, node_1, node_2, duration, 
 	end
 
 	self._transition_func = settings.transition_func
-
-	return 
 end
+
 CameraTransitionPositionLinear.update = function (self, dt, position, update_time)
 	CameraTransitionBase.update(self, dt, update_time)
 
@@ -58,4 +58,4 @@ CameraTransitionPositionLinear.update = function (self, dt, position, update_tim
 	return pos, done
 end
 
-return 
+return

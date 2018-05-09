@@ -1,4 +1,5 @@
 ActionBountyHunterHandgun = class(ActionBountyHunterHandgun)
+
 ActionBountyHunterHandgun.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.weapon_system = weapon_system
 	self.owner_unit = owner_unit
@@ -9,9 +10,8 @@ ActionBountyHunterHandgun.init = function (self, world, item_name, is_server, ow
 	self.wwise_world = Managers.world:wwise_world(world)
 	self.is_server = is_server
 	self.is_critical_strike = false
-
-	return 
 end
+
 ActionBountyHunterHandgun.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level, action_init_data)
 	local weapon_unit = self.weapon_unit
 	local owner_unit = self.owner_unit
@@ -72,9 +72,8 @@ ActionBountyHunterHandgun.client_owner_start_action = function (self, new_action
 
 		status_extension.set_blocking(status_extension, true)
 	end
-
-	return 
 end
+
 ActionBountyHunterHandgun.client_owner_post_update = function (self, dt, t, world, can_damage)
 	if not self.upper_shot_done and self.time_to_shoot_upper <= t then
 		self.upper_shoot_function(self)
@@ -93,9 +92,8 @@ ActionBountyHunterHandgun.client_owner_post_update = function (self, dt, t, worl
 
 		self.aoe_done = true
 	end
-
-	return 
 end
+
 ActionBountyHunterHandgun._railgun_shoot = function (self)
 	local weapon_unit = self.weapon_unit
 	local owner_unit = self.owner_unit
@@ -143,9 +141,8 @@ ActionBountyHunterHandgun._railgun_shoot = function (self)
 	end
 
 	first_person_extension.reset_aim_assist_multiplier(first_person_extension)
-
-	return 
 end
+
 ActionBountyHunterHandgun._shotgun_shoot = function (self)
 	local world = self.world
 	local owner_unit = self.owner_unit
@@ -221,9 +218,8 @@ ActionBountyHunterHandgun._shotgun_shoot = function (self)
 
 		first_person_extension.play_hud_sound_event(first_person_extension, fire_sound_event)
 	end
-
-	return 
 end
+
 ActionBountyHunterHandgun._do_aoe = function (self)
 	local world = self.world
 	local owner_unit = self.owner_unit
@@ -285,9 +281,8 @@ ActionBountyHunterHandgun._do_aoe = function (self)
 			weapon_system.send_rpc_attack_hit(weapon_system, damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", target_index, "blocking", shield_blocked, "shield_break_procced", false, "boost_curve_multiplier", ranged_boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", can_damage, "can_stagger", can_stagger)
 		end
 	end
-
-	return 
 end
+
 ActionBountyHunterHandgun.finish = function (self, reason)
 	local current_action = self.current_action
 	local owner_unit = self.owner_unit
@@ -309,8 +304,6 @@ ActionBountyHunterHandgun.finish = function (self, reason)
 	if hud_extension then
 		hud_extension.show_critical_indication = false
 	end
-
-	return 
 end
 
-return 
+return

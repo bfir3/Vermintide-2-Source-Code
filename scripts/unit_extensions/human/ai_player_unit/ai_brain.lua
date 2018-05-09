@@ -6,6 +6,7 @@ require("scripts/unit_extensions/human/ai_player_unit/debug_breeds/debug_globadi
 
 AIBrain = class(AIBrain)
 local BLACKBOARDS = BLACKBOARDS
+
 AIBrain.init = function (self, world, unit, blackboard, breed, behavior)
 	self._unit = unit
 	BLACKBOARDS[unit] = blackboard
@@ -18,18 +19,16 @@ AIBrain.init = function (self, world, unit, blackboard, breed, behavior)
 
 	self.load_brain(self, behavior)
 	self.init_utility_actions(self, blackboard, breed)
-
-	return 
 end
+
 AIBrain.destroy = function (self)
 	if not Network.game_session() then
-		return 
+		return
 	end
 
 	self.exit_last_action(self)
-
-	return 
 end
+
 AIBrain.init_utility_actions = function (self, blackboard, breed)
 	local utility_actions = {}
 	local actions = self._bt:action_data()
@@ -50,21 +49,20 @@ AIBrain.init_utility_actions = function (self, blackboard, breed)
 	end
 
 	blackboard.utility_actions = utility_actions
-
-	return 
 end
+
 AIBrain.load_brain = function (self, tree_name)
 	self._current_action = nil
 	local ai_system = Managers.state.entity:system("ai_system")
 	self._bt = ai_system.behavior_tree(ai_system, tree_name)
 
 	fassert(self._bt, "Cannot find behavior tree '%s' specified for unit '%s'", tree_name, self._unit)
-
-	return 
 end
+
 AIBrain.bt = function (self)
 	return self._bt
 end
+
 AIBrain.exit_last_action = function (self)
 	local blackboard = self._blackboard
 	blackboard.exit_last_action = true
@@ -72,14 +70,12 @@ AIBrain.exit_last_action = function (self)
 	local t = Managers.time:time("game")
 
 	root.set_running_child(root, self._unit, blackboard, t, nil, "aborted", true)
-
-	return 
 end
+
 AIBrain.update = function (self, unit, t, dt)
 	local result = self._bt:root():evaluate(unit, self._blackboard, t, dt)
-
-	return 
 end
+
 AIBrain.debug_draw_behaviours = function (self)
 	self._bt_strings = self._bt_strings or {}
 	local index = 1
@@ -125,9 +121,8 @@ AIBrain.debug_draw_behaviours = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 AIBrain.debug_draw_current_behavior = function (self)
 	local unit = self._unit
 	local node = self._bt:root()
@@ -146,8 +141,6 @@ AIBrain.debug_draw_current_behavior = function (self)
 
 	Managers.state.debug_text:clear_unit_text(unit, "bt_debug")
 	Managers.state.debug_text:output_unit_text(string, 0.25, unit, 0, offset, 0.5, "bt_debug", color, viewport_name)
-
-	return 
 end
 
-return 
+return

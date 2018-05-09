@@ -403,4 +403,4 @@ local action_data = {
 }
 BreedActions.skaven_gutter_runner = table.create_copy(BreedActions.skaven_gutter_runner, action_data)
 
-return 
+return

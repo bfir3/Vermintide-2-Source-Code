@@ -76,4 +76,4 @@ Weapons.aoe_damage_scroll.left_hand_unit = "units/weapons/player/wpn_scroll/wpn_
 Weapons.aoe_damage_scroll.actions.action_one.default = Weapons.aoe_damage_scroll.actions.action_one.default or table.clone(aoe_damage_scroll_action)
 Weapons.aoe_damage_scroll.gui_texture = "hud_consumable_icon_potion"
 
-return 
+return

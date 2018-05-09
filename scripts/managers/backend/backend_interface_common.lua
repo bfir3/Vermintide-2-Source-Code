@@ -1,10 +1,13 @@
 BackendInterfaceCommon = class(BackendInterfaceCommon)
+
 BackendInterfaceCommon.init = function (self)
-	return 
+	return
 end
+
 BackendInterfaceCommon.ready = function (self)
 	return true
 end
+
 BackendInterfaceCommon.can_wield = function (self, career_name, item_data)
 	local can_wield = item_data.can_wield
 
@@ -15,9 +18,8 @@ BackendInterfaceCommon.can_wield = function (self, career_name, item_data)
 			return true
 		end
 	end
-
-	return 
 end
+
 local filter_operators = {
 	not = {
 		4,
@@ -124,8 +126,6 @@ local filter_macros = {
 				end
 			end
 		end
-
-		return 
 	end,
 	equipped_by_current_career = function (item, backend_id, params)
 		local item_data = item.data
@@ -350,8 +350,6 @@ local filter_macros = {
 				return true
 			end
 		end
-
-		return 
 	end,
 	can_craft_with = function (item, backend_id)
 		local item_data = item.data
@@ -365,12 +363,11 @@ local filter_macros = {
 				return true
 			end
 		end
-
-		return 
 	end
 }
 BackendInterfaceCommon.filter_postfix_cache = BackendInterfaceCommon.filter_postfix_cache or {}
 local empty_params = {}
+
 BackendInterfaceCommon.filter_items = function (self, items, filter_infix, params)
 	local filter_postfix = BackendInterfaceCommon.filter_postfix_cache[filter_infix]
 
@@ -422,6 +419,7 @@ BackendInterfaceCommon.filter_items = function (self, items, filter_infix, param
 
 	return passed
 end
+
 BackendInterfaceCommon._infix_to_postfix_item_filter = function (self, filter_infix)
 	local output = {}
 	local stack = {}
@@ -476,6 +474,7 @@ BackendInterfaceCommon._infix_to_postfix_item_filter = function (self, filter_in
 
 	return output
 end
+
 BackendInterfaceCommon.serialize_traits = function (self, traits)
 	local serialized_traits = ""
 
@@ -495,6 +494,7 @@ BackendInterfaceCommon.serialize_traits = function (self, traits)
 
 	return serialized_traits
 end
+
 BackendInterfaceCommon.serialize_runes = function (self, runes)
 	local serialized_runes = ""
 
@@ -508,4 +508,4 @@ BackendInterfaceCommon.serialize_runes = function (self, runes)
 	return serialized_runes
 end
 
-return 
+return

@@ -419,4 +419,4 @@ weapon_template.tooltip_detail = {
 Weapons = Weapons or {}
 Weapons.longbow_template_1 = table.create_copy(Weapons.longbow_template_1, weapon_template)
 
-return 
+return

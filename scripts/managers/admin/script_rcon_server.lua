@@ -93,23 +93,20 @@ ScriptRconServer.init = function (self, settings)
 
 		self._enabled = false
 	end
-
-	return 
 end
+
 ScriptRconServer.destroy = function (self)
 	if self._enabled then
 		RConServer.stop()
 	end
-
-	return 
 end
+
 ScriptRconServer.update = function (self, dt, t)
 	if self._enabled then
 		RConServer.update(dt, self)
 	end
-
-	return 
 end
+
 ScriptRconServer._find_player = function (self, find_str)
 	local disable_pattern_matching = true
 	local start_index = 1
@@ -129,6 +126,7 @@ ScriptRconServer._find_player = function (self, find_str)
 
 	return found_id
 end
+
 ScriptRconServer._find_banned = function (self, find_str)
 	local list = Managers.ban_list:ban_list()
 	local disable_pattern_matching = true
@@ -149,6 +147,7 @@ ScriptRconServer._find_banned = function (self, find_str)
 
 	return found_id
 end
+
 ScriptRconServer.rcon_connect = function (self, id, ip_port)
 	cprintf("RCon client with ID %s successfully connected", id)
 
@@ -156,6 +155,7 @@ ScriptRconServer.rcon_connect = function (self, id, ip_port)
 
 	return true
 end
+
 ScriptRconServer.rcon_command = function (self, id, command_string)
 	if not self._clients[id] then
 		return string.format("%s\n", tr("rcon_server_command_error_unauthorized"))
@@ -164,7 +164,7 @@ ScriptRconServer.rcon_command = function (self, id, command_string)
 	local args = split_string(command_string)
 
 	if #args == 0 then
-		return 
+		return
 	end
 
 	local command = table.remove(args, 1)
@@ -188,13 +188,13 @@ ScriptRconServer.rcon_command = function (self, id, command_string)
 
 	return response
 end
+
 ScriptRconServer.rcon_disconnect = function (self, id)
 	cprintf("RCon client with ID %s disconnected", id)
 
 	self._clients[id] = nil
-
-	return 
 end
+
 ScriptRconServer._command_ban = function (self, peer_id, name, days_str)
 	local dec = Application.hex64_to_dec(peer_id)
 
@@ -225,12 +225,11 @@ ScriptRconServer._command_ban = function (self, peer_id, name, days_str)
 		if error ~= nil then
 			cprintf("Ban list save failed (%s)", error)
 		end
-
-		return 
 	end)
 
 	return string.format("%s\n", tr("rcon_server_command_response_ok"))
 end
+
 ScriptRconServer._command_banlist = function (self)
 	local result = ""
 	local manager = Managers.ban_list
@@ -247,6 +246,7 @@ ScriptRconServer._command_banlist = function (self)
 
 	return result
 end
+
 ScriptRconServer._command_help = function (self)
 	local help_text = tr("rcon_server_command_response_help") .. "\n---\n"
 	local sorted_names = {}
@@ -264,9 +264,11 @@ ScriptRconServer._command_help = function (self)
 
 	return help_text
 end
+
 ScriptRconServer._command_id = function (self)
 	return string.format("%s\n", Network.peer_id())
 end
+
 ScriptRconServer._command_kick = function (self, id_or_name)
 	local peer_id = self._find_player(self, id_or_name)
 
@@ -280,6 +282,7 @@ ScriptRconServer._command_kick = function (self, id_or_name)
 
 	return string.format("%s\n", tr("rcon_server_command_response_ok"))
 end
+
 ScriptRconServer._command_players = function (self)
 	local player_list = ""
 
@@ -293,11 +296,13 @@ ScriptRconServer._command_players = function (self)
 
 	return player_list
 end
+
 ScriptRconServer._command_shutdown = function (self)
 	Application.quit()
 
 	return string.format("%s\n", tr("rcon_server_command_response_shutting_down"))
 end
+
 ScriptRconServer._command_say = function (self, ...)
 	local say_text = varargs.join(" ", ...)
 	local chat = Managers.chat
@@ -308,6 +313,7 @@ ScriptRconServer._command_say = function (self, ...)
 
 	return string.format("%s\n", tr("rcon_server_command_response_ok"))
 end
+
 ScriptRconServer._command_unban = function (self, id_or_name)
 	local peer_id = self._find_banned(self, id_or_name)
 
@@ -322,11 +328,9 @@ ScriptRconServer._command_unban = function (self, id_or_name)
 		if error ~= nil then
 			cprintf("Ban list save failed (%s)", error)
 		end
-
-		return 
 	end)
 
 	return string.format("%s\n", tr("rcon_server_command_response_ok"))
 end
 
-return 
+return

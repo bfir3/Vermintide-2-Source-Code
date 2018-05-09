@@ -303,8 +303,6 @@ local function create_achievement_entry(scenegraph_id, size)
 			content_change_function = function (content, style)
 				local progress = 0.5 + math.sin(Application.time_since_launch() * 5) * 0.5
 				style.color[1] = 55 + progress * 200
-
-				return 
 			end
 		},
 		{

@@ -288,4 +288,4 @@ weapon_template.tooltip_detail = {
 Weapons = Weapons or {}
 Weapons.repeating_crossbow_template_1 = table.create_copy(Weapons.repeating_crossbow_template_1, weapon_template)
 
-return 
+return

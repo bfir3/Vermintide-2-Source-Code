@@ -1,4 +1,5 @@
 ActionHandgun = class(ActionHandgun)
+
 ActionHandgun.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.weapon_system = weapon_system
 	self.owner_unit = owner_unit
@@ -10,9 +11,8 @@ ActionHandgun.init = function (self, world, item_name, is_server, owner_unit, da
 	self.trail_end_position_variable = World.find_particles_variable(world, "fx/wpnfx_pistol_bullet_trail", "size")
 	self.is_server = is_server
 	self._is_critical_strike = false
-
-	return 
 end
+
 ActionHandgun.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level)
 	local weapon_unit = self.weapon_unit
 	local owner_unit = self.owner_unit
@@ -70,9 +70,8 @@ ActionHandgun.client_owner_start_action = function (self, new_action, t, chain_a
 
 		status_extension.set_blocking(status_extension, true)
 	end
-
-	return 
 end
+
 ActionHandgun.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local weapon_unit = self.weapon_unit
 	local owner_unit = self.owner_unit
@@ -208,9 +207,8 @@ ActionHandgun.client_owner_post_update = function (self, dt, t, world, can_damag
 			input_extension.add_buffer(input_extension, "weapon_reload", 0)
 		end
 	end
-
-	return 
 end
+
 ActionHandgun.finish = function (self, reason)
 	local ammo_extension = self.ammo_extension
 	local current_action = self.current_action
@@ -238,8 +236,6 @@ ActionHandgun.finish = function (self, reason)
 	if hud_extension then
 		hud_extension.show_critical_indication = false
 	end
-
-	return 
 end
 
-return 
+return

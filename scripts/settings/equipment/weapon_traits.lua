@@ -955,4 +955,4 @@ end
 
 BuffUtils.apply_buff_tweak_data(WeaponTraits.buff_templates, buff_tweak_data)
 
-return 
+return

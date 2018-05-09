@@ -11,14 +11,10 @@ function tutprintf(...)
 	if script_data.tutorial_debug then
 		printf(...)
 	end
-
-	return 
 end
 
 local function on_save_ended_callback()
 	print("Tutorial - save done")
-
-	return 
 end
 
 local function save(extension)
@@ -27,8 +23,6 @@ local function save(extension)
 	save_data.completed_tutorials = extension.completed_tutorials
 
 	Managers.save:auto_save(SaveFileName, SaveData, on_save_ended_callback)
-
-	return 
 end
 
 local extensions = {
@@ -39,6 +33,7 @@ local extensions = {
 	"ObjectiveUnitExtension"
 }
 TutorialSystem = class(TutorialSystem, ExtensionSystemBase)
+
 TutorialSystem.init = function (self, entity_system_creation_context, system_name)
 	TutorialSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -55,16 +50,15 @@ TutorialSystem.init = function (self, entity_system_creation_context, system_nam
 	network_event_delegate.register(network_event_delegate, self, "rpc_tutorial_message", "rpc_pacing_changed", "rpc_objective_unit_set_active", "rpc_prioritize_objective_tooltip")
 
 	DO_TUT_RELOAD = false
-
-	return 
 end
+
 TutorialSystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
 	table.clear(self)
-
-	return 
 end
+
 local dummy_input = {}
+
 TutorialSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	local extension = {}
 
@@ -127,20 +121,14 @@ TutorialSystem.on_add_extension = function (self, world, unit, extension_name, e
 
 					network_manager.network_transmit:send_rpc_clients("rpc_objective_unit_set_active", level_object_id, active)
 				end
-
-				return 
 			end
 		elseif Managers.player.is_server or not server_only then
 			function activate_func(extension, active)
 				extension.active = active
-
-				return 
 			end
 		else
 			function activate_func(extension, active)
 				local lol = math.random()
-
-				return 
 			end
 		end
 
@@ -156,6 +144,7 @@ TutorialSystem.on_add_extension = function (self, world, unit, extension_name, e
 
 	return extension
 end
+
 TutorialSystem.on_remove_extension = function (self, unit, extension_name)
 	if self.health_extensions[unit] then
 		self.health_extensions[unit] = nil
@@ -170,12 +159,11 @@ TutorialSystem.on_remove_extension = function (self, unit, extension_name)
 	ScriptUnit.remove_extension(unit, "tutorial_system")
 
 	POSITION_LOOKUP[unit] = nil
-
-	return 
 end
+
 TutorialSystem.physics_async_update = function (self, context, t)
 	if script_data.tutorial_disabled then
-		return 
+		return
 	end
 
 	local world = self.world
@@ -277,9 +265,8 @@ TutorialSystem.physics_async_update = function (self, context, t)
 	end
 
 	DO_TUT_RELOAD = false
-
-	return 
 end
+
 TutorialSystem.pre_render_update = function (self, dt, t)
 	local ingame_ui = self.ingame_ui
 
@@ -296,9 +283,8 @@ TutorialSystem.pre_render_update = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 TutorialSystem.iterate_tooltips = function (self, t, unit, extension, raycast_unit, world)
 	local tooltip_templates = TutorialTooltipTemplates
 	local tooltip_templates_n = TutorialTooltipTemplates_n
@@ -313,9 +299,8 @@ TutorialSystem.iterate_tooltips = function (self, t, unit, extension, raycast_un
 		local template = tooltip_templates[i]
 		local name = template.name
 	end
-
-	return 
 end
+
 local unit_local_position = Unit.local_position
 local vector3_distance_sq = Vector3.distance_squared
 local sort_unit_position_upvalue = nil
@@ -334,7 +319,7 @@ TutorialSystem.prioritize_objective_tooltip = function (self, objective_tooltip_
 		self._objective_tooltip_prioritized_list = nil
 		self._prioritized_objective_tooltip = nil
 
-		return 
+		return
 	end
 
 	fassert(TutorialTemplates[objective_tooltip_name], "[TutorialSystem] There is no TutorialObjectiveTooltipTemplate with the name %s", objective_tooltip_name)
@@ -352,9 +337,8 @@ TutorialSystem.prioritize_objective_tooltip = function (self, objective_tooltip_
 	end
 
 	self._prioritized_objective_tooltip = objective_tooltip_name
-
-	return 
 end
+
 TutorialSystem.iterate_objective_tooltips = function (self, t, unit, extension, raycast_unit, world)
 	local objective_tooltip_templates = self._objective_tooltip_prioritized_list or TutorialObjectiveTooltipTemplates
 	local objective_tooltip_templates_n = TutorialObjectiveTooltipTemplates_n
@@ -418,12 +402,11 @@ TutorialSystem.iterate_objective_tooltips = function (self, t, unit, extension, 
 				sort_unit_position_upvalue = nil
 			end
 
-			return 
+			return
 		end
 	end
-
-	return 
 end
+
 TutorialSystem.verify_info_slate = function (self, t, unit, raycast_unit, template)
 	local extension = self.player_units[unit]
 	local world = self.world
@@ -434,6 +417,7 @@ TutorialSystem.verify_info_slate = function (self, t, unit, raycast_unit, templa
 
 	return template.can_show(t, unit, extension.data, raycast_unit, world)
 end
+
 TutorialSystem.iterate_info_slates = function (self, t, unit, extension, raycast_unit, world)
 	if Application.user_setting("tutorials_enabled") then
 		local info_slate_templates = TutorialInfoSlateTemplates
@@ -456,14 +440,13 @@ TutorialSystem.iterate_info_slates = function (self, t, unit, extension, raycast
 	else
 		self.tutorial_ui:clear_tutorials()
 	end
-
-	return 
 end
+
 TutorialSystem.rpc_tutorial_message = function (self, sender, template_id, message_id)
 	local template_name = NetworkLookup.tutorials[template_id]
 
 	if not template_name then
-		return 
+		return
 	end
 
 	local message = NetworkLookup.tutorials[message_id]
@@ -474,58 +457,51 @@ TutorialSystem.rpc_tutorial_message = function (self, sender, template_id, messa
 
 		template.on_message(data, message)
 	end
-
-	return 
 end
+
 TutorialSystem.rpc_pacing_changed = function (self, sender, pacing_id)
 	local pacing = NetworkLookup.pacing[pacing_id]
 	self.pacing = pacing
 
 	tutprintf("Changing pacing state to %s", pacing)
-
-	return 
 end
+
 TutorialSystem.rpc_objective_unit_set_active = function (self, sender, level_object_id, activate)
 	local unit = Managers.state.network:game_object_or_level_unit(level_object_id, true)
 	local extension = ScriptUnit.extension(unit, "tutorial_system")
 
 	extension.set_active(extension, activate)
-
-	return 
 end
+
 TutorialSystem.rpc_prioritize_objective_tooltip = function (self, sender, prioritized_objective_tooltip_id)
 	local prioritized_objective_tooltip = NetworkLookup.objective_tooltips[prioritized_objective_tooltip_id]
 
 	self.prioritize_objective_tooltip(self, prioritized_objective_tooltip)
-
-	return 
 end
+
 TutorialSystem.set_ingame_ui = function (self, ingame_ui)
 	self.ingame_ui = ingame_ui
 	local tutorial_ui = ingame_ui.ingame_hud.tutorial_ui
 
 	self._set_tutorial_ui(self, tutorial_ui)
-
-	return 
 end
+
 TutorialSystem._set_tutorial_ui = function (self, tutorial_ui)
 	self.tutorial_ui = tutorial_ui
 
 	for unit, extension in pairs(self.health_extensions) do
 		tutorial_ui.add_health_bar(tutorial_ui, unit)
 	end
-
-	return 
 end
+
 TutorialSystem.flow_callback_show_health_bar = function (self, unit, show)
 	local tutorial_ui = self.tutorial_ui
 
 	if tutorial_ui then
 		tutorial_ui.show_health_bar(tutorial_ui, unit, show)
 	end
-
-	return 
 end
+
 TutorialSystem.flow_callback_tutorial_message = function (self, template_name, message)
 	if Managers.player.is_server then
 		local template_id = NetworkLookup.tutorials[template_name]
@@ -534,9 +510,8 @@ TutorialSystem.flow_callback_tutorial_message = function (self, template_name, m
 
 		network_manager.network_transmit:send_rpc_all("rpc_tutorial_message", template_id, message_id)
 	end
-
-	return 
 end
+
 TutorialSystem.hot_join_sync = function (self, peer_id)
 	local network_manager = Managers.state.network
 	local units = Managers.state.entity:get_entities("ObjectiveUnitExtension")
@@ -554,12 +529,11 @@ TutorialSystem.hot_join_sync = function (self, peer_id)
 
 		network_manager.network_transmit:send_rpc("rpc_prioritize_objective_tooltip", peer_id, prioritized_objective_tooltip_id)
 	end
-
-	return 
 end
+
 TutorialSystem.update = function (self, context, t)
 	if script_data.tutorial_disabled then
-		return 
+		return
 	end
 
 	local world = self.world
@@ -605,8 +579,6 @@ TutorialSystem.update = function (self, context, t)
 
 		raycast_units[unit] = raycast_unit
 	end
-
-	return 
 end
 
-return 
+return

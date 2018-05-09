@@ -8,10 +8,10 @@ local scenegraph_definition = definitions.scenegraph_definition
 local DO_RELOAD = false
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
 local menu_functions = {
@@ -20,22 +20,17 @@ local menu_functions = {
 
 		input_manager.block_device_except_service(input_manager, "options_menu", "gamepad")
 		this._activate_view(this, "options_view")
-
-		return 
 	end,
 	function (this)
 		Managers.state.game_mode:start_specific_level("prologue")
-
-		return 
 	end,
 	function (this)
 		this._activate_view(this, "credits_view")
-
-		return 
 	end
 }
 StartMenuStateOverview = class(StartMenuStateOverview)
 StartMenuStateOverview.NAME = "StartMenuStateOverview"
+
 StartMenuStateOverview.on_enter = function (self, params)
 	self.parent:clear_wanted_state()
 	print("[HeroViewState] Enter Substate StartMenuStateOverview")
@@ -84,9 +79,8 @@ StartMenuStateOverview.on_enter = function (self, params)
 	local career_index = hero_attributes.get(hero_attributes, hero_name, "career") or 1
 
 	self._populate_career_page(self, hero_name, career_index)
-
-	return 
 end
+
 StartMenuStateOverview.create_ui_elements = function (self, params)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -104,20 +98,21 @@ StartMenuStateOverview.create_ui_elements = function (self, params)
 	UIRenderer.clear_scenegraph_queue(self.ui_top_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
-
-	return 
 end
+
 StartMenuStateOverview._get_skin_item_data = function (self, index, career_index)
 	local profile_settings = SPProfiles[index]
 	local skin_name = profile_settings.careers[career_index].base_skin
 
 	return Cosmetics[skin_name]
 end
+
 StartMenuStateOverview._wanted_state = function (self)
 	local new_state = self.parent:wanted_state()
 
 	return new_state
 end
+
 StartMenuStateOverview.on_exit = function (self, params)
 	if self.menu_input_description then
 		self.menu_input_description:destroy()
@@ -128,12 +123,11 @@ StartMenuStateOverview.on_exit = function (self, params)
 	self.ui_animator = nil
 
 	print("[HeroViewState] Exit Substate StartMenuStateOverview")
-
-	return 
 end
+
 StartMenuStateOverview._update_transition_timer = function (self, dt)
 	if not self._transition_timer then
-		return 
+		return
 	end
 
 	if self._transition_timer == 0 then
@@ -141,9 +135,8 @@ StartMenuStateOverview._update_transition_timer = function (self, dt)
 	else
 		self._transition_timer = math.max(self._transition_timer - dt, 0)
 	end
-
-	return 
 end
+
 StartMenuStateOverview.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -178,9 +171,8 @@ StartMenuStateOverview.update = function (self, dt, t)
 	end
 
 	self.draw(self, dt)
-
-	return 
 end
+
 StartMenuStateOverview.post_update = function (self, dt, t)
 	self.ui_animator:update(dt)
 	self._update_animations(self, dt)
@@ -199,9 +191,8 @@ StartMenuStateOverview.post_update = function (self, dt, t)
 			self._spawn_hero_unit(self, hero_name)
 		end
 	end
-
-	return 
 end
+
 StartMenuStateOverview.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -223,9 +214,8 @@ StartMenuStateOverview.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 StartMenuStateOverview._update_animations = function (self, dt)
 	local animations = self._animations
 	local ui_animator = self.ui_animator
@@ -237,18 +227,16 @@ StartMenuStateOverview._update_animations = function (self, dt)
 			animations[animation_name] = nil
 		end
 	end
-
-	return 
 end
+
 StartMenuStateOverview._spawn_hero_unit = function (self, hero_name)
 	local world_previewer = self.world_previewer
 	local career_index = self.career_index
 	local callback = callback(self, "cb_hero_unit_spawned", hero_name)
 
 	world_previewer.request_spawn_hero_unit(world_previewer, hero_name, self.career_index, true, callback)
-
-	return 
 end
+
 StartMenuStateOverview.cb_hero_unit_spawned = function (self, hero_name)
 	local world_previewer = self.world_previewer
 	local career_index = self.career_index
@@ -279,9 +267,8 @@ StartMenuStateOverview.cb_hero_unit_spawned = function (self, hero_name)
 	if preview_idle_animation then
 		self.world_previewer:play_character_animation(preview_idle_animation)
 	end
-
-	return 
 end
+
 StartMenuStateOverview._populate_career_page = function (self, hero_name, career_index)
 	local profile_index = FindProfileIndex(hero_name)
 	local profile_settings = SPProfiles[profile_index]
@@ -311,30 +298,26 @@ StartMenuStateOverview._populate_career_page = function (self, hero_name, career
 
 	self._set_hero_info(self, Localize(character_name), level)
 	self._create_player_portrait(self, portrait_image, level)
-
-	return 
 end
+
 StartMenuStateOverview._set_hero_info = function (self, name, level)
 	local widgets_by_name = self._widgets_by_name
 	widgets_by_name.info_hero_name.content.text = name
 	widgets_by_name.info_hero_level.content.text = Localize("level") .. ": " .. level
-
-	return 
 end
+
 StartMenuStateOverview._create_player_portrait = function (self, portrait_image, level)
 	local level_text = (level and tostring(level)) or "-"
 	local frame_settings_name = "default"
 	local definition = UIWidgets.create_portrait_frame("portrait_root", frame_settings_name, level_text, 1, nil, portrait_image)
 	local widget = UIWidget.init(definition)
 	self._player_portrait_widget = widget
-
-	return 
 end
+
 StartMenuStateOverview._set_select_button_enabled = function (self, enabled)
 	self._widgets_by_name.select_button.content.button_hotspot.disable_button = not enabled
-
-	return 
 end
+
 StartMenuStateOverview._handle_input = function (self, dt, t)
 	local input_service = self.input_service(self, true)
 	local widgets_by_name = self._widgets_by_name
@@ -380,9 +363,8 @@ StartMenuStateOverview._handle_input = function (self, dt, t)
 	if Development.parameter("tobii_button") then
 		self._handle_tobii_button(self, dt)
 	end
-
-	return 
 end
+
 StartMenuStateOverview._handle_tobii_button = function (self, dt)
 	local widgets_by_name = self._widgets_by_name
 	local tobii_button = widgets_by_name.tobii_button
@@ -396,12 +378,12 @@ StartMenuStateOverview._handle_tobii_button = function (self, dt)
 
 		Application.open_url_in_browser(tobii_contest_url)
 	end
-
-	return 
 end
+
 StartMenuStateOverview.game_popup_active = function (self)
 	return self._show_play_popup
 end
+
 StartMenuStateOverview._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -411,45 +393,46 @@ StartMenuStateOverview._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartMenuStateOverview._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter
 end
+
 StartMenuStateOverview._is_button_hover_exit = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_exit
 end
+
 StartMenuStateOverview._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 StartMenuStateOverview.get_camera_position = function (self)
 	local world, viewport = self.parent:get_background_world()
 	local camera = ScriptViewport.camera(viewport)
 
 	return ScriptCamera.position(camera)
 end
+
 StartMenuStateOverview.get_camera_rotation = function (self)
 	local world, viewport = self.parent:get_background_world()
 	local camera = ScriptViewport.camera(viewport)
 
 	return ScriptCamera.rotation(camera)
 end
+
 StartMenuStateOverview.trigger_unit_flow_event = function (self, unit, event_name)
 	if unit and Unit.alive(unit) then
 		Unit.flow_event(unit, event_name)
 	end
-
-	return 
 end
+
 StartMenuStateOverview._start_transition_animation = function (self, key, animation_name)
 	local params = {
 		wwise_world = self.wwise_world,
@@ -458,9 +441,8 @@ StartMenuStateOverview._start_transition_animation = function (self, key, animat
 	local widgets = {}
 	local anim_id = self.ui_animator:start_animation(animation_name, widgets, scenegraph_definition, params)
 	self._animations[key] = anim_id
-
-	return 
 end
+
 StartMenuStateOverview._on_option_button_hover = function (self, widget, style_id)
 	local ui_animations = self._ui_animations
 	local animation_name = "option_button_" .. style_id
@@ -478,9 +460,8 @@ StartMenuStateOverview._on_option_button_hover = function (self, widget, style_i
 			pass_style.color[i] = target_color_value
 		end
 	end
-
-	return 
 end
+
 StartMenuStateOverview._on_option_button_dehover = function (self, widget, style_id)
 	local ui_animations = self._ui_animations
 	local animation_name = "option_button_" .. style_id
@@ -498,22 +479,24 @@ StartMenuStateOverview._on_option_button_dehover = function (self, widget, style
 			pass_style.color[1] = target_color_value
 		end
 	end
+end
 
-	return 
-end
 StartMenuStateOverview.play_sound = function (self, event)
-	return 
+	return
 end
+
 StartMenuStateOverview._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 StartMenuStateOverview._animate_element_by_catmullrom = function (self, target, target_index, target_value, p0, p1, p2, p3, time)
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
 end
+
 StartMenuStateOverview._init_menu_views = function (self)
 	local ingame_ui_context = self.ingame_ui_context
 	self._views = {
@@ -524,13 +507,10 @@ StartMenuStateOverview._init_menu_views = function (self)
 	for name, view in pairs(self._views) do
 		view.exit = function ()
 			self:exit_current_view()
-
-			return 
 		end
 	end
-
-	return 
 end
+
 StartMenuStateOverview._activate_view = function (self, new_view)
 	self._active_view = new_view
 	local views = self._views
@@ -540,9 +520,8 @@ StartMenuStateOverview._activate_view = function (self, new_view)
 	if new_view and views[new_view] and views[new_view].on_enter then
 		views[new_view]:on_enter()
 	end
-
-	return 
 end
+
 StartMenuStateOverview.exit_current_view = function (self)
 	local active_view = self._active_view
 	local views = self._views
@@ -561,9 +540,8 @@ StartMenuStateOverview.exit_current_view = function (self)
 	input_manager.block_device_except_service(input_manager, input_service_name, "keyboard")
 	input_manager.block_device_except_service(input_manager, input_service_name, "mouse")
 	input_manager.block_device_except_service(input_manager, input_service_name, "gamepad")
-
-	return 
 end
+
 StartMenuStateOverview.input_service = function (self, ignore_view_input)
 	if not ignore_view_input then
 		local active_view = self._active_view
@@ -578,4 +556,4 @@ StartMenuStateOverview.input_service = function (self, ignore_view_input)
 	return self.parent:input_service(true)
 end
 
-return 
+return

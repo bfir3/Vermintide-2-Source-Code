@@ -1,21 +1,21 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTSequence = class(BTSequence, BTNode)
+
 BTSequence.init = function (self, ...)
 	BTSequence.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTSequence.name = "BTSequence"
+
 BTSequence.leave = function (self, unit, blackboard, t)
 	self.set_running_child(self, unit, blackboard, t, nil, "aborted")
 
 	blackboard.node_data[self._identifier] = nil
-
-	return 
 end
+
 BTSequence.run = function (self, unit, blackboard, t, dt)
 	local node_data = blackboard.node_data[self._identifier]
 	local child_to_run_index = node_data or 1
@@ -51,10 +51,9 @@ BTSequence.run = function (self, unit, blackboard, t, dt)
 
 	return "done"
 end
+
 BTSequence.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

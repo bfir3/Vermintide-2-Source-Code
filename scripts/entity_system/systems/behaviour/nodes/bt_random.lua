@@ -2,13 +2,13 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTRandom = class(BTRandom, BTNode)
 BTRandom.name = "BTRandom"
+
 BTRandom.init = function (self, ...)
 	BTRandom.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTRandom.ready = function (self, lua_node)
 	local probabilities = {}
 
@@ -18,22 +18,19 @@ BTRandom.ready = function (self, lua_node)
 	end
 
 	self.prob, self.alias = LoadedDice.create(probabilities, false)
-
-	return 
 end
+
 BTRandom.enter = function (self, unit, blackboard, t)
 	local child_index = LoadedDice.roll(self.prob, self.alias)
 	blackboard.node_data[self._identifier] = child_index
-
-	return 
 end
+
 BTRandom.leave = function (self, unit, blackboard, t, reason, destroy)
 	self.set_running_child(self, unit, blackboard, t, nil)
 
 	blackboard.node_data[self._identifier] = nil
-
-	return 
 end
+
 BTRandom.run = function (self, unit, blackboard, t, dt)
 	local running_child = self.current_running_child(self, blackboard)
 
@@ -66,10 +63,9 @@ BTRandom.run = function (self, unit, blackboard, t, dt)
 
 	return "failed"
 end
+
 BTRandom.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

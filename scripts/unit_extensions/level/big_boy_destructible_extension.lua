@@ -2,6 +2,7 @@ BigBoyDestructibleExtension = class(BigBoyDestructibleExtension)
 local SIMPLE_ANIMATION_FPS = 30
 local NAVMESH_UPDATE_DELAY = 3
 local unit_alive = Unit.alive
+
 BigBoyDestructibleExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.world = extension_init_context.world
@@ -14,23 +15,20 @@ BigBoyDestructibleExtension.init = function (self, extension_init_context, unit,
 	self.breeds_failed_leaving_smart_object = {}
 	self.frames_since_obstacle_update = nil
 	self.num_attackers = 0
-
-	return 
 end
+
 BigBoyDestructibleExtension.extensions_ready = function (self)
 	self.health_extension = ScriptUnit.extension(self.unit, "health_system")
 
 	assert(self.health_extension)
-
-	return 
 end
+
 BigBoyDestructibleExtension.animation_played = function (self, frames, speed)
 	local animation_length = frames / SIMPLE_ANIMATION_FPS / speed
 	local t = Managers.time:time("game")
 	self.animation_stop_time = t + animation_length
-
-	return 
 end
+
 BigBoyDestructibleExtension.update_nav_obstacles = function (self)
 	local current_state = self.current_state
 	local obstacles = self.state_to_nav_obstacle_map
@@ -53,9 +51,8 @@ BigBoyDestructibleExtension.update_nav_obstacles = function (self)
 	end
 
 	self.frames_since_obstacle_update = 0
-
-	return 
 end
+
 BigBoyDestructibleExtension._get_animation_flow_event = function (self, current_state, new_state)
 	local event = self.animation_flow_events[current_state][new_state]
 
@@ -63,6 +60,7 @@ BigBoyDestructibleExtension._get_animation_flow_event = function (self, current_
 
 	return event
 end
+
 BigBoyDestructibleExtension.update = function (self, unit, input, dt, context, t)
 	local frames_since_obstacle_update = self.frames_since_obstacle_update
 
@@ -79,7 +77,7 @@ BigBoyDestructibleExtension.update = function (self, unit, input, dt, context, t
 	end
 
 	if self.dead then
-		return 
+		return
 	end
 
 	local animation_stop_time = self.animation_stop_time
@@ -95,21 +93,19 @@ BigBoyDestructibleExtension.update = function (self, unit, input, dt, context, t
 
 		self.destroy_box_obstacles(self)
 	end
-
-	return 
 end
+
 BigBoyDestructibleExtension.register_breed_failed_leaving_smart_object = function (self, unit)
 	if self.breeds_failed_leaving_smart_object == nil then
-		return 
+		return
 	end
 
 	self.breeds_failed_leaving_smart_object[unit] = true
-
-	return 
 end
+
 BigBoyDestructibleExtension.handle_breeds_failed_leaving_smart_object = function (self)
 	if self.breeds_failed_leaving_smart_object == nil then
-		return 
+		return
 	end
 
 	for unit, _ in pairs(self.breeds_failed_leaving_smart_object) do
@@ -123,9 +119,8 @@ BigBoyDestructibleExtension.handle_breeds_failed_leaving_smart_object = function
 	end
 
 	self.breeds_failed_leaving_smart_object = {}
-
-	return 
 end
+
 BigBoyDestructibleExtension.destroy = function (self)
 	self.destroy_box_obstacles(self)
 
@@ -133,9 +128,8 @@ BigBoyDestructibleExtension.destroy = function (self)
 	self.world = nil
 	self.health_extension = nil
 	self.breeds_failed_leaving_smart_object = nil
-
-	return 
 end
+
 BigBoyDestructibleExtension.destroy_box_obstacles = function (self)
 	if self.state_to_nav_obstacle_map then
 		for _, obstacle in pairs(self.state_to_nav_obstacle_map) do
@@ -146,8 +140,6 @@ BigBoyDestructibleExtension.destroy_box_obstacles = function (self)
 	end
 
 	self.frames_since_obstacle_update = 0
-
-	return 
 end
 
-return 
+return

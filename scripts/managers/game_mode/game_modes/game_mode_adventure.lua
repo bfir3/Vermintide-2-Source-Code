@@ -4,14 +4,14 @@ script_data.disable_gamemode_end = script_data.disable_gamemode_end or Developme
 GameModeAdventure = class(GameModeAdventure, GameModeBase)
 local COMPLETE_LEVEL_VAR = false
 local FAIL_LEVEL_VAR = false
+
 GameModeAdventure.init = function (self, settings, world, ...)
 	GameModeAdventure.super.init(self, settings, world, ...)
 
 	self.about_to_lose = false
 	self.lost_condition_timer = nil
-
-	return 
 end
+
 GameModeAdventure.evaluate_end_conditions = function (self, round_started, dt, t)
 	if script_data.disable_gamemode_end then
 		return false
@@ -66,18 +66,14 @@ GameModeAdventure.evaluate_end_conditions = function (self, round_started, dt, t
 	else
 		return false
 	end
-
-	return 
 end
+
 GameModeAdventure.complete_level = function (self, level_key)
 	COMPLETE_LEVEL_VAR = true
-
-	return 
 end
+
 GameModeAdventure.FAIL_LEVEL = function (self)
 	FAIL_LEVEL_VAR = true
-
-	return 
 end
 
-return 
+return

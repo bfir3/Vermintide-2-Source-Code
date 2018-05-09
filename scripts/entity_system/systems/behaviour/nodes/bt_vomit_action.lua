@@ -1,19 +1,17 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTVomitAction = class(BTVomitAction, BTNode)
+
 BTVomitAction.init = function (self, ...)
 	BTVomitAction.super.init(self, ...)
-
-	return 
 end
+
 BTVomitAction.name = "BTVomitAction"
 
 local function debug_print(...)
 	if script_data.debug_chaos_troll then
 		print(...)
 	end
-
-	return 
 end
 
 BTVomitAction.enter = function (self, unit, blackboard, t)
@@ -37,9 +35,8 @@ BTVomitAction.enter = function (self, unit, blackboard, t)
 	end
 
 	blackboard.update_puke_pos_at_t = t + 0.2
-
-	return 
 end
+
 BTVomitAction._position_on_navmesh = function (self, position, blackboard)
 	local nav_world = blackboard.nav_world
 	local success, z = GwNavQueries.triangle_from_position(nav_world, position, 1, 1)
@@ -53,6 +50,7 @@ BTVomitAction._position_on_navmesh = function (self, position, blackboard)
 
 	return position
 end
+
 BTVomitAction._get_vomit_position = function (self, unit, blackboard)
 	local troll_head_node = Unit.node(unit, "j_head")
 	local troll_head_pos = Unit.world_position(unit, troll_head_node)
@@ -80,6 +78,7 @@ BTVomitAction._get_vomit_position = function (self, unit, blackboard)
 
 	return puke_pos, puke_distance_sq, puke_direction
 end
+
 BTVomitAction.init_attack = function (self, unit, blackboard, action, t)
 	local puke_position, puke_distance_sq, puke_direction = self._get_vomit_position(self, unit, blackboard)
 
@@ -129,6 +128,7 @@ BTVomitAction.init_attack = function (self, unit, blackboard, action, t)
 
 	return true
 end
+
 BTVomitAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
 	blackboard.active_node = nil
@@ -147,9 +147,8 @@ BTVomitAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.update_puke_pos_at_t = nil
 	blackboard.check_puke_time = nil
 	blackboard.anim_locked = nil
-
-	return 
 end
+
 BTVomitAction._calculate_oobb_collision = function (self, bot_threat, self_pos, self_rot)
 	local width = bot_threat.width
 	local range = bot_threat.range
@@ -166,6 +165,7 @@ BTVomitAction._calculate_oobb_collision = function (self, bot_threat, self_pos, 
 
 	return oobb_pos, self_rot, size
 end
+
 BTVomitAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.attack_aborted then
 		return "failed"
@@ -238,6 +238,7 @@ BTVomitAction.run = function (self, unit, blackboard, t, dt)
 
 	return "done"
 end
+
 BTVomitAction.player_vomit_hit_check = function (self, unit, blackboard)
 	local troll_head_node = Unit.node(unit, "j_head")
 	local troll_head_pos = Unit.world_position(unit, troll_head_node)
@@ -268,9 +269,8 @@ BTVomitAction.player_vomit_hit_check = function (self, unit, blackboard)
 			end
 		end
 	end
-
-	return 
 end
+
 BTVomitAction.create_aoe = function (self, unit, blackboard, action)
 	local puke_pos = blackboard.puke_position:unbox()
 	puke_pos = self._position_on_navmesh(self, puke_pos, blackboard)
@@ -290,17 +290,14 @@ BTVomitAction.create_aoe = function (self, unit, blackboard, action)
 
 		liquid_area_damage_extension.ready(liquid_area_damage_extension)
 	end
-
-	return 
 end
+
 BTVomitAction.anim_cb_vomit = function (self, unit, blackboard)
 	if Managers.state.network:game() then
 		blackboard.is_puking = true
 
 		BTVomitAction:create_aoe(unit, blackboard, blackboard.action)
 	end
-
-	return 
 end
 
-return 
+return

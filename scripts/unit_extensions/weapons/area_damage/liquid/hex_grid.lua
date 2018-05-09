@@ -1,6 +1,7 @@
 require("scripts/managers/debug/debug_manager")
 
 HexGrid = class(HexGrid)
+
 HexGrid.init = function (self, center, xy_extents, z_extents, x_cell_size, z_cell_size)
 	local x_vector = Vector3.right()
 	local y_vector = Vector3.forward()
@@ -48,12 +49,12 @@ HexGrid.init = function (self, center, xy_extents, z_extents, x_cell_size, z_cel
 	self._xy_extents = xy_extents
 	self._z_extents = z_extents
 	self._check_player_units = true
-
-	return 
 end
+
 HexGrid.directions = function (self)
 	return self._directions
 end
+
 HexGrid.find_index = function (self, position)
 	local root = self._root_position:unbox()
 	local relative_position = position - root
@@ -66,6 +67,7 @@ HexGrid.find_index = function (self, position)
 
 	return i, j, k
 end
+
 HexGrid.real_index = function (self, i, j, k)
 	local xy_extents = self._xy_extents
 	local row_size = xy_extents * 2 + 1
@@ -73,6 +75,7 @@ HexGrid.real_index = function (self, i, j, k)
 
 	return i + (j - 1) * row_size + (k - 1) * layer_size
 end
+
 HexGrid.ijk = function (self, real_index)
 	local xy_extents = self._xy_extents
 	local row_size = xy_extents * 2 + 1
@@ -84,12 +87,14 @@ HexGrid.ijk = function (self, real_index)
 
 	return i, j + 1, k + 1
 end
+
 HexGrid.is_out_of_bounds = function (self, i, j, k)
 	local xy_extents = self._xy_extents
 	local row_size = xy_extents * 2 + 1
 
 	return i < 0 or row_size <= i or j < 0 or row_size <= j or k < 0
 end
+
 HexGrid.find_position = function (self, i, j, k)
 	local root = self._root_position:unbox()
 	local z = k * self._z_cell_size
@@ -98,6 +103,7 @@ HexGrid.find_position = function (self, i, j, k)
 
 	return root + Vector3(x, y, z)
 end
+
 HexGrid.sample_grid = function (self, samples, z, multiplier)
 	local drawer = QuickDrawerStay
 
@@ -144,8 +150,6 @@ HexGrid.sample_grid = function (self, samples, z, multiplier)
 			drawer.sphere(drawer, point, 0.05, color)
 		end
 	end
-
-	return 
 end
 
-return 
+return

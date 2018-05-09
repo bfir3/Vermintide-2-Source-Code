@@ -16,6 +16,7 @@ for i, state in ipairs(STORY_STATES) do
 end
 
 local unit_alive = Unit.alive
+
 LinkerTransportationExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.world = extension_init_context.world
@@ -73,15 +74,16 @@ LinkerTransportationExtension.init = function (self, extension_init_context, uni
 	self._movement_delta = Vector3Box(0, 0, 0)
 	self._old_position = Vector3Box(Unit.local_position(unit, 0))
 	self._unlink_after_update = false
+end
 
-	return 
-end
 LinkerTransportationExtension.extensions_ready = function (self)
-	return 
+	return
 end
+
 LinkerTransportationExtension.movement_delta = function (self)
 	return self._movement_delta:unbox()
 end
+
 LinkerTransportationExtension.register_navmesh_units = function (self, start_unit, end_unit)
 	local nav_world = GLOBAL_AI_NAVWORLD
 	local obstacle_start, transform_start = NavigationUtils.create_exclusive_box_obstacle_from_unit_data(nav_world, start_unit)
@@ -99,9 +101,8 @@ LinkerTransportationExtension.register_navmesh_units = function (self, start_uni
 	self.has_nav_obstacles = true
 
 	self.update_nav_obstacles(self)
-
-	return 
 end
+
 LinkerTransportationExtension.interacted_with = function (self, interactor_unit)
 	if self.story_state == "stopped_beginning" then
 		self.story_state = "moving_forward"
@@ -119,9 +120,8 @@ LinkerTransportationExtension.interacted_with = function (self, interactor_unit)
 	else
 		self._link_all_transported_units(self, interactor_unit)
 	end
-
-	return 
 end
+
 LinkerTransportationExtension.hot_join_sync = function (self, peer)
 	local network_manager = Managers.state.network
 	local level_id = Level.unit_index(LevelHelper:current_level(self.world), self.unit)
@@ -147,24 +147,21 @@ LinkerTransportationExtension.hot_join_sync = function (self, peer)
 	end
 
 	RPC.rpc_hot_join_sync_linker_transport_state(peer, level_id, STORY_STATES[state], story_time)
-
-	return 
 end
+
 LinkerTransportationExtension.rpc_hot_join_sync_linker_transporting = function (self, interactor_unit_id)
 	local interactor_unit = Managers.state.network.unit_storage:unit(interactor_unit_id)
 
 	self.interacted_with(self, interactor_unit)
-
-	return 
 end
+
 LinkerTransportationExtension.rpc_hot_join_sync_linker_transport_state = function (self, state_id, story_time)
 	self.story_state = STORY_STATES[state_id]
 	self.current_story_time = story_time
 
 	self.update_nav_obstacles(self)
-
-	return 
 end
+
 LinkerTransportationExtension._link_all_transported_units = function (self, interactor_unit)
 	local story_teller = self.story_teller
 	local story_id = self.story_id
@@ -219,9 +216,8 @@ LinkerTransportationExtension._link_all_transported_units = function (self, inte
 	end
 
 	Unit.flow_event(self.unit, "activate_collision")
-
-	return 
 end
+
 LinkerTransportationExtension._is_inside_transportation_unit = function (self, unit, size_modifier)
 	local oobb_mesh = self.oobb_mesh
 	local oobb_pose, oobb_size = Mesh.box(oobb_mesh)
@@ -235,6 +231,7 @@ LinkerTransportationExtension._is_inside_transportation_unit = function (self, u
 
 	return math.point_is_inside_oobb(unit_pos, oobb_pose, oobb_size)
 end
+
 LinkerTransportationExtension._is_bot = function (self, player)
 	if self.is_server then
 		return player.bot_player
@@ -243,9 +240,8 @@ LinkerTransportationExtension._is_bot = function (self, player)
 	else
 		return true
 	end
-
-	return 
 end
+
 LinkerTransportationExtension.update_units_inside_oobb = function (self)
 	local unit = self.unit
 	local oobb_mesh = self.oobb_mesh
@@ -314,12 +310,11 @@ LinkerTransportationExtension.update_units_inside_oobb = function (self)
 
 		status_extension.set_inside_transport_unit(status_extension, arg)
 	end
-
-	return 
 end
+
 LinkerTransportationExtension.update_nav_obstacles = function (self)
 	if not self.has_nav_obstacles then
-		return 
+		return
 	end
 
 	local story_state = self.story_state
@@ -339,9 +334,8 @@ LinkerTransportationExtension.update_nav_obstacles = function (self)
 		GwNavBoxObstacle.set_does_trigger_tagvolume(obstacle_start, true)
 		GwNavBoxObstacle.set_does_trigger_tagvolume(obstacle_end, true)
 	end
-
-	return 
 end
+
 LinkerTransportationExtension.update = function (self, unit, input, dt, context, t)
 	local story_teller = self.story_teller
 	local story_id = self.story_id
@@ -401,9 +395,8 @@ LinkerTransportationExtension.update = function (self, unit, input, dt, context,
 		local update_interval = (0 < units_inside_oobb.human.count and UPDATE_INTERVAL_OOBB_HUMANS_INSIDE) or UPDATE_INTERVAL_OOBB_NO_HUMANS_INSIDE
 		self.oobb_next_update = t + update_interval
 	end
-
-	return 
 end
+
 LinkerTransportationExtension.post_update = function (self, unit, input, dt, context, t)
 	local new_pos = Unit.world_position(unit, 0)
 	local old_pos = self._old_position:unbox()
@@ -422,9 +415,8 @@ LinkerTransportationExtension.post_update = function (self, unit, input, dt, con
 
 		self._unlink_all_transported_units(self)
 	end
-
-	return 
 end
+
 LinkerTransportationExtension._update_local_player_position = function (self)
 	local player_manager = Managers.player
 	local transported_units = self.transported_units
@@ -464,15 +456,16 @@ LinkerTransportationExtension._update_local_player_position = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 LinkerTransportationExtension.is_stationary = function (self)
 	return self.story_state == "stopped_beginning" or self.story_state == "stopped_end"
 end
+
 LinkerTransportationExtension.can_interact = function (self, interactor_unit)
 	return (self.story_state == "stopped_beginning" and #self.transported_units == 0) or (self.story_state == "stopped_end" and not self.auto_exit and self.transported_units[1] == interactor_unit)
 end
+
 LinkerTransportationExtension.destroy = function (self)
 	if self._transporting and self.is_server then
 		local unit = self.unit
@@ -512,9 +505,8 @@ LinkerTransportationExtension.destroy = function (self)
 
 	self.transported_units = nil
 	self.oobb_mesh = nil
-
-	return 
 end
+
 LinkerTransportationExtension._unlink_all_transported_units = function (self)
 	local story_teller = self.story_teller
 	local story_id = self.story_id
@@ -549,9 +541,8 @@ LinkerTransportationExtension._unlink_all_transported_units = function (self)
 	end
 
 	Unit.flow_event(self.unit, "deactivate_collision")
-
-	return 
 end
+
 LinkerTransportationExtension._unlink_transported_unit = function (self, unit_to_unlink)
 	local unit = self.unit
 	local locomotion_extension = ScriptUnit.extension(unit_to_unlink, "locomotion_system")
@@ -600,9 +591,8 @@ LinkerTransportationExtension._unlink_transported_unit = function (self, unit_to
 			locomotion_extension.teleport_to(locomotion_extension, end_position, current_rotation)
 		end
 	end
-
-	return 
 end
+
 LinkerTransportationExtension._get_position_from_index = function (self, index)
 	local unit = self.unit
 	local position = nil
@@ -620,6 +610,7 @@ LinkerTransportationExtension._get_position_from_index = function (self, index)
 
 	return position
 end
+
 LinkerTransportationExtension._link_transported_unit = function (self, unit_to_link, teleport_on_enter)
 	local unit = self.unit
 	local link_node = Unit.node(unit, "rp_transport")
@@ -673,11 +664,10 @@ LinkerTransportationExtension._link_transported_unit = function (self, unit_to_l
 			locomotion_extension.set_on_moving_platform(locomotion_extension, unit)
 		end
 	end
-
-	return 
 end
+
 LinkerTransportationExtension.assign_position_to_bot = function (self)
 	return Unit.world_position(self.unit, 0)
 end
 
-return 
+return

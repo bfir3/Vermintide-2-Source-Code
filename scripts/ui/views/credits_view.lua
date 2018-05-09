@@ -55,6 +55,7 @@ local font_sizes = {
 	normal = 30
 }
 CreditsView = class(CreditsView)
+
 CreditsView.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ui_top_renderer = ingame_ui_context.ui_top_renderer
@@ -71,12 +72,12 @@ CreditsView.init = function (self, ingame_ui_context)
 	self.current_offset = 0
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self.ui_element = UIElement.init(credits_ui_element)
-
-	return 
 end
+
 CreditsView.input_service = function (self)
 	return self.input_manager:get_service("credits_view")
 end
+
 CreditsView.on_enter = function (self)
 	self.input_manager:block_device_except_service("credits_view", "keyboard", 1)
 	self.input_manager:block_device_except_service("credits_view", "mouse", 1)
@@ -84,9 +85,8 @@ CreditsView.on_enter = function (self)
 
 	self.current_offset = 0
 	self.active = true
-
-	return 
 end
+
 CreditsView.on_exit = function (self)
 	self.input_manager:device_unblock_all_services("keyboard", 1)
 	self.input_manager:device_unblock_all_services("mouse", 1)
@@ -94,39 +94,35 @@ CreditsView.on_exit = function (self)
 
 	self.active = nil
 	self.exiting = nil
-
-	return 
 end
+
 CreditsView.exit = function (self, return_to_game)
 	local exit_transition = (return_to_game and "exit_menu") or "ingame_menu"
 
 	self.ingame_ui:handle_transition(exit_transition)
 
 	self.exiting = nil
-
-	return 
 end
+
 CreditsView.suspend = function (self)
 	self.suspended = true
 
 	self.input_manager:device_unblock_all_services("keyboard", 1)
 	self.input_manager:device_unblock_all_services("mouse", 1)
 	self.input_manager:device_unblock_all_services("gamepad", 1)
-
-	return 
 end
+
 CreditsView.unsuspend = function (self)
 	self.input_manager:block_device_except_service("credits_view", "keyboard", 1)
 	self.input_manager:block_device_except_service("credits_view", "mouse", 1)
 	self.input_manager:block_device_except_service("credits_view", "gamepad", 1)
 
 	self.suspended = nil
-
-	return 
 end
+
 CreditsView.update = function (self, dt)
 	if self.suspended then
-		return 
+		return
 	end
 
 	local input_manager = self.input_manager
@@ -136,7 +132,7 @@ CreditsView.update = function (self, dt)
 	if input_service.get(input_service, "toggle_menu", true) or (gamepad_active and input_service.get(input_service, "back", true)) then
 		self.exit(self)
 
-		return 
+		return
 	end
 
 	local input_axis = (gamepad_active and input_service.get(input_service, "gamepad_left_axis")) or input_service.get(input_service, "scroll_axis")
@@ -199,8 +195,6 @@ CreditsView.update = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
 
-return 
+return

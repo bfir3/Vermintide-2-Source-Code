@@ -1,13 +1,14 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTInGravityWellAction = class(BTInGravityWellAction, BTNode)
+
 BTInGravityWellAction.init = function (self, ...)
 	BTInGravityWellAction.super.init(self, ...)
-
-	return 
 end
+
 BTInGravityWellAction.name = "BTInGravityWellAction"
 local DEFAULT_IN_AIR_MOVER_CHECK_RADIUS = 0.35
+
 BTInGravityWellAction.enter = function (self, unit, blackboard, t)
 	local locomotion_extension = blackboard.locomotion_extension
 	local navigation_extension = blackboard.navigation_extension
@@ -34,9 +35,8 @@ BTInGravityWellAction.enter = function (self, unit, blackboard, t)
 	local action_data = self._tree_node.action_data
 	blackboard.action = action_data
 	blackboard.spawn_to_running = nil
-
-	return 
 end
+
 BTInGravityWellAction._set_wanted_velocity = function (self, dt, blackboard, self_pos)
 	local locomotion_extension = blackboard.locomotion_extension
 	local gravity_well_pos = blackboard.gravity_well_position:unbox()
@@ -63,6 +63,7 @@ BTInGravityWellAction._set_wanted_velocity = function (self, dt, blackboard, sel
 
 	return new_velocity, broke_free
 end
+
 BTInGravityWellAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
 	blackboard.stagger_hit_wall = nil
@@ -78,9 +79,8 @@ BTInGravityWellAction.leave = function (self, unit, blackboard, t, reason, destr
 	blackboard.gravity_well_position = nil
 	blackboard.gravity_well_strength = nil
 	blackboard.gravity_well_time = nil
-
-	return 
 end
+
 BTInGravityWellAction.run = function (self, unit, blackboard, t, dt)
 	local position = POSITION_LOOKUP[unit]
 	local velocity, broke_free = self._set_wanted_velocity(self, dt, blackboard, position)
@@ -113,4 +113,4 @@ BTInGravityWellAction.run = function (self, unit, blackboard, t, dt)
 	return ((broke_free or blackboard.gravity_well_time < t) and "done") or "running"
 end
 
-return 
+return

@@ -20,4 +20,4 @@ PACKAGED_LEVEL_PACKAGE_NAMES = {
 	["resource_packages/levels/ui_loot_preview"] = true
 }
 
-return 
+return

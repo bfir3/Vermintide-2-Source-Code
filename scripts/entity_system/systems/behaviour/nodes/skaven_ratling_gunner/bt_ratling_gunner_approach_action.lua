@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTRatlingGunnerApproachAction = class(BTRatlingGunnerApproachAction, BTNode)
+
 BTRatlingGunnerApproachAction.init = function (self, ...)
 	BTRatlingGunnerApproachAction.super.init(self, ...)
-
-	return 
 end
+
 BTRatlingGunnerApproachAction.name = "BTRatlingGunnerApproachAction"
+
 BTRatlingGunnerApproachAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local attack_pattern_data = blackboard.attack_pattern_data or {}
@@ -35,9 +36,8 @@ BTRatlingGunnerApproachAction.enter = function (self, unit, blackboard, t)
 
 		Managers.state.network.network_transmit:send_rpc_all("rpc_tutorial_message", template_id, message_id)
 	end
-
-	return 
 end
+
 BTRatlingGunnerApproachAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if reason ~= "done" then
 		blackboard.move_pos = nil
@@ -47,9 +47,8 @@ BTRatlingGunnerApproachAction.leave = function (self, unit, blackboard, t, reaso
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 BTRatlingGunnerApproachAction.run = function (self, unit, blackboard, t, dt)
 	local is_within_check_distance = self.is_within_check_distance(self, unit, blackboard)
 
@@ -93,6 +92,7 @@ BTRatlingGunnerApproachAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTRatlingGunnerApproachAction.is_within_check_distance = function (self, unit, blackboard)
 	local action = blackboard.action
 	local has_been_attacked = blackboard.previous_attacker
@@ -103,15 +103,15 @@ BTRatlingGunnerApproachAction.is_within_check_distance = function (self, unit, b
 
 	return is_within_check_distance
 end
+
 BTRatlingGunnerApproachAction.move_to = function (self, position, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.move_to(navigation_extension, position)
 
 	blackboard.move_pos = Vector3Box(position)
-
-	return 
 end
+
 BTRatlingGunnerApproachAction.calculate_move_position = function (self, unit, blackboard)
 	local action = blackboard.action
 	local min_distance = action.check_distance - 2
@@ -123,4 +123,4 @@ BTRatlingGunnerApproachAction.calculate_move_position = function (self, unit, bl
 	return position
 end
 
-return 
+return

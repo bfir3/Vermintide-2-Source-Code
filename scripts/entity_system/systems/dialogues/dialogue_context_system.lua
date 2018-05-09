@@ -2,6 +2,7 @@ local extensions = {
 	"GenericDialogueContextExtension"
 }
 DialogueContextSystem = class(DialogueContextSystem, ExtensionSystemBase)
+
 DialogueContextSystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
@@ -11,14 +12,12 @@ DialogueContextSystem.init = function (self, context, system_name)
 	self.unit_extension_data = {}
 
 	GarbageLeakDetector.register_object(self, "dialogue_context_system")
-
-	return 
 end
+
 DialogueContextSystem.destroy = function (self)
 	self.unit_extension_data = nil
-
-	return 
 end
+
 DialogueContextSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	local health_extension = ScriptUnit.extension(unit, "health_system")
 	local status_extension = ScriptUnit.extension(unit, "status_system")
@@ -41,13 +40,13 @@ DialogueContextSystem.on_add_extension = function (self, world, unit, extension_
 
 	return extension
 end
+
 DialogueContextSystem.on_remove_extension = function (self, unit, extension_name)
 	self.unit_extension_data[unit] = nil
 
 	ScriptUnit.remove_extension(unit, self.NAME)
-
-	return 
 end
+
 DialogueContextSystem.update = function (self, system_context, t)
 	for unit, extension in pairs(self.unit_extension_data) do
 		local context = extension.context
@@ -70,11 +69,10 @@ DialogueContextSystem.update = function (self, system_context, t)
 			context.primary_foe_name = (context.primary_foe and Unit.get_data(context.primary_foe, "breed").name) or nil
 		end
 	end
-
-	return 
 end
+
 DialogueContextSystem.hot_join_sync = function (self, sender)
-	return 
+	return
 end
 
-return 
+return

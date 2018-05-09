@@ -2,12 +2,15 @@ MainPathUtils = {}
 local distance_squared = Vector3.distance_squared
 local Geometry = Geometry
 local Vector3_distance = Vector3.distance
+
 MainPathUtils.total_path_dist = function ()
 	return EngineOptimized.main_path_total_length()
 end
+
 MainPathUtils.closest_pos_at_main_path = function (not_used, p)
 	return EngineOptimized.closest_pos_at_main_path(p)
 end
+
 MainPathUtils.closest_pos_at_main_path_lua = function (main_paths, p)
 	local best_dist = math.huge
 	local best_main_path, best_sub_index = nil
@@ -61,6 +64,7 @@ MainPathUtils.closest_pos_at_main_path_lua = function (main_paths, p)
 
 	return best_point, best_travel_dist, total_path_dist, move_percent, best_main_path, best_sub_index
 end
+
 MainPathUtils.collapse_main_paths = function (main_paths)
 	local unified_path = {}
 	local unified_travel_dists = {}
@@ -97,9 +101,11 @@ MainPathUtils.collapse_main_paths = function (main_paths)
 
 	return unified_path, unified_travel_dists, segments, breaks, breaks_order
 end
+
 MainPathUtils.point_on_mainpath = function (main_paths, wanted_distance)
 	return EngineOptimized.point_on_mainpath(wanted_distance)
 end
+
 MainPathUtils.point_on_mainpath_lua = function (main_paths, wanted_distance)
 	if wanted_distance < 0 then
 		return main_paths[1].nodes[1]:unbox(), 1
@@ -126,6 +132,7 @@ MainPathUtils.point_on_mainpath_lua = function (main_paths, wanted_distance)
 
 	return nodes[#nodes]:unbox(), num_main_paths
 end
+
 MainPathUtils.zone_segment_on_mainpath = function (main_paths, p)
 	local best_point, best_travel_dist, move_percent = MainPathUtils.closest_pos_at_main_path(main_paths, p)
 	local index = math.floor((best_travel_dist + 5) / 10)
@@ -154,8 +161,6 @@ function moll()
 			break
 		end
 	end
-
-	return 
 end
 
 local index_list = {
@@ -168,6 +173,7 @@ local index_list = {
 	-20
 }
 local index_list_size = #index_list
+
 MainPathUtils.closest_pos_at_collapsed_main_path = function (collapsed_path, collapsed_dists, breaks_lookup, p, last_index)
 	last_index = last_index or 1
 	local num_nodes = #collapsed_path
@@ -224,6 +230,7 @@ MainPathUtils.closest_pos_at_collapsed_main_path = function (collapsed_path, col
 
 	return best_point, best_travel_dist, move_percent, best_index
 end
+
 MainPathUtils.resolve_node_in_door = function (nav_world, node_position, door_unit)
 	local nav_graph_extension = ScriptUnit.has_extension(door_unit, "nav_graph_system")
 
@@ -262,7 +269,9 @@ MainPathUtils.resolve_node_in_door = function (nav_world, node_position, door_un
 
 	return node_position
 end
+
 local DOOR_SEARCH_RADIUS = 1.5
+
 MainPathUtils.node_list_from_main_paths = function (nav_world, main_paths, max_node_distance, obstacles)
 	local forward_list = {}
 	local reversed_list = {}
@@ -352,6 +361,7 @@ MainPathUtils.node_list_from_main_paths = function (nav_world, main_paths, max_n
 
 	return forward_list, reversed_list, forward_break_list, reversed_break_list
 end
+
 MainPathUtils.closest_node_in_node_list = function (node_list, p)
 	local best_dist = math.huge
 	local best_index = nil
@@ -368,6 +378,7 @@ MainPathUtils.closest_node_in_node_list = function (node_list, p)
 
 	return best_index
 end
+
 MainPathUtils.ray_along_node_list = function (nav_world, node_list, start_node_index, node_list_direction, wanted_distance)
 	local end_node_index = (node_list_direction == -1 and 1) or #node_list
 	local distance = 0
@@ -400,9 +411,8 @@ MainPathUtils.ray_along_node_list = function (nav_world, node_list, start_node_i
 			end
 		end
 	end
-
-	return 
 end
+
 MainPathUtils.find_equidistant_points_in_node_list = function (node_list, start_node_index, node_list_direction, point_distance, num_wanted_points)
 	local node_index = start_node_index
 	local points = {}
@@ -441,8 +451,6 @@ MainPathUtils.find_equidistant_points_in_node_list = function (node_list, start_
 		segment_offset = (segment_offset + point_distance) - segment_remainder
 		node_index = node_index + node_list_direction
 	end
-
-	return 
 end
 
-return 
+return

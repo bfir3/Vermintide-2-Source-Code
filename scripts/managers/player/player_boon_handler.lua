@@ -32,18 +32,16 @@ PlayerBoonHandler.init = function (self, player, world, is_server)
 	end
 
 	self.is_local_player = is_local_player
-
-	return 
 end
+
 PlayerBoonHandler.update = function (self, dt, t)
 	if self.is_local_player then
 		self._poll_for_boons(self)
 	end
 
 	self._update_active_boons(self, dt, t)
-
-	return 
 end
+
 PlayerBoonHandler._poll_for_boons = function (self)
 	local game_mode_key = Managers.state.game_mode:game_mode_key()
 	local query_boons = game_mode_key == "inn" or not self._boons_inited
@@ -59,9 +57,8 @@ PlayerBoonHandler._poll_for_boons = function (self)
 			self._boons_inited = true
 		end
 	end
-
-	return 
 end
+
 PlayerBoonHandler._update_boons = function (self, boons)
 	local name_ids = {}
 	local remaining_durations = {}
@@ -93,9 +90,8 @@ PlayerBoonHandler._update_boons = function (self, boons)
 			network_manager.network_transmit:send_rpc_server("rpc_set_boon_handler_game_object_fields", player_game_object_id, name_ids, remaining_durations)
 		end
 	end
-
-	return 
 end
+
 PlayerBoonHandler.set_game_object_fields = function (self, name_ids, remaining_durations)
 	local game = self.network_manager:game()
 	local player = self.player
@@ -117,9 +113,8 @@ PlayerBoonHandler.set_game_object_fields = function (self, name_ids, remaining_d
 
 		GameSession.set_game_object_field(game, player_game_object_id, "boon_poll_time", poll_time)
 	end
-
-	return 
 end
+
 PlayerBoonHandler._update_active_boons = function (self, dt, t)
 	local boon_templates = BoonTemplates
 	local game = self.network_manager:game()
@@ -169,12 +164,12 @@ PlayerBoonHandler._update_active_boons = function (self, dt, t)
 			self.debug_timer = 0
 		end
 	end
-
-	return 
 end
+
 PlayerBoonHandler.get_active_boons = function (self)
 	return self.active_boons
 end
+
 PlayerBoonHandler.get_last_poll_time = function (self)
 	local player = self.player
 	local player_game_object_id = player.game_object_id
@@ -187,6 +182,7 @@ PlayerBoonHandler.get_last_poll_time = function (self)
 
 	return boon_poll_time
 end
+
 PlayerBoonHandler.get_num_boons = function (self, boon_name)
 	local num_boons = 0
 	local active_boons = self.active_boons
@@ -201,6 +197,7 @@ PlayerBoonHandler.get_num_boons = function (self, boon_name)
 
 	return num_boons
 end
+
 PlayerBoonHandler.has_boon = function (self, boon_name)
 	local active_boons = self.active_boons
 
@@ -215,4 +212,4 @@ PlayerBoonHandler.has_boon = function (self, boon_name)
 	return false
 end
 
-return 
+return

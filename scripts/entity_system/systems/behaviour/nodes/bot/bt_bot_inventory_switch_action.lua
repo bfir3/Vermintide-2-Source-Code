@@ -1,23 +1,22 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTBotInventorySwitchAction = class(BTBotInventorySwitchAction, BTNode)
+
 BTBotInventorySwitchAction.init = function (self, ...)
 	BTBotInventorySwitchAction.super.init(self, ...)
-
-	return 
 end
+
 BTBotInventorySwitchAction.name = "BTBotInventorySwitchAction"
+
 BTBotInventorySwitchAction.enter = function (self, unit, blackboard, t)
 	blackboard.node_timer = t
 	blackboard.wanted_slot = self._tree_node.action_data.wanted_slot
-
-	return 
 end
+
 BTBotInventorySwitchAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.wanted_slot = nil
-
-	return 
 end
+
 BTBotInventorySwitchAction.run = function (self, unit, blackboard, t, dt)
 	local wanted_slot = blackboard.wanted_slot
 	local inventory_ext = blackboard.inventory_extension
@@ -34,8 +33,6 @@ BTBotInventorySwitchAction.run = function (self, unit, blackboard, t, dt)
 
 		return "running"
 	end
-
-	return 
 end
 
-return 
+return

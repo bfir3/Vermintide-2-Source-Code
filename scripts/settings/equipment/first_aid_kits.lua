@@ -196,4 +196,4 @@ Weapons.first_aid_kit_02.left_hand_unit = "units/weapons/player/wpn_first_aid_ki
 Weapons.first_aid_kit_02.gui_texture = "hud_teammate_consumable_icon_medkit"
 Weapons.healthkit = weapon_template
 
-return 
+return

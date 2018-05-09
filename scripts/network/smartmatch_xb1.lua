@@ -1,14 +1,12 @@
 local DEBUG_SMARTMATCH = true
 
 local function dprintf()
-	return 
+	return
 end
 
 if DEBUG_SMARTMATCH then
 	function dprintf(...)
 		print("[SmartMatch]", string.format(...))
-
-		return 
 	end
 end
 
@@ -47,6 +45,7 @@ local SMARTMATCH_SESSION_STATUS_LUT = {
 	[MultiplayerSession.BROKEN] = "BROKEN"
 }
 SmartMatch = class(SmartMatch)
+
 SmartMatch.init = function (self, hopper_name, is_host, ticket_params, timeout)
 	self._hopper_name = hopper_name or LobbyInternal.HOPPER_NAME
 	self._is_host = is_host or false
@@ -65,6 +64,7 @@ SmartMatch.init = function (self, hopper_name, is_host, ticket_params, timeout)
 
 	return self._hopper_name
 end
+
 SmartMatch._create_smartmatch_session = function (self)
 	local session_name = Application.guid()
 	local hopper_name = LobbyInternal.HOPPER_NAME
@@ -75,9 +75,8 @@ SmartMatch._create_smartmatch_session = function (self)
 	local guest_user_ids = nil
 	self._session_id = Network.create_multiplayer_session_host(self._user_id, session_name, session_template_name, keywords, min_num_members, max_num_members, guest_user_ids)
 	self._session_name = session_name
-
-	return 
 end
+
 SmartMatch._handle_smartmatch_session = function (self)
 	local status = MultiplayerSession.status(self._session_id)
 
@@ -88,12 +87,11 @@ SmartMatch._handle_smartmatch_session = function (self)
 		self._ready = status == MultiplayerSession.READY
 		self._failed = status == MultiplayerSession.BROKEN
 	end
-
-	return 
 end
+
 SmartMatch._start_smartmatch = function (self, dt)
 	if not self._ready then
-		return 
+		return
 	end
 
 	local timeout_in_seconds = (self._is_host and self._timout * 10) or self._timout
@@ -114,12 +112,11 @@ SmartMatch._start_smartmatch = function (self, dt)
 
 	self._smartmatch_started = true
 	self._state = "_check_smartmatch_result"
-
-	return 
 end
+
 SmartMatch._check_smartmatch_result = function (self, dt)
 	if not self._ready then
-		return 
+		return
 	end
 
 	local ticket_id, estimated_waiting_time = MultiplayerSession.start_smartmatch_result(self._session_id)
@@ -177,12 +174,12 @@ SmartMatch._check_smartmatch_result = function (self, dt)
 			self._state = "_smartmatch_done"
 		end
 	end
+end
 
-	return 
-end
 SmartMatch._smartmatch_done = function (self, dt)
-	return 
+	return
 end
+
 SmartMatch._convert_to_json = function (self, hopper_name, params)
 	local lut_variables = HOPPER_PARAMS_LUT[hopper_name]
 
@@ -218,7 +215,7 @@ SmartMatch._convert_to_json = function (self, hopper_name, params)
 	end
 
 	if str == "" then
-		return 
+		return
 	else
 		str = string.sub(str, 1, -2)
 
@@ -226,24 +223,27 @@ SmartMatch._convert_to_json = function (self, hopper_name, params)
 
 		return string.format("{%s}", str)
 	end
-
-	return 
 end
+
 SmartMatch.update = function (self, dt)
 	self._handle_smartmatch_session(self)
 	self[self._state](self, dt)
 
 	return self._ready and not self._done
 end
+
 SmartMatch.is_search_done = function (self)
 	return self._done
 end
+
 SmartMatch.results = function (self)
 	return self._found_session_name, self._found_session_template
 end
+
 SmartMatch.success = function (self)
 	return not self._failed
 end
+
 SmartMatch.destroy = function (self)
 	local session_data = {
 		destroy_session = true,
@@ -255,8 +255,6 @@ SmartMatch.destroy = function (self)
 	}
 
 	Managers.account:add_session_to_cleanup(session_data)
-
-	return 
 end
 
-return 
+return

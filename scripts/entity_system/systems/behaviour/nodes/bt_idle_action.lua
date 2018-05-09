@@ -3,11 +3,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 BTIdleAction = class(BTIdleAction, BTNode)
 local PLAYER_POSITIONS = PLAYER_POSITIONS
 local PLAYER_UNITS = PLAYER_UNITS
+
 BTIdleAction.init = function (self, ...)
 	BTIdleAction.super.init(self, ...)
-
-	return 
 end
+
 BTIdleAction.name = "BTIdleAction"
 
 local function randomize(event)
@@ -16,8 +16,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTIdleAction.enter = function (self, unit, blackboard, t)
@@ -64,13 +62,10 @@ BTIdleAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.navigation_extension:set_enabled(false)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
-
-	return 
 end
+
 BTIdleAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.navigation_extension:set_enabled(true)
-
-	return 
 end
 
 local function player_within_distance(unit, sqr_near_dist)
@@ -85,8 +80,6 @@ local function player_within_distance(unit, sqr_near_dist)
 			return PLAYER_UNITS[i]
 		end
 	end
-
-	return 
 end
 
 BTIdleAction._discovery_sound_when_close = function (self, unit, blackboard)
@@ -108,10 +101,10 @@ BTIdleAction._discovery_sound_when_close = function (self, unit, blackboard)
 			blackboard.sound_when_near_played = true
 		end
 	end
-
-	return 
 end
+
 local Unit_alive = Unit.alive
+
 BTIdleAction.run = function (self, unit, blackboard, t, dt)
 	local target_unit = blackboard.target_unit
 
@@ -125,4 +118,4 @@ BTIdleAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

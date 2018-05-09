@@ -4733,4 +4733,4 @@ GamepadSettings = {
 
 require("scripts/helpers/gamepad_alternate_layout_helper")
 
-return 
+return

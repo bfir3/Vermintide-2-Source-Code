@@ -25,8 +25,6 @@ local function player_stuck_cb()
 	if player and Unit.alive(player.player_unit) then
 		Managers.telemetry.events:player_stuck(player, level_key)
 	end
-
-	return 
 end
 
 if PLATFORM == "ps4" then
@@ -769,6 +767,7 @@ if GameSettingsDevelopment.use_global_chat and PLATFORM == "win32" then
 end
 
 IngameView = class(IngameView)
+
 IngameView.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ui_top_renderer = ingame_ui_context.ui_top_renderer
@@ -801,10 +800,10 @@ IngameView.init = function (self, ingame_ui_context)
 	self.menu_input_description = MenuInputDescriptionUI:new(ingame_ui_context, self.ui_top_renderer, input_service, number_of_actvie_descriptions, gui_layer, generic_input_actions)
 
 	self.menu_input_description:set_input_description(nil)
-
-	return 
 end
+
 local MENU_ANIMATION_TIME = 0.3
+
 IngameView.on_enter = function (self, menu_to_enter)
 	assert(menu_to_enter ~= "MainMenu")
 
@@ -828,9 +827,8 @@ IngameView.on_enter = function (self, menu_to_enter)
 		ShadingEnvironment.set_scalar(shading_env, "fullscreen_blur_amount", 0.75)
 		ShadingEnvironment.apply(shading_env)
 	end
-
-	return 
 end
+
 IngameView.on_exit = function (self)
 	if self._friends_component_ui:is_active() then
 		self._friends_component_ui:deactivate_friends_ui()
@@ -853,12 +851,12 @@ IngameView.on_exit = function (self)
 		ShadingEnvironment.set_scalar(shading_env, "fullscreen_blur_amount", 0)
 		ShadingEnvironment.apply(shading_env)
 	end
-
-	return 
 end
+
 IngameView.input_service = function (self)
 	return self.input_manager:get_service("ingame_menu")
 end
+
 IngameView.create_ui_elements = function (self)
 	local widgets = self.menu_definition.widgets
 	self.stored_buttons = {
@@ -888,9 +886,8 @@ IngameView.create_ui_elements = function (self)
 	self.right_chain_widget = UIWidget.init(widgets.right_chain)
 	self.console_cursor_widget = UIWidget.init(widgets.console_cursor)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(self.menu_definition.scenegraph_definition)
-
-	return 
 end
+
 IngameView.update_menu_options = function (self)
 	if script_data.pause_menu_full_access then
 		if not self.pause_menu_full_access then
@@ -983,9 +980,8 @@ IngameView.update_menu_options = function (self)
 			self.setup_button_layout(self, new_menu_layout)
 		end
 	end
-
-	return 
 end
+
 IngameView.update_menu_options_enabled_states = function (self)
 	local active_button_data = self.active_button_data
 
@@ -1014,9 +1010,8 @@ IngameView.update_menu_options_enabled_states = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 IngameView.setup_button_layout = function (self, layout_data)
 	local active_button_data = self.active_button_data
 
@@ -1063,16 +1058,14 @@ IngameView.setup_button_layout = function (self, layout_data)
 	end
 
 	self.set_background_height(self, #active_button_data)
-
-	return 
 end
+
 IngameView.destroy = function (self)
 	self.menu_input_description:destroy()
 
 	self.menu_input_description = nil
-
-	return 
 end
+
 IngameView.set_background_height = function (self, num_buttons)
 	local button_spacing = self.menu_definition.MENU_BUTTON_SPACING
 	local button_size = self.menu_definition.MENU_BUTTON_SIZE
@@ -1087,9 +1080,8 @@ IngameView.set_background_height = function (self, num_buttons)
 	local right_chain_widget = self.right_chain_widget
 	local right_chain_scenegraph_id = right_chain_widget.scenegraph_id
 	ui_scenegraph[right_chain_scenegraph_id].size[2] = total_button_height + 100
-
-	return 
 end
+
 IngameView.update = function (self, dt)
 	self.update_menu_options(self)
 	self.update_menu_options_enabled_states(self)
@@ -1193,16 +1185,14 @@ IngameView.update = function (self, dt)
 	if (input_service.get(input_service, "toggle_menu", true) or input_service.get(input_service, "back", true)) and not ingame_ui.pending_transition(ingame_ui) then
 		ingame_ui.handle_transition(ingame_ui, "exit_menu")
 	end
-
-	return 
 end
+
 IngameView.setup_controller_selection = function (self)
 	local selection_index = 1
 
 	self.controller_select_button_index(self, selection_index, true)
-
-	return 
 end
+
 IngameView.controller_select_button_index = function (self, index, ignore_sound)
 	local selection_accepted = false
 	local active_button_data = self.active_button_data
@@ -1237,6 +1227,7 @@ IngameView.controller_select_button_index = function (self, index, ignore_sound)
 
 	return selection_accepted
 end
+
 IngameView.clear_controller_selection = function (self)
 	local active_button_data = self.active_button_data
 
@@ -1244,9 +1235,8 @@ IngameView.clear_controller_selection = function (self)
 		local widget = data.widget
 		widget.content.button_hotspot.is_selected = false
 	end
-
-	return 
 end
+
 IngameView.update_controller_input = function (self, input_service, dt)
 	local num_buttons = #self.active_button_data
 
@@ -1257,7 +1247,7 @@ IngameView.update_controller_input = function (self, input_service, dt)
 		local min_multiplier = GamepadSettings.menu_min_speed_multiplier
 		self.speed_multiplier = math.max(speed_multiplier - decrease, min_multiplier)
 
-		return 
+		return
 	else
 		speed_multiplier = self.speed_multiplier or 1
 		local move_up = input_service.get(input_service, "move_up")
@@ -1275,7 +1265,7 @@ IngameView.update_controller_input = function (self, input_service, dt)
 
 			self.controller_cooldown = GamepadSettings.menu_cooldown * speed_multiplier
 
-			return 
+			return
 		end
 
 		local move_down = input_service.get(input_service, "move_down")
@@ -1292,25 +1282,21 @@ IngameView.update_controller_input = function (self, input_service, dt)
 
 			self.controller_cooldown = GamepadSettings.menu_cooldown * speed_multiplier
 
-			return 
+			return
 		end
 	end
 
 	self.speed_multiplier = 1
-
-	return 
 end
+
 IngameView.get_transition = function (self)
 	if self.leave_game then
 		return "leave_game"
 	end
-
-	return 
 end
+
 IngameView.play_sound = function (self, event)
 	WwiseWorld.trigger_event(self.wwise_world, event)
-
-	return 
 end
 
-return 
+return

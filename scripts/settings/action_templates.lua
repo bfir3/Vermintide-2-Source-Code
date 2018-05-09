@@ -185,7 +185,7 @@ ActionTemplates.instant_equip_tome = {
 			local wielded_slot = inventory_extension.get_wielded_slot_name(inventory_extension)
 
 			if wielded_slot == "slot_healthkit" then
-				return 
+				return
 			end
 
 			local has_tome = false
@@ -216,7 +216,7 @@ ActionTemplates.instant_equip_grimoire = {
 			local wielded_slot = inventory_extension.get_wielded_slot_name(inventory_extension)
 
 			if wielded_slot == "slot_potion" then
-				return 
+				return
 			end
 
 			local has_grimoire = false
@@ -274,8 +274,6 @@ ActionTemplates.action_inspect = {
 			else
 				return true
 			end
-
-			return 
 		end,
 		allowed_chain_actions = {
 			{
@@ -642,4 +640,4 @@ for hero_name, action_names in pairs(CareerActionNames) do
 	end
 end
 
-return 
+return

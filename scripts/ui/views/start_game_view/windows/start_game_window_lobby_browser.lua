@@ -42,14 +42,15 @@ end
 
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
 StartGameWindowLobbyBrowser = class(StartGameWindowLobbyBrowser)
 StartGameWindowLobbyBrowser.NAME = "StartGameWindowLobbyBrowser"
+
 StartGameWindowLobbyBrowser.on_enter = function (self, params, offset)
 	print("[StartGameWindow] Enter Substate StartGameWindowLobbyBrowser")
 
@@ -105,9 +106,8 @@ StartGameWindowLobbyBrowser.on_enter = function (self, params, offset)
 
 	Managers.matchmaking:set_active_lobby_browser(self)
 	self._populate_lobby_list(self)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -190,9 +190,8 @@ StartGameWindowLobbyBrowser.create_ui_elements = function (self, params, offset)
 
 	self._assign_hero_portraits(self)
 	self._reset_filters(self)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._assign_hero_portraits = function (self)
 	local widget = self._lobby_info_box_base_widgets_by_name.hero_tabs
 	local content = widget.content
@@ -206,9 +205,8 @@ StartGameWindowLobbyBrowser._assign_hero_portraits = function (self)
 		local ui_portrait = profile_settings.ui_portrait
 		hotspot_content[icon_name] = ui_portrait
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser.on_exit = function (self, params)
 	print("[StartGameWindow] Exit Substate StartGameWindowLobbyBrowser")
 
@@ -218,9 +216,8 @@ StartGameWindowLobbyBrowser.on_exit = function (self, params)
 	self.lobby_finder:destroy()
 
 	self.lobby_finder = nil
-
-	return 
 end
+
 StartGameWindowLobbyBrowser.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -342,12 +339,12 @@ StartGameWindowLobbyBrowser.update = function (self, dt, t)
 			self.search_timer = nil
 		end
 	end
+end
 
-	return 
-end
 StartGameWindowLobbyBrowser.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 StartGameWindowLobbyBrowser._setup_lobby_info_box = function (self, lobby_data)
 	local info_box_widgets = self._lobby_info_box_base_widgets_by_name
 	local info_box_widgets_lobbies = self._lobby_info_box_lobbies_widgets_by_name
@@ -434,9 +431,8 @@ StartGameWindowLobbyBrowser._setup_lobby_info_box = function (self, lobby_data)
 		info_box_widgets_servers.info_frame_favorite_text.content.text = (favorite and Localize("lb_yes")) or Localize("lb_no")
 		info_box_widgets_servers.add_to_favorites_button.content.button_text = (favorite and Localize("lb_remove_from_favorites")) or Localize("lb_add_to_favorites")
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -458,9 +454,8 @@ StartGameWindowLobbyBrowser._update_animations = function (self, dt)
 			self._ui_animations[name] = nil
 		end
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._is_refreshing = function (self)
 	local current_lobby_type = self._current_lobby_type
 
@@ -471,9 +466,8 @@ StartGameWindowLobbyBrowser._is_refreshing = function (self)
 	else
 		ferror("Unknown lobby types (%s)", current_lobby_type)
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -483,9 +477,8 @@ StartGameWindowLobbyBrowser._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._is_button_released = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -495,9 +488,8 @@ StartGameWindowLobbyBrowser._is_button_released = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._is_stepper_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot_left = content.button_hotspot_left
@@ -512,9 +504,8 @@ StartGameWindowLobbyBrowser._is_stepper_button_pressed = function (self, widget)
 
 		return true, 1
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._handle_input = function (self, dt, t)
 	local lobbies_widgets_by_name = self._lobbies_widgets_by_name
 
@@ -528,9 +519,8 @@ StartGameWindowLobbyBrowser._handle_input = function (self, dt, t)
 	self._handle_stepper_input(self, "search_type_stepper", server_widgets_by_name.search_type_stepper, callback(self, "_on_search_type_stepper_input"))
 	self._handle_name_input_box(self, dt, t)
 	self._handle_selected_lobby_input(self)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._handle_name_input_box = function (self, dt, t)
 	local input_service = self.parent:window_input_service()
 	local name_input_box_content = self._server_widgets_by_name.name_input_box.content
@@ -548,14 +538,13 @@ StartGameWindowLobbyBrowser._handle_name_input_box = function (self, dt, t)
 
 		self._populate_lobby_list(self)
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._handle_selected_lobby_input = function (self)
 	local lobby_data = self.lobby_list:selected_lobby()
 
 	if not lobby_data then
-		return 
+		return
 	end
 
 	if self._current_lobby_type == "servers" then
@@ -572,9 +561,8 @@ StartGameWindowLobbyBrowser._handle_selected_lobby_input = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._add_server_to_favorites = function (self, lobby_data)
 	local server_info = lobby_data.server_info
 	local ip = server_info.ip_address
@@ -582,9 +570,8 @@ StartGameWindowLobbyBrowser._add_server_to_favorites = function (self, lobby_dat
 	local query_port = server_info.query_port
 
 	self.game_server_finder:add_to_favorites(ip, connection_port, query_port)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._remove_server_from_favorites = function (self, lobby_data)
 	local server_info = lobby_data.server_info
 	local ip = server_info.ip_address
@@ -592,9 +579,8 @@ StartGameWindowLobbyBrowser._remove_server_from_favorites = function (self, lobb
 	local query_port = server_info.query_port
 
 	self.game_server_finder:remove_from_favorites(ip, connection_port, query_port)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -641,19 +627,16 @@ StartGameWindowLobbyBrowser.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser.cancel_join_lobby = function (self, status_message)
 	self.join_lobby_data_id = nil
-
-	return 
 end
+
 local dummy_lobby = {
 	difficulty = "normal",
 	player_slot_3 = "0:0",
@@ -674,6 +657,7 @@ local dummy_lobby = {
 	unique_server_name = "sebgra"
 }
 local dummy_server_info = {}
+
 StartGameWindowLobbyBrowser._populate_lobby_list = function (self, auto_update)
 	local selected_lobby_data = self.lobby_list:selected_lobby()
 	local lobbies = self._get_lobbies(self)
@@ -703,10 +687,10 @@ StartGameWindowLobbyBrowser._populate_lobby_list = function (self, auto_update)
 	if selected_lobby_data then
 		self.lobby_list:set_selected_lobby(selected_lobby_data)
 	end
-
-	return 
 end
+
 local empty_lobby_list = {}
+
 StartGameWindowLobbyBrowser._get_lobbies = function (self)
 	local current_lobby_type = self._current_lobby_type
 
@@ -721,9 +705,8 @@ StartGameWindowLobbyBrowser._get_lobbies = function (self)
 	else
 		ferror("Unknown lobby type (%s)", current_lobby_type)
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._valid_lobby = function (self, lobby_data)
 	local is_valid = lobby_data.valid
 
@@ -772,12 +755,15 @@ StartGameWindowLobbyBrowser._valid_lobby = function (self, lobby_data)
 
 	return true
 end
+
 StartGameWindowLobbyBrowser.set_status_message = function (self, status_message)
-	return 
+	return
 end
+
 StartGameWindowLobbyBrowser._input_service = function (self)
 	return self.parent:input_service()
 end
+
 StartGameWindowLobbyBrowser._update_auto_refresh = function (self, dt)
 	local lobby_list_update_timer = self.lobby_list_update_timer
 
@@ -790,9 +776,8 @@ StartGameWindowLobbyBrowser._update_auto_refresh = function (self, dt)
 			self.lobby_list_update_timer = lobby_list_update_timer
 		end
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._update_join_button = function (self, lobby_data)
 	local menu_input_description_ui = self.menu_input_description_ui
 	local active_menu_input_description = self.active_menu_input_description
@@ -811,9 +796,8 @@ StartGameWindowLobbyBrowser._update_join_button = function (self, lobby_data)
 	else
 		widget.content.button_hotspot.disable_button = true
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._reset_filters = function (self)
 	local levels_table = self._get_levels(self)
 	local any_level_index = #levels_table
@@ -826,9 +810,8 @@ StartGameWindowLobbyBrowser._reset_filters = function (self)
 	self._on_difficulty_stepper_input(self, 0, any_difficulty_index)
 	self._on_show_lobbies_stepper_input(self, 0, 1)
 	self._on_distance_stepper_input(self, 0, 2)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._switch_lobby_type = function (self, new_lobby_type)
 	self._current_lobby_type = new_lobby_type
 	local lobby_type_button = self._base_widgets_by_name.lobby_type_button
@@ -842,9 +825,8 @@ StartGameWindowLobbyBrowser._switch_lobby_type = function (self, new_lobby_type)
 	end
 
 	self._search(self)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._create_filter_requirements = function (self)
 	local lobby_finder = self.lobby_finder
 	local level_index = self.selected_level_index
@@ -924,13 +906,13 @@ StartGameWindowLobbyBrowser._create_filter_requirements = function (self)
 
 	return requirements
 end
+
 StartGameWindowLobbyBrowser._join = function (self, lobby_data, join_params)
 	Managers.matchmaking:request_join_lobby(lobby_data, join_params)
 
 	self.join_lobby_data_id = lobby_data.id
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._search = function (self)
 	local requirements = self._create_filter_requirements(self)
 
@@ -962,9 +944,8 @@ StartGameWindowLobbyBrowser._search = function (self)
 	self._searching = true
 
 	self._populate_lobby_list(self)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._get_levels = function (self)
 	local game_mode_data = definitions.game_mode_data
 	local game_mode_index = self.selected_game_mode_index or 1
@@ -973,6 +954,7 @@ StartGameWindowLobbyBrowser._get_levels = function (self)
 
 	return levels
 end
+
 StartGameWindowLobbyBrowser._get_difficulties = function (self)
 	local game_mode_data = definitions.game_mode_data
 	local game_mode_index = self.selected_game_mode_index or 1
@@ -981,6 +963,7 @@ StartGameWindowLobbyBrowser._get_difficulties = function (self)
 
 	return difficulties
 end
+
 StartGameWindowLobbyBrowser._on_game_mode_stepper_input = function (self, index_change, specific_index)
 	local stepper = self._base_widgets_by_name.game_mode_stepper
 	local game_mode_display_table = definitions.game_mode_data
@@ -1000,9 +983,8 @@ StartGameWindowLobbyBrowser._on_game_mode_stepper_input = function (self, index_
 	local any_difficulty_index = #difficulties_table
 
 	self._on_difficulty_stepper_input(self, 0, any_difficulty_index)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._on_level_stepper_input = function (self, index_change, specific_index)
 	local stepper = self._lobbies_widgets_by_name.level_stepper
 	local levels_table = self._get_levels(self)
@@ -1019,9 +1001,8 @@ StartGameWindowLobbyBrowser._on_level_stepper_input = function (self, index_chan
 	stepper.content.setting_text = Localize(level_display_name)
 	self.selected_level_index = new_index
 	self.search_timer = input_delay_before_start_new_search
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._on_difficulty_stepper_input = function (self, index_change, specific_index)
 	local stepper = self._lobbies_widgets_by_name.difficulty_stepper
 	local difficulties_table = self._get_difficulties(self)
@@ -1038,9 +1019,8 @@ StartGameWindowLobbyBrowser._on_difficulty_stepper_input = function (self, index
 	stepper.content.setting_text = Localize(difficulty_display_name)
 	self.selected_difficulty_index = new_index
 	self.search_timer = input_delay_before_start_new_search
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._on_show_lobbies_stepper_input = function (self, index_change, specific_index)
 	local stepper = self._lobbies_widgets_by_name.show_lobbies_stepper
 	local show_lobbies_table = definitions.show_lobbies_table
@@ -1050,9 +1030,8 @@ StartGameWindowLobbyBrowser._on_show_lobbies_stepper_input = function (self, ind
 	stepper.content.setting_text = Localize(show_lobbies_text)
 	self.selected_show_lobbies_index = new_index
 	self.search_timer = input_delay_before_start_new_search
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._on_distance_stepper_input = function (self, index_change, specific_index)
 	local stepper = self._lobbies_widgets_by_name.distance_stepper
 	local distance_table = definitions.distance_table
@@ -1062,9 +1041,8 @@ StartGameWindowLobbyBrowser._on_distance_stepper_input = function (self, index_c
 	stepper.content.setting_text = Localize(distance_text)
 	self.selected_distance_index = new_index
 	self.search_timer = input_delay_before_start_new_search
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._on_search_type_stepper_input = function (self, index_change, specific_index)
 	local stepper = self._server_widgets_by_name.search_type_stepper
 	local search_type_text_table = definitions.search_type_text_table
@@ -1078,9 +1056,8 @@ StartGameWindowLobbyBrowser._on_search_type_stepper_input = function (self, inde
 	local search_type = search_type_table[new_index]
 
 	self.game_server_finder:set_search_type(search_type)
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._on_stepper_input = function (self, stepper, data_table, current_index, index_change, specific_index)
 	local num_data = #data_table
 
@@ -1100,6 +1077,7 @@ StartGameWindowLobbyBrowser._on_stepper_input = function (self, stepper, data_ta
 
 	return new_index
 end
+
 StartGameWindowLobbyBrowser._handle_stepper_input = function (self, stepper_name, stepper, step_function)
 	local stepper_widget = stepper
 	local stepper_content = stepper_widget.content
@@ -1138,9 +1116,8 @@ StartGameWindowLobbyBrowser._handle_stepper_input = function (self, stepper_name
 		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "right_button_icon")
 		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "right_button_icon_clicked")
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._on_stepper_arrow_pressed = function (self, widget, name, style_id)
 	local ui_animations = self._ui_animations
 	local animation_name = "stepper_widget_arrow_" .. name .. style_id
@@ -1162,9 +1139,8 @@ StartGameWindowLobbyBrowser._on_stepper_arrow_pressed = function (self, widget, 
 	else
 		pass_style.color[1] = target_alpha
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._on_stepper_arrow_hover = function (self, widget, name, style_id)
 	local ui_animations = self._ui_animations
 	local animation_name = "stepper_widget_arrow_" .. name .. style_id
@@ -1182,9 +1158,8 @@ StartGameWindowLobbyBrowser._on_stepper_arrow_hover = function (self, widget, na
 	end
 
 	self._play_sound(self, "Play_hud_hover")
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._on_stepper_arrow_dehover = function (self, widget, name, style_id)
 	local ui_animations = self._ui_animations
 	local animation_name = "stepper_widget_arrow_" .. name .. style_id
@@ -1200,18 +1175,18 @@ StartGameWindowLobbyBrowser._on_stepper_arrow_dehover = function (self, widget, 
 	else
 		pass_style.color[1] = target_alpha
 	end
-
-	return 
 end
+
 StartGameWindowLobbyBrowser._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 StartGameWindowLobbyBrowser._animate_element_by_catmullrom = function (self, target, target_index, target_value, p0, p1, p2, p3, time)
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
 end
 
-return 
+return

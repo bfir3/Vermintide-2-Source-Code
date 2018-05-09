@@ -15,6 +15,7 @@ local single_widget_definitions = definitions.single_widget_definitions
 DemoTitleUI = class(DemoTitleUI)
 local WORLD_GUI_RESOLUTION = 1920
 local CAMERA_TRANSITION_TIME = 2
+
 DemoTitleUI.init = function (self, world, viewport, parent)
 	self._world = world
 	self._viewport = viewport
@@ -31,9 +32,8 @@ DemoTitleUI.init = function (self, world, viewport, parent)
 	self._setup_world_gui(self, parent)
 	self._create_ui_elements(self)
 	self._setup_input(self)
-
-	return 
 end
+
 DemoTitleUI._setup_gui = function (self)
 	self._render_settings = {
 		snap_pixel_positions = true
@@ -50,9 +50,8 @@ DemoTitleUI._setup_gui = function (self)
 	self._career_video_ui_renderer = UIRenderer.create(self._world, unpack(materials))
 
 	UISetupFontHeights(self._ui_renderer.gui)
-
-	return 
 end
+
 DemoTitleUI._setup_world_gui = function (self)
 	self._world_gui = World.create_world_gui(self._world, Matrix4x4.identity(), WORLD_GUI_RESOLUTION, WORLD_GUI_RESOLUTION, "material", "materials/ui/ui_1080p_title_screen", "immediate")
 	local camera_poses = self._camera_poses
@@ -63,9 +62,8 @@ DemoTitleUI._setup_world_gui = function (self)
 	local new_pose = Matrix4x4.from_quaternion_position(rotation, position + forward * 1.5)
 
 	Gui.move(self._world_gui, new_pose)
-
-	return 
 end
+
 DemoTitleUI._setup_level = function (self)
 	local level_name = DemoSettings.level_name
 	local spawned_object_sets = {}
@@ -84,9 +82,8 @@ DemoTitleUI._setup_level = function (self)
 	self._level = ScriptWorld.load_level(self._world, DemoSettings.level_name, spawned_object_sets, nil, nil, callback(self, "shading_callback"))
 
 	Level.spawn_background(self._level)
-
-	return 
 end
+
 DemoTitleUI.shading_callback = function (self, world, shading_env, viewport)
 	for name, settings in pairs(OutlineSettings.colors) do
 		local c = settings.color
@@ -100,9 +97,8 @@ DemoTitleUI.shading_callback = function (self, world, shading_env, viewport)
 		ShadingEnvironment.set_vector3(shading_env, settings.variable, color)
 		ShadingEnvironment.set_scalar(shading_env, settings.outline_multiplier_variable, multiplier)
 	end
-
-	return 
 end
+
 DemoTitleUI._collect_cameras = function (self)
 	self._camera_poses = {}
 	local unit_indices = LevelResource.unit_indices(DemoSettings.level_name, "units/hub_elements/cutscene_camera/cutscene_camera")
@@ -122,9 +118,8 @@ DemoTitleUI._collect_cameras = function (self)
 			print("Found camera: " .. name)
 		end
 	end
-
-	return 
 end
+
 DemoTitleUI._position_camera = function (self)
 	local camera = ScriptViewport.camera(self._viewport)
 	local starting_camera_name = DemoSettings.starting_camera_name
@@ -137,9 +132,8 @@ DemoTitleUI._position_camera = function (self)
 
 	self._scatter_system = World.scatter_system(self._world)
 	self._scatter_system_observer = ScatterSystem.make_observer(self._scatter_system, Matrix4x4.translation(camera_pose.unbox(camera_pose)), Matrix4x4.rotation(camera_pose.unbox(camera_pose)))
-
-	return 
 end
+
 DemoTitleUI._create_ui_elements = function (self)
 	self._ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self._attract_video = UIWidget.init(UIWidgets.create_splash_video(attract_mode_video))
@@ -192,9 +186,8 @@ DemoTitleUI._create_ui_elements = function (self)
 	self._ui_animations = {}
 	self._ui_animation_cb = {}
 	self._ui_animations.reset = UIAnimation.init(UIAnimation.function_by_time, self._ui_scenegraph.right_side_root.local_position, 1, self._ui_scenegraph.right_side_root.local_position[1], 450, 0, math.easeOutCubic)
-
-	return 
 end
+
 DemoTitleUI._populate_career_page = function (self, profile_name, career_index)
 	local profile_index = FindProfileIndex(profile_name)
 	local profile_settings = SPProfiles[profile_index]
@@ -237,15 +230,13 @@ DemoTitleUI._populate_career_page = function (self, profile_name, career_index)
 	local ingame_display_name = profile_settings.ingame_display_name
 
 	self._set_career_widget_text(self, "player_hero_name", ingame_display_name)
-
-	return 
 end
+
 DemoTitleUI._set_career_widget_text = function (self, widget_name, text)
 	local widget = self._career_widgets[widget_name]
 	widget.content.text = text
-
-	return 
 end
+
 DemoTitleUI._destroy_career_video_player = function (self)
 	local ui_renderer = self._career_video_ui_renderer
 	local widget = self._video_widget
@@ -255,9 +246,8 @@ DemoTitleUI._destroy_career_video_player = function (self)
 	end
 
 	self._video_created = nil
-
-	return 
 end
+
 DemoTitleUI._setup_video_player = function (self, material_name, resource)
 	self._destroy_career_video_player(self)
 	UIRenderer.create_video_player(self._career_video_ui_renderer, self._world, resource, true)
@@ -268,9 +258,8 @@ DemoTitleUI._setup_video_player = function (self, material_name, resource)
 	self._video_created = true
 	local video_widget_content = self._video_widget.content
 	video_widget_content.video_player = self._career_video_ui_renderer.video_player
-
-	return 
 end
+
 DemoTitleUI._setup_input = function (self)
 	self._input_manager = Managers.input
 
@@ -278,9 +267,8 @@ DemoTitleUI._setup_input = function (self)
 	self._input_manager:map_device_to_service("main_menu", "gamepad")
 	self._input_manager:map_device_to_service("main_menu", "keyboard")
 	self._input_manager:map_device_to_service("main_menu", "mouse")
-
-	return 
 end
+
 DemoTitleUI._setup_characters = function (self)
 	self._character_previewers = {}
 	local physics_world = World.physics_world(self._world)
@@ -310,18 +298,20 @@ DemoTitleUI._setup_characters = function (self)
 			self._character_previewers[profile_name] = DemoCharacterPreviewer:new(self._world, profile_name, career_index, position, rotation, zoom_offset)
 		end
 	end
-
-	return 
 end
+
 DemoTitleUI._play_sound = function (self, event)
 	return Managers.music:trigger_event(event)
 end
+
 DemoTitleUI.get_ui_renderer = function (self)
 	return self._ui_renderer
 end
+
 DemoTitleUI.in_transition = function (self)
 	return self._camera_transition
 end
+
 DemoTitleUI._recreate_characters = function (self)
 	for profile_name, character_previewer in pairs(self._character_previewers) do
 		character_previewer.destroy(character_previewer)
@@ -330,10 +320,10 @@ DemoTitleUI._recreate_characters = function (self)
 	self._character_previewers = {}
 
 	self._setup_characters(self)
-
-	return 
 end
+
 local DO_RELOAD = true
+
 DemoTitleUI.update = function (self, dt, t)
 	script_data.demo_ui = self
 
@@ -360,9 +350,8 @@ DemoTitleUI.update = function (self, dt, t)
 	self._draw(self, dt, t)
 	self._draw_fps(self, dt, t)
 	self._update_character_previewers(self, dt, t)
-
-	return 
 end
+
 DemoTitleUI._update_scatter = function (self, dt, t)
 	if self._scatter_system then
 		local viewport = ScriptWorld.viewport(self._world, "title_screen_viewport")
@@ -371,9 +360,8 @@ DemoTitleUI._update_scatter = function (self, dt, t)
 
 		ScatterSystem.move_observer(self._scatter_system, self._scatter_system_observer, Matrix4x4.translation(camera_pose), Matrix4x4.rotation(camera_pose))
 	end
-
-	return 
 end
+
 DemoTitleUI._update_input = function (self, dt, t)
 	if self._selected_profile then
 		local input_service = Managers.input:get_service("main_menu")
@@ -388,37 +376,35 @@ DemoTitleUI._update_input = function (self, dt, t)
 			self._back_pressed = false
 		end
 	end
-
-	return 
 end
+
 DemoTitleUI._update_character_previewers = function (self, dt, t)
 	for _, character_previewer in pairs(self._character_previewers) do
 		character_previewer.update(character_previewer, self._ui_activated and not self._selected_profile and not self._camera_transition, dt, t)
 	end
 
 	if not self._ui_activated then
-		return 
+		return
 	end
 
 	local button_content = self._start_game_button_widget.content
 	local hotspot = button_content.button_hotspot
 
 	if hotspot.is_hover or self._input_disabled then
-		return 
+		return
 	end
 
 	local button_content = self._back_button_widget.content
 	local hotspot = button_content.button_hotspot
 
 	if hotspot.is_hover or self._input_disabled then
-		return 
+		return
 	end
-
-	return 
 end
+
 DemoTitleUI._update_start_game = function (self, dt, t)
 	if self._camera_transition and self._selected_profile then
-		return 
+		return
 	end
 
 	local button_content = self._start_game_button_widget.content
@@ -428,12 +414,11 @@ DemoTitleUI._update_start_game = function (self, dt, t)
 		self._start_pressed = true
 		self._input_disabled = true
 	end
-
-	return 
 end
+
 DemoTitleUI._update_back = function (self, dt, t)
 	if self._camera_transition and self._selected_profile then
-		return 
+		return
 	end
 
 	local button_content = self._back_button_widget.content
@@ -443,12 +428,11 @@ DemoTitleUI._update_back = function (self, dt, t)
 		self._back_pressed = true
 		self._input_disabled = true
 	end
-
-	return 
 end
+
 DemoTitleUI._update_career_information = function (self, dt, t)
 	if self._input_disabled then
-		return 
+		return
 	end
 
 	local is_selected = false
@@ -507,8 +491,6 @@ DemoTitleUI._update_career_information = function (self, dt, t)
 			self._ui_animations.animate_out_portrait = animation
 			local animation = UIAnimation.init(UIAnimation.function_by_time, self._ui_scenegraph.button_root.local_position, 2, self._ui_scenegraph.button_root.local_position[2], -200, 0.3, math.easeInCubic)
 			self._ui_animations.animate_out_buttons = animation
-
-			return 
 		end
 
 		self._ui_animations.delay = UIAnimation.init(UIAnimation.function_by_time, {
@@ -518,9 +500,8 @@ DemoTitleUI._update_career_information = function (self, dt, t)
 		}, 1, 0, 0, 0, math.easeInCubic)
 		self._ui_animation_cb.delay = animation_cb
 	end
-
-	return 
 end
+
 DemoTitleUI._update_animation = function (self, dt, t)
 	for animation_name, animation in pairs(self._ui_animations) do
 		UIAnimation.update(animation, dt)
@@ -535,9 +516,8 @@ DemoTitleUI._update_animation = function (self, dt, t)
 			self._ui_animations[animation_name] = nil
 		end
 	end
-
-	return 
 end
+
 DemoTitleUI._update_camera = function (self, dt, t)
 	if self._camera_transition then
 		self._timer = self._timer or 0
@@ -552,7 +532,7 @@ DemoTitleUI._update_camera = function (self, dt, t)
 			self._camera_transition = false
 			self._timer = nil
 
-			return 
+			return
 		end
 
 		local time = self._ref_time or CAMERA_TRANSITION_TIME
@@ -586,17 +566,15 @@ DemoTitleUI._update_camera = function (self, dt, t)
 	local new_pose = Matrix4x4.from_quaternion_position(rotation, position + forward * scale_value)
 
 	Gui.move(self._world_gui, new_pose)
-
-	return 
 end
+
 DemoTitleUI._draw_3d_logo = function (self, dt, t)
 	local base_size = Vector2(1920, 1080)
 	local w, h = Gui.resolution()
 
 	Gui.bitmap(self._world_gui, "vermintide_logo_title", Vector3((-base_size[1] * w) / WORLD_GUI_RESOLUTION * 0.5, (-base_size[2] * w) / WORLD_GUI_RESOLUTION * 0.3, 1), Vector2((base_size[1] * w) / WORLD_GUI_RESOLUTION, (base_size[2] * w) / WORLD_GUI_RESOLUTION))
-
-	return 
 end
+
 DemoTitleUI._draw = function (self, dt, t)
 	local ui_renderer = self._ui_renderer
 	local career_video_ui_renderer = self._career_video_ui_renderer
@@ -684,9 +662,8 @@ DemoTitleUI._draw = function (self, dt, t)
 
 		UIRenderer.end_pass(career_video_ui_renderer)
 	end
-
-	return 
 end
+
 local debug_font = "gw_arial_32"
 local debug_font_mtrl = "materials/fonts/" .. debug_font
 local debug_font_size = 32
@@ -696,9 +673,10 @@ local black_color = Colors.color_definitions.black
 local red_color = Colors.color_definitions.red
 local test_fps = 0
 local test_fps_n = 0
+
 DemoTitleUI._draw_fps = function (self, dt, t)
 	if BUILD == "release" then
-		return 
+		return
 	end
 
 	self._old_fps = self._old_fps or 0
@@ -754,9 +732,8 @@ DemoTitleUI._draw_fps = function (self, dt, t)
 	position[3] = 898
 
 	UIRenderer.draw_text(ui_top_renderer, text, debug_font_mtrl, text_size, debug_font, Vector3(unpack(position)), black_color)
-
-	return 
 end
+
 DemoTitleUI.activate_career_ui = function (self, activate)
 	self._ui_activated = activate
 	self._selected_profile = nil
@@ -767,9 +744,8 @@ DemoTitleUI.activate_career_ui = function (self, activate)
 			character_previewer.reset_state(character_previewer)
 		end
 	end
-
-	return 
 end
+
 DemoTitleUI.animate_to_camera = function (self, camera_name, pose, cb, time)
 	local camera = ScriptViewport.camera(self._viewport)
 	local camera_pose = ScriptCamera.pose(camera)
@@ -779,28 +755,27 @@ DemoTitleUI.animate_to_camera = function (self, camera_name, pose, cb, time)
 	self._camera_transition = true
 	self._camera_animation_cb = cb
 	self._ref_time = time
-
-	return 
 end
+
 DemoTitleUI.enter_attract_mode = function (self)
 	self._attract_mode_enabled = true
 	self._sound_started = false
 	self._attract_video.content.video_content.video_completed = false
-
-	return 
 end
+
 DemoTitleUI.exit_attract_mode = function (self)
 	self._attract_mode_enabled = false
 	self._destroy_video_player = true
-
-	return 
 end
+
 DemoTitleUI.video_completed = function (self)
 	return self._attract_video.content.video_content.video_completed
 end
+
 DemoTitleUI.attract_mode = function (self)
 	return self._attract_mode_enabled
 end
+
 DemoTitleUI.is_ready = function (self)
 	for _, character_previewer in pairs(self._character_previewers) do
 		if not character_previewer.character_spawned(character_previewer) then
@@ -810,38 +785,47 @@ DemoTitleUI.is_ready = function (self)
 
 	return true
 end
+
 DemoTitleUI.should_start = function (self)
 	return self._start_pressed
 end
+
 DemoTitleUI.selected_profile = function (self)
 	return self._selected_profile
 end
+
 DemoTitleUI.set_start_pressed = function (self, pressed)
 	self._entering = pressed
+end
 
-	return 
-end
 DemoTitleUI.clear_playgo_status = function (self)
-	return 
+	return
 end
+
 DemoTitleUI.set_playgo_status = function (self)
-	return 
+	return
 end
+
 DemoTitleUI.show_menu = function (self)
-	return 
+	return
 end
+
 DemoTitleUI.clear_user_name = function (self)
-	return 
+	return
 end
+
 DemoTitleUI.current_menu_index = function (self)
-	return 
+	return
 end
+
 DemoTitleUI.active_menu_selection = function (self)
-	return 
+	return
 end
+
 DemoTitleUI.set_menu_item_enable_state_by_index = function (self)
-	return 
+	return
 end
+
 DemoTitleUI.destroy = function (self)
 	for profile_name, character_previewer in pairs(self._character_previewers) do
 		character_previewer.destroy(character_previewer)
@@ -854,9 +838,8 @@ DemoTitleUI.destroy = function (self)
 	UIRenderer.destroy(self._ui_renderer, self._world)
 	UIRenderer.destroy(self._career_video_ui_renderer, self._world)
 	World.destroy_gui(self._world, self._world_gui)
-
-	return 
 end
+
 DemoTitleUI.set_information_text = function (self, optinal_text)
 	self._draw_information_text = true
 	local widget = self._information_text
@@ -868,9 +851,8 @@ DemoTitleUI.set_information_text = function (self, optinal_text)
 	else
 		widget_content.text = optinal_text
 	end
-
-	return 
 end
+
 DemoTitleUI.set_user_name = function (self, username)
 	self._draw_gamertag = true
 	self._user_gamertag_widget.content.text = username
@@ -878,14 +860,11 @@ DemoTitleUI.set_user_name = function (self, username)
 	if PLATFORM == "ps4" then
 		self._switch_profile_blocked = true
 	end
-
-	return 
 end
+
 DemoTitleUI.clear_user_name = function (self)
 	self._draw_gamertag = nil
 	self._switch_profile_blocked = nil
-
-	return 
 end
 
-return 
+return

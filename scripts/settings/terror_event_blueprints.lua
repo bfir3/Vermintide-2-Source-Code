@@ -9105,4 +9105,4 @@ for chunk_name, chunk in pairs(WeightedRandomTerrorEvents) do
 	chunk.loaded_probability_table = LoadedDice.create_from_mixed(chunk)
 end
 
-return 
+return

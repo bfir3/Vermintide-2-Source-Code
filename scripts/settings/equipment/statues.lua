@@ -163,4 +163,4 @@ Weapons.training_dummy_armored.left_hand_unit = "units/gameplay/training_dummy/w
 Weapons.training_dummy_armored.actions.action_one.default.projectile_info.projectile_unit_name = "units/gameplay/training_dummy/training_dummy_armored"
 Weapons.training_dummy_armored.actions.action_one.default.projectile_info.pickup_name = "training_dummy_armored"
 
-return 
+return

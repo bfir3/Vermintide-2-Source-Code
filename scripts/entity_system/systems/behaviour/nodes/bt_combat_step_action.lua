@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTCombatStepAction = class(BTCombatStepAction, BTNode)
+
 BTCombatStepAction.init = function (self, ...)
 	BTCombatStepAction.super.init(self, ...)
-
-	return 
 end
+
 BTCombatStepAction.name = "BTCombatStepAction"
+
 BTCombatStepAction.enter = function (self, unit, blackboard, t)
 	blackboard.action = self._tree_node.action_data
 	blackboard.active_node = BTCombatStepAction
@@ -29,9 +30,8 @@ BTCombatStepAction.enter = function (self, unit, blackboard, t)
 	network_manager.anim_event(network_manager, unit, move_animation)
 
 	blackboard.move_state = "moving"
-
-	return 
 end
+
 BTCombatStepAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.start_finished = nil
 	local ai_slot_system = Managers.state.entity:system("ai_slot_system")
@@ -43,9 +43,8 @@ BTCombatStepAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 BTCombatStepAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.start_finished then
 		return "done"
@@ -53,6 +52,7 @@ BTCombatStepAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTCombatStepAction.anim_cb_combat_step_stop = function (self, unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
@@ -63,9 +63,8 @@ BTCombatStepAction.anim_cb_combat_step_stop = function (self, unit, blackboard)
 	local ai_slot_system = Managers.state.entity:system("ai_slot_system")
 
 	ai_slot_system.do_slot_search(ai_slot_system, unit, false)
-
-	return 
 end
+
 BTCombatStepAction._get_animation = function (self, rotation, direction)
 	local right_vector = Quaternion.right(rotation)
 	local right_dot = Vector3.dot(right_vector, direction)
@@ -88,4 +87,4 @@ BTCombatStepAction._get_animation = function (self, rotation, direction)
 	return anim
 end
 
-return 
+return

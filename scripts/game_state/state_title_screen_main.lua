@@ -7,6 +7,7 @@ end
 StateTitleScreenMain = class(StateTitleScreenMain)
 StateTitleScreenMain.NAME = "StateTitleScreenMain"
 ATTRACT_MODE_TIMER = (script_data.honduras_demo and DemoSettings.attract_timer) or 45
+
 StateTitleScreenMain.on_enter = function (self, params)
 	print("[Gamestate] Enter Substate StateTitleScreenMain")
 
@@ -59,8 +60,6 @@ StateTitleScreenMain.on_enter = function (self, params)
 		__index = function (event_table, event_key)
 			return function ()
 				Application.warning("Got RPC %s during forced network update when exiting StateTitleScreenMain", event_key)
-
-				return 
 			end
 		end
 	}
@@ -74,9 +73,8 @@ StateTitleScreenMain.on_enter = function (self, params)
 
 		self._params.menu_screen_music_playing = true
 	end
-
-	return 
 end
+
 StateTitleScreenMain._update_ui_settings = function (self)
 	local ui_scale = 150
 	local console_type = XboxOne.console_type()
@@ -95,19 +93,16 @@ StateTitleScreenMain._update_ui_settings = function (self)
 	local force_update = true
 
 	UPDATE_RESOLUTION_LOOKUP(force_update)
-
-	return 
 end
+
 StateTitleScreenMain._queue_popup = function (self, ...)
 	self._error_popups[#self._error_popups + 1] = Managers.popup:queue_popup(...)
-
-	return 
 end
+
 StateTitleScreenMain._setup_account_manager = function (self)
 	Managers.account = Managers.account or AccountManager:new()
-
-	return 
 end
+
 StateTitleScreenMain.update = function (self, dt, t)
 	self._update_network(self, dt, t)
 
@@ -154,13 +149,13 @@ StateTitleScreenMain.update = function (self, dt, t)
 
 	return self._next_state(self)
 end
+
 StateTitleScreenMain._update_network = function (self, dt, t)
 	if rawget(_G, "LobbyInternal") and LobbyInternal.network_initialized() then
 		Network.update(dt, setmetatable({}, self._network_event_meta_table))
 	end
-
-	return 
 end
+
 StateTitleScreenMain._update_attract_mode = function (self, dt, t)
 	if self._title_start_ui:attract_mode() then
 		if self._title_start_ui:video_completed() then
@@ -173,18 +168,16 @@ StateTitleScreenMain._update_attract_mode = function (self, dt, t)
 			self._enter_attract_mode(self)
 		end
 	end
-
-	return 
 end
+
 StateTitleScreenMain._enter_attract_mode = function (self)
 	Managers.music:stop_all_sounds()
 	self._title_start_ui:enter_attract_mode()
 	self.parent:enter_attract_mode(true)
 
 	self._attract_mode_active = true
-
-	return 
 end
+
 StateTitleScreenMain._exit_attract_mode = function (self)
 	Managers.music:stop_all_sounds()
 	Managers.music:trigger_event("Play_menu_screen_music")
@@ -197,9 +190,8 @@ StateTitleScreenMain._exit_attract_mode = function (self)
 	Managers.transition:fade_out(1)
 	self._title_start_ui:exit_attract_mode()
 	self.parent:enter_attract_mode(false)
-
-	return 
 end
+
 StateTitleScreenMain._handle_continue_input = function (self, dt, t)
 	local input_service = self.input_manager:get_service("main_menu")
 	local start_allowed = true
@@ -231,9 +223,8 @@ StateTitleScreenMain._handle_continue_input = function (self, dt, t)
 	if input_service.has(input_service, "delete_save") and input_service.get(input_service, "delete_save") and BUILD ~= "release" then
 		StateTitleScreenLoadSave.DELETE_SAVE = true
 	end
-
-	return 
 end
+
 StateTitleScreenMain._user_exists = function (self, user_id)
 	local users = {
 		XboxLive.users()
@@ -247,6 +238,7 @@ StateTitleScreenMain._user_exists = function (self, user_id)
 
 	return false
 end
+
 StateTitleScreenMain._update_input = function (self, dt, t)
 	local platform = PLATFORM
 	local controller = Managers.input:get_most_recent_device()
@@ -341,18 +333,16 @@ StateTitleScreenMain._update_input = function (self, dt, t)
 	else
 		self._title_start_ui:set_start_pressed(false)
 	end
-
-	return 
 end
+
 StateTitleScreenMain._next_state = function (self)
 	if self._state then
 		return self._state
 	end
-
-	return 
 end
+
 StateTitleScreenMain.on_exit = function (self)
-	return 
+	return
 end
 
-return 
+return

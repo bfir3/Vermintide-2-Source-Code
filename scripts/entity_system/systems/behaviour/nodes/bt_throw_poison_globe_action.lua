@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTThrowPoisonGlobeAction = class(BTThrowPoisonGlobeAction, BTNode)
+
 BTThrowPoisonGlobeAction.init = function (self, ...)
 	BTThrowPoisonGlobeAction.super.init(self, ...)
-
-	return 
 end
+
 BTThrowPoisonGlobeAction.name = "BTThrowPoisonGlobeAction"
+
 BTThrowPoisonGlobeAction.enter = function (self, unit, blackboard, t)
 	local ai_navigation = blackboard.navigation_extension
 
@@ -20,9 +21,8 @@ BTThrowPoisonGlobeAction.enter = function (self, unit, blackboard, t)
 
 	locomotion.set_rotation_speed(locomotion, 5)
 	locomotion.set_wanted_velocity(locomotion, Vector3.zero())
-
-	return 
 end
+
 BTThrowPoisonGlobeAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if blackboard.dummy_projectile_unit ~= nil then
 		if Unit.alive(blackboard.dummy_projectile_unit) then
@@ -45,9 +45,8 @@ BTThrowPoisonGlobeAction.leave = function (self, unit, blackboard, t, reason, de
 	end
 
 	blackboard.navigation_extension:set_enabled(true)
-
-	return 
 end
+
 BTThrowPoisonGlobeAction.run = function (self, unit, blackboard, t, dt)
 	if not Unit.alive(blackboard.target_unit) then
 		blackboard.target_unit = nil
@@ -105,6 +104,7 @@ BTThrowPoisonGlobeAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTThrowPoisonGlobeAction.attack_throw = function (self, unit, t, dt, blackboard, locomotion, action)
 	if blackboard.move_state ~= "throwing" then
 		local target_unit = blackboard.target_unit
@@ -134,9 +134,8 @@ BTThrowPoisonGlobeAction.attack_throw = function (self, unit, t, dt, blackboard,
 	local rot = LocomotionUtils.rotation_towards_unit_flat(unit, blackboard.throw_target)
 
 	locomotion.set_wanted_rotation(locomotion, rot)
-
-	return 
 end
+
 BTThrowPoisonGlobeAction.spawn_dummy_projectile = function (self, unit, blackboard, world, action)
 	local throw_hand_name = action.weapon_node_name
 	local throw_hand_node = Unit.node(unit, throw_hand_name)
@@ -153,9 +152,8 @@ BTThrowPoisonGlobeAction.spawn_dummy_projectile = function (self, unit, blackboa
 	network_manager.network_transmit:send_rpc_clients("rpc_link_unit", child_unit_id, 0, parent_unit_id, throw_hand_node)
 
 	blackboard.dummy_projectile_unit = projectile_unit
-
-	return 
 end
+
 BTThrowPoisonGlobeAction.launch_projectile = function (self, blackboard, action, initial_position, target_vector, angle, speed, owner_unit)
 	local difficulty_rank = Managers.state.difficulty:get_difficulty_rank()
 	local aoe_dot_damage_table = action.aoe_dot_damage[difficulty_rank]
@@ -207,8 +205,6 @@ BTThrowPoisonGlobeAction.launch_projectile = function (self, blackboard, action,
 	}
 	local projectile_unit_name = "units/weapons/projectile/poison_wind_globe/poison_wind_globe"
 	local projectile_unit = Managers.state.unit_spawner:spawn_network_unit(projectile_unit_name, "aoe_projectile_unit", extension_init_data, initial_position)
-
-	return 
 end
 
-return 
+return

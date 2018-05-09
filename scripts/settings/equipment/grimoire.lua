@@ -157,4 +157,4 @@ Weapons.wpn_side_objective_tome_01.pickup_data = {
 	pickup_name = "tome"
 }
 
-return 
+return

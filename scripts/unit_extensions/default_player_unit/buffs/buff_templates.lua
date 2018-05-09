@@ -195,8 +195,6 @@ local function add_stat_buff(weapon_type, name, application_method, buff_type)
 	StatBuffApplicationMethods[index] = application_method
 	WeaponSpecificStatBuffs[weapon_type] = WeaponSpecificStatBuffs[weapon_type] or {}
 	WeaponSpecificStatBuffs[weapon_type][buff_type] = name
-
-	return 
 end
 
 for _, template in pairs(Weapons) do
@@ -267,8 +265,6 @@ ProcFunctions = {
 
 			DamageUtils.heal_network(player_unit, player_unit, heal_amount, "heal_from_proc")
 		end
-
-		return 
 	end,
 	heal_permanent = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -278,8 +274,6 @@ ProcFunctions = {
 
 			DamageUtils.heal_network(player_unit, player_unit, heal_amount, "bandage")
 		end
-
-		return 
 	end,
 	heal_party = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -292,8 +286,6 @@ ProcFunctions = {
 				DamageUtils.heal_network(player_and_bot_units[i], player_unit, heal_amount, "heal_from_proc")
 			end
 		end
-
-		return 
 	end,
 	heal_assisted_and_self_on_assist = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -308,8 +300,6 @@ ProcFunctions = {
 				DamageUtils.heal_network(assisted_unit, player_unit, heal_amount, "heal_from_proc")
 			end
 		end
-
-		return 
 	end,
 	buff_defence_on_revived_target = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -320,8 +310,6 @@ ProcFunctions = {
 		if Unit.alive(player_unit) and Unit.alive(revived_unit) and Managers.player.is_server then
 			buff_system.add_buff(buff_system, revived_unit, buff_to_add, player_unit, false)
 		end
-
-		return 
 	end,
 	on_hit_debuff_enemy_defence = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -334,8 +322,6 @@ ProcFunctions = {
 				buff_extension.add_buff(buff_extension, "defence_debuff_enemies")
 			end
 		end
-
-		return 
 	end,
 	kills_stack_fiery_push = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -345,8 +331,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "bw_kill_stacks")
 		end
-
-		return 
 	end,
 	add_stacking_damage_from_melee_headshot = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -366,8 +350,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "stacking_melee_damage", buff_params)
 		end
-
-		return 
 	end,
 	heal_on_melee_headshot = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -381,8 +363,6 @@ ProcFunctions = {
 
 			DamageUtils.heal_network(player_unit, player_unit, heal_amount, "heal_from_proc")
 		end
-
-		return 
 	end,
 	heal_on_ranged_headshot = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -396,8 +376,6 @@ ProcFunctions = {
 
 			DamageUtils.heal_network(player_unit, player_unit, heal_amount, "heal_from_proc")
 		end
-
-		return 
 	end,
 	heal_on_crit = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -409,8 +387,6 @@ ProcFunctions = {
 
 			DamageUtils.heal_network(player_unit, player_unit, heal_amount, "heal_from_proc")
 		end
-
-		return 
 	end,
 	remove_wounded = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -421,8 +397,6 @@ ProcFunctions = {
 
 			DamageUtils.heal_network(player_unit, player_unit, heal_amount, "bandage")
 		end
-
-		return 
 	end,
 	apply_burn_to_enemies = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -437,8 +411,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "flaming_shield_burning_dot", buff_params)
 		end
-
-		return 
 	end,
 	regen_stamina_on_charged_attacks = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -446,7 +418,7 @@ ProcFunctions = {
 		local attack_type = params[2]
 
 		if attack_type ~= "heavy_attack" then
-			return 
+			return
 		end
 
 		if Unit.alive(player_unit) then
@@ -454,8 +426,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "stamina_regen", buff_params)
 		end
-
-		return 
 	end,
 	sienna_unchained_regen_stamina_on_charged_attacks = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -463,7 +433,7 @@ ProcFunctions = {
 		local attack_type = params[2]
 
 		if attack_type ~= "heavy_attack" then
-			return 
+			return
 		end
 
 		if Unit.alive(player_unit) then
@@ -471,8 +441,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "sienna_unchained_stamina_regen", buff_params)
 		end
-
-		return 
 	end,
 	markus_mercenary_regen_stamina_on_charged_attacks = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -480,7 +448,7 @@ ProcFunctions = {
 		local attack_type = params[2]
 
 		if attack_type ~= "heavy_attack" then
-			return 
+			return
 		end
 
 		if Unit.alive(player_unit) then
@@ -488,8 +456,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "markus_mercenary_stamina_regen_buff", buff_params)
 		end
-
-		return 
 	end,
 	markus_knight_regen_stamina_on_charged_attacks = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -497,7 +463,7 @@ ProcFunctions = {
 		local attack_type = params[2]
 
 		if attack_type ~= "heavy_attack" then
-			return 
+			return
 		end
 
 		if Unit.alive(player_unit) then
@@ -505,8 +471,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "markus_knight_stamina_regen_buff", buff_params)
 		end
-
-		return 
 	end,
 	bardin_ironbreaker_regen_stamina_on_charged_attacks = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -514,7 +478,7 @@ ProcFunctions = {
 		local attack_type = params[2]
 
 		if attack_type ~= "heavy_attack" then
-			return 
+			return
 		end
 
 		if Unit.alive(player_unit) then
@@ -522,8 +486,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "bardin_ironbreaker_regen_stamina_on_charged_attacks_buff", buff_params)
 		end
-
-		return 
 	end,
 	increased_melee_damage = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -541,8 +503,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "increased_melee_damage_from_proc", buff_params)
 		end
-
-		return 
 	end,
 	add_gromril_delay = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -560,8 +520,6 @@ ProcFunctions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	reduce_ally_damage_taken_on_revived_ally = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -572,8 +530,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "bardin_ironbreaker_reduce_damage_taken_on_revive")
 		end
-
-		return 
 	end,
 	victor_zealot_gain_invulnerability = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -599,8 +555,6 @@ ProcFunctions = {
 				return true
 			end
 		end
-
-		return 
 	end,
 	add_increased_ranged_damage = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -610,8 +564,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "passive_career_wh_2_proc")
 		end
-
-		return 
 	end,
 	ww_melee_kills_stack_ranged_damage = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -621,8 +573,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "ww_increased_ranged_damage_from_proc")
 		end
-
-		return 
 	end,
 	wh_stack_kills_to_be_uninterruptible = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -632,8 +582,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "wh_kill_stack_from_proc")
 		end
-
-		return 
 	end,
 	ww_melee_attacks_apply_damage_taken = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -644,8 +592,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "ww_applied_damage_taken")
 		end
-
-		return 
 	end,
 	es_legshots_cripple = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -658,8 +604,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "es_movement_speed_debuff")
 		end
-
-		return 
 	end,
 	ranged_crits_increase_dmg_vs_armour_type = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -682,8 +626,6 @@ ProcFunctions = {
 				buff_extension.add_buff(buff_extension, "ranged_power_vs_frenzy")
 			end
 		end
-
-		return 
 	end,
 	debuff_defence_on_crit = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -694,8 +636,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "defence_debuff")
 		end
-
-		return 
 	end,
 	victor_witchhunter_debuff_defence_on_crit = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -706,8 +646,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "defence_debuff_enemies")
 		end
-
-		return 
 	end,
 	kerillian_shade_debuff_defence_on_crit = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -718,8 +656,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "defence_debuff_enemies")
 		end
-
-		return 
 	end,
 	buff_defence_on_heal = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -731,12 +667,10 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "trait_necklace_damage_taken_reduction_buff")
 		end
-
-		return 
 	end,
 	bardin_ranger_scavenge_proc = function (player, buff, params)
 		if not Managers.state.network.is_server then
-			return 
+			return
 		end
 
 		local player_unit = player.player_unit
@@ -775,8 +709,6 @@ ProcFunctions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	debuff_defence_grenade_hit = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -789,8 +721,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "trait_trinket_grenade_damage_taken_buff")
 		end
-
-		return 
 	end,
 	activate_buff_on_disabler = function (player, buff, params)
 		local unit = player.player_unit
@@ -812,8 +742,6 @@ ProcFunctions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	buff_consecutive_shots_damage = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -826,8 +754,6 @@ ProcFunctions = {
 		else
 			player_unit_buff_extension.add_buff(player_unit_buff_extension, "consecutive_shot_buff")
 		end
-
-		return 
 	end,
 	block_increase_enemy_damage_taken = function (player, buff, params)
 		local buff_template = buff.template
@@ -838,8 +764,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "defence_debuff_enemies")
 		end
-
-		return 
 	end,
 	add_buff = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -851,12 +775,10 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, buff_name)
 		end
-
-		return 
 	end,
 	add_bardin_slayer_passive_buff = function (player, buff, params)
 		if not Managers.state.network.is_server then
-			return 
+			return
 		end
 
 		local player_unit = player.player_unit
@@ -886,8 +808,6 @@ ProcFunctions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	remove_fatigue = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -898,8 +818,6 @@ ProcFunctions = {
 
 			status_extension.remove_fatigue_points(status_extension, fatigue_amount)
 		end
-
-		return 
 	end,
 	increase_attack_speed = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -917,8 +835,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "increased_attack_speed", buff_params)
 		end
-
-		return 
 	end,
 	increase_critical_hit_chance = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -936,14 +852,12 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "increased_critical_hit_chance", buff_params)
 		end
-
-		return 
 	end,
 	remove_overcharge = function (player, buff, params)
 		local player_unit = player.player_unit
 
 		if not is_local(player_unit) then
-			return 
+			return
 		end
 
 		if Unit.alive(player_unit) then
@@ -954,8 +868,6 @@ ProcFunctions = {
 				overcharge_extension.remove_charge(overcharge_extension, overcharge_amount)
 			end
 		end
-
-		return 
 	end,
 	end_shade_activated_ability = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -981,8 +893,6 @@ ProcFunctions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	end_huntsman_stealth = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1026,8 +936,6 @@ ProcFunctions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	end_huntsman_activated_ability = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1042,8 +950,6 @@ ProcFunctions = {
 				buff_extension.remove_buff(buff_extension, huntsman_activated_ability_buff.id)
 			end
 		end
-
-		return 
 	end,
 	end_ranger_activated_ability = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1058,8 +964,6 @@ ProcFunctions = {
 				buff_extension.remove_buff(buff_extension, ranger_activated_ability_buff.id)
 			end
 		end
-
-		return 
 	end,
 	increased_movement_speed = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1077,8 +981,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "increased_movement_speed_from_proc", buff_params)
 		end
-
-		return 
 	end,
 	ammo_gain = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1098,14 +1000,12 @@ ProcFunctions = {
 				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
 			end
 		end
-
-		return 
 	end,
 	ammo_fraction_gain = function (player, buff, params)
 		local player_unit = player.player_unit
 
 		if player and player.remote then
-			return 
+			return
 		end
 
 		if Unit.alive(player_unit) then
@@ -1127,14 +1027,12 @@ ProcFunctions = {
 				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
 			end
 		end
-
-		return 
 	end,
 	ammo_gain_when_low = function (player, buff, params)
 		local player_unit = player.player_unit
 
 		if player and player.remote then
-			return 
+			return
 		end
 
 		if Unit.alive(player_unit) then
@@ -1157,8 +1055,6 @@ ProcFunctions = {
 				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
 			end
 		end
-
-		return 
 	end,
 	markus_huntsman_passive_proc = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1192,8 +1088,6 @@ ProcFunctions = {
 				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
 			end
 		end
-
-		return 
 	end,
 	markus_huntsman_increase_reload_speed = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1204,8 +1098,6 @@ ProcFunctions = {
 		if Unit.alive(player_unit) and hit_zone_name == "head" and (attack_type == "instant_projectile" or attack_type == "projectile") then
 			buff_extension.add_buff(buff_extension, "markus_huntsman_headshots_increase_reload_speed_buff")
 		end
-
-		return 
 	end,
 	replenish_ammo_on_headshot_ranged = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1227,8 +1119,6 @@ ProcFunctions = {
 				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
 			end
 		end
-
-		return 
 	end,
 	reset_tranquility = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1244,12 +1134,10 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "sienna_adept_passive")
 		end
-
-		return 
 	end,
 	gain_markus_mercenary_passive_proc = function (player, buff, params)
 		if not Managers.state.network.is_server then
-			return 
+			return
 		end
 
 		local player_unit = player.player_unit
@@ -1278,8 +1166,6 @@ ProcFunctions = {
 				buff_system.add_buff(buff_system, player_unit, buff_to_add, owner_unit, false)
 			end
 		end
-
-		return 
 	end,
 	reduce_activated_ability_cooldown = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1289,8 +1175,6 @@ ProcFunctions = {
 
 			career_extension.reduce_activated_ability_cooldown(career_extension, buff.bonus)
 		end
-
-		return 
 	end,
 	reduce_activated_ability_cooldown_on_damage_taken = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1303,8 +1187,6 @@ ProcFunctions = {
 
 			career_extension.reduce_activated_ability_cooldown(career_extension, cooldown_removed)
 		end
-
-		return 
 	end,
 	remove_victor_bountyhunter_passive_crit_buff = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1327,8 +1209,6 @@ ProcFunctions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	remove_markus_huntsman_passive_crit_buff = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1341,8 +1221,6 @@ ProcFunctions = {
 				buff_extension.remove_buff(buff_extension, crit_buff.id)
 			end
 		end
-
-		return 
 	end,
 	gain_uninterruptible = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1352,8 +1230,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "uninterruptible")
 		end
-
-		return 
 	end,
 	gain_bardin_slayer_uninterruptible_on_block_broken_buff = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1363,8 +1239,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "bardin_slayer_uninterruptible_on_block_broken_buff")
 		end
-
-		return 
 	end,
 	gain_markus_knight_uninterruptible_on_block_broken_buff = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1374,8 +1248,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "markus_knight_uninterruptible_on_block_broken_buff")
 		end
-
-		return 
 	end,
 	gain_kerillian_maidenguard_uninterruptible_on_block_broken_buff = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1385,8 +1257,6 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "kerillian_maidenguard_uninterruptible_on_block_broken_buff")
 		end
-
-		return 
 	end,
 	gain_victor_zealot_uninterruptible_on_block_broken_buff = function (player, buff, params)
 		local player_unit = player.player_unit
@@ -1396,33 +1266,31 @@ ProcFunctions = {
 
 			buff_extension.add_buff(buff_extension, "victor_zealot_uninterruptible_on_block_broken_buff")
 		end
-
-		return 
 	end,
 	victor_bountyhunter_activate_passive_on_melee_kill = function (player, buff, params)
 		local player_unit = player.player_unit
 		local killing_blow_data = params[1]
 
 		if not killing_blow_data then
-			return 
+			return
 		end
 
 		local master_list_key = killing_blow_data[DamageDataIndex.DAMAGE_SOURCE_NAME]
 
 		if not master_list_key then
-			return 
+			return
 		end
 
 		local master_list_data = ItemMasterList[master_list_key]
 
 		if not master_list_data then
-			return 
+			return
 		end
 
 		local slot_type = master_list_data.slot_type
 
 		if not slot_type then
-			return 
+			return
 		end
 
 		local melee_weapon = slot_type == "melee"
@@ -1440,8 +1308,6 @@ ProcFunctions = {
 				cooldown_buff.duration = 0
 			end
 		end
-
-		return 
 	end
 }
 MaxStackFunctions = {
@@ -1453,8 +1319,6 @@ MaxStackFunctions = {
 
 			buff_extension.add_buff(buff_extension, "bw_push_applies_burn")
 		end
-
-		return 
 	end,
 	gain_assassinate = function (player, sub_buff_template)
 		local player_unit = player.player_unit
@@ -1464,8 +1328,6 @@ MaxStackFunctions = {
 
 			buff_extension.add_buff(buff_extension, "assassinate")
 		end
-
-		return 
 	end,
 	gain_health_and_ammo = function (player, sub_buff_template)
 		local player_unit = player.player_unit
@@ -1491,8 +1353,6 @@ MaxStackFunctions = {
 				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
 			end
 		end
-
-		return 
 	end,
 	remove_buff = function (player, sub_buff_template)
 		local player_unit = player.player_unit
@@ -1506,8 +1366,6 @@ MaxStackFunctions = {
 				buff_extension.remove_buff(buff_extension, buff.id)
 			end
 		end
-
-		return 
 	end
 }
 PotionSpreadTrinketTemplates = {
@@ -5450,4 +5308,4 @@ for buff_name, buff_template in pairs(BuffTemplates) do
 	end
 end
 
-return 
+return

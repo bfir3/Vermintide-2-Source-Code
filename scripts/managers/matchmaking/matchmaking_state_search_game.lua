@@ -1,5 +1,6 @@
 MatchmakingStateSearchGame = class(MatchmakingStateSearchGame)
 MatchmakingStateSearchGame.NAME = "MatchmakingStateSearchGame"
+
 MatchmakingStateSearchGame.init = function (self, params)
 	self._lobby = params.lobby
 	self._lobby_finder = params.lobby_finder
@@ -10,20 +11,19 @@ MatchmakingStateSearchGame.init = function (self, params)
 	self._network_server = params.network_server
 	self._statistics_db = params.statistics_db
 	Managers.matchmaking.countdown_has_finished = false
+end
 
-	return 
-end
 MatchmakingStateSearchGame.destroy = function (self)
-	return 
+	return
 end
+
 MatchmakingStateSearchGame.on_enter = function (self, state_context)
 	self.state_context = state_context
 	self.search_config = state_context.search_config
 
 	self._start_searching_for_games(self)
-
-	return 
 end
+
 MatchmakingStateSearchGame._start_searching_for_games = function (self)
 	local search_config = self.search_config
 	local current_filters = {
@@ -106,12 +106,12 @@ MatchmakingStateSearchGame._start_searching_for_games = function (self)
 	local using_strict_matchmaking = self.search_config.strict_matchmaking
 
 	Managers.telemetry.events:matchmaking_connection(player, connection_state, time_taken, using_strict_matchmaking)
+end
 
-	return 
-end
 MatchmakingStateSearchGame.on_exit = function (self)
-	return 
+	return
 end
+
 MatchmakingStateSearchGame.update = function (self, dt, t)
 	local num_active_peers = self._network_server:num_active_peers()
 
@@ -131,7 +131,7 @@ MatchmakingStateSearchGame.update = function (self, dt, t)
 	self._game_server_finder:update(dt)
 
 	if self._lobby_finder:is_refreshing() or self._game_server_finder:is_refreshing() then
-		return 
+		return
 	end
 
 	local new_lobby = self._search_for_game(self, dt)
@@ -181,6 +181,7 @@ MatchmakingStateSearchGame.update = function (self, dt, t)
 
 	return nil
 end
+
 MatchmakingStateSearchGame._search_for_game = function (self, dt)
 	local lobbies = self._get_server_lobbies(self)
 	local active_lobby, wanted_profile_index = nil
@@ -192,7 +193,9 @@ MatchmakingStateSearchGame._search_for_game = function (self, dt)
 
 	return active_lobby
 end
+
 local server_lobbies = {}
+
 MatchmakingStateSearchGame._get_server_lobbies = function (self)
 	local lobbies = self._get_lobbies(self)
 	local servers = self._get_servers(self)
@@ -203,12 +206,15 @@ MatchmakingStateSearchGame._get_server_lobbies = function (self)
 
 	return server_lobbies
 end
+
 MatchmakingStateSearchGame._get_lobbies = function (self)
 	return self._lobby_finder:lobbies()
 end
+
 MatchmakingStateSearchGame._get_servers = function (self)
 	return self._game_server_finder:servers()
 end
+
 MatchmakingStateSearchGame._times_party_completed_level = function (self, level_key)
 	local times_completed = 0
 	local statistics_db = self._statistics_db
@@ -220,6 +226,7 @@ MatchmakingStateSearchGame._times_party_completed_level = function (self, level_
 
 	return times_completed
 end
+
 MatchmakingStateSearchGame._compare_first_prio_lobbies = function (self, current_lobby, new_lobby)
 	if current_lobby == nil then
 		return new_lobby
@@ -241,6 +248,7 @@ MatchmakingStateSearchGame._compare_first_prio_lobbies = function (self, current
 
 	return current_lobby
 end
+
 MatchmakingStateSearchGame._compare_secondary_prio_lobbies = function (self, current_lobby, new_lobby)
 	if current_lobby == nil then
 		return new_lobby
@@ -264,6 +272,7 @@ MatchmakingStateSearchGame._compare_secondary_prio_lobbies = function (self, cur
 
 	return current_lobby
 end
+
 MatchmakingStateSearchGame._find_suitable_lobby = function (self, lobbies, search_config, wanted_profile_id)
 	local level_key = search_config.level_key
 	local difficulty = search_config.difficulty
@@ -348,4 +357,4 @@ MatchmakingStateSearchGame._find_suitable_lobby = function (self, lobbies, searc
 	return current_first_prio_lobby or current_secondary_prio_lobby
 end
 
-return 
+return

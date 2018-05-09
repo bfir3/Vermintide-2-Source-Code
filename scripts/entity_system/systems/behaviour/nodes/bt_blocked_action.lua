@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTBlockedAction = class(BTBlockedAction, BTNode)
+
 BTBlockedAction.init = function (self, ...)
 	BTBlockedAction.super.init(self, ...)
-
-	return 
 end
+
 BTBlockedAction.name = "BTBlockedAction"
+
 BTBlockedAction.enter = function (self, unit, blackboard, t)
 	local navigation_extension = blackboard.navigation_extension
 
@@ -32,9 +33,8 @@ BTBlockedAction.enter = function (self, unit, blackboard, t)
 
 		shield_extension.set_is_blocking(shield_extension, false)
 	end
-
-	return 
 end
+
 BTBlockedAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.blocked = nil
 	blackboard.stagger_hit_wall = nil
@@ -62,9 +62,8 @@ BTBlockedAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_enabled(navigation_extension, true)
-
-	return 
 end
+
 BTBlockedAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion_extension = blackboard.locomotion_extension
 
@@ -97,4 +96,4 @@ BTBlockedAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

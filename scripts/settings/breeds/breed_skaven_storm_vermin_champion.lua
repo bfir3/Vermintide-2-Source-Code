@@ -1153,8 +1153,6 @@ local action_data = {
 
 				return math.lerp(0.4, 2.95, scaled_t)
 			end
-
-			return 
 		end
 	},
 	special_attack_shatter = {
@@ -1670,4 +1668,4 @@ local action_data = {
 }
 BreedActions.skaven_storm_vermin_champion = table.create_copy(BreedActions.skaven_storm_vermin_champion, action_data)
 
-return 
+return

@@ -47,4 +47,4 @@ weapon_template.buffs = {
 Weapons = Weapons or {}
 Weapons.bardin_ranger_career_skill_weapon = table.create_copy(Weapons.bardin_ranger_career_skill_weapon, weapon_template)
 
-return 
+return

@@ -1,6 +1,7 @@
 TargetOverrideExtension = class(TargetOverrideExtension)
 local OVERRIDE_RADIUS = 0.75
 local OVERRIDE_LIFETIME = 5
+
 TargetOverrideExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self._unit = unit
 	self._result_table = {}
@@ -11,12 +12,12 @@ TargetOverrideExtension.init = function (self, extension_init_context, unit, ext
 		0,
 		2
 	}
+end
 
-	return 
-end
 TargetOverrideExtension.destroy = function (self)
-	return 
+	return
 end
+
 TargetOverrideExtension.taunt = function (self, radius, duration, stagger, taunt_bosses)
 	local self_unit = self._unit
 	local taunt_end_time = Managers.time:time("game") + duration
@@ -48,9 +49,8 @@ TargetOverrideExtension.taunt = function (self, radius, duration, stagger, taunt
 			end
 		end
 	end
-
-	return 
 end
+
 TargetOverrideExtension.update = function (self, unit, input, dt, context, t)
 	local position = POSITION_LOOKUP[unit]
 	local radius = OVERRIDE_RADIUS
@@ -81,9 +81,8 @@ TargetOverrideExtension.update = function (self, unit, input, dt, context, t)
 			end
 		end
 	end
-
-	return 
 end
+
 TargetOverrideExtension.add_to_override_targets = function (self, ai_unit, target_unit, ai_unit_blackboard, t)
 	local override_time = t + OVERRIDE_LIFETIME
 	local previous_override_time = ai_unit_blackboard.override_targets[target_unit]
@@ -97,8 +96,6 @@ TargetOverrideExtension.add_to_override_targets = function (self, ai_unit, targe
 		ai_system.register_prioritized_perception_unit_update(ai_system, ai_unit, ai_extension)
 		ai_slot_system.register_prioritized_ai_unit_update(ai_slot_system, ai_unit)
 	end
-
-	return 
 end
 
-return 
+return

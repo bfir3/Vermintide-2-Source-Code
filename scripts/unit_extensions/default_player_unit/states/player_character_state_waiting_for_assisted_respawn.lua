@@ -1,13 +1,13 @@
 PlayerCharacterStateWaitingForAssistedRespawn = class(PlayerCharacterStateWaitingForAssistedRespawn, PlayerCharacterState)
+
 PlayerCharacterStateWaitingForAssistedRespawn.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "waiting_for_assisted_respawn")
 
 	local context = character_state_init_context
 	self.recovery_timer = nil
 	self.recovered = false
-
-	return 
 end
+
 PlayerCharacterStateWaitingForAssistedRespawn.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	local first_person_extension = self.first_person_extension
 
@@ -30,9 +30,8 @@ PlayerCharacterStateWaitingForAssistedRespawn.on_enter = function (self, unit, i
 	local flavour_animation = Unit.get_data(flavour_unit, "on_enter_loop_anim")
 
 	CharacterStateHelper.play_animation_event(unit, flavour_animation)
-
-	return 
 end
+
 PlayerCharacterStateWaitingForAssistedRespawn.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local flavour_unit = self.flavour_unit
 	local first_person_extension = self.first_person_extension
@@ -72,9 +71,8 @@ PlayerCharacterStateWaitingForAssistedRespawn.on_exit = function (self, unit, in
 
 		network_manager.network_transmit:send_rpc_server("rpc_status_change_bool", NetworkLookup.statuses.respawned, true, go_id, helper_go_id)
 	end
-
-	return 
 end
+
 PlayerCharacterStateWaitingForAssistedRespawn.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -90,11 +88,9 @@ PlayerCharacterStateWaitingForAssistedRespawn.update = function (self, unit, inp
 		elseif self.recovery_timer <= t then
 			csm.change_state(csm, "standing")
 
-			return 
+			return
 		end
 	end
-
-	return 
 end
 
-return 
+return

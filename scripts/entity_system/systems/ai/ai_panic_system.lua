@@ -5,6 +5,7 @@ local extensions = {
 	"AIFearExtension"
 }
 AIPanicSystem = class(AIPanicSystem, ExtensionSystemBase)
+
 AIPanicSystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
@@ -22,13 +23,14 @@ AIPanicSystem.init = function (self, context, system_name)
 	self.panic_zone_id = 1
 	self.current_fear_unit_index = 1
 	self.current_panic_unit_index = 1
+end
 
-	return 
-end
 AIPanicSystem.destroy = function (self)
-	return 
+	return
 end
+
 local dummy_input = {}
+
 AIPanicSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	local extension = {}
 
@@ -53,6 +55,7 @@ AIPanicSystem.on_add_extension = function (self, world, unit, extension_name, ex
 
 	return extension
 end
+
 AIPanicSystem.on_remove_extension = function (self, unit, extension_name)
 	local extension = self.unit_extension_data[unit]
 
@@ -98,12 +101,12 @@ AIPanicSystem.on_remove_extension = function (self, unit, extension_name)
 	self.unit_extension_data[unit] = nil
 
 	ScriptUnit.remove_extension(unit, self.NAME)
+end
 
-	return 
-end
 AIPanicSystem.hot_join_sync = function (self, sender, player)
-	return 
+	return
 end
+
 AIPanicSystem.activate_fear = function (self, unit)
 	local extension = self.unit_extension_data[unit]
 	local position = POSITION_LOOKUP[unit]
@@ -111,9 +114,8 @@ AIPanicSystem.activate_fear = function (self, unit)
 	local panic_zone = self.register_panic_zone(self, position, fear_radius)
 	extension.panic_zone = panic_zone
 	extension.active = true
-
-	return 
 end
+
 AIPanicSystem.register_panic_zone = function (self, position, radius)
 	local panic_zone = {
 		position = Vector3Box(position),
@@ -127,6 +129,7 @@ AIPanicSystem.register_panic_zone = function (self, position, radius)
 
 	return panic_zone
 end
+
 AIPanicSystem.deregister_panic_zone = function (self, panic_zone_to_remove)
 	local panic_zones = self.panic_zones
 	local panic_zones_n = #panic_zones
@@ -138,19 +141,17 @@ AIPanicSystem.deregister_panic_zone = function (self, panic_zone_to_remove)
 			panic_zones[i] = panic_zones[panic_zones_n]
 			panic_zones[panic_zones_n] = nil
 
-			return 
+			return
 		end
 	end
 
 	assert("trying to deregister_panic_zone which hasnt been registered: %q", deregister_panic_zone)
-
-	return 
 end
+
 AIPanicSystem.set_panic_zone_position = function (self, panic_zone, position)
 	panic_zone.position:store(position)
-
-	return 
 end
+
 AIPanicSystem.inside_panic_zone = function (self, position)
 	local panic_zones = self.panic_zones
 	local panic_zones_n = #panic_zones
@@ -168,7 +169,9 @@ AIPanicSystem.inside_panic_zone = function (self, position)
 
 	return nil
 end
+
 local FEAR_UNITS_UPDATES_PER_FRAME = 1
+
 AIPanicSystem.update_fear_units = function (self)
 	local fear_units = self.fear_units
 	local fear_units_n = #fear_units
@@ -194,10 +197,10 @@ AIPanicSystem.update_fear_units = function (self)
 	end
 
 	self.current_fear_unit_index = end_index + 1
-
-	return 
 end
+
 local PANIC_UNITS_UPDATES_PER_FRAME = 1
+
 AIPanicSystem.update_panic_units = function (self)
 	local panic_units = self.panic_units
 	local panic_units_n = #panic_units
@@ -219,9 +222,8 @@ AIPanicSystem.update_panic_units = function (self)
 	end
 
 	self.current_panic_unit_index = end_index + 1
-
-	return 
 end
+
 AIPanicSystem.update = function (self, context, t, dt)
 	self.update_fear_units(self)
 	self.update_panic_units(self)
@@ -229,9 +231,8 @@ AIPanicSystem.update = function (self, context, t, dt)
 	if script_data.ai_debug_panic_zones then
 		self.debug_draw_panic_zones(self)
 	end
-
-	return 
 end
+
 AIPanicSystem.debug_draw_panic_zones = function (self)
 	local drawer = Managers.state.debug:drawer({
 		mode = "immediate",
@@ -247,8 +248,6 @@ AIPanicSystem.debug_draw_panic_zones = function (self)
 
 		drawer.sphere(drawer, position, radius, Colors.get("red"))
 	end
-
-	return 
 end
 
-return 
+return

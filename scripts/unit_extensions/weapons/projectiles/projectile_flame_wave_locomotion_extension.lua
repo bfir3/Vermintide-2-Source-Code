@@ -1,6 +1,7 @@
 ProjectileFlameWaveLocomotionExtension = class(ProjectileFlameWaveLocomotionExtension)
 local EVALUATE_DISTANCE = 1
 local MAX_LATERAL_DIST = 0.5
+
 ProjectileFlameWaveLocomotionExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self._unit = unit
 	local world = extension_init_context.world
@@ -62,9 +63,8 @@ ProjectileFlameWaveLocomotionExtension.init = function (self, extension_init_con
 	end
 
 	self._distance_travelled = extension_init_data.distance_travelled or 0
-
-	return 
 end
+
 ProjectileFlameWaveLocomotionExtension._calculate_next_position = function (self, pos, velocity)
 	local nav_world = self._nav_world
 	local wanted_next_pos = pos + velocity * self._next_point_time_interval
@@ -82,12 +82,12 @@ ProjectileFlameWaveLocomotionExtension._calculate_next_position = function (self
 
 		return wanted_next_pos
 	end
+end
 
-	return 
-end
 ProjectileFlameWaveLocomotionExtension.destroy = function (self)
-	return 
+	return
 end
+
 ProjectileFlameWaveLocomotionExtension._generate_next_position = function (self)
 	local old_next_position = self._next_position:unbox()
 
@@ -97,9 +97,8 @@ ProjectileFlameWaveLocomotionExtension._generate_next_position = function (self)
 	local old_next_time = self._next_position_time
 	self._last_position_time = old_next_time
 	self._next_position_time = old_next_time + self._next_point_time_interval
-
-	return 
 end
+
 ProjectileFlameWaveLocomotionExtension._update_position = function (self, dt, t)
 	local delta_t = t - self._last_position_time
 	local last_pos = self._last_position:unbox()
@@ -121,9 +120,10 @@ ProjectileFlameWaveLocomotionExtension._update_position = function (self, dt, t)
 
 	return current_pos
 end
+
 ProjectileFlameWaveLocomotionExtension._update_spawn = function (self, dt, t, new_position)
 	if self._lateral_speed == 0 or self.is_husk then
-		return 
+		return
 	end
 
 	local time_since_spawn = t - self._last_spawn
@@ -135,9 +135,8 @@ ProjectileFlameWaveLocomotionExtension._update_spawn = function (self, dt, t, ne
 
 		self._last_spawn = self._last_spawn + MAX_LATERAL_DIST / math.abs(relative_speed)
 	end
-
-	return 
 end
+
 ProjectileFlameWaveLocomotionExtension._spawn_projectile = function (self, new_position, flat_direction, lateral_speed)
 	local position = new_position + -self._lateral_direction:unbox() * math.sign(lateral_speed) * MAX_LATERAL_DIST * 0.5
 	local age = Managers.time:time("game") - self.t
@@ -146,9 +145,8 @@ ProjectileFlameWaveLocomotionExtension._spawn_projectile = function (self, new_p
 	Managers.state.entity:system("projectile_system"):spawn_flame_wave_projectile(extension_init_data.owner_unit, extension_init_data.scale, extension_init_data.item_name, extension_init_data.item_template_name, extension_init_data.action_name, extension_init_data.sub_action_name, position, extension_init_data.flat_angle, lateral_speed, self._flat_direction_speed, age, self._neighbour_lateral_speed, self._distance_travelled)
 
 	self._neighbour_lateral_speed = lateral_speed
-
-	return 
 end
+
 ProjectileFlameWaveLocomotionExtension.update = function (self, unit, input, dt, context, t)
 	while self._next_position_time < t do
 		self._generate_next_position(self)
@@ -166,23 +164,24 @@ ProjectileFlameWaveLocomotionExtension.update = function (self, unit, input, dt,
 		self._velocity:store((new_position - old_position) / dt)
 		self._update_spawn(self, dt, t, new_position)
 	end
-
-	return 
 end
+
 ProjectileFlameWaveLocomotionExtension.moved_this_frame = function (self)
 	return not self._stopped
 end
+
 ProjectileFlameWaveLocomotionExtension.current_velocity = function (self)
 	return self._velocity:unbox()
 end
+
 ProjectileFlameWaveLocomotionExtension.stop = function (self)
 	self._stopped = true
-
-	return 
 end
+
 ProjectileFlameWaveLocomotionExtension.has_stopped = function (self)
 	return self._stopped or self._dissipate
 end
+
 ProjectileFlameWaveLocomotionExtension.get_game_object_data = function (self)
 	local position = Unit.local_position(self._unit, 0)
 	local flat_angle = self.extension_init_data.flat_angle
@@ -192,4 +191,4 @@ ProjectileFlameWaveLocomotionExtension.get_game_object_data = function (self)
 	return position, flat_angle, lateral_speed, forward_speed, self._distance_travelled
 end
 
-return 
+return

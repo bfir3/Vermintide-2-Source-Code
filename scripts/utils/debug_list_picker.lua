@@ -4,6 +4,7 @@ local font = "gw_arial_32"
 local font_mtrl = "materials/fonts/" .. font
 local font_height = 22
 local COLUMN_SPACING = 10
+
 DebugListPicker.init = function (self, list, save_data_name, max_cols_seen)
 	self.pick_list = list
 	self.save_data_name = save_data_name
@@ -20,12 +21,12 @@ DebugListPicker.init = function (self, list, save_data_name, max_cols_seen)
 	self.column = self.pick_list[self.column_index]
 	self.item = self.column[self.row_index]
 	self.max_cols_seen = max_cols_seen or 3
+end
 
-	return 
-end
 DebugListPicker.destroy = function (self)
-	return 
+	return
 end
+
 DebugListPicker.setup = function (self)
 	local saved_item_name = SaveData[self.save_data_name] or self.pick_list[1][1]
 	local start_item = nil
@@ -70,9 +71,8 @@ DebugListPicker.setup = function (self)
 	self.max_height = max_height
 	self.max_width = max_width + 40
 	self.max_rows = max_rows + 1
-
-	return 
 end
+
 DebugListPicker.activate = function (self)
 	self.active = not self.active
 
@@ -83,18 +83,19 @@ DebugListPicker.activate = function (self)
 
 		Managers.save:auto_save(SaveFileName, SaveData)
 	end
-
-	return 
 end
+
 DebugListPicker.current_item = function (self)
 	return self.item
 end
+
 DebugListPicker.current_item_name = function (self)
 	return self.item[1]
 end
+
 DebugListPicker.update = function (self, t, dt)
 	if not self.active then
-		return 
+		return
 	end
 
 	local wall_time = Application.time_since_launch()
@@ -189,8 +190,6 @@ DebugListPicker.update = function (self, t, dt)
 
 		Gui.rect(self.gui, Vector3(5, res_y - height - 80, 899), Vector3(self.max_width, height, 899), Color(230 * opacity, 10, 10, 10))
 	end
-
-	return 
 end
 
-return 
+return

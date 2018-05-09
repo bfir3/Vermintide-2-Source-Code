@@ -3,29 +3,28 @@
 CameraStateObserver = class(CameraStateObserver, CameraState)
 local NUM_PLAYERS = 4
 local LERP_DISTANCE = 50
+
 CameraStateObserver.init = function (self, camera_state_init_context)
 	CameraState.init(self, camera_state_init_context, "observer")
 
 	self._observer_targets = {}
 	self._follow_node_name = "camera_attach"
-
-	return 
 end
+
 CameraStateObserver.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	self._observed_player_id = nil
 
 	self.follow_next_unit(self)
 	Managers.state.event:trigger("camera_teleported")
-
-	return 
 end
+
 CameraStateObserver.on_exit = function (self, unit, input, dt, context, t, next_state)
 	self.camera_extension:set_observed_player_id(nil)
 	Managers.state.event:trigger("camera_teleported")
-
-	return 
 end
+
 local MAX_MIN_PITCH = math.pi / 2 - math.pi / 15
+
 CameraStateObserver.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local camera_extension = self.camera_extension
@@ -39,7 +38,7 @@ CameraStateObserver.update = function (self, unit, input, dt, context, t)
 		if not Unit.alive(self._follow_unit) then
 			csm.change_state(csm, "idle")
 
-			return 
+			return
 		end
 	end
 
@@ -49,7 +48,7 @@ CameraStateObserver.update = function (self, unit, input, dt, context, t)
 		csm.change_state(csm, external_state_change)
 		camera_extension.set_external_state_change(camera_extension, nil)
 
-		return 
+		return
 	end
 
 	local rotation = Unit.local_rotation(unit, 0)
@@ -85,9 +84,8 @@ CameraStateObserver.update = function (self, unit, input, dt, context, t)
 
 	assert(Vector3.is_valid(new_position), "Camera position invalid.")
 	Unit.set_local_position(unit, 0, new_position)
-
-	return 
 end
+
 CameraStateObserver.follow_next_unit = function (self)
 	local player_manager = Managers.player
 	local players = player_manager.players(player_manager)
@@ -130,8 +128,6 @@ CameraStateObserver.follow_next_unit = function (self)
 	self._observed_player_id = observed_player_id
 
 	self.camera_extension:set_observed_player_id(observed_player_id)
-
-	return 
 end
 
-return 
+return

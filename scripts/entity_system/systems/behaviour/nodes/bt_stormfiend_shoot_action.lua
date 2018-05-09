@@ -1,23 +1,22 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTStormfiendShootAction = class(BTStormfiendShootAction, BTNode)
+
 BTStormfiendShootAction.init = function (self, ...)
 	BTStormfiendShootAction.super.init(self, ...)
-
-	return 
 end
+
 BTStormfiendShootAction.name = "BTStormfiendShootAction"
 
 local function debug_print(...)
 	if script_data.debug_stormfiend then
 		print("BTStormfiendShootAction:", ...)
 	end
-
-	return 
 end
 
 local SPHERE_CAST_RADIUS = 0.4
 local SPHERE_CAST_MAX_NUM_HITS = 10
+
 BTStormfiendShootAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local world = blackboard.world
@@ -49,9 +48,8 @@ BTStormfiendShootAction.enter = function (self, unit, blackboard, t)
 
 		debug_print("ATTACK WAS NOT OK [Aborting]")
 	end
-
-	return 
 end
+
 BTStormfiendShootAction.set_global_environment_intensity = function (self, unit, group_blackboard, action)
 	local max_intensity = action.environment_max_intensity
 	local old_intensity = group_blackboard.firewall_environment_intensity or 0
@@ -69,9 +67,8 @@ BTStormfiendShootAction.set_global_environment_intensity = function (self, unit,
 	network_transmit.send_rpc_clients(network_transmit, "rpc_client_audio_set_global_parameter_with_lerp", parameter_id, percentage_taken)
 
 	group_blackboard.firewall_environment_intensity = new_intensity
-
-	return 
 end
+
 BTStormfiendShootAction._calculate_attack_animation = function (self, right_vector, forward_vector, dir, attack_anims)
 	local right_dot = Vector3.dot(right_vector, dir)
 	local fwd_dot = Vector3.dot(forward_vector, dir)
@@ -100,6 +97,7 @@ BTStormfiendShootAction._calculate_attack_animation = function (self, right_vect
 
 	return anim, arm, animation_driven_rotation
 end
+
 BTStormfiendShootAction._calculate_aim = function (self, unit, unit_position, attack_arm, forward_vector, rotation_needed, blackboard, action, target_unit, target_position, target_direction)
 	local muzzle_node_name = action.muzzle_nodes[attack_arm]
 	local muzzle_node = Unit.node(unit, muzzle_node_name)
@@ -195,6 +193,7 @@ BTStormfiendShootAction._calculate_aim = function (self, unit, unit_position, at
 
 	return firewall_start_position, aim_start_position, aim_end_position
 end
+
 BTStormfiendShootAction.init_attack = function (self, unit, blackboard, action, t)
 	local action = blackboard.action
 	local should_switch_setup = action.switch_between_weapon_setups
@@ -283,6 +282,7 @@ BTStormfiendShootAction.init_attack = function (self, unit, blackboard, action, 
 
 	return attack_is_ok
 end
+
 BTStormfiendShootAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local data = blackboard.shoot_data
 
@@ -325,9 +325,8 @@ BTStormfiendShootAction.leave = function (self, unit, blackboard, t, reason, des
 	blackboard.create_bot_threat_at_t = nil
 	blackboard.bot_threat_range = nil
 	blackboard.shoot_sfx_id = nil
-
-	return 
 end
+
 BTStormfiendShootAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.attack_aborted then
 		return "failed"
@@ -391,9 +390,8 @@ BTStormfiendShootAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "done"
 	end
-
-	return 
 end
+
 BTStormfiendShootAction._calculate_oobb_collision = function (self, bot_threat, bot_threat_range, self_pos, self_rot)
 	local range = bot_threat_range
 	local height = bot_threat.height
@@ -410,6 +408,7 @@ BTStormfiendShootAction._calculate_oobb_collision = function (self, bot_threat, 
 
 	return oobb_pos, self_rot, size
 end
+
 BTStormfiendShootAction._create_bot_aoe_threat = function (self, unit, attack_rotation, bot_threat, bot_threat_range)
 	local bot_threat_duration = bot_threat.duration
 	local unit_position = POSITION_LOOKUP[unit]
@@ -417,9 +416,8 @@ BTStormfiendShootAction._create_bot_aoe_threat = function (self, unit, attack_ro
 	local obstacle_position, obstacle_rotation, obstacle_size = self._calculate_oobb_collision(self, bot_threat, bot_threat_range, unit_position, attack_rotation)
 
 	ai_bot_group_system.aoe_threat_created(ai_bot_group_system, obstacle_position, "oobb", obstacle_size, obstacle_rotation, bot_threat_duration)
-
-	return 
 end
+
 BTStormfiendShootAction.create_firewall = function (self, unit, blackboard, data)
 	local start_pos = data.firewall_start_position:unbox()
 	local nav_world = blackboard.nav_world
@@ -433,7 +431,7 @@ BTStormfiendShootAction.create_firewall = function (self, unit, blackboard, data
 	end
 
 	if not start_pos then
-		return 
+		return
 	end
 
 	local direction = data.direction:unbox()
@@ -449,9 +447,8 @@ BTStormfiendShootAction.create_firewall = function (self, unit, blackboard, data
 	local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 
 	liquid_area_damage_extension.ready(liquid_area_damage_extension)
-
-	return 
 end
+
 BTStormfiendShootAction.shoot_hit_check = function (self, unit, blackboard)
 	local action = blackboard.action
 	local data = blackboard.shoot_data
@@ -514,9 +511,8 @@ BTStormfiendShootAction.shoot_hit_check = function (self, unit, blackboard)
 	end
 
 	self._debug_fire_beam(self, stormfiend_arm_pos, aim_position, true, debug_hit_index, result, "immediate")
-
-	return 
 end
+
 BTStormfiendShootAction._stop_beam_sfx = function (self, unit, blackboard, shoot_data)
 	local action = blackboard.action
 	local attack_arm = shoot_data.attack_arm
@@ -525,9 +521,8 @@ BTStormfiendShootAction._stop_beam_sfx = function (self, unit, blackboard, shoot
 	local audio_system = Managers.state.entity:system("audio_system")
 
 	audio_system.play_audio_unit_event(audio_system, event, unit, node_name)
-
-	return 
 end
+
 BTStormfiendShootAction._fire_from_position_direction = function (self, unit, blackboard, data, dt)
 	local action = blackboard.action
 	local attack_arm = data.attack_arm
@@ -547,6 +542,7 @@ BTStormfiendShootAction._fire_from_position_direction = function (self, unit, bl
 
 	return fire_pos, direction
 end
+
 BTStormfiendShootAction._update_ratling_gun = function (self, unit, blackboard, t, dt)
 	local data = blackboard.shoot_data
 	local time_in_shoot_action = t - data.shoot_start
@@ -559,9 +555,8 @@ BTStormfiendShootAction._update_ratling_gun = function (self, unit, blackboard, 
 
 		self._shoot_ratling_gun(self, unit, blackboard, t, dt)
 	end
-
-	return 
 end
+
 BTStormfiendShootAction._shoot_ratling_gun = function (self, unit, blackboard, t, dt)
 	local action = blackboard.action
 	local two_pi = math.pi * 2
@@ -601,9 +596,8 @@ BTStormfiendShootAction._shoot_ratling_gun = function (self, unit, blackboard, t
 	local projectile_system = Managers.state.entity:system("projectile_system")
 
 	projectile_system.create_light_weight_projectile(projectile_system, Unit.get_data(unit, "breed").name, unit, from_position, spread_direction, action.projectile_speed, action.projectile_max_range, collision_filter, action_data, action.light_weight_projectile_particle_effect)
-
-	return 
 end
+
 BTStormfiendShootAction.anim_cb_attack_fire = function (self, unit, blackboard)
 	if Managers.state.network:game() then
 		local action = blackboard.action
@@ -636,9 +630,8 @@ BTStormfiendShootAction.anim_cb_attack_fire = function (self, unit, blackboard)
 		data.is_firing = true
 		data.stop_firing_t = t + action.firing_time
 	end
-
-	return 
 end
+
 BTStormfiendShootAction.anim_cb_attack_start = function (self, unit, blackboard)
 	local data = blackboard.shoot_data
 
@@ -651,9 +644,8 @@ BTStormfiendShootAction.anim_cb_attack_start = function (self, unit, blackboard)
 
 		data.attack_started = true
 	end
-
-	return 
 end
+
 BTStormfiendShootAction._debug_firewall = function (self, minimum_length, start_position, wanted_end_pos, projected_start_pos, projected_end_pos)
 	if script_data.debug_stormfiend then
 		local drawer = Managers.state.debug:drawer({
@@ -673,9 +665,8 @@ BTStormfiendShootAction._debug_firewall = function (self, minimum_length, start_
 		drawer.sphere(drawer, debug_end_pos, 0.25, (minimum_length < distance and success_color) or fail_color)
 		debug_print("FIREWALL DISTANCE", distance, "MINIMUM DISTANCE", minimum_length)
 	end
-
-	return 
 end
+
 BTStormfiendShootAction._debug_fire_beam = function (self, start_position, end_position, success, stop_hit_index, hits, draw_mode)
 	if script_data.debug_stormfiend then
 		local drawer, success_color, fail_color, normal_color, stop_color, disabled_color = nil
@@ -727,9 +718,8 @@ BTStormfiendShootAction._debug_fire_beam = function (self, start_position, end_p
 			end
 		end
 	end
-
-	return 
 end
+
 BTStormfiendShootAction._debug_colliding_arm = function (self, shoulder_position, muzzle_position)
 	if script_data.debug_stormfiend then
 		local drawer = Managers.state.debug:drawer({
@@ -741,8 +731,6 @@ BTStormfiendShootAction._debug_colliding_arm = function (self, shoulder_position
 		drawer.line(drawer, shoulder_position, muzzle_position, Colors.get("black"))
 		drawer.sphere(drawer, muzzle_position, 0.1, Colors.get("black"))
 	end
-
-	return 
 end
 
-return 
+return

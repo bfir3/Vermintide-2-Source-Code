@@ -968,4 +968,4 @@ weapon_template.wwise_dep_left_hand = {
 Weapons = Weapons or {}
 Weapons.one_hand_axe_shield_template_1 = table.clone(weapon_template)
 
-return 
+return

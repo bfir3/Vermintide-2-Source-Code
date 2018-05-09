@@ -17,6 +17,7 @@ require("scripts/ui/views/level_end/level_end_view_wrapper")
 
 StateInGameRunning = class(StateInGameRunning)
 StateInGameRunning.NAME = "StateInGameRunning"
+
 StateInGameRunning.on_enter = function (self, params)
 	GarbageLeakDetector.register_object(self, "StateInGameRunning")
 
@@ -114,8 +115,6 @@ StateInGameRunning.on_enter = function (self, params)
 				locomotion_extension.teleport_to(locomotion_extension, pos, rot)
 			end
 		end
-
-		return 
 	end)
 
 	local ingame_ui_context = {
@@ -208,9 +207,8 @@ StateInGameRunning.on_enter = function (self, params)
 	if self.is_in_inn and Development.parameter("v2_achievements") then
 		Managers.state.achievement:setup_achievement_data()
 	end
-
-	return 
 end
+
 StateInGameRunning.create_ingame_ui = function (self, ingame_ui_context)
 	if self.ingame_ui then
 		self.ingame_ui:destroy()
@@ -232,9 +230,8 @@ StateInGameRunning.create_ingame_ui = function (self, ingame_ui_context)
 		matchmaking.set_popup_join_lobby_handler(matchmaking, self.ingame_ui.popup_join_lobby_handler)
 		matchmaking.set_popup_handler(matchmaking, self.ingame_ui.popup_handler)
 	end
-
-	return 
 end
+
 StateInGameRunning._setup_end_of_level_UI = function (self)
 	if script_data.disable_end_screens then
 		Managers.state.network.network_transmit:send_rpc_server("rpc_is_ready_for_transition")
@@ -281,48 +278,46 @@ StateInGameRunning._setup_end_of_level_UI = function (self)
 
 	self.level_end_view_context = nil
 	self.has_setup_end_of_level = true
-
-	return 
 end
+
 StateInGameRunning.level_end_view_wrapper = function (self)
 	return self._level_end_view_wrapper
 end
+
 StateInGameRunning.server_start_leave_game_timer = function (self)
 	local level_key = "inn_level"
 	local time_until_level_transition = 45
 
 	Managers.state.network.network_transmit:send_rpc_all("rpc_start_leave_game_countdown", time_until_level_transition)
 	Managers.state.game_mode:start_specific_level(level_key, time_until_level_transition)
-
-	return 
 end
+
 StateInGameRunning.handle_end_conditions = function (self)
 	local game_mode_manager = Managers.state.game_mode
 
 	if game_mode_manager and game_mode_manager.is_game_mode_ended(game_mode_manager) and game_mode_manager.is_game_mode_ended(game_mode_manager) then
 	end
-
-	return 
 end
+
 MOOD_BLACKBOARD = {}
+
 StateInGameRunning.setup_mood_blackboard = function (self)
 	for mood, _ in pairs(MoodSettings) do
 		MOOD_BLACKBOARD[mood] = false
 	end
-
-	return 
 end
+
 StateInGameRunning.check_invites = function (self)
 	if self.popup_id then
-		return 
+		return
 	end
 
 	if self.network_client and not self.network_client:is_ingame() then
-		return 
+		return
 	end
 
 	if self.network_server and not self.network_server:are_all_peers_ingame() then
-		return 
+		return
 	end
 
 	local invite_data = Managers.invite:get_invited_lobby_data()
@@ -364,20 +359,19 @@ StateInGameRunning.check_invites = function (self)
 			})
 		end
 	end
-
-	return 
 end
+
 StateInGameRunning.wanted_transition = function (self)
 	if self.popup_id then
-		return 
+		return
 	end
 
 	if self.network_client and not self.network_client:is_ingame() then
-		return 
+		return
 	end
 
 	if self.network_server and not self.network_server:are_all_peers_ingame() then
-		return 
+		return
 	end
 
 	local wanted_transition, data = self.ingame_ui:get_transition()
@@ -423,6 +417,7 @@ StateInGameRunning.wanted_transition = function (self)
 
 	return wanted_transition, data
 end
+
 StateInGameRunning.on_end_screen_ui_complete = function (self)
 	Managers.state.conflict:destroy_all_units()
 
@@ -432,9 +427,8 @@ StateInGameRunning.on_end_screen_ui_complete = function (self)
 	if Managers.state.network:game() then
 		Managers.state.network.network_transmit:send_rpc_server("rpc_is_ready_for_transition")
 	end
-
-	return 
 end
+
 StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpoint_available, percentage_completed)
 	if not self._spawn_initialized then
 		Managers.transition:hide_loading_icon()
@@ -512,7 +506,7 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 	Managers.backend:commit(true)
 
 	if self.is_in_inn or self.is_in_tutorial then
-		return 
+		return
 	end
 
 	if PLATFORM == "xb1" then
@@ -524,14 +518,12 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 			Managers.xbox_stats:update_hero_stats()
 		end
 	end
-
-	return 
 end
+
 StateInGameRunning.on_checkpoint_vote_cancelled = function (self)
 	self.checkpoint_vote_cancelled = true
-
-	return 
 end
+
 StateInGameRunning._debug_update_rooms = function (self, dt, t)
 	self._debug_room_handler_settings = self._debug_room_handler_settings or {
 		tapped_players = {}
@@ -561,8 +553,6 @@ StateInGameRunning._debug_update_rooms = function (self, dt, t)
 	end
 
 	self._debug_room_handler_settings = settings
-
-	return 
 end
 
 if PLATFORM ~= "win32" and (BUILD == "dev" or BUILD == "debug") then
@@ -578,8 +568,6 @@ if PLATFORM ~= "win32" and (BUILD == "dev" or BUILD == "debug") then
 		local unit = player.player_unit
 		local input_extension = ScriptUnit.extension(unit, "input_system")
 		input_extension.input_service = input_source
-
-		return 
 	end
 end
 
@@ -643,9 +631,8 @@ StateInGameRunning.update = function (self, dt, t)
 	if self._benchmark_handler then
 		self._benchmark_handler:update(dt, t)
 	end
-
-	return 
 end
+
 StateInGameRunning.check_for_new_quests_or_contracts = function (self, dt)
 	self._quest_expire_check_cooldown = (self._quest_expire_check_cooldown and self._quest_expire_check_cooldown - dt) or 0
 
@@ -658,9 +645,8 @@ StateInGameRunning.check_for_new_quests_or_contracts = function (self, dt)
 			self._quest_expire_check_cooldown = QuestSettings.EXPIRE_CHECK_COOLDOWN
 		end
 	end
-
-	return 
 end
+
 StateInGameRunning.disable_ui = function (self)
 	local ingame_ui = self.ingame_ui
 
@@ -669,27 +655,25 @@ StateInGameRunning.disable_ui = function (self)
 	end
 
 	self._disable_ui = true
-
-	return 
 end
+
 StateInGameRunning.event_close_ingame_menu = function (self)
 	local ingame_ui = self.ingame_ui
 
 	if ingame_ui then
 		ingame_ui.suspend_active_view(ingame_ui)
 	end
-
-	return 
 end
+
 StateInGameRunning.update_ui = function (self)
 	if self._disable_ui then
-		return 
+		return
 	end
 
 	if not self._ui_update_initialized then
 		self._ui_update_initialized = true
 
-		return 
+		return
 	end
 
 	local time_manager = Managers.time
@@ -712,16 +696,14 @@ StateInGameRunning.update_ui = function (self)
 	end
 
 	self._t = Application.time_since_launch()
-
-	return 
 end
+
 StateInGameRunning.cb_loading_view_fade_in_done = function (self)
 	Managers.transition:fade_out(GameSettings.transition_fade_out_speed, nil)
 
 	self.show_loading_view = false
-
-	return 
 end
+
 StateInGameRunning.update_mood = function (self, dt, t)
 	local mood_settings = MoodSettings
 	local mood_priority = MoodPriority
@@ -760,9 +742,8 @@ StateInGameRunning.update_mood = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 StateInGameRunning.post_update = function (self, dt, t)
 	local level_end_view_wrapper = self._level_end_view_wrapper
 	local disable_ingame_ui = script_data.disable_ui or level_end_view_wrapper ~= nil or (self.waiting_for_transition and Managers.state.network:game_session_host() ~= nil)
@@ -778,18 +759,16 @@ StateInGameRunning.post_update = function (self, dt, t)
 			self._level_end_view_wrapper = nil
 		end
 	end
-
-	return 
 end
+
 StateInGameRunning.trigger_xbox_multiplayer_round_end_events = function (self)
 	if self.is_in_inn or self.is_in_tutorial or Development.parameter("auto-host-level") ~= nil or self._xbox_event_end_triggered then
-		return 
+		return
 	end
 
 	self._xbone_end_of_round_events(self, self.statistics_db)
-
-	return 
 end
+
 StateInGameRunning.on_exit = function (self)
 	self.free_flight_manager:set_teleport_override(nil)
 
@@ -833,9 +812,8 @@ StateInGameRunning.on_exit = function (self)
 	self.player = nil
 
 	self._cancel_afk_warning(self)
-
-	return 
 end
+
 StateInGameRunning.event_game_started = function (self)
 	local world = self.parent.world
 	local level = LevelHelper:current_level(world)
@@ -849,25 +827,22 @@ StateInGameRunning.event_game_started = function (self)
 	self.end_conditions_met = false
 
 	if self.is_in_inn or self.is_in_tutorial then
-		return 
+		return
 	end
 
 	if PLATFORM == "xb1" then
 		self._xbone_round_start_events(self)
 	end
-
-	return 
 end
 
 if PLATFORM == "xb1" then
 	StateInGameRunning.event_trigger_xbox_round_end = function (self)
 		self._xbone_end_of_round_events(self, self.statistics_db)
-
-		return 
 	end
+
 	StateInGameRunning._xbone_round_start_events = function (self)
 		if self.is_in_inn or self.is_in_tutorial or Development.parameter("auto-host-level") ~= nil then
-			return 
+			return
 		end
 
 		if not self._xbox_event_init_triggered then
@@ -896,12 +871,11 @@ if PLATFORM == "xb1" then
 
 			Managers.xbox_events:write("MultiplayerRoundStart", multiplayer_round_start_table, debug_string, debug_print_func, true)
 		end
-
-		return 
 	end
+
 	StateInGameRunning._xbone_end_of_round_events = function (self, statistics_db)
 		if self.is_in_inn or self.is_in_tutorial or Development.parameter("auto-host-level") ~= nil then
-			return 
+			return
 		end
 
 		if not self._xbox_event_end_triggered then
@@ -947,8 +921,6 @@ if PLATFORM == "xb1" then
 
 			Managers.xbox_events:write("GameProgress", game_progress_table, debug_string, debug_print_func, true)
 		end
-
-		return 
 	end
 end
 
@@ -956,17 +928,15 @@ StateInGameRunning.event_conflict_director_setup_done = function (self)
 	self._conflict_directory_is_ready = true
 
 	self.game_actually_starts(self)
-
-	return 
 end
+
 StateInGameRunning.event_local_player_spawned = function (self, is_initial_spawn)
 	self._player_has_spawned = true
 	self._is_initial_spawn = is_initial_spawn
 
 	self.game_actually_starts(self)
-
-	return 
 end
+
 StateInGameRunning.game_actually_starts = function (self)
 	if not self._spawn_initialized and self._player_has_spawned and (not self.is_server or self._conflict_directory_is_ready) then
 		local platform = PLATFORM
@@ -1009,16 +979,16 @@ StateInGameRunning.game_actually_starts = function (self)
 		end
 
 		if self.is_in_inn or self.is_in_tutorial then
-			return 
+			return
 		end
 	end
-
-	return 
 end
+
 local afk_warn_timer = 120
 local afk_force_kick_timer = 180
+
 StateInGameRunning.update_player_afk_check = function (self, dt, t)
-	return 
+	return
 
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 	local active_cutscene = cutscene_system.active_camera
@@ -1031,7 +1001,7 @@ StateInGameRunning.update_player_afk_check = function (self, dt, t)
 
 		self.last_active_time = nil
 
-		return 
+		return
 	end
 
 	local last_input_time = Managers.input.last_active_time
@@ -1060,9 +1030,8 @@ StateInGameRunning.update_player_afk_check = function (self, dt, t)
 	end
 
 	self._handle_afk_warning_result(self)
-
-	return 
 end
+
 StateInGameRunning._show_afk_warning = function (self)
 	self.afk_popup_id = Managers.popup:queue_popup(Localize("afk_kick_warning"), Localize("popup_notice_topic"), "ok", Localize("button_ok"))
 	local can_flash_window = _G.Window ~= nil and Window.flash_window ~= nil and not Window.has_focus()
@@ -1074,26 +1043,23 @@ StateInGameRunning._show_afk_warning = function (self)
 	local player = Managers.player:local_player(1)
 
 	self._send_system_chat_message(self, "chat_afk_kick_warning", player.name(player))
-
-	return 
 end
+
 StateInGameRunning._send_system_chat_message = function (self, message, localization_param)
 	local channel_id = 1
 	local pop_chat = true
 
 	Managers.chat:send_system_chat_message(channel_id, message, localization_param, pop_chat)
-
-	return 
 end
+
 StateInGameRunning._cancel_afk_warning = function (self)
 	if self.afk_popup_id then
 		Managers.popup:cancel_popup(self.afk_popup_id)
 
 		self.afk_popup_id = nil
 	end
-
-	return 
 end
+
 StateInGameRunning._handle_afk_warning_result = function (self)
 	if self.afk_popup_id then
 		local popup_result = Managers.popup:query_result(self.afk_popup_id)
@@ -1102,9 +1068,8 @@ StateInGameRunning._handle_afk_warning_result = function (self)
 			self.afk_popup_id = nil
 		end
 	end
-
-	return 
 end
+
 StateInGameRunning._kick_afk_player = function (self)
 	self._cancel_afk_warning(self)
 
@@ -1113,8 +1078,6 @@ StateInGameRunning._kick_afk_player = function (self)
 	self._send_system_chat_message(self, "chat_afk_kick", player.name(player))
 
 	self.afk_kick = true
-
-	return 
 end
 
-return 
+return

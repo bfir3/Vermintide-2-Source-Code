@@ -28,8 +28,6 @@ local function convert_from_backend(raw_value, database_type)
 	end
 
 	assert(false, "Unknown database_type %s for value %s", tostring(database_type), tostring(raw_value))
-
-	return 
 end
 
 local function convert_to_backend(value, database_type)
@@ -58,50 +56,43 @@ local function convert_to_backend(value, database_type)
 	end
 
 	assert(false, "Unknown database_type %s for value %s", tostring(database_type), tostring(value))
-
-	return 
 end
 
 local function dbprintf(...)
 	if script_data.statistics_debug then
 		printf(...)
 	end
-
-	return 
 end
 
 StatisticsDatabase = class(StatisticsDatabase)
+
 StatisticsDatabase.init = function (self)
 	self.statistics = {}
 	self.categories = {}
-
-	return 
 end
+
 StatisticsDatabase.destroy = function (self)
 	local stat_id = next(self.statistics)
 
 	assert(stat_id == nil, "Destroying stats manager without properly cleaning up first. Stat id %q not unregistered.", tostring(stat_id))
-
-	return 
 end
+
 local RPCS = {
 	"rpc_sync_statistics_number",
 	"rpc_increment_stat",
 	"rpc_set_local_player_stat"
 }
+
 StatisticsDatabase.register_network_event_delegate = function (self, network_event_delegate)
 	self.network_event_delegate = network_event_delegate
 
 	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
-
-	return 
 end
+
 StatisticsDatabase.unregister_network_event_delegate = function (self)
 	self.network_event_delegate:unregister(self)
 
 	self.network_event_delegate = nil
-
-	return 
 end
 
 local function init_stat(stat, backend_stats)
@@ -125,8 +116,6 @@ local function init_stat(stat, backend_stats)
 			init_stat(stat_definition, backend_stats)
 		end
 	end
-
-	return 
 end
 
 StatisticsDatabase.register = function (self, id, category, backend_stats)
@@ -142,17 +131,15 @@ StatisticsDatabase.register = function (self, id, category, backend_stats)
 
 	self.statistics[id] = stats
 	self.categories[id] = category
-
-	return 
 end
+
 StatisticsDatabase.unregister = function (self, id)
 	dbprintf("StatisticsDatabase: Unregistering id=%s", tostring(id))
 
 	self.statistics[id] = nil
 	self.categories[id] = nil
-
-	return 
 end
+
 StatisticsDatabase.is_registered = function (self, id)
 	return self.statistics[id]
 end
@@ -209,8 +196,6 @@ local function sync_stat(peer_id, stat_peer_id, stat_local_player_id, path, path
 	end
 
 	path[path_step] = nil
-
-	return 
 end
 
 local function sync_stat_to_server(network_transmit, stat_peer_id, stat_local_player_id, path, path_step, stat)
@@ -232,8 +217,6 @@ local function sync_stat_to_server(network_transmit, stat_peer_id, stat_local_pl
 	end
 
 	path[path_step] = nil
-
-	return 
 end
 
 StatisticsDatabase.hot_join_sync = function (self, peer_id)
@@ -246,8 +229,6 @@ StatisticsDatabase.hot_join_sync = function (self, peer_id)
 		elseif category == "session" then
 		end
 	end
-
-	return 
 end
 
 local function reset_stat(stat)
@@ -264,8 +245,6 @@ local function reset_stat(stat)
 			reset_stat(stat_definition)
 		end
 	end
-
-	return 
 end
 
 StatisticsDatabase.reset_session_stats = function (self)
@@ -276,8 +255,6 @@ StatisticsDatabase.reset_session_stats = function (self)
 
 		reset_stat(stats)
 	end
-
-	return 
 end
 
 local function generate_backend_stats(stat, backend_stats)
@@ -292,8 +269,6 @@ local function generate_backend_stats(stat, backend_stats)
 			generate_backend_stats(stat_definition, backend_stats)
 		end
 	end
-
-	return 
 end
 
 StatisticsDatabase.generate_backend_stats = function (self, id, backend_stats)
@@ -306,6 +281,7 @@ StatisticsDatabase.generate_backend_stats = function (self, id, backend_stats)
 
 	return backend_stats
 end
+
 StatisticsDatabase.increment_stat = function (self, id, ...)
 	local stat = self.statistics[id]
 	local arg_n = select("#", ...)
@@ -329,9 +305,8 @@ StatisticsDatabase.increment_stat = function (self, id, ...)
 	end
 
 	dbprintf("StatisticsDatabase: Incremented stat %s for id=%s to %f", stat.name, tostring(id), stat.value)
-
-	return 
 end
+
 StatisticsDatabase.decrement_stat = function (self, id, ...)
 	local stat = self.statistics[id]
 	local arg_n = select("#", ...)
@@ -349,9 +324,8 @@ StatisticsDatabase.decrement_stat = function (self, id, ...)
 	end
 
 	dbprintf("StatisticsDatabase: Decremented stat %s for id=%s to %f", stat.name, tostring(id), stat.value)
-
-	return 
 end
+
 StatisticsDatabase.increment_stat_and_sync_to_clients = function (self, stat_name)
 	local player_manager = Managers.player
 	local player = player_manager.local_player(player_manager)
@@ -366,9 +340,8 @@ StatisticsDatabase.increment_stat_and_sync_to_clients = function (self, stat_nam
 	local stat_id = NetworkLookup.statistics[stat_name]
 
 	network_manager.network_transmit:send_rpc_clients("rpc_increment_stat", stat_id)
-
-	return 
 end
+
 StatisticsDatabase.modify_stat_by_amount = function (self, id, ...)
 	local stat = self.statistics[id]
 	local arg_n = select("#", ...)
@@ -388,9 +361,8 @@ StatisticsDatabase.modify_stat_by_amount = function (self, id, ...)
 	end
 
 	dbprintf("StatisticsDatabase: Modified stat %s for id=%s from %f to %f", stat.name, tostring(id), old_value, old_value + increment_value)
-
-	return 
 end
+
 StatisticsDatabase.get_array_stat = function (self, id, ...)
 	local array_stat = self.statistics[id]
 	local arg_n = select("#", ...)
@@ -404,6 +376,7 @@ StatisticsDatabase.get_array_stat = function (self, id, ...)
 
 	return array_stat.value[array_index]
 end
+
 StatisticsDatabase.get_persistent_array_stat = function (self, id, ...)
 	local array_stat = self.statistics[id]
 	local arg_n = select("#", ...)
@@ -421,6 +394,7 @@ StatisticsDatabase.get_persistent_array_stat = function (self, id, ...)
 
 	return false
 end
+
 StatisticsDatabase.set_array_stat = function (self, id, ...)
 	local array_stat = self.statistics[id]
 	local arg_n = select("#", ...)
@@ -439,9 +413,8 @@ StatisticsDatabase.set_array_stat = function (self, id, ...)
 	end
 
 	dbprintf("StatisticsDatabase: Set array stat %s[%s] for id=%s to %s", array_stat.name, tostring(array_index), tostring(id), tostring(new_stat_value))
-
-	return 
 end
+
 StatisticsDatabase.set_stat = function (self, id, ...)
 	local stat = self.statistics[id]
 	local arg_n = select("#", ...)
@@ -455,9 +428,8 @@ StatisticsDatabase.set_stat = function (self, id, ...)
 	stat.dirty = stat.value ~= new_value
 	stat.value = new_value
 	stat.persistent_value = new_value
-
-	return 
 end
+
 StatisticsDatabase.get_stat = function (self, id, ...)
 	local stat = self.statistics[id]
 	local arg_n = select("#", ...)
@@ -469,6 +441,7 @@ StatisticsDatabase.get_stat = function (self, id, ...)
 
 	return stat.value
 end
+
 StatisticsDatabase.get_persistent_stat = function (self, id, ...)
 	local stat = self.statistics[id]
 	local arg_n = select("#", ...)
@@ -501,15 +474,12 @@ StatisticsDatabase.get_persistent_stat = function (self, id, ...)
 	fassert(stat, error, unpack({
 		...
 	}))
-
-	return 
 end
+
 StatisticsDatabase.sync_stats_to_server = function (self, stat_id, peer_id, local_player_id, network_transmit)
 	local stats = self.statistics[stat_id]
 
 	sync_stat_to_server(network_transmit, peer_id, local_player_id, {}, 1, stats)
-
-	return 
 end
 
 local function debug_draw_stat(name, stat, indent_level)
@@ -528,13 +498,11 @@ local function debug_draw_stat(name, stat, indent_level)
 			debug_draw_stat(k, v, indent_level + 1)
 		end
 	end
-
-	return 
 end
 
 StatisticsDatabase.debug_draw = function (self)
 	if not script_data.statistics_debug then
-		return 
+		return
 	end
 
 	for stats_id, stats in pairs(self.statistics) do
@@ -544,30 +512,28 @@ StatisticsDatabase.debug_draw = function (self)
 			debug_draw_stat(k, v, 1)
 		end
 	end
-
-	return 
 end
+
 StatisticsDatabase.rpc_increment_stat = function (self, sender, stat_id)
 	local stat = NetworkLookup.statistics[stat_id]
 	local player = Managers.player:local_player()
 
 	if not player then
-		return 
+		return
 	end
 
 	local stats_id = player.stats_id(player)
 
 	print("Incremented stat ", stat)
 	self.increment_stat(self, stats_id, stat)
-
-	return 
 end
+
 StatisticsDatabase.rpc_set_local_player_stat = function (self, sender, stat_id, amount)
 	local stat = NetworkLookup.statistics[stat_id]
 	local player = Managers.player:local_player()
 
 	if not player then
-		return 
+		return
 	end
 
 	local stats_id = player.stats_id(player)
@@ -576,9 +542,8 @@ StatisticsDatabase.rpc_set_local_player_stat = function (self, sender, stat_id, 
 	if old_amount < amount then
 		self.set_stat(self, stats_id, stat, amount)
 	end
-
-	return 
 end
+
 StatisticsDatabase.rpc_sync_statistics_number = function (self, sender, peer_id, local_player_id, statistics_path_names, value, persistent_value)
 	local player = Managers.player:player(peer_id, local_player_id)
 	local stats_id = player.stats_id(player)
@@ -603,12 +568,12 @@ StatisticsDatabase.rpc_sync_statistics_number = function (self, sender, peer_id,
 	if Managers.state.network.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_sync_statistics_number", sender, peer_id, local_player_id, statistics_path_names, value, persistent_value)
 	end
-
-	return 
 end
+
 StatisticsDatabase.get_all_stats = function (self, id)
 	return self.statistics[id]
 end
+
 local DB_UNIT_TEST = false
 
 if DB_UNIT_TEST then
@@ -657,4 +622,4 @@ if DB_UNIT_TEST then
 	script_data.statistics_debug = old_debug
 end
 
-return 
+return

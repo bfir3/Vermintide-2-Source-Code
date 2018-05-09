@@ -108,4 +108,4 @@ PerlinLightConfigurations.fire_small_calm = {
 	}
 }
 
-return 
+return

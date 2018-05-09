@@ -256,4 +256,4 @@ BreedBehaviors.chaos_exalted_champion_norsca = {
 	name = "horde"
 }
 
-return 
+return

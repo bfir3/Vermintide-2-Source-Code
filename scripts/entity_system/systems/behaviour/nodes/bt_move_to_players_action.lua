@@ -2,12 +2,13 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTMoveToPlayersAction = class(BTMoveToPlayersAction, BTNode)
 local EVALUATE_TIME = 0.25
+
 BTMoveToPlayersAction.init = function (self, ...)
 	BTMoveToPlayersAction.super.init(self, ...)
-
-	return 
 end
+
 BTMoveToPlayersAction.name = "BTMoveToPlayersAction"
+
 BTMoveToPlayersAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -36,18 +37,16 @@ BTMoveToPlayersAction.enter = function (self, unit, blackboard, t)
 	blackboard.move_to_players = move_to_players
 
 	self._init_targets(self, move_to_players, t)
-
-	return 
 end
+
 BTMoveToPlayersAction._init_targets = function (self, data, t)
 	data.index = 0
 	data.eval_timer = t + EVALUATE_TIME
 	data.find_move_position_attempts = 0
 
 	table.merge(data.target_units, PLAYER_UNITS)
-
-	return 
 end
+
 BTMoveToPlayersAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
 	blackboard.move_to_players = nil
@@ -66,9 +65,8 @@ BTMoveToPlayersAction.leave = function (self, unit, blackboard, t, reason, destr
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 BTMoveToPlayersAction.run = function (self, unit, blackboard, t, dt)
 	local ai_navigation = blackboard.navigation_extension
 	local data = blackboard.move_to_players
@@ -90,6 +88,7 @@ BTMoveToPlayersAction.run = function (self, unit, blackboard, t, dt)
 
 	return ret_value
 end
+
 BTMoveToPlayersAction._evalute_targets = function (self, unit, blackboard, data, t)
 	local should_evaluate_next_player = data.eval_timer < t
 
@@ -121,6 +120,7 @@ BTMoveToPlayersAction._evalute_targets = function (self, unit, blackboard, data,
 
 	return (target_found and "done") or "running"
 end
+
 BTMoveToPlayersAction._find_target_globadier = function (self, unit, blackboard, action, next_target_unit, t)
 	local throw_globe_data = blackboard.throw_globe_data
 
@@ -156,6 +156,7 @@ BTMoveToPlayersAction._find_target_globadier = function (self, unit, blackboard,
 
 	return false
 end
+
 BTMoveToPlayersAction._find_target_ratling_gunner = function (self, unit, blackboard, action, next_target_unit, t)
 	local closest_enemy, visible_node_name, old_target_visible = PerceptionUtils.pick_ratling_gun_target(unit, blackboard, nil)
 
@@ -169,9 +170,8 @@ BTMoveToPlayersAction._find_target_ratling_gunner = function (self, unit, blackb
 	else
 		return false
 	end
-
-	return 
 end
+
 BTMoveToPlayersAction._update_move_to_players_position = function (self, blackboard, navigation_extension, wanted_position, data)
 	local attempts = data.find_move_position_attempts
 	local above = 0.7 + attempts * 0.2
@@ -201,9 +201,8 @@ BTMoveToPlayersAction._update_move_to_players_position = function (self, blackbo
 	else
 		data.find_move_position_attempts = attempts + 1
 	end
-
-	return 
 end
+
 BTMoveToPlayersAction._calculate_trajectory_to_target = function (self, unit, world, target_unit, attack_throw_offset, max_speed)
 	local curr_pos = Vector3.copy(POSITION_LOOKUP[unit])
 	local rot = LocomotionUtils.rotation_towards_unit_flat(unit, target_unit)
@@ -228,9 +227,11 @@ BTMoveToPlayersAction._calculate_trajectory_to_target = function (self, unit, wo
 
 	return hit, angle, speed, throw_pos, target_vector
 end
+
 BTMoveToPlayersAction._valid_globadier_target = function (self, target_unit, target_distance, action)
 	return VALID_TARGETS_PLAYERS_AND_BOTS[target_unit] and target_distance < action.attack_distance
 end
+
 BTMoveToPlayersAction._has_line_of_sight = function (self, unit, target_unit, world, t)
 	local start_pos = POSITION_LOOKUP[unit] + Vector3.up()
 	local end_pos = POSITION_LOOKUP[target_unit] + Vector3.up() * 1.75
@@ -241,6 +242,7 @@ BTMoveToPlayersAction._has_line_of_sight = function (self, unit, target_unit, wo
 
 	return not hit
 end
+
 BTMoveToPlayersAction.start_idle_animation = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
 
@@ -248,9 +250,8 @@ BTMoveToPlayersAction.start_idle_animation = function (self, unit, blackboard)
 	network_manager.anim_event(network_manager, unit, "idle")
 
 	blackboard.move_state = "idle"
-
-	return 
 end
+
 BTMoveToPlayersAction.start_move_animation = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
 
@@ -258,8 +259,6 @@ BTMoveToPlayersAction.start_move_animation = function (self, unit, blackboard)
 	network_manager.anim_event(network_manager, unit, "move_fwd")
 
 	blackboard.move_state = "moving"
-
-	return 
 end
 
-return 
+return

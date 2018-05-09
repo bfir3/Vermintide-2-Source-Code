@@ -5,6 +5,7 @@ local debug_spline = false
 local debug_dists = false
 local astar_spline = false
 local use_extra_anchor_point = false
+
 TentacleSplineExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local is_server = Managers.player.is_server
 	self._unit = unit
@@ -132,9 +133,8 @@ TentacleSplineExtension.init = function (self, extension_init_context, unit, ext
 	else
 		self._server_time_delta = 0
 	end
-
-	return 
 end
+
 TentacleSplineExtension.get_spiral_length = function (self, node_spacing)
 	local num_nodes = #node_spacing
 	local length = 0
@@ -145,6 +145,7 @@ TentacleSplineExtension.get_spiral_length = function (self, node_spacing)
 
 	return length
 end
+
 TentacleSplineExtension.parse_nodes = function (self, unit, tip_node_name)
 	local nodes = {}
 	local node_spacing = {}
@@ -185,6 +186,7 @@ TentacleSplineExtension.parse_nodes = function (self, unit, tip_node_name)
 
 	return nodes, node_spacing, max_length
 end
+
 TentacleSplineExtension.get_ground_pos_at_wall = function (self, unit, nav_world, wall_pos)
 	local portal_forward = Quaternion.forward(Unit.local_rotation(unit, 0)) * 1.5
 	local pos = wall_pos + portal_forward
@@ -195,9 +197,8 @@ TentacleSplineExtension.get_ground_pos_at_wall = function (self, unit, nav_world
 
 		return projected_pos
 	end
-
-	return 
 end
+
 TentacleSplineExtension.get_ground_pos_at_floor = function (self, unit, nav_world, floor_pos, target_pos)
 	local target_unit = self.target_unit
 	local to_target = Vector3.normalize(target_pos - floor_pos)
@@ -210,9 +211,8 @@ TentacleSplineExtension.get_ground_pos_at_floor = function (self, unit, nav_worl
 
 		return projected_pos
 	end
-
-	return 
 end
+
 TentacleSplineExtension.spawn_chaos_tentacle = function (self, unit, blackboard, nav_world, is_server, t, extension_init_data, tentacle_template)
 	local breed = blackboard.breed or Breeds.chaos_tentacle
 	local inside_wall_distance = breed.inside_wall_spawn_distance or 0
@@ -273,9 +273,11 @@ TentacleSplineExtension.spawn_chaos_tentacle = function (self, unit, blackboard,
 
 	return data, breed
 end
+
 TentacleSplineExtension.extensions_ready = function (self)
-	return 
+	return
 end
+
 TentacleSplineExtension.destroy = function (self)
 	local unit = self._unit
 
@@ -306,12 +308,12 @@ TentacleSplineExtension.destroy = function (self)
 			GwNavAStar.destroy(astar)
 		end
 	end
+end
 
-	return 
-end
 TentacleSplineExtension.reset = function (self)
-	return 
+	return
 end
+
 local TentacleAlignFunctions = {
 	attack = function (target_unit, spline_points, k)
 		local lock_point_index = k
@@ -407,30 +409,27 @@ local TentacleAlignFunctions = {
 		return lock_point_index
 	end
 }
+
 TentacleSplineExtension.set_target = function (self, template_name, target_unit, reach_dist)
 	self.target_unit = target_unit
 	self.active_template_name = template_name
 	self.tentacle_data.active_template_name = template_name
 	self.reach_dist = math.clamp(reach_dist, 0, 31)
-
-	return 
 end
+
 TentacleSplineExtension.set_reach_dist = function (self, reach_dist)
 	self.reach_dist = math.clamp(reach_dist, 0, 31)
-
-	return 
 end
+
 TentacleSplineExtension.set_target_unit = function (self, target_unit)
 	self.target_unit = target_unit
-
-	return 
 end
+
 TentacleSplineExtension.set_server_time = function (self, server_time)
 	local t = Managers.time:time("main")
 	self._server_time_delta = server_time - t
-
-	return 
 end
+
 TentacleSplineExtension.set_astar_points = function (self, node_list)
 	local tentacle_data = self.tentacle_data
 	local num_nodes = #node_list
@@ -459,9 +458,8 @@ TentacleSplineExtension.set_astar_points = function (self, node_list)
 
 	tentacle_data.reset = true
 	tentacle_data.astar_node_list = node_list
-
-	return 
 end
+
 TentacleSplineExtension.update_global_movement_sound_intensity = function (self, unit, breed, dt)
 	local previous_length = self.previous_reach_dist or 0
 	local current_length = self.reach_dist or previous_length
@@ -472,12 +470,11 @@ TentacleSplineExtension.update_global_movement_sound_intensity = function (self,
 	local audio_system = Managers.state.entity:system("audio_system")
 
 	audio_system.set_global_parameter_with_lerp(audio_system, sound_parameter, new_intensity)
-
-	return 
 end
+
 TentacleSplineExtension.update = function (self, unit, input, dt, context, t)
 	if not Unit.alive(self.target_unit) then
-		return 
+		return
 	end
 
 	local breed = self.breed
@@ -575,9 +572,8 @@ TentacleSplineExtension.update = function (self, unit, input, dt, context, t)
 	self.update_global_movement_sound_intensity(self, unit, breed, dt)
 
 	self.previous_reach_dist = self.reach_dist
-
-	return 
 end
+
 TentacleSplineExtension.get_last_ground_pos = function (self)
 	return self._last_good_ground_pos:unbox()
 end
@@ -588,11 +584,10 @@ local function draw_node_list(nodes, quick_drawer)
 	for j = 1, #nodes, 1 do
 		drawer.sphere(drawer, nodes[j]:unbox(), 0.4, Color(0, 255, 124))
 	end
-
-	return 
 end
 
 local a_dist = 0.6
+
 TentacleSplineExtension.calculate_tentacle_path = function (self, unit, tentacle_data)
 	local a_star = tentacle_data.a_star
 	local result = GwNavAStar.processing_finished(a_star)
@@ -661,9 +656,8 @@ TentacleSplineExtension.calculate_tentacle_path = function (self, unit, tentacle
 			tentacle_data.use_old_path = true
 		end
 	end
-
-	return 
 end
+
 local index_lists = {
 	first_part = {
 		2,
@@ -683,6 +677,7 @@ local index_lists = {
 		5
 	}
 }
+
 TentacleSplineExtension.keep_tentacle_above_ground = function (self, nav_world, spline_points, start_index, check_list)
 	for i = start_index, #check_list, 1 do
 		local index = check_list[i]
@@ -695,9 +690,8 @@ TentacleSplineExtension.keep_tentacle_above_ground = function (self, nav_world, 
 			spline_points[index] = projected_pos
 		end
 	end
-
-	return 
 end
+
 TentacleSplineExtension.funnel_tentacle_to_center = function (self, spline_points, from, to, wall_pos, root_pos, portal_forward, root_to_align_dist, horiz_influence_dist)
 	local influence_dist = 4
 
@@ -727,9 +721,8 @@ TentacleSplineExtension.funnel_tentacle_to_center = function (self, spline_point
 
 		spline_points[i] = p
 	end
-
-	return 
 end
+
 TentacleSplineExtension.funnel_one_point = function (self, point, wall_pos, root_pos, portal_forward, root_to_align_dist, horiz_influence_dist)
 	local influence_dist = 4
 	local p = Geometry.closest_point_on_line(point, root_pos, wall_pos + portal_forward * influence_dist)
@@ -1007,8 +1000,6 @@ TentacleSplineExtension.align_tentacle = function (self, template_name, tentacle
 		parent_pos = pos
 		parent_pose = world_pose
 	end
-
-	return 
 end
 
-return 
+return

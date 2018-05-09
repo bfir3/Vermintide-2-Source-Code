@@ -303,4 +303,4 @@ Weapons.dwarf_ranger_career_skill_weapon = table.create_copy(Weapons.dwarf_range
 Weapons.dwarf_ranger_career_skill_weapon.ammo_data.max_ammo = 3
 Weapons.dwarf_ranger_career_skill_weapon.ammo_data.unwield_when_out_of_ammo = true
 
-return 
+return

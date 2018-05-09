@@ -37,14 +37,13 @@ InteractionHelper.printf = function (...)
 	if script_data.debug_interactions then
 		printf(...)
 	end
-
-	return 
 end
+
 InteractionHelper.request = function (self, interaction_type, interactor_go_id, interactable_go_id, is_level_unit, is_server)
 	InteractionHelper.printf("InteractionHelper:request(%s, %s, %s, %s)", interaction_type, tostring(interactor_go_id), tostring(interactable_go_id), tostring(is_level_unit))
 
 	if LEVEL_EDITOR_TEST then
-		return 
+		return
 	end
 
 	local rpc_name = InteractionHelper.interactions[interaction_type].request_rpc
@@ -62,9 +61,8 @@ InteractionHelper.request = function (self, interaction_type, interactor_go_id, 
 	else
 		network_manager.network_transmit:send_rpc_server(rpc_name, interactor_go_id, interactable_go_id, is_level_unit)
 	end
-
-	return 
 end
+
 InteractionHelper.abort = function (self, interactor_go_id, is_server)
 	InteractionHelper.printf("InteractionHelper:abort(%s)", tostring(interactor_go_id))
 
@@ -73,14 +71,13 @@ InteractionHelper.abort = function (self, interactor_go_id, is_server)
 	else
 		Managers.state.network.network_transmit:send_rpc_server("rpc_interaction_abort", interactor_go_id)
 	end
-
-	return 
 end
+
 InteractionHelper.approve_request = function (self, interaction_type, interactor_unit, interactable_unit)
 	InteractionHelper.printf("InteractionHelper:approve_request(%s, %s, %s)", interaction_type, tostring(interactor_unit), tostring(interactable_unit))
 
 	if LEVEL_EDITOR_TEST then
-		return 
+		return
 	end
 
 	local interactable_extension = ScriptUnit.extension(interactable_unit, "interactable_system")
@@ -92,9 +89,8 @@ InteractionHelper.approve_request = function (self, interaction_type, interactor
 	local interactable_go_id, is_level_unit = Managers.state.network:game_object_or_level_id(interactable_unit)
 
 	Managers.state.network.network_transmit:send_rpc_clients("rpc_interaction_approved", interaction_id, interactor_go_id, interactable_go_id, is_level_unit)
-
-	return 
 end
+
 InteractionHelper.deny_request = function (self, sender, interactor_go_id)
 	InteractionHelper.printf("InteractionHelper:deny_request(%s, %s)", tostring(sender), tostring(interactor_go_id))
 
@@ -105,9 +101,8 @@ InteractionHelper.deny_request = function (self, sender, interactor_go_id)
 	else
 		RPC.rpc_interaction_denied(sender, interactor_go_id)
 	end
-
-	return 
 end
+
 InteractionHelper.request_approved = function (self, interaction_type, interactor_unit, interactable_unit)
 	InteractionHelper.printf("InteractionHelper:request_approved(%s, %s, %s)", interaction_type, tostring(interactor_unit), tostring(interactable_unit))
 
@@ -118,18 +113,16 @@ InteractionHelper.request_approved = function (self, interaction_type, interacto
 	local interactable_extension = ScriptUnit.extension(interactable_unit, "interactable_system")
 
 	interactable_extension.set_is_being_interacted_with(interactable_extension, interactor_unit)
-
-	return 
 end
+
 InteractionHelper.request_denied = function (self, interactor_unit)
 	InteractionHelper.printf("InteractionHelper:request_denied(%s)", tostring(interactor_unit))
 
 	local interactor_extension = ScriptUnit.extension(interactor_unit, "interactor_system")
 
 	interactor_extension.interaction_denied(interactor_extension)
-
-	return 
 end
+
 InteractionHelper.complete_interaction = function (self, interactor_unit, interactable_unit, result)
 	InteractionHelper.printf("InteractionHelper:complete_interaction(%s, %s, %s)", tostring(interactor_unit), tostring(interactable_unit), InteractionResult[result])
 
@@ -142,9 +135,8 @@ InteractionHelper.complete_interaction = function (self, interactor_unit, intera
 	local interactor_go_id = Managers.state.unit_storage:go_id(interactor_unit)
 
 	Managers.state.network.network_transmit:send_rpc_clients("rpc_interaction_completed", interactor_go_id, result)
-
-	return 
 end
+
 InteractionHelper.interaction_completed = function (self, interactor_unit, interactable_unit, result)
 	InteractionHelper.printf("InteractionHelper:interaction_completed(%s, %s, %s)", tostring(interactor_unit), tostring(interactable_unit), InteractionResult[result])
 
@@ -157,9 +149,8 @@ InteractionHelper.interaction_completed = function (self, interactor_unit, inter
 
 		interactable_extension.set_is_being_interacted_with(interactable_extension, nil)
 	end
-
-	return 
 end
+
 InteractionHelper.choose_player_interaction = function (interactor_unit, interactable_unit)
 	if InteractionDefinitions.release_from_hook.client.can_interact(interactor_unit, interactable_unit) then
 		return "release_from_hook"
@@ -176,9 +167,8 @@ InteractionHelper.choose_player_interaction = function (interactor_unit, interac
 	else
 		return nil
 	end
-
-	return 
 end
+
 InteractionHelper.player_modify_interaction_type = function (interactor_unit, interactable_unit, interaction_type)
 	if interaction_type == "player_generic" then
 		local result = InteractionHelper.choose_player_interaction(interactor_unit, interactable_unit)
@@ -191,4 +181,4 @@ InteractionHelper.player_modify_interaction_type = function (interactor_unit, in
 	return interaction_type
 end
 
-return 
+return

@@ -1,4 +1,5 @@
 LootCratesPreviewer = class(LootCratesPreviewer)
+
 LootCratesPreviewer.init = function (self, rewards, units, spawn_positions, end_positions, background_world, background_viewport)
 	self.background_world = background_world
 	self.background_viewport = background_viewport
@@ -16,14 +17,12 @@ LootCratesPreviewer.init = function (self, rewards, units, spawn_positions, end_
 	end
 
 	self._item_key_by_unit = item_key_by_unit
-
-	return 
 end
+
 LootCratesPreviewer.destroy = function (self)
 	self._destroy_units(self)
-
-	return 
 end
+
 LootCratesPreviewer._destroy_units = function (self)
 	local world = self.background_world
 	local spawned_units = self._spawned_units
@@ -35,19 +34,18 @@ LootCratesPreviewer._destroy_units = function (self)
 	end
 
 	self.units_spawned = nil
+end
 
-	return 
-end
 LootCratesPreviewer.update = function (self, dt, t)
-	return 
+	return
 end
+
 LootCratesPreviewer.post_update = function (self, dt, t)
 	if not self._entry_animation_complete then
 		self._animate_entry_positions(self, dt, t)
 	end
-
-	return 
 end
+
 LootCratesPreviewer._animate_entry_positions = function (self, dt, t)
 	local spawn_positions = self.spawn_positions
 	local end_positions = self.end_positions
@@ -76,42 +74,46 @@ LootCratesPreviewer._animate_entry_positions = function (self, dt, t)
 	end
 
 	self._entry_progress = entry_progress
-
-	return 
 end
+
 LootCratesPreviewer._trigger_unit_flow_event = function (self, unit, event_name)
 	if unit and Unit.alive(unit) then
 		Unit.flow_event(unit, event_name)
 	end
-
-	return 
 end
+
 LootCratesPreviewer._get_world = function (self)
 	return self.background_world, self.background_viewport
 end
+
 LootCratesPreviewer._get_camera_position = function (self)
 	local background_viewport = self.background_viewport
 	local camera = ScriptViewport.camera(background_viewport)
 
 	return ScriptCamera.position(camera)
 end
+
 LootCratesPreviewer._get_camera_rotation = function (self)
 	local background_viewport = self.background_viewport
 	local camera = ScriptViewport.camera(background_viewport)
 
 	return ScriptCamera.rotation(camera)
 end
+
 LootCratesPreviewer.get_units = function (self)
 	return self._spawned_units
 end
+
 LootCratesPreviewer.has_units = function (self)
 	local units_left = self._spawned_units and 0 < #self._spawned_units
 
 	return units_left
 end
+
 LootCratesPreviewer.get_item_key_by_unit = function (self, unit)
 	return self._item_key_by_unit[unit]
 end
+
 LootCratesPreviewer.delete_unit = function (self, unit)
 	local world = self.background_world
 	local spawned_units = self._spawned_units
@@ -121,12 +123,11 @@ LootCratesPreviewer.delete_unit = function (self, unit)
 			table.remove(spawned_units, index)
 			World.destroy_unit(world, spawned_unit)
 
-			return 
+			return
 		end
 	end
-
-	return 
 end
+
 LootCratesPreviewer.spawn_units = function (self, units_name)
 	local units = {}
 	local spawn_positions = self.spawn_positions
@@ -192,6 +193,7 @@ LootCratesPreviewer.spawn_units = function (self, units_name)
 
 	return units
 end
+
 LootCratesPreviewer._enable_units_visibility = function (self)
 	local spawned_units = self._spawned_units
 
@@ -204,8 +206,6 @@ LootCratesPreviewer._enable_units_visibility = function (self)
 			self._trigger_unit_flow_event(self, unit, unit_event)
 		end
 	end
-
-	return 
 end
 
-return 
+return

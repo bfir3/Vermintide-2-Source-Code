@@ -1,4 +1,5 @@
 PlayerBotNavigation = class(PlayerBotNavigation)
+
 PlayerBotNavigation.init = function (self, extension_init_context, unit, extension_init_data)
 	self._unit = unit
 	self._nav_world = extension_init_data.nav_world
@@ -18,21 +19,20 @@ PlayerBotNavigation.init = function (self, extension_init_context, unit, extensi
 	self._successive_failed_paths = 0
 	self._close_to_goal_time = nil
 	self._astar_cancelled = false
-
-	return 
 end
+
 PlayerBotNavigation.destroy = function (self)
 	if not GwNavAStar.processing_finished(self._astar) then
 		GwNavAStar.cancel(self._astar)
 	end
 
 	GwNavAStar.destroy(self._astar)
+end
 
-	return 
-end
 PlayerBotNavigation.reset = function (self)
-	return 
+	return
 end
+
 PlayerBotNavigation.update = function (self, unit, input, dt, context, t)
 	if self._astar_cancelled then
 		self._astar_cancelled = false
@@ -43,10 +43,10 @@ PlayerBotNavigation.update = function (self, unit, input, dt, context, t)
 	end
 
 	self._update_path(self, t)
-
-	return 
 end
+
 local SAME_DIRECTION_THRESHOLD = math.cos(math.pi / 8)
+
 PlayerBotNavigation.move_to = function (self, target_position, callback)
 	fassert(not callback or type(callback) == "function", "Tried to pass invalid callback value to PlayerBotNavigation:move_to()")
 
@@ -106,6 +106,7 @@ PlayerBotNavigation.move_to = function (self, target_position, callback)
 
 	return true
 end
+
 PlayerBotNavigation.teleport = function (self, destination)
 	if self._running_astar and not GwNavAStar.processing_finished(self._astar) then
 		GwNavAStar.cancel(self._astar)
@@ -131,16 +132,14 @@ PlayerBotNavigation.teleport = function (self, destination)
 	self._last_path = nil
 	self._last_path_index = nil
 	self._current_transition = nil
-
-	return 
 end
+
 PlayerBotNavigation.stop = function (self)
 	local current_position = POSITION_LOOKUP[self._unit]
 
 	self.teleport(self, current_position)
-
-	return 
 end
+
 PlayerBotNavigation.is_path_safe_from_vortex = function (self, path_check_distance, min_allowed_vortex_distance)
 	local path = self._path
 
@@ -221,8 +220,6 @@ local function is_same_point(p1, p2)
 
 		return x * x + y * y < 0.0001
 	end
-
-	return 
 end
 
 PlayerBotNavigation._update_path = function (self, t)
@@ -231,7 +228,7 @@ PlayerBotNavigation._update_path = function (self, t)
 	if not path or self._final_goal_reached then
 		self._current_transition = nil
 
-		return 
+		return
 	end
 
 	local unit = self._unit
@@ -255,9 +252,8 @@ PlayerBotNavigation._update_path = function (self, t)
 			self._reevaluate_current_nav_transition(self, unit, position, current_goal, new_goal)
 		end
 	end
-
-	return 
 end
+
 PlayerBotNavigation._reevaluate_current_nav_transition = function (self, self_unit, self_position, current_goal, new_goal)
 	local old_transition = self._current_transition
 	self._current_transition = nil
@@ -294,7 +290,7 @@ PlayerBotNavigation._reevaluate_current_nav_transition = function (self, self_un
 					data.t = Managers.time:time("game")
 				end
 
-				return 
+				return
 			end
 		else
 			local waypoint = data.waypoint:unbox()
@@ -316,7 +312,7 @@ PlayerBotNavigation._reevaluate_current_nav_transition = function (self, self_un
 					data.t = Managers.time:time("game")
 				end
 
-				return 
+				return
 			end
 		end
 	end
@@ -325,7 +321,7 @@ PlayerBotNavigation._reevaluate_current_nav_transition = function (self, self_un
 		old_transition.goal = "to"
 		self._current_transition = old_transition
 
-		return 
+		return
 	elseif best_ladder then
 		self._current_transition = best_ladder
 
@@ -333,14 +329,14 @@ PlayerBotNavigation._reevaluate_current_nav_transition = function (self, self_un
 			best_ladder.t = Managers.time:time("game")
 		end
 	end
-
-	return 
 end
+
 local FLAT_THRESHOLD_DEFAULT = 0.05
 local TIME_UNTIL_RAMP_THRESHOLD = 0.25
 local MAX_FLAT_THRESHOLD = 0.2
 local RAMP_TIME = 0.25
 local RAMP_SPEED = (MAX_FLAT_THRESHOLD - FLAT_THRESHOLD_DEFAULT) / RAMP_TIME
+
 PlayerBotNavigation._goal_reached = function (self, position, goal, previous_goal, t)
 	local unit_to_goal_direction = goal - position
 	local previous_to_goal_direction = goal - previous_goal
@@ -366,6 +362,7 @@ PlayerBotNavigation._goal_reached = function (self, position, goal, previous_goa
 
 	return goal_reached
 end
+
 PlayerBotNavigation.current_goal = function (self)
 	if self._final_goal_reached then
 		return nil
@@ -376,9 +373,8 @@ PlayerBotNavigation.current_goal = function (self)
 	else
 		return nil
 	end
-
-	return 
 end
+
 PlayerBotNavigation.is_following_last_goal = function (self)
 	if self._final_goal_reached then
 		return false
@@ -389,12 +385,12 @@ PlayerBotNavigation.is_following_last_goal = function (self)
 	else
 		return false
 	end
-
-	return 
 end
+
 PlayerBotNavigation.destination_reached = function (self)
 	return self._final_goal_reached
 end
+
 PlayerBotNavigation._update_astar = function (self, t)
 	local astar = self._astar
 	local result = GwNavAStar.processing_finished(astar)
@@ -447,12 +443,12 @@ PlayerBotNavigation._update_astar = function (self, t)
 			self._queued_path_callback = nil
 		end
 	end
-
-	return 
 end
+
 PlayerBotNavigation.path_callback = function (self)
 	return self._path_callback
 end
+
 PlayerBotNavigation._path_failed = function (self, t)
 	if script_data.debug_ai_movement then
 		print("AI bot failed to find path")
@@ -464,9 +460,8 @@ PlayerBotNavigation._path_failed = function (self, t)
 	if cb then
 		cb(false, self._destination:unbox())
 	end
-
-	return 
 end
+
 PlayerBotNavigation._path_successful = function (self, t)
 	self._last_successful_path = t
 	self._successive_failed_paths = 0
@@ -475,30 +470,28 @@ PlayerBotNavigation._path_successful = function (self, t)
 	if cb then
 		cb(true, self._destination:unbox())
 	end
-
-	return 
 end
+
 PlayerBotNavigation.successive_failed_paths = function (self)
 	return self._successive_failed_paths, self._last_successful_path
 end
+
 PlayerBotNavigation.destination = function (self)
 	if self._has_queued_target then
 		return self._queued_target_position:unbox()
 	else
 		return self._destination:unbox()
 	end
-
-	return 
 end
+
 PlayerBotNavigation.position_when_destination_reached = function (self)
 	if self._final_goal_reached then
 		return self._position_when_final_goal_reached:unbox()
 	else
 		return nil
 	end
-
-	return 
 end
+
 PlayerBotNavigation._debug_draw_path = function (self, position, previous_goal, current_goal)
 	if script_data.ai_bots_debug then
 		local color = self._player.color:unbox()
@@ -526,17 +519,18 @@ PlayerBotNavigation._debug_draw_path = function (self, position, previous_goal, 
 
 		drawer.sphere(drawer, last_node, size, color)
 	end
-
-	return 
 end
+
 PlayerBotNavigation.is_in_transition = function (self)
 	return self._current_transition ~= nil
 end
+
 PlayerBotNavigation.transition_type = function (self)
 	local transition = self._current_transition
 
 	return transition.type
 end
+
 PlayerBotNavigation.transition_requires_jump = function (self, position, direction)
 	local current_goal = self.current_goal(self)
 
@@ -551,6 +545,7 @@ PlayerBotNavigation.transition_requires_jump = function (self, position, directi
 
 	return false
 end
+
 PlayerBotNavigation.flow_cb_entered_nav_transition = function (self, transition_unit, actor)
 	local transitions = self._available_nav_transitions
 	local index = Unit.get_data(transition_unit, "bot_nav_transition_manager_index")
@@ -571,19 +566,18 @@ PlayerBotNavigation.flow_cb_entered_nav_transition = function (self, transition_
 		self._current_transition = transition
 		transition.t = Managers.time:time("game")
 	end
-
-	return 
 end
+
 PlayerBotNavigation.flow_cb_left_nav_transition = function (self, transition_unit, actor)
 	local transitions = self._available_nav_transitions
 	local index = Unit.get_data(transition_unit, "bot_nav_transition_manager_index")
 	transitions[transition_unit] = nil
-
-	return 
 end
+
 PlayerBotNavigation.traverse_logic = function (self)
 	return self._traverse_data
 end
+
 PlayerBotNavigation.add_transition = function (self, transition_unit, type, from, to)
 	local transition = {
 		unit = transition_unit,
@@ -593,14 +587,11 @@ PlayerBotNavigation.add_transition = function (self, transition_unit, type, from
 	}
 	local transitions = self._available_nav_transitions
 	transitions[transition_unit] = transition
-
-	return 
 end
+
 PlayerBotNavigation.remove_transition = function (self, transition_unit)
 	local transitions = self._available_nav_transitions
 	transitions[transition_unit] = nil
-
-	return 
 end
 
-return 
+return

@@ -1,4 +1,5 @@
 UIUtils = UIUtils or {}
+
 UIUtils.get_talent_description = function (talent_data)
 	local description_text = Localize(talent_data.description)
 	local description_values = talent_data.description_values
@@ -27,6 +28,7 @@ UIUtils.get_talent_description = function (talent_data)
 
 	return text
 end
+
 UIUtils.get_property_description = function (property_name, lerp_value)
 	local property_data = WeaponProperties.properties[property_name]
 	local description_text = Localize(property_data.display_name)
@@ -75,6 +77,7 @@ UIUtils.get_property_description = function (property_name, lerp_value)
 
 	return text, advanced_description
 end
+
 UIUtils.get_trait_description = function (trait_name)
 	local trait_data = WeaponTraits.traits[trait_name]
 	local description_text = Localize(trait_data.advanced_description)
@@ -103,6 +106,7 @@ UIUtils.get_trait_description = function (trait_name)
 
 	return text
 end
+
 UIUtils.get_ui_information_from_item = function (item)
 	local item_data = item.data
 	local item_type = item_data.item_type
@@ -142,9 +146,11 @@ UIUtils.get_ui_information_from_item = function (item)
 
 	return inventory_icon, display_name, description
 end
+
 UIUtils.presentable_hero_power_level = function (power_level)
 	return math.max(0, math.floor(power_level - PowerLevelFromLevelSettings.starting_power_level))
 end
+
 local formatting_functions = {
 	damage = function (value)
 		return string.format("%.2f", value)
@@ -338,8 +344,6 @@ function get_chain_damages(values, action, unit, item, stat_descriptor)
 			value_right = damage_right
 		}
 	end
-
-	return 
 end
 
 function get_chain_max_targets(values, action, unit, item, stat_descriptor)
@@ -399,8 +403,6 @@ function get_chain_max_targets(values, action, unit, item, stat_descriptor)
 			value_right = max_targets_right
 		}
 	end
-
-	return 
 end
 
 function get_chain_stagger_strengths(values, action, unit, item, stat_descriptor)
@@ -456,8 +458,6 @@ function get_chain_stagger_strengths(values, action, unit, item, stat_descriptor
 			value_right = strength_right
 		}
 	end
-
-	return 
 end
 
 function get_chain_critical_hit_chances(values, action, unit, item, stat_descriptor)
@@ -473,8 +473,6 @@ function get_chain_critical_hit_chances(values, action, unit, item, stat_descrip
 			value = crit_chance
 		}
 	end
-
-	return 
 end
 
 local ranged_actions = {
@@ -516,8 +514,6 @@ function get_time_between_damage(values, action, unit, item, stat_descriptor)
 			return true
 		end
 	end
-
-	return 
 end
 
 function get_chain_boost_coefficients(values, action, unit, item, stat_descriptor)
@@ -551,8 +547,6 @@ function get_chain_boost_coefficients(values, action, unit, item, stat_descripto
 			value_right = boost_coefficient_right
 		}
 	end
-
-	return 
 end
 
 function get_chain_headshot_boost_coefficients(values, action, unit, item, stat_descriptor)
@@ -586,8 +580,6 @@ function get_chain_headshot_boost_coefficients(values, action, unit, item, stat_
 			value_right = boost_coefficient_headshot_right
 		}
 	end
-
-	return 
 end
 
 function get_push_angles(values, action, unit, item, stat_descriptor)
@@ -621,8 +613,6 @@ function get_push_angles(values, action, unit, item, stat_descriptor)
 			value = outer_push_angle
 		}
 	end
-
-	return 
 end
 
 function get_push_strengths(values, action, unit, item, stat_descriptor)
@@ -670,8 +660,6 @@ function get_push_strengths(values, action, unit, item, stat_descriptor)
 			value = strength_outer
 		}
 	end
-
-	return 
 end
 
 local TRAVERSED_ACTION_PAIRS = {}
@@ -762,8 +750,6 @@ function parse_weapon_chain(values, unit, item, stat_descriptor, chain_value_fun
 			end
 		end
 	end
-
-	return 
 end
 
 UIUtils.get_tooltip_damage = function (unit, item, stat_descriptor)
@@ -779,6 +765,7 @@ UIUtils.get_tooltip_damage = function (unit, item, stat_descriptor)
 
 	return format_return_string("damage", damages)
 end
+
 UIUtils.get_tooltip_max_targets = function (unit, item, stat_descriptor)
 	local max_targets = {}
 
@@ -792,6 +779,7 @@ UIUtils.get_tooltip_max_targets = function (unit, item, stat_descriptor)
 
 	return format_return_string("max_targets", max_targets)
 end
+
 UIUtils.get_tooltip_stagger_strength = function (unit, item, stat_descriptor)
 	local stagger_strengths = {}
 
@@ -805,6 +793,7 @@ UIUtils.get_tooltip_stagger_strength = function (unit, item, stat_descriptor)
 
 	return format_return_string("stagger_strength", stagger_strengths)
 end
+
 UIUtils.get_tooltip_critical_hit_chance = function (unit, item, stat_descriptor)
 	local critical_hit_chances = {}
 
@@ -818,6 +807,7 @@ UIUtils.get_tooltip_critical_hit_chance = function (unit, item, stat_descriptor)
 
 	return format_return_string("crit", critical_hit_chances)
 end
+
 UIUtils.get_tooltip_time_between_damage = function (unit, item, stat_descriptor)
 	local time_between_damages = {}
 
@@ -827,6 +817,7 @@ UIUtils.get_tooltip_time_between_damage = function (unit, item, stat_descriptor)
 
 	return format_return_string("time_between_damage", time_between_damages)
 end
+
 UIUtils.get_tooltip_boost_coefficient = function (unit, item, stat_descriptor)
 	local boost_coefficients = {}
 
@@ -840,6 +831,7 @@ UIUtils.get_tooltip_boost_coefficient = function (unit, item, stat_descriptor)
 
 	return format_return_string("boost", boost_coefficients)
 end
+
 UIUtils.get_tooltip_headshot_boost_coefficient = function (unit, item, stat_descriptor)
 	local headshot_boost_coefficients = {}
 
@@ -853,6 +845,7 @@ UIUtils.get_tooltip_headshot_boost_coefficient = function (unit, item, stat_desc
 
 	return format_return_string("boost", headshot_boost_coefficients)
 end
+
 UIUtils.get_tooltip_push_angles = function (unit, item, stat_descriptor)
 	local push_angles = {}
 
@@ -860,6 +853,7 @@ UIUtils.get_tooltip_push_angles = function (unit, item, stat_descriptor)
 
 	return format_return_string("push_angle", push_angles)
 end
+
 UIUtils.get_tooltip_push_stagger_strengths = function (unit, item, stat_descriptor)
 	local push_strengths = {}
 
@@ -867,6 +861,7 @@ UIUtils.get_tooltip_push_stagger_strengths = function (unit, item, stat_descript
 
 	return format_return_string("push_strength", push_strengths)
 end
+
 UIUtils.get_hero_statistics_by_template = function (template)
 	local layout = {}
 	local params = {}
@@ -893,4 +888,4 @@ UIUtils.get_hero_statistics_by_template = function (template)
 	return layout
 end
 
-return 
+return

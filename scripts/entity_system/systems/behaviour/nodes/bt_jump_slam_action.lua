@@ -2,12 +2,13 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 local position_lookup = POSITION_LOOKUP
 BTJumpSlamAction = class(BTJumpSlamAction, BTNode)
+
 BTJumpSlamAction.init = function (self, ...)
 	BTJumpSlamAction.super.init(self, ...)
-
-	return 
 end
+
 BTJumpSlamAction.name = "BTJumpSlamAction"
+
 BTJumpSlamAction.enter = function (self, unit, blackboard, t)
 	local data = blackboard.jump_slam_data
 	data.anim_jump_rot_var = Unit.animation_find_variable(unit, "jump_rotation")
@@ -34,9 +35,8 @@ BTJumpSlamAction.enter = function (self, unit, blackboard, t)
 	end
 
 	blackboard.action = action
-
-	return 
 end
+
 BTJumpSlamAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local animation_system = Managers.state.entity:system("animation_system")
 
@@ -63,9 +63,8 @@ BTJumpSlamAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.create_bot_threat_at_t = nil
 	blackboard.current_bot_threat_index = nil
 	blackboard.bot_threats_data = nil
-
-	return 
 end
+
 BTJumpSlamAction.run = function (self, unit, blackboard, t, dt)
 	local data = blackboard.jump_slam_data
 	local velocity = blackboard.locomotion_extension:current_velocity()
@@ -111,6 +110,7 @@ BTJumpSlamAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTJumpSlamAction._calculate_sphere_collision = function (self, action, bot_threat, self_pos, self_rot)
 	local radius = bot_threat.radius or action.radius
 	local offset_forward = bot_threat.offset_forward or action.forward_offset
@@ -119,6 +119,7 @@ BTJumpSlamAction._calculate_sphere_collision = function (self, action, bot_threa
 
 	return sphere_center, radius
 end
+
 BTJumpSlamAction._create_bot_aoe_threat = function (self, jump_data, attack_rotation, action, bot_threat)
 	local bot_threat_duration = bot_threat.duration
 	local hit_position = jump_data.target_pos:unbox()
@@ -126,9 +127,8 @@ BTJumpSlamAction._create_bot_aoe_threat = function (self, jump_data, attack_rota
 	local ai_bot_group_system = Managers.state.entity:system("ai_bot_group_system")
 
 	ai_bot_group_system.aoe_threat_created(ai_bot_group_system, obstacle_position, "sphere", obstacle_size, nil, bot_threat_duration)
-
-	return 
 end
+
 BTJumpSlamAction.progress_to_landing = function (blackboard, unit, data)
 	LocomotionUtils.set_animation_driven_movement(unit, true, false, false)
 	Managers.state.network:anim_event(unit, "attack_jump_land")
@@ -138,9 +138,8 @@ BTJumpSlamAction.progress_to_landing = function (blackboard, unit, data)
 	locomotion.set_movement_type(locomotion, "snap_to_navmesh")
 	locomotion.set_wanted_velocity(locomotion, Vector3.zero())
 	locomotion.set_gravity(locomotion, nil)
-
-	return 
 end
+
 BTJumpSlamAction.progress_to_in_flight = function (blackboard, unit, velocity)
 	LocomotionUtils.set_animation_driven_movement(unit, false, true)
 
@@ -149,8 +148,6 @@ BTJumpSlamAction.progress_to_in_flight = function (blackboard, unit, velocity)
 	locomotion.set_movement_type(locomotion, "script_driven")
 	locomotion.set_gravity(locomotion, blackboard.breed.jump_slam_gravity)
 	locomotion.set_wanted_velocity(locomotion, velocity)
-
-	return 
 end
 
-return 
+return

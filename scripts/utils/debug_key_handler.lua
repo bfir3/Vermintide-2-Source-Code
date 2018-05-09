@@ -35,34 +35,34 @@ DebugKeyHandler = DebugKeyHandler or {
 	keys = {}
 }
 local DebugKeyHandler = DebugKeyHandler
+
 DebugKeyHandler.setup = function (world, input_manager)
 	DebugKeyHandler.gui = World.create_screen_gui(world, "material", "materials/fonts/gw_fonts", "immediate")
 	DebugKeyHandler.enabled = true
 	DebugKeyHandler.input_manager = input_manager
 	DebugKeyHandler.current_y = 0
-
-	return 
 end
+
 DebugKeyHandler.set_enabled = function (enabled)
 	DebugKeyHandler.enabled = enabled
-
-	return 
 end
+
 local blocking_modifiers = {
 	"left ctrl",
 	"left shift",
 	"right ctrl",
 	"left alt"
 }
+
 DebugKeyHandler.key_pressed = function (key, description, category, key_modifier, input_service_name)
 	if not DebugKeyHandler.enabled then
-		return 
+		return
 	end
 
 	local input_service = DebugKeyHandler.input_manager:get_service(input_service_name or "Debug")
 
 	if not input_service then
-		return 
+		return
 	end
 
 	if script_data.debug_key_handler_visible then
@@ -102,6 +102,7 @@ DebugKeyHandler.key_pressed = function (key, description, category, key_modifier
 
 	return modifier_pressed and key_pressed
 end
+
 DebugKeyHandler.frame_clear = function ()
 	DebugKeyHandler.num_keys = 0
 
@@ -112,15 +113,15 @@ DebugKeyHandler.frame_clear = function ()
 
 		table.clear(category_keys)
 	end
-
-	return 
 end
+
 local font_size = 16
 local font = "gw_arial_16"
 local font_mtrl = "materials/fonts/" .. font
+
 DebugKeyHandler.render = function ()
 	if not script_data.debug_key_handler_visible then
-		return 
+		return
 	end
 
 	local offset_lerp = 1
@@ -166,8 +167,6 @@ DebugKeyHandler.render = function ()
 	if not DebugKeyHandler.enabled then
 		Gui.rect(gui, Vector3(res_x - 250, pos.y + font_size, 300), Vector2(250, start_y - pos.y), Color(offset_lerp * 200, 20, 20, 20))
 	end
-
-	return 
 end
 
-return 
+return

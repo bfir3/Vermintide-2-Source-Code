@@ -2,6 +2,7 @@ require("scripts/settings/ui_frame_settings")
 require("scripts/settings/ui_player_portrait_frame_settings")
 
 UIWidgets = UIWidgets or {}
+
 UIWidgets.create_talent_slot = function (scenegraph_id, offset)
 	local counter_offset = {
 		50,
@@ -320,6 +321,7 @@ UIWidgets.create_talent_slot = function (scenegraph_id, offset)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_simple_item_presentation = function (scenegraph_id)
 	return {
 		element = {
@@ -364,6 +366,7 @@ UIWidgets.create_simple_item_presentation = function (scenegraph_id)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_reward_slot = function (texture, scenegraph_id, size, masked, retained)
 	return {
 		element = {
@@ -447,6 +450,7 @@ UIWidgets.create_reward_slot = function (texture, scenegraph_id, size, masked, r
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_talent_tree_background = function (scenegraph_id, size, title_text)
 	local background_color = Colors.get_color_table_with_alpha("black", 220)
 	local slot_color = Colors.get_color_table_with_alpha("gray", 50)
@@ -590,6 +594,7 @@ UIWidgets.create_talent_tree_background = function (scenegraph_id, size, title_t
 
 	return widget
 end
+
 UIWidgets.create_hero_frame = function (scenegraph_id, size, frame_name, background_texture)
 	background_texture = background_texture or "menu_frame_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -664,6 +669,7 @@ UIWidgets.create_hero_frame = function (scenegraph_id, size, frame_name, backgro
 		}
 	}
 end
+
 UIWidgets.create_recipe_grid = function (scenegraph_id, size, rows, slots_per_row, slot_width_spacing, slot_height_spacing)
 	local default_color = {
 		255,
@@ -943,6 +949,7 @@ UIWidgets.create_recipe_grid = function (scenegraph_id, size, rows, slots_per_ro
 
 	return widget
 end
+
 UIWidgets.create_grid = function (scenegraph_id, size, rows, slots_per_row, slot_width_spacing, slot_height_spacing, use_pages)
 	local default_color = {
 		255,
@@ -1463,8 +1470,6 @@ UIWidgets.create_grid = function (scenegraph_id, size, rows, slots_per_row, slot
 							ItemHelper.unmark_backend_id_as_new(backend_id)
 						end
 					end
-
-					return 
 				end
 			}
 			style[new_icon_name] = {
@@ -1497,6 +1502,7 @@ UIWidgets.create_grid = function (scenegraph_id, size, rows, slots_per_row, slot
 
 	return widget
 end
+
 UIWidgets.create_simple_inventory_item = function (scenegraph_id, size)
 	local widget = {
 		element = {}
@@ -1635,6 +1641,7 @@ UIWidgets.create_simple_inventory_item = function (scenegraph_id, size)
 
 	return widget
 end
+
 UIWidgets.create_loadout_grid = function (scenegraph_id, size, rows, spacing, align_horizontal)
 	local default_color = {
 		255,
@@ -1935,6 +1942,7 @@ UIWidgets.create_loadout_grid = function (scenegraph_id, size, rows, spacing, al
 
 	return widget
 end
+
 UIWidgets.create_inventory_statistics = function (scenegraph_id, size, background_texture)
 	local background_color = Colors.get_color_table_with_alpha("black", 220)
 	local slot_color = Colors.get_color_table_with_alpha("gray", 50)
@@ -2122,6 +2130,7 @@ UIWidgets.create_inventory_statistics = function (scenegraph_id, size, backgroun
 
 	return widget
 end
+
 UIWidgets.create_weapon_statistics = function (scenegraph_id, size)
 	local font_default_color = Colors.get_color_table_with_alpha("font_default", 255)
 	local font_title_color = Colors.get_color_table_with_alpha("font_title", 255)
@@ -2480,6 +2489,7 @@ UIWidgets.create_weapon_statistics = function (scenegraph_id, size)
 
 	return widget
 end
+
 UIWidgets.create_background_with_frame = function (scenegraph_id, size, background_texture, frame_style)
 	background_texture = background_texture or "menu_frame_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -2558,6 +2568,7 @@ UIWidgets.create_background_with_frame = function (scenegraph_id, size, backgrou
 
 	return widget
 end
+
 UIWidgets.create_rect_with_frame = function (scenegraph_id, size, rect_color, frame_style)
 	local frame_settings = (frame_style and UIFrameSettings[frame_style]) or UIFrameSettings.menu_frame_02
 	local widget = {
@@ -2619,6 +2630,7 @@ UIWidgets.create_rect_with_frame = function (scenegraph_id, size, rect_color, fr
 
 	return widget
 end
+
 UIWidgets.create_background = function (scenegraph_id, size, background_texture, optional_color)
 	background_texture = background_texture or "menu_frame_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -2674,6 +2686,7 @@ UIWidgets.create_background = function (scenegraph_id, size, background_texture,
 
 	return widget
 end
+
 UIWidgets.create_frame = function (scenegraph_id, size, frame_style, layer)
 	local frame_settings = (frame_style and UIFrameSettings[frame_style]) or UIFrameSettings.menu_frame_02
 	local widget = {
@@ -2718,6 +2731,7 @@ UIWidgets.create_frame = function (scenegraph_id, size, frame_style, layer)
 
 	return widget
 end
+
 UIWidgets.create_craft_recipe_window = function (scenegraph_id, size, num_components, background_texture)
 	local default_color = Colors.get_color_table_with_alpha("white", 255)
 	local background_texture = background_texture or "menu_frame_bg_01"
@@ -2924,6 +2938,7 @@ UIWidgets.create_craft_recipe_window = function (scenegraph_id, size, num_compon
 
 	return widget
 end
+
 UIWidgets.create_hero_view_button = function (scenegraph_id, size, text, background_texture, masked)
 	background_texture = background_texture or "button_frame_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -3254,6 +3269,7 @@ UIWidgets.create_hero_view_button = function (scenegraph_id, size, text, backgro
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_reward_slot_grid = function (scenegraph_id, size, slot_size, grid_offset, rows, slots_per_row, background_texture)
 	local default_color = {
 		255,
@@ -3455,6 +3471,7 @@ UIWidgets.create_reward_slot_grid = function (scenegraph_id, size, slot_size, gr
 
 	return widget
 end
+
 UIWidgets.create_reward_card = function (scenegraph_id, size)
 	local default_color = {
 		255,
@@ -3629,6 +3646,7 @@ UIWidgets.create_reward_card = function (scenegraph_id, size)
 
 	return widget
 end
+
 UIWidgets.create_score_topic = function (scenegraph_id, size)
 	local background_texture = "menu_frame_bg_04"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -3814,6 +3832,7 @@ UIWidgets.create_score_topic = function (scenegraph_id, size)
 		}
 	}
 end
+
 UIWidgets.create_experience_entry = function (scenegraph_id, size)
 	return {
 		element = {
@@ -3869,6 +3888,7 @@ UIWidgets.create_experience_entry = function (scenegraph_id, size)
 		}
 	}
 end
+
 UIWidgets.create_background_masked_text = function (scenegraph_id, size, text, background_texture, font_size, color, text_style, optional_font_style, retained)
 	background_texture = background_texture or "summary_screen_03"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -3951,6 +3971,7 @@ UIWidgets.create_background_masked_text = function (scenegraph_id, size, text, b
 
 	return slot10
 end
+
 UIWidgets.create_summary_entry = function (scenegraph_id, size, index)
 	return {
 		element = {
@@ -4047,6 +4068,7 @@ UIWidgets.create_summary_entry = function (scenegraph_id, size, index)
 		}
 	}
 end
+
 UIWidgets.create_chest_score_entry = function (scenegraph_id, size, index)
 	return {
 		element = {
@@ -4296,6 +4318,7 @@ UIWidgets.create_chest_score_entry = function (scenegraph_id, size, index)
 		}
 	}
 end
+
 UIWidgets.create_score_list = function (scenegraph_id, size, rows)
 	local metal_bg_texture = "menu_frame_bg_01"
 	local paper_bg_texture = "scoreboard_bg"
@@ -4832,6 +4855,7 @@ UIWidgets.create_score_list = function (scenegraph_id, size, rows)
 
 	return widget
 end
+
 UIWidgets.create_level_up_widget = function (scenegraph_id, size)
 	return {
 		element = {
@@ -4905,6 +4929,7 @@ UIWidgets.create_level_up_widget = function (scenegraph_id, size)
 		}
 	}
 end
+
 UIWidgets.create_experience_bar = function (scenegraph_id, size, masked)
 	local frame_settings = UIFrameSettings.menu_frame_06
 
@@ -5096,6 +5121,7 @@ UIWidgets.create_experience_bar = function (scenegraph_id, size, masked)
 		}
 	}
 end
+
 UIWidgets.create_statistics_bar = function (scenegraph_id, size, optional_detail_texture, optional_detail_offset)
 	local frame_settings = UIFrameSettings.menu_frame_06
 	local side_detail_texture = optional_detail_texture or "button_detail_03"
@@ -5153,8 +5179,6 @@ UIWidgets.create_statistics_bar = function (scenegraph_id, size, optional_detail
 						local start_offset = experience_bar_style.offset[1]
 						style.offset[1] = math.floor(experience_bar_style.size[1] + start_offset)
 						style.size[1] = math.min(40, experience_bar_style.default_size[1] - style.offset[1] - start_offset)
-
-						return 
 					end
 				},
 				{
@@ -5369,6 +5393,7 @@ UIWidgets.create_statistics_bar = function (scenegraph_id, size, optional_detail
 		}
 	}
 end
+
 UIWidgets.create_summary_experience_bar = function (scenegraph_id, size)
 	return {
 		element = {
@@ -5458,6 +5483,7 @@ UIWidgets.create_summary_experience_bar = function (scenegraph_id, size)
 		}
 	}
 end
+
 UIWidgets.create_talent_tab = function (scenegraph_id, size)
 	local default_color = {
 		255,
@@ -5621,6 +5647,7 @@ UIWidgets.create_talent_tab = function (scenegraph_id, size)
 
 	return widget
 end
+
 UIWidgets.create_tab_selector = function (scenegraph_id, size, height, slot_icons, slot_texts)
 	local default_color = {
 		255,
@@ -6031,6 +6058,7 @@ UIWidgets.create_tab_selector = function (scenegraph_id, size, height, slot_icon
 
 	return widget
 end
+
 UIWidgets.create_character_selection_frame = function (scenegraph_id, size)
 	local background_texture = "tab_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -6317,6 +6345,7 @@ UIWidgets.create_character_selection_frame = function (scenegraph_id, size)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_career_summary_window = function (scenegraph_id, size)
 	local background_texture = "menu_frame_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -6571,6 +6600,7 @@ UIWidgets.create_career_summary_window = function (scenegraph_id, size)
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_default_button = function (scenegraph_id, size, frame_name, background_texture, text, font_size, optional_color_name, optional_detail_texture, optional_detail_offset, disable_with_gamepad)
 	background_texture = background_texture or "button_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -6931,6 +6961,7 @@ UIWidgets.create_default_button = function (scenegraph_id, size, frame_name, bac
 		}
 	}
 end
+
 UIWidgets.create_default_image_button = function (scenegraph_id, size, frame_name, background_texture, text, font_size, background_icon, optional_color_name, optional_detail_texture, optional_detail_offset)
 	background_texture = background_texture or "button_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -7345,6 +7376,7 @@ UIWidgets.create_default_image_button = function (scenegraph_id, size, frame_nam
 		}
 	}
 end
+
 UIWidgets.create_default_icon_tabs = function (scenegraph_id, size, amount)
 	local background_texture = "button_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -7595,6 +7627,7 @@ UIWidgets.create_default_icon_tabs = function (scenegraph_id, size, amount)
 
 	return widget
 end
+
 UIWidgets.create_default_checkbox_button = function (scenegraph_id, size, text, font_size, tooltip_info)
 	local background_texture = "button_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -8004,6 +8037,7 @@ UIWidgets.create_default_checkbox_button = function (scenegraph_id, size, text, 
 
 	return widget
 end
+
 UIWidgets.create_default_text_tabs = function (scenegraph_id, size, amount)
 	local background_texture = "button_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -8295,6 +8329,7 @@ UIWidgets.create_default_text_tabs = function (scenegraph_id, size, amount)
 
 	return widget
 end
+
 UIWidgets.create_simple_window_button = function (scenegraph_id, size, text, font_size, background_texture)
 	background_texture = background_texture or "button_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -8555,6 +8590,7 @@ UIWidgets.create_simple_window_button = function (scenegraph_id, size, text, fon
 		}
 	}
 end
+
 UIWidgets.create_window_category_button = function (scenegraph_id, size, button_text, icon_name, background_icon)
 	icon_name = icon_name or "options_button_icon_quickplay"
 	local icon_glow_name = icon_name .. "_glow"
@@ -8598,8 +8634,6 @@ UIWidgets.create_window_category_button = function (scenegraph_id, size, button_
 
 						if not button_hotspot.disable_button and not button_hotspot.is_selected then
 						end
-
-						return 
 					end
 				},
 				{
@@ -9125,6 +9159,7 @@ UIWidgets.create_window_category_button = function (scenegraph_id, size, button_
 
 	return widget
 end
+
 UIWidgets.create_play_button = function (scenegraph_id, size, text, font_size)
 	local button_color_name = nil
 	local optional_color_name = "green"
@@ -9611,6 +9646,7 @@ UIWidgets.create_play_button = function (scenegraph_id, size, text, font_size)
 		}
 	}
 end
+
 UIWidgets.create_icon_button = function (scenegraph_id, size, frame_name, background_texture, text, font_size)
 	background_texture = background_texture or "tab_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -9808,6 +9844,7 @@ UIWidgets.create_icon_button = function (scenegraph_id, size, frame_name, backgr
 		}
 	}
 end
+
 UIWidgets.create_stepper = function (scenegraph_id, size, frame_name, background_texture, text)
 	background_texture = background_texture or "tab_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -10280,6 +10317,7 @@ UIWidgets.create_stepper = function (scenegraph_id, size, frame_name, background
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_title_and_tooltip = function (scenegraph_id, size, text, tooltip_text, text_style, tooltip_style)
 	return {
 		element = {
@@ -10341,6 +10379,7 @@ UIWidgets.create_title_and_tooltip = function (scenegraph_id, size, text, toolti
 		scenegraph_id = scenegraph_id
 	}
 end
+
 UIWidgets.create_icon_selector = function (scenegraph_id, icon_size, slot_icons, slot_spacing, use_frame, optional_frame_size, optional_allow_multi_hover)
 	local default_color = {
 		255,
@@ -10517,6 +10556,7 @@ UIWidgets.create_icon_selector = function (scenegraph_id, icon_size, slot_icons,
 
 	return widget
 end
+
 UIWidgets.create_title_widget = function (scenegraph_id, size, title_text, use_fade, disable_detail, flip_fade, font_size)
 	local widget = {
 		element = {}
@@ -10716,6 +10756,7 @@ UIWidgets.create_title_widget = function (scenegraph_id, size, title_text, use_f
 
 	return widget
 end
+
 UIWidgets.create_large_window_title = function (scenegraph_id, size, text, font_size)
 	local background_texture = "menu_frame_bg_01"
 	local background_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(background_texture)
@@ -10938,7 +10979,9 @@ UIWidgets.create_large_window_title = function (scenegraph_id, size, text, font_
 		}
 	}
 end
+
 GAMEPAD_CURSOR_SIZE = 64
+
 UIWidgets.create_console_cursor = function (scenegraph_id)
 	local widget = {
 		element = {}
@@ -10987,6 +11030,7 @@ UIWidgets.create_console_cursor = function (scenegraph_id)
 
 	return widget
 end
+
 UIWidgets.create_difficulty_selector = function (scenegraph_id, size, spacing, amount, image_size)
 	local default_color = {
 		255,
@@ -11174,6 +11218,7 @@ UIWidgets.create_difficulty_selector = function (scenegraph_id, size, spacing, a
 
 	return widget
 end
+
 UIWidgets.create_portrait_frame = function (scenegraph_id, frame_settings_name, level_text, scale, retained_mode, portrait_texture)
 	scale = scale or 1
 	local frame_settings = UIPlayerPortraitFrameSettings[frame_settings_name]
@@ -11294,6 +11339,7 @@ UIWidgets.create_portrait_frame = function (scenegraph_id, frame_settings_name, 
 
 	return widget
 end
+
 UIWidgets.create_portrait_frame_button = function (scenegraph_id, frame_settings_name, scale, retained_mode, portrait_texture)
 	scale = scale or 1
 	local frame_settings = UIPlayerPortraitFrameSettings[frame_settings_name]
@@ -11412,6 +11458,7 @@ UIWidgets.create_portrait_frame_button = function (scenegraph_id, frame_settings
 
 	return widget
 end
+
 UIWidgets.create_cosmetic_list = function (scenegraph_id, size, amount)
 	local default_color = {
 		255,
@@ -12151,6 +12198,7 @@ UIWidgets.create_cosmetic_list = function (scenegraph_id, size, amount)
 
 	return widget
 end
+
 UIWidgets.create_score_entry = function (scenegraph_id, size, num_rows, side)
 	local default_color = {
 		255,
@@ -12575,6 +12623,7 @@ UIWidgets.create_score_entry = function (scenegraph_id, size, num_rows, side)
 
 	return widget
 end
+
 UIWidgets.create_score_topics = function (scenegraph_id, size, hover_hotspot_length, num_rows)
 	local default_color = {
 		255,
@@ -12968,6 +13017,7 @@ UIWidgets.create_score_topics = function (scenegraph_id, size, hover_hotspot_len
 
 	return widget
 end
+
 UIWidgets.create_page_dot_selector = function (scenegraph_id, amount)
 	local default_color = {
 		255,
@@ -13075,6 +13125,7 @@ UIWidgets.create_page_dot_selector = function (scenegraph_id, amount)
 
 	return widget
 end
+
 UIWidgets.create_text_input_rect = function (scenegraph_id, size, text_offset)
 	local passes = {
 		{
@@ -13165,4 +13216,4 @@ UIWidgets.create_text_input_rect = function (scenegraph_id, size, text_offset)
 	return widget
 end
 
-return 
+return

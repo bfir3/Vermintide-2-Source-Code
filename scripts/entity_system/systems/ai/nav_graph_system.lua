@@ -5,6 +5,7 @@ local extensions = {
 	"LevelUnitSmartObjectExtension"
 }
 script_data.nav_mesh_debug = script_data.nav_mesh_debug or Development.parameter("nav_mesh_debug")
+
 NavGraphSystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
@@ -61,18 +62,17 @@ NavGraphSystem.init = function (self, context, system_name)
 	self.smart_object_ids = {}
 	self.line_object = World.create_line_object(self.world)
 	self.initialized_unit_nav_graphs = {}
-
-	return 
 end
+
 NavGraphSystem.destroy = function (self)
 	World.destroy_line_object(self.world, self.line_object)
 
 	self.line_object = nil
 	self.initialized_unit_nav_graphs = nil
-
-	return 
 end
+
 local control_points = {}
+
 NavGraphSystem.init_nav_graphs = function (self, unit, smart_object_id, extension)
 	local nav_world = self.nav_world
 	local level = LevelHelper:current_level(self.world)
@@ -151,9 +151,8 @@ NavGraphSystem.init_nav_graphs = function (self, unit, smart_object_id, extensio
 	end
 
 	self.initialized_unit_nav_graphs[unit] = true
-
-	return 
 end
+
 NavGraphSystem.on_add_extension = function (self, world, unit, extension_name)
 	local extension = {
 		navgraphs = {}
@@ -195,6 +194,7 @@ NavGraphSystem.on_add_extension = function (self, world, unit, extension_name)
 
 	return extension
 end
+
 NavGraphSystem._level_unit_smart_object_id = function (self, unit)
 	local level = LevelHelper:current_level(self.world)
 	local unit_level_id = Level.unit_index(level, unit)
@@ -204,6 +204,7 @@ NavGraphSystem._level_unit_smart_object_id = function (self, unit)
 
 	return smart_object_id
 end
+
 NavGraphSystem.init_nav_graph_from_flow = function (self, unit)
 	local extension = self.unit_extension_data[unit]
 
@@ -219,9 +220,8 @@ NavGraphSystem.init_nav_graph_from_flow = function (self, unit)
 	if smart_object_id and self.smart_objects[smart_object_id] and not self.no_nav_mesh then
 		self.init_nav_graphs(self, unit, smart_object_id, extension)
 	end
-
-	return 
 end
+
 NavGraphSystem.smart_object_from_unit_data = function (self, unit, smart_object_id)
 	local smart_object = {}
 	local i = 0
@@ -295,6 +295,7 @@ NavGraphSystem.smart_object_from_unit_data = function (self, unit, smart_object_
 
 	return smart_object
 end
+
 NavGraphSystem.on_remove_extension = function (self, unit, extension_name)
 	ScriptUnit.remove_extension(unit, self.NAME)
 
@@ -307,9 +308,8 @@ NavGraphSystem.on_remove_extension = function (self, unit, extension_name)
 	end
 
 	self.unit_extension_data[unit] = nil
-
-	return 
 end
+
 NavGraphSystem.update = function (self, context, t, dt)
 	if self._nav_mesh_debug or script_data.nav_mesh_debug then
 		self._nav_mesh_debug = script_data.nav_mesh_debug
@@ -328,12 +328,12 @@ NavGraphSystem.update = function (self, context, t, dt)
 		Debug.text("WARNING: Using old smart objects. Found version=%s Wanted version=%s", tostring(self.ledgelator_version), WANTED_LEDGELATOR_VERSION)
 		Debug.text("Re-generate and save from level editor, then run generate_resource_packages.bat")
 	end
+end
 
-	return 
-end
 NavGraphSystem.hot_join_sync = function (self, sender)
-	return 
+	return
 end
+
 NavGraphSystem.get_smart_object_type = function (self, smart_object_id)
 	if self.smart_object_types[smart_object_id] == nil then
 		slot2 = 1
@@ -341,14 +341,17 @@ NavGraphSystem.get_smart_object_type = function (self, smart_object_id)
 
 	return self.smart_object_types[smart_object_id]
 end
+
 NavGraphSystem.get_smart_object_data = function (self, smart_object_id)
 	return self.smart_object_data[smart_object_id]
 end
+
 NavGraphSystem.get_smart_objects = function (self, smart_object_id)
 	return self.smart_objects[smart_object_id]
 end
+
 NavGraphSystem.get_smart_object_id = function (self, unit)
 	return self.smart_object_ids[unit]
 end
 
-return 
+return

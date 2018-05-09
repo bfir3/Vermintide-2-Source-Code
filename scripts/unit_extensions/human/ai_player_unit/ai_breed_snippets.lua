@@ -32,8 +32,6 @@ local function set_initial_aggro(unit, blackboard)
 
 		print("Boss gave ", best_enemy, "initial aggro")
 	end
-
-	return 
 end
 
 local function setup_start_angry(unit, blackboard, conflict_director)
@@ -66,8 +64,6 @@ local function setup_start_angry(unit, blackboard, conflict_director)
 
 		set_initial_aggro(unit, blackboard)
 	end
-
-	return 
 end
 
 AiBreedSnippets.on_rat_ogre_spawn = function (unit, blackboard)
@@ -82,9 +78,8 @@ AiBreedSnippets.on_rat_ogre_spawn = function (unit, blackboard)
 	setup_start_angry(unit, blackboard, conflict_director)
 	conflict_director.freeze_intensity_decay(conflict_director, 10)
 	conflict_director.add_unit_to_bosses(conflict_director, unit)
-
-	return 
 end
+
 AiBreedSnippets.on_rat_ogre_death = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -95,9 +90,8 @@ AiBreedSnippets.on_rat_ogre_death = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_rat_ogre_despawn = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -108,8 +102,6 @@ AiBreedSnippets.on_rat_ogre_despawn = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
 
 local function stop_stormfiend_firewall_ambience(unit, blackboard)
@@ -130,8 +122,6 @@ local function stop_stormfiend_firewall_ambience(unit, blackboard)
 
 	local group_blackboard = blackboard.group_blackboard
 	group_blackboard.firewall_environment_intensity = 0
-
-	return 
 end
 
 AiBreedSnippets.on_stormfiend_spawn = function (unit, blackboard)
@@ -152,9 +142,8 @@ AiBreedSnippets.on_stormfiend_spawn = function (unit, blackboard)
 
 		audio_system.play_2d_audio_event(audio_system, "Play_stormfiend_ambience")
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_stormfiend_death = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -171,9 +160,8 @@ AiBreedSnippets.on_stormfiend_death = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_stormfiend_despawn = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -190,9 +178,8 @@ AiBreedSnippets.on_stormfiend_despawn = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_stormfiend_demo_death = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -211,9 +198,8 @@ AiBreedSnippets.on_stormfiend_demo_death = function (unit, blackboard)
 	end
 
 	AiBreedSnippets.on_stormfiend_demo_shoot(unit, blackboard)
-
-	return 
 end
+
 AiBreedSnippets.on_stormfiend_demo_despawn = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -232,9 +218,8 @@ AiBreedSnippets.on_stormfiend_demo_despawn = function (unit, blackboard)
 	end
 
 	AiBreedSnippets.on_stormfiend_demo_shoot(unit, blackboard)
-
-	return 
 end
+
 AiBreedSnippets.on_stormfiend_demo_shoot = function (unit, blackboard)
 	local world = blackboard.world
 
@@ -256,9 +241,8 @@ AiBreedSnippets.on_stormfiend_demo_shoot = function (unit, blackboard)
 	local audio_system = Managers.state.entity:system("audio_system")
 
 	audio_system.set_global_parameter_with_lerp(audio_system, "demo_slowmo", inverted_value)
-
-	return 
 end
+
 AiBreedSnippets.on_loot_rat_update = function (unit, blackboard, t)
 	local t = Managers.time:time("game")
 	local cooldown_time = blackboard.dodge_cooldown_time
@@ -273,9 +257,8 @@ AiBreedSnippets.on_loot_rat_update = function (unit, blackboard, t)
 			blackboard.dodge_cooldown_time = t + blackboard.breed.dodge_cooldown
 		end
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_loot_rat_alerted = function (unit, blackboard, alerting_unit, enemy_unit)
 	local t = Managers.time:time("game")
 	local cooldown_time = blackboard.dodge_cooldown_time
@@ -309,18 +292,16 @@ AiBreedSnippets.on_loot_rat_alerted = function (unit, blackboard, alerting_unit,
 		blackboard.threat_vector = threat_vector
 		blackboard.dodge_cooldown_time = t + blackboard.breed.dodge_cooldown
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_loot_rat_stagger_action_done = function (unit)
 	if Unit.alive(unit) then
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
 		health_extension.regen_dodge_damage_points(health_extension)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_troll_spawn = function (unit, blackboard)
 	blackboard.aggro_list = {}
 	blackboard.fling_skaven_timer = 0
@@ -346,9 +327,8 @@ AiBreedSnippets.on_chaos_troll_spawn = function (unit, blackboard)
 		conflict_director.freeze_intensity_decay(conflict_director, 10)
 		conflict_director.add_unit_to_bosses(conflict_director, unit)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_troll_death = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -359,9 +339,8 @@ AiBreedSnippets.on_chaos_troll_death = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_troll_despawn = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -372,9 +351,8 @@ AiBreedSnippets.on_chaos_troll_despawn = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_dummy_troll_spawn = function (unit, blackboard)
 	blackboard.aggro_list = {}
 	blackboard.can_get_downed = true
@@ -385,9 +363,8 @@ AiBreedSnippets.on_chaos_dummy_troll_spawn = function (unit, blackboard)
 	blackboard.health_regen_per_sec = breed.health_regen_per_sec[difficulty_rank]
 	blackboard.idle_sound_timer = Managers.time:time("game") + 2
 	blackboard.play_alert = true
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_dummy_troll_update = function (unit, blackboard)
 	local t = Managers.time:time("game")
 	local idle_sound_timer = blackboard.idle_sound_timer
@@ -408,22 +385,19 @@ AiBreedSnippets.on_chaos_dummy_troll_update = function (unit, blackboard)
 
 		blackboard.idle_sound_timer = nil
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_dummy_troll_death = function (unit, blackboard)
 	local audio_system = Managers.state.entity:system("audio_system")
 
 	audio_system.play_audio_unit_event(audio_system, "Play_enemy_troll_vce_hurt", unit)
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_dummy_sorcerer_spawn = function (unit, blackboard, t)
 	local health_extension = ScriptUnit.extension(unit, "health_system")
 	health_extension.is_invincible = true
-
-	return 
 end
+
 AiBreedSnippets.on_storm_vermin_champion_spawn = function (unit, blackboard)
 	local breed = blackboard.breed
 	blackboard.aggro_list = {}
@@ -479,17 +453,15 @@ AiBreedSnippets.on_storm_vermin_champion_spawn = function (unit, blackboard)
 
 		blackboard.spawn_allies_positions = spawn_allies_positions
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_storm_vermin_champion_husk_spawn = function (unit)
 	local actor = Unit.actor(unit, "c_trophy_rack_ward")
 
 	Actor.set_collision_enabled(actor, false)
 	Actor.set_scene_query_enabled(actor, false)
-
-	return 
 end
+
 AiBreedSnippets.on_storm_vermin_hot_join_sync = function (sender, unit)
 	local bb = BLACKBOARDS[unit]
 
@@ -499,9 +471,8 @@ AiBreedSnippets.on_storm_vermin_hot_join_sync = function (sender, unit)
 
 		RPC.rpc_set_ward_state(sender, unit_id, true)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_storm_vermin_champion_update = function (unit, blackboard, t, dt)
 	local self_pos = POSITION_LOOKUP[unit]
 	local range = BreedActions.skaven_storm_vermin_champion.special_attack_spin.radius
@@ -580,9 +551,8 @@ AiBreedSnippets.on_storm_vermin_champion_update = function (unit, blackboard, t,
 	if blackboard.displaced_units then
 		AiUtils.push_intersecting_players(unit, blackboard.displaced_units, breed.displace_players_data, t, dt)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_storm_vermin_champion_death = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -598,9 +568,8 @@ AiBreedSnippets.on_storm_vermin_champion_death = function (unit, blackboard)
 	end
 
 	AiBreedSnippets.kill_lord_reward(2, Vector3(166.5, -46, 38))
-
-	return 
 end
+
 AiBreedSnippets.on_storm_vermin_champion_despawn = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -610,27 +579,24 @@ AiBreedSnippets.on_storm_vermin_champion_despawn = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_warrior_spawn = function (unit, blackboard)
 	blackboard.displaced_units = {}
 	blackboard.aggro_list = {}
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_warrior_update = function (unit, blackboard, t)
 	local breed = blackboard.breed
 	local displace_players_data = breed.displace_players_data
 
 	if not displace_players_data or not AiUtils.unit_alive(unit) then
-		return 
+		return
 	end
 
 	AiUtils.push_intersecting_players(unit, blackboard.displaced_units, displace_players_data, t)
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_tentacle_despawn = function (unit, blackboard)
 	local tentacle_data = blackboard.tentacle_data
 
@@ -649,9 +615,8 @@ AiBreedSnippets.on_chaos_tentacle_despawn = function (unit, blackboard)
 		boss_blackboard.num_portals_alive = boss_blackboard.num_portals_alive - 1
 		boss_blackboard.tentacle_portal_units[unit] = nil
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_spawn_spawn = function (unit, blackboard)
 	local breed = blackboard.breed
 	blackboard.aggro_list = {}
@@ -667,9 +632,8 @@ AiBreedSnippets.on_chaos_spawn_spawn = function (unit, blackboard)
 	setup_start_angry(unit, blackboard, conflict_director)
 	conflict_director.freeze_intensity_decay(conflict_director, 10)
 	conflict_director.add_unit_to_bosses(conflict_director, unit)
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_spawn_death = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -679,9 +643,8 @@ AiBreedSnippets.on_chaos_spawn_death = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_spawn_despawn = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -691,16 +654,14 @@ AiBreedSnippets.on_chaos_spawn_despawn = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_vortex_sorcerer_spawn = function (unit, blackboard)
 	local breed = blackboard.breed
 	blackboard.max_vortex_units = breed.max_vortex_units
 	blackboard.spell_count = 0
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_vortex_sorcerer_death = function (unit, blackboard)
 	local vortex_data = blackboard.vortex_data
 	local vortex_units = vortex_data and vortex_data.vortex_units
@@ -716,9 +677,8 @@ AiBreedSnippets.on_chaos_vortex_sorcerer_death = function (unit, blackboard)
 			end
 		end
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_vortex_sorcerer_despawn = function (unit, blackboard)
 	local vortex_data = blackboard.vortex_data
 	local vortex_units = vortex_data and vortex_data.vortex_units
@@ -734,19 +694,16 @@ AiBreedSnippets.on_chaos_vortex_sorcerer_despawn = function (unit, blackboard)
 			end
 		end
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_plague_sorcerer_spawn = function (unit, blackboard)
 	blackboard.spell_count = 0
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_tentacle_sorcerer_spawn = function (unit, blackboard)
 	blackboard.spell_count = 0
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_sorcerer_spawn = function (unit, blackboard)
 	local t = Managers.time:time("game")
 	local breed = blackboard.breed
@@ -923,6 +880,7 @@ AiBreedSnippets.on_chaos_exalted_sorcerer_spawn = function (unit, blackboard)
 		local arena_pose_box = Matrix4x4Box(Matrix4x4.from_quaternion_position(arena_rot, arena_center_pos))
 		blackboard.arena_pose_boxed = arena_pose_box
 		blackboard.arena_half_extents = Vector3Box(12, 12, 1)
+
 		blackboard.valid_teleport_pos_func = function (pos, blackboard)
 			local pose = blackboard.arena_pose_boxed:unbox()
 			local half_extents = blackboard.arena_half_extents:unbox()
@@ -932,6 +890,7 @@ AiBreedSnippets.on_chaos_exalted_sorcerer_spawn = function (unit, blackboard)
 		end
 	else
 		blackboard.phase = "offensive"
+
 		blackboard.valid_teleport_pos_func = function (pos, blackboard)
 			return true
 		end
@@ -960,9 +919,8 @@ AiBreedSnippets.on_chaos_exalted_sorcerer_spawn = function (unit, blackboard)
 	conflict_director.add_unit_to_bosses(conflict_director, unit)
 
 	blackboard.is_valid_target_func = GenericStatusExtension.is_lord_target
-
-	return 
 end
+
 local min_retaliation_dist_sqr = 100
 
 function check_for_recent_attackers(unit, blackboard, t)
@@ -991,20 +949,19 @@ function check_for_recent_attackers(unit, blackboard, t)
 		blackboard.recent_attacker_timer = math.huge
 		blackboard.recent_attacker = false
 	end
-
-	return 
 end
 
 local show_arena_extents = false
+
 AiBreedSnippets.on_chaos_exalted_sorcerer_update = function (unit, blackboard, t, dt)
 	check_for_recent_attackers(unit, blackboard, t)
 
 	if not blackboard.in_boss_arena then
-		return 
+		return
 	end
 
 	if blackboard.intro_timer then
-		return 
+		return
 	end
 
 	if show_arena_extents then
@@ -1049,9 +1006,8 @@ AiBreedSnippets.on_chaos_exalted_sorcerer_update = function (unit, blackboard, t
 
 		blackboard.missle_bot_threat_unit = nil
 	end
-
-	return 
 end
+
 AiBreedSnippets.kill_lord_reward = function (num_die, pos)
 	local pickup_name = "loot_die"
 
@@ -1072,9 +1028,8 @@ AiBreedSnippets.kill_lord_reward = function (num_die, pos)
 
 		Managers.state.unit_spawner:spawn_network_unit(unit_name, unit_template_name, extension_init_data, position, rotation)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_sorcerer_death = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -1089,9 +1044,8 @@ AiBreedSnippets.on_chaos_exalted_sorcerer_death = function (unit, blackboard)
 	end
 
 	AiBreedSnippets.kill_lord_reward(2, Vector3(362.5, 51.6, -9.1))
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_sorcerer_despawn = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -1100,9 +1054,8 @@ AiBreedSnippets.on_chaos_exalted_sorcerer_despawn = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_champion_spawn = function (unit, blackboard)
 	local t = Managers.time:time("game")
 	local breed = blackboard.breed
@@ -1140,9 +1093,8 @@ AiBreedSnippets.on_chaos_exalted_champion_spawn = function (unit, blackboard)
 
 	blackboard.is_valid_target_func = GenericStatusExtension.is_lord_target
 	blackboard.num_times_hit_chaos_warrior = 0
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_champion_norsca_spawn = function (unit, blackboard)
 	local t = Managers.time:time("game")
 	local breed = blackboard.breed
@@ -1165,9 +1117,8 @@ AiBreedSnippets.on_chaos_exalted_champion_norsca_spawn = function (unit, blackbo
 	blackboard.is_angry = true
 	blackboard.ray_can_go_update_time = t + 0.5
 	blackboard.is_valid_target_func = GenericStatusExtension.is_lord_target
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_champion_update = function (unit, blackboard, t, dt)
 	local self_pos = POSITION_LOOKUP[unit]
 	local breed = blackboard.breed
@@ -1261,9 +1212,8 @@ AiBreedSnippets.on_chaos_exalted_champion_update = function (unit, blackboard, t
 		blackboard.ray_can_go_to_target = LocomotionUtils.ray_can_go_on_mesh(nav_world, POSITION_LOOKUP[unit], target_position, nil, 1, 1)
 		blackboard.ray_can_go_update_time = t + 0.5
 	end
-
-	return 
 end
+
 AiBreedSnippets.update_exalted_champion_cheer_state = function (unit, blackboard, t, dt, player_average_hp)
 	local network_manager = Managers.state.network
 	local network_transmit = network_manager.network_transmit
@@ -1295,9 +1245,8 @@ AiBreedSnippets.update_exalted_champion_cheer_state = function (unit, blackboard
 
 		blackboard.walla_sync_timer = t + 2
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_champion_norsca_update = function (unit, blackboard, t, dt)
 	local self_pos = POSITION_LOOKUP[unit]
 	local breed = blackboard.breed
@@ -1317,9 +1266,8 @@ AiBreedSnippets.on_chaos_exalted_champion_norsca_update = function (unit, blackb
 		blackboard.ray_can_go_to_target = LocomotionUtils.ray_can_go_on_mesh(nav_world, POSITION_LOOKUP[unit], target_position, nil, 1, 1)
 		blackboard.ray_can_go_update_time = t + 0.5
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_champion_death = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -1340,9 +1288,8 @@ AiBreedSnippets.on_chaos_exalted_champion_death = function (unit, blackboard)
 	end
 
 	AiBreedSnippets.kill_lord_reward(2, Vector3(231, -75, 45))
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_champion_norsca_death = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -1356,9 +1303,8 @@ AiBreedSnippets.on_chaos_exalted_champion_norsca_death = function (unit, blackbo
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_chaos_exalted_champion_despawn = function (unit, blackboard)
 	local conflict_director = Managers.state.conflict
 
@@ -1367,9 +1313,8 @@ AiBreedSnippets.on_chaos_exalted_champion_despawn = function (unit, blackboard)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_stormfiend_boss_spawn = function (unit, blackboard)
 	AiBreedSnippets.on_stormfiend_spawn(unit, blackboard)
 
@@ -1381,9 +1326,8 @@ AiBreedSnippets.on_stormfiend_boss_spawn = function (unit, blackboard)
 	local health_extension = ScriptUnit.extension(unit, "health_system")
 	health_extension.is_invincible = true
 	blackboard.current_phase = 1
-
-	return 
 end
+
 AiBreedSnippets.on_stormfiend_boss_update = function (unit, blackboard)
 	local breed = blackboard.breed
 	local hp = ScriptUnit.extension(blackboard.unit, "health_system"):current_health_percent()
@@ -1405,9 +1349,8 @@ AiBreedSnippets.on_stormfiend_boss_update = function (unit, blackboard)
 	if 0.25 <= hp_at_mounted - hp then
 		AiBreedSnippets.on_stormfiend_boss_dismount(unit, blackboard)
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_stormfiend_boss_dismount = function (unit, blackboard)
 	local grey_seer_unit = blackboard.linked_unit
 
@@ -1434,9 +1377,8 @@ AiBreedSnippets.on_stormfiend_boss_dismount = function (unit, blackboard)
 			GameSession.set_game_object_field(game, go_id, "animation_synced_unit_id", 0)
 		end
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_grey_seer_spawn = function (unit, blackboard)
 	local breed = blackboard.breed
 	local t = Managers.time:time("game")
@@ -1532,9 +1474,8 @@ AiBreedSnippets.on_grey_seer_spawn = function (unit, blackboard)
 
 		blackboard.call_stormfiend_positions = call_stormfiend_positions
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_grey_seer_update = function (unit, blackboard, t)
 	local breed = blackboard.breed
 	local mounted_data = blackboard.mounted_data
@@ -1550,7 +1491,7 @@ AiBreedSnippets.on_grey_seer_update = function (unit, blackboard, t)
 	local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
 
 	if blackboard.intro_timer or current_phase == 6 then
-		return 
+		return
 	end
 
 	if current_phase == 4 and blackboard.death_sequence then
@@ -1692,9 +1633,8 @@ AiBreedSnippets.on_grey_seer_update = function (unit, blackboard, t)
 
 		blackboard.missile_bot_threat_unit = nil
 	end
-
-	return 
 end
+
 AiBreedSnippets.on_grey_seer_death = function (unit, blackboard, t)
 	local conflict_director = Managers.state.conflict
 
@@ -1709,9 +1649,8 @@ AiBreedSnippets.on_grey_seer_death = function (unit, blackboard, t)
 	end
 
 	AiBreedSnippets.kill_lord_reward(3, Vector3(-308, -364, -126))
-
-	return 
 end
+
 AiBreedSnippets.on_grey_seer_despawn = function (unit, blackboard, t)
 	local conflict_director = Managers.state.conflict
 
@@ -1720,8 +1659,6 @@ AiBreedSnippets.on_grey_seer_despawn = function (unit, blackboard, t)
 	if blackboard.is_angry then
 		conflict_director.add_angry_boss(conflict_director, -1)
 	end
-
-	return 
 end
 
-return 
+return

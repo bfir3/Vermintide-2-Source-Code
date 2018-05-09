@@ -5,12 +5,13 @@ local command_to_query_concept = {
 	clan_rat_attack = "commanding"
 }
 BTGiveCommandAction = class(BTGiveCommandAction, BTNode)
+
 BTGiveCommandAction.init = function (self, ...)
 	BTGiveCommandAction.super.init(self, ...)
-
-	return 
 end
+
 BTGiveCommandAction.name = "BTGiveCommandAction"
+
 BTGiveCommandAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -34,9 +35,8 @@ BTGiveCommandAction.enter = function (self, unit, blackboard, t)
 
 		network_manager.network_transmit:send_rpc_all("rpc_tutorial_message", template_id, message_id)
 	end
-
-	return 
 end
+
 BTGiveCommandAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.navigation_extension:set_enabled(true)
 
@@ -54,9 +54,8 @@ BTGiveCommandAction.leave = function (self, unit, blackboard, t, reason, destroy
 	blackboard.command_target = nil
 	blackboard.command_num_units = nil
 	blackboard.anim_cb_stormvermin_voice = nil
-
-	return 
 end
+
 BTGiveCommandAction.run = function (self, unit, blackboard, t, dt)
 	local command_target = blackboard.command_target
 
@@ -102,4 +101,4 @@ BTGiveCommandAction.run = function (self, unit, blackboard, t, dt)
 	return "running", "evaluate"
 end
 
-return 
+return

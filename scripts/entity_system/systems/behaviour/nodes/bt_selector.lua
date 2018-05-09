@@ -2,18 +2,17 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTSelector = class(BTSelector, BTNode)
 BTSelector.name = "BTSelector"
+
 BTSelector.init = function (self, ...)
 	BTSelector.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTSelector.leave = function (self, unit, blackboard, t, reason)
 	self.set_running_child(self, unit, blackboard, t, nil, reason)
-
-	return 
 end
+
 BTSelector.run = function (self, unit, blackboard, t, dt)
 	local child_running = self.current_running_child(self, blackboard)
 
@@ -43,10 +42,9 @@ BTSelector.run = function (self, unit, blackboard, t, dt)
 
 	return "failed"
 end
+
 BTSelector.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

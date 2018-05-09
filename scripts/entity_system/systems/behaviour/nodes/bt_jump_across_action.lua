@@ -19,17 +19,16 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTJumpAcrossAction = class(BTJumpAcrossAction, BTNode)
+
 BTJumpAcrossAction.init = function (self, ...)
 	BTJumpAcrossAction.super.init(self, ...)
-
-	return 
 end
+
 BTJumpAcrossAction.name = "BTJumpAcrossAction"
+
 BTJumpAcrossAction.enter = function (self, unit, blackboard, t)
 	local drawer = Managers.state.debug:drawer({
 		mode = "retained",
@@ -68,9 +67,8 @@ BTJumpAcrossAction.enter = function (self, unit, blackboard, t)
 	else
 		debug_graph():set_active(false)
 	end
-
-	return 
 end
+
 BTJumpAcrossAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.jump_spline_ground = nil
 	blackboard.jump_spline_ledge = nil
@@ -97,9 +95,8 @@ BTJumpAcrossAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local hit_reaction_extension = ScriptUnit.extension(unit, "hit_reaction_system")
 	hit_reaction_extension.force_ragdoll_on_death = nil
 	slot9 = navigation_extension.is_using_smart_object(navigation_extension) and navigation_extension.use_smart_object(navigation_extension, false)
-
-	return 
 end
+
 BTJumpAcrossAction.run = function (self, unit, blackboard, t, dt)
 	local navigation_extension = blackboard.navigation_extension
 	local locomotion_extension = blackboard.locomotion_extension
@@ -207,6 +204,7 @@ BTJumpAcrossAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTJumpAcrossAction._debug_draw_update = function (self, unit, blackboard, t)
 	local drawer = Managers.state.debug:drawer({
 		mode = "immediate",
@@ -224,8 +222,6 @@ BTJumpAcrossAction._debug_draw_update = function (self, unit, blackboard, t)
 	drawer.sphere(drawer, jump_exit_pos, 0.3, Colors.get("red"))
 	drawer.sphere(drawer, unit_position, 0.3 + math.sin(t * 5) * 0.01, Colors.get("purple"))
 	debug_graph():add_point(t, unit_position.z)
-
-	return 
 end
 
-return 
+return

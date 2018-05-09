@@ -13,6 +13,7 @@ local MAX_NUMBER_OF_NEWS = definitions.MAX_NUMBER_OF_NEWS
 local WIDGET_SIZE = definitions.WIDGET_SIZE
 local NEWS_SPACING = definitions.NEWS_SPACING
 NewsFeedUI = class(NewsFeedUI)
+
 NewsFeedUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -29,9 +30,8 @@ NewsFeedUI.init = function (self, ingame_ui_context)
 	self.feed_sync_delay = SYNC_WAIT_DURATION_TIME
 
 	rawset(_G, "news_feed_ui", self)
-
-	return 
 end
+
 NewsFeedUI._create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local news_widgets = {}
@@ -48,11 +48,11 @@ NewsFeedUI._create_ui_elements = function (self)
 
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 	self.set_visible(self, true)
-
-	return 
 end
+
 local widgets_to_remove = {}
 local news_to_add = {}
+
 NewsFeedUI._sync_news = function (self, dt, t)
 	local feed_sync_delay = self.feed_sync_delay
 
@@ -65,7 +65,7 @@ NewsFeedUI._sync_news = function (self, dt, t)
 			self.feed_sync_delay = feed_sync_delay
 		end
 
-		return 
+		return
 	end
 
 	local templates_on_cooldown = self.templates_on_cooldown
@@ -99,7 +99,7 @@ NewsFeedUI._sync_news = function (self, dt, t)
 		conditions_params.hero_name = hero_name
 		conditions_params.career_name = career_name
 	else
-		return 
+		return
 	end
 
 	local active_news = self._active_news
@@ -178,9 +178,8 @@ NewsFeedUI._sync_news = function (self, dt, t)
 			self.feed_sync_delay = SYNC_WAIT_DURATION_TIME_LONG
 		end
 	end
-
-	return 
 end
+
 NewsFeedUI._add_entry = function (self, template)
 	local template_name = template.name
 	local duration = template.duration
@@ -225,6 +224,7 @@ NewsFeedUI._add_entry = function (self, template)
 
 	return true
 end
+
 NewsFeedUI._update_alignment_duration = function (self)
 	self._alignment_duration = ALIGNMENT_DURATION_TIME
 
@@ -234,9 +234,8 @@ NewsFeedUI._update_alignment_duration = function (self)
 		local current_position = widget_offset[2]
 		data.current_position = current_position
 	end
-
-	return 
 end
+
 NewsFeedUI._update_entries_expire_time = function (self, dt, t)
 	for index, data in ipairs(self._active_news) do
 		local widget = data.widget
@@ -254,9 +253,8 @@ NewsFeedUI._update_entries_expire_time = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 NewsFeedUI._mark_entry_for_removal = function (self, index)
 	local active_news = self._active_news
 	local data = active_news[index]
@@ -265,9 +263,8 @@ NewsFeedUI._mark_entry_for_removal = function (self, index)
 		data.state = ANIM_STATE_EXIT
 		data.anim_duration = EXIT_DURATION_TIME
 	end
-
-	return 
 end
+
 NewsFeedUI._remove_entry = function (self, index)
 	local active_news = self._active_news
 	local data = table.remove(active_news, index)
@@ -285,14 +282,13 @@ NewsFeedUI._remove_entry = function (self, index)
 	if removed_func then
 		removed_func()
 	end
-
-	return 
 end
+
 NewsFeedUI._update_alignment = function (self, dt)
 	local alignment_duration = self._alignment_duration
 
 	if not alignment_duration then
-		return 
+		return
 	end
 
 	alignment_duration = math.max(alignment_duration - dt, 0)
@@ -316,9 +312,8 @@ NewsFeedUI._update_alignment = function (self, dt)
 		widget_offset[2] = current_position - diff * (1 - anim_progress)
 		widget_target_position = widget_target_position - vertical_spacing
 	end
-
-	return 
 end
+
 NewsFeedUI._update_state_animations = function (self, dt)
 	local vertical_spacing = WIDGET_SIZE[2] + NEWS_SPACING
 	local widget_target_position = 0
@@ -367,9 +362,8 @@ NewsFeedUI._update_state_animations = function (self, dt)
 			self._remove_entry(self, index)
 		end
 	end
-
-	return 
 end
+
 NewsFeedUI._animate_widget = function (self, widget, state, progress)
 	local offset = widget.offset
 	local style = widget.style
@@ -402,31 +396,27 @@ NewsFeedUI._animate_widget = function (self, widget, state, progress)
 	elseif alpha < effect_color[1] then
 		effect_color[1] = alpha
 	end
-
-	return 
 end
+
 NewsFeedUI.set_position = function (self, x, y)
 	local position = self.ui_scenegraph.pivot.local_position
 	position[1] = x
 	position[2] = y
-
-	return 
 end
+
 NewsFeedUI.destroy = function (self)
 	self.set_visible(self, false)
 	rawset(_G, "news_feed_ui", nil)
-
-	return 
 end
+
 NewsFeedUI.set_visible = function (self, visible)
 	self._is_visible = visible
 	local ui_renderer = self.ui_renderer
-
-	return 
 end
+
 NewsFeedUI.update = function (self, dt, t)
 	if not self._is_visible then
-		return 
+		return
 	end
 
 	self._sync_news(self, dt, t)
@@ -435,19 +425,18 @@ NewsFeedUI.update = function (self, dt, t)
 	self._handle_resolution_modified(self)
 	self._update_entries_expire_time(self, dt, t)
 	self.draw(self, dt)
-
-	return 
 end
+
 NewsFeedUI._handle_resolution_modified = function (self)
 	if RESOLUTION_LOOKUP.modified then
 		self._on_resolution_modified(self)
 	end
+end
 
-	return 
-end
 NewsFeedUI._on_resolution_modified = function (self)
-	return 
+	return
 end
+
 NewsFeedUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -462,8 +451,6 @@ NewsFeedUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
 
-return 
+return

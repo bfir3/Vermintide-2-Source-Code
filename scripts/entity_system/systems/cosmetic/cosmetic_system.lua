@@ -7,6 +7,7 @@ local RPCS = {
 local extension_list = {
 	"PlayerUnitCosmeticExtension"
 }
+
 CosmeticSystem.init = function (self, entity_system_creation_context, system_name)
 	table.dump(entity_system_creation_context, "entity_system_creation_context")
 	CosmeticSystem.super.init(self, entity_system_creation_context, system_name, extension_list)
@@ -15,21 +16,20 @@ CosmeticSystem.init = function (self, entity_system_creation_context, system_nam
 	self._network_event_delegate = entity_system_creation_context.network_event_delegate
 
 	self._network_event_delegate:register(self, unpack(RPCS))
-
-	return 
 end
+
 CosmeticSystem.destroy = function (self)
 	self._network_event_delegate:unregister(self)
 
 	self._network_event_delegate = nil
-
-	return 
 end
+
 CosmeticSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	extension_init_data.is_server = self.is_server
 
 	return CosmeticSystem.super.on_add_extension(self, world, unit, extension_name, extension_init_data)
 end
+
 CosmeticSystem.get_equipped_frame = function (self, unit)
 	local player_portrait_frame = "default"
 
@@ -41,6 +41,7 @@ CosmeticSystem.get_equipped_frame = function (self, unit)
 
 	return player_portrait_frame
 end
+
 CosmeticSystem.set_equipped_frame = function (self, unit, frame_name)
 	local ext = ScriptUnit.extension(unit, "cosmetic_system")
 
@@ -54,9 +55,8 @@ CosmeticSystem.set_equipped_frame = function (self, unit, frame_name)
 	else
 		self.network_transmit:send_rpc_server("rpc_set_equipped_frame", unit_id, frame_name_id)
 	end
-
-	return 
 end
+
 CosmeticSystem.rpc_set_equipped_frame = function (self, sender, unit_id, frame_name_id)
 	if self.is_server then
 		self.network_transmit:send_rpc_clients_except("rpc_set_equipped_frame", sender, unit_id, frame_name_id)
@@ -70,8 +70,6 @@ CosmeticSystem.rpc_set_equipped_frame = function (self, sender, unit_id, frame_n
 
 		ext.set_equipped_frame(ext, frame_name)
 	end
-
-	return 
 end
 
-return 
+return

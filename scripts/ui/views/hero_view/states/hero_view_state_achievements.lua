@@ -25,14 +25,15 @@ local ACHIEVEMENT_PRESENTATION_AMOUNT = achievement_presentation_amount
 local ACHIEVEMENT_SPACING = achievement_spacing
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
 HeroViewStateAchievements = class(HeroViewStateAchievements)
 HeroViewStateAchievements.NAME = "HeroViewStateAchievements"
+
 HeroViewStateAchievements.on_enter = function (self, params)
 	print("[HeroViewState] Enter Substate HeroViewStateAchievements")
 
@@ -102,14 +103,13 @@ HeroViewStateAchievements.on_enter = function (self, params)
 
 	self._on_layout_button_pressed(self, summary_button, "summary")
 	self.play_sound(self, "Play_gui_achivements_menu_open")
-
-	return 
 end
+
 HeroViewStateAchievements._update_quest_timer = function (self, dt)
 	local time_left_in_seconds = self._quest_time
 
 	if not time_left_in_seconds then
-		return 
+		return
 	end
 
 	local seconds = math.max(time_left_in_seconds - dt, 0)
@@ -121,9 +121,8 @@ HeroViewStateAchievements._update_quest_timer = function (self, dt)
 	local content = widget.content
 	content.text = time_text
 	self._quest_time = seconds
-
-	return 
 end
+
 HeroViewStateAchievements.create_ui_elements = function (self, params)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -181,9 +180,8 @@ HeroViewStateAchievements.create_ui_elements = function (self, params)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
-
-	return 
 end
+
 HeroViewStateAchievements._setup_achievement_progress_overview = function (self)
 	local achievement_manager = self._achievement_manager
 
@@ -223,9 +221,8 @@ HeroViewStateAchievements._setup_achievement_progress_overview = function (self)
 	end
 
 	self._set_summary_achievement_categories_progress(self, progress_overview)
-
-	return 
 end
+
 HeroViewStateAchievements._handle_layout_buttons_hovered = function (self)
 	local widgets_by_name = self._widgets_by_name
 	local summary_widgets_by_name = self._summary_widgets_by_name
@@ -260,9 +257,8 @@ HeroViewStateAchievements._handle_layout_buttons_hovered = function (self)
 	if play_sound then
 		self.play_sound(self, "play_gui_equipment_button_hover")
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._on_layout_button_pressed = function (self, widget, layout_type)
 	local widgets_by_name = self._widgets_by_name
 	local quests_button = widgets_by_name.quests_button
@@ -298,16 +294,14 @@ HeroViewStateAchievements._on_layout_button_pressed = function (self, widget, la
 
 		self._activate_tab(self, tab_widget, tab_widget_index, true)
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._reset_tabs = function (self)
 	for _, widget in ipairs(self._category_tab_widgets) do
 		self._reset_tab(self, widget)
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._setup_layout = function (self, layout_type)
 	local category_tab_widgets = self._category_tab_widgets
 	local num_tab_widgets = #category_tab_widgets
@@ -336,9 +330,8 @@ HeroViewStateAchievements._setup_layout = function (self, layout_type)
 	end
 
 	self._achievement_layout_type = layout_type
-
-	return 
 end
+
 HeroViewStateAchievements._get_layout = function (self, layout_type)
 	if layout_type == "achievements" then
 		return self._achievement_manager:outline()
@@ -356,9 +349,8 @@ HeroViewStateAchievements._get_layout = function (self, layout_type)
 
 		return quest_layout
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._reset_tab = function (self, widget)
 	local content = widget.content
 	local style = widget.style
@@ -371,9 +363,8 @@ HeroViewStateAchievements._reset_tab = function (self, widget)
 	local list_scenegraph_id = list_style.scenegraph_id
 	local list_scenegraph = self.ui_scenegraph[list_scenegraph_id]
 	list_scenegraph.size[2] = 0
-
-	return 
 end
+
 HeroViewStateAchievements._populate_tab = function (self, widget, categories)
 	local content = widget.content
 	local style = widget.style.list_style
@@ -391,9 +382,8 @@ HeroViewStateAchievements._populate_tab = function (self, widget, categories)
 	end
 
 	style.num_draws = num_categories
-
-	return 
 end
+
 HeroViewStateAchievements._create_entries = function (self, entries, entry_type)
 	local quest_manager = self._quest_manager
 	local achievement_manager = self._achievement_manager
@@ -492,9 +482,8 @@ HeroViewStateAchievements._create_entries = function (self, entries, entry_type)
 	self.scroll_value = nil
 
 	self._update_scroll_height(self)
-
-	return 
 end
+
 HeroViewStateAchievements._set_widget_bar_progress = function (self, widget, fraction, text)
 	local content = widget.content
 	local style = widget.style
@@ -503,9 +492,8 @@ HeroViewStateAchievements._set_widget_bar_progress = function (self, widget, fra
 	local texture_size = progress_bar_style.texture_size
 	texture_size[1] = default_size[1] * fraction
 	content.progress_text = text
-
-	return 
 end
+
 HeroViewStateAchievements._set_requirements = function (self, widget, requirements)
 	local content = widget.content
 	local style = widget.style
@@ -550,24 +538,23 @@ HeroViewStateAchievements._set_requirements = function (self, widget, requiremen
 
 	return height + larges_list_amount * CHECKLIST_ENTRY_HEIGHT
 end
+
 HeroViewStateAchievements._set_achievement_expand_height = function (self, widget, height)
 	local content = widget.content
 	local style = widget.style
 	content.expand_height = height
 	style.expand_background.texture_size[2] = height
 	style.expand_background_edge.offset[2] = -height
-
-	return 
 end
+
 HeroViewStateAchievements._update_scroll_height = function (self, optional_scroll_value)
 	local total_height = self._get_achievement_entries_height(self)
 	self.total_scroll_height = math.max(total_height - ACHIEVEMENT_WINDOW_HEIGHT, 0)
 
 	self._align_achievement_entries(self)
 	self._setup_scrollbar(self, total_height, optional_scroll_value)
-
-	return 
 end
+
 HeroViewStateAchievements._get_achievement_entries_height = function (self, start_index)
 	start_index = start_index or 1
 	local total_height = 0
@@ -591,6 +578,7 @@ HeroViewStateAchievements._get_achievement_entries_height = function (self, star
 
 	return total_height
 end
+
 HeroViewStateAchievements._setup_scrollbar = function (self, height, optional_value)
 	local widget = self._widgets_by_name.achievement_scrollbar
 	local scenegraph_id = widget.scenegraph_id
@@ -603,9 +591,8 @@ HeroViewStateAchievements._setup_scrollbar = function (self, height, optional_va
 	local scroll_step_multiplier = 2
 	local scroll_amount = math.max(ACHIEVEMENT_DEFAULT_HEIGHT / self.total_scroll_height, 0) * scroll_step_multiplier
 	self._widgets_by_name.achievement_window.content.scroll_amount = scroll_amount
-
-	return 
 end
+
 HeroViewStateAchievements._update_mouse_scroll_input = function (self)
 	local using_scrollbar = true
 
@@ -621,7 +608,7 @@ HeroViewStateAchievements._update_mouse_scroll_input = function (self)
 		local mouse_scroll_value = achievement_window_widget.content.scroll_value
 
 		if not mouse_scroll_value then
-			return 
+			return
 		end
 
 		local scroll_bar_value = widget.content.scroll_bar_info.value
@@ -633,9 +620,8 @@ HeroViewStateAchievements._update_mouse_scroll_input = function (self)
 			self._set_scrollbar_value(self, scroll_bar_value)
 		end
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._set_scrollbar_value = function (self, value)
 	local current_scroll_value = self.scroll_value
 
@@ -650,9 +636,8 @@ HeroViewStateAchievements._set_scrollbar_value = function (self, value)
 
 		self.scroll_value = value
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._update_achievement_read_index = function (self, fraction)
 	local achievement_widgets = self._achievement_widgets
 	local num_achievements = #achievement_widgets
@@ -686,9 +671,8 @@ HeroViewStateAchievements._update_achievement_read_index = function (self, fract
 
 	self._achievement_draw_index = widgets_scrolled
 	self.ui_scenegraph.achievement_root.position[2] = math.floor(height_scrolled)
-
-	return 
 end
+
 HeroViewStateAchievements._on_achievement_pressed = function (self, widget)
 	local content = widget.content
 	local style = widget.style
@@ -735,9 +719,8 @@ HeroViewStateAchievements._on_achievement_pressed = function (self, widget)
 
 		self._update_scroll_height(self, new_scroll_fraction)
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._claim_reward = function (self, widget)
 	local content = widget.content
 	local id = content.id
@@ -761,9 +744,8 @@ HeroViewStateAchievements._claim_reward = function (self, widget)
 
 		self._reward_poll_id = reward_poll_id
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._claim_quest_reward = function (self, id)
 	local quest_manager = self._quest_manager
 	local can_claim, claim_error = quest_manager.can_claim_quest_rewards(quest_manager, id)
@@ -778,6 +760,7 @@ HeroViewStateAchievements._claim_quest_reward = function (self, id)
 
 	return claim_id
 end
+
 HeroViewStateAchievements._claim_achievement_reward = function (self, id)
 	local achievement_manager = self._achievement_manager
 	local can_claim, claim_error = achievement_manager.can_claim_achievement_rewards(achievement_manager, id)
@@ -792,14 +775,16 @@ HeroViewStateAchievements._claim_achievement_reward = function (self, id)
 
 	return claim_id
 end
+
 HeroViewStateAchievements._is_polling = function (self)
 	return self._reward_poll_id or self._quest_refresh_poll_id
 end
+
 HeroViewStateAchievements._poll_quest_refresh = function (self, dt)
 	local quest_refresh_poll_id = self._quest_refresh_poll_id
 
 	if not quest_refresh_poll_id then
-		return 
+		return
 	end
 
 	local quest_manager = self._quest_manager
@@ -813,14 +798,13 @@ HeroViewStateAchievements._poll_quest_refresh = function (self, dt)
 
 		self._on_layout_button_pressed(self, quests_button, "quest")
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._poll_rewards = function (self, dt)
 	local reward_poll_id = self._reward_poll_id
 
 	if not reward_poll_id then
-		return 
+		return
 	end
 
 	local quest_manager = self._quest_manager
@@ -833,9 +817,8 @@ HeroViewStateAchievements._poll_rewards = function (self, dt)
 
 		self._reward_poll_id = nil
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._on_reward_claimed = function (self, reward_poll_id)
 	local widget = self._reward_claim_widget
 	local content = widget.content
@@ -856,9 +839,8 @@ HeroViewStateAchievements._on_reward_claimed = function (self, reward_poll_id)
 	self._reward_claim_widget = nil
 
 	self._setup_reward_presentation(self, reward_poll_id)
-
-	return 
 end
+
 HeroViewStateAchievements._setup_reward_presentation = function (self, reward_poll_id)
 	local backend_manager = Managers.backend
 	local item_interface = backend_manager.get_interface(backend_manager, "items")
@@ -895,22 +877,19 @@ HeroViewStateAchievements._setup_reward_presentation = function (self, reward_po
 	else
 		self.unblock_input(self)
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._set_color_intensity = function (self, color, fraction)
 	self._set_color_values(self, color, nil, color[2] * fraction, color[3] * fraction, color[4] * fraction)
-
-	return 
 end
+
 HeroViewStateAchievements._set_color_values = function (self, color, p1, p2, p3, p4)
 	color[1] = p1 or color[1]
 	color[2] = p2 or color[2]
 	color[3] = p3 or color[3]
 	color[4] = p4 or color[4]
-
-	return 
 end
+
 HeroViewStateAchievements._align_achievement_entries = function (self)
 	local total_height = 0
 	local achievement_widgets = self._achievement_widgets
@@ -927,31 +906,30 @@ HeroViewStateAchievements._align_achievement_entries = function (self)
 
 		total_height = total_height + widget_height
 	end
-
-	return 
 end
+
 HeroViewStateAchievements.transitioning = function (self)
 	if self.exiting then
 		return true
 	else
 		return false
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._wanted_state = function (self)
 	local new_state = self.parent:wanted_state()
 
 	return new_state
 end
+
 HeroViewStateAchievements.wanted_menu_state = function (self)
 	return self._wanted_menu_state
 end
+
 HeroViewStateAchievements.clear_wanted_menu_state = function (self)
 	self._wanted_menu_state = nil
-
-	return 
 end
+
 HeroViewStateAchievements.on_exit = function (self, params)
 	print("[HeroViewState] Exit Substate HeroViewStateAchievements")
 
@@ -966,12 +944,11 @@ HeroViewStateAchievements.on_exit = function (self, params)
 
 		self.reward_popup = nil
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._update_transition_timer = function (self, dt)
 	if not self._transition_timer then
-		return 
+		return
 	end
 
 	if self._transition_timer == 0 then
@@ -979,12 +956,12 @@ HeroViewStateAchievements._update_transition_timer = function (self, dt)
 	else
 		self._transition_timer = math.max(self._transition_timer - dt, 0)
 	end
-
-	return 
 end
+
 HeroViewStateAchievements.input_service = function (self)
 	return self.parent:input_service()
 end
+
 HeroViewStateAchievements.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -1025,9 +1002,8 @@ HeroViewStateAchievements.update = function (self, dt, t)
 			return wanted_state or self._new_state
 		end
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._has_active_level_vote = function (self)
 	local voting_manager = self.voting_manager
 	local active_vote_name = voting_manager.vote_in_progress(voting_manager)
@@ -1035,12 +1011,12 @@ HeroViewStateAchievements._has_active_level_vote = function (self)
 
 	return is_mission_vote and not voting_manager.has_voted(voting_manager, Network.peer_id())
 end
+
 HeroViewStateAchievements.post_update = function (self, dt, t)
 	self.ui_animator:update(dt)
 	self._update_animations(self, dt)
-
-	return 
 end
+
 HeroViewStateAchievements._update_animations = function (self, dt)
 	for name, animation in pairs(self._ui_animations) do
 		UIAnimation.update(animation, dt)
@@ -1076,34 +1052,35 @@ HeroViewStateAchievements._update_animations = function (self, dt)
 	local book_progress = 0.5 + math.sin(Application.time_since_launch() * 2) * 0.5
 	local book_anim_progress = math.easeOutCubic(book_progress)
 	summary_quest_book.offset[2] = book_anim_progress * 6
-
-	return 
 end
+
 HeroViewStateAchievements._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter
 end
+
 HeroViewStateAchievements._is_button_hover_exit = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_exit
 end
+
 HeroViewStateAchievements._is_button_hover = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot or content.hotspot
 
 	return hotspot.is_hover
 end
+
 HeroViewStateAchievements._set_button_force_hover = function (self, widget, forced)
 	local content = widget.content
 	local hotspot = content.button_hotspot or content.hotspot
 	hotspot.force_hover = forced
-
-	return 
 end
+
 HeroViewStateAchievements._handle_input = function (self, dt, t)
 	local input_service = (self._input_blocked and fake_input_service) or self.input_service(self)
 	local input_pressed = input_service.get(input_service, "toggle_menu")
@@ -1209,11 +1186,10 @@ HeroViewStateAchievements._handle_input = function (self, dt, t)
 		self.play_sound(self, "Play_hud_hover")
 		self.close_menu(self)
 
-		return 
+		return
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._on_tab_list_pressed = function (self, list_index, ignore_sound)
 	local active_tab_index = self._active_tab_index
 	local achievement_layout_type = self._achievement_layout_type
@@ -1232,9 +1208,8 @@ HeroViewStateAchievements._on_tab_list_pressed = function (self, list_index, ign
 	if not ignore_sound then
 		self.play_sound(self, "Play_gui_achivements_menu_select_category")
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._tab_pressed = function (self, widget, index, ignore_sound)
 	if self._active_tab == widget then
 		self._activate_tab(self, widget, index, ignore_sound)
@@ -1245,9 +1220,8 @@ HeroViewStateAchievements._tab_pressed = function (self, widget, index, ignore_s
 
 		self._activate_tab(self, widget, index, ignore_sound)
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._activate_tab = function (self, widget, index, ignore_sound)
 	self._active_tab = widget
 	self._active_tab_index = index
@@ -1295,14 +1269,13 @@ HeroViewStateAchievements._activate_tab = function (self, widget, index, ignore_
 	elseif not ignore_sound then
 		self.play_sound(self, "Play_gui_achivements_menu_select_category")
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._deactivate_active_tab = function (self)
 	local widget = self._active_tab
 
 	if not widget then
-		return 
+		return
 	end
 
 	self._active_tab = nil
@@ -1318,9 +1291,8 @@ HeroViewStateAchievements._deactivate_active_tab = function (self)
 	content.active = false
 	content.list_content.active = false
 	content.button_hotspot.is_selected = false
-
-	return 
 end
+
 HeroViewStateAchievements.close_menu = function (self, ignore_sound_on_close_menu)
 	if not ignore_sound_on_close_menu then
 		self.play_sound(self, "Play_gui_achivements_menu_close")
@@ -1329,9 +1301,8 @@ HeroViewStateAchievements.close_menu = function (self, ignore_sound_on_close_men
 	ignore_sound_on_close_menu = true
 
 	self.parent:close_menu(nil, ignore_sound_on_close_menu)
-
-	return 
 end
+
 HeroViewStateAchievements.draw = function (self, input_service, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -1408,9 +1379,8 @@ HeroViewStateAchievements.draw = function (self, input_service, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 HeroViewStateAchievements._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot or content.hotspot
@@ -1420,14 +1390,12 @@ HeroViewStateAchievements._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroViewStateAchievements.play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroViewStateAchievements._start_transition_animation = function (self, key, animation_name)
 	local params = {
 		wwise_world = self.wwise_world,
@@ -1436,9 +1404,8 @@ HeroViewStateAchievements._start_transition_animation = function (self, key, ani
 	local widgets = {}
 	local anim_id = self.ui_animator:start_animation(animation_name, widgets, scenegraph_definition, params)
 	self._animations[key] = anim_id
-
-	return 
 end
+
 HeroViewStateAchievements.set_fullscreen_effect_enable_state = function (self, enabled)
 	local world = self.ui_renderer.world
 	local shading_env = World.get_data(world, "shading_environment")
@@ -1450,22 +1417,20 @@ HeroViewStateAchievements.set_fullscreen_effect_enable_state = function (self, e
 	end
 
 	self._fullscreen_effect_enabled = enabled
-
-	return 
 end
+
 HeroViewStateAchievements.block_input = function (self)
 	self._input_blocked = true
-
-	return 
 end
+
 HeroViewStateAchievements.unblock_input = function (self)
 	self._input_blocked = false
-
-	return 
 end
+
 HeroViewStateAchievements.input_blocked = function (self)
 	return self._input_blocked
 end
+
 HeroViewStateAchievements._populate_recent_claimed_achievements = function (self, achievements)
 	local summary_widgets_by_name = self._summary_widgets_by_name
 	local icons_widget = summary_widgets_by_name.summary_center_recent_icons
@@ -1481,9 +1446,8 @@ HeroViewStateAchievements._populate_recent_claimed_achievements = function (self
 			icon_content[index] = icon
 		end
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._set_summary_achievement_categories_progress = function (self, progress_data)
 	local summary_widgets_by_name = self._summary_widgets_by_name
 	local name = "summary_achievement_bar_"
@@ -1506,9 +1470,8 @@ HeroViewStateAchievements._set_summary_achievement_categories_progress = functio
 		local bar_default_size = experience_bar_style.default_size
 		bar_size[1] = math.floor(bar_default_size[1] * progress)
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._present_reward = function (self, data)
 	local reward_popup = self.reward_popup
 
@@ -1522,9 +1485,8 @@ HeroViewStateAchievements._present_reward = function (self, data)
 
 		self.block_input(self)
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._handle_queued_presentations = function (self)
 	if self._is_reward_presentation_complete(self) or (#self._reward_presentation_queue == 0 and not self._displaying_reward_presentation(self)) then
 		local reward_presentation_queue = self._reward_presentation_queue
@@ -1540,17 +1502,18 @@ HeroViewStateAchievements._handle_queued_presentations = function (self)
 			self.unblock_input(self)
 		end
 	end
-
-	return 
 end
+
 HeroViewStateAchievements._displaying_reward_presentation = function (self)
 	return self.reward_popup:is_presentation_active()
 end
+
 HeroViewStateAchievements._is_reward_presentation_complete = function (self)
 	return self.reward_popup:is_presentation_complete()
 end
+
 HeroViewStateAchievements._reward_presentation_done = function (self)
 	return not self._reward_presentation_active
 end
 
-return 
+return

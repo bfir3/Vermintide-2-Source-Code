@@ -3,6 +3,7 @@ require("scripts/utils/keystroke_helper")
 local definitions = local_require("scripts/ui/views/chat_gui_definitions")
 ChatGui = class(ChatGui)
 ChatGui.MAX_CHARS = 512
+
 ChatGui.init = function (self, ui_context)
 	self.input_manager = ui_context.input_manager
 	self.ui_renderer = ui_context.ui_top_renderer
@@ -25,19 +26,16 @@ ChatGui.init = function (self, ui_context)
 	self.chat_close_time = 0
 
 	self._set_chat_window_alpha(self, 0)
-
-	return 
 end
+
 ChatGui.set_profile_synchronizer = function (self, profile_synchronizer)
 	self.profile_synchronizer = profile_synchronizer
-
-	return 
 end
+
 ChatGui.set_wwise_world = function (self, wwise_world)
 	self.wwise_world = wwise_world
-
-	return 
 end
+
 ChatGui.set_input_manager = function (self, input_manager)
 	if input_manager then
 		local block_reasons = {
@@ -56,10 +54,10 @@ ChatGui.set_input_manager = function (self, input_manager)
 	end
 
 	self.input_manager = input_manager
-
-	return 
 end
+
 local RELOAD_CHAT_GUI = false
+
 ChatGui.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
@@ -72,46 +70,44 @@ ChatGui.create_ui_elements = function (self)
 	self.window_tabbed_position = -400
 	self.ui_animations.caret_pulse = self.animate_element_pulse(self, self.chat_input_widget.style.text.caret_color, 1, 60, 255, 2)
 	RELOAD_CHAT_GUI = false
-
-	return 
 end
+
 ChatGui.clear_messages = function (self)
 	self.chat_output_widget = UIWidget.init(definitions.chat_output_widget)
-
-	return 
 end
+
 ChatGui.animate_element_pulse = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.pulse_animation, target, target_index, from, to, time)
 
 	return new_animation
 end
+
 ChatGui.animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 ChatGui.destroy = function (self)
 	rawset(_G, "global_chat_gui", nil)
-
-	return 
 end
+
 ChatGui.ignoring_peer_id = function (self, peer_id)
 	return self.chat_manager:ignoring_peer_id(peer_id)
 end
+
 ChatGui.ignore_peer_id = function (self, peer_id)
 	self.chat_manager:ignore_peer_id(peer_id)
-
-	return 
 end
+
 ChatGui.remove_ignore_peer_id = function (self, peer_id)
 	self.chat_manager:remove_ignore_peer_id(peer_id)
-
-	return 
 end
+
 ChatGui.set_font_size = function (self, font_size)
 	Application.warning("CHAT FONT SIZE DISABLED")
 
-	return 
+	return
 
 	self.chat_output_widget.style.text.font_size = font_size
 	self.chat_input_widget.style.text.font_size = font_size + 2
@@ -121,9 +117,8 @@ ChatGui.set_font_size = function (self, font_size)
 	local scenegraph_definition = definitions.scenegraph_definition
 	ui_scenegraph[self.chat_input_widget.style.text.scenegraph_id].size[2] = definitions.CHAT_HEIGHT - 26 - 200 - (font_size + 4)
 	ui_scenegraph[self.chat_output_widget.style.text.scenegraph_id].size[2] = definitions.CHAT_HEIGHT - 26 - (font_size + 4)
-
-	return 
 end
+
 ChatGui.update = function (self, dt, menu_active, menu_input_service, no_unblock, chat_enabled)
 	if RELOAD_CHAT_GUI then
 		self.create_ui_elements(self)
@@ -241,9 +236,8 @@ ChatGui.update = function (self, dt, menu_active, menu_input_service, no_unblock
 	end
 
 	self._draw_widgets(self, dt, input_service, chat_enabled)
-
-	return 
 end
+
 ChatGui._update_chat_messages = function (self)
 	if Managers.chat:gui_should_clear() then
 		self.clear_messages(self)
@@ -326,6 +320,7 @@ ChatGui._update_chat_messages = function (self)
 
 	return show_new_messages
 end
+
 ChatGui.show_chat = function (self)
 	self.clear_current_transition(self)
 	self.set_menu_transition_fraction(self, 1)
@@ -336,9 +331,8 @@ ChatGui.show_chat = function (self)
 	self.chat_close_time = nil
 	self.keep_chat_visible = true
 	self.scrollbar_widget.content.internal_scroll_value = 0
-
-	return 
 end
+
 ChatGui.hide_chat = function (self)
 	self.clear_current_transition(self)
 	self.set_menu_transition_fraction(self, 0)
@@ -348,9 +342,8 @@ ChatGui.hide_chat = function (self)
 	self.chat_focused = false
 	self.chat_close_time = nil
 	self.keep_chat_visible = false
-
-	return 
 end
+
 ChatGui.menu_open = function (self)
 	self.clear_current_transition(self)
 
@@ -359,17 +352,15 @@ ChatGui.menu_open = function (self)
 	self.tab_widget.style.button_notification.color[1] = ui_settings.tab_notification_alpha_1
 	self.opening = true
 	self.transition_timer = 0
-
-	return 
 end
+
 ChatGui.menu_close = function (self)
 	self.clear_current_transition(self)
 
 	self.closing = true
 	self.transition_timer = 0
-
-	return 
 end
+
 ChatGui.set_menu_transition_fraction = function (self, fraction)
 	local ui_scenegraph = self.ui_scenegraph
 	local scenegraph_definition = definitions.scenegraph_definition
@@ -390,14 +381,13 @@ ChatGui.set_menu_transition_fraction = function (self, fraction)
 	local default_definition_background = scenegraph_definition[background_scenegraph_id]
 	window_content.background.uvs[1][1] = uv_fraction
 	ui_scenegraph[background_scenegraph_id].size[1] = default_definition_background.size[1] * fraction
-
-	return 
 end
+
 ChatGui.update_transition = function (self, dt)
 	local transition_timer = self.transition_timer
 
 	if not transition_timer then
-		return 
+		return
 	end
 
 	local total_transition_time = 0.2
@@ -421,16 +411,14 @@ ChatGui.update_transition = function (self, dt)
 	else
 		self.transition_timer = transition_timer
 	end
-
-	return 
 end
+
 ChatGui.clear_current_transition = function (self)
 	self.opening = nil
 	self.closing = nil
 	self.transition_timer = nil
-
-	return 
 end
+
 ChatGui.block_input = function (self, input_service_name)
 	local input_manager = self.input_manager
 
@@ -450,9 +438,8 @@ ChatGui.block_input = function (self, input_service_name)
 		input_manager.block_device_except_service(input_manager, "chat_input", "gamepad", 1)
 		Window.set_show_cursor(true)
 	end
-
-	return 
 end
+
 ChatGui.unblock_input = function (self, no_unblock)
 	local input_manager = self.input_manager
 
@@ -470,9 +457,8 @@ ChatGui.unblock_input = function (self, no_unblock)
 		input_manager.device_unblock_all_services(input_manager, "gamepad", 1)
 		Window.set_show_cursor(false)
 	end
-
-	return 
 end
+
 ChatGui._update_input = function (self, input_service, menu_input_service, dt, no_unblock, chat_enabled)
 	local input_manager = self.input_manager
 	local chat_focused = self.chat_focused
@@ -765,6 +751,7 @@ ChatGui._update_input = function (self, input_service, menu_input_service, dt, n
 
 	return chat_focused, chat_closed, chat_close_time
 end
+
 ChatGui._handle_input_service_release = function (self, menu_active, menu_input_service, no_unblock)
 	if menu_active then
 		local input_service_name = menu_input_service.name
@@ -777,16 +764,15 @@ ChatGui._handle_input_service_release = function (self, menu_active, menu_input_
 	else
 		self.unblock_input(self, no_unblock)
 	end
-
-	return 
 end
+
 ChatGui._draw_widgets = function (self, dt, input_service, chat_enabled)
 	local gamepad_active = self.input_manager:is_device_active("gamepad")
 	local chat_close_time = self.chat_close_time
 	local menu_active = self.menu_active
 
 	if not menu_active and chat_close_time and chat_close_time == 0 then
-		return 
+		return
 	end
 
 	local ui_scenegraph = self.ui_scenegraph
@@ -855,9 +841,8 @@ ChatGui._draw_widgets = function (self, dt, input_service, chat_enabled)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 ChatGui._set_chat_window_alpha = function (self, progress)
 	local ui_settings = UISettings.chat
 	local window_widget = self.chat_window_widget
@@ -889,15 +874,12 @@ ChatGui._set_chat_window_alpha = function (self, progress)
 	stroke_alpha = ui_settings.scrollbar_stroke_alpha * progress
 	style.scrollbar_stroke_top.color[1] = stroke_alpha
 	style.scrollbar_stroke_bottom.color[1] = stroke_alpha
-
-	return 
 end
+
 ChatGui._apply_color_values = function (self, color, to_color)
 	color[2] = to_color[2]
 	color[3] = to_color[3]
 	color[4] = to_color[4]
-
-	return 
 end
 
-return 
+return

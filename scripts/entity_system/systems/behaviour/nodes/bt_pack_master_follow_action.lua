@@ -1,14 +1,15 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTPackMasterFollowAction = class(BTPackMasterFollowAction, BTNode)
+
 BTPackMasterFollowAction.init = function (self, ...)
 	BTPackMasterFollowAction.super.init(self, ...)
 
 	self.navigation_group_manager = Managers.state.conflict.navigation_group_manager
-
-	return 
 end
+
 BTPackMasterFollowAction.name = "BTPackMasterFollowAction"
+
 BTPackMasterFollowAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -24,9 +25,8 @@ BTPackMasterFollowAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.start_anim_done = true
 	blackboard.physics_world = blackboard.physics_world or World.get_data(blackboard.world, "physics_world")
-
-	return 
 end
+
 BTPackMasterFollowAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
 	blackboard.start_anim_locked = nil
@@ -39,9 +39,8 @@ BTPackMasterFollowAction.leave = function (self, unit, blackboard, t, reason, de
 	elseif reason == "failed" then
 		blackboard.target_unit = nil
 	end
-
-	return 
 end
+
 BTPackMasterFollowAction.run = function (self, unit, blackboard, t, dt)
 	local target_unit = blackboard.target_unit
 
@@ -108,4 +107,4 @@ BTPackMasterFollowAction.run = function (self, unit, blackboard, t, dt)
 	return "running", should_evaluate
 end
 
-return 
+return

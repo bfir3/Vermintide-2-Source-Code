@@ -3,17 +3,16 @@ require("scripts/level/environment/environment_blend_volume")
 
 EnvironmentHandler = class(EnvironmentHandler)
 EnvironmentHandler.ID = EnvironmentHandler.ID or 0
+
 EnvironmentHandler.init = function (self)
 	self._blends = {}
 	self._weights = {}
-
-	return 
 end
+
 EnvironmentHandler.add_blend_group = function (self, group)
 	self._blends[group] = {}
-
-	return 
 end
+
 EnvironmentHandler.add_blend = function (self, blend_class_name, group, priority, blend_data, specified_id)
 	local id = nil
 
@@ -39,6 +38,7 @@ EnvironmentHandler.add_blend = function (self, blend_class_name, group, priority
 
 	return id
 end
+
 EnvironmentHandler.remove_blend = function (self, id)
 	for _, group in pairs(self._blends) do
 		for key, blend_data in pairs(group) do
@@ -48,28 +48,25 @@ EnvironmentHandler.remove_blend = function (self, id)
 				table.clear(self._weights)
 				self._update_weights(self)
 
-				return 
+				return
 			end
 		end
 	end
-
-	return 
 end
+
 EnvironmentHandler.update = function (self, dt, t)
 	self._update_blends(self, dt)
 	self._update_weights(self, dt)
-
-	return 
 end
+
 EnvironmentHandler._update_blends = function (self, dt)
 	for _, blends in pairs(self._blends) do
 		for _, b in ipairs(blends) do
 			b.blend:update(dt)
 		end
 	end
-
-	return 
 end
+
 EnvironmentHandler._update_weights = function (self)
 	local particle_light_intensity = nil
 
@@ -100,12 +97,12 @@ EnvironmentHandler._update_weights = function (self)
 
 		self._weights[group] = weights
 	end
-
-	return 
 end
+
 EnvironmentHandler.weights = function (self, group)
 	return self._weights[group]
 end
+
 EnvironmentHandler.override_settings = function (self)
 	local max_prio = 0
 	local blend_volume = nil
@@ -123,6 +120,7 @@ EnvironmentHandler.override_settings = function (self)
 
 	return nil
 end
+
 EnvironmentHandler.destroy = function (self)
 	for _, blends in pairs(self._blends) do
 		for _, b in ipairs(blends) do
@@ -131,8 +129,6 @@ EnvironmentHandler.destroy = function (self)
 	end
 
 	self._blends = nil
-
-	return 
 end
 
-return 
+return

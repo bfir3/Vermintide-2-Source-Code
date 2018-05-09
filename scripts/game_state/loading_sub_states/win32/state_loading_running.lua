@@ -3,6 +3,7 @@ require("scripts/ui/views/loading_view")
 DO_RELOAD = false
 StateLoadingRunning = class(StateLoadingRunning)
 StateLoadingRunning.NAME = "StateLoadingRunning"
+
 StateLoadingRunning.on_enter = function (self, params)
 	print("[Gamestate] Enter Substate StateLoadingRunning")
 	self._init_network(self)
@@ -28,9 +29,8 @@ StateLoadingRunning.on_enter = function (self, params)
 	end
 
 	DO_RELOAD = false
-
-	return 
 end
+
 StateLoadingRunning._init_network = function (self)
 	local loading_context = self.parent.parent.loading_context
 	Managers.state.event = EventManager:new()
@@ -73,12 +73,11 @@ StateLoadingRunning._init_network = function (self)
 			self.parent:setup_network_transmit(self._network_client)
 		end
 	end
-
-	return 
 end
+
 StateLoadingRunning.update = function (self, dt)
 	if PLATFORM == "xb1" and self.parent:waiting_for_cleanup() then
-		return 
+		return
 	end
 
 	if not LEVEL_EDITOR_TEST and self._level_transition_handler.transition_type ~= nil then
@@ -100,11 +99,10 @@ StateLoadingRunning.update = function (self, dt)
 
 		self.parent:setup_loading_view(level_key)
 	end
-
-	return 
 end
+
 StateLoadingRunning.on_exit = function (self, application_shutdown)
-	return 
+	return
 end
 
-return 
+return

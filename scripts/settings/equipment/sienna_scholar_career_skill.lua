@@ -318,4 +318,4 @@ weapon_template.wwise_dep_right_hand = {
 Weapons = Weapons or {}
 Weapons.sienna_scholar_career_skill_weapon = table.create_copy(Weapons.sienna_scholar_career_skill_weapon, weapon_template)
 
-return 
+return

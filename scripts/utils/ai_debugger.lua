@@ -27,6 +27,7 @@ local function table_as_sorted_string_arrays(source, key_dest, value_dest)
 end
 
 AIDebugger = class(AIDebugger)
+
 AIDebugger.init = function (self, world, nav_world, group_blackboard, is_server, free_flight_manager)
 	self.free_flight_manager = free_flight_manager
 	self.is_server = is_server
@@ -42,24 +43,23 @@ AIDebugger.init = function (self, world, nav_world, group_blackboard, is_server,
 	self.follow_active = false
 	self.show_behavior_tree = false
 	self.hint_time_when_key_handle_visible = 0
-
-	return 
 end
+
 AIDebugger.lazy_create_drawer = function (self)
 	if self.drawer then
-		return 
+		return
 	end
 
 	self.drawer = Managers.state.debug:drawer({
 		mode = "immediate",
 		name = "AIDebugger"
 	})
+end
 
-	return 
-end
 AIDebugger.destroy = function (self)
-	return 
+	return
 end
+
 AIDebugger.update = function (self, t, dt)
 	self.lazy_create_drawer(self)
 
@@ -116,7 +116,7 @@ AIDebugger.update = function (self, t, dt)
 		self.key_handler_visible = nil
 
 		if script_data.ai_debugger_freeflight_only then
-			return 
+			return
 		end
 	end
 
@@ -256,9 +256,8 @@ AIDebugger.update = function (self, t, dt)
 			self.drawer:sphere(position, 0.5, Color(255, 255, 0, 0))
 		end
 	end
-
-	return 
 end
+
 AIDebugger.perlin_path = function (self, t, x, y, xsize, ysize)
 	local resx, resy = Application.resolution()
 	local layer = 500
@@ -295,9 +294,8 @@ AIDebugger.perlin_path = function (self, t, x, y, xsize, ysize)
 			p1 = p2
 		end
 	end
-
-	return 
 end
+
 AIDebugger.update_selection = function (self, input, dt)
 	self.mouse_raycast(self, input)
 
@@ -316,9 +314,8 @@ AIDebugger.update_selection = function (self, input, dt)
 		local units = Managers.state.entity:get_entities("AISimpleExtension")
 		self.active_unit = next(units, self.active_unit)
 	end
-
-	return 
 end
+
 AIDebugger.update_ingame_selection = function (self, in_free_flight)
 	if not Unit.alive(self.active_unit) then
 		self.active_unit = nil
@@ -339,9 +336,8 @@ AIDebugger.update_ingame_selection = function (self, in_free_flight)
 			print("[AIDebugger] NEW TARGET!", self.active_unit)
 		end
 	end
-
-	return 
 end
+
 AIDebugger.closest_unit_in_aim_dir = function (self, in_free_flight)
 	if in_free_flight then
 		return true
@@ -352,7 +348,7 @@ AIDebugger.closest_unit_in_aim_dir = function (self, in_free_flight)
 	local player_unit = player.player_unit
 
 	if not player_unit then
-		return 
+		return
 	end
 
 	local first_person_extension = ScriptUnit.extension(player_unit, "first_person_system")
@@ -395,9 +391,8 @@ AIDebugger.closest_unit_in_aim_dir = function (self, in_free_flight)
 
 		return true
 	end
-
-	return 
 end
+
 AIDebugger.mouse_raycast = function (self, input)
 	local data = self.free_flight_manager.data.global
 	local world = Managers.world:world(data.viewport_world_name)
@@ -423,17 +418,17 @@ AIDebugger.mouse_raycast = function (self, input)
 			self.hot_actor = actor
 		end
 	end
-
-	return 
 end
+
 local damage_direction = {
 	z = -1,
 	x = 0,
 	y = 0
 }
+
 AIDebugger.update_mouse_input = function (self, input)
 	if not Unit.alive(self.hot_unit) then
-		return 
+		return
 	end
 
 	local mouse_released = input.get(input, "action_two")
@@ -443,25 +438,22 @@ AIDebugger.update_mouse_input = function (self, input)
 
 		DamageUtils.debug_deal_damage(self.hot_unit, "basic_debug_damage_ai")
 	end
-
-	return 
 end
+
 AIDebugger.draw_hot_unit = function (self)
 	local position = Unit.local_position(self.hot_unit, 0)
 
 	self.drawer:sphere(position + Vector3.up() * 2, 0.15, Color(255, 255, 100, 0))
-
-	return 
 end
+
 AIDebugger.draw_active_unit = function (self, t)
 	local drawer = self.drawer
 	local position = Unit.local_position(self.active_unit, 0)
 
 	drawer.sphere(drawer, position + Vector3.up() * 2, 0.1, Color(255, 255, 255, 0))
 	self.draw_nearby_navmesh(self, self.active_unit)
-
-	return 
 end
+
 local color_table = {}
 
 for i = 1, 25, 1 do
@@ -470,7 +462,7 @@ end
 
 AIDebugger.draw_nearby_navmesh = function (self, ai_unit)
 	if not self.show_navmesh then
-		return 
+		return
 	end
 
 	local drawer = self.drawer
@@ -484,7 +476,7 @@ AIDebugger.draw_nearby_navmesh = function (self, ai_unit)
 	local triangle = GwNavTraversal.get_seed_triangle(nav_world, position)
 
 	if triangle == nil then
-		return 
+		return
 	end
 
 	local triangles = {
@@ -536,12 +528,11 @@ AIDebugger.draw_nearby_navmesh = function (self, ai_unit)
 	end
 
 	LineObject.dispatch(self.world, self._line_object)
-
-	return 
 end
+
 AIDebugger.draw_blackboard = function (self, ai_unit)
 	if not self.show_blackboard then
-		return 
+		return
 	end
 
 	local gui = self.screen_gui
@@ -629,12 +620,11 @@ AIDebugger.draw_blackboard = function (self, ai_unit)
 	else
 		Gui.rect(gui, Vector3(150, 0, 100), Vector2(pos.x + 400, start_y + 50), Color(240, 25, 50, 25))
 	end
-
-	return 
 end
+
 AIDebugger.draw_behavior_tree = function (self, ai_unit, t, dt)
 	if not self.show_behavior_tree then
-		return 
+		return
 	end
 
 	self.tree_x = self.tree_x or 0.45
@@ -683,11 +673,10 @@ AIDebugger.draw_behavior_tree = function (self, ai_unit, t, dt)
 			self.tree_y = 0
 		end
 	end
-
-	return 
 end
+
 AIDebugger.draw_reticule = function (self)
-	return 
+	return
 
 	local crosshair = "crosshair_texture_1"
 	local atlas_name = "hud_assets"
@@ -700,9 +689,8 @@ AIDebugger.draw_reticule = function (self)
 
 		Gui.bitmap_uv(self.screen_gui, material, Vector2(uv00[1], uv00[2]), Vector2(uv11[1], uv11[2]), Vector3((resolution_width - scale * size.x) / 2, (resolution_height - scale * size.y) / 2, 0), scale * size, color)
 	end
-
-	return 
 end
+
 AIDebugger.debug_player_intensity = function (self, t, dt)
 	local xcol = {
 		Color(200, 160, 145, 0),
@@ -767,9 +755,8 @@ AIDebugger.debug_player_intensity = function (self, t, dt)
 	local small_font_size = 22
 
 	ScriptGUI.itext(gui, res_x, res_y, decay_text, font_mtrl, small_font_size, font, win_x, row + bar_height * 0.75, 3, Color(255, 200, 200, 32))
-
-	return 
 end
+
 AIDebugger.debug_pacing = function (self, t, dt)
 	local gui = self.screen_gui
 	local cm = Managers.state.conflict
@@ -851,17 +838,17 @@ AIDebugger.debug_pacing = function (self, t, dt)
 	end
 
 	ScriptGUI.irect(gui, res_x, res_y, win_x, win_y, win_x + width, row, 2, Color(100, 10, 10, 10))
-
-	return 
 end
+
 local hint_shown = false
+
 AIDebugger.draw_hint = function (self, t)
 	if script_data and script_data.disable_debug_draw then
-		return 
+		return
 	end
 
 	if hint_shown then
-		return 
+		return
 	end
 
 	local gui = self.screen_gui
@@ -870,7 +857,7 @@ AIDebugger.draw_hint = function (self, t)
 	if script_data.debug_key_handler_visible then
 		self.hint_time_when_key_handle_visible = t
 
-		return 
+		return
 	end
 
 	local anim_t = t - self.hint_time_when_key_handle_visible
@@ -878,7 +865,7 @@ AIDebugger.draw_hint = function (self, t)
 	if math.pi * 2 < anim_t then
 		hint_shown = true
 
-		return 
+		return
 	end
 
 	local opacity = math.min(1, math.sin(anim_t * 0.5) * 3) * 255
@@ -889,9 +876,8 @@ AIDebugger.draw_hint = function (self, t)
 
 	Gui.text(gui, msg, font_mtrl, font_size, font, Vector3(x, 20, 150), Color(opacity, 255, 255, 255))
 	Gui.rect(gui, Vector3(x - 20, 0, 100), Vector2(msg_width + 40, 50), Color(opacity * 0.75, 25, 50, 25))
-
-	return 
 end
+
 AIDebugger.create_fake_players = function (self)
 	local player_manager = Managers.player
 	local player = player_manager.player_from_peer_id(player_manager, Network.peer_id())
@@ -908,12 +894,14 @@ AIDebugger.create_fake_players = function (self)
 
 	return self._fake_players
 end
+
 AIDebugger.fake_players = function (self)
 	return self._fake_players
 end
+
 AIDebugger.draw_extensions = function (self, ai_unit)
 	if not self.show_extensions then
-		return 
+		return
 	end
 
 	local gui = self.screen_gui
@@ -948,8 +936,6 @@ AIDebugger.draw_extensions = function (self, ai_unit)
 	else
 		Gui.rect(gui, Vector3(150, 0, 100), Vector2(pos.x + 400, start_y + 50), Color(240, 25, 50, 25))
 	end
-
-	return 
 end
 
-return 
+return

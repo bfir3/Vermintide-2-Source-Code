@@ -5,6 +5,7 @@ local die_index_type = {
 	"golden"
 }
 DieCollectionUI = class(DieCollectionUI)
+
 DieCollectionUI.init = function (self, dice_roller, ui_renderer, input_manager, scenegraph_id, topic_text, dies_enabled, world)
 	self.dice_roller = dice_roller
 	self.ui_renderer = ui_renderer
@@ -16,9 +17,8 @@ DieCollectionUI.init = function (self, dice_roller, ui_renderer, input_manager, 
 
 	self.scenegraph_id = scenegraph_id
 	self.wwise_world = Managers.world:wwise_world(world)
-
-	return 
 end
+
 local button_name_index_list = {}
 local button_hotspot_name_index_list = {}
 
@@ -54,9 +54,8 @@ DieCollectionUI.create_ui_elements = function (self)
 	dice_collection_widget.content.topic_text = self.topic_text
 	category_widgets[4] = UIWidget.init(dice_collection_widget)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
-
-	return 
 end
+
 DieCollectionUI.update = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local input_service = self.input_manager:get_service("ingame_menu")
@@ -135,9 +134,8 @@ DieCollectionUI.update = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 local dice_categorys = {}
 
 for i = 1, 3, 1 do
@@ -408,4 +406,4 @@ dice_collection_widget = {
 	}
 }
 
-return 
+return

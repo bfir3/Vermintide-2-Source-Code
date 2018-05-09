@@ -1,6 +1,7 @@
 require("scripts/unit_extensions/weapons/spread/spread_templates")
 
 WeaponSpreadExtension = class(WeaponSpreadExtension)
+
 WeaponSpreadExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.owner_unit = extension_init_data.owner_unit
@@ -20,21 +21,20 @@ WeaponSpreadExtension.init = function (self, extension_init_context, unit, exten
 	self.shooting = false
 	self.hit_aftermath = false
 	self.hit_timer = 0
-
-	return 
 end
+
 WeaponSpreadExtension.extensions_ready = function (self, world, unit)
 	local owner_unit = self.owner_unit
 	self.owner_health_extension = ScriptUnit.extension(owner_unit, "health_system")
 	self.owner_status_extension = ScriptUnit.extension(owner_unit, "status_system")
 	self.owner_buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 	self.owner_locomotion_extension = ScriptUnit.extension(owner_unit, "locomotion_system")
+end
 
-	return 
-end
 WeaponSpreadExtension.destroy = function (self)
-	return 
+	return
 end
+
 local ignored_damage_types = {
 	temporary_health_degen = true,
 	globadier_gas_dot = true,
@@ -46,6 +46,7 @@ local ignored_damage_types = {
 	heal = true,
 	warpfire_ground = true
 }
+
 WeaponSpreadExtension.update = function (self, unit, input, dt, context, t)
 	local current_pitch = self.current_pitch
 	local current_yaw = self.current_yaw
@@ -137,14 +138,12 @@ WeaponSpreadExtension.update = function (self, unit, input, dt, context, t)
 	current_yaw = current_yaw + immediate_yaw
 	self.current_pitch = math.min(current_pitch, SpreadTemplates.maximum_pitch)
 	self.current_yaw = math.min(current_yaw, SpreadTemplates.maximum_yaw)
-
-	return 
 end
+
 WeaponSpreadExtension.set_shooting = function (self)
 	self.shooting = true
-
-	return 
 end
+
 WeaponSpreadExtension.combine_spread_rotations = function (self, roll, pitch, current_rot)
 	local roll_rot = Quaternion(Vector3.forward(), roll)
 	local pitch_rot = Quaternion(Vector3.right(), pitch)
@@ -153,6 +152,7 @@ WeaponSpreadExtension.combine_spread_rotations = function (self, roll, pitch, cu
 
 	return combined_rotation
 end
+
 WeaponSpreadExtension.get_max_pitch_rotation = function (self, roll_rotation)
 	local current_pitch = self.current_pitch
 	local current_yaw = self.current_yaw
@@ -168,9 +168,11 @@ WeaponSpreadExtension.get_max_pitch_rotation = function (self, roll_rotation)
 
 	return math.degrees_to_radians(max_pitch_rotation)
 end
+
 WeaponSpreadExtension.get_current_pitch_and_yaw = function (self)
 	return self.current_pitch, self.current_yaw
 end
+
 WeaponSpreadExtension.override_spread_template = function (self, spread_template_name)
 	self.spread_settings = SpreadTemplates[spread_template_name]
 	local current_state = self.current_state
@@ -178,14 +180,12 @@ WeaponSpreadExtension.override_spread_template = function (self, spread_template
 	local state_settings = continuous_spread_settings[current_state]
 	self.current_pitch = state_settings.max_pitch
 	self.current_yaw = state_settings.max_yaw
-
-	return 
 end
+
 WeaponSpreadExtension.reset_spread_template = function (self)
 	self.spread_settings = SpreadTemplates[self.default_spread_template_name]
-
-	return 
 end
+
 WeaponSpreadExtension.get_randomised_spread = function (self, current_rotation)
 	local rand_roll_rotation = math.random() * math.pi * 2
 	local pitch = math.random() * self.get_max_pitch_rotation(self, rand_roll_rotation)
@@ -193,6 +193,7 @@ WeaponSpreadExtension.get_randomised_spread = function (self, current_rotation)
 
 	return final_rotation
 end
+
 WeaponSpreadExtension.get_target_style_spread = function (self, original_current_shot, original_max_shots, current_rotation, num_layers_spread, bullseye, spread_pitch)
 	if bullseye and original_current_shot == 1 then
 		return current_rotation
@@ -220,4 +221,4 @@ WeaponSpreadExtension.get_target_style_spread = function (self, original_current
 	return final_rotation
 end
 
-return 
+return

@@ -1,12 +1,13 @@
 PlayerCharacterStateLeaping = class(PlayerCharacterStateLeaping, PlayerCharacterState)
+
 PlayerCharacterStateLeaping.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "leaping")
 
 	self._direction = Vector3Box()
-
-	return 
 end
+
 local position_lookup = POSITION_LOOKUP
+
 PlayerCharacterStateLeaping.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	table.clear(self.temp_params)
 
@@ -49,9 +50,8 @@ PlayerCharacterStateLeaping.on_enter = function (self, unit, input, dt, context,
 	status_extension.set_falling_height(status_extension, start_jump_height)
 
 	self._played_landing_event = nil
-
-	return 
 end
+
 PlayerCharacterStateLeaping.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local input_extension = self.input_extension
 
@@ -71,9 +71,8 @@ PlayerCharacterStateLeaping.on_exit = function (self, unit, input, dt, context, 
 	if self._leap_data.leap_finish then
 		self._leap_data.leap_finish(unit, self._leap_data.projected_hit_pos:unbox())
 	end
-
-	return 
 end
+
 PlayerCharacterStateLeaping.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
@@ -85,19 +84,19 @@ PlayerCharacterStateLeaping.update = function (self, unit, input, dt, context, t
 	local health_extension = self.health_extension
 
 	if CharacterStateHelper.do_common_state_transitions(status_extension, csm) then
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_using_transport(status_extension) then
 		csm.change_state(csm, "using_transport")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_overcharge_exploding(status_extension) then
 		csm.change_state(csm, "overcharge_exploding")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_pushed(status_extension) then
@@ -109,7 +108,7 @@ PlayerCharacterStateLeaping.update = function (self, unit, input, dt, context, t
 
 		csm.change_state(csm, "stunned", params)
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_block_broken(status_extension) then
@@ -120,7 +119,7 @@ PlayerCharacterStateLeaping.update = function (self, unit, input, dt, context, t
 
 		csm.change_state(csm, "stunned", params)
 
-		return 
+		return
 	end
 
 	if self._update_movement(self, unit, dt, t) then
@@ -130,7 +129,7 @@ PlayerCharacterStateLeaping.update = function (self, unit, input, dt, context, t
 			csm.change_state(csm, "walking", self.temp_params)
 			first_person_extension.change_state(first_person_extension, "walking")
 
-			return 
+			return
 		end
 
 		if not self.csm.state_next and locomotion_extension.current_velocity(locomotion_extension).z <= 0 then
@@ -138,7 +137,7 @@ PlayerCharacterStateLeaping.update = function (self, unit, input, dt, context, t
 			csm.change_state(csm, "falling", self.temp_params)
 			first_person_extension.change_state(first_person_extension, "falling")
 
-			return 
+			return
 		end
 	end
 
@@ -154,9 +153,8 @@ PlayerCharacterStateLeaping.update = function (self, unit, input, dt, context, t
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, first_person_extension, status_extension, inventory_extension, look_sense_override, look_override)
 	CharacterStateHelper.update_weapon_actions(t, unit, input_extension, inventory_extension, health_extension)
 	CharacterStateHelper.reload(input_extension, inventory_extension, status_extension)
-
-	return 
 end
+
 PlayerCharacterStateLeaping._update_movement = function (self, unit, dt, t)
 	local leap_done = false
 	local leap_data = self._leap_data
@@ -181,6 +179,7 @@ PlayerCharacterStateLeaping._update_movement = function (self, unit, dt, t)
 
 	return leap_done or colliding_down
 end
+
 PlayerCharacterStateLeaping._finish = function (self, unit, t)
 	local world = self.world
 	local locomotion_extension = self.locomotion_extension
@@ -200,9 +199,8 @@ PlayerCharacterStateLeaping._finish = function (self, unit, t)
 
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 	movement_settings_table.gravity_acceleration = PlayerUnitMovementSettings.gravity_acceleration
-
-	return 
 end
+
 PlayerCharacterStateLeaping._start_leap = function (self, unit, velocity, t)
 	local world = self.world
 	local locomotion_extension = self.locomotion_extension
@@ -225,8 +223,6 @@ PlayerCharacterStateLeaping._start_leap = function (self, unit, velocity, t)
 
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 	movement_settings_table.gravity_acceleration = PlayerUnitMovementSettings.gravity_acceleration * 0.9
-
-	return 
 end
 
-return 
+return

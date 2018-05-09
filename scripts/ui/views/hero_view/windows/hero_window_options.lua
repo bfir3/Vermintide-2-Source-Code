@@ -6,6 +6,7 @@ local DO_RELOAD = false
 local HERO_POWER_EFFECT_DURATION = 1
 HeroWindowOptions = class(HeroWindowOptions)
 HeroWindowOptions.NAME = "HeroWindowOptions"
+
 HeroWindowOptions.on_enter = function (self, params, offset)
 	print("[HeroViewWindow] Enter Substate HeroWindowOptions")
 
@@ -47,9 +48,8 @@ HeroWindowOptions.on_enter = function (self, params, offset)
 		cosmetics = widgets_by_name.game_option_4,
 		loot_chest = widgets_by_name.game_option_5
 	}
-
-	return 
 end
+
 HeroWindowOptions.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -76,16 +76,14 @@ HeroWindowOptions.create_ui_elements = function (self, params, offset)
 	end
 
 	widgets_by_name.game_option_4.content.button_hotspot.disable_button = false
-
-	return 
 end
+
 HeroWindowOptions.on_exit = function (self, params)
 	print("[HeroViewWindow] Exit Substate HeroWindowOptions")
 
 	self.ui_animator = nil
-
-	return 
 end
+
 HeroWindowOptions.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -99,14 +97,12 @@ HeroWindowOptions.update = function (self, dt, t)
 	self._update_animations(self, dt)
 	self._update_hero_power_effect(self, dt)
 	self.draw(self, dt)
-
-	return 
 end
+
 HeroWindowOptions.post_update = function (self, dt, t)
 	self._handle_input(self, dt, t)
-
-	return 
 end
+
 HeroWindowOptions._update_animations = function (self, dt)
 	self._update_game_options_hover_effect(self, dt)
 
@@ -131,9 +127,8 @@ HeroWindowOptions._update_animations = function (self, dt)
 			animations[animation_name] = nil
 		end
 	end
-
-	return 
 end
+
 HeroWindowOptions._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -145,9 +140,8 @@ HeroWindowOptions._is_button_pressed = function (self, widget)
 			return true
 		end
 	end
-
-	return 
 end
+
 HeroWindowOptions._is_stepper_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot_left = content.button_hotspot_left
@@ -162,27 +156,29 @@ HeroWindowOptions._is_stepper_button_pressed = function (self, widget)
 
 		return true, 1
 	end
-
-	return 
 end
+
 HeroWindowOptions._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter and not hotspot.is_selected
 end
+
 HeroWindowOptions._is_button_hover_exit = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_exit and not hotspot.is_selected
 end
+
 HeroWindowOptions._is_button_selected = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.is_selected
 end
+
 HeroWindowOptions._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local gamepad_active = Managers.input:is_device_active("gamepad")
@@ -208,9 +204,8 @@ HeroWindowOptions._handle_input = function (self, dt, t)
 			self.parent:set_layout(current_index + 1)
 		end
 	end
-
-	return 
 end
+
 HeroWindowOptions._update_game_options_hover_effect = function (self, dt)
 	local widgets_by_name = self._widgets_by_name
 	local widget_prefix = "game_option_"
@@ -231,9 +226,8 @@ HeroWindowOptions._update_game_options_hover_effect = function (self, dt)
 	if self._is_button_hover_enter(self, widgets_by_name.game_option_5) or self._is_button_hover_enter(self, widgets_by_name.hero_power_tooltip) then
 		self._play_sound(self, "play_gui_equipment_button_hover")
 	end
-
-	return 
 end
+
 HeroWindowOptions._set_selected_option = function (self, index)
 	local widgets_by_name = self._widgets_by_name
 	local widget_prefix = "game_option_"
@@ -243,9 +237,8 @@ HeroWindowOptions._set_selected_option = function (self, index)
 		local widget = widgets_by_name[widget_name]
 		widget.content.button_hotspot.is_selected = index == i
 	end
-
-	return 
 end
+
 HeroWindowOptions._update_selected_option = function (self)
 	local parent = self.parent
 	local selected_index = parent.get_selected_game_mode_index(parent)
@@ -255,9 +248,8 @@ HeroWindowOptions._update_selected_option = function (self)
 
 		self._selected_index = selected_index
 	end
-
-	return 
 end
+
 HeroWindowOptions._update_loadout_sync = function (self)
 	local parent = self.parent
 	local loadout_sync_id = parent.loadout_sync_id
@@ -269,9 +261,8 @@ HeroWindowOptions._update_loadout_sync = function (self)
 
 		self._loadout_sync_id = loadout_sync_id
 	end
-
-	return 
 end
+
 HeroWindowOptions._has_hero_level_changed = function (self)
 	local experience = ExperienceSettings.get_experience(self.hero_name)
 	local level = ExperienceSettings.get_level(experience)
@@ -279,9 +270,8 @@ HeroWindowOptions._has_hero_level_changed = function (self)
 	if level ~= self._hero_level then
 		return true
 	end
-
-	return 
 end
+
 HeroWindowOptions._update_experience_presentation = function (self)
 	local widgets_by_name = self._widgets_by_name
 	local experience = ExperienceSettings.get_experience(self.hero_name)
@@ -298,9 +288,8 @@ HeroWindowOptions._update_experience_presentation = function (self)
 
 	widgets_by_name.level_text.content.text = text
 	self._hero_level = level
-
-	return 
 end
+
 HeroWindowOptions._calculate_power_level = function (self)
 	local hero_name = self.hero_name
 	local career_index = self.career_index
@@ -322,11 +311,11 @@ HeroWindowOptions._calculate_power_level = function (self)
 
 	content.power = presentable_hero_power_level
 	content.text = tostring(presentable_hero_power_level)
-
-	return 
 end
+
 local power_default_color = Colors.get_color_table_with_alpha("white", 255)
 local power_increase_color = Colors.get_color_table_with_alpha("font_title", 255)
+
 HeroWindowOptions._update_hero_power_effect = function (self, dt)
 	local hero_power_effect_time = self._hero_power_effect_time
 
@@ -349,9 +338,8 @@ HeroWindowOptions._update_hero_power_effect = function (self, dt)
 			self._hero_power_effect_time = hero_power_effect_time
 		end
 	end
-
-	return 
 end
+
 HeroWindowOptions._update_hero_portrait_frame = function (self)
 	local career_index = self.career_index
 	local profile_index = self.profile_index
@@ -368,9 +356,8 @@ HeroWindowOptions._update_hero_portrait_frame = function (self)
 	local portrait_frame_name = self._get_portrait_frame(self)
 	local portrait_widget = self._create_portrait_frame_widget(self, portrait_frame_name, portrait_image, level_text)
 	self._portrait_widget = portrait_widget
-
-	return 
 end
+
 HeroWindowOptions.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -395,14 +382,12 @@ HeroWindowOptions.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 HeroWindowOptions._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroWindowOptions._get_text_height = function (self, ui_renderer, size, ui_style, text, ui_style_global)
 	local widget_scale = nil
 
@@ -442,6 +427,7 @@ HeroWindowOptions._get_text_height = function (self, ui_renderer, size, ui_style
 
 	return full_font_height
 end
+
 HeroWindowOptions._create_portrait_frame_widget = function (self, frame_settings_name, portrait_texture, level_text)
 	local widget_definition = UIWidgets.create_portrait_frame("portrait_root", frame_settings_name, level_text, 1, nil, portrait_texture)
 	local widget = UIWidget.init(widget_definition)
@@ -450,6 +436,7 @@ HeroWindowOptions._create_portrait_frame_widget = function (self, frame_settings
 
 	return widget
 end
+
 HeroWindowOptions._get_portrait_frame = function (self)
 	local profile_index = self.profile_index
 	local career_index = self.career_index
@@ -470,6 +457,7 @@ HeroWindowOptions._get_portrait_frame = function (self)
 
 	return player_portrait_frame
 end
+
 HeroWindowOptions._create_style_animation_enter = function (self, widget, target_value, style_id, widget_index, instant)
 	local ui_animations = self._ui_animations
 	local animation_name = "game_option_" .. style_id
@@ -485,9 +473,8 @@ HeroWindowOptions._create_style_animation_enter = function (self, widget, target
 	else
 		pass_style.color[1] = target_color_value
 	end
-
-	return 
 end
+
 HeroWindowOptions._create_style_animation_exit = function (self, widget, target_value, style_id, widget_index, instant)
 	local ui_animations = self._ui_animations
 	local animation_name = "game_option_" .. style_id
@@ -503,19 +490,20 @@ HeroWindowOptions._create_style_animation_exit = function (self, widget, target_
 	else
 		pass_style.color[1] = target_color_value
 	end
-
-	return 
 end
+
 HeroWindowOptions._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 HeroWindowOptions._animate_element_by_catmullrom = function (self, target, target_index, target_value, p0, p1, p2, p3, time)
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
 end
+
 HeroWindowOptions._sync_news = function (self, dt, t)
 	local sync_delay = self._sync_delay
 
@@ -528,7 +516,7 @@ HeroWindowOptions._sync_news = function (self, dt, t)
 			self._sync_delay = sync_delay
 		end
 
-		return 
+		return
 	end
 
 	local player = Managers.player:local_player(1)
@@ -547,8 +535,6 @@ HeroWindowOptions._sync_news = function (self, dt, t)
 	end
 
 	self._sync_delay = 4
-
-	return 
 end
 
-return 
+return

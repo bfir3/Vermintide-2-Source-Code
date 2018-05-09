@@ -406,6 +406,7 @@ local broken_heights = {
 }
 local SCALAR = 0.03
 DiceRoller = class(DiceRoller)
+
 DiceRoller.init = function (self, world, dice_keeper, rewards, hero_name)
 	self.world = world
 	self.simulation_world = Managers.world:create_world("dice_simulation", nil, nil, nil, Application.DISABLE_APEX_CLOTH, Application.DISABLE_RENDERING, Application.DISABLE_SOUND)
@@ -448,16 +449,14 @@ DiceRoller.init = function (self, world, dice_keeper, rewards, hero_name)
 	self._request_from_backend(self, hero_name)
 
 	self._glow_dice = {}
-
-	return 
 end
+
 DiceRoller.destroy = function (self)
 	if not self.post_cleanup_done then
 		self.cleanup_post_roll(self)
 	end
-
-	return 
 end
+
 DiceRoller._request_from_backend = function (self, hero_name)
 	local difficulty = Managers.state.difficulty:get_difficulty()
 	local dice = self.dice_keeper:get_dice()
@@ -468,9 +467,8 @@ DiceRoller._request_from_backend = function (self, hero_name)
 	local backend_items = Managers.backend:get_interface("items")
 
 	backend_items.generate_item_server_loot(backend_items, dice, difficulty, level_start, level_end, hero_name, dlc_name)
-
-	return 
 end
+
 DiceRoller._check_for_achievement = function (self, reward_backend_id)
 	local backend_items = Managers.backend:get_interface("items")
 	local hero_trinkets = backend_items.get_filtered_items(backend_items, "trinket_as_hero and equipped_by == current_hero")
@@ -485,7 +483,7 @@ DiceRoller._check_for_achievement = function (self, reward_backend_id)
 		local can_wield = item_data.can_wield
 
 		if 1 < #can_wield then
-			return 
+			return
 		end
 
 		local trinket_traits = trinket.traits
@@ -511,9 +509,8 @@ DiceRoller._check_for_achievement = function (self, reward_backend_id)
 			statistics_db.set_stat(statistics_db, stats_id, "win_item_as_" .. trinket_as_hero, 1)
 		end
 	end
-
-	return 
 end
+
 DiceRoller.poll_for_backend_result = function (self)
 	if self._got_backend_result then
 		return true
@@ -536,19 +533,23 @@ DiceRoller.poll_for_backend_result = function (self)
 
 	return false
 end
+
 DiceRoller.dice = function (self)
 	return self.dice_keeper:get_dice()
 end
+
 DiceRoller.successes = function (self)
 	fassert(self._got_backend_result, "Trying to roll dice before response from backend")
 
 	return self._successes
 end
+
 DiceRoller.reward_backend_id = function (self)
 	fassert(self._got_backend_result, "Trying to roll dice before response from backend")
 
 	return self._reward_backend_id
 end
+
 DiceRoller.num_successes = function (self)
 	fassert(self._got_backend_result, "Trying to roll dice before response from backend")
 
@@ -560,16 +561,19 @@ DiceRoller.num_successes = function (self)
 
 	return num_successes
 end
+
 DiceRoller.level_up_rewards = function (self)
 	fassert(self._got_backend_result, "Trying get level up rewards before response from backend")
 
 	return self._level_rewards
 end
+
 DiceRoller.win_list = function (self)
 	fassert(self._got_backend_result, "Trying to roll dice before response from backend")
 
 	return self._win_list
 end
+
 DiceRoller.reward_item_key = function (self)
 	fassert(self._got_backend_result, "Trying to roll dice before response from backend")
 
@@ -577,6 +581,7 @@ DiceRoller.reward_item_key = function (self)
 
 	return self._win_list[num_successes]
 end
+
 DiceRoller.flow_callback_die_collision = function (self, params)
 	local touched_unit = params.touched_unit
 	local touching_unit = params.touching_unit
@@ -589,18 +594,20 @@ DiceRoller.flow_callback_die_collision = function (self, params)
 			self._sound_events[#self._sound_events] = "hud_dice_game_dice_collision_bucket"
 		end
 	end
-
-	return 
 end
+
 DiceRoller.is_rolling = function (self)
 	return self.rolling
 end
+
 DiceRoller.is_completed = function (self)
 	return self.rolling_finished
 end
+
 DiceRoller.has_rerolls = function (self)
 	return self.needs_rerolls
 end
+
 local dice_visibility_groups = {
 	normal = "lvl1"
 }
@@ -615,8 +622,6 @@ local function set_emissive(unit, emissive)
 
 		Material.set_vector3(material, "emissive", emissive)
 	end
-
-	return 
 end
 
 DiceRoller._add_to_glow_list = function (self, unit)
@@ -626,9 +631,8 @@ DiceRoller._add_to_glow_list = function (self, unit)
 	}
 
 	WwiseWorld.trigger_event(self.wwise_world, "hud_dice_game_glow")
-
-	return 
 end
+
 DiceRoller._update_glow = function (self, dt)
 	local target_emissive = Vector3(0.615, 0.208, 0.055)
 	local duration = 0.2
@@ -641,9 +645,8 @@ DiceRoller._update_glow = function (self, dt)
 
 		set_emissive(data.unit, emissive)
 	end
-
-	return 
 end
+
 DiceRoller._create_success_table = function (self, success_list)
 	local success_table = {}
 	self.remaining_dice = self.remaining_dice or table.clone(self.dice_data)
@@ -669,9 +672,8 @@ DiceRoller._create_success_table = function (self, success_list)
 	table.shuffle(success_table)
 
 	self._success_table = success_table
-
-	return 
 end
+
 DiceRoller.roll_dices = function (self)
 	fassert(self._got_backend_result, "Trying to roll dice before response from backend")
 
@@ -703,6 +705,7 @@ DiceRoller.roll_dices = function (self)
 
 	return #dice_simulation_settings
 end
+
 DiceRoller.simulate_dice_rolls = function (self, success_list)
 	fassert(self._got_backend_result, "Trying to roll dice before response from backend")
 
@@ -906,6 +909,7 @@ DiceRoller.simulate_dice_rolls = function (self, success_list)
 
 	return simulation_successful
 end
+
 DiceRoller.run_simulation = function (self, dice_simulation_settings)
 
 	-- Decompilation error in this vicinity:
@@ -1148,6 +1152,7 @@ DiceRoller.run_simulation = function (self, dice_simulation_settings)
 
 
 end
+
 DiceRoller.calculate_results = function (self, dice_simulation_settings)
 
 	-- Decompilation error in this vicinity:
@@ -1184,12 +1189,13 @@ DiceRoller.calculate_results = function (self, dice_simulation_settings)
 
 	-- Decompilation error in this vicinity:
 	--- BLOCK #2 15-15, warpins: 1 ---
-	return 
+	return
 	--- END OF BLOCK #2 ---
 
 
 
 end
+
 DiceRoller.get_dice_result = function (self, unit, dice_type)
 
 	-- Decompilation error in this vicinity:
@@ -1360,6 +1366,7 @@ DiceRoller.get_dice_result = function (self, unit, dice_type)
 
 
 end
+
 DiceRoller.alter_rotations = function (self, dice_simulation_settings)
 
 	-- Decompilation error in this vicinity:
@@ -1463,12 +1470,13 @@ DiceRoller.alter_rotations = function (self, dice_simulation_settings)
 
 	-- Decompilation error in this vicinity:
 	--- BLOCK #2 63-63, warpins: 1 ---
-	return 
+	return
 	--- END OF BLOCK #2 ---
 
 
 
 end
+
 DiceRoller.get_dice_results = function (self)
 
 	-- Decompilation error in this vicinity:
@@ -1479,6 +1487,7 @@ DiceRoller.get_dice_results = function (self)
 
 
 end
+
 DiceRoller.update = function (self, dt)
 
 	-- Decompilation error in this vicinity:
@@ -1495,7 +1504,7 @@ DiceRoller.update = function (self, dt)
 
 	-- Decompilation error in this vicinity:
 	--- BLOCK #1 4-4, warpins: 1 ---
-	return 
+	return
 
 	--- END OF BLOCK #1 ---
 
@@ -1717,12 +1726,13 @@ DiceRoller.update = function (self, dt)
 	--- BLOCK #10 160-161, warpins: 4 ---
 	self.roll_time = roll_time
 
-	return 
+	return
 	--- END OF BLOCK #10 ---
 
 
 
 end
+
 DiceRoller.cleanup_post_roll = function (self)
 
 	-- Decompilation error in this vicinity:
@@ -2363,4 +2373,4 @@ if Development.parameter("dice_chance_simulation") then
 
 end
 
-return 
+return

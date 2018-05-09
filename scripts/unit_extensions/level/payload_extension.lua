@@ -8,6 +8,7 @@ local ANIM_SPEED = 30 / FRAMES / WHEEL_CIRCUMFERENCE
 local ERROR_RECOUP_TIME = 0.5
 local MOVING_THRESHOLD = 0.1
 PayloadExtension = class(PayloadExtension)
+
 PayloadExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	local network_manager = Managers.state.network
@@ -28,29 +29,29 @@ PayloadExtension.init = function (self, extension_init_context, unit, extension_
 	}
 	self._stop_command_given = false
 	self._activated = true
-
-	return 
 end
+
 PayloadExtension.activate = function (self)
 	self._activated = true
-
-	return 
 end
+
 PayloadExtension.deactivate = function (self, stop)
 	self._activated = false
 	self._stop_command_given = stop
+end
 
-	return 
-end
 PayloadExtension.destroy = function (self)
-	return 
+	return
 end
+
 PayloadExtension.extensions_ready = function (self)
-	return 
+	return
 end
+
 PayloadExtension.hot_join_sync = function (self, sender)
-	return 
+	return
 end
+
 PayloadExtension.init_payload = function (self, payload_gizmos)
 	local unit = self._unit
 	self._spline_curve = self._init_movement_spline(self, self._world, unit, payload_gizmos)
@@ -91,9 +92,8 @@ PayloadExtension.init_payload = function (self, payload_gizmos)
 	if self._is_server then
 		self._create_game_object(self)
 	end
-
-	return 
 end
+
 PayloadExtension._push_player = function (self, player_unit, abs_speed)
 	local unit = self._unit
 	local self_pos = POSITION_LOOKUP[unit]
@@ -109,11 +109,11 @@ PayloadExtension._push_player = function (self, player_unit, abs_speed)
 
 		locomotion_extension.add_external_velocity(locomotion_extension, pushed_velocity)
 	end
-
-	return 
 end
+
 local RESULT_TABLE = {}
 local STAGGERED = {}
+
 PayloadExtension._hit_enemies = function (self, abs_speed, t)
 	local payload_unit = self._unit
 	local payload_pos = POSITION_LOOKUP[payload_unit]
@@ -160,9 +160,8 @@ PayloadExtension._hit_enemies = function (self, abs_speed, t)
 			STAGGERED[hit_unit] = false
 		end
 	end
-
-	return 
 end
+
 PayloadExtension.update = function (self, unit, input, dt, context, t)
 	local num_players_in_proximity, players_in_proximity = self._players_in_proximity(self)
 	local has_players_in_proximity = 0 < num_players_in_proximity
@@ -291,9 +290,8 @@ PayloadExtension.update = function (self, unit, input, dt, context, t)
 
 		Unit.set_local_rotation(unit, node, node_rot)
 	end
-
-	return 
 end
+
 PayloadExtension.payload_flow_event = function (self, spline_index)
 	local spline_curve = self._spline_curve
 	local splines = spline_curve.splines(spline_curve)
@@ -303,10 +301,10 @@ PayloadExtension.payload_flow_event = function (self, spline_index)
 	local flow_event = flow_event_data.flow_event
 
 	LevelHelper:flow_event(self._world, flow_event)
-
-	return 
 end
+
 local PLAYERS_IN_PROXIMITY = {}
+
 PayloadExtension._players_in_proximity = function (self)
 	local player_units = PLAYER_UNITS
 	local num_player_units = #player_units
@@ -328,6 +326,7 @@ PayloadExtension._players_in_proximity = function (self)
 
 	return num_players_in_proximity, PLAYERS_IN_PROXIMITY
 end
+
 PayloadExtension._error_speed_calculation = function (self, dt, t, game, id, movement)
 	local spline_index = GameSession.game_object_field(game, id, "spline_index")
 	local subdiv = GameSession.game_object_field(game, id, "subdivision_index")
@@ -350,6 +349,7 @@ PayloadExtension._error_speed_calculation = function (self, dt, t, game, id, mov
 
 	return old_vals.error_compensation_speed
 end
+
 PayloadExtension.set_game_object_id = function (self, game_object_id)
 	local game = self._game
 	local spline_index = GameSession.game_object_field(game, game_object_id, "spline_index")
@@ -362,10 +362,10 @@ PayloadExtension.set_game_object_id = function (self, game_object_id)
 	movement.set_speed(movement, speed)
 
 	self._id = game_object_id
-
-	return 
 end
+
 local gizmo_point_map = {}
+
 PayloadExtension._init_movement_spline = function (self, world, unit, payload_gizmos)
 	local spline_name = Unit.get_data(unit, "spline_name")
 	local level = LevelHelper:current_level(world)
@@ -442,6 +442,7 @@ PayloadExtension._init_movement_spline = function (self, world, unit, payload_gi
 
 	return spline_curve
 end
+
 PayloadExtension._create_game_object = function (self)
 	local unit = self._unit
 	local movement = self._spline_curve:movement()
@@ -460,13 +461,10 @@ PayloadExtension._create_game_object = function (self)
 	local callback = callback(self, "cb_game_session_disconnect")
 	local game_object_id = self._network_manager:create_game_object("payload", game_object_data_table, callback)
 	self._id = game_object_id
-
-	return 
 end
+
 PayloadExtension.cb_game_session_disconnect = function (self)
 	self._game = nil
-
-	return 
 end
 
-return 
+return

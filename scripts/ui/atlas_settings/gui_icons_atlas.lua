@@ -10543,4 +10543,4 @@ icons_atlas = {
 	}
 }
 
-return 
+return

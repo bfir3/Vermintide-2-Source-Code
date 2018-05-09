@@ -104,8 +104,6 @@ local function add_dot(dot_template_name, hit_unit, attacker_unit, damage_source
 
 		buff_extension.add_buff(buff_extension, dot_template_name, buff_params)
 	end
-
-	return 
 end
 
 Dots = {
@@ -263,4 +261,4 @@ for item_template_name, item_template in pairs(Weapons) do
 	end
 end
 
-return 
+return

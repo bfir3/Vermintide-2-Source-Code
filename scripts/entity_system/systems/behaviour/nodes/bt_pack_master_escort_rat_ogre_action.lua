@@ -2,11 +2,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTPackMasterEscortRatOgreAction = class(BTPackMasterEscortRatOgreAction, BTNode)
 BTPackMasterEscortRatOgreAction.name = "BTPackMasterEscortRatOgreAction"
+
 BTPackMasterEscortRatOgreAction.init = function (self, ...)
 	BTPackMasterEscortRatOgreAction.super.init(self, ...)
-
-	return 
 end
+
 BTPackMasterEscortRatOgreAction.enter = function (self, unit, blackboard, t)
 	blackboard.action = self._tree_node.action_data
 
@@ -26,14 +26,12 @@ BTPackMasterEscortRatOgreAction.enter = function (self, unit, blackboard, t)
 	locomotion.set_rotation_speed(locomotion, 5)
 
 	blackboard.attack_cooldown = blackboard.attack_cooldown or 0
-
-	return 
 end
+
 BTPackMasterEscortRatOgreAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	Managers.state.network:anim_event(unit, "move_fwd")
-
-	return 
 end
+
 BTPackMasterEscortRatOgreAction.run = function (self, unit, blackboard, t, dt)
 	local escort_slot = blackboard.my_escort_slot
 
@@ -96,4 +94,4 @@ BTPackMasterEscortRatOgreAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

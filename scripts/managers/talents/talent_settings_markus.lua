@@ -1777,4 +1777,4 @@ end
 
 BuffUtils.apply_buff_tweak_data(TalentBuffTemplates.empire_soldier, buff_tweak_data)
 
-return 
+return

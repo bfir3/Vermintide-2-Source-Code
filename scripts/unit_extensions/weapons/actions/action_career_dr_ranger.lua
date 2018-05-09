@@ -1,4 +1,5 @@
 ActionCareerDRRanger = class(ActionCareerDRRanger, ActionCareerBase)
+
 ActionCareerDRRanger.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	ActionCareerDRRanger.super.init(self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 
@@ -6,9 +7,8 @@ ActionCareerDRRanger.init = function (self, world, item_name, is_server, owner_u
 	self.input_extension = ScriptUnit.extension(owner_unit, "input_system")
 	self.inventory_extension = ScriptUnit.extension(owner_unit, "inventory_system")
 	self.status_extension = ScriptUnit.extension(owner_unit, "status_system")
-
-	return 
 end
+
 ActionCareerDRRanger.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level)
 	self.current_action = new_action
 	self.action_time_started = t
@@ -18,9 +18,8 @@ ActionCareerDRRanger.client_owner_start_action = function (self, new_action, t, 
 	self.inventory_extension:wield(slot)
 
 	self.power_level = power_level
-
-	return 
 end
+
 ActionCareerDRRanger._create_smoke_screen = function (self)
 	local owner_unit = self.owner_unit
 	local network_manager = Managers.state.network
@@ -72,21 +71,19 @@ ActionCareerDRRanger._create_smoke_screen = function (self)
 
 	career_extension.set_state(career_extension, "bardin_activate_ranger")
 	status_extension.set_invisible(status_extension, true)
-
-	return 
 end
+
 ActionCareerDRRanger._play_vo = function (self)
 	local owner_unit = self.owner_unit
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
-
-	return 
 end
+
 ActionCareerDRRanger.client_owner_post_update = function (self, dt, t, world, can_damage)
 	if self.thrown then
-		return 
+		return
 	end
 
 	local current_action = self.current_action
@@ -99,9 +96,8 @@ ActionCareerDRRanger.client_owner_post_update = function (self, dt, t, world, ca
 
 		self.thrown = true
 	end
-
-	return 
 end
+
 ActionCareerDRRanger._stagger_explosion = function (self)
 	local owner_unit = self.owner_unit
 	local world = self.world
@@ -136,20 +132,17 @@ ActionCareerDRRanger._stagger_explosion = function (self)
 	end
 
 	self.career_extension:create_aoe(position, explosion_template.explosion.radius, duration, "end_ranger_activated_ability")
-
-	return 
 end
+
 ActionCareerDRRanger.finish = function (self, reason)
 	ActionCareerDRRanger.super.finish(self, reason)
 
 	if reason ~= "action_complete" then
-		return 
+		return
 	end
 
 	self.inventory_extension:wield_previous_weapon()
 	self.career_extension:start_activated_ability_cooldown()
-
-	return 
 end
 
-return 
+return

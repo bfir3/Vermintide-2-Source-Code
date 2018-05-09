@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTLootRatAlertedAction = class(BTLootRatAlertedAction, BTNode)
+
 BTLootRatAlertedAction.init = function (self, ...)
 	BTLootRatAlertedAction.super.init(self, ...)
-
-	return 
 end
+
 BTLootRatAlertedAction.name = "BTLootRatAlertedAction"
+
 BTLootRatAlertedAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -20,9 +21,8 @@ BTLootRatAlertedAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.navigation_extension:set_enabled(false)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
-
-	return 
 end
+
 BTLootRatAlertedAction.init_alerted = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
 	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
@@ -49,9 +49,8 @@ BTLootRatAlertedAction.init_alerted = function (self, unit, blackboard)
 	if ScriptUnit.has_extension(unit, "ai_inventory_system") then
 		network_manager.network_transmit:send_rpc_all("rpc_ai_inventory_wield", unit_id, 1)
 	end
-
-	return 
 end
+
 BTLootRatAlertedAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if script_data.enable_alert_icon then
 		local category_name = "detect"
@@ -75,9 +74,8 @@ BTLootRatAlertedAction.leave = function (self, unit, blackboard, t, reason, dest
 	blackboard.detection_radius = math.huge
 	blackboard.spawn_to_running = true
 	blackboard.update_timer = 0
-
-	return 
 end
+
 BTLootRatAlertedAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.confirmed_player_sighting then
 		return "done"
@@ -92,8 +90,6 @@ BTLootRatAlertedAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "running"
 	end
-
-	return 
 end
 
-return 
+return

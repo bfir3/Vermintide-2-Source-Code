@@ -3,11 +3,11 @@ require("scripts/network/network_server")
 
 StateDedicatedServerInit = class(StateDedicatedServerInit)
 StateDedicatedServerInit.NAME = "StateDedicatedServerInit"
+
 StateDedicatedServerInit.on_enter = function (self, params)
 	self._init_network(self)
-
-	return 
 end
+
 StateDedicatedServerInit._init_network = function (self)
 	self.parent:setup_network_options()
 
@@ -46,17 +46,15 @@ StateDedicatedServerInit._init_network = function (self)
 
 	self._state = "waiting_for_backend"
 	Managers.ban_list = Managers.ban_list or BanListManager:new()
-
-	return 
 end
+
 StateDedicatedServerInit._load_save_data = function (self)
 	print("[StateDedicatedServerInit] SaveFileName", SaveFileName)
 	Managers.save:auto_load(SaveFileName, callback(self, "cb_save_data_loaded"))
 
 	self._save_data_loaded = false
-
-	return 
 end
+
 StateDedicatedServerInit.cb_save_data_loaded = function (self, info)
 	if info.error then
 		Application.warning("Load error %q", info.error)
@@ -66,9 +64,8 @@ StateDedicatedServerInit.cb_save_data_loaded = function (self, info)
 
 	self._save_data_loaded = true
 	GameSettingsDevelopment.trunk_path = Development.parameter("trunk_path")
-
-	return 
 end
+
 StateDedicatedServerInit.update = function (self, dt, t)
 	local game_server = self._game_server
 	local server_state = game_server.update(game_server, dt, t)
@@ -99,8 +96,9 @@ StateDedicatedServerInit.update = function (self, dt, t)
 
 	return nil
 end
+
 StateDedicatedServerInit.on_exit = function (self)
-	return 
+	return
 end
 
-return 
+return

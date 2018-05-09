@@ -24,8 +24,6 @@ local function trigger_player_friendly_fire_dialogue(player_unit, attacker_unit)
 
 		dialogue_input.trigger_dialogue_event(dialogue_input, "friendly_fire", event_data)
 	end
-
-	return 
 end
 
 local function trigger_enemy_armor_hit_dialogue(enemy_unit, player_unit, damage_dealt, hit)
@@ -43,8 +41,6 @@ local function trigger_enemy_armor_hit_dialogue(enemy_unit, player_unit, damage_
 			end
 		end
 	end
-
-	return 
 end
 
 local dot_hit_types = {
@@ -65,11 +61,9 @@ HitReactions.templates = {
 			end
 
 			trigger_enemy_armor_hit_dialogue(unit, attacker_unit, damage_taken, hit)
-
-			return 
 		end,
 		husk = function (unit, dt, context, t, hit)
-			return 
+			return
 		end
 	},
 	player = {
@@ -87,15 +81,11 @@ HitReactions.templates = {
 
 				trigger_player_friendly_fire_dialogue(unit, attacker)
 			end
-
-			return 
 		end,
 		husk = function (unit, dt, context, t, hit)
 			local attacker = hit[DamageDataIndex.ATTACKER]
 
 			trigger_player_friendly_fire_dialogue(unit, attacker)
-
-			return 
 		end
 	},
 	level_object = {
@@ -105,8 +95,6 @@ HitReactions.templates = {
 
 			Unit.set_flow_variable(unit, "current_health", current_health)
 			Unit.flow_event(unit, "lua_on_damage_taken")
-
-			return 
 		end,
 		husk = function (unit, dt, context, t, hit)
 			local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -114,8 +102,6 @@ HitReactions.templates = {
 
 			Unit.set_flow_variable(unit, "current_health", current_health)
 			Unit.flow_event(unit, "lua_on_damage_taken")
-
-			return 
 		end
 	},
 	dummy = {
@@ -134,8 +120,6 @@ HitReactions.templates = {
 				Unit.set_flow_variable(unit, "current_health", current_health)
 				Unit.flow_event(unit, "lua_on_damage_taken")
 			end
-
-			return 
 		end,
 		husk = function (unit, dt, context, t, hit)
 			local hit_type = hit[2]
@@ -152,8 +136,6 @@ HitReactions.templates = {
 				Unit.set_flow_variable(unit, "current_health", current_health)
 				Unit.flow_event(unit, "lua_on_damage_taken")
 			end
-
-			return 
 		end,
 		hit_zones = {
 			nil,
@@ -171,6 +153,7 @@ HitReactions.templates = {
 		}
 	}
 }
+
 HitReactions.get_reaction = function (hit_reaction_template, is_husk)
 	local templates = HitReactions.templates
 	local husk_key = (is_husk and "husk") or "unit"
@@ -183,4 +166,4 @@ HitReactions.get_reaction = function (hit_reaction_template, is_husk)
 	return reaction_table.unit
 end
 
-return 
+return

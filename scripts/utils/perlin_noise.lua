@@ -1,4 +1,5 @@
 PerlinNoise = class(PerlinNoise)
+
 PerlinNoise.init = function (self, world)
 	self._n = 256
 	self._permutations = {}
@@ -8,9 +9,8 @@ PerlinNoise.init = function (self, world)
 	self._line_object = World.create_line_object(world, false)
 
 	self.setup(self)
-
-	return 
 end
+
 local colors = {
 	{
 		30,
@@ -88,6 +88,7 @@ local colors = {
 		255
 	}
 }
+
 PerlinNoise.draw_height = function (self, height, x, y, z, rad)
 	local drawer = Managers.state.debug:drawer({
 		mode = "lel",
@@ -104,9 +105,8 @@ PerlinNoise.draw_height = function (self, height, x, y, z, rad)
 	local color = colors[index]
 
 	drawer.sphere(drawer, Vector3(x, y, z + 0.5), rad or 0.35, Color(color[1], color[2], color[3]))
-
-	return 
 end
+
 PerlinNoise.filter_list_using_noise = function (self, list, height_threshold)
 	local a, b, c = Script.temp_count()
 	local lowest = 0
@@ -143,6 +143,7 @@ PerlinNoise.filter_list_using_noise = function (self, list, height_threshold)
 
 	return list
 end
+
 PerlinNoise.normalize = function (self, gradient_x, gradient_y)
 	local s = nil
 	s = math.sqrt(gradient_x * gradient_x + gradient_y * gradient_y)
@@ -154,6 +155,7 @@ PerlinNoise.normalize = function (self, gradient_x, gradient_y)
 
 	return gradient_x, gradient_y
 end
+
 PerlinNoise.setup = function (self)
 	for i = 1, self._n, 1 do
 		self._permutations[i] = i
@@ -193,9 +195,8 @@ PerlinNoise.setup = function (self)
 			self._gradients[self._n + i][j] = self._gradients[i][j]
 		end
 	end
-
-	return 
 end
+
 PerlinNoise.get_height = function (self, x, y)
 	local point_x = x
 	local point_y = y
@@ -249,16 +250,19 @@ PerlinNoise.get_height = function (self, x, y)
 
 	return z
 end
+
 PerlinNoise.at2 = function (self, gradient, vec_x, vec_y)
 	local arctang = gradient[1] * vec_x + gradient[2] * vec_y
 
 	return arctang
 end
+
 PerlinNoise.getSCurve = function (self, p)
 	local s_curve = 6 * p^5 - 15 * p^4 + 10 * p^3
 
 	return s_curve
 end
+
 PerlinNoise.simulate_points = function (self)
 	local drawer = Managers.state.debug:drawer({
 		mode = "lel",
@@ -308,8 +312,6 @@ PerlinNoise.simulate_points = function (self)
 	end
 
 	print("lowest and highest", lowest, highest)
-
-	return 
 end
 
-return 
+return

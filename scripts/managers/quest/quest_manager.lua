@@ -25,6 +25,7 @@ local stat_names_by_quest_key = {
 	}
 }
 QuestManager = class(QuestManager)
+
 QuestManager.init = function (self, statistics_db)
 	self._statistics_db = statistics_db
 	local backend_interface_quests = Managers.backend:get_interface("quests")
@@ -32,9 +33,8 @@ QuestManager.init = function (self, statistics_db)
 	self._backend_interface_quests = backend_interface_quests
 
 	Managers.state.event:register(self, "event_stat_incremented", "event_stat_incremented")
-
-	return 
 end
+
 QuestManager.event_stat_incremented = function (self, stats_id, ...)
 	local templates = quest_templates.quests
 	local statistics_db = self._statistics_db
@@ -70,16 +70,15 @@ QuestManager.event_stat_incremented = function (self, stats_id, ...)
 			end
 		end
 	end
-
-	return 
 end
+
 QuestManager.update = function (self, dt, t)
 	local reward_poll_id = self._reward_poll_id
 	local player_manager = Managers.player
 	local player = player_manager.local_player(player_manager)
 
 	if not player then
-		return 
+		return
 	end
 
 	local stats_id = player.stats_id(player)
@@ -129,9 +128,8 @@ QuestManager.update = function (self, dt, t)
 			self._refresh_poll_id = nil
 		end
 	end
-
-	return 
 end
+
 QuestManager.get_quest_outline = function (self)
 	local quests = self._backend_interface_quests:get_quests()
 	local outline = table.clone(outline)
@@ -158,6 +156,7 @@ QuestManager.get_quest_outline = function (self)
 
 	return outline
 end
+
 QuestManager.get_data_by_id = function (self, quest_id)
 	local quests = self._backend_interface_quests:get_quests()
 	local quest_key = table.find(quests, quest_id)
@@ -254,6 +253,7 @@ QuestManager.get_data_by_id = function (self, quest_id)
 
 	return evaluated_quest
 end
+
 QuestManager.refresh_quest = function (self, quest_id)
 	if self._reward_poll_id or self._refresh_poll_id then
 		return "Polling in progress."
@@ -267,9 +267,11 @@ QuestManager.refresh_quest = function (self, quest_id)
 
 	return refresh_poll_id
 end
+
 QuestManager.polling_quest_refresh = function (self)
 	return (self._refresh_poll_id and true) or false
 end
+
 QuestManager.can_refresh_quest = function (self)
 	local backend_interface_quests = self._backend_interface_quests
 	local can_refresh = backend_interface_quests.can_refresh_quest(backend_interface_quests)
@@ -284,6 +286,7 @@ QuestManager.can_refresh_quest = function (self)
 
 	return true
 end
+
 QuestManager.claim_reward = function (self, quest_id)
 	if self._reward_poll_id or self._refresh_poll_id then
 		return "Polling in progress."
@@ -297,9 +300,11 @@ QuestManager.claim_reward = function (self, quest_id)
 
 	return reward_poll_id
 end
+
 QuestManager.polling_quest_reward = function (self)
 	return (self._reward_poll_id and true) or false
 end
+
 QuestManager.can_claim_quest_rewards = function (self, quest_id)
 	local quests = self._backend_interface_quests:get_quests()
 	local quest_key = table.find(quests, quest_id)
@@ -316,6 +321,7 @@ QuestManager.can_claim_quest_rewards = function (self, quest_id)
 
 	return true
 end
+
 QuestManager.time_until_new_daily_quest = function (self)
 	local current_utc = os.time(os.date("!*t"))
 	local backend_interface_quests = self._backend_interface_quests
@@ -326,4 +332,4 @@ QuestManager.time_until_new_daily_quest = function (self)
 	return difference_in_seconds
 end
 
-return 
+return

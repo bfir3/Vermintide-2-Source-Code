@@ -1,20 +1,21 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTTentacleIdleAction = class(BTTentacleIdleAction, BTNode)
+
 BTTentacleIdleAction.init = function (self, ...)
 	BTTentacleIdleAction.super.init(self, ...)
-
-	return 
 end
+
 BTTentacleIdleAction.name = "BTTentacleIdleAction"
+
 BTTentacleIdleAction.enter = function (self, unit, blackboard, t)
 	blackboard.next_attack_time = blackboard.next_attack_time or t + 0.5
+end
 
-	return 
-end
 BTTentacleIdleAction.leave = function (self, unit, blackboard, t, reason, destroy)
-	return 
+	return
 end
+
 BTTentacleIdleAction.run = function (self, unit, blackboard, t, dt, bt_name)
 	local data = blackboard.tentacle_data
 	local current_length = data.current_length
@@ -48,4 +49,4 @@ BTTentacleIdleAction.run = function (self, unit, blackboard, t, dt, bt_name)
 	return "running"
 end
 
-return 
+return

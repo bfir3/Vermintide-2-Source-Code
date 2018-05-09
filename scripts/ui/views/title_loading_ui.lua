@@ -872,6 +872,7 @@ local dynamic_range_value_settings = {
 	}
 }
 TitleLoadingUI = class(TitleLoadingUI)
+
 TitleLoadingUI.init = function (self, world, params, force_done)
 	if PLATFORM == "win32" then
 		Application.set_time_step_policy("no_smoothing", "clear_history", "throttle", 60)
@@ -899,16 +900,14 @@ TitleLoadingUI.init = function (self, world, params, force_done)
 	Managers.input:map_device_to_service("title_loading_ui", "mouse")
 	Managers.input:map_device_to_service("title_loading_ui", "gamepad")
 	self._setup_gui(self)
-
-	return 
 end
+
 TitleLoadingUI._setup_gui = function (self)
 	self._ui_renderer = UIRenderer.create(self._world, "material", "materials/ui/ui_1080p_splash_screen", "material", "materials/ui/ui_1080p_title_screen", "material", "materials/ui/ui_1080p_common", "material", first_time_video.video_name, "material", "materials/fonts/gw_fonts")
 
 	self._create_elements(self)
-
-	return 
 end
+
 TitleLoadingUI._create_elements = function (self)
 	self._ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self._video_widget = UIWidget.init(UIWidgets.create_splash_video(first_time_video))
@@ -973,10 +972,10 @@ TitleLoadingUI._create_elements = function (self)
 	end
 
 	DO_RELOAD = false
-
-	return 
 end
+
 DO_RELOAD = true
+
 TitleLoadingUI.setup_gamma_menu = function (self)
 	local gamma_stepper = self._gamma_widgets_by_name.gamma_stepper
 	local gamma_adjuster = self._gamma_widgets_by_name.gamma_adjuster
@@ -990,9 +989,8 @@ TitleLoadingUI.setup_gamma_menu = function (self)
 	gamma_stepper.content.internal_value = internal_value
 	local gamma_adjuster_content = gamma_adjuster.content
 	gamma_adjuster_content.value_text = string.format("%.1f", value)
-
-	return 
 end
+
 TitleLoadingUI.setup_sound_panning_menu = function (self)
 	local stepper = self._panning_widgets_by_name.stepper
 	local min = panning_value_settings.min
@@ -1007,9 +1005,8 @@ TitleLoadingUI.setup_sound_panning_menu = function (self)
 	stepper.content.internal_value = start_value
 
 	self._change_sound_panning_display_by_value(self, start_value)
-
-	return 
 end
+
 TitleLoadingUI.setup_sound_dynamic_range_menu = function (self)
 	local stepper = self._dynamic_range_widgets_by_name.stepper
 	local min = dynamic_range_value_settings.min
@@ -1024,9 +1021,8 @@ TitleLoadingUI.setup_sound_dynamic_range_menu = function (self)
 	stepper.content.internal_value = start_value
 
 	self._change_sound_dynamic_range_display_by_value(self, start_value)
-
-	return 
 end
+
 TitleLoadingUI.update = function (self, dt)
 	if DO_RELOAD then
 		self._create_elements(self)
@@ -1109,9 +1105,8 @@ TitleLoadingUI.update = function (self, dt)
 	end
 
 	self._render(self, dt)
-
-	return 
 end
+
 TitleLoadingUI._change_sound_panning_display_by_value = function (self, value)
 	local min = panning_value_settings.min
 	local max = panning_value_settings.max
@@ -1136,9 +1131,8 @@ TitleLoadingUI._change_sound_panning_display_by_value = function (self, value)
 	end
 
 	panning_widgets_by_name.sound_presentation_image.content.texture_id = "sound_setting_icon_0" .. value
-
-	return 
 end
+
 TitleLoadingUI._change_sound_dynamic_range_display_by_value = function (self, value)
 	local min = dynamic_range_value_settings.min
 	local max = dynamic_range_value_settings.max
@@ -1153,9 +1147,8 @@ TitleLoadingUI._change_sound_dynamic_range_display_by_value = function (self, va
 	stepper.content.value = option_value
 	stepper.content.internal_value = internal_value
 	dynamic_range_widgets_by_name.sound_presentation_image.content.texture_id = "sound_setting_icon_0" .. value + 4
-
-	return 
 end
+
 TitleLoadingUI._update_continue_button = function (self, gamepad_active, dt)
 	self._animate_button(self, self._done_button, dt)
 
@@ -1204,9 +1197,8 @@ TitleLoadingUI._update_continue_button = function (self, gamepad_active, dt)
 			self._settings_index = settings_index + 1
 		end
 	end
-
-	return 
 end
+
 TitleLoadingUI._animate_button = function (self, widget, dt)
 	local ui_renderer = self.ui_renderer
 	local scenegraph_id = widget.scenegraph_id
@@ -1271,9 +1263,8 @@ TitleLoadingUI._animate_button = function (self, widget, dt)
 	local title_select_text_color = title_text_style.select_text_color
 
 	Colors.lerp_color_tables(title_default_text_color, title_select_text_color, combined_progress, title_text_color)
-
-	return 
 end
+
 TitleLoadingUI._handle_stepper_input = function (self, widget, stepper_settings, gamepad_active, dt)
 	local input_service = Managers.input:get_service("title_loading_ui")
 	local content = widget.content
@@ -1352,6 +1343,7 @@ TitleLoadingUI._handle_stepper_input = function (self, widget, stepper_settings,
 
 	return change_made
 end
+
 TitleLoadingUI._on_stepper_arrow_hover = function (self, widget, style_id)
 	local widget_animations = widget.animations
 	local widget_style = widget.style
@@ -1368,9 +1360,8 @@ TitleLoadingUI._on_stepper_arrow_hover = function (self, widget, style_id)
 	else
 		pass_style.color[1] = target_alpha
 	end
-
-	return 
 end
+
 TitleLoadingUI._on_stepper_arrow_dehover = function (self, widget, style_id)
 	local widget_animations = widget.animations
 	local widget_style = widget.style
@@ -1387,9 +1378,8 @@ TitleLoadingUI._on_stepper_arrow_dehover = function (self, widget, style_id)
 	else
 		pass_style.color[1] = target_alpha
 	end
-
-	return 
 end
+
 TitleLoadingUI._on_stepper_arrow_pressed = function (self, widget, style_id)
 	local widget_animations = widget.animations
 	local widget_style = widget.style
@@ -1413,19 +1403,20 @@ TitleLoadingUI._on_stepper_arrow_pressed = function (self, widget, style_id)
 	else
 		pass_style.color[1] = target_alpha
 	end
-
-	return 
 end
+
 TitleLoadingUI._animate_element_by_catmullrom = function (self, target, target_index, target_value, p0, p1, p2, p3, time)
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
 end
+
 TitleLoadingUI._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 TitleLoadingUI._get_input_texture_data = function (self, input_action)
 	local input_service = Managers.input:get_service("title_loading_ui")
 
@@ -1441,14 +1432,14 @@ TitleLoadingUI._get_input_texture_data = function (self, input_action)
 	elseif Managers.input:is_device_active("gamepad") then
 		return UISettings.get_gamepad_input_texture_data(input_service, input_action, true)
 	end
-
-	return 
 end
+
 TitleLoadingUI._get_input_gamepad_texture_data = function (self, input_action)
 	local input_service = Managers.input:get_service("title_loading_ui")
 
 	return UISettings.get_gamepad_input_texture_data(input_service, input_action, true)
 end
+
 TitleLoadingUI._update_input_text = function (self, dt)
 	local widget_content = self._skip_widget.content
 	local widget_style = self._skip_widget.style
@@ -1490,10 +1481,10 @@ TitleLoadingUI._update_input_text = function (self, dt)
 	end
 
 	self._can_draw_input_widget = true
-
-	return 
 end
+
 INPUTS_TO_REMOVE = {}
+
 TitleLoadingUI._update_any_held = function (self)
 	local held = false
 
@@ -1531,11 +1522,12 @@ TitleLoadingUI._update_any_held = function (self)
 
 	return held
 end
+
 TitleLoadingUI._update_input = function (self, dt)
 	if self._force_done then
 		self._handle_skip_fade(self, 0)
 
-		return 
+		return
 	end
 
 	local total_hold_time = 1
@@ -1587,9 +1579,8 @@ TitleLoadingUI._update_input = function (self, dt)
 	end
 
 	self._cancel_video = self._cancel_video or cancel_video
-
-	return 
 end
+
 TitleLoadingUI._handle_skip_fade = function (self, alpha)
 	local skip_input_style = self._skip_widget.style
 	skip_input_style.input_text_1.text_color[1] = alpha
@@ -1598,9 +1589,8 @@ TitleLoadingUI._handle_skip_fade = function (self, alpha)
 	skip_input_style.input_icon.color[1] = alpha
 	skip_input_style.input_icon_bar.color[1] = alpha
 	skip_input_style.hold_bar_bg.color[1] = alpha
-
-	return 
 end
+
 TitleLoadingUI._render = function (self, dt)
 	local input_manager = Managers.input
 	local input_service = input_manager.get_service(input_manager, "title_loading_ui")
@@ -1638,16 +1628,15 @@ TitleLoadingUI._render = function (self, dt)
 
 	UIRenderer.draw_widget(self._ui_renderer, self._dead_space_filler_widget)
 	UIRenderer.end_pass(self._ui_renderer)
-
-	return 
 end
+
 TitleLoadingUI._render_video = function (self, dt)
 	if not self._trailer then
-		return 
+		return
 	end
 
 	if self._done then
-		return 
+		return
 	end
 
 	if not self._ui_renderer.video_player then
@@ -1681,9 +1670,8 @@ TitleLoadingUI._render_video = function (self, dt)
 			UIRenderer.draw_widget(self._ui_renderer, self._video_widget)
 		end
 	end
-
-	return 
 end
+
 TitleLoadingUI.destroy = function (self)
 	UIRenderer.destroy(self._ui_renderer, self._world)
 
@@ -1706,12 +1694,12 @@ TitleLoadingUI.destroy = function (self)
 
 		self._needs_cursor_pop = false
 	end
-
-	return 
 end
+
 TitleLoadingUI.is_done = function (self)
 	return self._startup_settings_done and (self._force_done or self._done)
 end
+
 TitleLoadingUI.force_done = function (self)
 	self._force_done = true
 	self._cancel_timer = nil
@@ -1721,8 +1709,6 @@ TitleLoadingUI.force_done = function (self)
 	end
 
 	self._skip_widget.style.input_icon_bar.gradient_threshold = 0
-
-	return 
 end
 
-return 
+return

@@ -63,8 +63,6 @@ AspectRatio.calculate = function (width, height)
 	else
 		return AspectRatio.AR16_9, max
 	end
-
-	return 
 end
 
-return 
+return

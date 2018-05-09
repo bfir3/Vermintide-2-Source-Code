@@ -6,6 +6,7 @@ local BLACKBOARDS = BLACKBOARDS
 local NUMBER_OF_RAYCASTS = 36
 local RAYCAST_INVERAL_RAD = (2 * math.pi) / NUMBER_OF_RAYCASTS
 local NAV_COST_MAP_UPDATE_INTERVAL = 0.5
+
 VortexExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	self.world = world
@@ -70,9 +71,8 @@ VortexExtension.init = function (self, extension_init_context, unit, extension_i
 
 		self._use_nav_cost_map_volumes = true
 	end
-
-	return 
 end
+
 VortexExtension._create_nav_cost_maps = function (self, ai_system, position, full_outer_radius, high_cost_type, medium_cost_type)
 	local num_volumes = 1
 	local transform = Matrix4x4.from_translation(position)
@@ -86,9 +86,8 @@ VortexExtension._create_nav_cost_maps = function (self, ai_system, position, ful
 	local time_manager = Managers.time
 	local t = time_manager.time(time_manager, "game")
 	self._next_nav_cost_map_update_t = t + NAV_COST_MAP_UPDATE_INTERVAL
-
-	return 
 end
+
 VortexExtension.extensions_ready = function (self, world, unit)
 	local blackboard = BLACKBOARDS[unit]
 	self.blackboard = blackboard
@@ -138,9 +137,8 @@ VortexExtension.extensions_ready = function (self, world, unit)
 
 	navigation_extension.init_position(navigation_extension)
 	WwiseUtils.trigger_unit_event(world, "Play_enemy_sorcerer_vortex_loop", unit)
-
-	return 
 end
+
 VortexExtension.destroy = function (self)
 	local blackboard = self.blackboard
 	local vortex_data = blackboard.vortex_data
@@ -227,10 +225,10 @@ VortexExtension.destroy = function (self)
 		ai_system.remove_nav_cost_map_volume(ai_system, medium_cost_volume_id, medium_cost_cost_map_id)
 		ai_system.destroy_nav_cost_map(ai_system, medium_cost_cost_map_id)
 	end
-
-	return 
 end
+
 local HEIGHT_FX_LERP = 2
+
 VortexExtension.update = function (self, unit, input, dt, context, t)
 	local blackboard = self.blackboard
 	local vortex_template = self.vortex_template
@@ -248,7 +246,7 @@ VortexExtension.update = function (self, unit, input, dt, context, t)
 	if vortex_data.time_of_death < t then
 		Managers.state.conflict:destroy_unit(unit, blackboard, "vortex")
 
-		return 
+		return
 	end
 
 	if self._use_nav_cost_map_volumes and self._next_nav_cost_map_update_t < t then
@@ -271,8 +269,6 @@ VortexExtension.update = function (self, unit, input, dt, context, t)
 	local scale_z = height_lerp * vortex_template.max_height
 
 	Unit.set_local_scale(unit, 0, Vector3(scale_xy, scale_xy, scale_z))
-
-	return 
 end
 
 local function position_aligned_on_navmesh_transform(nav_world, position, x_axis)
@@ -289,8 +285,6 @@ local function position_aligned_on_navmesh_transform(nav_world, position, x_axis
 
 		return transform, position_on_mesh, rotation, y_axis
 	end
-
-	return 
 end
 
 VortexExtension._update_nav_cost_map_volumes = function (self, position, full_outer_radius, nav_world, ai_system, navigation_extension, locomotion_extension)
@@ -300,7 +294,7 @@ VortexExtension._update_nav_cost_map_volumes = function (self, position, full_ou
 	local high_cost_transform, high_cost_position, high_cost_rotation, high_cost_direction = position_aligned_on_navmesh_transform(nav_world, position, x_axis)
 
 	if not high_cost_transform then
-		return 
+		return
 	end
 
 	local high_cost_map_id = self._high_cost_nav_cost_map_id
@@ -322,10 +316,10 @@ VortexExtension._update_nav_cost_map_volumes = function (self, position, full_ou
 	local medium_cost_transform = Matrix4x4.from_quaternion_position(high_cost_rotation, medium_cost_position)
 
 	ai_system.set_nav_cost_map_volume_transform(ai_system, medium_cost_volume_id, medium_cost_map_id, medium_cost_transform)
-
-	return 
 end
+
 local INCREASE_HEIGHT_LERP_PROGRESS_PER_SECOND = 0.25
+
 VortexExtension._update_height = function (self, unit, t, dt, vortex_template, vortex_data)
 	local check_z_offset = 1
 	local current_raycast_rad = vortex_data.current_raycast_rad
@@ -370,11 +364,11 @@ VortexExtension._update_height = function (self, unit, t, dt, vortex_template, v
 		local new_lerp_value = math.clamp(current_lerp_value + dt * INCREASE_HEIGHT_LERP_PROGRESS_PER_SECOND, 0, 1)
 		vortex_data.height = math.lerp(start_lerp_height, wanted_height, new_lerp_value)
 	end
-
-	return 
 end
+
 local INCREASE_RADIUS_LERP_PROGRESS_PER_SECOND = 0.75
 local DECREASE_RADIUS_LERP_PROGRESS_PER_SECOND = 1.5
+
 VortexExtension._update_radius = function (self, unit, t, dt, nav_world, traverse_logic, vortex_template, vortex_data)
 	local unit_position = position_lookup[unit]
 	local current_inner_radius = vortex_data.inner_radius
@@ -385,7 +379,7 @@ VortexExtension._update_radius = function (self, unit, t, dt, nav_world, travers
 	local success, projected_start_pos, projected_end_pos, hit_position = LocomotionUtils.raycast_on_navmesh(nav_world, unit_position, ray_end, traverse_logic, 1, 1)
 
 	if not projected_start_pos then
-		return 
+		return
 	end
 
 	local hit_distance = Vector3.distance(projected_start_pos, hit_position)
@@ -439,9 +433,8 @@ VortexExtension._update_radius = function (self, unit, t, dt, nav_world, travers
 
 	local inner_radius_p = vortex_data.inner_radius / vortex_template.full_inner_radius
 	vortex_data.outer_radius = math.max(vortex_template.min_outer_radius, vortex_template.full_outer_radius * inner_radius_p)
-
-	return 
 end
+
 VortexExtension.control_size = function (self, unit, t, dt, nav_world, traverse_logic, vortex_template, vortex_data)
 	vortex_data.current_raycast_rad = math.fmod(vortex_data.current_raycast_rad + RAYCAST_INVERAL_RAD, 2 * math.pi)
 
@@ -463,8 +456,10 @@ VortexExtension.control_size = function (self, unit, t, dt, nav_world, traverse_
 
 	return vortex_data.inner_radius, vortex_data.outer_radius, vortex_data.fx_radius
 end
+
 local NUM_SEGMENTS = 4
 local EJECT_SEGMENT_LIST = Script.new_array(NUM_SEGMENTS)
+
 VortexExtension._update_attract_players = function (self, unit, blackboard, vortex_data, vortex_template, t, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius, allowed_distance)
 	local nav_world = blackboard.nav_world
 	local physics_world = vortex_data.physics_world
@@ -580,10 +575,10 @@ VortexExtension._update_attract_players = function (self, unit, blackboard, vort
 			end
 		end
 	end
-
-	return 
 end
+
 local ai_units = {}
+
 VortexExtension._update_attract_outside_ai = function (self, vortex_data, blackboard, vortex_template, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius)
 	local vortex_height = vortex_data.height
 	local ai_attract_speed = vortex_template.ai_attract_speed
@@ -633,9 +628,8 @@ VortexExtension._update_attract_outside_ai = function (self, vortex_data, blackb
 			end
 		end
 	end
-
-	return 
 end
+
 VortexExtension._update_attract_inside_ai = function (self, blackboard, vortex_data, vortex_template, dt, center_pos, inner_radius, allowed_distance)
 	local ai_rotation_speed = vortex_template.ai_rotation_speed
 	local ai_radius_change_speed = vortex_template.ai_radius_change_speed
@@ -677,9 +671,8 @@ VortexExtension._update_attract_inside_ai = function (self, blackboard, vortex_d
 			ai_units_inside[ai_unit] = nil
 		end
 	end
-
-	return 
 end
+
 VortexExtension.attract = function (self, unit, t, dt, blackboard, vortex_template, vortex_data, center_pos, inner_radius, outer_radius)
 	local minimum_height_diff = -0.5
 	local falloff_radius = outer_radius - inner_radius
@@ -689,9 +682,8 @@ VortexExtension.attract = function (self, unit, t, dt, blackboard, vortex_templa
 	self._update_attract_players(self, unit, blackboard, vortex_data, vortex_template, t, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius, allowed_distance)
 	self._update_attract_outside_ai(self, vortex_data, blackboard, vortex_template, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius)
 	self._update_attract_inside_ai(self, blackboard, vortex_data, vortex_template, dt, center_pos, inner_radius, allowed_distance)
-
-	return 
 end
+
 VortexExtension.is_position_inside = function (self, position, min_allowed_distance)
 	local blackboard = self.blackboard
 	local vortex_data = blackboard.vortex_data
@@ -703,9 +695,11 @@ VortexExtension.is_position_inside = function (self, position, min_allowed_dista
 
 	return distance_sq < required_distance_sq
 end
+
 local spiral = {}
 local spiral_segments = 8
 local spiral_lines = 10
+
 VortexExtension.debug_render_vortex = function (self, t, dt, pos, fx_radius, inner_radius, outer_radius, spin_speed, height)
 	fx_radius = fx_radius + math.sin(t * 1.7) * 0.4
 	local step = (2 * math.pi) / 6
@@ -739,8 +733,6 @@ VortexExtension.debug_render_vortex = function (self, t, dt, pos, fx_radius, inn
 
 	QuickDrawer:circle(pos, inner_radius, Vector3.up(), Colors.get("pink"))
 	QuickDrawer:circle(pos, outer_radius, Vector3.up(), Colors.get("lime_green"))
-
-	return 
 end
 
-return 
+return

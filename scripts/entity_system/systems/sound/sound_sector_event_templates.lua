@@ -267,4 +267,4 @@ SoundSectorEventTemplates.marauder_mass_idle = {
 	end
 }
 
-return 
+return

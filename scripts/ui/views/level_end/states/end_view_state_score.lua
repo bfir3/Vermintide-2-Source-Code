@@ -9,14 +9,15 @@ local PLAYER_NAME_MAX_LENGTH = 16
 local DO_RELOAD = false
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
 EndViewStateScore = class(EndViewStateScore)
 EndViewStateScore.NAME = "EndViewStateScore"
+
 EndViewStateScore.on_enter = function (self, params)
 	print("[PlayState] Enter Substate EndViewStateScore")
 
@@ -53,19 +54,18 @@ EndViewStateScore.on_enter = function (self, params)
 
 	self._setup_player_scores(self, players_session_score)
 	self._play_sound(self, "play_gui_mission_summary_team_summary_enter")
-
-	return 
 end
+
 EndViewStateScore.exit = function (self, direction)
 	self._exit_started = true
 
 	self._start_transition_animation(self, "on_enter", "transition_exit")
-
-	return 
 end
+
 EndViewStateScore.exit_done = function (self)
 	return self._exit_started and self._animations.on_enter == nil
 end
+
 EndViewStateScore.create_ui_elements = function (self, params)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -95,29 +95,27 @@ EndViewStateScore.create_ui_elements = function (self, params)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
-
-	return 
 end
+
 EndViewStateScore._wanted_state = function (self)
 	local new_state = self.parent:wanted_menu_state()
 
 	return new_state
 end
+
 EndViewStateScore.set_input_manager = function (self, input_manager)
 	self.input_manager = input_manager
-
-	return 
 end
+
 EndViewStateScore.on_exit = function (self, params)
 	print("[PlayState] Exit Substate EndViewStateScore")
 
 	self.ui_animator = nil
-
-	return 
 end
+
 EndViewStateScore._update_transition_timer = function (self, dt)
 	if not self._transition_timer then
-		return 
+		return
 	end
 
 	if self._transition_timer == 0 then
@@ -125,9 +123,8 @@ EndViewStateScore._update_transition_timer = function (self, dt)
 	else
 		self._transition_timer = math.max(self._transition_timer - dt, 0)
 	end
-
-	return 
 end
+
 EndViewStateScore.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -162,12 +159,12 @@ EndViewStateScore.update = function (self, dt, t)
 	if not transitioning and not self._transition_timer then
 		self._handle_input(self, dt, t)
 	end
+end
 
-	return 
-end
 EndViewStateScore.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 EndViewStateScore._update_animations = function (self, dt)
 	for name, animation in pairs(self._ui_animations) do
 		UIAnimation.update(animation, dt)
@@ -187,9 +184,8 @@ EndViewStateScore._update_animations = function (self, dt)
 			animations[animation_name] = nil
 		end
 	end
-
-	return 
 end
+
 EndViewStateScore._update_entry_hover = function (self)
 	local hover_index = nil
 	local widgets_by_name = self._widgets_by_name
@@ -219,9 +215,8 @@ EndViewStateScore._update_entry_hover = function (self)
 
 		self._current_topic_hover_index = hover_index
 	end
-
-	return 
 end
+
 EndViewStateScore._set_entry_hover_index = function (self, hover_index)
 	local widgets_by_name = self._widgets_by_name
 	local score_widgets = self._score_widgets
@@ -234,16 +229,14 @@ EndViewStateScore._set_entry_hover_index = function (self, hover_index)
 	local topics_widget = widgets_by_name.scores_topics
 	local content = topics_widget.content
 	content.hover_index = hover_index
-
-	return 
 end
+
 EndViewStateScore._handle_input = function (self, dt, t)
 	if Development.parameter("tobii_button") then
 		self._handle_tobii_button(self, dt)
 	end
-
-	return 
 end
+
 EndViewStateScore._handle_tobii_button = function (self, dt)
 	local widgets_by_name = self._widgets_by_name
 	local tobii_button = widgets_by_name.tobii_button
@@ -261,9 +254,8 @@ EndViewStateScore._handle_tobii_button = function (self, dt)
 
 		Application.open_url_in_browser(tobii_contest_url)
 	end
-
-	return 
 end
+
 EndViewStateScore._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -273,15 +265,15 @@ EndViewStateScore._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 EndViewStateScore._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter
 end
+
 EndViewStateScore.draw = function (self, input_service, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -302,9 +294,8 @@ EndViewStateScore.draw = function (self, input_service, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 EndViewStateScore._start_transition_animation = function (self, key, animation_name)
 	local params = {
 		wwise_world = self.wwise_world,
@@ -313,19 +304,20 @@ EndViewStateScore._start_transition_animation = function (self, key, animation_n
 	local widgets = {}
 	local anim_id = self.ui_animator:start_animation(animation_name, widgets, scenegraph_definition, params)
 	self._animations[key] = anim_id
-
-	return 
 end
+
 EndViewStateScore._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 EndViewStateScore._animate_element_by_catmullrom = function (self, target, target_index, target_value, p0, p1, p2, p3, time)
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
 end
+
 EndViewStateScore._transform_player_session_score = function (self, players_session_scores)
 	local transformed_player_session_score = {
 		group_scores = {}
@@ -355,6 +347,7 @@ EndViewStateScore._transform_player_session_score = function (self, players_sess
 
 	return transformed_player_session_score
 end
+
 EndViewStateScore._group_scores_by_player_and_topic = function (self, score_panel_scores, player_data, player_index)
 	for group_name, group_data in pairs(player_data.group_scores) do
 		if not score_panel_scores[group_name] then
@@ -377,9 +370,8 @@ EndViewStateScore._group_scores_by_player_and_topic = function (self, score_pane
 			score_panel_scores[group_name][index].player_scores[player_index] = score_data.score
 		end
 	end
-
-	return 
 end
+
 EndViewStateScore._setup_player_scores = function (self, players_session_scores)
 	local score_panel_scores = {}
 	local player_names = {}
@@ -409,9 +401,8 @@ EndViewStateScore._setup_player_scores = function (self, players_session_scores)
 	end
 
 	self._setup_score_panel(self, score_panel_scores, player_names)
-
-	return 
 end
+
 local position_colors = {
 	Colors.get_color_table_with_alpha("cyan", 255),
 	Colors.get_color_table_with_alpha("gold", 255),
@@ -424,6 +415,7 @@ local position_textures = {
 	"scoreboard_topic_03",
 	"scoreboard_topic_04"
 }
+
 EndViewStateScore._set_topic_data = function (self, player_data, widget_index)
 	local widget = self._score_widgets[widget_index]
 	local content = widget.content
@@ -441,9 +433,8 @@ EndViewStateScore._set_topic_data = function (self, player_data, widget_index)
 
 		group_data.total_score = group_total_score
 	end
-
-	return 
 end
+
 EndViewStateScore._setup_score_panel = function (self, score_panel_scores, player_names)
 	local category_title_size = 30
 	local text_size = 22
@@ -505,9 +496,8 @@ EndViewStateScore._setup_score_panel = function (self, score_panel_scores, playe
 
 		score_index = score_index + 1
 	end
-
-	return 
 end
+
 EndViewStateScore._set_score_topic_by_row = function (self, row, text)
 	local widget = self._widgets_by_name.scores_topics
 	local content = widget.content
@@ -518,9 +508,8 @@ EndViewStateScore._set_score_topic_by_row = function (self, row, text)
 	row_content[score_text_name] = text
 	row_content.has_score = true
 	row_content.has_background = row % 2 == 0
-
-	return 
 end
+
 EndViewStateScore._setup_hero_score_tooltip = function (self, widget, group_scores)
 	local content = widget.content.tooltip
 	local style = widget.style.tooltip
@@ -581,21 +570,20 @@ EndViewStateScore._setup_hero_score_tooltip = function (self, widget, group_scor
 			}
 		end
 	end
-
-	return 
 end
+
 EndViewStateScore._player_score_data_by_stats_id = function (self, stats_id)
 	return self._players_list[stats_id]
 end
+
 EndViewStateScore._get_player_position_in_score_table = function (self, stats_id, scores_data)
 	for index, scores in ipairs(scores_data.scores) do
 		if scores.stats_id == stats_id then
 			return index
 		end
 	end
-
-	return 
 end
+
 EndViewStateScore._start_hero_score_animation = function (self, animation_name)
 	local params = {
 		wwise_world = self.wwise_world
@@ -603,10 +591,9 @@ EndViewStateScore._start_hero_score_animation = function (self, animation_name)
 
 	return self.ui_animator:start_animation(animation_name, self._hero_widgets, scenegraph_definition, params)
 end
+
 EndViewStateScore._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
 
-return 
+return

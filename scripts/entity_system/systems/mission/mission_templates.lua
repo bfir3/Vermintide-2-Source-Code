@@ -18,8 +18,6 @@ MissionTemplates = {
 					Vault.deposit_single(self.mission_text, value)
 
 					self.current_amount = value
-
-					return 
 				end,
 				increase_current_amount = function (self, amount)
 					local ret = Vault.single_add_ex(self.mission_text, amount, self.current_amount)
@@ -63,8 +61,6 @@ MissionTemplates = {
 			local center_text = string.format("%s/%s %s", tostring(current_amount), tostring(collect_amount), data.mission_text)
 			data.text = text
 			data.center_text = center_text
-
-			return 
 		end,
 		evaluate_mission = function (data, dt)
 			return data.get_current_amount(data) == data.collect_amount, data.get_current_amount(data) / data.collect_amount
@@ -78,8 +74,6 @@ MissionTemplates = {
 		end,
 		sync = function (data, sync_data)
 			data.set_current_amount(data, sync_data[1])
-
-			return 
 		end
 	},
 	defend = {
@@ -113,8 +107,6 @@ MissionTemplates = {
 			local current_amount = data.current_amount
 			local text = data.mission_text
 			data.text = text
-
-			return 
 		end,
 		evaluate_mission = function (data, dt)
 			return data.current_amount == data.defend_amount, data.current_amount / data.defend_amount
@@ -129,8 +121,6 @@ MissionTemplates = {
 		sync = function (data, sync_data)
 			local current_amount = sync_data[1]
 			data.current_amount = current_amount
-
-			return 
 		end
 	},
 	simple = {
@@ -157,7 +147,7 @@ MissionTemplates = {
 			return true
 		end,
 		update_text = function (data)
-			return 
+			return
 		end,
 		evaluate_mission = function (data, dt)
 			return data.done, (data.done and 1) or 0
@@ -168,7 +158,7 @@ MissionTemplates = {
 			return sync_data
 		end,
 		sync = function (data, sync_data)
-			return 
+			return
 		end
 	},
 	timed = {
@@ -203,8 +193,6 @@ MissionTemplates = {
 			local sseconds = (10 <= seconds and tostring(seconds)) or string.format("0%s", tostring(seconds))
 			local text = string.format("%s:%s\n%s", sminutes, sseconds, data.mission_text)
 			data.text = text
-
-			return 
 		end,
 		evaluate_mission = function (data, dt)
 			return 0 < data.time_left, 0
@@ -219,8 +207,6 @@ MissionTemplates = {
 		sync = function (data, sync_data)
 			local end_time = sync_data[1]
 			data.end_time = end_time
-
-			return 
 		end
 	},
 	goal = {
@@ -238,12 +224,10 @@ MissionTemplates = {
 			return data
 		end,
 		update = function (data, positive, dt, network_time)
-			return 
+			return
 		end,
 		update_text = function (data)
 			data.text = data.mission_text
-
-			return 
 		end,
 		evaluate_mission = function (data, dt)
 			return true, 1
@@ -254,7 +238,7 @@ MissionTemplates = {
 			return sync_data
 		end,
 		sync = function (data, sync_data)
-			return 
+			return
 		end
 	},
 	players_alive = {
@@ -274,12 +258,10 @@ MissionTemplates = {
 			return data
 		end,
 		update = function (data, positive, dt)
-			return 
+			return
 		end,
 		update_text = function (data)
 			data.text = ""
-
-			return 
 		end,
 		evaluate_mission = function (data, dt)
 			local players = Managers.player:human_and_bot_players()
@@ -301,11 +283,9 @@ MissionTemplates = {
 		end,
 		create_sync_data = function (data)
 			local sync_data = {}
-
-			return 
 		end,
 		sync = function (data, sync_data)
-			return 
+			return
 		end
 	},
 	survival = {
@@ -375,8 +355,6 @@ MissionTemplates = {
 				data.wave_state = data.states.wave
 				data.wave = data.wave + 1
 			end
-
-			return 
 		end,
 		update_text = function (data)
 			if data.wave_state == data.states.wave then
@@ -388,8 +366,6 @@ MissionTemplates = {
 			else
 				data.text = data.mission_text .. " " .. data.wave - data.starting_wave
 			end
-
-			return 
 		end,
 		evaluate_mission = function (data, dt)
 			return false, data.wave_completed
@@ -419,8 +395,6 @@ MissionTemplates = {
 			data.wave_completed_time = wave_completed_time
 			local starting_wave = sync_data[6]
 			data.starting_wave = starting_wave
-
-			return 
 		end
 	},
 	tutorial = {
@@ -445,8 +419,6 @@ MissionTemplates = {
 		end,
 		update_text = function (data)
 			data.text = ""
-
-			return 
 		end,
 		evaluate_mission = function (data, dt)
 			return data.done, (data.done and 1) or 0
@@ -457,13 +429,14 @@ MissionTemplates = {
 			return sync_data
 		end,
 		sync = function (data, sync_data)
-			return 
+			return
 		end
 	}
 }
 MissionTemplates.collect_uncompletable = table.clone(MissionTemplates.collect)
+
 MissionTemplates.collect_uncompletable.evaluate_mission = function (data, dt)
 	return false, data.get_current_amount(data)
 end
 
-return 
+return

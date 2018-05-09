@@ -333,4 +333,4 @@ weapon_template.wwise_dep_right_hand = {
 Weapons = Weapons or {}
 Weapons.drakegun_template_1 = table.clone(weapon_template)
 
-return 
+return

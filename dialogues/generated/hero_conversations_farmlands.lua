@@ -4257,6 +4257,4 @@ return function ()
 			}
 		}
 	})
-
-	return 
 end

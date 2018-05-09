@@ -727,4 +727,4 @@ Weapons.two_handed_swords_wood_elf_template_t3_un = table.clone(Weapons.two_hand
 Weapons.two_handed_swords_wood_elf_template_t3_un.actions.action_inspect.default.anim_event = "inspect_start_2"
 Weapons.two_handed_swords_wood_elf_template_t3_un.actions.action_inspect.default.anim_end_event = "inspect_end_2"
 
-return 
+return

@@ -4,23 +4,22 @@ local unit_alive = Unit.alive
 local Profiler = Profiler
 
 local function nop()
-	return 
+	return
 end
 
 BTSelector_skaven_poison_wind_globadier = class(BTSelector_skaven_poison_wind_globadier, BTNode)
 BTSelector_skaven_poison_wind_globadier.name = "BTSelector_skaven_poison_wind_globadier"
+
 BTSelector_skaven_poison_wind_globadier.init = function (self, ...)
 	BTSelector_skaven_poison_wind_globadier.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTSelector_skaven_poison_wind_globadier.leave = function (self, unit, blackboard, t, reason)
 	self.set_running_child(self, unit, blackboard, t, nil, reason)
-
-	return 
 end
+
 BTSelector_skaven_poison_wind_globadier.run = function (self, unit, blackboard, t, dt)
 	local child_running = self.current_running_child(self, blackboard)
 	local children = self._children
@@ -178,13 +177,10 @@ BTSelector_skaven_poison_wind_globadier.run = function (self, unit, blackboard, 
 	if result ~= "failed" then
 		return result, evaluate
 	end
-
-	return 
 end
+
 BTSelector_skaven_poison_wind_globadier.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

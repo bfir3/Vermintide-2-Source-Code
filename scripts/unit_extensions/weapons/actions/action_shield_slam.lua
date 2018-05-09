@@ -1,6 +1,7 @@
 -- WARNING: Error occurred during decompilation.
 --   Code may be incomplete or incorrect.
 ActionShieldSlam = class(ActionShieldSlam)
+
 ActionShieldSlam.init = function (self, world, item_name, is_server, owner_unit, weapon_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.owner_unit_first_person = first_person_unit
@@ -21,9 +22,8 @@ ActionShieldSlam.init = function (self, world, item_name, is_server, owner_unit,
 	self.hit_units = {}
 	self.target_hit_zones_names = {}
 	self.target_hit_unit_positions = {}
-
-	return 
 end
+
 ActionShieldSlam.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level, action_init_data)
 	self.current_action = new_action
 	self.target_breed_unit = nil
@@ -112,9 +112,8 @@ ActionShieldSlam.client_owner_start_action = function (self, new_action, t, chai
 
 		self.overcharge_extension:add_charge(overcharge_amount)
 	end
-
-	return 
 end
+
 ActionShieldSlam.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local current_action = self.current_action
 	local owner_unit = self.owner_unit
@@ -132,9 +131,8 @@ ActionShieldSlam.client_owner_post_update = function (self, dt, t, world, can_da
 			})
 		end
 	end
-
-	return 
 end
+
 ActionShieldSlam._hit = function (self, world, can_damage, owner_unit, current_action)
 	local network_manager = Managers.state.network
 	local physics_world = World.get_data(world, "physics_world")
@@ -269,9 +267,8 @@ ActionShieldSlam._hit = function (self, world, can_damage, owner_unit, current_a
 	end
 
 	self.state = "hit"
-
-	return 
 end
+
 ActionShieldSlam.finish = function (self, reason)
 	local hud_extension = ScriptUnit.has_extension(self.owner_unit, "hud_system")
 
@@ -293,9 +290,8 @@ ActionShieldSlam.finish = function (self, reason)
 
 		ammo_extension.start_reload(ammo_extension, play_reload_animation)
 	end
-
-	return 
 end
+
 ActionShieldSlam._is_infront_player = function (self, player_position, player_direction, hit_position, push_dot)
 	local player_to_hit_unit_dir = Vector3.normalize(hit_position - player_position)
 	local dot = Vector3.dot(player_to_hit_unit_dir, player_direction)
@@ -303,17 +299,14 @@ ActionShieldSlam._is_infront_player = function (self, player_position, player_di
 	if (push_dot or 0.35) < dot then
 		return true
 	end
-
-	return 
 end
+
 ActionShieldSlam.destroy = function (self)
 	if self.critical_strike_particle_id then
 		World.destroy_particles(self.world, self.critical_strike_particle_id)
 
 		self.critical_strike_particle_id = nil
 	end
-
-	return 
 end
 
-return 
+return

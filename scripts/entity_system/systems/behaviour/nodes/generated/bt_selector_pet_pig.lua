@@ -4,23 +4,22 @@ local unit_alive = Unit.alive
 local Profiler = Profiler
 
 local function nop()
-	return 
+	return
 end
 
 BTSelector_pet_pig = class(BTSelector_pet_pig, BTNode)
 BTSelector_pet_pig.name = "BTSelector_pet_pig"
+
 BTSelector_pet_pig.init = function (self, ...)
 	BTSelector_pet_pig.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTSelector_pet_pig.leave = function (self, unit, blackboard, t, reason)
 	self.set_running_child(self, unit, blackboard, t, nil, reason)
-
-	return 
 end
+
 BTSelector_pet_pig.run = function (self, unit, blackboard, t, dt)
 	local child_running = self.current_running_child(self, blackboard)
 	local children = self._children
@@ -94,13 +93,10 @@ BTSelector_pet_pig.run = function (self, unit, blackboard, t, dt)
 	if result ~= "failed" then
 		return result, evaluate
 	end
-
-	return 
 end
+
 BTSelector_pet_pig.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

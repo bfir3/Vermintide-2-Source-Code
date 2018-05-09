@@ -243,8 +243,6 @@ local function survey_rating_definitions(index)
 					click_check_content_id = "button_hotspot",
 					click_function = function (ui_scenegraph, ui_style, ui_content, input_service)
 						ui_content.button_hotspot.is_selected = true
-
-						return 
 					end
 				}
 			}

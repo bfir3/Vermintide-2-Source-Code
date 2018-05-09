@@ -221,4 +221,4 @@ DamageWaveTemplates.templates.sienna_adept_ability_trail_increased_duration.fx_n
 DamageWaveTemplates.templates.sienna_adept_ability_trail_increased_duration.fx_name_filled = "fx/brw_adept_skill_02_upgraded"
 DamageWaveTemplates.templates.sienna_adept_ability_trail_increased_duration.fx_name_arrived = "fx/brw_adept_skill_02_upgraded"
 
-return 
+return

@@ -100,4 +100,4 @@ Weapons.door_stick = weapon_template
 Weapons.door_stick = Weapons.door_stick or table.clone(weapon_template)
 Weapons.door_stick.right_hand_unit = "units/gameplay/timed_door_base_02/wpn_timed_door_stick"
 
-return 
+return

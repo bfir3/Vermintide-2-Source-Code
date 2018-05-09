@@ -129,8 +129,6 @@ weapon_template.actions = {
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.reset_release_input(input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end,
 			recoil_settings = {
 				horizontal_climb = -1,
@@ -204,8 +202,6 @@ weapon_template.actions = {
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.reset_release_input(input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end
 		}
 	},
@@ -241,8 +237,6 @@ weapon_template.actions = {
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.reset_release_input(input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end,
 			allowed_chain_actions = {
 				{
@@ -364,4 +358,4 @@ weapon_template.tooltip_detail = {
 Weapons = Weapons or {}
 Weapons.staff_fireball_geiser_template_1 = table.create_copy(Weapons.staff_fireball_geiser_template_1, weapon_template)
 
-return 
+return

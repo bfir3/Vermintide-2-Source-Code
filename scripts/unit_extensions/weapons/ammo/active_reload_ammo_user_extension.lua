@@ -1,5 +1,6 @@
 script_data.infinite_ammo = script_data.infinite_ammo or Development.parameter("infinite_ammo")
 ActiveReloadAmmoUserExtension = class(ActiveReloadAmmoUserExtension)
+
 ActiveReloadAmmoUserExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.world = extension_init_context.world
 	self.owner_unit = extension_init_data.owner_unit
@@ -21,22 +22,22 @@ ActiveReloadAmmoUserExtension.init = function (self, extension_init_context, uni
 	self._gui = World.create_screen_gui(extension_init_context.world, "immediate")
 
 	self.reset(self)
+end
 
-	return 
-end
 ActiveReloadAmmoUserExtension.extensions_ready = function (self, world, unit)
-	return 
+	return
 end
+
 ActiveReloadAmmoUserExtension.destroy = function (self)
-	return 
+	return
 end
+
 ActiveReloadAmmoUserExtension.reset = function (self)
 	self.current_ammo = self.ammo_per_clip
 	self.available_ammo = self.start_ammo - self.current_ammo
 	self.shots_fired = 0
-
-	return 
 end
+
 ActiveReloadAmmoUserExtension.update = function (self, unit, input, dt, context, t)
 	if 0 < self.shots_fired then
 		self.current_ammo = self.current_ammo - self.shots_fired
@@ -106,21 +107,21 @@ ActiveReloadAmmoUserExtension.update = function (self, unit, input, dt, context,
 			self._debug_draw(self, dt, t)
 		end
 	end
-
-	return 
 end
+
 local EVENT_TIME = 0.2
 local DEAD_ZONE_PERCENT = 0.3
+
 ActiveReloadAmmoUserExtension._update_active_reload = function (self, dt, t)
 	if not self.input_extension:get("weapon_reload") then
-		return 
+		return
 	end
 
 	local reload_start_time = self.reload_start_time(self)
 	local dead_zone_time = self.reload_time * DEAD_ZONE_PERCENT
 
 	if t < reload_start_time + dead_zone_time then
-		return 
+		return
 	end
 
 	local event_start = reload_start_time + self.event_start
@@ -132,9 +133,8 @@ ActiveReloadAmmoUserExtension._update_active_reload = function (self, dt, t)
 		self.next_reload_time = self.next_reload_time + self.time_penalty
 		self.event_missed = true
 	end
-
-	return 
 end
+
 ActiveReloadAmmoUserExtension._debug_draw = function (self, dt, t)
 	local gui = self._gui
 	local w, h = Gui.resolution()
@@ -165,61 +165,60 @@ ActiveReloadAmmoUserExtension._debug_draw = function (self, dt, t)
 	local indicator_pos_offset = Vector3(bg_size.x * DEAD_ZONE_PERCENT, 0, 5)
 
 	Gui.rect(gui, pos + bg_pos_offset + indicator_pos_offset, indicator_size, Color(255, 255, 0, 0))
-
-	return 
 end
+
 local EVENT_START_PERCENT = 0.6
+
 ActiveReloadAmmoUserExtension._setup_indicator_area = function (self)
 	assert(self.next_reload_time)
 
 	local reload_start = self.reload_start_time(self)
 	self.event_start = self.reload_time * EVENT_START_PERCENT
-
-	return 
 end
+
 ActiveReloadAmmoUserExtension.reload_start_time = function (self)
 	assert(self.next_reload_time)
 
 	return self.next_reload_time - self.reload_time
 end
+
 ActiveReloadAmmoUserExtension.add_ammo = function (self, ammo_amount)
 	self.available_ammo = math.min(self.available_ammo + ammo_amount, self.max_ammo - self.current_ammo - self.shots_fired)
-
-	return 
 end
+
 ActiveReloadAmmoUserExtension.use_ammo = function (self, ammo_used)
 	self.shots_fired = self.shots_fired + ammo_used
 
 	assert(0 <= self.ammo_count(self))
-
-	return 
 end
+
 ActiveReloadAmmoUserExtension.start_reload = function (self, play_reload_animation)
 	assert(self.can_reload(self))
 	assert(self.next_reload_time == nil)
 
 	self.start_reloading = true
 	self.next_reload_time = 0
-
-	return 
 end
+
 ActiveReloadAmmoUserExtension.abort_reload = function (self)
 	assert(self.is_reloading(self))
 
 	self.start_reloading = nil
 	self.next_reload_time = nil
-
-	return 
 end
+
 ActiveReloadAmmoUserExtension.ammo_count = function (self)
 	return self.current_ammo - self.shots_fired
 end
+
 ActiveReloadAmmoUserExtension.clip_size = function (self)
 	return self.ammo_per_clip
 end
+
 ActiveReloadAmmoUserExtension.remaining_ammo = function (self)
 	return self.available_ammo
 end
+
 ActiveReloadAmmoUserExtension.can_reload = function (self)
 	if self.is_reloading(self) then
 		return false
@@ -235,8 +234,9 @@ ActiveReloadAmmoUserExtension.can_reload = function (self)
 
 	return 0 < self.available_ammo
 end
+
 ActiveReloadAmmoUserExtension.is_reloading = function (self)
 	return self.next_reload_time ~= nil
 end
 
-return 
+return

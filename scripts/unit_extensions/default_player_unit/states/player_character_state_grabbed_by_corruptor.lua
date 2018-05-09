@@ -1,12 +1,12 @@
 PlayerCharacterStateGrabbedByCorruptor = class(PlayerCharacterStateGrabbedByCorruptor, PlayerCharacterState)
 local position_lookup = POSITION_LOOKUP
+
 PlayerCharacterStateGrabbedByCorruptor.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "grabbed_by_corruptor")
 
 	self.next_hanging_damage_time = 0
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByCorruptor.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	local inventory_extension = self.inventory_extension
 
@@ -39,9 +39,8 @@ PlayerCharacterStateGrabbedByCorruptor.on_enter = function (self, unit, input, d
 
 	locomotion.enable_rotation_towards_velocity(locomotion, false)
 	CharacterStateHelper.show_inventory_3p(unit, false, true, Managers.player.is_server, self.inventory_extension)
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByCorruptor.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local first_person_extension = self.first_person_extension
 	local status_extension = self.status_extension
@@ -71,9 +70,8 @@ PlayerCharacterStateGrabbedByCorruptor.on_exit = function (self, unit, input, dt
 			inventory_extension.rewield_wielded_slot(inventory_extension)
 		end
 	end
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByCorruptor.states = {
 	chaos_corruptor_grabbed = {
 		enter = function (parent, unit)
@@ -89,8 +87,6 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 				Unit.set_local_rotation(unit, 0, Quaternion.look(to_corruptor))
 				locomotion.enable_rotation_towards_velocity(locomotion, true, Quaternion.look(to_corruptor), 1)
 			end
-
-			return 
 		end,
 		run = function (parent, unit)
 			local corruptor_unit = parent.status_extension.corruptor_unit
@@ -106,13 +102,11 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 				locomotion.set_maximum_upwards_velocity(locomotion, velocity.z)
 				locomotion.set_forced_velocity(locomotion, velocity)
 			end
-
-			return 
 		end
 	},
 	chaos_corruptor_dragging = {
 		enter = function (parent, unit)
-			return 
+			return
 		end,
 		run = function (parent, unit)
 			local corruptor_unit = parent.status_extension.corruptor_unit
@@ -139,7 +133,7 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 	},
 	chaos_corruptor_released = {
 		run = function (parent, unit)
-			return 
+			return
 		end,
 		enter = function (parent, unit)
 			parent.locomotion_extension:enable_script_driven_movement()
@@ -173,11 +167,10 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 			end
 
 			CharacterStateHelper.show_inventory_3p(unit, true, true, Managers.player.is_server, parent.inventory_extension)
-
-			return 
 		end
 	}
 }
+
 PlayerCharacterStateGrabbedByCorruptor.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -201,12 +194,10 @@ PlayerCharacterStateGrabbedByCorruptor.update = function (self, unit, input, dt,
 	end
 
 	if not states[corruptor_status].run(self, unit) then
-		return 
+		return
 	end
 
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, self.first_person_extension, status_extension, self.inventory_extension)
-
-	return 
 end
 
-return 
+return

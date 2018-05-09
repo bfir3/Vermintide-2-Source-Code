@@ -259,4 +259,4 @@ PowerLevelFromLevelSettings = {
 	power_level_per_level = 10
 }
 
-return 
+return

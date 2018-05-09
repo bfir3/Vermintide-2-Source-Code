@@ -1,4 +1,5 @@
 ActionGeiser = class(ActionGeiser)
+
 ActionGeiser.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.world = world
 	self.owner_unit = owner_unit
@@ -12,9 +13,8 @@ ActionGeiser.init = function (self, world, item_name, is_server, owner_unit, dam
 	self._damage_buffer_index = 1
 	self.network_transmit = Managers.state.network.network_transmit
 	self._check_buffs = false
-
-	return 
 end
+
 ActionGeiser.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level)
 	self.current_action = new_action
 	local owner_unit = self.owner_unit
@@ -36,9 +36,8 @@ ActionGeiser.client_owner_start_action = function (self, new_action, t, chain_ac
 	self._damage_buffer_index = 1
 	self._check_buffs = true
 	self._is_critical_strike = is_critical_strike
-
-	return 
 end
+
 ActionGeiser.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local current_action = self.current_action
 
@@ -59,9 +58,8 @@ ActionGeiser.client_owner_post_update = function (self, dt, t, world, can_damage
 			self.state = "shot"
 		end
 	end
-
-	return 
 end
+
 ActionGeiser.finish = function (self, reason)
 	if self.targeting_effect_id then
 		World.destroy_particles(self.world, self.targeting_effect_id)
@@ -73,9 +71,8 @@ ActionGeiser.finish = function (self, reason)
 	if hud_extension then
 		hud_extension.show_critical_indication = false
 	end
-
-	return 
 end
+
 ActionGeiser.fire = function (self, reason)
 	local current_action = self.current_action
 	local world = self.world
@@ -200,10 +197,10 @@ ActionGeiser.fire = function (self, reason)
 			hud_extension.show_critical_indication = true
 		end
 	end
-
-	return 
 end
+
 local UNITS_PER_FRAME = 1
+
 ActionGeiser._update_damage = function (self, current_action)
 	local damage_buffer = self._damage_buffer
 	local damage_buffer_index = self._damage_buffer_index
@@ -262,8 +259,6 @@ ActionGeiser._update_damage = function (self, current_action)
 	end
 
 	self._damage_buffer_index = num_units + 1
-
-	return 
 end
 
-return 
+return

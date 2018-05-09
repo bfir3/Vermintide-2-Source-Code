@@ -68,8 +68,6 @@ local function validate_level_data(level_key, level_data)
 			return level_key ~= "inn_level" and unlockable
 		end
 	end
-
-	return 
 end
 
 for level_key, level_data in pairs(LevelSettings) do
@@ -164,6 +162,7 @@ LevelUnlockUtils = {
 		return math.max(#GameActsOrder - 1, 0)
 	end
 }
+
 LevelUnlockUtils.unlocked_level_difficulty_index = function (statistics_db, player_stats_id, level_key)
 	local level_settings = LevelSettings[level_key]
 	local game_mode = level_settings.game_mode
@@ -191,9 +190,8 @@ LevelUnlockUtils.unlocked_level_difficulty_index = function (statistics_db, play
 
 		return math.max(math.min(completed_difficulty_index + 1, highest_available_difficulty_index), automatic_difficulty_unlock_index)
 	end
-
-	return 
 end
+
 LevelUnlockUtils.completed_level_difficulty_index = function (statistics_db, player_stats_id, level_key)
 	local level_difficulty_name = LevelDifficultyDBNames[level_key]
 
@@ -204,9 +202,8 @@ LevelUnlockUtils.completed_level_difficulty_index = function (statistics_db, pla
 	else
 		return 0
 	end
-
-	return 
 end
+
 LevelUnlockUtils.completed_adventure_difficulty = function (statistics_db, player_stats_id)
 	local lowest_completed = math.huge
 
@@ -294,6 +291,7 @@ LevelUnlockUtils.level_unlocked = function (statistics_db, player_stats_id, leve
 
 	return true
 end
+
 LevelUnlockUtils.all_levels_completed = function (statistics_db, player_stats_id)
 	local level_keys = UnlockableLevelsByGameMode.adventure
 
@@ -307,6 +305,7 @@ LevelUnlockUtils.all_levels_completed = function (statistics_db, player_stats_id
 
 	return true
 end
+
 LevelUnlockUtils.get_act_key_by_level = function (level_key)
 	for key, levels in pairs(GameActs) do
 		for _, act_level_key in ipairs(levels) do
@@ -315,9 +314,8 @@ LevelUnlockUtils.get_act_key_by_level = function (level_key)
 			end
 		end
 	end
-
-	return 
 end
+
 LevelUnlockUtils.act_unlocked = function (statistics_db, player_stats_id, act_key)
 	assert(GameActs[act_key] ~= nil, "Act %s does not exist.", act_key)
 
@@ -334,6 +332,7 @@ LevelUnlockUtils.act_unlocked = function (statistics_db, player_stats_id, act_ke
 
 	return true
 end
+
 LevelUnlockUtils.act_completed = function (statistics_db, player_stats_id, act_key)
 	assert(GameActs[act_key] ~= nil, "Act %s does not exist.", act_key)
 
@@ -350,6 +349,7 @@ LevelUnlockUtils.act_completed = function (statistics_db, player_stats_id, act_k
 
 	return true
 end
+
 LevelUnlockUtils.num_acts_completed = function (statistics_db, player_stats_id)
 	local num = 0
 
@@ -361,6 +361,7 @@ LevelUnlockUtils.num_acts_completed = function (statistics_db, player_stats_id)
 
 	return num
 end
+
 LevelUnlockUtils.all_acts_completed = function (statistics_db, player_stats_id)
 	for _, key in ipairs(GameActsOrder) do
 		if not LevelUnlockUtils.act_completed(statistics_db, player_stats_id, key) then
@@ -370,6 +371,7 @@ LevelUnlockUtils.all_acts_completed = function (statistics_db, player_stats_id)
 
 	return true
 end
+
 LevelUnlockUtils.all_dlc_levels_completed = function (statistics_db, player_stats_id, dlc_name)
 	local level_keys = DLCProgressionOrder[dlc_name]
 
@@ -387,6 +389,7 @@ LevelUnlockUtils.all_dlc_levels_completed = function (statistics_db, player_stat
 
 	return true
 end
+
 LevelUnlockUtils.set_all_acts_incompleted = function ()
 	local player_manager = Managers.player
 	local statistics_db = player_manager.statistics_db(player_manager)
@@ -418,9 +421,8 @@ LevelUnlockUtils.set_all_acts_incompleted = function ()
 
 	statistics_db.generate_backend_stats(statistics_db, stats_id, backend_stats)
 	Managers.backend:set_stats(backend_stats)
-
-	return 
 end
+
 LevelUnlockUtils.debug_set_completed_game_difficulty = function (difficulty)
 	local statistics_db = Managers.player:statistics_db()
 	local player = Managers.player:local_player()
@@ -435,9 +437,8 @@ LevelUnlockUtils.debug_set_completed_game_difficulty = function (difficulty)
 	statistics_db.generate_backend_stats(statistics_db, stats_id, backend_stats)
 	Managers.backend:set_stats(backend_stats)
 	Managers.backend:commit()
-
-	return 
 end
+
 LevelUnlockUtils.debug_unlock_act = function (act_index)
 	local player_manager = Managers.player
 	local statistics_db = player_manager.statistics_db(player_manager)
@@ -477,9 +478,8 @@ LevelUnlockUtils.debug_unlock_act = function (act_index)
 	statistics_db.generate_backend_stats(statistics_db, stats_id, backend_stats)
 	Managers.backend:set_stats(backend_stats)
 	Managers.backend:commit()
-
-	return 
 end
+
 LevelUnlockUtils.debug_completed_act_levels = function (act_key, complete)
 	local player_manager = Managers.player
 	local statistics_db = player_manager.statistics_db(player_manager)
@@ -490,7 +490,7 @@ LevelUnlockUtils.debug_completed_act_levels = function (act_key, complete)
 	if not act_levels then
 		print("Could not find any levels for act", act_key)
 
-		return 
+		return
 	end
 
 	for _, level_key in ipairs(act_levels) do
@@ -506,8 +506,6 @@ LevelUnlockUtils.debug_completed_act_levels = function (act_key, complete)
 	statistics_db.generate_backend_stats(statistics_db, stats_id, backend_stats)
 	Managers.backend:set_stats(backend_stats)
 	Managers.backend:commit()
-
-	return 
 end
 
-return 
+return

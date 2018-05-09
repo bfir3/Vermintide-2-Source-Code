@@ -5,6 +5,7 @@ local unit_find_actor = Unit.find_actor
 script_data.no_critical_strikes = script_data.no_critical_strikes or Development.parameter("no_critical_strikes")
 script_data.always_critical_strikes = script_data.always_critical_strikes or Development.parameter("always_critical_strikes")
 script_data.alternating_critical_strikes = script_data.alternating_critical_strikes or Development.parameter("alternating_critical_strikes")
+
 ActionUtils.get_power_level_percentage = function (power_level)
 	local min_power_level = MIN_POWER_LEVEL
 	local max_power_level = MAX_POWER_LEVEL
@@ -12,6 +13,7 @@ ActionUtils.get_power_level_percentage = function (power_level)
 
 	return percentage
 end
+
 ActionUtils.get_max_targets = function (damage_profile, cleave_power_level)
 	local cleave_distribution = damage_profile.cleave_distribution or DefaultCleaveDistribution
 	local cleave_range = Cleave.max - Cleave.min
@@ -24,6 +26,7 @@ ActionUtils.get_max_targets = function (damage_profile, cleave_power_level)
 
 	return max_targets_attack, max_targets_impact
 end
+
 ActionUtils.get_target_armor = function (hit_zone_name, breed, dummy_unit_armor)
 	local target_unit_armor_attack = 1
 	local target_unit_armor_impact = 1
@@ -68,6 +71,7 @@ ActionUtils.get_target_armor = function (hit_zone_name, breed, dummy_unit_armor)
 
 	return target_unit_armor_attack, target_unit_armor_impact, target_unit_primary_armor_attack, target_unit_primary_armor_impact
 end
+
 ActionUtils.get_dropoff_scalar = function (damage_profile, target_settings, attacker_unit, target_unit)
 	local range_dropoff_settings = target_settings.range_dropoff_settings or damage_profile.range_dropoff_settings
 
@@ -93,6 +97,7 @@ ActionUtils.get_dropoff_scalar = function (damage_profile, target_settings, atta
 
 	return dropoff_scalar
 end
+
 ActionUtils.get_armor_power_modifier = function (power_type, damage_profile, target_settings, target_unit_armor, target_unit_primary_armor, critical_strike_settings, dropoff_scalar)
 	local armor_modifier = target_settings.armor_modifier or damage_profile.armor_modifier or DefaultArmorPowerModifier
 	local armor_modifier_near = target_settings.armor_modifier_near or damage_profile.armor_modifier_near
@@ -115,11 +120,13 @@ ActionUtils.get_armor_power_modifier = function (power_type, damage_profile, tar
 
 	return armor_power_modifier
 end
+
 local POWER_LEVEL_DIFF_RATIO = {
 	impact = 2,
 	attack = 3.5,
 	cleave = 3.5
 }
+
 ActionUtils.scale_power_levels = function (power_level, power_type, attacker_unit, difficulty_level)
 	local actual_power_level = power_level
 
@@ -161,6 +168,7 @@ ActionUtils.scale_power_levels = function (power_level, power_type, attacker_uni
 
 	return scaled_power_level
 end
+
 ActionUtils.get_power_level = function (power_type, power_level, damage_profile, target_settings, critical_strike_settings, dropoff_scalar, attacker_unit, difficulty_level)
 	local power_distribution = target_settings.power_distribution or damage_profile.power_distribution or DefaultPowerDistribution
 	local power_distribution_near = target_settings.power_distribution_near or damage_profile.power_distribution_near
@@ -180,6 +188,7 @@ ActionUtils.get_power_level = function (power_type, power_level, damage_profile,
 
 	return scaled_power_level * power_multiplier
 end
+
 ActionUtils.get_power_level_for_target = function (original_power_level, damage_profile, target_index, is_critical_strike, attacker_unit, hit_zone_name, armor_type_override, damage_source, breed, dummy_unit_armor, dropoff_scalar, difficulty_level, target_unit_armor, target_unit_primary_armor)
 	local target_settings = (damage_profile.targets and damage_profile.targets[target_index]) or damage_profile.default_target
 	local critical_strike_settings = is_critical_strike and damage_profile.critical_strike
@@ -224,6 +233,7 @@ ActionUtils.get_power_level_for_target = function (original_power_level, damage_
 
 	return attack_power, impact_power
 end
+
 ActionUtils.apply_buffs_to_power_level = function (unit, power_level)
 	local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
 
@@ -235,6 +245,7 @@ ActionUtils.apply_buffs_to_power_level = function (unit, power_level)
 
 	return power_level
 end
+
 ActionUtils.apply_buffs_to_power_level_on_hit = function (unit, power_level, breed, damage_source, dummy_unit_armor)
 	if not Unit.alive(unit) then
 		return power_level
@@ -285,6 +296,7 @@ ActionUtils.apply_buffs_to_power_level_on_hit = function (unit, power_level, bre
 
 	return power_level
 end
+
 ActionUtils.scale_charged_projectile_power_level = function (power_level, action, charge_level)
 	if action.scale_power_level then
 		local projectile_power_level = math.max(action.scale_power_level, charge_level) * power_level
@@ -294,11 +306,13 @@ ActionUtils.scale_charged_projectile_power_level = function (power_level, action
 
 	return power_level
 end
+
 ActionUtils.scale_geiser_power_level = function (power_level, charge_value)
 	local scaled_power_level = (0.5 + 0.5 * charge_value) * power_level
 
 	return scaled_power_level
 end
+
 ActionUtils.get_melee_boost = function (unit)
 	local career_extension = ScriptUnit.has_extension(unit, "career_system")
 	local has_melee_boost = false
@@ -310,6 +324,7 @@ ActionUtils.get_melee_boost = function (unit)
 
 	return has_melee_boost, boost_curve_multiplier
 end
+
 ActionUtils.get_ranged_boost = function (unit)
 	local career_extension = ScriptUnit.has_extension(unit, "career_system")
 	local has_ranged_boost = false
@@ -321,23 +336,22 @@ ActionUtils.get_ranged_boost = function (unit)
 
 	return has_ranged_boost, boost_curve_multiplier
 end
+
 ActionUtils.spawn_flame_wave_projectile = function (owner_unit, scale, item_template_name, action_name, sub_action_name, position, flat_angle, lateral_speed, initial_forward_speed)
 	scale = scale or 100
 	local projectile_system = Managers.state.entity:system("projectile_system")
 
 	projectile_system.spawn_flame_wave_projectile(projectile_system, owner_unit, scale, item_name, item_template_name, action_name, sub_action_name, position, flat_angle, lateral_speed, initial_forward_speed)
-
-	return 
 end
+
 ActionUtils.spawn_player_projectile = function (owner_unit, position, rotation, scale, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, is_critical_strike, power_level, gaze_settings)
 	scale = scale or 100
 	local projectile_system = Managers.state.entity:system("projectile_system")
 	local ping = 0
 
 	projectile_system.spawn_player_projectile(projectile_system, owner_unit, position, rotation, scale, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, ping, is_critical_strike, power_level, gaze_settings)
-
-	return 
 end
+
 ActionUtils.spawn_pickup_projectile = function (world, weapon_unit, projectile_unit_name, projectile_unit_template_name, current_action, owner_unit, position, rotation, velocity, angular_velocity, item_name, spawn_type)
 	local lookup_data = current_action.lookup_data
 	local projectile_info = current_action.projectile_info
@@ -394,18 +408,16 @@ ActionUtils.spawn_pickup_projectile = function (world, weapon_unit, projectile_u
 	else
 		Managers.state.network.network_transmit:send_rpc_server("rpc_spawn_pickup_projectile", projectile_unit_name_id, projectile_unit_template_name_id, network_position, network_rotation, network_velocity, network_angular_velocity, pickup_name_id, spawn_type_id)
 	end
-
-	return 
 end
+
 ActionUtils.spawn_true_flight_projectile = function (owner_unit, target_unit, true_flight_template_id, position, rotation, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, scale, is_critical_strike, power_level)
 	local projectile_system = Managers.state.entity:system("projectile_system")
 	local true_flight_template_name = TrueFlightTemplatesLookup[true_flight_template_id]
 	scale = scale or 100
 
 	projectile_system.spawn_true_flight_projectile(projectile_system, owner_unit, target_unit, true_flight_template_name, position, rotation, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, scale, is_critical_strike, power_level)
-
-	return 
 end
+
 ActionUtils.apply_attack_speed_buff = function (attack_speed_value, unit)
 	local new_value = attack_speed_value
 
@@ -416,6 +428,7 @@ ActionUtils.apply_attack_speed_buff = function (attack_speed_value, unit)
 
 	return new_value
 end
+
 ActionUtils.init_action_buff_data = function (action_buff_data, buff_data, t)
 	local start_times = action_buff_data.buff_start_times
 	local end_times = action_buff_data.buff_end_times
@@ -431,10 +444,10 @@ ActionUtils.init_action_buff_data = function (action_buff_data, buff_data, t)
 		action_buffs_in_progress[buff_index] = false
 		buff_identifiers[buff_index] = ""
 	end
-
-	return 
 end
+
 local params = {}
+
 ActionUtils.update_action_buff_data = function (action_buff_data, buff_data, owner_unit, t)
 	local start_times = action_buff_data.buff_start_times
 	local end_times = action_buff_data.buff_end_times
@@ -464,9 +477,8 @@ ActionUtils.update_action_buff_data = function (action_buff_data, buff_data, own
 			buff_extension.remove_buff(buff_extension, id)
 		end
 	end
-
-	return 
 end
+
 ActionUtils.remove_action_buff_data = function (action_buff_data, buff_data, owner_unit)
 	local action_buffs_in_progress = action_buff_data.action_buffs_in_progress
 	local buff_identifiers = action_buff_data.buff_identifiers
@@ -479,9 +491,8 @@ ActionUtils.remove_action_buff_data = function (action_buff_data, buff_data, own
 			buff_extension.remove_buff(buff_extension, id)
 		end
 	end
-
-	return 
 end
+
 ActionUtils.start_charge_sound = function (wwise_world, weapon_unit, player_unit, action_settings)
 	local wwise_source_id = WwiseWorld.make_auto_source(wwise_world, weapon_unit)
 	local overcharge_extension = ScriptUnit.extension(player_unit, "overcharge_system")
@@ -505,15 +516,15 @@ ActionUtils.start_charge_sound = function (wwise_world, weapon_unit, player_unit
 
 	return wwise_playing_id, wwise_source_id
 end
+
 ActionUtils.stop_charge_sound = function (wwise_world, wwise_playing_id, wwise_source_id, action_settings)
 	local charge_sound_stop_event = action_settings.charge_sound_stop_event
 
 	if charge_sound_stop_event then
 		WwiseWorld.trigger_event(wwise_world, charge_sound_stop_event, wwise_source_id)
 	end
-
-	return 
 end
+
 ActionUtils.play_husk_sound_event = function (sound_event, player_unit)
 	local network_manager = Managers.state.network
 	local network_transmit = network_manager.network_transmit
@@ -525,9 +536,8 @@ ActionUtils.play_husk_sound_event = function (sound_event, player_unit)
 	else
 		network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_sound_event", go_id, event_id)
 	end
-
-	return 
 end
+
 ActionUtils.get_critical_strike_chance = function (unit, action)
 	local career_extension = ScriptUnit.extension(unit, "career_system")
 	local buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -547,7 +557,9 @@ ActionUtils.get_critical_strike_chance = function (unit, action)
 
 	return crit_chance
 end
+
 local last_attack_critical = false
+
 ActionUtils.is_critical_strike = function (unit, action, t)
 	if script_data.no_critical_strikes then
 		return false
@@ -581,6 +593,7 @@ ActionUtils.is_critical_strike = function (unit, action, t)
 
 	return rand < crit_chance
 end
+
 ActionUtils.pitch_from_rotation = function (rotation)
 	local forward = Vector3.normalize(Quaternion.forward(rotation))
 	local forward_flat = Vector3.normalize(Vector3.flat(forward))
@@ -597,6 +610,7 @@ ActionUtils.pitch_from_rotation = function (rotation)
 
 	return angle
 end
+
 ActionUtils.redirect_shield_hit = function (hit_unit, hit_actor)
 	local potential_hit_unit_owner = unit_get_data(hit_unit, "shield_owner_unit")
 
@@ -613,8 +627,6 @@ ActionUtils.redirect_shield_hit = function (hit_unit, hit_actor)
 	else
 		return hit_unit, hit_actor
 	end
-
-	return 
 end
 
-return 
+return

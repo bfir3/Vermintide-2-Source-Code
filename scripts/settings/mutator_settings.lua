@@ -33,8 +33,6 @@ local function apply_buff_to_alive_player_units(context, data, buff_name)
 			player_units[unit] = nil
 		end
 	end
-
-	return 
 end
 
 local mutator_settings = {
@@ -60,13 +58,9 @@ local mutator_settings = {
 		icon = "mutator_icon_player_dot",
 		server_start_function = function (context, data)
 			data.player_units = {}
-
-			return 
 		end,
 		server_update_function = function (context, data, dt, t)
 			apply_buff_to_alive_player_units(context, data, "mutator_player_dot")
-
-			return 
 		end
 	},
 	instant_death = {
@@ -106,16 +100,12 @@ local mutator_settings = {
 
 			GearUtils.get_property_and_trait_buffs = get_property_and_trait_buffs_whiterun
 			data.vanilla_get_property_and_trait_buffs = vanilla_get_property_and_trait_buffs
-
-			return 
 		end,
 		client_stop_function = function (context, data)
 			BackendUtils.get_total_power_level = data.vanilla_get_total_power_level
 			data.vanilla_get_total_power_level = nil
 			GearUtils.get_property_and_trait_buffs = data.vanilla_get_property_and_trait_buffs
 			data.vanilla_get_property_and_trait_buffs = nil
-
-			return 
 		end
 	},
 	no_respawn = {
@@ -124,11 +114,9 @@ local mutator_settings = {
 		icon = "mutator_icon_no_respawn",
 		server_start_game_mode_function = function (context, data)
 			Managers.state.spawn:set_respawning_enabled(false)
-
-			return 
 		end,
 		server_stop_function = function (context, data)
-			return 
+			return
 		end
 	},
 	elite_run = {
@@ -147,11 +135,9 @@ local mutator_settings = {
 
 			Managers.state.entity:system("ai_interest_point_system"):set_breed_override_lookup(roamer_override_lookup)
 			Managers.state.conflict:set_breed_override_lookup(roamer_override_lookup)
-
-			return 
 		end,
 		server_stop_function = function (context, data)
-			return 
+			return
 		end
 	},
 	specials_frequency = {
@@ -211,8 +197,6 @@ local mutator_settings = {
 			end
 
 			data.vanilla_specials_settings = vanilla_specials_settings
-
-			return 
 		end,
 		server_stop_function = function (context, data)
 			local vanilla_specials_settings = data.vanilla_specials_settings
@@ -250,8 +234,6 @@ local mutator_settings = {
 					end
 				end
 			end
-
-			return 
 		end
 	},
 	hordes_galore = {
@@ -270,8 +252,6 @@ local mutator_settings = {
 				time_table[2] = tt_2 - tt_2 * modifier
 
 				mutator_dprint(dprint_string, tt_1, tt_2, time_table[1], time_table[2], modifier)
-
-				return 
 			end
 
 			local template = data.template
@@ -321,8 +301,6 @@ local mutator_settings = {
 			end
 
 			data.vanilla_pacing_settings = vanilla_pacing_settings
-
-			return 
 		end,
 		server_stop_function = function (context, data)
 			local function reset_time_table(time_table, vanilla_time_table, dprint_string)
@@ -335,8 +313,6 @@ local mutator_settings = {
 				local s = sprintf("Resetting time table from ({%s, %s}) to ({%s, %s}) - %s", tt_1, tt_2, vanilla_tt_1, vanilla_tt_2, dprint_string)
 
 				mutator_dprint(s)
-
-				return 
 			end
 
 			for name, pacing_settings in pairs(PacingSettings) do
@@ -386,8 +362,6 @@ local mutator_settings = {
 					end
 				end
 			end
-
-			return 
 		end
 	},
 	powerful_elites = {
@@ -406,13 +380,9 @@ local mutator_settings = {
 		},
 		server_start_function = function (context, data)
 			data.player_units = {}
-
-			return 
 		end,
 		server_update_function = function (context, data)
 			apply_buff_to_alive_player_units(context, data, "damage_taken_powerful_elites")
-
-			return 
 		end
 	}
 }

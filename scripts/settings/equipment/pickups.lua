@@ -581,4 +581,4 @@ for group, pickups in pairs(Pickups) do
 	NearPickupSpawnChance[group] = NearPickupSpawnChance[group] or 0
 end
 
-return 
+return

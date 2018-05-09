@@ -47,6 +47,7 @@ end
 
 local RELOAD_UI = true
 MissionVotingUI = class(MissionVotingUI)
+
 MissionVotingUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ui_top_renderer = ingame_ui_context.ui_top_renderer
@@ -74,9 +75,8 @@ MissionVotingUI.init = function (self, ingame_ui_context)
 	input_manager.map_device_to_service(input_manager, "mission_voting", "keyboard")
 	input_manager.map_device_to_service(input_manager, "mission_voting", "mouse")
 	input_manager.map_device_to_service(input_manager, "mission_voting", "gamepad")
-
-	return 
 end
+
 MissionVotingUI.create_ui_elements = function (self)
 	local widgets = {}
 	local widgets_by_name = {}
@@ -134,21 +134,20 @@ MissionVotingUI.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 	self.scenegraph_definition = definitions.scenegraph_definition
 	RELOAD_UI = false
-
-	return 
 end
+
 MissionVotingUI.destroy = function (self)
 	if self.vote_started then
 		self.on_vote_ended(self)
 	end
 
 	rawset(_G, "ingame_voting_ui", nil)
-
-	return 
 end
+
 MissionVotingUI.is_active = function (self)
 	return self.vote_started and not self.has_voted
 end
+
 MissionVotingUI.get_text_width = function (self, text, text_style)
 	local font = UIFontByResolution(text_style)
 	local font_size = text_style.font_size
@@ -156,6 +155,7 @@ MissionVotingUI.get_text_width = function (self, text, text_style)
 
 	return text_width
 end
+
 MissionVotingUI.setup_option_input = function (self, option_widget, option)
 	local total_width = 35
 	local text = option.text
@@ -171,9 +171,8 @@ MissionVotingUI.setup_option_input = function (self, option_widget, option)
 
 	local option_text = Localize(text)
 	option_widget.content.title_text = option_text
-
-	return 
 end
+
 MissionVotingUI.start_vote = function (self, active_voting)
 	self.render_settings.alpha_multiplier = 0
 	local widgets_by_name = self._widgets_by_name
@@ -187,7 +186,7 @@ MissionVotingUI.start_vote = function (self, active_voting)
 
 			print(string.format("[MissionVotingUI] - Terminating vote request (%s) due to the requirements to start was not fulfilled.", text))
 
-			return 
+			return
 		end
 	end
 
@@ -254,18 +253,16 @@ MissionVotingUI.start_vote = function (self, active_voting)
 	end
 
 	self._check_initial_votes(self)
-
-	return 
 end
+
 MissionVotingUI._check_initial_votes = function (self)
 	local has_voted = self.voting_manager:has_voted(Network.peer_id())
 
 	if has_voted then
 		self.on_vote_casted(self)
 	end
-
-	return 
 end
+
 MissionVotingUI.on_vote_casted = function (self)
 	self.has_voted = true
 
@@ -280,9 +277,8 @@ MissionVotingUI.on_vote_casted = function (self)
 		ShadingEnvironment.set_scalar(shading_env, "fullscreen_blur_amount", 0)
 		ShadingEnvironment.apply(shading_env)
 	end
-
-	return 
 end
+
 MissionVotingUI.on_vote_ended = function (self)
 	if not self.has_voted then
 		self.voting_manager:allow_vote_input(false)
@@ -306,9 +302,8 @@ MissionVotingUI.on_vote_ended = function (self)
 
 	self.has_voted = nil
 	self.vote_started = nil
-
-	return 
 end
+
 MissionVotingUI._get_selection_frame_by_difficulty_index = function (self, difficulty_index)
 	local completed_frame_texture = "map_frame_00"
 
@@ -321,6 +316,7 @@ MissionVotingUI._get_selection_frame_by_difficulty_index = function (self, diffi
 
 	return completed_frame_texture
 end
+
 MissionVotingUI._set_adventure_presentation = function (self, difficulty)
 	local difficulty_settings = DifficultySettings[difficulty]
 	local difficulty_display_name = difficulty_settings.display_name
@@ -332,9 +328,8 @@ MissionVotingUI._set_adventure_presentation = function (self, difficulty)
 	game_option_1.content.icon = difficulty_display_image
 	game_option_1.content.icon_frame = difficulty_frame_texture
 	self._presentation_type = "adventure"
-
-	return 
 end
+
 MissionVotingUI._set_custom_game_presentation = function (self, difficulty, level_key, private_game, always_host, strict_matchmaking)
 	local difficulty_settings = DifficultySettings[difficulty]
 	local difficulty_display_name = difficulty_settings.display_name
@@ -373,9 +368,8 @@ MissionVotingUI._set_custom_game_presentation = function (self, difficulty, leve
 	strict_matchmaking_button.content.button_hotspot.is_selected = strict_matchmaking
 	strict_matchmaking_button.style.hover_glow.color[1] = 0
 	self._presentation_type = "custom"
-
-	return 
 end
+
 MissionVotingUI._set_deed_presentation = function (self, item_key, level_key, difficulty)
 	local item_data = ItemMasterList[item_key]
 	local level_settings = LevelSettings[level_key]
@@ -393,9 +387,8 @@ MissionVotingUI._set_deed_presentation = function (self, item_key, level_key, di
 	local item_presentation = deed_widgets_by_name.item_presentation
 	item_presentation.content.item = item
 	self._presentation_type = "deed"
-
-	return 
 end
+
 MissionVotingUI.update_vote_timer = function (self)
 	local voting_manager = self.voting_manager
 	local vote_template = voting_manager.active_vote_template(voting_manager)
@@ -404,9 +397,8 @@ MissionVotingUI.update_vote_timer = function (self)
 	local time_progress = math.max(vote_time_left / duration, 0)
 
 	self._set_vote_time_progress(self, time_progress)
-
-	return 
 end
+
 MissionVotingUI._set_vote_time_progress = function (self, progress)
 	local widgets_by_name = self._widgets_by_name
 	local widget = widgets_by_name.timer_fg
@@ -418,9 +410,8 @@ MissionVotingUI._set_vote_time_progress = function (self, progress)
 	local current_size = self.ui_scenegraph[scenegraph_id].size
 	current_size[1] = default_size[1] * progress
 	uvs[2][1] = progress
-
-	return 
 end
+
 MissionVotingUI._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -430,9 +421,8 @@ MissionVotingUI._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 MissionVotingUI.update = function (self, menu_active, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local ingame_ui = self.ingame_ui
@@ -500,9 +490,8 @@ MissionVotingUI.update = function (self, menu_active, dt, t)
 
 		self.draw(self, dt)
 	end
-
-	return 
 end
+
 MissionVotingUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -573,12 +562,11 @@ MissionVotingUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 MissionVotingUI.update_pulse_animations = function (self, dt)
 	if self.has_voted then
-		return 
+		return
 	end
 
 	local widgets_by_name = self._widgets_by_name
@@ -594,9 +582,8 @@ MissionVotingUI.update_pulse_animations = function (self, dt)
 		widgets_by_name.timer_fg.style.texture_id.color[1] = alpha
 		widgets_by_name.timer_glow.style.texture_id.color[1] = alpha
 	end
-
-	return 
 end
+
 MissionVotingUI.acquire_input = function (self, ignore_cursor_stack)
 	local input_manager = self.input_manager
 
@@ -614,9 +601,8 @@ MissionVotingUI.acquire_input = function (self, ignore_cursor_stack)
 	if not ignore_cursor_stack then
 		ShowCursorStack.push()
 	end
-
-	return 
 end
+
 MissionVotingUI.release_input = function (self, ignore_cursor_stack)
 	local input_manager = self.input_manager
 
@@ -633,9 +619,8 @@ MissionVotingUI.release_input = function (self, ignore_cursor_stack)
 	if not ignore_cursor_stack then
 		ShowCursorStack.pop()
 	end
-
-	return 
 end
+
 MissionVotingUI.active_input_service = function (self)
 	local input_manager = self.input_manager
 	local service_name = "mission_voting"
@@ -644,4 +629,4 @@ MissionVotingUI.active_input_service = function (self)
 	return input_service
 end
 
-return 
+return

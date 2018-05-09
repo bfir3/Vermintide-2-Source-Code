@@ -5,8 +5,6 @@ local function debug_print(format, ...)
 	if VisualStateMachine.DEBUG then
 		printf("[VisualStateMachine] " .. format, ...)
 	end
-
-	return 
 end
 
 VisualStateMachine.init = function (self, name, parent, ...)
@@ -43,9 +41,8 @@ VisualStateMachine.init = function (self, name, parent, ...)
 	self._transitions = {}
 
 	Managers.state_machine:_register_state_machine(self)
-
-	return 
 end
+
 VisualStateMachine.destroy = function (self)
 	local state = self._current_state
 	self._current_state = nil
@@ -69,9 +66,8 @@ VisualStateMachine.destroy = function (self)
 	self._state_machine_stack = nil
 
 	Managers.state_machine:_unregister_state_machine(self)
-
-	return 
 end
+
 VisualStateMachine.add_transition = function (self, source_class_name, event_name, target_class)
 	local transitions = self._transitions
 
@@ -84,37 +80,33 @@ VisualStateMachine.add_transition = function (self, source_class_name, event_nam
 	assert(target_transitions[event_name] == nil, "the event " .. event_name .. " already has a transition to " .. tostring(target_transitions[event_name]))
 
 	target_transitions[event_name] = target_class
-
-	return 
 end
+
 VisualStateMachine.remove_transition = function (self, source_class_name, event_name)
 	local transitions = self._transitions[source_class_name]
 
 	if transitions == nil then
-		return 
+		return
 	end
 
 	transitions[event_name] = nil
-
-	return 
 end
+
 VisualStateMachine.set_transitions = function (self, source_class_name, transitions)
 	self._transitions[source_class_name] = transitions
-
-	return 
 end
+
 VisualStateMachine.set_initial_state = function (self, state_class, ...)
 	assert(self._current_state == nil, "it is not allowed to set initial state twice")
 
 	self._current_state = self._enter_state(self, state_class, {
 		...
 	})
-
-	return 
 end
+
 VisualStateMachine.update = function (self, dt)
 	if self._root_state_machine ~= self then
-		return 
+		return
 	end
 
 	local stack = self._state_machine_stack
@@ -158,18 +150,16 @@ VisualStateMachine.update = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 VisualStateMachine.event = function (self, event_name, ...)
 	local root = self._root_state_machine
 	root._pending_event = event_name
 	root._pending_args = {
 		...
 	}
-
-	return 
 end
+
 VisualStateMachine.state_report = function (self)
 	local s = ""
 	local stack = self._state_machine_stack
@@ -195,6 +185,7 @@ VisualStateMachine.state_report = function (self)
 
 	return s
 end
+
 VisualStateMachine._transitions_from_state = function (self)
 	if self._current_state == nil then
 		return {}
@@ -208,6 +199,7 @@ VisualStateMachine._transitions_from_state = function (self)
 
 	return transitions
 end
+
 VisualStateMachine._current_state_name = function (state_machine)
 	local state_machine_name = state_machine._name
 	local state_name = "<no state>"
@@ -222,6 +214,7 @@ VisualStateMachine._current_state_name = function (state_machine)
 
 	return state_machine_name .. ":" .. state_name
 end
+
 VisualStateMachine._handle_event = function (self, event_name, args)
 	local state = self._current_state
 
@@ -242,6 +235,7 @@ VisualStateMachine._handle_event = function (self, event_name, args)
 
 	return false
 end
+
 VisualStateMachine._received_event = function (self, event_name, args)
 	local stack = self._state_machine_stack
 
@@ -263,18 +257,16 @@ VisualStateMachine._received_event = function (self, event_name, args)
 	report = report .. self._root_state_machine:state_report()
 
 	assert(false, report)
-
-	return 
 end
+
 VisualStateMachine.find_in_table = function (t, value)
 	for ii, vv in ipairs(t) do
 		if vv == value then
 			return ii
 		end
 	end
-
-	return 
 end
+
 VisualStateMachine._leave_state = function (self)
 	local stack = self._state_machine_stack
 	local stack_index = self.find_in_table(stack, self)
@@ -295,9 +287,8 @@ VisualStateMachine._leave_state = function (self)
 			state.destroy(state)
 		end
 	end
-
-	return 
 end
+
 VisualStateMachine._enter_state = function (self, state_class, args)
 	assert(self._current_state == nil, "entering a state twice is not allowed")
 	assert(type(state_class.NAME) == "string", "States must have a class variable NAME set to a string value")
@@ -312,4 +303,4 @@ VisualStateMachine._enter_state = function (self, state_class, args)
 	return state
 end
 
-return 
+return

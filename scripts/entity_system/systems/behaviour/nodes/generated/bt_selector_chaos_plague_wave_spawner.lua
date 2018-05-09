@@ -4,23 +4,22 @@ local unit_alive = Unit.alive
 local Profiler = Profiler
 
 local function nop()
-	return 
+	return
 end
 
 BTSelector_chaos_plague_wave_spawner = class(BTSelector_chaos_plague_wave_spawner, BTNode)
 BTSelector_chaos_plague_wave_spawner.name = "BTSelector_chaos_plague_wave_spawner"
+
 BTSelector_chaos_plague_wave_spawner.init = function (self, ...)
 	BTSelector_chaos_plague_wave_spawner.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTSelector_chaos_plague_wave_spawner.leave = function (self, unit, blackboard, t, reason)
 	self.set_running_child(self, unit, blackboard, t, nil, reason)
-
-	return 
 end
+
 BTSelector_chaos_plague_wave_spawner.run = function (self, unit, blackboard, t, dt)
 	local child_running = self.current_running_child(self, blackboard)
 	local children = self._children
@@ -61,13 +60,10 @@ BTSelector_chaos_plague_wave_spawner.run = function (self, unit, blackboard, t, 
 	elseif node_in_combat == child_running then
 		self.set_running_child(self, unit, blackboard, t, nil, "failed")
 	end
-
-	return 
 end
+
 BTSelector_chaos_plague_wave_spawner.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

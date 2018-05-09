@@ -3,6 +3,7 @@ local RELOAD_UI = true
 local MIN_HEALTH_DIVIDERS = 0
 local MAX_HEALTH_DIVIDERS = 10
 ObserverUI = class(ObserverUI)
+
 ObserverUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -15,9 +16,8 @@ ObserverUI.init = function (self, ingame_ui_context)
 	self._is_visible = false
 
 	self.create_ui_elements(self)
-
-	return 
 end
+
 ObserverUI.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 	self.divider_widget = UIWidget.init(definitions.widget_definitions.divider)
@@ -29,9 +29,8 @@ ObserverUI.create_ui_elements = function (self)
 
 	self.set_visible(self, false)
 	self.draw(self)
-
-	return 
 end
+
 ObserverUI.get_player_camera_extension = function (self)
 	local peer_id = self.peer_id
 	local my_player = self.player_manager:player_from_peer_id(peer_id)
@@ -40,14 +39,13 @@ ObserverUI.get_player_camera_extension = function (self)
 	if camera_unit and ScriptUnit.has_extension(camera_unit, "camera_system") then
 		return ScriptUnit.extension(camera_unit, "camera_system")
 	end
-
-	return 
 end
+
 ObserverUI.handle_observer_player_changed = function (self)
 	local camera_extension = self.get_player_camera_extension(self)
 
 	if not camera_extension then
-		return 
+		return
 	end
 
 	local observed_player_id = camera_extension.get_observed_player_id(camera_extension)
@@ -61,9 +59,8 @@ ObserverUI.handle_observer_player_changed = function (self)
 	else
 		self.stop_draw_observer_ui(self)
 	end
-
-	return 
 end
+
 ObserverUI.set_observer_player = function (self, player_id)
 	local profiles = SPProfiles
 	local profile_synchronizer = self.profile_synchronizer
@@ -82,9 +79,8 @@ ObserverUI.set_observer_player = function (self, player_id)
 	self.player_name_widget.element.dirty = true
 	self.hero_name_widget.element.dirty = true
 	self._dirty = true
-
-	return 
 end
+
 ObserverUI.stop_draw_observer_ui = function (self)
 	self.observing_player_id = nil
 	self.divider_widget.element.dirty = true
@@ -92,16 +88,15 @@ ObserverUI.stop_draw_observer_ui = function (self)
 	self.hero_name_widget.element.dirty = true
 	self.hp_bar_widget.element.dirty = true
 	self._dirty = true
-
-	return 
 end
+
 ObserverUI.update = function (self, dt, t)
 	if RELOAD_UI then
 		self.create_ui_elements(self)
 	end
 
 	if not self._is_visible then
-		return 
+		return
 	end
 
 	self.handle_observer_player_changed(self)
@@ -114,9 +109,8 @@ ObserverUI.update = function (self, dt, t)
 	end
 
 	self.draw(self, dt)
-
-	return 
 end
+
 ObserverUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -134,12 +128,12 @@ ObserverUI.draw = function (self, dt)
 
 	UIRenderer.draw_widget(ui_renderer, self.hp_bar_widget)
 	UIRenderer.end_pass(ui_renderer)
+end
 
-	return 
-end
 ObserverUI.destroy = function (self)
-	return 
+	return
 end
+
 ObserverUI.set_visible = function (self, visible)
 	if self._is_visible ~= visible then
 		local divider_widget = self.divider_widget
@@ -169,12 +163,12 @@ ObserverUI.set_visible = function (self, visible)
 		self._dirty = true
 		self._is_visible = visible
 	end
-
-	return 
 end
+
 ObserverUI.is_visible = function (self)
 	return self._is_visible
 end
+
 ObserverUI.update_follow_player_health_bar = function (self, peer_id)
 	local profile_synchronizer = self.profile_synchronizer
 	local player_manager = Managers.player
@@ -182,7 +176,7 @@ ObserverUI.update_follow_player_health_bar = function (self, peer_id)
 	local player = players[peer_id]
 
 	if not player then
-		return 
+		return
 	end
 
 	local local_player_id = player.local_player_id(player)
@@ -296,9 +290,8 @@ ObserverUI.update_follow_player_health_bar = function (self, peer_id)
 		hp_bar_widget.element.dirty = true
 		self._dirty = true
 	end
-
-	return 
 end
+
 ObserverUI.on_player_health_changed = function (self, name, widget, health_percent)
 	if not self.bar_animations_data then
 		self.bar_animations_data = {}
@@ -340,9 +333,8 @@ ObserverUI.on_player_health_changed = function (self, name, widget, health_perce
 
 		return true
 	end
-
-	return 
 end
+
 ObserverUI.on_num_grimoires_changed = function (self, name, widget, health_debuff_percent)
 	if not self.bar_animations_data then
 		self.bar_animations_data = {}
@@ -373,9 +365,8 @@ ObserverUI.on_num_grimoires_changed = function (self, name, widget, health_debuf
 
 	widget_animation_data.current_health_debuff = health_debuff_percent
 	self.bar_animations_data[name] = widget_animation_data
-
-	return 
 end
+
 ObserverUI.update_health_animations = function (self, dt)
 	local bar_animations = self.bar_animations_data
 
@@ -407,9 +398,8 @@ ObserverUI.update_health_animations = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 ObserverUI.update_player_bar_animation = function (self, widget, bar, time, total_time, anim_start_health, anim_end_health, dt)
 	time = time + dt
 
@@ -438,6 +428,7 @@ ObserverUI.update_player_bar_animation = function (self, widget, bar, time, tota
 
 	return nil
 end
+
 ObserverUI.update_damage_highlight = function (self, widget, time, dt)
 	local total_time = (self._skip_bar_animation and 0) or 0.2
 	time = time + dt
@@ -457,4 +448,4 @@ ObserverUI.update_damage_highlight = function (self, widget, time, dt)
 	return nil
 end
 
-return 
+return

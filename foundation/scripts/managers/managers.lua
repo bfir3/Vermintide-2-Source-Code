@@ -2,8 +2,6 @@ local function debug_print(format, ...)
 	if script_data.network_debug then
 		printf("[Managers] " .. format, ...)
 	end
-
-	return 
 end
 
 local PROFILE_MANAGERS = BUILD == "dev" or BUILD == "debug"
@@ -29,8 +27,6 @@ local function destroy_global_managers()
 		Managers[alias] = nil
 		ManagersCreationOrder.global[index] = nil
 	end
-
-	return 
 end
 
 local function destroy_state_managers()
@@ -47,21 +43,17 @@ local function destroy_state_managers()
 		Managers.state[alias] = nil
 		ManagersCreationOrder.state[index] = nil
 	end
-
-	return 
 end
 
 Managers.destroy = function (self)
 	destroy_state_managers()
 	destroy_global_managers()
-
-	return 
 end
+
 Managers.state.destroy = function (self)
 	destroy_state_managers()
-
-	return 
 end
+
 local mt_global = {
 	__newindex = function (managers, alias, manager)
 		rawset(ManagersCreationOrder.global, #ManagersCreationOrder.global + 1, alias)
@@ -79,8 +71,6 @@ local mt_global = {
 				end
 			end
 		end
-
-		return 
 	end,
 	__tostring = function (managers)
 		local s = "\n"
@@ -102,14 +92,13 @@ local mt_state = {
 		if manager and PROFILE_MANAGERS then
 			local scope_name = alias .. "_update"
 			local mt = getmetatable(manager)
+
 			manager.update = function (...)
 				local ret1, ret2, ret3 = mt.update(...)
 
 				return ret1, ret2, ret3
 			end
 		end
-
-		return 
 	end,
 	__tostring = function (managers)
 		local s = "\n"
@@ -127,4 +116,4 @@ local mt_state = {
 setmetatable(Managers, mt_global)
 setmetatable(Managers.state, mt_state)
 
-return 
+return

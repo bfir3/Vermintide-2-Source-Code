@@ -2,6 +2,7 @@ require("foundation/scripts/util/bezier")
 require("foundation/scripts/util/hermite")
 
 SplineCurve = class(SplineCurve)
+
 SplineCurve.init = function (self, points, class_name, movement_class, name, ...)
 	self._t = 0
 	self._name = name
@@ -14,20 +15,20 @@ SplineCurve.init = function (self, points, class_name, movement_class, name, ...
 	self._splines = splines
 	self._points = points
 	self._movement = rawget(_G, movement_class):new(self, splines, spline_class, ...)
-
-	return 
 end
+
 SplineCurve.splines = function (self)
 	return self._splines
 end
+
 SplineCurve.name = function (self)
 	return self._name
 end
+
 SplineCurve.recalc_splines = function (self, points)
 	self._build_splines(self, self._splines, points, self._spline_class, 1)
-
-	return 
 end
+
 SplineCurve._build_splines = function (self, splines, points, spline_class)
 	local index = 1
 	local spline_index = 1
@@ -47,8 +48,6 @@ SplineCurve._build_splines = function (self, splines, points, spline_class)
 		index = spline_class.next_index(points, index)
 		spline_index = spline_index + 1
 	end
-
-	return 
 end
 
 function unpack_unbox(t, k)
@@ -70,9 +69,8 @@ SplineCurve.draw = function (self, segments_per_spline, drawer, tangent_scale, c
 
 		spline_class.draw(segments_per_spline, drawer, tangent_scale, color, unpack_unbox(points))
 	end
-
-	return 
 end
+
 SplineCurve.length = function (self, segments_per_spline)
 	local spline_class = self._spline_class
 
@@ -83,6 +81,7 @@ SplineCurve.length = function (self, segments_per_spline)
 
 	return length
 end
+
 SplineCurve.get_travel_dist_to_spline_point = function (self, point_index)
 	local spline_points = self._splines
 	local spline_class = self._spline_class
@@ -96,6 +95,7 @@ SplineCurve.get_travel_dist_to_spline_point = function (self, point_index)
 
 	return travel_dist
 end
+
 SplineCurve.get_point_at_distance = function (self, dist)
 	local spline_points = self._splines
 	local spline_class = self._spline_class
@@ -125,15 +125,17 @@ SplineCurve.get_point_at_distance = function (self, dist)
 
 	return s[3]:unbox(), spline_class.calc_tangent(1, s[1]:unbox(), s[2]:unbox(), s[3]:unbox(), s[4]:unbox()), true
 end
+
 SplineCurve.movement = function (self)
 	return self._movement
 end
+
 SplineCurve.update = function (self, dt)
 	self._movement:update(dt)
-
-	return 
 end
+
 SplineMovementMetered = class(SplineMovementMetered)
+
 SplineMovementMetered.init = function (self, spline_curve, splines, spline_class)
 	self._splines = splines
 	self._spline_curve = spline_curve
@@ -143,9 +145,8 @@ SplineMovementMetered.init = function (self, spline_curve, splines, spline_class
 	self._t = 0
 
 	self._set_spline_lengths(self, splines, spline_class, 10)
-
-	return 
 end
+
 SplineMovementMetered._set_spline_lengths = function (self, splines, spline_class, segments_per_spline)
 	for index, spline in ipairs(splines) do
 		local points = spline.points
@@ -153,27 +154,26 @@ SplineMovementMetered._set_spline_lengths = function (self, splines, spline_clas
 
 		fassert(0 < spline.length, "[SplineMovementMetered] Spline %n in curve %s has length 0.", index, self._spline_curve:name())
 	end
-
-	return 
 end
+
 SplineMovementMetered.draw = function (self, script_drawer, radius, color)
 	local pos = self.current_position(self)
 
 	script_drawer.sphere(script_drawer, pos, radius or 1, color)
-
-	return 
 end
+
 SplineMovementMetered.current_position = function (self)
 	return self._spline_class.calc_point(self._t, unpack_unbox(self._current_spline(self).points))
 end
+
 SplineMovementMetered._current_spline = function (self)
 	return self._splines[self._current_spline_index]
 end
+
 SplineMovementMetered.update = function (self, dt)
 	self.move(self, dt * self._speed)
-
-	return 
 end
+
 SplineMovementMetered.move = function (self, delta)
 	local current_spline = self._current_spline(self)
 	local current_spline_length = current_spline.length
@@ -182,7 +182,7 @@ SplineMovementMetered.move = function (self, delta)
 	if 1 < new_t and self._current_spline_index == #self._splines then
 		self._t = 1
 
-		return 
+		return
 	elseif 1 < new_t then
 		self._current_spline_index = self._current_spline_index + 1
 		self._t = 0
@@ -192,7 +192,7 @@ SplineMovementMetered.move = function (self, delta)
 	elseif new_t < 0 and self._current_spline_index == 1 then
 		self._t = 0
 
-		return 
+		return
 	elseif new_t < 0 then
 		self._current_spline_index = self._current_spline_index - 1
 		self._t = 1
@@ -202,12 +202,12 @@ SplineMovementMetered.move = function (self, delta)
 	else
 		self._t = new_t
 
-		return 
+		return
 	end
-
-	return 
 end
+
 SplineMovementHermiteInterpolatedMetered = class(SplineMovementHermiteInterpolatedMetered)
+
 SplineMovementHermiteInterpolatedMetered.init = function (self, spline_curve, splines, spline_class, subdivisions)
 	self._splines = splines
 	self._spline_curve = spline_curve
@@ -218,9 +218,8 @@ SplineMovementHermiteInterpolatedMetered.init = function (self, spline_curve, sp
 	self._current_subdivision_index = 1
 
 	self._build_subdivisions(self, subdivisions, splines, spline_class)
-
-	return 
 end
+
 SplineMovementHermiteInterpolatedMetered._build_subdivisions = function (self, subdivisions, splines, spline_class)
 	local first_point = spline_class.calc_point(0, unpack_unbox(splines[1].points))
 	local points = {
@@ -266,9 +265,8 @@ SplineMovementHermiteInterpolatedMetered._build_subdivisions = function (self, s
 
 		spline.subdivisions = subs
 	end
-
-	return 
 end
+
 SplineMovementHermiteInterpolatedMetered._set_spline_lengths = function (self, splines, spline_class, segments_per_spline)
 	for index, spline in ipairs(splines) do
 		local points = spline.points
@@ -276,43 +274,44 @@ SplineMovementHermiteInterpolatedMetered._set_spline_lengths = function (self, s
 
 		fassert(0 < spline.length, "[SplineMovementHermiteInterpolatedMetered] Spline %n in curve %s has length 0.", index, self._spline_curve:name())
 	end
-
-	return 
 end
+
 SplineMovementHermiteInterpolatedMetered.draw = function (self, script_drawer, radius, color)
 	local pos = self.current_position(self)
 
 	script_drawer.sphere(script_drawer, pos, radius or 1, color)
-
-	return 
 end
+
 SplineMovementHermiteInterpolatedMetered.draw_subdivisions = function (self, script_drawer, color)
 	for _, spline in ipairs(self._splines) do
 		for _, subdivision in ipairs(spline.subdivisions) do
 			Hermite.draw(10, script_drawer, Color(255, 0, 0), nil, unpack_unbox(subdivision.points))
 		end
 	end
-
-	return 
 end
+
 SplineMovementHermiteInterpolatedMetered.current_position = function (self)
 	local current_subdivision = self._current_spline_subdivision(self)
 
 	return Hermite.calc_point(self._t, unpack_unbox(current_subdivision.points))
 end
+
 SplineMovementHermiteInterpolatedMetered.current_tangent_direction = function (self)
 	local current_subdivision = self._current_spline_subdivision(self)
 
 	return Hermite.calc_tangent(self._t, unpack_unbox(current_subdivision.points))
 end
+
 SplineMovementHermiteInterpolatedMetered._current_spline = function (self)
 	return self._splines[self._current_spline_index]
 end
+
 SplineMovementHermiteInterpolatedMetered.update = function (self, dt)
 	local state = self.move(self, dt * self._speed)
 
 	return state
 end
+
 SplineMovementHermiteInterpolatedMetered.distance = function (self, from_index, from_subdiv, from_spline_t, to_index, to_subdiv, to_spline_t)
 	local distance = 0
 	local splines = self._splines
@@ -384,17 +383,19 @@ SplineMovementHermiteInterpolatedMetered.distance = function (self, from_index, 
 
 	return distance
 end
+
 SplineMovementHermiteInterpolatedMetered.set_speed = function (self, speed)
 	self._speed = speed
-
-	return 
 end
+
 SplineMovementHermiteInterpolatedMetered.speed = function (self)
 	return self._speed
 end
+
 SplineMovementHermiteInterpolatedMetered._current_spline_subdivision = function (self)
 	return self._current_spline(self).subdivisions[self._current_subdivision_index]
 end
+
 SplineMovementHermiteInterpolatedMetered.move = function (self, delta)
 	local current_spline = self._current_spline(self)
 	local current_subdivision = self._current_spline_subdivision(self)
@@ -438,24 +439,24 @@ SplineMovementHermiteInterpolatedMetered.move = function (self, delta)
 
 		return "moving"
 	end
-
-	return 
 end
+
 SplineMovementHermiteInterpolatedMetered.set_spline_index = function (self, spline_index, subdivision_index, t)
 	self._current_spline_index = spline_index
 	self._current_subdivision_index = subdivision_index
 	self._t = t
-
-	return 
 end
+
 SplineMovementHermiteInterpolatedMetered.current_spline_index = function (self)
 	return self._current_spline_index
 end
+
 SplineMovementHermiteInterpolatedMetered.current_subdivision_index = function (self)
 	return self._current_subdivision_index
 end
+
 SplineMovementHermiteInterpolatedMetered.current_t = function (self)
 	return self._t
 end
 
-return 
+return

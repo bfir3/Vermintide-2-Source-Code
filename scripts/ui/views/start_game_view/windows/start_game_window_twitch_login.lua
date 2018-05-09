@@ -5,6 +5,7 @@ local animation_definitions = definitions.animation_definitions
 local DO_RELOAD = false
 StartGameWindowTwitchLogin = class(StartGameWindowTwitchLogin)
 StartGameWindowTwitchLogin.NAME = "StartGameWindowTwitchLogin"
+
 StartGameWindowTwitchLogin.on_enter = function (self, params, offset)
 	print("[StartGameWindow] Enter Substate StartGameWindowTwitchLogin")
 
@@ -27,9 +28,8 @@ StartGameWindowTwitchLogin.on_enter = function (self, params, offset)
 	self.create_ui_elements(self, params, offset)
 	self.set_active(self, true)
 	self._set_disconnect_button_text(self)
-
-	return 
 end
+
 StartGameWindowTwitchLogin.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -54,18 +54,16 @@ StartGameWindowTwitchLogin.create_ui_elements = function (self, params, offset)
 		window_position[2] = window_position[2] + offset[2]
 		window_position[3] = window_position[3] + offset[3]
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin.on_exit = function (self, params)
 	print("[StartGameWindow] Exit Substate StartGameWindowTwitchLogin")
 
 	self.ui_animator = nil
 
 	self.set_active(self, false)
-
-	return 
 end
+
 StartGameWindowTwitchLogin.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -78,9 +76,8 @@ StartGameWindowTwitchLogin.update = function (self, dt, t)
 	self._handle_input(self, dt, t)
 	self._update_game_options(self, dt, t)
 	self.draw(self, dt)
-
-	return 
 end
+
 StartGameWindowTwitchLogin.set_active = function (self, active, skip_block)
 	self._active = active
 
@@ -89,9 +86,8 @@ StartGameWindowTwitchLogin.set_active = function (self, active, skip_block)
 	else
 		Managers.irc:unregister_message_callback("twitch")
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin._update_popup = function (self)
 	if self._error_popup_id then
 		local result = Managers.popup:query_result(self._error_popup_id)
@@ -102,9 +98,8 @@ StartGameWindowTwitchLogin._update_popup = function (self)
 			fassert(false, "[StateTitleScreenMainMenu] The popup result doesn't exist (%s)", result)
 		end
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin._handle_input = function (self, dt, t)
 	local frame_widget = self._widgets_by_name.frame_widget
 	local frame_widget_content = frame_widget.content
@@ -129,7 +124,7 @@ StartGameWindowTwitchLogin._handle_input = function (self, dt, t)
 
 				self.parent.parent:set_input_blocked(false)
 
-				return 
+				return
 			end
 
 			frame_widget_content.text_field_active = false
@@ -184,9 +179,8 @@ StartGameWindowTwitchLogin._handle_input = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin._update_game_options = function (self, dt, t)
 	local is_connected = Managers.twitch:is_connected()
 	local is_connecting = Managers.twitch:is_connecting()
@@ -202,26 +196,22 @@ StartGameWindowTwitchLogin._update_game_options = function (self, dt, t)
 		self.parent:enable_widget(1, "game_option_3", true)
 		self.parent:enable_widget(1, "game_option_5", true)
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin.cb_connection_error_callback = function (self, message)
 	self._error_popup_id = Managers.popup:queue_popup(message, Localize("popup_header_error_twitch"), "ok", Localize("popup_choice_ok"))
-
-	return 
 end
+
 StartGameWindowTwitchLogin.cb_connection_success_callback = function (self, user_data)
 	self._set_disconnect_button_text(self)
-
-	return 
 end
+
 StartGameWindowTwitchLogin._set_disconnect_button_text = function (self)
 	local user_name = (Managers.twitch and Managers.twitch:user_name()) or "N/A"
 	local disconnect_button_widget = self._widgets_by_name.button_2
 	disconnect_button_widget.content.button_hotspot.text = string.format(Localize("start_game_window_twitch_disconnect"), user_name)
-
-	return 
 end
+
 StartGameWindowTwitchLogin.cb_on_message_received = function (self, key, message_type, user_name, message, parameter)
 	local chat_output_widget = self._widgets_by_name.chat_output_widget
 	local chat_output_content = chat_output_widget.content
@@ -239,9 +229,8 @@ StartGameWindowTwitchLogin.cb_on_message_received = function (self, key, message
 	else
 		chat_output_content.text_start_offset = chat_output_content.text_start_offset + 1
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -251,18 +240,19 @@ StartGameWindowTwitchLogin._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter
 end
+
 StartGameWindowTwitchLogin.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 StartGameWindowTwitchLogin._update_animations = function (self, dt)
 	self._update_button_animations(self, dt)
 
@@ -289,9 +279,8 @@ StartGameWindowTwitchLogin._update_animations = function (self, dt)
 	end
 
 	local widgets_by_name = self._widgets_by_name
-
-	return 
 end
+
 StartGameWindowTwitchLogin._update_button_animations = function (self, dt)
 	local widgets_by_name = self._widgets_by_name
 	local widget_prefix = "button_"
@@ -302,9 +291,8 @@ StartGameWindowTwitchLogin._update_button_animations = function (self, dt)
 
 		self._animate_button(self, widget, dt)
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin._animate_button = function (self, widget, dt)
 	local content = widget.content
 	local style = widget.style
@@ -365,9 +353,8 @@ StartGameWindowTwitchLogin._animate_button = function (self, widget, dt)
 	hotspot.hover_progress = hover_progress
 	hotspot.input_progress = input_progress
 	hotspot.selection_progress = selection_progress
-
-	return 
 end
+
 StartGameWindowTwitchLogin._update_private_option = function (self)
 	local parent = self.parent
 	local private_enabled = parent.is_private_option_enabled(parent)
@@ -377,9 +364,8 @@ StartGameWindowTwitchLogin._update_private_option = function (self)
 		widgets_by_name.private_option.content.checked = private_enabled
 		self._private_enabled = private_enabled
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin._update_difficulty_option = function (self)
 	local parent = self.parent
 	local difficulty_key = parent.get_difficulty_option(parent)
@@ -389,24 +375,21 @@ StartGameWindowTwitchLogin._update_difficulty_option = function (self)
 
 		self._difficulty_key = difficulty_key
 	end
-
-	return 
 end
+
 StartGameWindowTwitchLogin._set_difficulty_option = function (self, difficulty_key)
 	local widgets_by_name = self._widgets_by_name
 	local widget = widgets_by_name.difficulty_title
 	local difficulty_settings = DifficultySettings[difficulty_key]
 	local display_name = difficulty_settings.display_name
 	widget.content.text = Localize(display_name)
-
-	return 
 end
+
 StartGameWindowTwitchLogin._exit = function (self, selected_level)
 	self.exit = true
 	self.exit_level_id = selected_level
-
-	return 
 end
+
 StartGameWindowTwitchLogin.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -419,13 +402,10 @@ StartGameWindowTwitchLogin.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 StartGameWindowTwitchLogin._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
 
-return 
+return

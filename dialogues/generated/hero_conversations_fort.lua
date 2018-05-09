@@ -2793,6 +2793,4 @@ return function ()
 			}
 		}
 	})
-
-	return 
 end

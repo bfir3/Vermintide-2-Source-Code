@@ -8,6 +8,7 @@ local extensions = {
 	"AIVolumeExtension",
 	"PickupProjectileVolumeExtension"
 }
+
 VolumeSystem.init = function (self, context, name)
 	VolumeSystem.super.init(self, context, name, extensions)
 
@@ -28,10 +29,10 @@ VolumeSystem.init = function (self, context, name)
 
 	self.nav_tag_volume_handler = nil
 	self.nav_tag_volumes_to_create = {}
-
-	return 
 end
+
 local dummy_input = {}
+
 VolumeSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	assert(self.is_server, "Volume Extensions are only allowed on server!")
 
@@ -47,18 +48,18 @@ VolumeSystem.on_add_extension = function (self, world, unit, extension_name, ext
 
 	return extension
 end
+
 VolumeSystem.on_remove_extension = function (self, unit, extension_name)
 	self.on_freeze_extension(self, unit, extension_name)
 	ScriptUnit.remove_extension(unit, self.NAME)
-
-	return 
 end
+
 VolumeSystem.on_freeze_extension = function (self, unit, extension_name)
 	local unit_index_map = self.unit_index_map[extension_name]
 	local index = unit_index_map[unit]
 
 	if index == nil then
-		return 
+		return
 	end
 
 	local unit_array = self.unit_array[extension_name]
@@ -74,9 +75,8 @@ VolumeSystem.on_freeze_extension = function (self, unit, extension_name)
 	unit_array[index_n] = nil
 	extension_array[index_n] = nil
 	unit_index_map[unit] = nil
-
-	return 
 end
+
 VolumeSystem.update = function (self, context, t, dt)
 	local updates_n = VolumeSystemSettings.updates_per_frame
 	local extension_array = self.extension_array
@@ -103,9 +103,8 @@ VolumeSystem.update = function (self, context, t, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 VolumeSystem.destroy = function (self)
 	VolumeSystem.super.destroy(self)
 
@@ -116,9 +115,8 @@ VolumeSystem.destroy = function (self)
 	self.extension_volumes = nil
 	self.nav_tag_volume_handler = nil
 	self.nav_tag_volumes_to_create = nil
-
-	return 
 end
+
 VolumeSystem.register_volume = function (self, volume_name, volume_type, params)
 	local level = LevelHelper:current_level(self.world)
 
@@ -160,9 +158,8 @@ VolumeSystem.register_volume = function (self, volume_name, volume_type, params)
 			end
 		end
 	end
-
-	return 
 end
+
 VolumeSystem.ai_ready = function (self)
 	self.nav_tag_volume_handler = Managers.state.conflict.nav_tag_volume_handler
 	local nav_tag_volumes_to_create = self.nav_tag_volumes_to_create
@@ -174,14 +171,13 @@ VolumeSystem.ai_ready = function (self)
 	end
 
 	self.nav_tag_volumes_to_create = nil
-
-	return 
 end
+
 VolumeSystem.create_nav_tag_volume_from_data = function (self, pos, size, layer_name)
 	local level_settings = LevelHelper:current_level_settings()
 
 	if level_settings.no_bots_allowed then
-		return 
+		return
 	end
 
 	local nav_tag_volume_handler = self.nav_tag_volume_handler
@@ -191,23 +187,24 @@ VolumeSystem.create_nav_tag_volume_from_data = function (self, pos, size, layer_
 
 	return volume_name
 end
+
 VolumeSystem.get_volume_mapping_from_lookup_id = function (self, lookup_id)
 	local nav_tag_volume_handler = self.nav_tag_volume_handler
 
 	return self.nav_tag_volume_handler:get_mapping_from_lookup_id(lookup_id)
 end
+
 VolumeSystem.destroy_nav_tag_volume = function (self, volume_name)
 	local nav_tag_volume_handler = self.nav_tag_volume_handler
 
 	nav_tag_volume_handler.destroy_nav_tag_volume(nav_tag_volume_handler, volume_name)
-
-	return 
 end
+
 VolumeSystem.create_nav_tag_volume = function (self, volume_name, layer_name, layer_costs)
 	local level_settings = LevelHelper:current_level_settings()
 
 	if level_settings.no_bots_allowed then
-		return 
+		return
 	end
 
 	local nav_tag_volume_handler = self.nav_tag_volume_handler
@@ -234,9 +231,8 @@ VolumeSystem.create_nav_tag_volume = function (self, volume_name, layer_name, la
 			extension.set_layer_cost(extension, layer_name, layer_cost_ai)
 		end
 	end
-
-	return 
 end
+
 VolumeSystem.unregister_volume = function (self, volume_name)
 	local level = LevelHelper:current_level(self.world)
 
@@ -263,9 +259,8 @@ VolumeSystem.unregister_volume = function (self, volume_name)
 			volumes[volume_name] = nil
 		end
 	end
-
-	return 
 end
+
 VolumeSystem.update_volumes = function (self, dt, t, extension_name, extension)
 	local unit = extension.unit
 	local unit_position = POSITION_LOOKUP[unit]
@@ -302,9 +297,8 @@ VolumeSystem.update_volumes = function (self, dt, t, extension_name, extension)
 			extension.on_volume_exit(extension, volume)
 		end
 	end
-
-	return 
 end
+
 VolumeSystem.volume_has_units_inside = function (self, volume_name)
 	local extension_array = self.extension_array
 	local extension_volumes = self.extension_volumes
@@ -320,9 +314,8 @@ VolumeSystem.volume_has_units_inside = function (self, volume_name)
 			end
 		end
 	end
-
-	return 
 end
+
 VolumeSystem.all_human_players_inside = function (self, volume_name)
 	local extension_array = self.extension_array
 	local extension_volumes = self.extension_volumes
@@ -352,4 +345,4 @@ VolumeSystem.all_human_players_inside = function (self, volume_name)
 	return true
 end
 
-return 
+return

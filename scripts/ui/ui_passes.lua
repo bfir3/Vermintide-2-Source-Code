@@ -70,8 +70,6 @@ local function get_line_color_override(line_index, line_length, line_global_star
 	if line_color_override and 0 < #line_color_override then
 		return line_color_override
 	end
-
-	return 
 end
 
 UIPasses = UIPasses or {}
@@ -96,8 +94,6 @@ UIPasses.texture_uv_dynamic_color_uvs_size_offset = {
 
 			pass_data.retained_id = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		if pass_definition.content_id and not ui_content[pass_definition.content_id] then
@@ -201,8 +197,6 @@ UIPasses.state_texture = {
 
 			UIRenderer[draw_function](ui_renderer, texture, position, size, ui_style.color, ui_style and ui_style.masked)
 		end
-
-		return 
 	end
 }
 local element_alignment_position = {
@@ -355,8 +349,6 @@ UIPasses.list_pass = {
 				row_count = row_count + 1
 			end
 		end
-
-		return 
 	end
 }
 UIPasses.gradient_mask_texture = {
@@ -366,8 +358,6 @@ UIPasses.gradient_mask_texture = {
 				dirty = true
 			}
 		end
-
-		return 
 	end,
 	destroy = function (ui_renderer, pass_data, pass_definition)
 		assert(pass_definition.retained_mode, "why u destroy immediate pass?")
@@ -377,8 +367,6 @@ UIPasses.gradient_mask_texture = {
 
 			pass_data.retained_id = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		if ui_style then
@@ -413,8 +401,6 @@ UIPasses.gradient_mask_texture = {
 		else
 			UIRenderer.draw_gradient_mask_texture(ui_renderer, ui_content[pass_definition.texture_id], position, size, ui_style and ui_style.color, ui_style.gradient_threshold or 1)
 		end
-
-		return 
 	end
 }
 UIPasses.texture_frame = {
@@ -486,8 +472,6 @@ UIPasses.texture = {
 				dirty = true
 			}
 		end
-
-		return 
 	end,
 	destroy = function (ui_renderer, pass_data, pass_definition)
 		assert(pass_definition.retained_mode, "why u destroy immediate pass?")
@@ -497,8 +481,6 @@ UIPasses.texture = {
 
 			pass_data.retained_id = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		if ui_style then
@@ -533,8 +515,6 @@ UIPasses.texture = {
 		else
 			UIRenderer_draw_texture(ui_renderer, ui_content[texture_id], position, size, ui_style and ui_style.color, ui_style and ui_style.masked, ui_style and ui_style.saturated)
 		end
-
-		return 
 	end
 }
 UIPasses.shader_tiled_texture = {
@@ -544,8 +524,6 @@ UIPasses.shader_tiled_texture = {
 				dirty = true
 			}
 		end
-
-		return 
 	end,
 	destroy = function (ui_renderer, pass_data, pass_definition)
 		assert(pass_definition.retained_mode, "why u destroy immediate pass?")
@@ -555,8 +533,6 @@ UIPasses.shader_tiled_texture = {
 
 			pass_data.retained_id = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		if ui_style then
@@ -608,8 +584,6 @@ UIPasses.shader_tiled_texture = {
 		else
 			UIRenderer_draw_texture(ui_renderer, ui_content[texture_id], position, size, ui_style and ui_style.color, ui_style and ui_style.masked, ui_style and ui_style.saturated)
 		end
-
-		return 
 	end
 }
 UIPasses.tiled_texture = {
@@ -686,8 +660,6 @@ UIPasses.multi_texture = {
 
 			pass_data.retained_ids = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local texture_size = ui_style.texture_size
@@ -704,8 +676,6 @@ UIPasses.multi_texture = {
 		else
 			return UIRenderer.draw_multi_texture(ui_renderer, ui_content[pass_definition.texture_id], position, texture_size, texture_sizes, texture_offsets, ui_style.tile_sizes, ui_style.axis, ui_style.spacing, ui_style.direction, ui_style.draw_count, ui_style.texture_colors, ui_style.color, ui_style.masked, ui_style and ui_style.texture_saturation, ui_style and ui_style.saturated)
 		end
-
-		return 
 	end
 }
 UIPasses.centered_texture_amount = {
@@ -730,8 +700,6 @@ UIPasses.centered_texture_amount = {
 
 			pass_data.retained_ids = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local texture_size = ui_style.texture_size
@@ -754,8 +722,6 @@ UIPasses.centered_texture_amount = {
 		else
 			return UIRenderer.draw_centered_texture_amount(ui_renderer, ui_content[pass_definition.texture_id], position, size, texture_size, num_of_textures, texture_axis, ui_style and ui_style.spacing, ui_style and ui_style.color, ui_style and ui_style.texture_colors, ui_style and ui_style.masked)
 		end
-
-		return 
 	end
 }
 UIPasses.centered_uv_texture_amount = {
@@ -804,8 +770,6 @@ UIPasses.texture_uv = {
 
 			pass_data.retained_id = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local uvs = ui_content.uvs
@@ -842,8 +806,6 @@ UIPasses.texture_uv = {
 		else
 			UIRenderer_draw_texture_uv(ui_renderer, texture, position, size, uvs, color, ui_style and ui_style.masked, ui_style and ui_style.saturated)
 		end
-
-		return 
 	end
 }
 UIPasses.texture_uv_dynamic_size_uvs = {
@@ -880,8 +842,6 @@ UIPasses.rotated_texture = {
 				dirty = true
 			}
 		end
-
-		return 
 	end,
 	destroy = function (ui_renderer, pass_data, pass_definition)
 		assert(pass_definition.retained_mode, "why u destroy immediate pass?")
@@ -891,8 +851,6 @@ UIPasses.rotated_texture = {
 
 			pass_data.retained_id = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local texture_id = pass_definition.texture_id
@@ -931,8 +889,6 @@ UIPasses.rotated_texture = {
 		else
 			UIRenderer.draw_texture_rotated(ui_renderer, texture, size, position, angle, pivot, color, ui_style and ui_style.masked)
 		end
-
-		return 
 	end
 }
 UIPasses.rounded_background = {
@@ -972,8 +928,6 @@ UIPasses.rect = {
 				dirty = true
 			}
 		end
-
-		return 
 	end,
 	destroy = function (ui_renderer, pass_data, pass_definition)
 		assert(pass_definition.retained_mode, "why u destroy immediate pass?")
@@ -983,8 +937,6 @@ UIPasses.rect = {
 
 			pass_data.retained_id = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		if ui_style then
@@ -1017,8 +969,6 @@ UIPasses.rect = {
 		else
 			UIRenderer.draw_rect(ui_renderer, position, size, ui_style.color)
 		end
-
-		return 
 	end
 }
 local cursor_value_type_name = "Vector3"
@@ -1214,8 +1164,6 @@ UIPasses.scrollbar_hotspot = {
 				})
 			end
 		end
-
-		return 
 	end
 }
 UIPasses.scrollbar = {
@@ -1250,8 +1198,6 @@ UIPasses.scrollbar = {
 		scrollbar_position[3] = position[3] + 1
 
 		UIRenderer.draw_rect(ui_renderer, scrollbar_position, scrollbar_size, ui_style.scrollbar_color)
-
-		return 
 	end
 }
 UIPasses.rect_rotated = {
@@ -1283,8 +1229,6 @@ UIPasses.video = {
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local is_complete = UIRenderer.draw_video(ui_renderer, ui_content.material_name, position, size, ui_style.color)
 		ui_content.video_completed = is_complete
-
-		return 
 	end
 }
 UIPasses.splash_video = {
@@ -1294,8 +1238,6 @@ UIPasses.splash_video = {
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local is_complete = UIRenderer.draw_splash_video(ui_renderer, ui_content.material_name, position, size, ui_style.color)
 		ui_content.video_completed = is_complete
-
-		return 
 	end
 }
 UIPasses.border = {
@@ -1310,8 +1252,6 @@ UIPasses.border = {
 		UIRenderer.draw_rect(ui_renderer, lower_left_corner, Vector3(size.x, thickness, 0), ui_style.color)
 		UIRenderer.draw_rect(ui_renderer, lower_left_corner + Vector3(size.x - thickness, 0, 0), Vector3(thickness, size.y, 0), ui_style.color)
 		UIRenderer.draw_rect(ui_renderer, lower_left_corner + Vector3(0, size.y - thickness, 0), Vector3(size.x, thickness, 0), ui_style.color)
-
-		return 
 	end
 }
 
@@ -1358,7 +1298,7 @@ UIPasses.text_area_chat = {
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		if #ui_content.message_tables == 0 then
-			return 
+			return
 		end
 
 		table.clear_array(message_array, #message_array)
@@ -1596,8 +1536,6 @@ UIPasses.text_area_chat = {
 
 			position.y = position.y - ui_style.font_size - spacing
 		end
-
-		return 
 	end
 }
 local temp_line_color_override = {}
@@ -1622,8 +1560,6 @@ UIPasses.text = {
 
 			pass_data.retained_ids = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global)
 		local retained_ids = nil
@@ -1899,8 +1835,6 @@ UIPasses.text = {
 		end
 
 		ui_style.font_size = default_font_size
-
-		return 
 	end
 }
 
@@ -1942,8 +1876,6 @@ UIPasses.lorebook_multiple_texts = {
 
 			pass_data.retained_id = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local retained_id = nil
@@ -1984,8 +1916,6 @@ UIPasses.lorebook_multiple_texts = {
 			pass_data.retained_id = retained_id or pass_data.retained_id
 			pass_data.dirty = false
 		end
-
-		return 
 	end
 }
 UIPasses.lorebook_paragraph_divider = {
@@ -1995,8 +1925,6 @@ UIPasses.lorebook_paragraph_divider = {
 				dirty = true
 			}
 		end
-
-		return 
 	end,
 	destroy = function (ui_renderer, pass_data, pass_definition)
 		assert(pass_definition.retained_mode, "why u destroy immediate pass?")
@@ -2006,8 +1934,6 @@ UIPasses.lorebook_paragraph_divider = {
 
 			pass_data.retained_id = nil
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local divider_positions = ui_content.positions
@@ -2032,8 +1958,6 @@ UIPasses.lorebook_paragraph_divider = {
 				UIRenderer_draw_texture(ui_renderer, texture, position, size, ui_style and ui_style.color, ui_style and ui_style.masked, ui_style and ui_style.saturated)
 			end
 		end
-
-		return 
 	end
 }
 UIPasses.text_positive_reinforcement = {
@@ -2046,7 +1970,7 @@ UIPasses.text_positive_reinforcement = {
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		if #ui_content.message_tables == 0 then
-			return 
+			return
 		end
 
 		local font_material, font_size, font_name = nil
@@ -2086,8 +2010,6 @@ UIPasses.text_positive_reinforcement = {
 
 			position.y = position.y + ui_style.font_size
 		end
-
-		return 
 	end
 }
 UIPasses.editable_text = {
@@ -2095,7 +2017,7 @@ UIPasses.editable_text = {
 		return nil
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
-		return 
+		return
 	end
 }
 UIPasses.multiple_texts = {
@@ -2169,8 +2091,6 @@ UIPasses.multiple_texts = {
 				position[1] = position[1] + size[1] + ui_style.spacing
 			end
 		end
-
-		return 
 	end
 }
 UIPasses.viewport = {
@@ -2242,8 +2162,6 @@ UIPasses.viewport = {
 
 		ScriptWorld.destroy_viewport(pass_data.world, pass_data.viewport_name)
 		Managers.world:destroy_world(pass_data.world)
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local scaled_position = UIScaleVectorToResolution(position)
@@ -2278,8 +2196,6 @@ UIPasses.viewport = {
 			pass_data.size_scale_x = viewport_size.x
 			pass_data.size_scale_y = viewport_size.y
 		end
-
-		return 
 	end,
 	raycast_at_screen_position = function (pass_data, screen_position, result_type, range, collision_filter)
 		if pass_data.viewport_rect_pos_x == nil then
@@ -2350,13 +2266,13 @@ UIPasses.drag = {
 		end
 
 		if ui_content.drag_disabled then
-			return 
+			return
 		end
 
 		local drag_texture = ui_content[pass_definition.texture_id]
 
 		if not drag_texture then
-			return 
+			return
 		end
 
 		local cursor = input_service.get(input_service, "cursor") or NilCursor
@@ -2415,8 +2331,6 @@ UIPasses.drag = {
 				255
 			})
 		end
-
-		return 
 	end
 }
 local cursor_position_table = {
@@ -2479,8 +2393,6 @@ UIPasses.gamepad_cursor = {
 				255
 			})
 		end
-
-		return 
 	end
 }
 UIPasses.hover = {
@@ -2536,8 +2448,6 @@ UIPasses.hover = {
 		if not is_hover and ui_content.internal_is_hover then
 			ui_content.internal_is_hover = nil
 		end
-
-		return 
 	end
 }
 UIPasses.click = {
@@ -2550,8 +2460,6 @@ UIPasses.click = {
 		else
 			ui_content.is_clicked = (ui_content.is_clicked or 10) + dt
 		end
-
-		return 
 	end
 }
 UIPasses.generic_tooltip = {
@@ -2622,8 +2530,6 @@ UIPasses.generic_tooltip = {
 			local data = end_pass.data
 			slot23 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
-
-		return 
 	end
 }
 UIPasses.additional_option_tooltip = {
@@ -2653,14 +2559,12 @@ UIPasses.additional_option_tooltip = {
 			pass_data.alpha_progress = 0
 			pass_data.alpha_wait_time = UISettings.tooltip_wait_duration
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, parent_size, input_service, dt, ui_style_global)
 		local additional_option_data = ui_content[pass_definition.additional_option_id]
 
 		if not additional_option_data then
-			return 
+			return
 		end
 
 		local gamepad_active = Managers.input:is_device_active("gamepad")
@@ -2757,8 +2661,6 @@ UIPasses.additional_option_tooltip = {
 			local data = end_pass.data
 			slot31 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
-
-		return 
 	end
 }
 UIPasses.level_tooltip = {
@@ -2788,14 +2690,12 @@ UIPasses.level_tooltip = {
 			pass_data.alpha_progress = 0
 			pass_data.alpha_wait_time = UISettings.tooltip_wait_duration
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, parent_size, input_service, dt, ui_style_global)
 		local level_data = ui_content[pass_definition.level_id]
 
 		if not level_data then
-			return 
+			return
 		end
 
 		local alpha_wait_time = pass_data.alpha_wait_time
@@ -2874,8 +2774,6 @@ UIPasses.level_tooltip = {
 			local data = end_pass.data
 			slot30 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
-
-		return 
 	end
 }
 UIPasses.hero_power_tooltip = {
@@ -2919,8 +2817,6 @@ UIPasses.hero_power_tooltip = {
 			pass_data.alpha_progress = 0
 			pass_data.alpha_wait_time = UISettings.tooltip_wait_duration
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, parent_size, input_service, dt, ui_style_global)
 		if not pass_data.player then
@@ -3003,8 +2899,6 @@ UIPasses.hero_power_tooltip = {
 			local data = end_pass.data
 			slot29 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
-
-		return 
 	end
 }
 UIPasses.option_tooltip = {
@@ -3034,8 +2928,6 @@ UIPasses.option_tooltip = {
 			pass_data.alpha_progress = 0
 			pass_data.alpha_wait_time = UISettings.tooltip_wait_duration
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, parent_size, input_service, dt, ui_style_global)
 		local gamepad_active = Managers.input:is_device_active("gamepad")
@@ -3119,8 +3011,6 @@ UIPasses.option_tooltip = {
 			local data = end_pass.data
 			slot30 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
-
-		return 
 	end
 }
 UIPasses.item_tooltip = {
@@ -3254,8 +3144,6 @@ UIPasses.item_tooltip = {
 				end
 			end
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, parent_size, input_service, dt, ui_style_global)
 		if not pass_data.player then
@@ -3265,7 +3153,7 @@ UIPasses.item_tooltip = {
 		local preview_item = ui_content[pass_definition.item_id]
 
 		if not preview_item then
-			return 
+			return
 		end
 
 		local items = pass_data.items
@@ -3482,8 +3370,6 @@ UIPasses.item_tooltip = {
 
 			position[3] = start_position_z
 		end
-
-		return 
 	end
 }
 UIPasses.talent_tooltip = {
@@ -3513,14 +3399,12 @@ UIPasses.talent_tooltip = {
 			pass_data.alpha_progress = 0
 			pass_data.alpha_wait_time = UISettings.tooltip_wait_duration
 		end
-
-		return 
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, parent_size, input_service, dt, ui_style_global)
 		local talent = ui_content[pass_definition.talent_id]
 
 		if not talent then
-			return 
+			return
 		end
 
 		local alpha_wait_time = pass_data.alpha_wait_time
@@ -3599,8 +3483,6 @@ UIPasses.talent_tooltip = {
 			local data = end_pass.data
 			slot30 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
-
-		return 
 	end
 }
 local tooltip_size = {
@@ -3730,8 +3612,6 @@ UIPasses.tooltip_text = {
 		tooltip_size[2] = tooltip_size[2] + padding_y * 2
 
 		UIRenderer.draw_rounded_rect(ui_renderer, position, tooltip_size, 5, tooltip_background_color)
-
-		return 
 	end
 }
 local rect_text_size = {
@@ -3845,8 +3725,6 @@ UIPasses.rect_text = {
 		else
 			UIRenderer.draw_rounded_rect(ui_renderer, position, rect_text_size, 5, ui_style.rect_color)
 		end
-
-		return 
 	end
 }
 local test_timer = nil
@@ -3854,7 +3732,7 @@ local double_click_threshold = UISettings.double_click_threshold
 local cursor_value_type_name = "Vector3"
 UIPasses.hotspot = {
 	init = function (pass_definition, content)
-		return 
+		return
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local gamepad_active = Managers.input:is_device_active("gamepad")
@@ -4000,13 +3878,11 @@ UIPasses.hotspot = {
 			ui_content.on_release = false
 			ui_content.is_clicked = (ui_content.is_clicked or 10) + dt
 		end
-
-		return 
 	end
 }
 UIPasses.controller_hotspot = {
 	init = function (pass_definition)
-		return 
+		return
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local was_hover = ui_content.is_hover
@@ -4072,18 +3948,14 @@ UIPasses.controller_hotspot = {
 			ui_content.on_release = false
 			ui_content.is_clicked = (ui_content.is_clicked or 10) + dt
 		end
-
-		return 
 	end
 }
 UIPasses.game_pad_connected = {
 	init = function (pass_definition)
-		return 
+		return
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		ui_content.gamepad_connected = Managers.input:get_device("gamepad").active()
-
-		return 
 	end
 }
 
@@ -4097,55 +3969,45 @@ local function gamepad_button_clicked(ui_renderer, pass_data, ui_scenegraph, pas
 		ui_content.on_release = false
 		ui_content.is_clicked = (ui_content.is_clicked or 10) + dt
 	end
-
-	return 
 end
 
 UIPasses.gamepad_button_click_confirm = {
 	init = function (pass_definition)
-		return 
+		return
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		gamepad_button_clicked(ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, "confirm")
-
-		return 
 	end
 }
 UIPasses.gamepad_button_click_back = {
 	init = function (pass_definition)
-		return 
+		return
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		gamepad_button_clicked(ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, "back")
-
-		return 
 	end
 }
 UIPasses.gamepad_button_click_refresh = {
 	init = function (pass_definition)
-		return 
+		return
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		gamepad_button_clicked(ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, "refresh")
-
-		return 
 	end
 }
 UIPasses.on_click = {
 	init = function (pass_definition)
-		return 
+		return
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		if ui_content[pass_definition.click_check_content_id].on_pressed then
 			pass_definition.click_function(ui_scenegraph, ui_style, ui_content, input_service)
 		end
-
-		return 
 	end
 }
 UIPasses.on_left_and_right_click = {
 	init = function (pass_definition)
-		return 
+		return
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local hotspot = ui_content[pass_definition.click_check_content_id]
@@ -4153,13 +4015,11 @@ UIPasses.on_left_and_right_click = {
 		if hotspot.on_pressed or hotspot.on_right_click then
 			pass_definition.click_function(ui_scenegraph, ui_style, ui_content, input_service)
 		end
-
-		return 
 	end
 }
 UIPasses.on_double_click = {
 	init = function (pass_definition)
-		return 
+		return
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local click_content = ui_content[pass_definition.click_check_content_id]
@@ -4167,8 +4027,6 @@ UIPasses.on_double_click = {
 		if click_content.on_double_click then
 			pass_definition.click_function(ui_scenegraph, ui_style, ui_content, input_service)
 		end
-
-		return 
 	end
 }
 UIPasses.debug_cursor = {
@@ -4183,8 +4041,6 @@ UIPasses.debug_cursor = {
 		end
 
 		UIRenderer.draw_rect(ui_renderer, position, size, color)
-
-		return 
 	end
 }
 UIPasses.local_offset = {
@@ -4193,8 +4049,6 @@ UIPasses.local_offset = {
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		pass_definition.offset_function(ui_scenegraph, ui_style, ui_content, ui_renderer)
-
-		return 
 	end
 }
 UIPasses.scroll = {
@@ -4219,8 +4073,6 @@ UIPasses.scroll = {
 		if scroll_axis then
 			pass_definition.scroll_function(ui_scenegraph, ui_style, ui_content, input_service, scroll_axis, dt)
 		end
-
-		return 
 	end
 }
 UIPasses.held = {
@@ -4247,8 +4099,6 @@ UIPasses.held = {
 				content.is_held = false
 			end
 		end
-
-		return 
 	end
 }
 UIPasses.item_presentation = {
@@ -4314,7 +4164,7 @@ UIPasses.item_presentation = {
 		local item = ui_content[pass_definition.item_id]
 
 		if not item then
-			return 
+			return
 		end
 
 		if not pass_data.player then
@@ -4377,8 +4227,6 @@ UIPasses.item_presentation = {
 		end
 
 		ui_style.item_presentation_height = size[2]
-
-		return 
 	end
 }
 UIPasses.keystrokes = {
@@ -4398,9 +4246,7 @@ UIPasses.keystrokes = {
 			ui_content.caret_index = new_caret_index
 			ui_content.input_mode = new_input_mode
 		end
-
-		return 
 	end
 }
 
-return 
+return

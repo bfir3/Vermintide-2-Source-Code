@@ -226,6 +226,7 @@ local button_definitions = {
 	}
 }
 UICalibrationView = class(UICalibrationView)
+
 UICalibrationView.init = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self.background = UIWidget.init(widget_definitions.background)
@@ -238,12 +239,12 @@ UICalibrationView.init = function (self)
 	end
 
 	self.buttons = buttons
+end
 
-	return 
-end
 UICalibrationView.destroy = function (self)
-	return 
+	return
 end
+
 UICalibrationView.update = function (self, ui_renderer, input_service, dt)
 	local ui_scenegraph = self.ui_scenegraph
 	local top_left_reticule = self.top_left_reticule
@@ -325,17 +326,15 @@ UICalibrationView.update = function (self, ui_renderer, input_service, dt)
 			self.reset_root_scale(self)
 		end
 	end
-
-	return 
 end
+
 UICalibrationView.reset_root_scale = function (self)
 	UISettings.root_scale[1] = 1
 	UISettings.root_scale[2] = 1
 
 	self.save_new_root_scale(self, UISettings.root_scale)
-
-	return 
 end
+
 UICalibrationView.evaluate_new_root_scale = function (self, root_scale)
 	local w, h = Application.resolution()
 	local scale_x = root_scale[1]
@@ -361,15 +360,12 @@ UICalibrationView.evaluate_new_root_scale = function (self, root_scale)
 
 	root_scale[1] = scale_x
 	root_scale[2] = scale_y
-
-	return 
 end
+
 UICalibrationView.save_new_root_scale = function (self, root_scale)
 	Application.set_user_setting("root_scale_x", root_scale[1])
 	Application.set_user_setting("root_scale_y", root_scale[2])
 	Application.save_user_settings()
-
-	return 
 end
 
-return 
+return

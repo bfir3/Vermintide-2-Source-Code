@@ -3,12 +3,13 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 BTChaosSorcererPlagueSkulkAction = class(BTChaosSorcererPlagueSkulkAction, BTNode)
 local BTChaosSorcererPlagueSkulkAction = BTChaosSorcererPlagueSkulkAction
 local POSITION_LOOKUP = POSITION_LOOKUP
+
 BTChaosSorcererPlagueSkulkAction.init = function (self, ...)
 	BTChaosSorcererPlagueSkulkAction.super.init(self, ...)
-
-	return 
 end
+
 BTChaosSorcererPlagueSkulkAction.name = "BTChaosSorcererPlagueSkulkAction"
+
 BTChaosSorcererPlagueSkulkAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local breed = blackboard.breed
@@ -61,9 +62,8 @@ BTChaosSorcererPlagueSkulkAction.enter = function (self, unit, blackboard, t)
 
 		blackboard.played_foreshadow = true
 	end
-
-	return 
 end
+
 BTChaosSorcererPlagueSkulkAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local skulk_data = blackboard.skulk_data
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
@@ -92,9 +92,8 @@ BTChaosSorcererPlagueSkulkAction.leave = function (self, unit, blackboard, t, re
 	if reason == "failed" then
 		blackboard.target_unit = nil
 	end
-
-	return 
 end
+
 BTChaosSorcererPlagueSkulkAction.run = function (self, unit, blackboard, t, dt)
 	if not AiUtils.is_of_interest_plague_wave_sorcerer(blackboard.target_unit) then
 		return "failed"
@@ -223,6 +222,7 @@ BTChaosSorcererPlagueSkulkAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTChaosSorcererPlagueSkulkAction.at_goal = function (self, unit, blackboard)
 	local action = blackboard.action
 	local dist = blackboard.target_dist
@@ -240,9 +240,8 @@ BTChaosSorcererPlagueSkulkAction.at_goal = function (self, unit, blackboard)
 	if goal_distance < 0.25 then
 		return true
 	end
-
-	return 
 end
+
 BTChaosSorcererPlagueSkulkAction.move_to = function (self, position, unit, blackboard)
 	local action = blackboard.action
 	local ai_navigation = blackboard.navigation_extension
@@ -251,9 +250,8 @@ BTChaosSorcererPlagueSkulkAction.move_to = function (self, position, unit, black
 	ai_navigation.move_to(ai_navigation, position)
 
 	blackboard.move_pos = Vector3Box(position)
-
-	return 
 end
+
 BTChaosSorcererPlagueSkulkAction.vanish = function (self, unit, blackboard, t)
 	local action = blackboard.action
 	local escape_position = BTNinjaVanishAction.find_escape_position(unit, blackboard)
@@ -274,22 +272,21 @@ BTChaosSorcererPlagueSkulkAction.vanish = function (self, unit, blackboard, t)
 
 	return false
 end
+
 BTChaosSorcererPlagueSkulkAction.idle = function (self, unit, blackboard)
 	self.anim_event(self, unit, blackboard, "idle")
 
 	blackboard.move_state = "idle"
-
-	return 
 end
+
 BTChaosSorcererPlagueSkulkAction.start_move_animation = function (self, unit, blackboard)
 	local move_animation = blackboard.action.move_animation
 
 	self.anim_event(self, unit, blackboard, move_animation)
 
 	blackboard.move_state = "moving"
-
-	return 
 end
+
 BTChaosSorcererPlagueSkulkAction.anim_event = function (self, unit, blackboard, anim)
 	local skulk_data = blackboard.skulk_data
 
@@ -298,10 +295,10 @@ BTChaosSorcererPlagueSkulkAction.anim_event = function (self, unit, blackboard, 
 
 		skulk_data.animation_state = anim
 	end
-
-	return 
 end
+
 local debug_plague_wave = false
+
 BTChaosSorcererPlagueSkulkAction.get_plague_wave_cast_position = function (self, unit, blackboard, plague_wave_data)
 	local action = blackboard.action
 	local nav_world = blackboard.nav_world
@@ -368,7 +365,9 @@ BTChaosSorcererPlagueSkulkAction.get_plague_wave_cast_position = function (self,
 
 	return plague_wave_cast_position
 end
+
 local TRIES = 15
+
 BTChaosSorcererPlagueSkulkAction.get_skulk_target = function (self, unit, blackboard, teleporting)
 	local action = blackboard.action
 	local nav_world = blackboard.nav_world
@@ -377,7 +376,7 @@ BTChaosSorcererPlagueSkulkAction.get_skulk_target = function (self, unit, blackb
 	local target_unit = blackboard.target_unit
 
 	if not target_unit then
-		return 
+		return
 	end
 
 	local target_position = POSITION_LOOKUP[target_unit]
@@ -417,8 +416,6 @@ BTChaosSorcererPlagueSkulkAction.get_skulk_target = function (self, unit, blackb
 	end
 
 	skulk_data.direction = skulk_data.direction * -1
-
-	return 
 end
 
-return 
+return

@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTTransformAction = class(BTTransformAction, BTNode)
+
 BTTransformAction.init = function (self, ...)
 	BTTransformAction.super.init(self, ...)
-
-	return 
 end
+
 BTTransformAction.name = "BTTransformAction"
+
 BTTransformAction.enter = function (self, unit, blackboard, t)
 	blackboard.action = self._tree_node.action_data
 	blackboard.active_node = BTTransformAction
@@ -34,12 +35,12 @@ BTTransformAction.enter = function (self, unit, blackboard, t)
 	if not enemy_package_loader.breed_processed[action.wanted_breed_transform] then
 		enemy_package_loader.request_breed(enemy_package_loader, action.wanted_breed_transform, true)
 	end
+end
 
-	return 
-end
 BTTransformAction.leave = function (self, unit, blackboard, t, reason, destroy)
-	return 
+	return
 end
+
 BTTransformAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.transform_anim_finished and not blackboard.has_transformed then
 		self.transform(self, unit, blackboard)
@@ -49,11 +50,11 @@ BTTransformAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTTransformAction.anim_cb_transform_finished = function (self, unit, blackboard)
 	blackboard.transform_anim_finished = true
-
-	return 
 end
+
 BTTransformAction.transform = function (self, unit, blackboard)
 	local action = blackboard.action
 	local transfer_health_percentage = action.transfer_health_percentage
@@ -74,8 +75,6 @@ BTTransformAction.transform = function (self, unit, blackboard)
 
 				Managers.state.network.network_transmit:send_rpc_clients("rpc_sync_damage_taken", go_id, is_level_unit, false, damage, state)
 			end
-
-			return 
 		end
 	}
 	local breed = Breeds[action.wanted_breed_transform]
@@ -86,8 +85,6 @@ BTTransformAction.transform = function (self, unit, blackboard)
 	conflict_director.destroy_unit(conflict_director, unit, blackboard, "boss_transformation")
 
 	blackboard.has_transformed = true
-
-	return 
 end
 
-return 
+return

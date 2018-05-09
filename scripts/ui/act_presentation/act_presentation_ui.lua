@@ -4,6 +4,7 @@ local widget_definitions = definitions.widgets
 local animation_definitions = definitions.animations
 ActPresentationUI = class(ActPresentationUI)
 local RELOAD_UI = false
+
 ActPresentationUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ui_top_renderer = ingame_ui_context.ui_top_renderer
@@ -28,9 +29,8 @@ ActPresentationUI.init = function (self, ingame_ui_context)
 	input_manager.map_device_to_service(input_manager, "act_presentation", "keyboard")
 	input_manager.map_device_to_service(input_manager, "act_presentation", "mouse")
 	input_manager.map_device_to_service(input_manager, "act_presentation", "gamepad")
-
-	return 
 end
+
 ActPresentationUI.create_ui_elements = function (self)
 	local widgets = {}
 	local widgets_by_name = {}
@@ -49,9 +49,8 @@ ActPresentationUI.create_ui_elements = function (self)
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
 	self._animations = {}
 	RELOAD_UI = false
-
-	return 
 end
+
 ActPresentationUI.start = function (self, level_key, previous_completed_difficulty_index)
 	local act_key = LevelUnlockUtils.get_act_key_by_level(level_key)
 
@@ -81,9 +80,8 @@ ActPresentationUI.start = function (self, level_key, previous_completed_difficul
 	self.start_presentation_animation(self, animation_name, animation_params)
 
 	self.active = true
-
-	return 
 end
+
 ActPresentationUI._set_presentation_info = function (self, act_key, level_key)
 	local level_settings = LevelSettings[level_key]
 	local level_display_name = level_settings.display_name
@@ -96,9 +94,8 @@ ActPresentationUI._set_presentation_info = function (self, act_key, level_key)
 	widgets_by_name.level.content.icon = level_image
 	widgets_by_name.act_title.content.text = Localize(act_display_name)
 	widgets_by_name.level_title.content.text = Localize(level_display_name)
-
-	return 
 end
+
 ActPresentationUI._setup_level = function (self, act_key, played_level_key, previous_difficulty_index_completed)
 	local widgets_by_name = self._widgets_by_name
 	local statistics_db = self.statistics_db
@@ -115,13 +112,13 @@ ActPresentationUI._setup_level = function (self, act_key, played_level_key, prev
 
 	return first_time_completed, difficulty_complete_index
 end
+
 ActPresentationUI.destroy = function (self)
 	self.ui_animator = nil
 
 	rawset(_G, "act_presentation_ui", nil)
-
-	return 
 end
+
 ActPresentationUI._update_animations = function (self, dt)
 	local animations = self._animations
 	local ui_animator = self.ui_animator
@@ -141,14 +138,14 @@ ActPresentationUI._update_animations = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 ActPresentationUI.presentation_completed = function (self)
 	local animation_params = self.animation_params
 
 	return (animation_params and animation_params.presentation_completed) or self._presentation_aborted
 end
+
 ActPresentationUI.update = function (self, dt, t)
 	if RELOAD_UI then
 		self.create_ui_elements(self)
@@ -156,9 +153,8 @@ ActPresentationUI.update = function (self, dt, t)
 
 	self._update_animations(self, dt)
 	self.draw(self, dt)
-
-	return 
 end
+
 ActPresentationUI.draw = function (self, dt)
 	local ui_top_renderer = self.ui_top_renderer
 	local render_settings = self.render_settings
@@ -181,9 +177,8 @@ ActPresentationUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 ActPresentationUI.start_presentation_animation = function (self, animation_name, optional_params)
 	if not optional_params then
 		local params = {
@@ -198,4 +193,4 @@ ActPresentationUI.start_presentation_animation = function (self, animation_name,
 	return animation_key
 end
 
-return 
+return

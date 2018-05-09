@@ -875,8 +875,6 @@ local action_data = {
 						blackboard.grabbed_time = 0
 						blackboard.grabbed_state = "tentacle_grab"
 					end
-
-					return 
 				end,
 				extra_space_directions = {
 					bwd = true,
@@ -1207,4 +1205,4 @@ local action_data = {
 }
 BreedActions.chaos_spawn = table.create_copy(BreedActions.chaos_spawn, action_data)
 
-return 
+return

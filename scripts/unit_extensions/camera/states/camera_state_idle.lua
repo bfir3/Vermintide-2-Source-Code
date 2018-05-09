@@ -1,15 +1,17 @@
 CameraStateIdle = class(CameraStateIdle, CameraState)
+
 CameraStateIdle.init = function (self, camera_state_init_context)
 	CameraState.init(self, camera_state_init_context, "idle")
+end
 
-	return 
-end
 CameraStateIdle.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
-	return 
+	return
 end
+
 CameraStateIdle.on_exit = function (self, unit, input, dt, context, t, next_state)
-	return 
+	return
 end
+
 CameraStateIdle.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -19,7 +21,7 @@ CameraStateIdle.update = function (self, unit, input, dt, context, t)
 	if follow_unit then
 		csm.change_state(csm, "follow")
 
-		return 
+		return
 	end
 
 	local position = camera_extension.get_idle_position(camera_extension)
@@ -28,8 +30,6 @@ CameraStateIdle.update = function (self, unit, input, dt, context, t)
 	assert(Vector3.is_valid(position), "Camera position invalid.")
 	Unit.set_local_position(unit, 0, position)
 	Unit.set_local_rotation(unit, 0, rotation)
-
-	return 
 end
 
-return 
+return

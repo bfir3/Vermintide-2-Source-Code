@@ -3,11 +3,11 @@ local position_lookup = POSITION_LOOKUP
 local anim_event = CharacterStateHelper.play_animation_event
 local switch_to_3p_dist_sq = 100
 local switch_to_portal_cam_dist_sq = 9
+
 PlayerCharacterStateGrabbedByTentacle.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "grabbed_by_tentacle")
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByTentacle.on_enter = function (self, unit, input, dt, context, t, previous_state)
 	local inventory_extension = self.inventory_extension
 
@@ -56,8 +56,6 @@ PlayerCharacterStateGrabbedByTentacle.on_enter = function (self, unit, input, dt
 	end
 
 	self.grabbed_by_tentacle_status = grabbed_by_tentacle_status
-
-	return 
 end
 
 local function get_navmesh_position(nav_world, current_pos)
@@ -76,8 +74,6 @@ local function get_navmesh_position(nav_world, current_pos)
 	if border_position then
 		return border_position
 	end
-
-	return 
 end
 
 PlayerCharacterStateGrabbedByTentacle.on_exit = function (self, unit, input, dt, context, t, next_state)
@@ -128,9 +124,8 @@ PlayerCharacterStateGrabbedByTentacle.on_exit = function (self, unit, input, dt,
 
 	self.camera_state = nil
 	self.grabbed_by_tentacle_status = nil
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByTentacle.states = {
 	grabbed = {
 		enter = function (parent, unit, t)
@@ -138,8 +133,6 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 
 			CharacterStateHelper.show_inventory_3p(unit, false, include_local_player, parent.is_server, parent.inventory_extension)
 			anim_event(unit, "tentacle_grabbed_loop")
-
-			return 
 		end,
 		run = function (parent, unit, t, dt)
 			local current_pos = Unit.world_position(unit, parent.hips_node)
@@ -185,11 +178,9 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 					parent.camera_state = "portal"
 				end
 			end
-
-			return 
 		end,
 		leave = function (parent, unit)
-			return 
+			return
 		end
 	},
 	portal_hanging = {
@@ -199,8 +190,6 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 			local hang_rotation = Unit.world_rotation(parent.portal_unit, parent.hang_node)
 
 			Unit.set_local_rotation(unit, 0, hang_rotation)
-
-			return 
 		end,
 		run = function (parent, unit, t, dt)
 			local current_pos = Unit.world_position(unit, 0)
@@ -214,11 +203,9 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 			else
 				parent.locomotion_extension:set_wanted_velocity(Vector3.zero())
 			end
-
-			return 
 		end,
 		leave = function (parent, unit)
-			return 
+			return
 		end
 	},
 	portal_consume = {
@@ -238,14 +225,12 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 			local csm = parent.csm
 
 			csm.change_state(csm, "dead", params)
-
-			return 
 		end,
 		run = function (parent, unit, t, dt)
-			return 
+			return
 		end,
 		leave = function (parent, unit)
-			return 
+			return
 		end
 	},
 	portal_release = {
@@ -256,8 +241,6 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 			local breed = parent.breed
 			local portal_release_time = breed.portal_release_time
 			parent.wait_for_release = t + portal_release_time
-
-			return 
 		end,
 		run = function (parent, unit, t, dt)
 			if parent.wait_for_release < t then
@@ -265,14 +248,13 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 
 				csm.change_state(csm, "standing")
 			end
-
-			return 
 		end,
 		leave = function (parent, unit)
-			return 
+			return
 		end
 	}
 }
+
 PlayerCharacterStateGrabbedByTentacle.get_drag_velocity = function (self, player_pos, t, dt)
 	self.winding_dist = self.winding_dist - self.drag_speed * dt
 	local spline = self.tentacle_spline_extension.spline
@@ -316,6 +298,7 @@ PlayerCharacterStateGrabbedByTentacle.get_drag_velocity = function (self, player
 
 	return velocity, look_dir
 end
+
 PlayerCharacterStateGrabbedByTentacle.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local input_extension = self.input_extension
@@ -333,7 +316,7 @@ PlayerCharacterStateGrabbedByTentacle.update = function (self, unit, input, dt, 
 			csm.change_state(csm, "standing")
 		end
 
-		return 
+		return
 	end
 
 	local grabbed_by_tentacle_status = CharacterStateHelper.grabbed_by_tentacle_status(status_extension)
@@ -357,8 +340,6 @@ PlayerCharacterStateGrabbedByTentacle.update = function (self, unit, input, dt, 
 	local player = self.player
 
 	CharacterStateHelper.look(input_extension, player.viewport_name, self.first_person_extension, status_extension, self.inventory_extension)
-
-	return 
 end
 
-return 
+return

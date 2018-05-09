@@ -72,8 +72,6 @@ local function encode_table(val, stack)
 
 		return "{" .. table.concat(res, ",") .. "}"
 	end
-
-	return 
 end
 
 local function encode_string(val)
@@ -105,13 +103,12 @@ function encode(val, stack)
 	end
 
 	error("unexpected type '" .. t .. "'")
-
-	return 
 end
 
 json.encode = function (val)
 	return encode(val)
 end
+
 local parse = nil
 
 local function create_set(...)
@@ -157,8 +154,6 @@ local function decode_error(str, idx, msg)
 	end
 
 	error(string.format("%s at line %d col %d", msg, line_count, col_count))
-
-	return 
 end
 
 local function codepoint_to_utf8(n)
@@ -175,8 +170,6 @@ local function codepoint_to_utf8(n)
 	end
 
 	error(string.format("invalid unicode codepoint '%x'", n))
-
-	return 
 end
 
 local function parse_unicode_escape(s)
@@ -188,8 +181,6 @@ local function parse_unicode_escape(s)
 	else
 		return codepoint_to_utf8(n1)
 	end
-
-	return 
 end
 
 local function parse_string(str, i)
@@ -251,8 +242,6 @@ local function parse_string(str, i)
 	end
 
 	decode_error(str, i, "expected closing quote for string")
-
-	return 
 end
 
 local function parse_number(str, i)
@@ -385,8 +374,6 @@ function parse(str, idx)
 	end
 
 	decode_error(str, idx, "unexpected character '" .. chr .. "'")
-
-	return 
 end
 
 json.decode = function (str)

@@ -1,6 +1,6 @@
 LocomotionTemplates.AILocomotionExtensionC = {
 	init = function (data, nav_world)
-		return 
+		return
 	end,
 	update = function (data, t, dt)
 		local units_to_kill = EngineOptimizedExtensions.ai_locomotion_update(t, dt)
@@ -38,9 +38,7 @@ LocomotionTemplates.AILocomotionExtensionC = {
 				conflict_director.destroy_unit(conflict_director, unit, blackboard, "out_of_range")
 			end
 		end
-
-		return 
 	end
 }
 
-return 
+return

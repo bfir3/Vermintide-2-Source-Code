@@ -1,4 +1,5 @@
 NavigationGroup = class(NavigationGroup)
+
 NavigationGroup.init = function (self, nav_world, poly_hash, poly, poly_center, poly_area, group_number)
 	self._center_poly = poly_hash
 	self._area = 0
@@ -10,9 +11,8 @@ NavigationGroup.init = function (self, nav_world, poly_hash, poly, poly_center, 
 	self._group_neighbours = {}
 
 	self.add_polygon(self, poly, poly_center, poly_area, nav_world)
-
-	return 
 end
+
 NavigationGroup.make_string_of_group = function (self, write_string)
 	write_string = write_string .. "{neighbours={"
 
@@ -31,6 +31,7 @@ NavigationGroup.make_string_of_group = function (self, write_string)
 
 	return write_string
 end
+
 NavigationGroup.add_polygon = function (self, poly, poly_center, poly_area, nav_world)
 	local poly_hash = self.get_poly_hash(self, poly, nav_world)
 	self._group_polygons[poly_hash] = poly
@@ -40,34 +41,30 @@ NavigationGroup.add_polygon = function (self, poly, poly_center, poly_area, nav_
 	if poly_center ~= nil then
 		self.calculate_group_center(self, poly_center, poly_hash, nav_world)
 	end
-
-	return 
 end
+
 NavigationGroup.add_neighbour_group = function (self, group)
 	self._group_neighbours[group] = true
-
-	return 
 end
+
 NavigationGroup.remove_neighbour_group = function (self, group)
 	self._group_neighbours[group] = nil
-
-	return 
 end
+
 NavigationGroup.set_distance_from_finish = function (self, distance_from_finish)
 	self._distance_from_finish = distance_from_finish
-
-	return 
 end
+
 NavigationGroup.get_group_neighbours = function (self)
 	return self._group_neighbours
 end
+
 NavigationGroup.recalc_neighbour_distances = function (self)
 	for neighbour, data in pairs(self._group_neighbours) do
 		data = Vector3.distance(self._group_center:unbox(), neighbour.get_group_center(neighbour):unbox())
 	end
-
-	return 
 end
+
 NavigationGroup.calculate_group_center = function (self, poly_center, poly_hash, nav_world)
 	local group_size = self._group_size
 	local curr_center = self._group_center:unbox()
@@ -96,9 +93,8 @@ NavigationGroup.calculate_group_center = function (self, poly_center, poly_hash,
 
 		Script.set_temp_count(a, b, c)
 	end
-
-	return 
 end
+
 NavigationGroup.get_group_polygons_centers = function (self, list, nav_world)
 	error("not used?")
 
@@ -114,40 +110,48 @@ NavigationGroup.get_group_polygons_centers = function (self, list, nav_world)
 
 	return list
 end
+
 NavigationGroup.get_poly_center_from_hash = function (self, poly_hash)
 	return self._group_polygons[poly_hash]
 end
+
 NavigationGroup.get_group_center_poly = function (self)
 	return self._center_poly
 end
+
 NavigationGroup.get_group_center = function (self)
 	return self._group_center
 end
+
 NavigationGroup.get_group_area = function (self)
 	return self._area
 end
+
 NavigationGroup.get_group_polygons = function (self)
 	return self._group_polygons
 end
+
 NavigationGroup.get_group_size = function (self)
 	return self._group_size
 end
+
 NavigationGroup.get_distance_from_finish = function (self)
 	return self._distance_from_finish
 end
+
 NavigationGroup.destroy = function (self)
 	self._group_neighbours = {}
 	self._group_polygons = {}
 	self._group_size = 0
-
-	return 
 end
+
 NavigationGroup.calc_polygon_center = function (self, poly, nav_world)
 	local p1, p2, p3 = GwNavTraversal.get_triangle_vertices(nav_world, poly)
 	local center = (p1 + p2 + p3) / 3
 
 	return center
 end
+
 NavigationGroup.get_poly_hash = function (self, poly, nav_world)
 	local a, b, c = Script.temp_count()
 	local poly_center = self.calc_polygon_center(self, poly, nav_world)
@@ -157,7 +161,9 @@ NavigationGroup.get_poly_hash = function (self, poly, nav_world)
 
 	return poly_hash
 end
+
 local BREADTH_FIRST_MAX_NODES = 1000
+
 NavigationGroup.breadth_first_find_nearest_group_triangle = function (self, root_triangle, nav_world)
 	local triangle_lookup = FrameTable.alloc_table()
 	local b_queue = FrameTable.alloc_table()
@@ -205,9 +211,8 @@ NavigationGroup.breadth_first_find_nearest_group_triangle = function (self, root
 			return nil, nil
 		end
 	end
-
-	return 
 end
+
 NavigationGroup.print_group = function (self, world, nav_world, line_object, line_drawer, debug_world_gui)
 	local color_node_a = math.random(0, 255)
 	local color_node_b = math.random(0, 255)
@@ -237,9 +242,8 @@ NavigationGroup.print_group = function (self, world, nav_world, line_object, lin
 	Gui.text_3d(debug_world_gui, "id=" .. self._group_number, font_material, font_size - 0.8, font, m, text_pos + Vector3(0, 1.5, 0), 3, Color(255, 255, 255))
 	Gui.text_3d(debug_world_gui, "dist=" .. self._distance_from_finish, font_material, font_size - 0.8, font, m, text_pos + Vector3(0, 1, 0), 3, Color(255, 255, 255))
 	Gui.text_3d(debug_world_gui, "area=" .. self._area, font_material, font_size - 0.8, font, m, text_pos + Vector3(0, 0.5, 0), 3, Color(255, 255, 255))
-
-	return 
 end
+
 NavigationGroup.draw_poly_lines = function (self, poly, color, nav_world, line_object, debug_world_gui)
 	local a, b, c = Script.temp_count()
 	local p1, p2, p3 = GwNavTraversal.get_triangle_vertices(nav_world, poly)
@@ -251,8 +255,6 @@ NavigationGroup.draw_poly_lines = function (self, poly, color, nav_world, line_o
 	LineObject.add_line(line_object, color, p1, p3)
 	LineObject.add_line(line_object, color, p2, p3)
 	Script.set_temp_count(a, b, c)
-
-	return 
 end
 
-return 
+return

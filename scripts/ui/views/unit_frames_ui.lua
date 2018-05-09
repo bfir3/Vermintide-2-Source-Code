@@ -15,6 +15,7 @@ local teammate_inventory_widget_slots = {
 	slot_grenade = 3,
 	slot_potion = 2
 }
+
 UnitFramesUI.init = function (self, ingame_ui_context)
 	self.is_server = ingame_ui_context.is_server
 	self.ui_renderer = ingame_ui_context.ui_renderer
@@ -37,9 +38,8 @@ UnitFramesUI.init = function (self, ingame_ui_context)
 	local server_peer_id = network_transmit.server_peer_id
 	self.host_peer_id = server_peer_id or network_transmit.peer_id
 	self.shielded_players = {}
-
-	return 
 end
+
 UnitFramesUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
@@ -61,10 +61,10 @@ UnitFramesUI.create_ui_elements = function (self)
 	end
 
 	reload = false
-
-	return 
 end
+
 local inventory_consumable_icons = definitions.inventory_consumable_icons
+
 UnitFramesUI.init_player_inventory_list = function (self, widget, num_elements)
 	local list_content = {}
 	local item_styles = {}
@@ -141,16 +141,14 @@ UnitFramesUI.init_player_inventory_list = function (self, widget, num_elements)
 	widget.style.list_style.start_index = 1
 	widget.style.list_style.num_draws = 3
 	widget.element.pass_data[1].num_list_elements = nil
-
-	return 
 end
+
 UnitFramesUI.destroy = function (self)
 	self.set_visible(self, false)
 	rawset(_G, "unit_frame_pointer", nil)
 	GarbageLeakDetector.register_object(self, "unit_frame_gui")
-
-	return 
 end
+
 UnitFramesUI.set_visible = function (self, visible)
 	for i = 1, #self.other_player_portraits, 1 do
 		local player_portrait_widget = self.other_player_portraits[i]
@@ -159,9 +157,8 @@ UnitFramesUI.set_visible = function (self, visible)
 	end
 
 	UIRenderer.set_element_visible(self.ui_renderer, self.player_portrait.element, visible)
-
-	return 
 end
+
 UnitFramesUI.update = function (self, dt, t, my_player)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -171,7 +168,7 @@ UnitFramesUI.update = function (self, dt, t, my_player)
 	local player_unit = my_player.player_unit
 
 	if not player_unit then
-		return 
+		return
 	end
 
 	self.update_portrait_frames(self, dt, my_player)
@@ -184,8 +181,6 @@ UnitFramesUI.update = function (self, dt, t, my_player)
 	self.update_health_animations(self, dt)
 	self.update_slot_equip_animations(self, dt)
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
 
 local function get_portrait_frame_by_unit(network_manager, player_manager, unit_storage, unit)
@@ -228,8 +223,6 @@ UnitFramesUI.update_portrait_frames = function (self, dt, my_player)
 			player_portrait_widget.content.portrait_frame = "unit_frame_01"
 		end
 	end
-
-	return 
 end
 
 local function get_portrait_name_by_profile_index(profile_index)
@@ -248,6 +241,7 @@ local tmp_peer_ids = {}
 local tmp_peer_ids_by_index = {}
 local tmp_peer_ids_by_index_old = {}
 local modified_teammate = {}
+
 UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph, ui_renderer, my_player)
 	local modified_teammate = modified_teammate
 	local profile_synchronizer = self.profile_synchronizer
@@ -564,9 +558,8 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 		tmp_peer_ids_by_index_old[idx] = tmp_peer_ids_by_index[idx]
 		tmp_peer_ids_by_index[idx] = nil
 	end
-
-	return 
 end
+
 UnitFramesUI.update_player_unit_frame = function (self, dt, t, ui_scenegraph, ui_renderer, peer_id, local_player_id, my_player)
 	local profile_synchronizer = self.profile_synchronizer
 	local player_unit = my_player.player_unit
@@ -751,9 +744,8 @@ UnitFramesUI.update_player_unit_frame = function (self, dt, t, ui_scenegraph, ui
 	end
 
 	UIRenderer.draw_widget(ui_renderer, player_portrait)
-
-	return 
 end
+
 UnitFramesUI.on_player_health_changed = function (self, name, widget, health_percent)
 	local lol = math.random()
 
@@ -797,9 +789,8 @@ UnitFramesUI.on_player_health_changed = function (self, name, widget, health_per
 
 		return true
 	end
-
-	return 
 end
+
 UnitFramesUI.on_num_grimoires_changed = function (self, name, widget, health_debuff_percent)
 	if not self.bar_animations_data then
 		self.bar_animations_data = {}
@@ -830,9 +821,8 @@ UnitFramesUI.on_num_grimoires_changed = function (self, name, widget, health_deb
 
 	widget_animation_data.current_health_debuff = health_debuff_percent
 	self.bar_animations_data[name] = widget_animation_data
-
-	return 
 end
+
 UnitFramesUI.update_player_bar_animation = function (self, widget, bar, time, total_time, anim_start_health, anim_end_health, dt)
 	time = time + dt
 
@@ -860,6 +850,7 @@ UnitFramesUI.update_player_bar_animation = function (self, widget, bar, time, to
 
 	return nil
 end
+
 UnitFramesUI.update_damage_highlight = function (self, widget, time, dt)
 	local total_time = 0.2
 	time = time + dt
@@ -877,6 +868,7 @@ UnitFramesUI.update_damage_highlight = function (self, widget, time, dt)
 
 	return nil
 end
+
 UnitFramesUI.update_talk_highlight = function (self, widget, time, dt)
 	local total_time = 0.2
 	time = time + dt
@@ -893,6 +885,7 @@ UnitFramesUI.update_talk_highlight = function (self, widget, time, dt)
 
 	return nil
 end
+
 UnitFramesUI.update_health_animations = function (self, dt)
 	local bar_animations = self.bar_animations_data
 
@@ -924,9 +917,8 @@ UnitFramesUI.update_health_animations = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 UnitFramesUI.add_slot_equip_animation = function (self, name, style)
 	local animations = self.slot_equip_animations
 	local inventory_hud_settings = UISettings.inventory_hud
@@ -943,9 +935,8 @@ UnitFramesUI.add_slot_equip_animation = function (self, name, style)
 			style = style
 		}
 	end
-
-	return 
 end
+
 UnitFramesUI.animate_slot_equip = function (self, animation_data, dt)
 	local style = animation_data.style
 	local total_time = animation_data.total_time
@@ -958,14 +949,13 @@ UnitFramesUI.animate_slot_equip = function (self, animation_data, dt)
 
 	return (progress < 1 and animation_data) or nil
 end
+
 UnitFramesUI.update_slot_equip_animations = function (self, dt)
 	local animations = self.slot_equip_animations
 
 	for scenegraph_id, animation_data in pairs(animations) do
 		animations[scenegraph_id] = self.animate_slot_equip(self, animation_data, dt)
 	end
-
-	return 
 end
 
-return 
+return

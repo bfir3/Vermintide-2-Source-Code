@@ -1,5 +1,6 @@
 local ledges = require("scripts/settings/ledges")
 NavGraphConnectorExtension = class(NavGraphConnectorExtension)
+
 NavGraphConnectorExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.world = extension_init_context.world
 	self.unit = unit
@@ -19,11 +20,11 @@ NavGraphConnectorExtension.init = function (self, extension_init_context, unit, 
 
 		drawer.box(drawer, pose, half_extents * 1.1, Colors.get("purple"))
 	end
-
-	return 
 end
+
 local control_points = {}
 local idx = 0
+
 NavGraphConnectorExtension.init_nav_graphs = function (self, ledge_id)
 	local unit = self.unit
 	local world = self.world
@@ -72,12 +73,12 @@ NavGraphConnectorExtension.init_nav_graphs = function (self, ledge_id)
 			end
 		end
 	end
+end
 
-	return 
-end
 NavGraphConnectorExtension.extensions_ready = function (self)
-	return 
+	return
 end
+
 NavGraphConnectorExtension.destroy = function (self)
 	for i = 1, #self.navgraphs, 1 do
 		local navgraph = self.navgraphs[i]
@@ -85,11 +86,10 @@ NavGraphConnectorExtension.destroy = function (self)
 		GwNavGraph.remove_from_database(navgraph)
 		GwNavGraph.destroy(navgraph)
 	end
-
-	return 
 end
+
 NavGraphConnectorExtension.update = function (self, unit, input, dt, context, t)
-	return 
+	return
 end
 
-return 
+return

@@ -7,17 +7,18 @@ local DETAILED_PROFILING = true
 if DETAILED_PROFILING then
 else
 	function detailed_profiler_start()
-		return 
+		return
 	end
 
 	function detailed_profiler_stop()
-		return 
+		return
 	end
 end
 
 local UPDATE_STATISTICS = false
 LocomotionTemplates.PlayerUnitLocomotionExtension = {}
 local T = LocomotionTemplates.PlayerUnitLocomotionExtension
+
 T.init = function (data, nav_world)
 	data.nav_world = nav_world
 	data.all_update_units = {}
@@ -37,18 +38,16 @@ T.init = function (data, nav_world)
 		GraphHelper.set_range("PlayerUnitLocomotionExtension", -10, 10)
 		GraphHelper.hide("PlayerUnitLocomotionExtension")
 	end
-
-	return 
 end
+
 T.update = function (data, t, dt)
 	T.update_movement(data, t, dt)
 	T.update_rotation(data, t, dt)
 	T.update_network(data, dt)
 	T.update_average_velocity(data, t, dt)
 	T.update_disabled_units(data, dt)
-
-	return 
 end
+
 T.update_average_velocity = function (data, t, dt)
 	local all_update_units = data.all_update_units
 	local SAMPLE_UPDATE_RATE = 0.125
@@ -104,10 +103,10 @@ T.update_average_velocity = function (data, t, dt)
 	end
 
 	data.last_average_velocity_unit = unit
-
-	return 
 end
+
 local MAX_TIME_SINCE_LAST_DOWN_COLLIDE = 0.2
+
 T.update_movement = function (data, t, dt)
 	for unit, extension in pairs(data.all_update_units) do
 		extension.IS_NEW_FRAME = false
@@ -168,14 +167,13 @@ T.update_movement = function (data, t, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 T.update_network = function (data, dt)
 	local game = Managers.state.network:game()
 
 	if not game or LEVEL_EDITOR_TEST then
-		return 
+		return
 	end
 
 	local MAX_MOVE_SPEED = 99.9999
@@ -213,17 +211,15 @@ T.update_network = function (data, dt)
 		GameSession_set_game_object_field(game, go_id, "average_velocity", Vector3.clamp(extension._average_velocity:unbox(), min_vel, max_vel))
 		GameSession_set_game_object_field(game, go_id, "small_sample_size_average_velocity", Vector3.clamp(extension._small_sample_size_average_velocity:unbox(), min_vel, max_vel))
 	end
-
-	return 
 end
+
 T.update_statistics = function (data, t, dt)
 	for unit, extension in pairs(data.all_update_units) do
 		GraphHelper.record_statistics("move_velocity", extension.velocity_current:unbox())
 		GraphHelper.record_statistics("move_speed", Vector3.length(extension.velocity_current:unbox()))
 	end
-
-	return 
 end
+
 T.update_rotation = function (data, t, dt)
 	local is_server = Managers.player.is_server
 	local Unit_set_local_rotation = Unit.set_local_rotation
@@ -291,9 +287,8 @@ T.update_rotation = function (data, t, dt)
 
 		extension.disable_rotation_update = false
 	end
-
-	return 
 end
+
 T.update_disabled_units = function (data, dt)
 	for unit, extension in pairs(data.all_disabled_units) do
 		extension.run_func(unit, dt, extension)
@@ -307,11 +302,10 @@ T.update_disabled_units = function (data, dt)
 			extension.sync_network_velocity(extension, game, go_id, dt)
 		end
 
-		return 
+		return
 	end
-
-	return 
 end
+
 T.update_debug_anims = function (data)
 	for unit, extension in pairs(data.all_update_units) do
 		local unit_1p = extension.first_person_extension:get_first_person_unit()
@@ -336,8 +330,6 @@ T.update_debug_anims = function (data)
 			Unit.set_animation_logging(unit, false)
 		end
 	end
-
-	return 
 end
 
-return 
+return

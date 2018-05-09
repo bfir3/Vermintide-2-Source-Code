@@ -1,4 +1,5 @@
 TalentExtension = class(TalentExtension)
+
 TalentExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self._unit = unit
 	self.world = extension_init_context.world
@@ -6,9 +7,8 @@ TalentExtension.init = function (self, extension_init_context, unit, extension_i
 	self.player = extension_init_data.player
 	self._profile_index = extension_init_data.profile_index
 	self._talent_buff_ids = {}
-
-	return 
 end
+
 TalentExtension.extensions_ready = function (self, world, unit)
 	local career_extension = ScriptUnit.extension(unit, "career_system")
 	self.buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -22,18 +22,16 @@ TalentExtension.extensions_ready = function (self, world, unit)
 	local talent_ids = self._get_talent_ids(self)
 
 	self.apply_buffs_from_talents(self, talent_ids)
-
-	return 
 end
+
 TalentExtension.game_object_initialized = function (self, unit, unit_go_id)
 	if not self.is_server then
 		local talent_ids = self._get_talent_ids(self)
 
 		self._send_rpc_sync_talents(self, talent_ids)
 	end
-
-	return 
 end
+
 TalentExtension.talents_changed = function (self)
 	local talent_ids = self._get_talent_ids(self)
 
@@ -42,9 +40,8 @@ TalentExtension.talents_changed = function (self)
 	if not self.is_server and Managers.state.network:game() then
 		self._send_rpc_sync_talents(self, talent_ids)
 	end
-
-	return 
 end
+
 TalentExtension._send_rpc_sync_talents = function (self, talent_ids)
 	local network_manager = Managers.state.network
 	local network_transmit = network_manager.network_transmit
@@ -56,10 +53,10 @@ TalentExtension._send_rpc_sync_talents = function (self, talent_ids)
 	local talent_id_5 = talent_ids[5]
 
 	network_transmit.send_rpc_server(network_transmit, "rpc_sync_talents", unit_go_id, talent_id_1, talent_id_2, talent_id_3, talent_id_4, talent_id_5)
-
-	return 
 end
+
 local params = {}
+
 TalentExtension.apply_buffs_from_talents = function (self, talent_ids)
 	local hero_name = self._hero_name
 	local buff_extension = self.buff_extension
@@ -91,9 +88,8 @@ TalentExtension.apply_buffs_from_talents = function (self, talent_ids)
 			end
 		end
 	end
-
-	return 
 end
+
 TalentExtension._clear_buffs_from_talents = function (self)
 	local buff_extension = self.buff_extension
 	local talent_buff_ids = self._talent_buff_ids
@@ -106,9 +102,8 @@ TalentExtension._clear_buffs_from_talents = function (self)
 	end
 
 	table.clear(self._talent_buff_ids)
-
-	return 
 end
+
 TalentExtension.has_talent = function (self, talent_name)
 	local talent_ids = self._get_talent_ids(self)
 	local wanted_talent_id = TalentIDLookup[talent_name]
@@ -123,7 +118,9 @@ TalentExtension.has_talent = function (self, talent_name)
 
 	return false
 end
+
 local talent_ids = {}
+
 TalentExtension._get_talent_ids = function (self)
 	local talent_interface = Managers.backend:get_interface("talents")
 	local career_name = self._career_name
@@ -152,6 +149,7 @@ TalentExtension._get_talent_ids = function (self)
 
 	return talent_ids
 end
+
 TalentExtension.get_talent_names = function (self)
 	local talent_ids = self._get_talent_ids(self)
 	local talent_names = {}
@@ -169,8 +167,9 @@ TalentExtension.get_talent_names = function (self)
 
 	return talent_names
 end
+
 TalentExtension.destroy = function (self)
-	return 
+	return
 end
 
-return 
+return

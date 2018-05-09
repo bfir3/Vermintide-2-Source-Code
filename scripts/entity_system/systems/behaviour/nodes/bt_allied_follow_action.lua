@@ -1,21 +1,21 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTAlliedFollowAction = class(BTAlliedFollowAction, BTNode)
+
 BTAlliedFollowAction.init = function (self, ...)
 	BTAlliedFollowAction.super.init(self, ...)
-
-	return 
 end
+
 BTAlliedFollowAction.name = "BTAlliedFollowAction"
+
 BTAlliedFollowAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
 	blackboard.target_status_extension = ScriptUnit.extension(blackboard.player_controller, "status_system")
 	blackboard.teleport_timer = t + 1
 	blackboard.follow_timer = t
-
-	return 
 end
+
 BTAlliedFollowAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
@@ -24,9 +24,8 @@ BTAlliedFollowAction.leave = function (self, unit, blackboard, t, reason, destro
 
 	blackboard.anim_cb_rotation_start = nil
 	blackboard.anim_cb_move = nil
-
-	return 
 end
+
 BTAlliedFollowAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion_extension = blackboard.locomotion_extension
 
@@ -34,6 +33,7 @@ BTAlliedFollowAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running", "evaluate"
 end
+
 BTAlliedFollowAction._go_idle = function (self, unit, blackboard, locomotion_extension)
 	blackboard.move_state = "idle"
 	local action = blackboard.action
@@ -47,23 +47,20 @@ BTAlliedFollowAction._go_idle = function (self, unit, blackboard, locomotion_ext
 
 		locomotion_extension.set_wanted_rotation(locomotion_extension, rot)
 	end
-
-	return 
 end
+
 BTAlliedFollowAction._go_moving = function (self, unit, t, blackboard, action)
 	blackboard.move_state = "moving"
 
 	Managers.state.network:anim_event(unit, action.move_anim)
-
-	return 
 end
+
 BTAlliedFollowAction._teleport_to = function (self, blackboard, t, pos)
 	local locomotion_extension = blackboard.locomotion_extension
 
 	locomotion_extension.teleport_to(locomotion_extension, pos)
-
-	return 
 end
+
 BTAlliedFollowAction._get_wanted_pos = function (self, unit, blackboard)
 	local target_unit = blackboard.player_controller
 	local target_position = POSITION_LOOKUP[target_unit]
@@ -81,9 +78,8 @@ BTAlliedFollowAction._get_wanted_pos = function (self, unit, blackboard)
 			return wanted_position
 		end
 	end
-
-	return 
 end
+
 BTAlliedFollowAction.follow = function (self, unit, t, dt, blackboard, locomotion_extension)
 	local action = blackboard.action
 	local navigation_extension = blackboard.navigation_extension
@@ -125,9 +121,8 @@ BTAlliedFollowAction.follow = function (self, unit, t, dt, blackboard, locomotio
 
 	local target_intensity = blackboard.target_status_extension and blackboard.target_status_extension:get_intensity()
 	blackboard.target_is_in_combat = target_intensity and 0 < target_intensity
-
-	return 
 end
+
 BTAlliedFollowAction._follow_target = function (self, unit, blackboard, t, dt)
 	local action = blackboard.action
 	local navigation_extension = blackboard.navigation_extension
@@ -136,8 +131,6 @@ BTAlliedFollowAction._follow_target = function (self, unit, blackboard, t, dt)
 	navigation_extension.move_to(navigation_extension, wanted_position)
 
 	blackboard.follow_timer = t + 0.1
-
-	return 
 end
 
-return 
+return

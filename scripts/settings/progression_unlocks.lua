@@ -172,8 +172,6 @@ ProgressionUnlocks = {
 		if not template.disabled and template.level_requirement <= level then
 			return true
 		end
-
-		return 
 	end,
 	get_level_unlocks = function (level, profile)
 		local templates = {}
@@ -200,14 +198,12 @@ ProgressionUnlocks = {
 		if template.level_requirement <= level then
 			return true
 		end
-
-		return 
 	end,
 	get_quests_unlocked = function (level_key)
 		local level_settings = LevelSettings[level_key]
 
 		if level_settings.dlc_name or not table.contains(MainGameLevels, level_key) then
-			return 
+			return
 		end
 
 		local statistics_db = Managers.player:statistics_db()
@@ -237,8 +233,6 @@ ProgressionUnlocks = {
 		if quests_unlocked then
 			return progression_unlocks.quests
 		end
-
-		return 
 	end
 }
 local prestige_unlocks = {
@@ -283,12 +277,15 @@ local prestige_unlocks = {
 		"frame_0006"
 	}
 }
+
 ProgressionUnlocks.prestige_reward_by_level = function (prestige_level, profile_name)
 	return prestige_unlocks[profile_name][prestige_level]
 end
+
 ProgressionUnlocks.get_max_prestige_levels = function ()
 	return 5
 end
+
 ProgressionUnlocks.can_upgrade_prestige = function (hero_name)
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 	local prestige = hero_attributes.get(hero_attributes, hero_name, "prestige")
@@ -298,6 +295,7 @@ ProgressionUnlocks.can_upgrade_prestige = function (hero_name)
 
 	return can_unlock
 end
+
 ProgressionUnlocks.upgrade_prestige = function (hero_name)
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 	local can_unlock = ProgressionUnlocks.can_upgrade_prestige(hero_name)
@@ -305,7 +303,7 @@ ProgressionUnlocks.upgrade_prestige = function (hero_name)
 	if not can_unlock then
 		print("Trying to upgrade prestige although requirements are not met")
 
-		return 
+		return
 	end
 
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
@@ -321,14 +319,14 @@ ProgressionUnlocks.upgrade_prestige = function (hero_name)
 	local item_interface = Managers.backend:get_interface("items")
 
 	item_interface.award_item(item_interface, reward)
-
-	return 
 end
+
 ProgressionUnlocks.get_prestige_level = function (hero_name)
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 
 	return hero_attributes.get(hero_attributes, hero_name, "prestige") or 0
 end
+
 ProgressionUnlocks.get_num_talent_points = function (hero_name)
 	local experience = ExperienceSettings.get_experience(hero_name)
 	local level = ExperienceSettings.get_level(experience)
@@ -342,7 +340,9 @@ ProgressionUnlocks.get_num_talent_points = function (hero_name)
 
 	return num_talent_points
 end
+
 local debug_current_hero_template = ""
+
 ProgressionUnlocks.debug_use_hero_template = function (hero_template)
 	if debug_current_hero_template ~= hero_template.name then
 		local item_interface = Managers.backend:get_interface("items")
@@ -373,17 +373,16 @@ ProgressionUnlocks.debug_use_hero_template = function (hero_template)
 	else
 		print("ERROR: You are already using hero template " .. hero_template.name)
 	end
-
-	return 
 end
+
 ProgressionUnlocks.debug_get_current_hero_template = function ()
 	return debug_current_hero_template
 end
+
 ProgressionUnlocks.debug_reset_current_hero_template = function ()
 	debug_current_hero_template = ""
-
-	return 
 end
+
 local level_up_rewards = {
 	dwarf_ranger = {
 		{},
@@ -1127,4 +1126,4 @@ local level_up_rewards = {
 	}
 }
 
-return 
+return

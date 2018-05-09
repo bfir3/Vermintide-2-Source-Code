@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTPackMasterHoistAction = class(BTPackMasterHoistAction, BTNode)
+
 BTPackMasterHoistAction.init = function (self, ...)
 	BTPackMasterHoistAction.super.init(self, ...)
-
-	return 
 end
+
 BTPackMasterHoistAction.name = "BTPackMasterHoistAction"
+
 BTPackMasterHoistAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -15,9 +16,8 @@ BTPackMasterHoistAction.enter = function (self, unit, blackboard, t)
 	StatusUtils.set_grabbed_by_pack_master_network("pack_master_hoisting", blackboard.drag_target_unit, true, unit)
 	LocomotionUtils.set_animation_driven_movement(unit, true, false, false)
 	AiUtils.show_polearm(unit, false)
-
-	return 
 end
+
 BTPackMasterHoistAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if reason == "done" then
 		blackboard.needs_hook = true
@@ -38,9 +38,8 @@ BTPackMasterHoistAction.leave = function (self, unit, blackboard, t, reason, des
 
 	LocomotionUtils.set_animation_driven_movement(unit, false)
 	blackboard.locomotion_extension:set_movement_type("snap_to_navmesh")
-
-	return 
 end
+
 BTPackMasterHoistAction.run = function (self, unit, blackboard, t, dt)
 	local drag_target_unit = blackboard.drag_target_unit
 
@@ -61,4 +60,4 @@ BTPackMasterHoistAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

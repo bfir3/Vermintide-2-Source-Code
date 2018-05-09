@@ -852,8 +852,6 @@ local function create_dynamic_health_widget()
 						local grim_progress = math.max(internal_bar_value, actual_active_percentage)
 						local offset = style.offset
 						offset[1] = health_bar_offset[1] + health_bar_size[1] * grim_progress
-
-						return 
 					end
 				},
 				{
@@ -894,8 +892,6 @@ local function create_dynamic_health_widget()
 						uvs[1][1] = grim_progress
 						size[1] = bar_length * (1 - grim_progress)
 						offset[1] = 2 + health_bar_offset[1] + bar_length * grim_progress
-
-						return 
 					end
 				},
 				{
@@ -1065,8 +1061,6 @@ local function create_dynamic_ability_widget()
 						local bar_length = 92
 						uvs[2][2] = ability_progress
 						size[1] = bar_length * ability_progress
-
-						return 
 					end
 				}
 			}

@@ -1,6 +1,7 @@
 local definitions = local_require("scripts/ui/hud_ui/endurance_badge_ui_definitions")
 local mission_names = definitions.mission_names
 EnduranceBadgeUI = class(EnduranceBadgeUI)
+
 EnduranceBadgeUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -10,9 +11,8 @@ EnduranceBadgeUI.init = function (self, ingame_ui_context)
 
 	self.create_ui_elements(self)
 	rawset(_G, "endurance_badge_ui", self)
-
-	return 
 end
+
 EnduranceBadgeUI.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 	local widget_definitions = definitions.widget_definitions
@@ -26,9 +26,8 @@ EnduranceBadgeUI.create_ui_elements = function (self)
 
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 	self.align_badge_widgets(self)
-
-	return 
 end
+
 EnduranceBadgeUI.align_badge_widgets = function (self)
 	local badge_widgets = self.badge_widgets
 
@@ -44,15 +43,13 @@ EnduranceBadgeUI.align_badge_widgets = function (self)
 			widget.element.dirty = true
 		end
 	end
-
-	return 
 end
+
 EnduranceBadgeUI.destroy = function (self)
 	self.set_visible(self, false)
 	rawset(_G, "endurance_badge_ui", nil)
-
-	return 
 end
+
 EnduranceBadgeUI.set_visible = function (self, visible)
 	local ui_renderer = self.ui_renderer
 	local badge_widgets = self.badge_widgets
@@ -62,9 +59,8 @@ EnduranceBadgeUI.set_visible = function (self, visible)
 			UIRenderer.set_element_visible(ui_renderer, widget.element, visible)
 		end
 	end
-
-	return 
 end
+
 EnduranceBadgeUI.update_mission_data = function (self, dt)
 	local mission_system = self.mission_system
 	local badge_widgets = self.badge_widgets
@@ -84,9 +80,8 @@ EnduranceBadgeUI.update_mission_data = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 EnduranceBadgeUI.update = function (self, dt)
 	self.update_mission_data(self, dt)
 
@@ -124,9 +119,8 @@ EnduranceBadgeUI.update = function (self, dt)
 	end
 
 	self.draw(self, dt)
-
-	return 
 end
+
 EnduranceBadgeUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -143,9 +137,8 @@ EnduranceBadgeUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 EnduranceBadgeUI.set_badge_amount = function (self, widget, amount, ignore_animation)
 	local scenegraph_id = widget.scenegraph_id
 	local widget_style = widget.style
@@ -167,8 +160,6 @@ EnduranceBadgeUI.set_badge_amount = function (self, widget, amount, ignore_anima
 		local duration = 0.2
 		self.ui_animations[scenegraph_id] = UIAnimation.init(UIAnimation.catmullrom, size, nil, 64, p1, p2, p3, p4, duration)
 	end
-
-	return 
 end
 
-return 
+return

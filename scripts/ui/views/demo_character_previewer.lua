@@ -1,4 +1,5 @@
 DemoCharacterPreviewer = class(DemoCharacterPreviewer)
+
 DemoCharacterPreviewer.init = function (self, world, profile_name, career_index, position, rotation, zoom_offset)
 	self._world = world
 	self._profile_name = profile_name
@@ -20,17 +21,15 @@ DemoCharacterPreviewer.init = function (self, world, profile_name, career_index,
 	end
 
 	self._spawn_character(self)
-
-	return 
 end
+
 DemoCharacterPreviewer.reset_state = function (self)
 	self._is_hover = nil
 	self._is_pressed = nil
 
 	self.outline_unit(self, false)
-
-	return 
 end
+
 DemoCharacterPreviewer._spawn_character = function (self, position)
 	self._position = position or self._position
 
@@ -40,15 +39,15 @@ DemoCharacterPreviewer._spawn_character = function (self, position)
 	local career_index = self._career_index
 
 	self._spawn_hero_unit(self, profile_name, career_index)
-
-	return 
 end
+
 DemoCharacterPreviewer._color_from_table = function (self, color_table)
 	return Color(color_table[1], color_table[2], color_table[3], color_table[4])
 end
+
 DemoCharacterPreviewer.outline_unit = function (self, enable_outline, outline_settings, extra_time)
 	if self._outlined == enable_outline then
-		return 
+		return
 	end
 
 	if Unit.alive(self._character_unit) then
@@ -67,12 +66,12 @@ DemoCharacterPreviewer.outline_unit = function (self, enable_outline, outline_se
 
 		self._outlined = enable_outline
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer.is_outlined = function (self)
 	return self._outlined
 end
+
 DemoCharacterPreviewer._reset_hero = function (self)
 	if self._character_unit then
 		World.destroy_unit(self._world, self._character_unit)
@@ -118,9 +117,8 @@ DemoCharacterPreviewer._reset_hero = function (self)
 		LineObject.reset(self._line_object)
 		LineObject.dispatch(self._world, self._line_object)
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer._spawn_hero_unit = function (self, profile_name, career_index)
 	local profile_index = FindProfileIndex(profile_name)
 	local profile = SPProfiles[profile_index]
@@ -134,9 +132,8 @@ DemoCharacterPreviewer._spawn_hero_unit = function (self, profile_name, career_i
 	else
 		Managers.package:load(unit_name, "DemoCharacterPreviewer", callback(self, "cb_spawn_hero_unit", profile, career, skin_data), true, true)
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer.cb_spawn_hero_unit = function (self, profile, career, skin_data)
 	local world = self._world
 	local unit_name = skin_data.third_person
@@ -170,9 +167,8 @@ DemoCharacterPreviewer.cb_spawn_hero_unit = function (self, profile, career, ski
 
 	Unit.flow_event(character_unit, "lua_spawn_attachments")
 	self._spawn_inventory(self, career)
-
-	return 
 end
+
 DemoCharacterPreviewer.update = function (self, activated, dt, t)
 	self._update_aim_constraint(self, dt, t)
 
@@ -180,15 +176,14 @@ DemoCharacterPreviewer.update = function (self, activated, dt, t)
 		self._update_hover(self, dt, t)
 		self._update_pressed(self, dt, t)
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer._update_hover = function (self)
 	local input_service = Managers.input:get_service("main_menu")
 	local cursor = input_service.get(input_service, "cursor")
 
 	if not cursor then
-		return 
+		return
 	else
 		local scale = RESOLUTION_LOOKUP.scale
 		cursor.x = cursor.x * scale
@@ -196,7 +191,7 @@ DemoCharacterPreviewer._update_hover = function (self)
 	end
 
 	if not Unit.alive(self._character_unit) then
-		return 
+		return
 	end
 
 	local viewport = ScriptWorld.viewport(self._world, "title_screen_viewport")
@@ -224,9 +219,8 @@ DemoCharacterPreviewer._update_hover = function (self)
 
 		self._is_hover = false
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer._update_pressed = function (self, dt, t)
 	self._was_pressed_this_frame = nil
 	local input_service = Managers.input:get_service("main_menu")
@@ -247,9 +241,8 @@ DemoCharacterPreviewer._update_pressed = function (self, dt, t)
 			self.outline_unit(self, false, OutlineSettings.colors.ally)
 		end
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer.cb_on_select_animation_complete = function (self)
 	local node = "j_neck"
 	local unit = self._character_unit
@@ -262,9 +255,8 @@ DemoCharacterPreviewer.cb_on_select_animation_complete = function (self)
 
 		WwiseWorld.trigger_event(wwise_world, DemoSettings.play_on_select[self._profile_name], wwise_source_id)
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer.pressed_pose = function (self)
 	local viewport = ScriptWorld.viewport(self._world, "title_screen_viewport")
 	local camera = ScriptViewport.camera(viewport)
@@ -281,9 +273,10 @@ DemoCharacterPreviewer.pressed_pose = function (self)
 
 	return Matrix4x4Box(Matrix4x4.from_quaternion_position(current_camera_rot, camera_pos))
 end
+
 DemoCharacterPreviewer._update_aim_constraint = function (self, dt, t)
 	if not Unit.alive(self._character_unit) then
-		return 
+		return
 	end
 
 	local viewport = ScriptWorld.viewport(self._world, "title_screen_viewport")
@@ -293,24 +286,27 @@ DemoCharacterPreviewer._update_aim_constraint = function (self, dt, t)
 	local aim_constraint_anim_var = Unit.animation_find_constraint_target(character_unit, "aim_constraint_target")
 
 	Unit.animation_set_constraint_target(character_unit, aim_constraint_anim_var, position)
-
-	return 
 end
+
 DemoCharacterPreviewer.is_hover = function (self)
 	return self._is_hover
 end
+
 DemoCharacterPreviewer.is_pressed = function (self)
 	return self._is_pressed
 end
+
 DemoCharacterPreviewer.was_pressed_this_frame = function (self)
 	local was_pressed_this_frame = self._was_pressed_this_frame
 	self._was_pressed_this_frame = nil
 
 	return was_pressed_this_frame
 end
+
 DemoCharacterPreviewer.profile_information = function (self)
 	return self._profile_name, self._career_index
 end
+
 DemoCharacterPreviewer._spawn_inventory = function (self, career)
 	local preview_animation = career.preview_animation
 	local preview_wield_slot = career.preview_wield_slot
@@ -337,12 +333,12 @@ DemoCharacterPreviewer._spawn_inventory = function (self, career)
 	end
 
 	self._character_spawned = true
-
-	return 
 end
+
 DemoCharacterPreviewer.character_spawned = function (self)
 	return self._character_spawned
 end
+
 DemoCharacterPreviewer.wield_weapon_slot = function (self, slot_type)
 	self._wielded_slot_type = slot_type
 
@@ -353,20 +349,18 @@ DemoCharacterPreviewer.wield_weapon_slot = function (self, slot_type)
 	if self.item_names.ranged then
 		self._equip_item(self, self.item_names.ranged, InventorySettings.slots_by_name.slot_ranged)
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer.play_character_animation = function (self, animation_event)
 	local character_unit = self._character_unit
 
 	if character_unit == nil then
-		return 
+		return
 	end
 
 	Unit.animation_event(character_unit, animation_event)
-
-	return 
 end
+
 DemoCharacterPreviewer._equip_item = function (self, item_name, slot)
 	self.items_loaded = nil
 	local item_slot_type = slot.type
@@ -437,9 +431,8 @@ DemoCharacterPreviewer._equip_item = function (self, item_name, slot)
 
 		self.load_package(self, package_names, item_name)
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer.load_package = function (self, package_names, item_name)
 	local package_names_to_load = {}
 
@@ -456,9 +449,8 @@ DemoCharacterPreviewer.load_package = function (self, package_names, item_name)
 
 		package_manager.load(package_manager, package_name, "DemoCharacterPreviewer", cb, true, true)
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer.on_load_complete = function (self, package_name, item_name)
 	local loaded_packages = self._loaded_packages
 	loaded_packages[package_name] = true
@@ -470,20 +462,19 @@ DemoCharacterPreviewer.on_load_complete = function (self, package_name, item_nam
 		local item_slot_type = unit_spawn_data.item_slot_type
 
 		if item_names[item_slot_type] ~= item_name then
-			return 
+			return
 		end
 
 		local unit_name = unit_spawn_data.unit_name
 
 		if not loaded_packages[unit_name] then
-			return 
+			return
 		end
 	end
 
 	self._spawn_item(self, item_name)
-
-	return 
 end
+
 DemoCharacterPreviewer._spawn_item = function (self, item_name)
 	local world = self._world
 	local character_unit = self._character_unit
@@ -553,9 +544,8 @@ DemoCharacterPreviewer._spawn_item = function (self, item_name)
 			end
 		end
 	end
-
-	return 
 end
+
 DemoCharacterPreviewer.equip_item_unit = function (self, unit, item_slot_type, item_template, unit_attachment_node_linking, scene_graph_links)
 	local world = self._world
 	local character_unit = self._character_unit
@@ -583,9 +573,8 @@ DemoCharacterPreviewer.equip_item_unit = function (self, unit, item_slot_type, i
 	end
 
 	GearUtils.link(world, unit_attachment_node_linking, scene_graph_links, character_unit, unit)
-
-	return 
 end
+
 DemoCharacterPreviewer.destroy = function (self)
 	self._reset_hero(self)
 
@@ -594,8 +583,6 @@ DemoCharacterPreviewer.destroy = function (self)
 
 		self._line_object = nil
 	end
-
-	return 
 end
 
-return 
+return

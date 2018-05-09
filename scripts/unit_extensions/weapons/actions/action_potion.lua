@@ -1,5 +1,6 @@
 ActionPotion = class(ActionPotion)
 local PLAYER_AND_BOT_UNITS = PLAYER_AND_BOT_UNITS
+
 ActionPotion.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.weapon_unit = weapon_unit
@@ -10,20 +11,19 @@ ActionPotion.init = function (self, world, item_name, is_server, owner_unit, dam
 	if ScriptUnit.has_extension(weapon_unit, "ammo_system") then
 		self.ammo_extension = ScriptUnit.extension(weapon_unit, "ammo_system")
 	end
-
-	return 
 end
+
 ActionPotion.client_owner_start_action = function (self, new_action, t)
 	self.current_action = new_action
+end
 
-	return 
-end
 ActionPotion.client_owner_post_update = function (self, dt, t, world, can_damage)
-	return 
+	return
 end
+
 ActionPotion.finish = function (self, reason)
 	if reason ~= "action_complete" then
-		return 
+		return
 	end
 
 	local current_action = self.current_action
@@ -115,8 +115,6 @@ ActionPotion.finish = function (self, reason)
 	local position = POSITION_LOOKUP[owner_unit]
 
 	Managers.telemetry.events:player_used_item(player, self.item_name, position)
-
-	return 
 end
 
-return 
+return

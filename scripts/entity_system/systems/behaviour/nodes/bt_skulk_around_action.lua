@@ -4,18 +4,15 @@ BTSkulkAroundAction = class(BTSkulkAroundAction, BTNode)
 BTSkulkAroundAction.name = "BTSkulkAroundAction"
 local position_lookup = POSITION_LOOKUP
 local script_data = script_data
+
 BTSkulkAroundAction.init = function (self, ...)
 	BTSkulkAroundAction.super.init(self, ...)
-
-	return 
 end
 
 local function debug3d(unit, text, color_name)
 	if script_data.debug_ai_movement then
 		Debug.world_sticky_text(position_lookup[unit], text, color_name)
 	end
-
-	return 
 end
 
 BTSkulkAroundAction.enter = function (self, unit, blackboard, t)
@@ -51,9 +48,8 @@ BTSkulkAroundAction.enter = function (self, unit, blackboard, t)
 	if not skulk_data.attack_timer or skulk_data.attack_timer < t then
 		skulk_data.attack_timer = t + math.random(25, 30)
 	end
-
-	return 
 end
+
 BTSkulkAroundAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
@@ -67,9 +63,8 @@ BTSkulkAroundAction.leave = function (self, unit, blackboard, t, reason, destroy
 		local skulk_data = blackboard.skulk_data
 		skulk_data.attack_timer = nil
 	end
-
-	return 
 end
+
 BTSkulkAroundAction.run = function (self, unit, blackboard, t, dt)
 	local skulk_data = blackboard.skulk_data
 
@@ -103,6 +98,7 @@ BTSkulkAroundAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTSkulkAroundAction.get_new_skulk_goal = function (self, unit, blackboard)
 	local conflict_director = Managers.state.conflict
 	local main_paths = conflict_director.level_analysis:get_main_paths()
@@ -162,4 +158,4 @@ BTSkulkAroundAction.get_new_skulk_goal = function (self, unit, blackboard)
 	return pos
 end
 
-return 
+return

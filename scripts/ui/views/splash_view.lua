@@ -386,6 +386,7 @@ if Development.parameter("use_beta_overlay") or script_data.settings.use_beta_ov
 end
 
 SplashView = class(SplashView)
+
 SplashView.init = function (self, input_manager, world)
 	if PLATFORM == "ps4" then
 		PS4.hide_splash_screen()
@@ -428,15 +429,14 @@ SplashView.init = function (self, input_manager, world)
 	end
 
 	self._next_splash(self, true)
-
-	return 
 end
+
 SplashView._next_splash = function (self, override_skip)
 	if not override_skip and (PLATFORM == "xb1" or PLATFORM == "ps4") and not self._allow_console_skip then
 		self._update_func = "_wait_for_allow_console_skip"
 		self._video_complete = true
 
-		return 
+		return
 	end
 
 	self._update_func = "do_nothing"
@@ -450,9 +450,8 @@ SplashView._next_splash = function (self, override_skip)
 	elseif not Managers.transition:loading_icon_active() then
 		Managers.transition:show_loading_icon()
 	end
-
-	return 
 end
+
 SplashView._update_video = function (self, gui, dt)
 	if not self.ui_renderer.video_player then
 		UIRenderer.create_video_player(self.ui_renderer, self._world, self._current_splash_data.video_name, false)
@@ -482,9 +481,8 @@ SplashView._update_video = function (self, gui, dt)
 			UIRenderer.draw_widget(self.ui_renderer, self._current_widget)
 		end
 	end
-
-	return 
 end
+
 SplashView._update_texture = function (self, gui, dt)
 	local w, h = Gui.resolution()
 	local timer = self._current_splash_data.timer
@@ -509,8 +507,6 @@ SplashView._update_texture = function (self, gui, dt)
 	if self._current_splash_data.timer <= 0 then
 		self._next_splash(self)
 	end
-
-	return 
 end
 
 if PLATFORM == "xb1" or PLATFORM == "ps4" then
@@ -518,8 +514,6 @@ if PLATFORM == "xb1" or PLATFORM == "ps4" then
 		if self._allow_console_skip then
 			self._next_splash(self)
 		end
-
-		return 
 	end
 end
 
@@ -527,10 +521,10 @@ SplashView.set_index = function (self, index)
 	self._current_index = index
 
 	self._next_splash(self)
-
-	return 
 end
+
 local DO_RELOAD = true
+
 SplashView._create_ui_elements = function (self)
 	print("doing_stuff")
 	table.clear(self._splash_widgets)
@@ -554,14 +548,13 @@ SplashView._create_ui_elements = function (self)
 	self._next_splash(self)
 
 	DO_RELOAD = false
-
-	return 
 end
+
 SplashView.update = function (self, dt)
 	if PLATFORM == "win32" and self._fram_skip_hack < 1 then
 		self._fram_skip_hack = self._fram_skip_hack + 1
 
-		return 
+		return
 	end
 
 	if DO_RELOAD then
@@ -602,19 +595,16 @@ SplashView.update = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
 
 if PLATFORM == "xb1" or PLATFORM == "ps4" then
 	SplashView.allow_console_skip = function (self)
 		self._allow_console_skip = true
-
-		return 
 	end
+
 	SplashView._get_console_input = function (self)
 		if not self._allow_console_skip then
-			return 
+			return
 		end
 
 		local pad = "Pad"
@@ -627,25 +617,24 @@ if PLATFORM == "xb1" or PLATFORM == "ps4" then
 				return true
 			end
 		end
-
-		return 
 	end
 end
 
 SplashView.render = function (self)
-	return 
+	return
 end
+
 SplashView.video_complete = function (self)
 	return self._video_complete
 end
+
 SplashView.destroy = function (self)
 	Managers.music:stop_all_sounds()
 	UIRenderer.destroy(self.ui_renderer, self._world)
-
-	return 
 end
+
 SplashView.is_completed = function (self)
 	return self._current_splash_data == nil
 end
 
-return 
+return

@@ -17,7 +17,7 @@ end
 
 local function play_screen_space_blood(world, unit, attacker_unit, killing_blow, damage_type)
 	if Development.parameter("screen_space_player_camera_reactions") == false then
-		return 
+		return
 	end
 
 	local pos = POSITION_LOOKUP[unit] + Vector3(0, 0, 1)
@@ -36,8 +36,6 @@ local function play_screen_space_blood(world, unit, attacker_unit, killing_blow,
 			end
 		end
 	end
-
-	return 
 end
 
 local function handle_boss_difficulty_kill_achievement_tracking(breed, statistics_db)
@@ -68,8 +66,6 @@ local function handle_boss_difficulty_kill_achievement_tracking(breed, statistic
 			local_player_id = local_player_id + 1
 		end
 	end
-
-	return 
 end
 
 local function handle_military_event_achievement(damage_type, breed_name, statistics_db)
@@ -94,8 +90,6 @@ local function handle_military_event_achievement(damage_type, breed_name, statis
 			end
 		end
 	end
-
-	return 
 end
 
 local function ai_default_unit_start(unit, context, t, killing_blow, is_server)
@@ -324,8 +318,6 @@ local function update_wall_nail(unit, dt, t, data)
 			Unit.set_local_position(unit, node, Vector3.lerp(nail_data.position:unbox(), nail_data.target_position:unbox(), lerp_t))
 		end
 	end
-
-	return 
 end
 
 local function ai_default_unit_update(unit, dt, context, t, data, is_server)
@@ -446,13 +438,11 @@ end
 
 local function play_unit_audio(unit, blackboard, sound_name)
 	Managers.state.entity:system("audio_system"):play_audio_unit_event(sound_name, unit)
-
-	return 
 end
 
 local function trigger_unit_dialogue_death_event(killed_unit, killer_unit, hit_zone, damage_type)
 	if not Unit.alive(killed_unit) or not Unit.alive(killer_unit) then
-		return 
+		return
 	end
 
 	if Unit.has_data(killed_unit, "enemy_dialogue_face_anim") and Unit.has_animation_state_machine(killed_unit) then
@@ -517,8 +507,6 @@ local function trigger_unit_dialogue_death_event(killed_unit, killer_unit, hit_z
 			end
 		end
 	end
-
-	return 
 end
 
 local buff_params = {}
@@ -574,8 +562,6 @@ local function trigger_player_killing_blow_ai_buffs(ai_unit, killing_blow, is_se
 			end
 		end
 	end
-
-	return 
 end
 
 local function trigger_headshot_dialogue_event(unit, killing_blow)
@@ -595,8 +581,6 @@ local function trigger_headshot_dialogue_event(unit, killing_blow)
 			SurroundingAwareSystem.add_event(source, "heard_speak", last_query.validated_rule.sound_distance, "heard_event", last_query.result, "speaker", source, "speaker_name", speaker_name, "sound_event", extension.last_query_sound_event or "unknown")
 		end
 	end
-
-	return 
 end
 
 local pickup_params = {}
@@ -837,8 +821,6 @@ DeathReactions.templates = {
 
 					return data, result
 				end
-
-				return 
 			end,
 			update = function (unit, dt, context, t, data)
 				local blackboard = data.blackboard
@@ -907,8 +889,6 @@ DeathReactions.templates = {
 
 					return nil, DeathReactions.IS_NOT_DONE
 				end
-
-				return 
 			end,
 			update = function (unit, dt, context, t, data)
 				local blackboard = BLACKBOARDS[unit]
@@ -974,8 +954,6 @@ DeathReactions.templates = {
 
 					return data, result
 				end
-
-				return 
 			end,
 			update = function (unit, dt, context, t, data)
 				local blackboard = BLACKBOARDS[unit]
@@ -1162,21 +1140,17 @@ DeathReactions.templates = {
 			start = function (unit, context, t, killing_blow, is_server)
 				Unit.set_flow_variable(unit, "current_health", 0)
 				Unit.flow_event(unit, "lua_on_death")
-
-				return 
 			end,
 			update = function (unit, dt, context, t, data)
-				return 
+				return
 			end
 		},
 		husk = {
 			start = function (unit, context, t, killing_blow, is_server)
 				Unit.flow_event(unit, "lua_on_death")
-
-				return 
 			end,
 			update = function (unit, dt, context, t, data)
-				return 
+				return
 			end
 		}
 	},
@@ -1197,17 +1171,15 @@ DeathReactions.templates = {
 				return nil, DeathReactions.IS_DONE
 			end,
 			update = function (unit, dt, context, t, data)
-				return 
+				return
 			end
 		},
 		husk = {
 			start = function (unit, context, t, killing_blow, is_server)
 				Unit.flow_event(unit, "lua_on_death")
-
-				return 
 			end,
 			update = function (unit, dt, context, t, data)
-				return 
+				return
 			end
 		}
 	},
@@ -1268,8 +1240,6 @@ DeathReactions.templates = {
 
 					return DeathReactions.IS_DONE
 				end
-
-				return 
 			end
 		},
 		husk = {
@@ -1317,8 +1287,6 @@ DeathReactions.templates = {
 				elseif data.explode_time + 0.5 <= network_time then
 					return DeathReactions.IS_DONE
 				end
-
-				return 
 			end
 		}
 	},
@@ -1391,8 +1359,6 @@ DeathReactions.templates = {
 
 					return result
 				end
-
-				return 
 			end
 		},
 		husk = {
@@ -1577,6 +1543,7 @@ DeathReactions.templates = {
 		}
 	}
 }
+
 DeathReactions.get_reaction = function (death_reaction_template, is_husk)
 	local templates = DeathReactions.templates
 	local husk_key = (is_husk and "husk") or "unit"
@@ -1586,6 +1553,7 @@ DeathReactions.get_reaction = function (death_reaction_template, is_husk)
 
 	return reaction
 end
+
 DeathReactions._add_ai_killed_by_player_telemetry = function (victim_unit, breed_name, player_unit, player, damage_type, weapon_name, death_hit_zone)
 	local network_manager = Managers.state.network
 	local is_server = network_manager.is_server
@@ -1598,8 +1566,6 @@ DeathReactions._add_ai_killed_by_player_telemetry = function (victim_unit, breed
 
 		Managers.telemetry.events:player_killed_ai(player, player_position, victim_position, breed_name, weapon_name, damage_type, death_hit_zone)
 	end
-
-	return 
 end
 
-return 
+return

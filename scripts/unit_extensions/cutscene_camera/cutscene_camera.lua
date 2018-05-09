@@ -1,4 +1,5 @@
 CutsceneCamera = class(CutsceneCamera)
+
 CutsceneCamera.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	self.level = LevelHelper:current_level(world)
@@ -14,18 +15,16 @@ CutsceneCamera.init = function (self, extension_init_context, unit, extension_in
 
 	Camera.set_near_range(self.camera, near_range)
 	Camera.set_far_range(self.camera, far_range)
-
-	return 
 end
+
 CutsceneCamera.destroy = function (self)
 	self.level = nil
 	self.unit = nil
 	self.camera = nil
 	self.source_camera = nil
 	self.target_camera = nil
-
-	return 
 end
+
 CutsceneCamera.activate = function (self, transition_data)
 	local transition = transition_data.transition
 	local source_camera, target_camera, transition_start_time, transition_end_time = nil
@@ -63,9 +62,8 @@ CutsceneCamera.activate = function (self, transition_data)
 		0,
 		0
 	}
-
-	return 
 end
+
 CutsceneCamera.setup_external_camera = function (self, transition, tree_name, node_name)
 	local camera_manager = Managers.state.camera
 	local camera_node = camera_manager.tree_node(camera_manager, self.viewport, tree_name, node_name)
@@ -75,11 +73,11 @@ CutsceneCamera.setup_external_camera = function (self, transition, tree_name, no
 
 	return camera_node
 end
+
 CutsceneCamera.update = function (self)
 	self.update_cutscene_camera(self)
-
-	return 
 end
+
 CutsceneCamera.update_cutscene_camera = function (self)
 	local source_camera = self.source_camera
 	local target_camera = self.target_camera
@@ -132,9 +130,8 @@ CutsceneCamera.update_cutscene_camera = function (self)
 	end
 
 	camera_manager.set_camera_node(camera_manager, viewport, "cutscene", "root_node")
-
-	return 
 end
+
 CutsceneCamera._handle_input = function (self, pose)
 	local look_delta = nil
 	local gamepad_active = Managers.input:is_device_active("gamepad")
@@ -179,9 +176,8 @@ CutsceneCamera._handle_input = function (self, pose)
 	local offset_rotation = Quaternion.multiply(Quaternion.multiply(rotation_yaw, rotation_pitch), rotation_roll)
 
 	Matrix4x4.set_rotation(pose, offset_rotation)
-
-	return 
 end
+
 CutsceneCamera.transition_progress = function (self, start_time, end_time, time)
 	local progress = nil
 	local interpolation_time = end_time - start_time
@@ -195,17 +191,21 @@ CutsceneCamera.transition_progress = function (self, start_time, end_time, time)
 
 	return progress
 end
+
 CutsceneCamera.pose = function (self)
 	return Unit.world_pose(self.unit, 0)
 end
+
 CutsceneCamera.vertical_fov = function (self)
 	return Camera.vertical_fov(self.camera)
 end
+
 CutsceneCamera.near_range = function (self)
 	return Camera.near_range(self.camera)
 end
+
 CutsceneCamera.far_range = function (self)
 	return Camera.far_range(self.camera)
 end
 
-return 
+return

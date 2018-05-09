@@ -1,20 +1,19 @@
 PlayerCharacterStateLeavingLadderTop = class(PlayerCharacterStateLeavingLadderTop, PlayerCharacterState)
+
 PlayerCharacterStateLeavingLadderTop.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "leaving_ladder_top")
 
 	local context = character_state_init_context
 	self.is_server = Managers.player.is_server
 	self.wanted_forward_bonus_velocity = Vector3Box()
-
-	return 
 end
+
 PlayerCharacterStateLeavingLadderTop.on_enter_animation_event = function (self, speed)
 	local unit = self.unit
 
 	CharacterStateHelper.play_animation_event_with_variable_float(unit, "climb_top_exit_ladder", "climb_enter_exit_speed", speed)
-
-	return 
 end
+
 PlayerCharacterStateLeavingLadderTop.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	local unit = self.unit
 	local input_extension = self.input_extension
@@ -33,9 +32,8 @@ PlayerCharacterStateLeavingLadderTop.on_enter = function (self, unit, input, dt,
 
 	loc_ext.enable_script_driven_ladder_transition_movement(loc_ext)
 	loc_ext.set_mover_filter_property(loc_ext, "ladder", true)
-
-	return 
 end
+
 PlayerCharacterStateLeavingLadderTop.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local network_manager = Managers.state.network
 	local unit_id = network_manager.unit_game_object_id(network_manager, self.unit)
@@ -58,9 +56,8 @@ PlayerCharacterStateLeavingLadderTop.on_exit = function (self, unit, input, dt, 
 	loc_ext.enable_script_driven_movement(loc_ext)
 	loc_ext.enable_rotation_towards_velocity(loc_ext, true)
 	loc_ext.set_mover_filter_property(loc_ext, "ladder", false)
-
-	return 
 end
+
 PlayerCharacterStateLeavingLadderTop.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -71,19 +68,19 @@ PlayerCharacterStateLeavingLadderTop.update = function (self, unit, input, dt, c
 	if CharacterStateHelper.is_dead(status_extension) then
 		csm.change_state(csm, "dead")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_knocked_down(status_extension) then
 		csm.change_state(csm, "knocked_down")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_pounced_down(status_extension) then
 		csm.change_state(csm, "pounced_down")
 
-		return 
+		return
 	end
 
 	local is_catapulted, direction = CharacterStateHelper.is_catapulted(status_extension)
@@ -96,7 +93,7 @@ PlayerCharacterStateLeavingLadderTop.update = function (self, unit, input, dt, c
 
 		csm.change_state(csm, "catapulted", params)
 
-		return 
+		return
 	end
 
 	if self.finish_time < t then
@@ -107,8 +104,6 @@ PlayerCharacterStateLeavingLadderTop.update = function (self, unit, input, dt, c
 	local max_radians = math.degrees_to_radians(movement_settings_table.ladder.look_horizontal_max_degrees)
 
 	CharacterStateHelper.look_limited_rotation_freedom(input_extension, self.player.viewport_name, self.first_person_extension, self.ladder_unit, unit, max_radians, nil, status_extension, self.inventory_extension)
-
-	return 
 end
 
-return 
+return

@@ -1,11 +1,11 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTStormVerminPushAction = class(BTStormVerminPushAction, BTNode)
+
 BTStormVerminPushAction.init = function (self, ...)
 	BTStormVerminPushAction.super.init(self, ...)
-
-	return 
 end
+
 BTStormVerminPushAction.name = "BTStormVerminPushAction"
 
 local function randomize(event)
@@ -14,8 +14,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTStormVerminPushAction.enter = function (self, unit, blackboard, t)
@@ -43,9 +41,8 @@ BTStormVerminPushAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.spawn_to_running = nil
 	blackboard.wake_up_push = 0
-
-	return 
 end
+
 BTStormVerminPushAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.move_state = nil
 
@@ -55,9 +52,8 @@ BTStormVerminPushAction.leave = function (self, unit, blackboard, t, reason, des
 	blackboard.attack_aborted = nil
 	blackboard.attacking_target = nil
 	blackboard.attack_anim = nil
-
-	return 
 end
+
 BTStormVerminPushAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.attack_aborted then
 		local network_manager = Managers.state.network
@@ -72,9 +68,8 @@ BTStormVerminPushAction.run = function (self, unit, blackboard, t, dt)
 
 		return "running"
 	end
-
-	return 
 end
+
 BTStormVerminPushAction.attack = function (self, unit, t, dt, blackboard)
 	local locomotion = blackboard.locomotion_extension
 	local attacking_target = blackboard.attacking_target
@@ -84,12 +79,11 @@ BTStormVerminPushAction.attack = function (self, unit, t, dt, blackboard)
 
 		locomotion.set_wanted_rotation(locomotion, rotation)
 	end
-
-	return 
 end
+
 BTStormVerminPushAction.anim_cb_stormvermin_push = function (self, unit, blackboard, target_unit)
 	if not DamageUtils.check_distance(blackboard.action, blackboard, unit, target_unit) or not DamageUtils.check_infront(unit, target_unit) then
-		return 
+		return
 	end
 
 	local action = blackboard.action
@@ -105,8 +99,6 @@ BTStormVerminPushAction.anim_cb_stormvermin_push = function (self, unit, blackbo
 
 		locomotion_extension.add_external_velocity(locomotion_extension, velocity, action.max_impact_push_speed)
 	end
-
-	return 
 end
 
-return 
+return

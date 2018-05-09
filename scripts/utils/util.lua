@@ -1,8 +1,6 @@
 function cprint(...)
 	print(...)
 	CommandWindow.print(...)
-
-	return 
 end
 
 function cprintf(f, ...)
@@ -10,8 +8,6 @@ function cprintf(f, ...)
 
 	print(s)
 	CommandWindow.print(s)
-
-	return 
 end
 
 string.split = function (str, sep)
@@ -20,12 +16,11 @@ string.split = function (str, sep)
 
 	str.gsub(str, pattern, function (part)
 		fields[#fields + 1] = part
-
-		return 
 	end)
 
 	return fields
 end
+
 table.remove_unordered_items = function (t, filter)
 	local num_items = #t
 	local i = 1
@@ -41,8 +36,6 @@ table.remove_unordered_items = function (t, filter)
 			i = i + 1
 		end
 	end
-
-	return 
 end
 
-return 
+return

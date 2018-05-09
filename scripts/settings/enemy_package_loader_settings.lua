@@ -158,4 +158,4 @@ for alias, breed_name in pairs(alias_to_breed) do
 	aliases[#aliases + 1] = alias
 end
 
-return 
+return

@@ -351,11 +351,9 @@ local function add_names(stats)
 			stat_definition.name = stat_name
 		end
 	end
-
-	return 
 end
 
 add_names(player)
 add_names(unit_test)
 
-return 
+return

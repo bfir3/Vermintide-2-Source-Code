@@ -7,6 +7,7 @@ local RPCS = {
 local extensions = {
 	"ObjectiveSocketUnitExtension"
 }
+
 ObjectiveSocketSystem.init = function (self, entity_system_creation_context, system_name)
 	ObjectiveSocketSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -17,11 +18,12 @@ ObjectiveSocketSystem.init = function (self, entity_system_creation_context, sys
 	self.network_event_delegate = network_event_delegate
 	self.network_manager = Managers.state.network
 	self.socket_extensions = {}
+
 	self.objective_entered_zone_server = function (extension, unit)
 		local socket, socket_id = extension.pick_socket(extension, unit)
 
 		if not socket then
-			return 
+			return
 		end
 
 		extension.objective_entered_zone_client(extension, socket_id)
@@ -36,9 +38,8 @@ ObjectiveSocketSystem.init = function (self, entity_system_creation_context, sys
 
 			unit_spawner.mark_for_deletion(unit_spawner, unit)
 		end
-
-		return 
 	end
+
 	self.objective_entered_zone_client = function (extension, socket_id)
 		local socket = extension.socket_from_id(extension, socket_id)
 
@@ -56,21 +57,17 @@ ObjectiveSocketSystem.init = function (self, entity_system_creation_context, sys
 		if num_closed_sockets == extension.num_sockets then
 			Unit.flow_event(extension.unit, "lua_all_sockets_occupied")
 		end
-
-		return 
 	end
-
-	return 
 end
+
 ObjectiveSocketSystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
 
 	self.network_event_delegate = nil
 	self.network_manager = nil
 	self.socket_extensions = nil
-
-	return 
 end
+
 ObjectiveSocketSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	local extension = ObjectiveSocketSystem.super.on_add_extension(self, world, unit, extension_name, extension_init_data, self.is_server)
 
@@ -86,13 +83,13 @@ ObjectiveSocketSystem.on_add_extension = function (self, world, unit, extension_
 
 	return extension
 end
+
 ObjectiveSocketSystem.on_remove_extension = function (self, unit, extension_name)
 	ObjectiveSocketSystem.super.on_remove_extension(self, unit, extension_name)
 
 	self.socket_extensions[unit] = nil
-
-	return 
 end
+
 ObjectiveSocketSystem.hot_join_sync = function (self, sender)
 	for unit, extension in pairs(self.socket_extensions) do
 		local sockets = extension.sockets
@@ -107,9 +104,8 @@ ObjectiveSocketSystem.hot_join_sync = function (self, sender)
 			end
 		end
 	end
-
-	return 
 end
+
 ObjectiveSocketSystem.rpc_objective_entered_socket_zone = function (self, sender, unit_id, socket_id)
 	fassert(not self.is_server, "Should only be called on the client")
 
@@ -118,8 +114,6 @@ ObjectiveSocketSystem.rpc_objective_entered_socket_zone = function (self, sender
 	local objective_socket_extension = ScriptUnit.extension(unit, "objective_socket_system")
 
 	objective_socket_extension.objective_entered_zone_client(objective_socket_extension, socket_id)
-
-	return 
 end
 
-return 
+return

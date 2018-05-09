@@ -933,4 +933,4 @@ Weapons.one_handed_hammer_template_2_t3_un = table.clone(Weapons.one_handed_hamm
 Weapons.one_handed_hammer_template_2_t3_un.actions.action_inspect.action_inspect_hold.anim_event = "inspect_start_2"
 Weapons.one_handed_hammer_template_2_t3_un.actions.action_inspect.action_inspect_hold.anim_end_event = "inspect_end_2"
 
-return 
+return

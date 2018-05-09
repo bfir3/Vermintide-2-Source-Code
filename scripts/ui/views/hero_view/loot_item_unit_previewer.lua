@@ -1,4 +1,5 @@
 LootItemUnitPreviewer = class(LootItemUnitPreviewer)
+
 LootItemUnitPreviewer.init = function (self, reward, spawn_position, background_world, background_viewport, unique_id)
 	self.background_world = background_world
 	self.background_viewport = background_viewport
@@ -9,17 +10,15 @@ LootItemUnitPreviewer.init = function (self, reward, spawn_position, background_
 	self.reward = reward
 	self._link_units = self.spawn_link_units(self, reward)
 	self.units_to_spawn = self.load_reward_units(self, reward)
-
-	return 
 end
+
 LootItemUnitPreviewer.destroy = function (self)
 	self._destroy_units(self)
 	self._unload_packages(self)
 	table.clear(self.loaded_packages)
 	table.clear(self.packages_to_load)
-
-	return 
 end
+
 LootItemUnitPreviewer._destroy_units = function (self)
 	local world = self.background_world
 	local spawned_units = self._spawned_units
@@ -43,24 +42,23 @@ LootItemUnitPreviewer._destroy_units = function (self)
 	table.clear(link_units)
 
 	self.units_spawned = nil
+end
 
-	return 
-end
 LootItemUnitPreviewer.update = function (self, dt, t)
-	return 
+	return
 end
+
 LootItemUnitPreviewer.post_update = function (self, dt, t)
 	if not self._items_spawned and self._packages_loaded(self) then
 		self._present_items(self)
 
 		self._items_spawned = true
 	end
-
-	return 
 end
+
 LootItemUnitPreviewer.load_reward_units = function (self, reward)
 	if not reward then
-		return 
+		return
 	end
 
 	local reward_units_to_spawn = {}
@@ -124,28 +122,31 @@ LootItemUnitPreviewer.load_reward_units = function (self, reward)
 
 	return reward_units_to_spawn
 end
+
 LootItemUnitPreviewer._trigger_unit_flow_event = function (self, unit, event_name)
 	if unit and Unit.alive(unit) then
 		Unit.flow_event(unit, event_name)
 	end
-
-	return 
 end
+
 LootItemUnitPreviewer._get_world = function (self)
 	return self.background_world, self.background_viewport
 end
+
 LootItemUnitPreviewer._get_camera_position = function (self)
 	local background_viewport = self.background_viewport
 	local camera = ScriptViewport.camera(background_viewport)
 
 	return ScriptCamera.position(camera)
 end
+
 LootItemUnitPreviewer._get_camera_rotation = function (self)
 	local background_viewport = self.background_viewport
 	local camera = ScriptViewport.camera(background_viewport)
 
 	return ScriptCamera.rotation(camera)
 end
+
 LootItemUnitPreviewer._packages_loaded = function (self)
 	local units_to_spawn = self.units_to_spawn
 	local loaded_packages = self.loaded_packages
@@ -160,9 +161,10 @@ LootItemUnitPreviewer._packages_loaded = function (self)
 
 	return true
 end
+
 LootItemUnitPreviewer.load_package = function (self, package_name)
 	if self.packages_to_load[package_name] ~= nil then
-		return 
+		return
 	end
 
 	self.packages_to_load[package_name] = true
@@ -175,15 +177,13 @@ LootItemUnitPreviewer.load_package = function (self, package_name)
 	end
 
 	package_manager.load(package_manager, package_name, reference_name, cb, true)
-
-	return 
 end
+
 LootItemUnitPreviewer._on_load_complete = function (self, package_name)
 	self.loaded_packages[package_name] = true
 	self.packages_to_load[package_name] = false
-
-	return 
 end
+
 LootItemUnitPreviewer._unload_packages = function (self)
 	local reference_name = "LootItemUnitPreviewer"
 
@@ -200,15 +200,16 @@ LootItemUnitPreviewer._unload_packages = function (self)
 			package_manager.unload(package_manager, package_name, reference_name)
 		end
 	end
-
-	return 
 end
+
 LootItemUnitPreviewer.link_units = function (self)
 	return self._link_units
 end
+
 LootItemUnitPreviewer.reward_units = function (self)
 	return self._spawned_units
 end
+
 LootItemUnitPreviewer.spawn_link_units = function (self, reward)
 	local link_units = {}
 	local reward_data = reward.data
@@ -278,6 +279,7 @@ LootItemUnitPreviewer.spawn_link_units = function (self, reward)
 
 	return link_units
 end
+
 LootItemUnitPreviewer._present_items = function (self)
 	local reward = self.reward
 	local units_to_spawn = self.units_to_spawn
@@ -309,9 +311,8 @@ LootItemUnitPreviewer._present_items = function (self)
 
 	self._spawned_units = spawned_units
 	self._units_by_item_key = units_by_item_key
-
-	return 
 end
+
 LootItemUnitPreviewer.spawn_units = function (self, item_key, spawn_data)
 	local units = {}
 	local link_unit = self._link_units[item_key]
@@ -338,6 +339,7 @@ LootItemUnitPreviewer.spawn_units = function (self, item_key, spawn_data)
 
 	return units
 end
+
 LootItemUnitPreviewer.present_item = function (self, item_key)
 	local units_by_item_key = self._units_by_item_key
 
@@ -357,9 +359,8 @@ LootItemUnitPreviewer.present_item = function (self, item_key)
 
 		Unit.flow_event(link_unit, "lua_spin_no_fx")
 	end
-
-	return 
 end
+
 LootItemUnitPreviewer._enable_reward_units_visibility = function (self)
 	local spawned_units = self._spawned_units
 
@@ -372,8 +373,6 @@ LootItemUnitPreviewer._enable_reward_units_visibility = function (self)
 			self._trigger_unit_flow_event(self, unit, reward_unit_event)
 		end
 	end
-
-	return 
 end
 
-return 
+return

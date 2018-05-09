@@ -1,12 +1,13 @@
 PlayerCharacterStatePouncedDown = class(PlayerCharacterStatePouncedDown, PlayerCharacterState)
+
 PlayerCharacterStatePouncedDown.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "pounced_down")
 
 	local context = character_state_init_context
-
-	return 
 end
+
 local liberate_duration = 1.2
+
 PlayerCharacterStatePouncedDown.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	CharacterStateHelper.stop_weapon_actions(self.inventory_extension, "pounced")
 
@@ -24,9 +25,8 @@ PlayerCharacterStatePouncedDown.on_enter = function (self, unit, input, dt, cont
 	CharacterStateHelper.play_animation_event(pouncer_unit, "jump_attack")
 	CharacterStateHelper.play_animation_event(unit, "jump_attack")
 	self.inventory_extension:check_and_drop_pickups("pounced_down")
-
-	return 
 end
+
 PlayerCharacterStatePouncedDown.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local first_person_extension = self.first_person_extension
 	self.liberated = nil
@@ -48,17 +48,15 @@ PlayerCharacterStatePouncedDown.on_exit = function (self, unit, input, dt, conte
 
 		CharacterStateHelper.show_inventory_3p(unit, true, include_local_player, self.is_server, self.inventory_extension)
 	end
-
-	return 
 end
+
 PlayerCharacterStatePouncedDown.set_free = function (self, t, unit)
 	self.liberated = true
 	self.liberation_time = t + liberate_duration
 
 	CharacterStateHelper.play_animation_event(unit, "jump_attack_stand_up")
-
-	return 
 end
+
 PlayerCharacterStatePouncedDown.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -69,7 +67,7 @@ PlayerCharacterStatePouncedDown.update = function (self, unit, input, dt, contex
 	if CharacterStateHelper.is_dead(status_extension) then
 		csm.change_state(csm, "dead")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_knocked_down(status_extension) then
@@ -77,7 +75,7 @@ PlayerCharacterStatePouncedDown.update = function (self, unit, input, dt, contex
 
 		csm.change_state(csm, "knocked_down", self.temp_params)
 
-		return 
+		return
 	end
 
 	if self.liberated then
@@ -85,7 +83,7 @@ PlayerCharacterStatePouncedDown.update = function (self, unit, input, dt, contex
 			csm.change_state(csm, "standing")
 		end
 
-		return 
+		return
 	end
 
 	if not CharacterStateHelper.is_pounced_down(status_extension) then
@@ -94,8 +92,6 @@ PlayerCharacterStatePouncedDown.update = function (self, unit, input, dt, contex
 
 	self.locomotion_extension:set_disable_rotation_update()
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, self.first_person_extension, status_extension, self.inventory_extension)
-
-	return 
 end
 
-return 
+return

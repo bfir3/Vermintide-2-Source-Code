@@ -22,12 +22,13 @@ local function get_fall_animation(unit, blackboard)
 end
 
 BTFallAction = class(BTFallAction, BTNode)
+
 BTFallAction.init = function (self, ...)
 	BTFallAction.super.init(self, ...)
-
-	return 
 end
+
 BTFallAction.name = "BTFallAction"
+
 BTFallAction.enter = function (self, unit, blackboard, t)
 	local fall_animation = get_fall_animation(unit, blackboard)
 
@@ -51,9 +52,8 @@ BTFallAction.enter = function (self, unit, blackboard, t)
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "falling", event_data)
-
-	return 
 end
+
 BTFallAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	LocomotionUtils.set_animation_driven_movement(unit, false)
 
@@ -68,9 +68,8 @@ BTFallAction.leave = function (self, unit, blackboard, t, reason, destroy)
 
 	blackboard.jump_climb_finished = nil
 	blackboard.fall_state = nil
-
-	return 
 end
+
 BTFallAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.fall_state == "waiting_to_stop_freefall" then
 		local is_in_freefall = blackboard.locomotion_extension:is_falling()
@@ -120,4 +119,4 @@ BTFallAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

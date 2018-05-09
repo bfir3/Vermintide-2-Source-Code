@@ -10,6 +10,7 @@ local generic_input_actions = definitions.generic_input_actions
 local DO_RELOAD = false
 HeroWindowTalents = class(HeroWindowTalents)
 HeroWindowTalents.NAME = "HeroWindowTalents"
+
 HeroWindowTalents.on_enter = function (self, params, offset)
 	print("[HeroViewWindow] Enter Substate HeroWindowTalents")
 
@@ -40,9 +41,8 @@ HeroWindowTalents.on_enter = function (self, params, offset)
 	self.hero_level = ExperienceSettings.get_level(experience)
 
 	self._initialize_talents(self)
-
-	return 
 end
+
 HeroWindowTalents.on_exit = function (self, params)
 	print("[HeroViewWindow] Exit Substate HeroWindowTalents")
 
@@ -64,9 +64,8 @@ HeroWindowTalents.on_exit = function (self, params)
 
 		inventory_extension.apply_buffs_to_ammo(inventory_extension)
 	end
-
-	return 
 end
+
 HeroWindowTalents.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -95,9 +94,8 @@ HeroWindowTalents.create_ui_elements = function (self, params, offset)
 		window_position[2] = window_position[2] + offset[2]
 		window_position[3] = window_position[3] + offset[3]
 	end
-
-	return 
 end
+
 HeroWindowTalents._initialize_talents = function (self)
 	local career_name = self._career_name
 	local talent_interface = Managers.backend:get_interface("talents")
@@ -108,9 +106,8 @@ HeroWindowTalents._initialize_talents = function (self)
 	self._update_talent_sync(self, true)
 
 	self._initialized = true
-
-	return 
 end
+
 HeroWindowTalents.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -121,18 +118,17 @@ HeroWindowTalents.update = function (self, dt, t)
 	self._update_animations(self, dt)
 	self._handle_input(self, dt, t)
 	self.draw(self, dt)
+end
 
-	return 
-end
 HeroWindowTalents.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 HeroWindowTalents._update_talent_sync = function (self, initialize)
 	self._populate_talents_by_hero(self, initialize)
 	self._populate_career_info(self, initialize)
-
-	return 
 end
+
 HeroWindowTalents._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -146,9 +142,8 @@ HeroWindowTalents._update_animations = function (self, dt)
 			animations[animation_name] = nil
 		end
 	end
-
-	return 
 end
+
 HeroWindowTalents._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -158,9 +153,8 @@ HeroWindowTalents._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroWindowTalents._is_button_released = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -170,9 +164,8 @@ HeroWindowTalents._is_button_released = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroWindowTalents._is_stepper_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot_left = content.button_hotspot_left
@@ -187,15 +180,15 @@ HeroWindowTalents._is_stepper_button_pressed = function (self, widget)
 
 		return true, 1
 	end
-
-	return 
 end
+
 HeroWindowTalents._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter and not hotspot.is_selected
 end
+
 HeroWindowTalents._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local widgets_by_name = self._widgets_by_name
@@ -226,9 +219,8 @@ HeroWindowTalents._handle_input = function (self, dt, t)
 		self._update_talent_sync(self)
 		parent.update_talent_sync(parent)
 	end
-
-	return 
 end
+
 HeroWindowTalents.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -255,14 +247,12 @@ HeroWindowTalents.draw = function (self, dt)
 	if gamepad_active then
 		self._menu_input_description:draw(ui_top_renderer, dt)
 	end
-
-	return 
 end
+
 HeroWindowTalents._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroWindowTalents._get_text_height = function (self, ui_renderer, size, ui_style, text, ui_style_global)
 	local widget_scale = nil
 
@@ -302,6 +292,7 @@ HeroWindowTalents._get_text_height = function (self, ui_renderer, size, ui_style
 
 	return full_font_height
 end
+
 HeroWindowTalents._populate_talents_by_hero = function (self, initialize)
 	self._clear_talents(self)
 
@@ -378,9 +369,8 @@ HeroWindowTalents._populate_talents_by_hero = function (self, initialize)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroWindowTalents._clear_talents = function (self)
 	local widgets_by_name = self._widgets_by_name
 
@@ -400,9 +390,8 @@ HeroWindowTalents._clear_talents = function (self)
 			content[hotspot_name].disabled = true
 		end
 	end
-
-	return 
 end
+
 HeroWindowTalents._is_talent_pressed = function (self)
 	local widgets_by_name = self._widgets_by_name
 
@@ -420,9 +409,8 @@ HeroWindowTalents._is_talent_pressed = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroWindowTalents._is_talent_hovered = function (self)
 	local widgets_by_name = self._widgets_by_name
 
@@ -440,9 +428,8 @@ HeroWindowTalents._is_talent_hovered = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroWindowTalents._is_disabled_talent_hovered = function (self)
 	local widgets_by_name = self._widgets_by_name
 
@@ -460,9 +447,8 @@ HeroWindowTalents._is_disabled_talent_hovered = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroWindowTalents._populate_career_info = function (self, initialize)
 	local hero_name = self.hero_name
 	local career_index = self.career_index
@@ -503,13 +489,12 @@ HeroWindowTalents._populate_career_info = function (self, initialize)
 		widget.content.text = Localize(display_name)
 		widget.content.tooltip_data = data
 	end
-
-	return 
 end
+
 HeroWindowTalents._animate_pulse = function (self, target, target_index, from, to, speed)
 	local new_animation = UIAnimation.init(UIAnimation.pulse_animation, target, target_index, from, to, speed)
 
 	return new_animation
 end
 
-return 
+return

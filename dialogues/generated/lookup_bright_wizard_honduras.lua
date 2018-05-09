@@ -305,4 +305,4 @@ DialogueLookup[DialogueLookup_n + 151] = "pbw_gameplay_seeing_a_stormfiend"
 DialogueLookup[DialogueLookup_n + 152] = "pbw_gameplay_seeing_a_troll"
 DialogueLookup_n = DialogueLookup_n + 152
 
-return 
+return

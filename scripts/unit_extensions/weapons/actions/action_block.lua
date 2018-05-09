@@ -1,4 +1,5 @@
 ActionBlock = class(ActionBlock)
+
 ActionBlock.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.world = world
 	self.owner_unit = owner_unit
@@ -9,9 +10,8 @@ ActionBlock.init = function (self, world, item_name, is_server, owner_unit, dama
 	self._blocked_flag = false
 	self._blocked_time = 0
 	self._status_extension = ScriptUnit.extension(owner_unit, "status_system")
-
-	return 
 end
+
 ActionBlock.client_owner_start_action = function (self, new_action, t)
 	self.current_action = new_action
 	self.action_time_started = t
@@ -37,9 +37,8 @@ ActionBlock.client_owner_start_action = function (self, new_action, t)
 	status_extension.set_blocking(status_extension, true)
 
 	status_extension.timed_block = t + 0.5
-
-	return 
 end
+
 ActionBlock.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local status_extension = self._status_extension
 
@@ -49,9 +48,8 @@ ActionBlock.client_owner_post_update = function (self, dt, t, world, can_damage)
 
 		status_extension.set_has_blocked(status_extension, false)
 	end
-
-	return 
 end
+
 ActionBlock.finish = function (self, reason)
 	local owner_unit = self.owner_unit
 	local go_id = Managers.state.unit_storage:go_id(owner_unit)
@@ -69,9 +67,8 @@ ActionBlock.finish = function (self, reason)
 
 	status_extension.set_blocking(status_extension, false)
 	status_extension.set_has_blocked(status_extension, false)
-
-	return 
 end
+
 ActionBlock.streak_available = function (self, t, streak_action)
 	local relative_start = streak_action and streak_action.relative_start_time
 	local relative_end = streak_action and streak_action.relative_end_time
@@ -94,4 +91,4 @@ ActionBlock.streak_available = function (self, t, streak_action)
 	return false
 end
 
-return 
+return

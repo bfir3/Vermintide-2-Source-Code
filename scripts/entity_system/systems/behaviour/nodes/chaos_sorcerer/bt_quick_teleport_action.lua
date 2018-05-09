@@ -1,11 +1,11 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTQuickTeleportAction = class(BTQuickTeleportAction, BTNode)
+
 BTQuickTeleportAction.init = function (self, ...)
 	BTQuickTeleportAction.super.init(self, ...)
-
-	return 
 end
+
 BTQuickTeleportAction.name = "BTQuickTeleportAction"
 local player_and_bot_units = PLAYER_AND_BOT_UNITS
 
@@ -15,8 +15,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTQuickTeleportAction.enter = function (self, unit, blackboard, t)
@@ -36,9 +34,8 @@ BTQuickTeleportAction.enter = function (self, unit, blackboard, t)
 	if action.push_close_players then
 		blackboard.hit_units = {}
 	end
-
-	return 
 end
+
 BTQuickTeleportAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.quick_teleport_exit_pos = nil
 	blackboard.quick_teleport_entrance_pos = nil
@@ -53,9 +50,8 @@ BTQuickTeleportAction.leave = function (self, unit, blackboard, t, reason, destr
 	if blackboard.action.push_close_players then
 		blackboard.hit_units = nil
 	end
-
-	return 
 end
+
 BTQuickTeleportAction.run = function (self, unit, blackboard, t, dt)
 	if not blackboard.quick_teleport then
 		return "done"
@@ -63,6 +59,7 @@ BTQuickTeleportAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTQuickTeleportAction.play_teleport_effect = function (self, unit, blackboard, start_position, end_position)
 	local action = blackboard.action
 	local effect_name_id = NetworkLookup.effects[action.teleport_effect]
@@ -90,9 +87,8 @@ BTQuickTeleportAction.play_teleport_effect = function (self, unit, blackboard, s
 	if breed.teleport_sound_event then
 		audio_system_extension.play_audio_unit_event(audio_system_extension, breed.teleport_sound_event, unit)
 	end
-
-	return 
 end
+
 BTQuickTeleportAction.anim_cb_teleport_start_finished = function (self, unit, blackboard)
 	local entrance_position = blackboard.quick_teleport_entrance_pos:unbox()
 	local teleport_position = nil
@@ -135,14 +131,12 @@ BTQuickTeleportAction.anim_cb_teleport_start_finished = function (self, unit, bl
 	if blackboard.action.teleport_end_anim then
 		Managers.state.network:anim_event(unit, blackboard.action.teleport_end_anim)
 	end
-
-	return 
 end
+
 BTQuickTeleportAction.anim_cb_teleport_end_finished = function (self, unit, blackboard)
 	blackboard.quick_teleport = false
-
-	return 
 end
+
 BTQuickTeleportAction.push_close_players = function (self, unit, blackboard, position, target_unit)
 	local action = blackboard.action
 	local radius = action.radius
@@ -171,8 +165,6 @@ BTQuickTeleportAction.push_close_players = function (self, unit, blackboard, pos
 
 		hit_units[target_unit] = true
 	end
-
-	return 
 end
 
-return 
+return

@@ -11,4 +11,4 @@ TelemetrySettings = {
 	use_session_survey = Development.parameter("use-session-survey")
 }
 
-return 
+return

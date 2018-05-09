@@ -1,6 +1,7 @@
 BTConditions.can_activate = BTConditions.can_activate or {}
 local unit_alive = Unit.alive
 local ScriptUnit = ScriptUnit
+
 BTConditions.can_activate.dr_ironbreaker = function (blackboard)
 	local self_unit = blackboard.unit
 	local self_position = POSITION_LOOKUP[self_unit]
@@ -29,6 +30,7 @@ BTConditions.can_activate.dr_ironbreaker = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.dr_slayer = function (blackboard)
 	local locomotion_extension = blackboard.locomotion_extension
 	local is_on_ground = locomotion_extension.is_on_ground(locomotion_extension)
@@ -77,6 +79,7 @@ BTConditions.can_activate.dr_slayer = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.dr_ranger = function (blackboard)
 	local self_unit = blackboard.unit
 	local target_ally_unit = blackboard.target_ally_unit
@@ -112,6 +115,7 @@ BTConditions.can_activate.dr_ranger = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.es_mercenary = function (blackboard)
 	local self_unit = blackboard.unit
 	local self_position = POSITION_LOOKUP[self_unit]
@@ -167,6 +171,7 @@ BTConditions.can_activate.es_mercenary = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.es_huntsman = function (blackboard)
 	local proximite_enemies = blackboard.proximite_enemies
 	local num_proximite_enemies = #proximite_enemies
@@ -199,6 +204,7 @@ BTConditions.can_activate.es_huntsman = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.es_knight = function (blackboard)
 	local self_unit = blackboard.unit
 	local self_position = POSITION_LOOKUP[self_unit]
@@ -241,6 +247,7 @@ BTConditions.can_activate.es_knight = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.we_waywatcher = function (blackboard, can_use_ranged_shot_ability)
 	if not can_use_ranged_shot_ability then
 		return false
@@ -264,9 +271,8 @@ BTConditions.can_activate.we_waywatcher = function (blackboard, can_use_ranged_s
 	else
 		return false
 	end
-
-	return 
 end
+
 BTConditions.can_activate.we_maidenguard = function (blackboard)
 	local self_unit = blackboard.unit
 	local self_position = POSITION_LOOKUP[self_unit]
@@ -309,6 +315,7 @@ BTConditions.can_activate.we_maidenguard = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.we_shade = function (blackboard)
 	local proximite_enemies = blackboard.proximite_enemies
 	local num_proximite_enemies = #proximite_enemies
@@ -341,6 +348,7 @@ BTConditions.can_activate.we_shade = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.wh_captain = function (blackboard)
 	local self_unit = blackboard.unit
 	local self_position = POSITION_LOOKUP[self_unit]
@@ -397,6 +405,7 @@ BTConditions.can_activate.wh_captain = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.wh_bountyhunter = function (blackboard, can_use_ranged_shot_ability)
 	if not can_use_ranged_shot_ability then
 		return false
@@ -420,9 +429,8 @@ BTConditions.can_activate.wh_bountyhunter = function (blackboard, can_use_ranged
 	else
 		return false
 	end
-
-	return 
 end
+
 BTConditions.can_activate.wh_zealot = function (blackboard)
 	local self_unit = blackboard.unit
 	local self_position = POSITION_LOOKUP[self_unit]
@@ -464,6 +472,7 @@ BTConditions.can_activate.wh_zealot = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.bw_adept = function (blackboard)
 	local self_unit = blackboard.unit
 	local self_position = POSITION_LOOKUP[self_unit]
@@ -505,6 +514,7 @@ BTConditions.can_activate.bw_adept = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate.bw_scholar = function (blackboard, can_use_ranged_shot_ability)
 	if not can_use_ranged_shot_ability then
 		return false
@@ -528,9 +538,8 @@ BTConditions.can_activate.bw_scholar = function (blackboard, can_use_ranged_shot
 	else
 		return false
 	end
-
-	return 
 end
+
 BTConditions.can_activate.bw_unchained = function (blackboard)
 	local overcharge_extension = blackboard.overcharge_extension
 	local is_above_critical_limit = overcharge_extension.is_above_critical_limit(overcharge_extension)
@@ -566,6 +575,7 @@ BTConditions.can_activate.bw_unchained = function (blackboard)
 
 	return false
 end
+
 BTConditions.can_activate_ability = function (blackboard, args)
 	local career_extension = blackboard.career_extension
 	local is_using_ability = blackboard.activate_ability_data.is_using_ability
@@ -580,12 +590,15 @@ BTConditions.can_activate_ability = function (blackboard, args)
 
 	return is_using_ability or (career_extension.can_use_activated_ability(career_extension) and condition_function and condition_function(blackboard, can_use_ranged_shot_ability))
 end
+
 BTConditions.is_disabled = function (blackboard)
 	return blackboard.is_knocked_down or blackboard.is_grabbed_by_pack_master or blackboard.is_pounced_down or blackboard.is_hanging_from_hook or blackboard.is_ledge_hanging or blackboard.is_grabbed_by_chaos_spawn
 end
+
 BTConditions.is_transported = function (blackboard)
 	return blackboard.is_transported
 end
+
 local PUSHED_COOLDOWN = 2
 local BLOCK_BROKEN_COOLDOWN = 4
 
@@ -608,8 +621,6 @@ local function is_safe_to_block_interact(status_extension, interaction_extension
 	else
 		return false
 	end
-
-	return 
 end
 
 local function is_there_threat_to_aid(self_unit, proximite_enemies, force_aid)
@@ -660,8 +671,6 @@ local function has_reached_ally_aid_destination(self_position, blackboard)
 
 		return math.abs(offset.z) <= Z_MOVE_TO_EPSILON and Vector3.length_squared(Vector3.flat(offset)) <= FLAT_MOVE_TO_EPSILON_SQ
 	end
-
-	return 
 end
 
 BTConditions.can_revive = function (blackboard)
@@ -696,9 +705,8 @@ BTConditions.can_revive = function (blackboard)
 			return true
 		end
 	end
-
-	return 
 end
+
 BTConditions.can_heal_player = function (blackboard)
 	local target_ally_unit = blackboard.target_ally_unit
 
@@ -727,9 +735,8 @@ BTConditions.can_heal_player = function (blackboard)
 			return true
 		end
 	end
-
-	return 
 end
+
 BTConditions.can_help_in_need_player = function (blackboard, args)
 	local need_type = args[1]
 	local target_ally_unit = blackboard.target_ally_unit
@@ -748,9 +755,8 @@ BTConditions.can_help_in_need_player = function (blackboard, args)
 			return true
 		end
 	end
-
-	return 
 end
+
 BTConditions.can_rescue_hanging_from_hook = function (blackboard)
 	local target_ally_unit = blackboard.target_ally_unit
 
@@ -773,9 +779,8 @@ BTConditions.can_rescue_hanging_from_hook = function (blackboard)
 			return true
 		end
 	end
-
-	return 
 end
+
 BTConditions.can_rescue_ledge_hanging = function (blackboard)
 	local target_ally_unit = blackboard.target_ally_unit
 
@@ -798,9 +803,8 @@ BTConditions.can_rescue_ledge_hanging = function (blackboard)
 			return true
 		end
 	end
-
-	return 
 end
+
 BTConditions.can_loot = function (blackboard)
 	local play_go_system = Managers.state.entity:system("play_go_tutorial_system")
 
@@ -812,6 +816,7 @@ BTConditions.can_loot = function (blackboard)
 
 	return (blackboard.health_pickup and blackboard.allowed_to_take_health_pickup and blackboard.health_dist < max_dist and blackboard.health_pickup == blackboard.interaction_unit) or (blackboard.ammo_pickup and blackboard.needs_ammo and blackboard.ammo_dist < max_dist and blackboard.ammo_pickup == blackboard.interaction_unit) or (blackboard.mule_pickup and blackboard.mule_pickup == blackboard.interaction_unit and blackboard.mule_pickup_dist_squared < max_dist * max_dist)
 end
+
 BTConditions.bot_should_heal = function (blackboard)
 	local self_unit = blackboard.unit
 	local inventory_ext = blackboard.inventory_extension
@@ -833,6 +838,7 @@ BTConditions.bot_should_heal = function (blackboard)
 
 	return is_safe and (hurt or blackboard.force_use_health_pickup or wounded)
 end
+
 BTConditions.is_slot_not_wielded = function (blackboard, args)
 	local wielded_slot = blackboard.inventory_extension:equipment().wielded_slot
 	local wanted_slot = args[1]
@@ -843,9 +849,8 @@ BTConditions.is_slot_not_wielded = function (blackboard, args)
 	else
 		return wielded_slot ~= wanted_slot
 	end
-
-	return 
 end
+
 BTConditions.has_priority_or_opportunity_target = function (blackboard)
 	local target = blackboard.target_unit
 
@@ -858,9 +863,11 @@ BTConditions.has_priority_or_opportunity_target = function (blackboard)
 
 	return result
 end
+
 BTConditions.ally_within_range_or_solo = function (blackboard)
 	return not unit_alive(blackboard.target_ally_unit) or blackboard.ally_distance < 40
 end
+
 BTConditions.bot_in_melee_range = function (blackboard)
 	local target_unit = blackboard.target_unit
 
@@ -904,6 +911,7 @@ BTConditions.bot_in_melee_range = function (blackboard)
 
 	return in_range and -1.5 < z_offset and z_offset < 2
 end
+
 BTConditions.has_target_and_ammo_greater_than = function (blackboard, args)
 	local target_unit = blackboard.target_unit
 
@@ -933,6 +941,7 @@ BTConditions.has_target_and_ammo_greater_than = function (blackboard, args)
 
 	return ammo_ok and overcharge_ok and not obstructed
 end
+
 BTConditions.should_vent_overcharge = function (blackboard, args)
 	local overcharge_extension = blackboard.overcharge_extension
 	local overcharge_limit_type = args.overcharge_limit_type
@@ -954,6 +963,7 @@ BTConditions.should_vent_overcharge = function (blackboard, args)
 
 	return should_vent
 end
+
 BTConditions.can_open_door = function (blackboard)
 	local can_interact = false
 
@@ -968,11 +978,13 @@ BTConditions.can_open_door = function (blackboard)
 
 	return can_interact
 end
+
 BTConditions.bot_at_breakable = function (blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
 	return navigation_extension.is_in_transition(navigation_extension) and navigation_extension.transition_type(navigation_extension) == "planks"
 end
+
 BTConditions.cant_reach_ally = function (blackboard)
 	local follow_unit = blackboard.ai_bot_group_extension.data.follow_unit
 
@@ -1009,6 +1021,7 @@ BTConditions.cant_reach_ally = function (blackboard)
 
 	return blackboard.moving_toward_follow_position and (((disable_bot_main_path_teleport_check or is_forwards) and 1) or 5) < fails and 5 < t - last_success and not blackboard.has_teleported
 end
+
 BTConditions.can_teleport = function (blackboard)
 	local follow_unit = blackboard.ai_bot_group_extension.data.follow_unit
 
@@ -1033,4 +1046,4 @@ BTConditions.can_teleport = function (blackboard)
 	return true
 end
 
-return 
+return

@@ -35,4 +35,4 @@ BackendSettings.stage_xbone = {
 	allow_local = local_backend_available
 }
 
-return 
+return

@@ -67,13 +67,13 @@ LightFXConditionalSettings = {
 			local game = Managers.state.network and Managers.state.network:game()
 
 			if not game then
-				return 
+				return
 			end
 
 			local player = Managers.player:local_player()
 
 			if not player then
-				return 
+				return
 			end
 
 			local unit = player.player_unit
@@ -87,13 +87,9 @@ LightFXConditionalSettings = {
 			else
 				return true
 			end
-
-			return 
 		end,
 		update_func = function (dt, t, v)
 			Managers.light_fx:set_lightfx_color(v[1], v[2], v[3], v[4], v[5])
-
-			return 
 		end
 	},
 	{
@@ -133,8 +129,6 @@ LightFXConditionalSettings = {
 		end,
 		update_func = function (dt, t, v)
 			Managers.light_fx:set_lightfx_color(v[1], v[2], v[3], v[4], v[5])
-
-			return 
 		end
 	}
 }
@@ -161,4 +155,4 @@ function percent_to_rgb(percent)
 	return r, g, b
 end
 
-return 
+return

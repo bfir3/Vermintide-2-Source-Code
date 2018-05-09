@@ -84,4 +84,4 @@ function from_base64(to_decode)
 	return decoded
 end
 
-return 
+return

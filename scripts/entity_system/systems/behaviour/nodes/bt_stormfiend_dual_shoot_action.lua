@@ -1,15 +1,16 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTStormfiendDualShootAction = class(BTStormfiendDualShootAction, BTNode)
+
 BTStormfiendDualShootAction.init = function (self, ...)
 	BTStormfiendDualShootAction.super.init(self, ...)
-
-	return 
 end
+
 BTStormfiendDualShootAction.name = "BTStormfiendDualShootAction"
 local SPHERE_CAST_RADIUS = 0.4
 local SPHERE_CAST_MAX_NUM_HITS = 10
 local unit_alive = Unit.alive
+
 BTStormfiendDualShootAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local world = blackboard.world
@@ -35,9 +36,8 @@ BTStormfiendDualShootAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.navigation_extension:set_enabled(false)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
-
-	return 
 end
+
 BTStormfiendDualShootAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.navigation_extension:set_enabled(true)
 
@@ -54,9 +54,8 @@ BTStormfiendDualShootAction.leave = function (self, unit, blackboard, t, reason,
 	blackboard.create_bot_threat_at_t = nil
 	blackboard.bot_threat_range = nil
 	blackboard.shoot_sfx_id = nil
-
-	return 
 end
+
 BTStormfiendDualShootAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.attack_aborted or not unit_alive(blackboard.target_unit) then
 		return "failed"
@@ -110,9 +109,8 @@ BTStormfiendDualShootAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "done"
 	end
-
-	return 
 end
+
 BTStormfiendDualShootAction.create_firewall = function (self, unit, data)
 	local start_pos = data.firewall_start_position:unbox()
 	local direction = data.direction:unbox()
@@ -128,9 +126,8 @@ BTStormfiendDualShootAction.create_firewall = function (self, unit, data)
 	local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 
 	liquid_area_damage_extension.ready(liquid_area_damage_extension)
-
-	return 
 end
+
 BTStormfiendDualShootAction.shoot_hit_check = function (self, unit, blackboard)
 	local action = blackboard.action
 	local data = blackboard.shoot_data
@@ -193,9 +190,8 @@ BTStormfiendDualShootAction.shoot_hit_check = function (self, unit, blackboard)
 	end
 
 	self._debug_fire_beam(self, stormfiend_arm_pos, aim_position, true, debug_hit_index, result, "immediate")
-
-	return 
 end
+
 BTStormfiendDualShootAction._stop_beam_sfx = function (self, unit, blackboard, shoot_data)
 	local action = blackboard.action
 	local attack_arm = shoot_data.attack_arm
@@ -204,9 +200,8 @@ BTStormfiendDualShootAction._stop_beam_sfx = function (self, unit, blackboard, s
 	local audio_system = Managers.state.entity:system("audio_system")
 
 	audio_system.play_audio_unit_event(audio_system, event, unit, node_name)
-
-	return 
 end
+
 BTStormfiendDualShootAction._fire_from_position_direction = function (self, unit, blackboard, data, dt, muzzle_node_name)
 	local action = blackboard.action
 	local muzzle_node = Unit.node(unit, muzzle_node_name)
@@ -227,6 +222,7 @@ BTStormfiendDualShootAction._fire_from_position_direction = function (self, unit
 
 	return fire_pos, direction
 end
+
 BTStormfiendDualShootAction._update_ratling_gun = function (self, unit, blackboard, t, dt)
 	local data = blackboard.shoot_data
 	local time_in_shoot_action = t - data.shoot_start
@@ -247,9 +243,8 @@ BTStormfiendDualShootAction._update_ratling_gun = function (self, unit, blackboa
 		blackboard.shoot_sfx_id_1 = WwiseUtils.trigger_unit_event(blackboard.world, action.shoot_sfx, unit, Unit.node(unit, "fx_left_muzzle"))
 		blackboard.shoot_sfx_id_2 = WwiseUtils.trigger_unit_event(blackboard.world, action.shoot_sfx, unit, Unit.node(unit, "fx_right_muzzle"))
 	end
-
-	return 
 end
+
 BTStormfiendDualShootAction._shoot_ratling_gun = function (self, unit, blackboard, t, dt, muzzle_node_name)
 	local action = blackboard.action
 	local two_pi = math.pi * 2
@@ -281,9 +276,8 @@ BTStormfiendDualShootAction._shoot_ratling_gun = function (self, unit, blackboar
 	local projectile_system = Managers.state.entity:system("projectile_system")
 
 	projectile_system.create_light_weight_projectile(projectile_system, Unit.get_data(unit, "breed").name, unit, from_position, spread_direction, action.projectile_speed, action.projectile_max_range, collision_filter, action_data, action.light_weight_projectile_particle_effect)
-
-	return 
 end
+
 BTStormfiendDualShootAction.anim_cb_attack_fire = function (self, unit, blackboard)
 	if Managers.state.network:game() then
 		local action = blackboard.action
@@ -316,13 +310,10 @@ BTStormfiendDualShootAction.anim_cb_attack_fire = function (self, unit, blackboa
 		data.is_firing = true
 		data.stop_firing_t = t + action.firing_time
 	end
-
-	return 
 end
+
 BTStormfiendDualShootAction.anim_cb_attack_start = function (self, unit, blackboard)
 	data.attack_started = true
-
-	return 
 end
 
-return 
+return

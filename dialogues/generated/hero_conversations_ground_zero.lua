@@ -3002,6 +3002,4 @@ return function ()
 			}
 		}
 	})
-
-	return 
 end

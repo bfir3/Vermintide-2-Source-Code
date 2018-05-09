@@ -1,6 +1,7 @@
 require("core/gwnav/lua/safe_require")
 
 local NavClass = safe_require_guard()
+
 NavClass.NavClass = function (class, super)
 	class = class or {}
 

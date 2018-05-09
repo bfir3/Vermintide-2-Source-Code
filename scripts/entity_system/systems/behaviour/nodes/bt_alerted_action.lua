@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTAlertedAction = class(BTAlertedAction, BTNode)
+
 BTAlertedAction.init = function (self, ...)
 	BTAlertedAction.super.init(self, ...)
-
-	return 
 end
+
 BTAlertedAction.name = "BTAlertedAction"
+
 BTAlertedAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -28,9 +29,8 @@ BTAlertedAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.in_alerted_state = true
 	blackboard.move_state = "idle"
-
-	return 
 end
+
 BTAlertedAction.init_alerted = function (self, unit, blackboard, t)
 	local network_manager = Managers.state.network
 	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
@@ -85,6 +85,7 @@ BTAlertedAction.init_alerted = function (self, unit, blackboard, t)
 
 	return true
 end
+
 BTAlertedAction.decide_deadline = function (self, unit, blackboard, t)
 	local target_unit = blackboard.target_unit
 	local current_pos = POSITION_LOOKUP[unit]
@@ -106,9 +107,8 @@ BTAlertedAction.decide_deadline = function (self, unit, blackboard, t)
 	end
 
 	blackboard.alerted_action.deadline = time_alerted + t
-
-	return 
 end
+
 BTAlertedAction.should_hesitate = function (self, unit, blackboard, action)
 	if action.no_hesitation then
 		blackboard.no_hesitation = true
@@ -135,9 +135,8 @@ BTAlertedAction.should_hesitate = function (self, unit, blackboard, action)
 			blackboard.no_hesitation = true
 		end
 	end
-
-	return 
 end
+
 BTAlertedAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local network_manager = Managers.state.network
 
@@ -196,8 +195,6 @@ BTAlertedAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if not blackboard.confirmed_player_sighting then
 		Managers.state.network:anim_event(unit, "to_passive")
 	end
-
-	return 
 end
 
 local function contains(wanted_event, event)
@@ -206,8 +203,6 @@ local function contains(wanted_event, event)
 	else
 		return wanted_event == event
 	end
-
-	return 
 end
 
 BTAlertedAction.check_if_should_start_moving = function (self, unit, blackboard)
@@ -257,9 +252,8 @@ BTAlertedAction.check_if_should_start_moving = function (self, unit, blackboard)
 			LocomotionUtils.set_animation_rotation_scale(unit, rot_scale)
 		end
 	end
-
-	return 
 end
+
 BTAlertedAction.run = function (self, unit, blackboard, t, dt)
 	local action = blackboard.action
 	local target_unit = blackboard.target_unit
@@ -329,8 +323,6 @@ BTAlertedAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "running"
 	end
-
-	return 
 end
 
-return 
+return

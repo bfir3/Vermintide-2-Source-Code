@@ -277,4 +277,4 @@ Weapons = Weapons or {}
 Weapons.staff_slam_geiser_template_1 = table.clone(weapon_template)
 Weapons.staff_slam_geiser_template_1_t2 = table.clone(weapon_template)
 
-return 
+return

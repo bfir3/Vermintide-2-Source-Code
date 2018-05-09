@@ -31,4 +31,4 @@ function RandomTable_get_05_to_05(seed)
 	return RandomTable_05_05[index]
 end
 
-return 
+return

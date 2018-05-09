@@ -1,4 +1,5 @@
 ActionShotgun = class(ActionShotgun)
+
 ActionShotgun.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.weapon_system = weapon_system
 	self.owner_unit = owner_unit
@@ -17,9 +18,8 @@ ActionShotgun.init = function (self, world, item_name, is_server, owner_unit, da
 	self.is_server = is_server
 	self._is_critical_strike = false
 	self.start_gaze_rotation = QuaternionBox()
-
-	return 
 end
+
 ActionShotgun.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level)
 	self.current_action = new_action
 	self.state = "waiting_to_shoot"
@@ -67,9 +67,8 @@ ActionShotgun.client_owner_start_action = function (self, new_action, t, chain_a
 			self.start_gaze_rotation:store(eyetracking_extension.gaze_rotation(eyetracking_extension))
 		end
 	end
-
-	return 
 end
+
 ActionShotgun.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local owner_unit = self.owner_unit
 	local current_action = self.current_action
@@ -203,9 +202,8 @@ ActionShotgun.client_owner_post_update = function (self, dt, t, world, can_damag
 			input_extension.add_buffer(input_extension, "weapon_reload", 0)
 		end
 	end
-
-	return 
 end
+
 ActionShotgun.finish = function (self, reason)
 	local ammo_extension = self.ammo_extension
 	local current_action = self.current_action
@@ -225,8 +223,6 @@ ActionShotgun.finish = function (self, reason)
 	if hud_extension then
 		hud_extension.show_critical_indication = false
 	end
-
-	return 
 end
 
-return 
+return

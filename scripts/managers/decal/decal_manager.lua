@@ -1,13 +1,13 @@
 require("scripts/settings/decal_settings")
 
 DecalManager = class(DecalManager)
+
 DecalManager.init = function (self, world)
 	self._world = world
 
 	self._setup_decal_data(self)
-
-	return 
 end
+
 DecalManager._setup_decal_data = function (self)
 	self._decal_pools = {}
 	local decal_pools = self._decal_pools
@@ -17,9 +17,8 @@ DecalManager._setup_decal_data = function (self)
 	end
 
 	decal_pools.default = GrowQueue:new()
-
-	return 
 end
+
 DecalManager.add_projection_decal = function (self, effect_name, material, hit_unit, hit_actor, position, rotation, extents, normal, unit_rotation)
 	local world = self._world
 	local material_surface_decals = EffectHelper.create_surface_material_drawer_mapping(effect_name)
@@ -105,9 +104,8 @@ DecalManager.add_projection_decal = function (self, effect_name, material, hit_u
 	end
 
 	decal_pool.push_back(decal_pool, unit)
-
-	return 
 end
+
 DecalManager.update = function (self, dt, t)
 	local world = self._world
 	local unit_alive = Unit.alive
@@ -128,11 +126,10 @@ DecalManager.update = function (self, dt, t)
 			World.destroy_unit(world, unit)
 		end
 	end
-
-	return 
 end
+
 DecalManager.destroy = function (self)
-	return 
+	return
 end
 
-return 
+return

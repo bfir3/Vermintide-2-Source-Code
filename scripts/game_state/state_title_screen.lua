@@ -13,6 +13,7 @@ end
 
 StateTitleScreen = class(StateTitleScreen)
 StateTitleScreen.NAME = "StateTitleScreen"
+
 StateTitleScreen.on_enter = function (self, params)
 	print("[Gamestate] Enter StateTitleScreen")
 
@@ -87,9 +88,8 @@ StateTitleScreen.on_enter = function (self, params)
 	if Managers.backend and Managers.backend:item_script_type() == "tutorial" then
 		Managers.backend:stop_tutorial()
 	end
-
-	return 
 end
+
 StateTitleScreen._demo_hack_state_managers = function (self)
 	local STATE_TABLE = {}
 	local FUNCTION_TABLE = {}
@@ -123,9 +123,8 @@ StateTitleScreen._demo_hack_state_managers = function (self)
 
 	self._old_state_manager = Managers.state
 	Managers.state = STATE_TABLE
-
-	return 
 end
+
 StateTitleScreen._fade_out = function (self)
 	if self._platform == "xb1" then
 		if Managers.account:should_teardown_xboxlive() then
@@ -140,18 +139,16 @@ StateTitleScreen._fade_out = function (self)
 		Managers.transition:hide_loading_icon()
 		Managers.transition:fade_out(1)
 	end
-
-	return 
 end
+
 StateTitleScreen._setup_leak_prevention = function (self)
 	local assert_on_leak = true
 
 	GarbageLeakDetector.run_leak_detection(assert_on_leak)
 	GarbageLeakDetector.register_object(self, "StateTitleScreen")
 	VisualAssertLog.setup(self._world)
-
-	return 
 end
+
 StateTitleScreen._setup_world = function (self)
 	if not Managers.package:has_loaded("resource_packages/start_menu_splash", "StateSplashScreen") and not GameSettingsDevelopment.skip_start_screen then
 		Managers.package:load("resource_packages/start_menu_splash", "StateSplashScreen")
@@ -171,9 +168,8 @@ StateTitleScreen._setup_world = function (self)
 
 	Camera.set_vertical_fov(camera, (math.pi * 65) / 180)
 	Camera.set_far_range(camera, 5000)
-
-	return 
 end
+
 StateTitleScreen._init_input = function (self)
 	self._input_manager = InputManager:new()
 	local input_manager = self._input_manager
@@ -183,10 +179,10 @@ StateTitleScreen._init_input = function (self)
 	input_manager.initialize_device(input_manager, "mouse", 1)
 	input_manager.initialize_device(input_manager, "gamepad")
 	input_manager.create_input_service(input_manager, "Player", "PlayerControllerKeymaps", "PlayerControllerFilters")
-
-	return 
 end
+
 local DO_RELOAD = true
+
 StateTitleScreen._init_ui = function (self)
 	if not GameSettingsDevelopment.skip_start_screen then
 		if script_data.honduras_demo then
@@ -195,9 +191,8 @@ StateTitleScreen._init_ui = function (self)
 			self._title_start_ui = TitleMainUI:new(self._world)
 		end
 	end
-
-	return 
 end
+
 StateTitleScreen._setup_state_machine = function (self)
 	local loading_context = self.parent.loading_context
 
@@ -218,28 +213,24 @@ StateTitleScreen._setup_state_machine = function (self)
 			auto_start = self._auto_start
 		}, true)
 	end
-
-	return 
 end
+
 StateTitleScreen._init_popup_manager = function (self)
 	Managers.popup = PopupManager:new()
 
 	Managers.popup:set_input_manager(self._input_manager)
 
 	Managers.simple_popup = SimplePopup:new()
-
-	return 
 end
+
 StateTitleScreen._init_chat_manager = function (self)
 	Managers.chat = Managers.chat or ChatManager:new()
-
-	return 
 end
+
 StateTitleScreen._init_beta_overlay = function (self)
 	Managers.beta_overlay = BetaOverlay:new()
-
-	return 
 end
+
 StateTitleScreen.update = function (self, dt, t)
 	self._handle_delayed_fade_in(self)
 	Managers.input:update(dt, t)
@@ -269,11 +260,11 @@ StateTitleScreen.update = function (self, dt, t)
 
 	return self._next_state(self)
 end
+
 StateTitleScreen.post_update = function (self, dt, t)
 	self._machine:post_update(dt, t)
-
-	return 
 end
+
 StateTitleScreen._next_state = function (self)
 	if Managers.popup:has_popup() or Managers.account:user_detached() then
 		if Managers.account:leaving_game() then
@@ -281,7 +272,7 @@ StateTitleScreen._next_state = function (self)
 
 			Managers.popup:cancel_all_popups()
 		else
-			return 
+			return
 		end
 	elseif Managers.account:leaving_game() then
 		self.state = StateTitleScreen
@@ -295,6 +286,7 @@ StateTitleScreen._next_state = function (self)
 
 	return self.state
 end
+
 StateTitleScreen._handle_delayed_fade_in = function (self)
 	if self._platform == "xb1" and self._wait_for_xboxlive_teardown and not Managers.account:should_teardown_xboxlive() then
 		Managers.transition:hide_loading_icon()
@@ -302,12 +294,11 @@ StateTitleScreen._handle_delayed_fade_in = function (self)
 
 		self._wait_for_xboxlive_teardown = nil
 	end
-
-	return 
 end
+
 StateTitleScreen._update_play_go_progress = function (self, dt, t)
 	if self._is_installed then
-		return 
+		return
 	end
 
 	local installed = Managers.play_go:installed()
@@ -323,22 +314,20 @@ StateTitleScreen._update_play_go_progress = function (self, dt, t)
 
 		self._title_start_ui:set_playgo_status(progress_string)
 	end
-
-	return 
 end
+
 StateTitleScreen.enter_attract_mode = function (self, enter)
 	self._attract_mode_active = enter
+end
 
-	return 
-end
 StateTitleScreen._render = function (self, dt, render_only_background)
-	return 
+	return
 end
+
 StateTitleScreen.show_menu = function (self, show)
 	self._title_start_ui:show_menu(show)
-
-	return 
 end
+
 StateTitleScreen.on_exit = function (self, application_shutdown)
 	if PLATFORM == "win32" then
 		local max_fps = Application.user_setting("max_fps")
@@ -375,8 +364,6 @@ StateTitleScreen.on_exit = function (self, application_shutdown)
 
 	Managers.state:destroy()
 	Managers.music:trigger_event("Stop_menu_screen_music")
-
-	return 
 end
 
-return 
+return

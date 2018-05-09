@@ -3,11 +3,11 @@ require("scripts/helpers/mover_helper")
 PlayerUnitLocomotionExtension = class(PlayerUnitLocomotionExtension)
 IS_NEW_FRAME = false
 local POSITION_LOOKUP = POSITION_LOOKUP
+
 PlayerUnitLocomotionExtension.set_new_frame = function ()
 	IS_NEW_FRAME = true
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.is_server = Managers.player.is_server
@@ -60,9 +60,8 @@ PlayerUnitLocomotionExtension.init = function (self, extension_init_context, uni
 		ladder = false,
 		enemy_noclip = false
 	}
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_mover_filter_property = function (self, property, bool)
 	local modes = self._mover_modes
 
@@ -83,10 +82,10 @@ PlayerUnitLocomotionExtension.set_mover_filter_property = function (self, proper
 	local mover = Unit.mover(self.unit)
 
 	Mover.set_collision_filter(mover, filter)
-
-	return 
 end
+
 local ALLOWED_MOVER_MOVE_DISTANCE = 1
+
 PlayerUnitLocomotionExtension.move_to_non_intersecting_position = function (self)
 	local unit = self.unit
 	local mover = Unit.mover(unit)
@@ -96,9 +95,8 @@ PlayerUnitLocomotionExtension.move_to_non_intersecting_position = function (self
 		Mover.set_position(mover, new_position)
 		Unit.set_local_position(unit, 0, new_position)
 	end
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.destroy = function (self)
 	if self.is_server then
 		GwNavCostMap.destroy_tag_cost_table(self._nav_cost_map_cost_table)
@@ -109,9 +107,8 @@ PlayerUnitLocomotionExtension.destroy = function (self)
 	local system_data = self._system_data
 	system_data.all_disabled_units[unit] = nil
 	system_data.all_update_units[unit] = nil
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_on_moving_platform = function (self, platform_unit)
 	local level_unit_id = nil
 
@@ -131,20 +128,19 @@ PlayerUnitLocomotionExtension.set_on_moving_platform = function (self, platform_
 
 	GameSession.set_game_object_field(game, go_id, "moving_platform", level_unit_id)
 	self.sync_network_position(self, game, go_id)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.get_moving_platform = function (self)
 	return self._platform_unit, self._platform_extension
 end
+
 PlayerUnitLocomotionExtension.hot_join_sync = function (self, sender)
 	local unit = self.unit
 	local game_object_id = Managers.state.network:unit_game_object_id(unit)
 
 	RPC.rpc_sync_anim_state_3(sender, game_object_id, Unit.animation_get_state(unit))
-
-	return 
 end
+
 PlayerUnitLocomotionExtension._initialize_sample_velocities = function (self)
 	self._sample_velocity_index = 0
 	self._sample_velocity_time = Managers.time:time("game")
@@ -172,9 +168,8 @@ PlayerUnitLocomotionExtension._initialize_sample_velocities = function (self)
 		Vector3Box(0, 0, 0),
 		Vector3Box(0, 0, 0)
 	}
-
-	return 
 end
+
 PlayerUnitLocomotionExtension._stop = function (self, clear_average_velocity)
 	local zero = Vector3.zero()
 
@@ -188,25 +183,26 @@ PlayerUnitLocomotionExtension._stop = function (self, clear_average_velocity)
 			velocities[i]:store(zero)
 		end
 	end
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.average_velocity = function (self)
 	return self._average_velocity:unbox()
 end
+
 PlayerUnitLocomotionExtension.small_sample_size_average_velocity = function (self)
 	return self._small_sample_size_average_velocity:unbox()
 end
+
 PlayerUnitLocomotionExtension.extensions_ready = function (self)
 	self.first_person_extension = ScriptUnit.extension(self.unit, "first_person_system")
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.last_position_on_navmesh = function (self)
 	assert(self.is_server, "last position on nav mesh is only saved on server")
 
 	return self._latest_position_on_navmesh:unbox()
 end
+
 PlayerUnitLocomotionExtension.reset = function (self)
 	self.state = "script_driven"
 	self.velocity_wanted = Vector3Box(0, 0, 0)
@@ -217,9 +213,8 @@ PlayerUnitLocomotionExtension.reset = function (self)
 	self.speed_multiplier = nil
 	self.speed_multiplier_start_time = nil
 	self.speed_multiplier_duration = nil
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_disabled = function (self, disabled, run_func, master_unit, dont_update_position_on_exit)
 	self.disabled = disabled
 	self.run_func = run_func
@@ -247,19 +242,16 @@ PlayerUnitLocomotionExtension.set_disabled = function (self, disabled, run_func,
 			self.move_to_non_intersecting_position(self)
 		end
 	end
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_mover_disable_reason = function (self, reason, state)
 	MoverHelper.set_disable_reason(self.unit, self.mover_state, reason, state)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_active_mover = function (self, active_mover)
 	MoverHelper.set_active_mover(self.unit, self.mover_state, active_mover)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.post_update = function (self, unit, input, dt, context, t)
 	if self._platform_extension then
 		local delta = self._platform_extension:movement_delta()
@@ -270,9 +262,8 @@ PlayerUnitLocomotionExtension.post_update = function (self, unit, input, dt, con
 		Mover.set_position(mover, new_pos)
 		Unit.set_local_position(unit, 0, new_pos)
 	end
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.moving_on_slope = function (self, calculate_fall_velocity, unit, mover, final_position)
 	if self.is_bot then
 		self.allow_jump = true
@@ -301,7 +292,9 @@ PlayerUnitLocomotionExtension.moving_on_slope = function (self, calculate_fall_v
 
 	return on_slope and calculate_fall_velocity
 end
+
 local ai_units = {}
+
 PlayerUnitLocomotionExtension.update_script_driven_movement = function (self, unit, dt, t, calculate_fall_velocity)
 	if self._script_movement_time_scale then
 		dt = dt * self._script_movement_time_scale
@@ -451,9 +444,8 @@ PlayerUnitLocomotionExtension.update_script_driven_movement = function (self, un
 	end
 
 	self.velocity_current:store(final_velocity)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.update_animation_driven_movement = function (self, unit, dt, t)
 	local wanted_pose = Unit.animation_wanted_root_pose(unit)
 	local wanted_position = Matrix4x4.translation(wanted_pose)
@@ -483,9 +475,8 @@ PlayerUnitLocomotionExtension.update_animation_driven_movement = function (self,
 
 	self.velocity_network:store(velocity_new)
 	self.velocity_current:store(velocity_new)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.update_animation_driven_movement_no_mover = function (self, unit, dt, t)
 	local wanted_pose = Unit.animation_wanted_root_pose(unit)
 	local wanted_position = Matrix4x4.translation(wanted_pose)
@@ -497,9 +488,8 @@ PlayerUnitLocomotionExtension.update_animation_driven_movement_no_mover = functi
 
 	self.velocity_network:store(velocity_new)
 	self.velocity_current:store(velocity_new)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.update_animation_driven_movement_with_rotation_no_mover = function (self, unit, dt, t)
 	self.update_animation_driven_movement_no_mover(self, unit, dt, t)
 
@@ -507,9 +497,8 @@ PlayerUnitLocomotionExtension.update_animation_driven_movement_with_rotation_no_
 	local final_rotation = Matrix4x4.rotation(wanted_pose)
 
 	Unit.set_local_rotation(unit, 0, final_rotation)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.update_script_driven_ladder_transition_movement = function (self, unit, dt, t)
 	local wanted_pose = Unit.animation_wanted_root_pose(unit)
 	local animation_position = Matrix4x4.translation(wanted_pose)
@@ -530,9 +519,8 @@ PlayerUnitLocomotionExtension.update_script_driven_ladder_transition_movement = 
 	self.velocity_network:store(velocity)
 	self.velocity_current:store(velocity)
 	self.old_error:store(move_error)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.update_linked_movement = function (self, unit, dt, t)
 	local link_data = self.link_data
 	local link_unit = link_data.unit
@@ -546,9 +534,8 @@ PlayerUnitLocomotionExtension.update_linked_movement = function (self, unit, dt,
 
 	self.velocity_network:store(velocity)
 	self.velocity_current:store(velocity)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.update_script_driven_no_mover_movement = function (self, unit, dt, t)
 	local velocity = self.velocity_wanted:unbox()
 	local current_position = POSITION_LOOKUP[unit]
@@ -557,14 +544,12 @@ PlayerUnitLocomotionExtension.update_script_driven_no_mover_movement = function 
 	Unit.set_local_position(unit, 0, final_position)
 	self.velocity_network:store(velocity)
 	self.velocity_current:store(velocity)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_disable_rotation_update = function (self)
 	self.disable_rotation_update = true
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_stood_still_target_rotation = function (self, rotation)
 	self.target_rotation:store(rotation)
 
@@ -572,9 +557,8 @@ PlayerUnitLocomotionExtension.set_stood_still_target_rotation = function (self, 
 	local final_rotation = Quaternion.look(rotation_flat)
 
 	Unit.set_local_rotation(self.unit, 0, final_rotation)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.is_stood_still = function (self)
 	local first_person_extension = self.first_person_extension
 	local current_rotation = first_person_extension.current_rotation(first_person_extension)
@@ -585,6 +569,7 @@ PlayerUnitLocomotionExtension.is_stood_still = function (self)
 
 	return velocity_dot == 0
 end
+
 PlayerUnitLocomotionExtension.sync_network_rotation = function (self, game, go_id)
 	local current_rotation = Unit.local_rotation(self.unit, 0)
 	local yaw = Quaternion.yaw(current_rotation)
@@ -592,9 +577,8 @@ PlayerUnitLocomotionExtension.sync_network_rotation = function (self, game, go_i
 
 	GameSession.set_game_object_field(game, go_id, "yaw", yaw)
 	GameSession.set_game_object_field(game, go_id, "pitch", pitch)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.sync_network_position = function (self, game, go_id)
 	local position = Unit.local_position(self.unit, 0)
 
@@ -608,10 +592,10 @@ PlayerUnitLocomotionExtension.sync_network_position = function (self, game, go_i
 	local max = position_constant.max
 
 	GameSession.set_game_object_field(game, go_id, "position", Vector3.clamp(position, min, max))
-
-	return 
 end
+
 local MAX_MOVE_SPEED = 99.9999
+
 PlayerUnitLocomotionExtension.sync_network_velocity = function (self, game, go_id, dt)
 	local velocity = self.velocity_network:unbox()
 	local platform_ext = self._platform_extension
@@ -627,21 +611,18 @@ PlayerUnitLocomotionExtension.sync_network_velocity = function (self, game, go_i
 
 	GameSession.set_game_object_field(game, go_id, "velocity", Vector3.clamp(velocity, min, max))
 	GameSession.set_game_object_field(game, go_id, "average_velocity", Vector3.clamp(self._average_velocity:unbox(), min, max))
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_wanted_velocity = function (self, velocity_wanted)
 	if not self.disabled and (self.state == "script_driven" or self.state == "script_driven_ladder" or self.state == "script_driven_no_mover" or self.state == "script_driven_ladder_transition_movement") then
 		self.velocity_wanted:store(velocity_wanted)
 	end
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_script_movement_time_scale = function (self, scale)
 	self._script_movement_time_scale = scale
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.add_external_velocity = function (self, velocity_delta, upper_limit)
 	if not self.external_velocity then
 		self.external_velocity = Vector3Box()
@@ -655,9 +636,8 @@ PlayerUnitLocomotionExtension.add_external_velocity = function (self, velocity_d
 	local new_velocity = old_velocity + modified_delta
 
 	self.external_velocity:store(new_velocity)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_forced_velocity = function (self, velocity_forced)
 	if not self.disabled and (self.state == "script_driven" or self.state == "script_driven_ladder") then
 		assert(IS_NEW_FRAME, "trying to set forced velocity too late in frame")
@@ -669,38 +649,38 @@ PlayerUnitLocomotionExtension.set_forced_velocity = function (self, velocity_for
 			self.velocity_forced = nil
 		end
 	end
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_maximum_upwards_velocity = function (self, z_velocity)
 	self.maximum_upward_velocity = z_velocity
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.reset_maximum_upwards_velocity = function (self)
 	self.maximum_upward_velocity = 0
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.set_speed_multiplier = function (self, multiplier, t, duration)
 	self.speed_multiplier = multiplier
 	self.speed_multiplier_start_time = t
 	self.speed_multiplier_duration = duration
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.current_speed_multiplier = function (self)
 	return self.speed_multiplier
 end
+
 PlayerUnitLocomotionExtension.jump_allowed = function (self)
 	return self.allow_jump
 end
+
 PlayerUnitLocomotionExtension.current_velocity = function (self)
 	return self.velocity_current and self.velocity_current:unbox()
 end
+
 PlayerUnitLocomotionExtension.current_rotation = function (self)
 	return self.first_person_extension:current_rotation()
 end
+
 PlayerUnitLocomotionExtension.current_relative_velocity = function (self)
 	local first_person_extension = self.first_person_extension
 	local velocity_current = self.velocity_current:unbox()
@@ -710,6 +690,7 @@ PlayerUnitLocomotionExtension.current_relative_velocity = function (self)
 
 	return velocity_relative
 end
+
 PlayerUnitLocomotionExtension.enable_linked_movement = function (self, parent_unit, node, offset)
 	self.state = "linked_movement"
 	self.link_data = {
@@ -731,9 +712,8 @@ PlayerUnitLocomotionExtension.enable_linked_movement = function (self, parent_un
 		GameSession.set_game_object_field(game, go_id, "link_node", node)
 		GameSession.set_game_object_field(game, go_id, "link_offset", offset)
 	end
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.disable_linked_movement = function (self)
 	local unit = self.unit
 	local game = Managers.state.network:game()
@@ -742,72 +722,71 @@ PlayerUnitLocomotionExtension.disable_linked_movement = function (self)
 	if game and go_id then
 		GameSession.set_game_object_field(game, go_id, "linked_movement", false)
 	end
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.enable_animation_driven_movement = function (self)
 	self.state = "animation_driven"
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.enable_animation_driven_movement_with_rotation_no_mover = function (self)
 	self.state = "animation_driven_with_rotation_no_mover"
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.enable_script_driven_movement = function (self)
 	self.velocity_forced = nil
 	self._script_movement_time_scale = nil
 	self.state = "script_driven"
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.enable_script_driven_ladder_movement = function (self)
 	self.velocity_forced = nil
 	self._script_movement_time_scale = nil
 	self.state = "script_driven_ladder"
 
 	self.set_wanted_velocity(self, Vector3.zero())
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.enable_script_driven_ladder_transition_movement = function (self)
 	self.state = "script_driven_ladder_transition_movement"
 	self.old_error = Vector3Box(0, 0, 0)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.enable_script_driven_no_mover_movement = function (self)
 	self.state = "script_driven_no_mover"
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.is_animation_driven = function (self)
 	return self.state == "animation_driven"
 end
+
 PlayerUnitLocomotionExtension.is_linked_movement = function (self)
 	return self.state == "linked_movement"
 end
+
 PlayerUnitLocomotionExtension.is_script_driven_ladder = function (self)
 	return self.state == "script_driven_ladder"
 end
+
 PlayerUnitLocomotionExtension.is_script_driven_ladder_transition = function (self)
 	return self.state == "script_driven_ladder_transition_movement"
 end
+
 PlayerUnitLocomotionExtension.get_link_data = function (self)
 	return self.link_data
 end
+
 PlayerUnitLocomotionExtension.is_colliding_down = function (self)
 	return self.collides_down
 end
+
 PlayerUnitLocomotionExtension.force_on_ground = function (self, on_ground)
 	self.on_ground = on_ground
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.is_on_ground = function (self)
 	return self.on_ground
 end
+
 PlayerUnitLocomotionExtension.teleport_to = function (self, pos, rot)
 	local unit = self.unit
 	local mover = Unit.mover(unit)
@@ -820,9 +799,8 @@ PlayerUnitLocomotionExtension.teleport_to = function (self, pos, rot)
 	end
 
 	self.move_to_non_intersecting_position(self)
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.enable_rotation_towards_velocity = function (self, enabled, target_rotation, duration)
 	self.rotate_along_direction = enabled
 
@@ -839,13 +817,10 @@ PlayerUnitLocomotionExtension.enable_rotation_towards_velocity = function (self,
 			end_time = t + duration
 		}
 	end
-
-	return 
 end
+
 PlayerUnitLocomotionExtension.enable_drag = function (self, use_drag)
 	self.use_drag = use_drag
-
-	return 
 end
 
-return 
+return

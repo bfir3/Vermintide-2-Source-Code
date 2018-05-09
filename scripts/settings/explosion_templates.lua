@@ -881,8 +881,6 @@ ExplosionTemplates = {
 						end
 					end
 				end
-
-				return 
 			end
 		}
 	},
@@ -1178,8 +1176,6 @@ ExplosionTemplates.chaos_slow_bomb_missile = {
 
 			AiUtils.ai_explosion(projectile_unit, owner_unit, blackboard, damage_source, explosion_template)
 		end
-
-		return 
 	end
 }
 ExplosionTemplates.chaos_vortex_dummy_missile = {
@@ -1240,4 +1236,4 @@ for name, templates in pairs(ExplosionTemplates) do
 	templates.name = name
 end
 
-return 
+return

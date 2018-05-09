@@ -5,11 +5,11 @@ local DEFAULT_SPEED_MODIFIER_ON_TARGET_DODGE = 0.2
 local DEFAULT_SPEED_LERP_TIME_ON_TARGET_DODGE = 0.6
 local DEFAULT_DODGE_ROTATION_TIME = 1
 local REEVAL_TIME = 0.5
+
 BTAttackAction.init = function (self, ...)
 	BTAttackAction.super.init(self, ...)
-
-	return 
 end
+
 BTAttackAction.name = "BTAttackAction"
 
 local function randomize(event)
@@ -18,8 +18,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTAttackAction.enter = function (self, unit, blackboard, t)
@@ -90,9 +88,8 @@ BTAttackAction.enter = function (self, unit, blackboard, t)
 	blackboard.attack_rotation = QuaternionBox(rotation)
 	blackboard.attack_rotation_lock_timer = t
 	blackboard.attack_dodge_window_start = (action.dodge_window_start and action.dodge_window_start + t) or t
-
-	return 
 end
+
 BTAttackAction.anim_cb_attack_vce = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
 	local game = network_manager.game(network_manager)
@@ -100,16 +97,14 @@ BTAttackAction.anim_cb_attack_vce = function (self, unit, blackboard)
 	if game and blackboard.target_unit_status_extension then
 		self.trigger_attack_sound(self, blackboard.action, unit, blackboard.target_unit, blackboard, blackboard.target_unit_status_extension)
 	end
-
-	return 
 end
+
 BTAttackAction.trigger_attack_sound = function (self, action, unit, target_unit, blackboard, target_unit_status_extension)
 	if blackboard.attack_token and target_unit_status_extension then
 		DialogueSystem:TriggerAttack(target_unit, unit, false, blackboard)
 	end
-
-	return 
 end
+
 BTAttackAction._select_attack = function (self, action, unit, target_unit, blackboard, target_unit_status_extension)
 	local target_type = Unit.get_data(target_unit, "target_type")
 	local target_exception_attack = target_type and action.target_type_exceptions and action.target_type_exceptions[target_type]
@@ -144,9 +139,8 @@ BTAttackAction._select_attack = function (self, action, unit, target_unit, black
 			return default_attack
 		end
 	end
-
-	return 
 end
+
 BTAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if blackboard.move_state ~= "idle" and AiUtils.unit_alive(unit) then
 		if not blackboard.blocked then
@@ -196,9 +190,8 @@ BTAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 
 		shield_extension.set_is_blocking(shield_extension, true)
 	end
-
-	return 
 end
+
 BTAttackAction.run = function (self, unit, blackboard, t, dt)
 	if not Unit.alive(blackboard.attacking_target) then
 		return "done"
@@ -272,14 +265,14 @@ BTAttackAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTAttackAction.attack_cooldown = function (self, unit, blackboard)
 	local t = Managers.time:time("game")
 	local cooldown, cooldown_at = self.get_attack_cooldown_finished_at(self, unit, blackboard, t)
 	blackboard.attack_cooldown_at = cooldown_at
 	blackboard.is_in_attack_cooldown = cooldown
-
-	return 
 end
+
 BTAttackAction.attack_success = function (self, unit, blackboard)
 	local breed = blackboard.breed
 
@@ -288,9 +281,8 @@ BTAttackAction.attack_success = function (self, unit, blackboard)
 
 		blackboard.backstab_attack_trigger = false
 	end
-
-	return 
 end
+
 BTAttackAction.attack = function (self, unit, t, dt, blackboard)
 	local bb = blackboard
 	local action = bb.action
@@ -324,9 +316,8 @@ BTAttackAction.attack = function (self, unit, t, dt, blackboard)
 	end
 
 	locomotion.set_wanted_rotation(locomotion, blackboard.attack_rotation:unbox())
-
-	return 
 end
+
 BTAttackAction.get_attack_cooldown_finished_at = function (self, unit, blackboard, t)
 	local attacking_target = blackboard.attacking_target
 
@@ -371,4 +362,4 @@ BTAttackAction.get_attack_cooldown_finished_at = function (self, unit, blackboar
 	return true, cooldown + t
 end
 
-return 
+return

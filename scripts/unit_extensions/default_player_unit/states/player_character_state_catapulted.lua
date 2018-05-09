@@ -3,11 +3,11 @@ require("scripts/settings/player_movement_settings")
 PlayerCharacterStateCatapulted = class(PlayerCharacterStateCatapulted, PlayerCharacterState)
 local position_lookup = POSITION_LOOKUP
 local DIRECTIONS = PlayerUnitMovementSettings.catapulted.directions
+
 PlayerCharacterStateCatapulted.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "catapulted")
-
-	return 
 end
+
 PlayerCharacterStateCatapulted.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	CharacterStateHelper.stop_weapon_actions(self.inventory_extension, "stunned")
 
@@ -47,9 +47,8 @@ PlayerCharacterStateCatapulted.on_enter = function (self, unit, input, dt, conte
 	end
 
 	self.start_catapulted_height = position_lookup[unit].z
-
-	return 
 end
+
 PlayerCharacterStateCatapulted.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local direction = self._direction
 	self._direction = nil
@@ -66,9 +65,8 @@ PlayerCharacterStateCatapulted.on_exit = function (self, unit, input, dt, contex
 	end
 
 	self.status_extension:set_falling_height(nil, self.start_catapulted_height)
-
-	return 
 end
+
 PlayerCharacterStateCatapulted.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -87,25 +85,25 @@ PlayerCharacterStateCatapulted.update = function (self, unit, input, dt, context
 	if CharacterStateHelper.is_ledge_hanging(world, unit, self.temp_params) then
 		csm.change_state(csm, "ledge_hanging", self.temp_params)
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_dead(status_extension) then
 		csm.change_state(csm, "dead")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_pounced_down(status_extension) then
 		csm.change_state(csm, "pounced_down")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_in_vortex(status_extension) then
 		csm.change_state(csm, "in_vortex")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_colliding_down(unit) and self.locomotion_extension:current_velocity().z < 0 then
@@ -119,7 +117,7 @@ PlayerCharacterStateCatapulted.update = function (self, unit, input, dt, context
 			csm.change_state(csm, "standing")
 		end
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_colliding_sides(unit) then
@@ -128,14 +126,12 @@ PlayerCharacterStateCatapulted.update = function (self, unit, input, dt, context
 		CharacterStateHelper.play_animation_event(unit, anim)
 		csm.change_state(csm, "standing")
 
-		return 
+		return
 	end
 
 	local first_person_extension = self.first_person_extension
 
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, first_person_extension, status_extension, self.inventory_extension)
-
-	return 
 end
 
-return 
+return

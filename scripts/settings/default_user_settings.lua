@@ -163,7 +163,7 @@ end
 DefaultUserSettings = {
 	set_default_user_settings = function ()
 		if LEVEL_EDITOR_TEST then
-			return 
+			return
 		end
 
 		local set_default = false
@@ -203,8 +203,6 @@ DefaultUserSettings = {
 		if set_default then
 			Application.save_user_settings()
 		end
-
-		return 
 	end,
 	get = function (setting_type, setting_name)
 		local setting = nil
@@ -317,9 +315,7 @@ DefaultUserSettings = {
 
 			return true
 		end
-
-		return 
 	end
 }
 
-return 
+return

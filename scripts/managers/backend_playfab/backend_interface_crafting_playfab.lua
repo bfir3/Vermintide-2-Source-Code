@@ -2,6 +2,7 @@ require("scripts/managers/backend_playfab/backend_interface_crafting_base")
 
 local PlayFabClientApi = require("PlayFab.PlayFabClientApi")
 BackendInterfaceCraftingPlayfab = class(BackendInterfaceCraftingPlayfab, BackendInterfaceCraftingBase)
+
 BackendInterfaceCraftingPlayfab.init = function (self, backend_mirror)
 	BackendInterfaceCraftingPlayfab.super.init(self)
 
@@ -9,20 +10,22 @@ BackendInterfaceCraftingPlayfab.init = function (self, backend_mirror)
 	self._backend_mirror = backend_mirror
 	self._last_id = 0
 	self._craft_requests = {}
-
-	return 
 end
+
 BackendInterfaceCraftingPlayfab.ready = function (self)
 	return true
 end
+
 BackendInterfaceCraftingPlayfab.update = function (self, dt)
-	return 
+	return
 end
+
 BackendInterfaceCraftingPlayfab._new_id = function (self)
 	self._last_id = self._last_id + 1
 
 	return self._last_id
 end
+
 BackendInterfaceCraftingPlayfab.craft = function (self, career_name, item_backend_ids, recipe_override)
 	local recipe, item_backend_ids_and_amounts = self._get_valid_recipe(self, item_backend_ids, recipe_override)
 	local hero_name = CareerSettings[career_name].profile_name
@@ -47,6 +50,7 @@ BackendInterfaceCraftingPlayfab.craft = function (self, career_name, item_backen
 
 	return nil
 end
+
 BackendInterfaceCraftingPlayfab.craft_challenge_request_cb = function (self, data, result)
 	if result.Error then
 		table.dump(result, nil, 5)
@@ -71,9 +75,8 @@ BackendInterfaceCraftingPlayfab.craft_challenge_request_cb = function (self, dat
 			self._craft(self, data, response)
 		end
 	end
-
-	return 
 end
+
 BackendInterfaceCraftingPlayfab._craft = function (self, data, response)
 	local result_function = data.result_function_playfab
 	local craft_request = {
@@ -88,9 +91,8 @@ BackendInterfaceCraftingPlayfab._craft = function (self, data, response)
 	local craft_request_cb = callback(self, "craft_request_cb", id)
 
 	PlayFabClientApi.ExecuteCloudScript(craft_request, craft_request_cb, craft_request_cb)
-
-	return 
 end
+
 BackendInterfaceCraftingPlayfab.craft_request_cb = function (self, id, result)
 	if result.Error then
 		table.dump(result, nil, 5)
@@ -105,7 +107,7 @@ BackendInterfaceCraftingPlayfab.craft_request_cb = function (self, id, result)
 		if eac_failed then
 			Managers.backend:playfab_eac_error()
 
-			return 
+			return
 		end
 
 		local items = function_result.items
@@ -155,9 +157,8 @@ BackendInterfaceCraftingPlayfab.craft_request_cb = function (self, id, result)
 
 		self._craft_requests[id] = result
 	end
-
-	return 
 end
+
 BackendInterfaceCraftingPlayfab.is_craft_complete = function (self, id)
 	local craft_request = self._craft_requests[id]
 
@@ -167,9 +168,11 @@ BackendInterfaceCraftingPlayfab.is_craft_complete = function (self, id)
 
 	return false
 end
+
 BackendInterfaceCraftingPlayfab.get_craft_result = function (self, id)
 	return self._craft_requests[id]
 end
+
 BackendInterfaceCraftingPlayfab._get_eac_response = function (self, challenge)
 	local i = 0
 	local str = ""
@@ -196,4 +199,4 @@ BackendInterfaceCraftingPlayfab._get_eac_response = function (self, challenge)
 	return eac_response, response
 end
 
-return 
+return

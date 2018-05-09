@@ -1,13 +1,14 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTSpawningAction = class(BTSpawningAction, BTNode)
+
 BTSpawningAction.init = function (self, ...)
 	BTSpawningAction.super.init(self, ...)
-
-	return 
 end
+
 BTSpawningAction.name = "BTSpawningAction"
 local unit_alive = Unit.alive
+
 BTSpawningAction.enter = function (self, unit, blackboard, t)
 	Unit.set_animation_root_mode(unit, "ignore")
 
@@ -43,9 +44,8 @@ BTSpawningAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.spawn_last_pos = Vector3Box(POSITION_LOOKUP[unit])
 	blackboard.spawn_immovable_time = 0
-
-	return 
 end
+
 BTSpawningAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.spawn = nil
 	blackboard.spawning_finished = nil
@@ -87,9 +87,8 @@ BTSpawningAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	end
 
 	LocomotionUtils.set_animation_translation_scale(unit, Vector3(1, 1, 1))
-
-	return 
 end
+
 BTSpawningAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion_extension = blackboard.locomotion_extension
 	local spawning_finished = blackboard.spawning_finished
@@ -139,7 +138,7 @@ BTSpawningAction.run = function (self, unit, blackboard, t, dt)
 
 				AiUtils.kill_unit(unit, nil, nil, damage_type, damage_direction)
 
-				return 
+				return
 			end
 		end
 	end
@@ -173,4 +172,4 @@ BTSpawningAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

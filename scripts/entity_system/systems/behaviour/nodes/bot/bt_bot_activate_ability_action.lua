@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTBotActivateAbilityAction = class(BTBotActivateAbilityAction, BTNode)
+
 BTBotActivateAbilityAction.init = function (self, ...)
 	BTBotActivateAbilityAction.super.init(self, ...)
-
-	return 
 end
+
 BTBotActivateAbilityAction.name = "BTBotActivateAbilityAction"
+
 BTBotActivateAbilityAction.enter = function (self, unit, blackboard, t)
 	local action_data = self._tree_node.action_data
 	local career_extension = blackboard.career_extension
@@ -28,9 +29,8 @@ BTBotActivateAbilityAction.enter = function (self, unit, blackboard, t)
 		input_extension.set_aiming(input_extension, true, true, false)
 		input_extension.set_aim_position(input_extension, aim_position)
 	end
-
-	return 
 end
+
 BTBotActivateAbilityAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local activate_ability_data = blackboard.activate_ability_data
 
@@ -41,9 +41,8 @@ BTBotActivateAbilityAction.leave = function (self, unit, blackboard, t, reason, 
 	end
 
 	activate_ability_data.is_using_ability = false
-
-	return 
 end
+
 BTBotActivateAbilityAction._start_ability = function (self, activate_ability_data, blackboard, t)
 	local started = nil
 	local do_start_input = activate_ability_data.do_start_input
@@ -101,6 +100,7 @@ BTBotActivateAbilityAction._start_ability = function (self, activate_ability_dat
 
 	return do_start_input, started
 end
+
 BTBotActivateAbilityAction._perform_wait_action = function (self, activate_ability_data, unit, blackboard)
 	local wait_action = activate_ability_data.wait_action
 
@@ -109,9 +109,8 @@ BTBotActivateAbilityAction._perform_wait_action = function (self, activate_abili
 
 		input_extension[wait_action.input](input_extension)
 	end
-
-	return 
 end
+
 BTBotActivateAbilityAction._evaluate_end_condition = function (self, activate_ability_data, unit, blackboard, t)
 	local end_condition = activate_ability_data.end_condition
 
@@ -153,9 +152,8 @@ BTBotActivateAbilityAction._evaluate_end_condition = function (self, activate_ab
 	else
 		return "running"
 	end
-
-	return 
 end
+
 BTBotActivateAbilityAction.run = function (self, unit, blackboard, t, dt)
 	local data = blackboard.activate_ability_data
 
@@ -172,4 +170,4 @@ BTBotActivateAbilityAction.run = function (self, unit, blackboard, t, dt)
 	return self._evaluate_end_condition(self, data, unit, blackboard, t)
 end
 
-return 
+return

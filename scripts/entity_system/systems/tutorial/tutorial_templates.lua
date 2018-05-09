@@ -1,5 +1,5 @@
 local function apply_outline(unit)
-	return 
+	return
 end
 
 local function has_melee_weapon_equipped(unit)
@@ -31,13 +31,13 @@ TutorialTemplates = {
 		icon = "hud_tutorial_icon_attention",
 		is_mission_tutorial = true,
 		init_data = function (data)
-			return 
+			return
 		end,
 		clear_data = function (data)
-			return 
+			return
 		end,
 		update_data = function (t, unit, data)
-			return 
+			return
 		end,
 		can_show = function (t, unit, data, raycast_unit)
 			local players = Managers.player:human_and_bot_players()
@@ -91,13 +91,13 @@ TutorialTemplates = {
 		icon = "hud_tutorial_icon_attention",
 		is_mission_tutorial = true,
 		init_data = function (data)
-			return 
+			return
 		end,
 		clear_data = function (data)
-			return 
+			return
 		end,
 		update_data = function (t, unit, data)
-			return 
+			return
 		end,
 		can_show = function (t, unit, data, raycast_unit, world)
 			local players = Managers.player:human_and_bot_players()
@@ -148,13 +148,13 @@ TutorialTemplates = {
 		icon = "grenade_icon",
 		is_mission_tutorial = true,
 		init_data = function (data)
-			return 
+			return
 		end,
 		clear_data = function (data)
-			return 
+			return
 		end,
 		update_data = function (t, unit, data)
-			return 
+			return
 		end,
 		can_show = function (t, unit, data, raycast_unit, world)
 			local unit_position = POSITION_LOOKUP[unit]
@@ -225,17 +225,15 @@ TutorialTemplates = {
 			return data.force_update
 		end,
 		init_data = function (data)
-			return 
+			return
 		end,
 		clear_data = function (data)
-			return 
+			return
 		end,
 		update_data = function (t, unit, data)
 			if data.force_update then
 				data.force_update = false
 			end
-
-			return 
 		end,
 		can_show = function (t, unit, data, raycast_unit, world)
 			local mission_system = Managers.state.entity:system("mission_system")
@@ -274,13 +272,13 @@ TutorialTemplates = {
 		icon = "hud_tutorial_icon_rescue",
 		is_mission_tutorial = true,
 		init_data = function (data)
-			return 
+			return
 		end,
 		clear_data = function (data)
-			return 
+			return
 		end,
 		update_data = function (t, unit, data)
-			return 
+			return
 		end,
 		can_show = function (t, unit, data, raycast_unit, world)
 			local players = Managers.player:human_and_bot_players()
@@ -357,13 +355,13 @@ TutorialTemplates.objective_pickup = {
 		return data.objective_text
 	end,
 	init_data = function (data)
-		return 
+		return
 	end,
 	clear_data = function (data)
-		return 
+		return
 	end,
 	update_data = function (t, unit, data)
-		return 
+		return
 	end,
 	can_show = function (t, unit, data, raycast_unit, world)
 		local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
@@ -445,13 +443,13 @@ TutorialTemplates.objective_socket = {
 		return data.objective_text
 	end,
 	init_data = function (data)
-		return 
+		return
 	end,
 	clear_data = function (data)
-		return 
+		return
 	end,
 	update_data = function (t, unit, data)
-		return 
+		return
 	end,
 	can_show = function (t, unit, data, raycast_unit, world)
 		local unit_position = POSITION_LOOKUP[unit]
@@ -519,13 +517,13 @@ TutorialTemplates.objective_unit = {
 		return data.objective_wave
 	end,
 	init_data = function (data)
-		return 
+		return
 	end,
 	clear_data = function (data)
-		return 
+		return
 	end,
 	update_data = function (t, unit, data)
-		return 
+		return
 	end,
 	can_show = function (t, unit, data, raycast_unit, world)
 		local unit_position = POSITION_LOOKUP[unit]
@@ -593,4 +591,4 @@ end
 table.sort(TutorialTooltipTemplates, tooltip_sort_function)
 table.sort(TutorialObjectiveTooltipTemplates, tooltip_sort_function)
 
-return 
+return

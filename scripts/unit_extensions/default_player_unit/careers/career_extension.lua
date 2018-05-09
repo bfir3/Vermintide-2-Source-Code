@@ -1,4 +1,5 @@
 CareerExtension = class(CareerExtension)
+
 CareerExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self._unit = unit
 	self.world = extension_init_context.world
@@ -25,9 +26,8 @@ CareerExtension.init = function (self, extension_init_context, unit, extension_i
 	if career_data.activated_ability.ability_class then
 		self._activated_ability = career_data.activated_ability.ability_class:new(extension_init_context, unit, extension_init_data)
 	end
-
-	return 
 end
+
 CareerExtension.extensions_ready = function (self, world, unit)
 	local buff_extension = ScriptUnit.extension(unit, "buff_system")
 	local passive_ability_data = self._career_data.passive_ability
@@ -50,9 +50,8 @@ CareerExtension.extensions_ready = function (self, world, unit)
 	if self._activated_ability then
 		self._activated_ability:extensions_ready(world, unit)
 	end
-
-	return 
 end
+
 CareerExtension.update = function (self, unit, input, dt, context, t)
 	local player = self.player
 	local aoe_data = self._aoe_data
@@ -68,7 +67,7 @@ CareerExtension.update = function (self, unit, input, dt, context, t)
 	end
 
 	if self._cooldown_paused then
-		return 
+		return
 	end
 
 	local buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -80,7 +79,7 @@ CareerExtension.update = function (self, unit, input, dt, context, t)
 			self._activated_ability:update(unit, input, dt, context, t)
 		end
 
-		return 
+		return
 	elseif self._cooldown == 0 then
 		self._is_ready = true
 		local first_person_extension = self._first_person_extension
@@ -91,12 +90,11 @@ CareerExtension.update = function (self, unit, input, dt, context, t)
 	end
 
 	self._update_game_object_field(self, unit)
-
-	return 
 end
+
 CareerExtension._update_game_object_field = function (self, unit)
 	if (not self.is_server or not self.player.bot_player) and not self.player.local_player then
-		return 
+		return
 	end
 
 	local ability_cooldown, max_cooldown = self.current_ability_cooldown(self)
@@ -112,18 +110,19 @@ CareerExtension._update_game_object_field = function (self, unit)
 	ability_percentage = math.min(1, ability_percentage)
 
 	GameSession.set_game_object_field(game, go_id, "ability_percentage", ability_percentage)
+end
 
-	return 
-end
 CareerExtension.destroy = function (self)
-	return 
+	return
 end
+
 CareerExtension.get_activated_ability_data = function (self)
 	local career_data = self._career_data
 	local activated_ability_data = career_data.activated_ability
 
 	return activated_ability_data
 end
+
 CareerExtension.start_activated_ability_cooldown = function (self, refund_percent)
 	self._is_ready = false
 	local activated_ability_data = self.get_activated_ability_data(self)
@@ -142,50 +141,56 @@ CareerExtension.start_activated_ability_cooldown = function (self, refund_percen
 	if Development.parameter("short_ability_cooldowns") then
 		self._cooldown = 5
 	end
-
-	return 
 end
+
 CareerExtension.reduce_activated_ability_cooldown = function (self, amount)
 	if self._cooldown_paused then
-		return 
+		return
 	end
 
 	self._cooldown = self._cooldown - amount
-
-	return 
 end
+
 CareerExtension.set_activated_ability_cooldown_paused = function (self)
 	self._cooldown_paused = true
-
-	return 
 end
+
 CareerExtension.can_use_activated_ability = function (self)
 	return self._is_ready and not self._cooldown_paused
 end
+
 CareerExtension.current_ability_cooldown = function (self)
 	return self._cooldown, self._max_cooldown
 end
+
 CareerExtension.get_max_ability_cooldown = function (self)
 	return self._max_cooldown
 end
+
 CareerExtension.current_ability_paused = function (self)
 	return self._cooldown_paused
 end
+
 CareerExtension.career_index = function (self)
 	return self._career_index
 end
+
 CareerExtension.career_name = function (self)
 	return self._career_name
 end
+
 CareerExtension.career_settings = function (self)
 	return self._career_data
 end
+
 CareerExtension.career_skill_weapon_name = function (self)
 	return self.get_activated_ability_data(self).weapon_name
 end
+
 CareerExtension.get_base_critical_strike_chance = function (self)
 	return self._career_data.attributes.base_critical_strike_chance or 0
 end
+
 CareerExtension.create_aoe = function (self, position, radius, duration, end_function_name)
 	self._aoe_data = {
 		position = Vector3Box(position),
@@ -193,9 +198,8 @@ CareerExtension.create_aoe = function (self, position, radius, duration, end_fun
 		duration_left = duration,
 		end_function_name = end_function_name
 	}
-
-	return 
 end
+
 CareerExtension.is_in_aoe = function (self, position)
 	if not self._aoe_data then
 		return false
@@ -206,6 +210,7 @@ CareerExtension.is_in_aoe = function (self, position)
 
 	return within_distance
 end
+
 CareerExtension.has_melee_boost = function (self)
 	local buff_extension = self._buff_extension
 	local has_shade_buff = buff_extension.has_buff_type(buff_extension, "kerillian_shade_activated_ability") or buff_extension.has_buff_type(buff_extension, "kerillian_shade_activated_ability_duration")
@@ -214,6 +219,7 @@ CareerExtension.has_melee_boost = function (self)
 
 	return has_shade_buff or has_murder_hobo_buff, multiplier
 end
+
 CareerExtension.has_ranged_boost = function (self)
 	local buff_extension = self._buff_extension
 	local has_murder_hobo_buff = buff_extension.has_buff_type(buff_extension, "markus_huntsman_activated_ability")
@@ -222,6 +228,7 @@ CareerExtension.has_ranged_boost = function (self)
 
 	return has_murder_hobo_buff or has_ranger_buff, multiplier
 end
+
 CareerExtension.get_career_power_level = function (self)
 	local player = self.player
 	local career_name = self._career_name
@@ -253,13 +260,13 @@ CareerExtension.get_career_power_level = function (self)
 
 	return BackendUtils.get_total_power_level(profile_name, career_name)
 end
+
 CareerExtension.set_state = function (self, state)
 	self._state = state
-
-	return 
 end
+
 CareerExtension.get_state = function (self)
 	return self._state or "default"
 end
 
-return 
+return

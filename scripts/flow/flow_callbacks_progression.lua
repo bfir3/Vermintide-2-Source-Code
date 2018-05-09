@@ -162,8 +162,6 @@ function flow_callback_override_level_progression_for_experience(params)
 	local mission_system = Managers.state.entity:system("mission_system")
 
 	mission_system.override_percentage_completed(mission_system, progression)
-
-	return 
 end
 
 function flow_query_leader_hero_level(params)
@@ -307,8 +305,6 @@ function flow_callback_leader_sum_best_power_levels(params)
 		LevelHelper:set_flow_parameter(world, result_parameter, value)
 		LevelHelper:flow_event(world, result_event)
 	end
-
-	return 
 end
 
 function flow_query_leader_has_dlc(params)
@@ -365,4 +361,4 @@ function flow_query_leader_completed_all_dlc_levels(params)
 	return flow_return_table
 end
 
-return 
+return

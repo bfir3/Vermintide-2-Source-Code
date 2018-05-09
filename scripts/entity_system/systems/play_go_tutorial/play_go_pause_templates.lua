@@ -46,8 +46,6 @@ DefaultAnimationFunctions = {
 				mission_system.flow_callback_start_mission(mission_system, mission_name)
 			end
 		end
-
-		return 
 	end,
 	update_input = function (this, t)
 		if not this.activated then
@@ -219,8 +217,6 @@ DefaultAnimationFunctions = {
 		local level = LevelHelper:current_level(this.world)
 
 		Level.trigger_event(level, "lua_" .. this.name .. "_done")
-
-		return 
 	end,
 	default_prerequisites = function (this)
 		local player = Managers.player:local_player()
@@ -382,4 +378,4 @@ for idx, pause_event in ipairs(PauseEvents.pause_events) do
 	PauseEvents.pause_events[pause_event.name] = pause_event
 end
 
-return 
+return

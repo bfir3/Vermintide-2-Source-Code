@@ -10,8 +10,6 @@ if script_data.honduras_demo then
 			Managers.transition:show_loading_icon(false)
 			Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done", DemoSettings.demo_level))
 			Managers.music:trigger_event("hud_menu_start_game")
-
-			return 
 		end
 	}
 else
@@ -22,8 +20,6 @@ else
 			Managers.transition:show_loading_icon(false)
 			Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done"))
 			Managers.music:trigger_event("hud_menu_start_game")
-
-			return 
 		end,
 		function (this)
 			this._input_disabled = true
@@ -31,8 +27,6 @@ else
 			Managers.transition:show_loading_icon(false)
 			Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done", "tutorial"))
 			Managers.music:trigger_event("hud_menu_start_game")
-
-			return 
 		end,
 		function (this)
 			local input_manager = Managers.input
@@ -42,14 +36,10 @@ else
 			input_manager.block_device_except_service(input_manager, "options_menu", "gamepad", 1)
 			this.activate_view(this, "options_view")
 			Managers.music:trigger_event("play_hud_select")
-
-			return 
 		end,
 		function (this)
 			this.activate_view(this, "credits_view")
 			Managers.music:trigger_event("play_hud_select")
-
-			return 
 		end,
 		function (this)
 			this._input_disabled = true
@@ -57,8 +47,6 @@ else
 			Managers.transition:show_loading_icon(false)
 			Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done", "ai_benchmark"))
 			Managers.music:trigger_event("play_hud_select")
-
-			return 
 		end,
 		function (this)
 			this._input_disabled = true
@@ -66,8 +54,6 @@ else
 			Managers.transition:show_loading_icon(false)
 			Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done", "ai_benchmark_cycle"))
 			Managers.music:trigger_event("play_hud_select")
-
-			return 
 		end,
 		function (this)
 			this._input_disabled = true
@@ -75,8 +61,6 @@ else
 			Managers.transition:show_loading_icon(false)
 			Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done", "whitebox_combat"))
 			Managers.music:trigger_event("play_hud_select")
-
-			return 
 		end
 	}
 end
@@ -96,9 +80,8 @@ StateTitleScreenMainMenu.on_enter = function (self, params)
 	self._init_menu_views(self)
 	self.parent:show_menu(true)
 	Managers.transition:hide_loading_icon()
-
-	return 
 end
+
 StateTitleScreenMainMenu._setup_sound = function (self)
 	local master_bus_volume = Application.user_setting("master_bus_volume") or 90
 	local music_bus_volume = Application.user_setting("music_bus_volume") or 90
@@ -114,20 +97,17 @@ StateTitleScreenMainMenu._setup_sound = function (self)
 	WwiseWorld.set_global_parameter(wwise_world, "master_bus_volume", master_bus_volume)
 	Managers.music:set_master_volume(master_bus_volume)
 	Managers.music:set_music_volume(music_bus_volume)
-
-	return 
 end
+
 StateTitleScreenMainMenu.cb_camera_animation_complete = function (self)
 	ShowCursorStack.push()
 	self._title_start_ui:activate_career_ui(true)
-
-	return 
 end
+
 StateTitleScreenMainMenu.cb_camera_animation_complete_back = function (self)
 	self._new_state = StateTitleScreenMain
-
-	return 
 end
+
 StateTitleScreenMainMenu._init_menu_views = function (self)
 	local ui_renderer = self._title_start_ui:get_ui_renderer()
 	local view_context = {
@@ -150,13 +130,10 @@ StateTitleScreenMainMenu._init_menu_views = function (self)
 	for name, view in pairs(self._views) do
 		view.exit = function ()
 			self:exit_current_view()
-
-			return 
 		end
 	end
-
-	return 
 end
+
 StateTitleScreenMainMenu.update = function (self, dt, t)
 	local active_view = self._active_view
 
@@ -168,7 +145,7 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 		if self._auto_start then
 			menu_functions[1](self)
 
-			return 
+			return
 		end
 
 		local title_start_ui = self._title_start_ui
@@ -203,6 +180,7 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 
 	return self._new_state
 end
+
 StateTitleScreenMainMenu.on_exit = function (self)
 	for k, view in pairs(self._views) do
 		if view.destroy then
@@ -213,9 +191,8 @@ StateTitleScreenMainMenu.on_exit = function (self)
 	self._views = nil
 
 	ShowCursorStack.pop()
-
-	return 
 end
+
 StateTitleScreenMainMenu.cb_fade_in_done = function (self, level_key, profile_name)
 	self.parent.state = StateLoading
 	self.parent.parent.loading_context.restart_network = true
@@ -230,9 +207,8 @@ StateTitleScreenMainMenu.cb_fade_in_done = function (self, level_key, profile_na
 		GameSettingsDevelopment.disable_free_flight = DemoSettings.disable_free_flight
 		GameSettingsDevelopment.disable_intro_trailer = DemoSettings.disable_intro_trailer
 	end
-
-	return 
 end
+
 StateTitleScreenMainMenu.activate_view = function (self, new_view)
 	self._active_view = new_view
 	local views = self._views
@@ -242,9 +218,8 @@ StateTitleScreenMainMenu.activate_view = function (self, new_view)
 	if new_view and views[new_view] and views[new_view].on_enter then
 		views[new_view]:on_enter()
 	end
-
-	return 
 end
+
 StateTitleScreenMainMenu.exit_current_view = function (self)
 	local active_view = self._active_view
 	local views = self._views
@@ -259,8 +234,6 @@ StateTitleScreenMainMenu.exit_current_view = function (self)
 	local input_manager = Managers.input
 
 	input_manager.block_device_except_service(input_manager, "main_menu", "gamepad", 1)
-
-	return 
 end
 
-return 
+return

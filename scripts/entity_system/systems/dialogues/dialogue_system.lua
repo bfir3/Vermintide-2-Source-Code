@@ -22,6 +22,7 @@ local extensions = {
 local dialogue_category_config = DialogueSettings.dialogue_category_config
 local enabled = true
 DialogueSystem = class(DialogueSystem, ExtensionSystemBase)
+
 DialogueSystem.init = function (self, entity_system_creation_context, system_name)
 	local entity_manager = entity_system_creation_context.entity_manager
 
@@ -123,18 +124,16 @@ DialogueSystem.init = function (self, entity_system_creation_context, system_nam
 	self.network_event_delegate = network_event_delegate
 
 	network_event_delegate.register(network_event_delegate, self, "rpc_trigger_dialogue_event", "rpc_play_dialogue_event", "rpc_interrupt_dialogue_event")
-
-	return 
 end
+
 DialogueSystem.destroy = function (self)
 	self.tagquery_loader:unload_files()
 	self.tagquery_database:destroy()
 	World.destroy_gui(self.world, self.gui)
 	self.network_event_delegate:unregister(self)
 	table.clear(self)
-
-	return 
 end
+
 DialogueSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	local extension = {
 		user_memory = {},
@@ -147,7 +146,7 @@ DialogueSystem.on_add_extension = function (self, world, unit, extension_name, e
 	local input = MakeTableStrict({
 		trigger_dialogue_event = function (self, event_name, event_data, identifier)
 			if not dialogue_system.is_server then
-				return 
+				return
 			end
 
 			local input_event_queue = dialogue_system.input_event_queue
@@ -157,12 +156,10 @@ DialogueSystem.on_add_extension = function (self, world, unit, extension_name, e
 			input_event_queue[input_event_queue_n + 3] = event_data
 			input_event_queue[input_event_queue_n + 4] = identifier or ""
 			dialogue_system.input_event_queue_n = input_event_queue_n + 4
-
-			return 
 		end,
 		trigger_networked_dialogue_event = function (self, event_name, event_data, identifier)
 			if LEVEL_EDITOR_TEST then
-				return 
+				return
 			end
 
 			if dialogue_system.is_server then
@@ -174,7 +171,7 @@ DialogueSystem.on_add_extension = function (self, world, unit, extension_name, e
 				input_event_queue[input_event_queue_n + 4] = identifier or ""
 				dialogue_system.input_event_queue_n = input_event_queue_n + 4
 
-				return 
+				return
 			end
 
 			local event_data_array_temp_types = FrameTable.alloc_table()
@@ -205,8 +202,6 @@ DialogueSystem.on_add_extension = function (self, world, unit, extension_name, e
 			local network_manager = Managers.state.network
 
 			network_manager.network_transmit:send_rpc_server("rpc_trigger_dialogue_event", go_id, event_id, event_data_array_temp, event_data_array_temp_types)
-
-			return 
 		end,
 		play_voice = function (self, sound_event, use_occlusion)
 			local wwise_source_id = WwiseUtils.make_unit_auto_source(dialogue_system.world, extension.play_unit, extension.voice_node)
@@ -246,8 +241,6 @@ DialogueSystem.on_add_extension = function (self, world, unit, extension_name, e
 			local concept, source, test_query, test_user_context_list, test_global_context = unpack(event_data)
 
 			dialogue_system.tagquery_database:debug_test_query(concept, source, test_query, test_user_context_list, test_global_context)
-
-			return 
 		end
 	})
 
@@ -301,6 +294,7 @@ DialogueSystem.on_add_extension = function (self, world, unit, extension_name, e
 
 	return extension
 end
+
 DialogueSystem.extensions_ready = function (self, world, unit)
 	local extension = self.unit_extension_data[unit]
 	local context = self.unit_extension_data[unit].context
@@ -369,20 +363,18 @@ DialogueSystem.extensions_ready = function (self, world, unit)
 	if script_data.sound_debug then
 		printf("Spawned unit %q with play_unit=%s, voice_node=%d, vo_center_percent=%d, local_player=%s", tostring(unit), tostring(play_unit), voice_node, vo_center_percent, tostring(extension.local_player))
 	end
-
-	return 
 end
+
 DialogueSystem.on_remove_extension = function (self, unit, extension_name)
 	self.on_freeze_extension(self, unit, extension_name)
 	ScriptUnit.remove_extension(unit, "dialogue_system")
-
-	return 
 end
+
 DialogueSystem.on_freeze_extension = function (self, unit, extension_name)
 	local extension = self.unit_extension_data[unit]
 
 	if extension == nil then
-		return 
+		return
 	end
 
 	local player_profile = extension.context.player_profile
@@ -409,14 +401,13 @@ DialogueSystem.on_freeze_extension = function (self, unit, extension_name)
 
 	self.tagquery_database:remove_object(unit)
 	self.function_command_queue:cleanup_destroyed_unit(unit)
-
-	return 
 end
+
 DialogueSystem.rpc_trigger_dialogue_event = function (self, sender, go_id, event_id, event_data_array, event_data_array_types, identifier)
 	local unit = Managers.state.unit_storage:unit(go_id)
 
 	if not unit then
-		return 
+		return
 	end
 
 	local event_data_array_n = #event_data_array
@@ -445,9 +436,8 @@ DialogueSystem.rpc_trigger_dialogue_event = function (self, sender, go_id, event
 	input_event_queue[input_event_queue_n + 3] = event_data
 	input_event_queue[input_event_queue_n + 4] = identifier or ""
 	self.input_event_queue_n = input_event_queue_n + 4
-
-	return 
 end
+
 local LOCAL_GAMETIME = 0
 DialogueSystem.function_by_op = DialogueSystem.function_by_op or {
 	[TagQuery.OP.ADD] = function (lhs, rhs)
@@ -463,6 +453,7 @@ DialogueSystem.function_by_op = DialogueSystem.function_by_op or {
 		return Managers.time:time("game") + 900
 	end
 }
+
 DialogueSystem.update_currently_playing_dialogues = function (self, dt)
 	local function_command_queue = self.function_command_queue
 	local player_manager = Managers.player
@@ -567,11 +558,10 @@ DialogueSystem.update_currently_playing_dialogues = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 DialogueSystem.update = function (self, context, t)
-	return 
+	return
 end
 
 local function get_dialogue_event(dialogue, index)
@@ -613,8 +603,6 @@ local function get_dialogue_event_index(dialogue)
 	else
 		return 1
 	end
-
-	return 
 end
 
 DialogueSystem._handle_wwise_markers = function (self, dt, t)
@@ -629,9 +617,8 @@ DialogueSystem._handle_wwise_markers = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 DialogueSystem._trigger_marker = function (self, marker_data)
 	local marker_name = marker_data.label
 	local sound_event = marker_data.sound_event
@@ -691,14 +678,13 @@ DialogueSystem._trigger_marker = function (self, marker_data)
 			end
 		end
 	end
-
-	return 
 end
+
 DialogueSystem.rpc_play_marker_event = function (self, sender, go_id, marker_id)
 	local marker_unit = Managers.state.network:game_object_or_level_unit(go_id, false)
 
 	if not marker_unit then
-		return 
+		return
 	end
 
 	if self.playing_units[marker_unit] then
@@ -718,9 +704,8 @@ DialogueSystem.rpc_play_marker_event = function (self, sender, go_id, marker_id)
 	end
 
 	WwiseWorld.trigger_event(wwise_world, marker_sound_event, wwise_source_id)
-
-	return 
 end
+
 DialogueSystem.physics_async_update = function (self, context, t)
 	self.debug_state = RuleDatabase.get_debug and RuleDatabase.get_debug()
 	local dt = context.dt
@@ -729,7 +714,7 @@ DialogueSystem.physics_async_update = function (self, context, t)
 	self.update_cutscene_subtitles(self, t)
 
 	if not self.is_server then
-		return 
+		return
 	end
 
 	self.dialogue_state_handler:update(t)
@@ -946,14 +931,12 @@ DialogueSystem.physics_async_update = function (self, context, t)
 	end
 
 	self.update_new_events(self, t)
-
-	return 
 end
+
 DialogueSystem.post_update = function (self, entity_system_update_context, t)
 	self.function_command_queue:run_commands()
-
-	return 
 end
+
 DialogueSystem.update_incapacitation = function (self, t)
 	for unit, extension in pairs(self.unit_extension_data) do
 		local status_extension = extension.status_extension
@@ -973,9 +956,8 @@ DialogueSystem.update_incapacitation = function (self, t)
 			extension.is_incapacitated = is_incapacitated
 		end
 	end
-
-	return 
 end
+
 DialogueSystem.update_new_events = function (self, t)
 	local unit_input_data_list = self.unit_input_data
 	local unit_extension_data = self.unit_extension_data
@@ -1036,12 +1018,12 @@ DialogueSystem.update_new_events = function (self, t)
 	self.input_event_queue_n = 0
 
 	self.update_debug(self, t)
+end
 
-	return 
-end
 DialogueSystem.hot_join_sync = function (self, sender)
-	return 
+	return
 end
+
 local font_size = 16
 local font = "gw_arial_16"
 local font_mtrl = "materials/fonts/" .. font
@@ -1049,6 +1031,7 @@ local debug_vo_by_file, debug_vo_by_file_gui = nil
 local debug_tick_time = 0
 local debug_text = {}
 local DebugVo = {}
+
 DialogueSystem.update_debug = function (self, t)
 	local res_x = RESOLUTION_LOOKUP.res_w
 	local res_y = RESOLUTION_LOOKUP.res_h
@@ -1230,8 +1213,6 @@ DialogueSystem.update_debug = function (self, t)
 
 		Gui.rect(gui, Vector3(start_x - 15, start_y - 15, 249), Vector2(500, start_y), Color(200, 20, 20, 20))
 	end
-
-	return 
 end
 
 function DebugPlayVoice(profile_name, event_name, is_npc)
@@ -1258,8 +1239,6 @@ function DebugPlayVoice(profile_name, event_name, is_npc)
 
 		return source_id
 	end
-
-	return 
 end
 
 DialogueSystem.LocalPlayerHasMovedFromStartPos = function (self)
@@ -1282,9 +1261,8 @@ DialogueSystem.LocalPlayerHasMovedFromStartPos = function (self)
 			extension.local_player_has_moved = true
 		end
 	end
-
-	return 
 end
+
 DialogueSystem.PlayerShieldCheck = function (self, unit, slot)
 	local has_shield = 0
 
@@ -1309,6 +1287,7 @@ DialogueSystem.PlayerShieldCheck = function (self, unit, slot)
 
 	return has_shield
 end
+
 DialogueSystem.TriggerGeneralUnitEvent = function (self, unit, event)
 	local network_manager = Managers.state.network
 	local player_manager = Managers.player
@@ -1320,9 +1299,8 @@ DialogueSystem.TriggerGeneralUnitEvent = function (self, unit, event)
 	local general_event_id = NetworkLookup.sound_events[event]
 
 	network_manager.network_transmit:send_rpc_clients("rpc_server_audio_unit_event", general_event_id, unit_id, 0)
-
-	return 
 end
+
 DialogueSystem.TriggerTargetedByRatling = function (self, player_unit)
 	local player_manager = Managers.player
 	local owner = player_manager.unit_owner(player_manager, player_unit)
@@ -1333,9 +1311,8 @@ DialogueSystem.TriggerTargetedByRatling = function (self, player_unit)
 
 		dialogue_input.trigger_dialogue_event(dialogue_input, "ratling_target", event_data)
 	end
-
-	return 
 end
+
 DialogueSystem.TriggerAttack = function (self, player_unit, enemy_unit, should_backstab, blackboard)
 	local player_manager = Managers.player
 	local owner = player_manager.unit_owner(player_manager, player_unit)
@@ -1389,9 +1366,8 @@ DialogueSystem.TriggerAttack = function (self, player_unit, enemy_unit, should_b
 			network_manager.network_transmit:send_rpc_clients_except("rpc_server_audio_unit_dialogue_event", owner.peer_id, general_event_id, unit_id, 0)
 		end
 	end
-
-	return 
 end
+
 DialogueSystem.TriggerBackstab = function (self, player_unit, enemy_unit, blackboard)
 	local player_manager = Managers.player
 	local owner = player_manager.unit_owner(player_manager, player_unit)
@@ -1428,9 +1404,8 @@ DialogueSystem.TriggerBackstab = function (self, player_unit, enemy_unit, blackb
 			end
 		end
 	end
-
-	return 
 end
+
 DialogueSystem.TriggerFlanking = function (self, player_unit, enemy_unit)
 	local player_manager = Managers.player
 	local owner = player_manager.unit_owner(player_manager, player_unit)
@@ -1461,9 +1436,8 @@ DialogueSystem.TriggerFlanking = function (self, player_unit, enemy_unit)
 			end
 		end
 	end
-
-	return 
 end
+
 DialogueSystem.TriggerBackstabHit = function (self, player_unit, enemy_unit)
 	local player_manager = Managers.player
 	local owner = player_manager.unit_owner(player_manager, player_unit)
@@ -1497,9 +1471,8 @@ DialogueSystem.TriggerBackstabHit = function (self, player_unit, enemy_unit)
 			end
 		end
 	end
-
-	return 
 end
+
 DialogueSystem.GetRandomPlayer = function (self)
 	local players = Managers.player:human_and_bot_players()
 	local unit_list = {}
@@ -1522,6 +1495,7 @@ DialogueSystem.GetRandomPlayer = function (self)
 
 	return nil
 end
+
 local story_tick_time = DialogueSettings.story_start_delay - 10
 
 function update_story_lines(t)
@@ -1537,14 +1511,13 @@ function update_story_lines(t)
 	end
 
 	update_PlayerJumping(t)
-
-	return 
 end
 
 local current_cutscene_subs = {}
 local cutscene_speaker = nil
 local end_time = 0
 local end_delay = 5
+
 DialogueSystem.TriggerCutsceneSubtitles = function (self, event_name, speaker, end_hangtime)
 	enabled = false
 	cutscene_speaker = speaker
@@ -1553,9 +1526,8 @@ DialogueSystem.TriggerCutsceneSubtitles = function (self, event_name, speaker, e
 	for k, value in pairs(SpecialSubtitleEvents[event_name]) do
 		current_cutscene_subs[k] = value + Managers.time:time("game")
 	end
-
-	return 
 end
+
 DialogueSystem.update_cutscene_subtitles = function (self, t)
 	local hud_system = Managers.state.entity:system("hud_system")
 
@@ -1574,19 +1546,16 @@ DialogueSystem.update_cutscene_subtitles = function (self, t)
 
 		enabled = true
 	end
-
-	return 
 end
+
 DialogueSystem.Disable = function (self)
 	enabled = false
-
-	return 
 end
+
 DialogueSystem.Enable = function (self)
 	enabled = true
-
-	return 
 end
+
 DialogueSystem.ResetMemoryTime = function (self, memory, name, unit)
 	local newtime = LOCAL_GAMETIME - 2000
 
@@ -1597,9 +1566,8 @@ DialogueSystem.ResetMemoryTime = function (self, memory, name, unit)
 	if name == "time_since_conversation" then
 		story_tick_time = 0
 	end
-
-	return 
 end
+
 DialogueSystem.TriggerStoryDialogue = function (self, unit)
 	if Unit.alive(unit) then
 		local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
@@ -1608,15 +1576,14 @@ DialogueSystem.TriggerStoryDialogue = function (self, unit)
 
 		dialogue_input.trigger_dialogue_event(dialogue_input, "story_trigger", event_data)
 	end
-
-	return 
 end
+
 local num_of_jumps = 0
 local jump_tick_time = 0
 
 function update_PlayerJumping(t)
 	if DEDICATED_SERVER then
-		return 
+		return
 	end
 
 	local player_input = Managers.input.input_services.Player
@@ -1643,22 +1610,20 @@ function update_PlayerJumping(t)
 			num_of_jumps = 0
 		end
 	end
-
-	return 
 end
 
 DialogueSystem.rpc_play_dialogue_event = function (self, sender, go_id, is_level_unit, dialogue_id, dialogue_index)
 	local dialogue_actor_unit = Managers.state.network:game_object_or_level_unit(go_id, is_level_unit)
 
 	if not dialogue_actor_unit then
-		return 
+		return
 	end
 
 	local dialogue_name = NetworkLookup.dialogues[dialogue_id]
 	local dialogue = self.dialogues[dialogue_name]
 
 	if dialogue.currently_playing_id then
-		return 
+		return
 	end
 
 	local extension = self.unit_extension_data[dialogue_actor_unit]
@@ -1717,14 +1682,13 @@ DialogueSystem.rpc_play_dialogue_event = function (self, sender, go_id, is_level
 		print(string.format("Played wwise event for dialogues: %q with subtitle: %q. Defined in rule %q with index %d\n", sound_event, subtitles_event, subdialogue_name, dialogue_index))
 		print("################################################################################################################################################################")
 	end
-
-	return 
 end
+
 DialogueSystem.rpc_interrupt_dialogue_event = function (self, sender, go_id, is_level_unit)
 	local dialogue_actor_unit = Managers.state.network:game_object_or_level_unit(go_id, is_level_unit)
 
 	if not dialogue_actor_unit then
-		return 
+		return
 	end
 
 	local extension = self.unit_extension_data[dialogue_actor_unit]
@@ -1754,8 +1718,6 @@ DialogueSystem.rpc_interrupt_dialogue_event = function (self, sender, go_id, is_
 			Unit.animation_event(dialogue_actor_unit, "talk_body_end")
 		end
 	end
-
-	return 
 end
 
 function DebugPrintPlayedQuery(query, extension)
@@ -1769,8 +1731,6 @@ function DebugPrintPlayedQuery(query, extension)
 	end
 
 	print("--------------- END OF PLAYED QUERY ---------------")
-
-	return 
 end
 
 DialogueSystem.DebugPlayDialogue = function (self)
@@ -1782,26 +1742,18 @@ DialogueSystem.DebugPlayDialogue = function (self)
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_dialogue_event(dialogue_input, "story_trigger", event_data)
-
-	return 
 end
 
 function DebugVo_pause()
 	DebugVo.pause()
-
-	return 
 end
 
 function DebugVo_play()
 	DebugVo.play()
-
-	return 
 end
 
 function DebugVo_jump_to(line_number)
 	DebugVo.jump_to(line_number)
-
-	return 
 end
 
 function DebugVoByFile(file_name, quick)
@@ -1817,6 +1769,7 @@ function DebugVoByFile(file_name, quick)
 		localization_strings = {}
 	}
 	local cl = 1
+
 	DebugVo.play = function ()
 		if cl < #current_file.sound_events then
 			local is_npc = true
@@ -1831,7 +1784,7 @@ function DebugVoByFile(file_name, quick)
 				if profile == nil then
 					print("That player profile does not exist")
 
-					return 
+					return
 				end
 
 				if profile.display_name == current_file.profile_names[cl] and Unit.alive(player.player_unit) then
@@ -1897,13 +1850,13 @@ function DebugVoByFile(file_name, quick)
 
 		return cl, #current_file.sound_events, current_file.face_animations[cl], current_file.sound_events[cl], current_file.profile_names[cl], missing_vo, fast_play, current_file.localization_strings[cl]
 	end
+
 	DebugVo.pause = function ()
 		debug_vo_by_file = false
 		DialogueSettings.dialogue_level_start_delay = DialogueSettings.dialogue_level_start_delay
 		DialogueSettings.story_tick_time = DialogueSettings.story_tick_time
-
-		return 
 	end
+
 	DebugVo.jump_to = function (line_number)
 		if type(line_number) == "number" then
 			cl = line_number
@@ -1914,15 +1867,13 @@ function DebugVoByFile(file_name, quick)
 				end
 			end
 		end
-
-		return 
 	end
 
 	local function fetch(self)
 		local file_environment = {
 			OP = "EQ",
 			define_rule = function (rule_definition)
-				return 
+				return
 			end,
 			add_dialogues = function (dialogues)
 				for name, dialogue in pairs(dialogues) do
@@ -1965,8 +1916,6 @@ function DebugVoByFile(file_name, quick)
 						printf(tostring(#current_file.event_names .. " -- " .. dialogue.sound_events[i]))
 					end
 				end
-
-				return 
 			end
 		}
 		local comp_file_name = "dialogues/generated/" .. file_name
@@ -1974,14 +1923,10 @@ function DebugVoByFile(file_name, quick)
 
 		setfenv(file_function, file_environment)
 		file_function()
-
-		return 
 	end
 
 	fetch()
 	DebugVo.play()
-
-	return 
 end
 
-return 
+return

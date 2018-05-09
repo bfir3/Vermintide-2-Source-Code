@@ -15,6 +15,7 @@ OutlineSystem.system_extensions = {
 	"EnemyOutlineExtension",
 	"GenericOutlineExtension"
 }
+
 OutlineSystem.init = function (self, context, system_name)
 	local extensions = OutlineSystem.system_extensions
 
@@ -27,9 +28,8 @@ OutlineSystem.init = function (self, context, system_name)
 	self.current_index = 0
 	self.darkness_system = Managers.state.entity:system("darkness_system")
 	self.cutscene_system = Managers.state.entity:system("cutscene_system")
-
-	return 
 end
+
 OutlineSystem.on_add_extension = function (self, world, unit, extension_name)
 	local extension = {}
 
@@ -45,6 +45,7 @@ OutlineSystem.on_add_extension = function (self, world, unit, extension_name)
 		extension.last_set_method = extension.method
 		extension.flag = "outline_unit"
 		extension.apply_method = "unit_and_childs"
+
 		extension.set_method_player_setting = function (method)
 			if extension.override_method then
 				extension.last_set_method = method
@@ -52,9 +53,8 @@ OutlineSystem.on_add_extension = function (self, world, unit, extension_name)
 				extension.method = method
 				extension.last_set_method = method
 			end
-
-			return 
 		end
+
 		extension.update_override_method_player_setting = function ()
 			local override_method = nil
 			local player_outlines = Application.user_setting("player_outlines")
@@ -72,8 +72,6 @@ OutlineSystem.on_add_extension = function (self, world, unit, extension_name)
 			else
 				extension.method = override_method
 			end
-
-			return 
 		end
 
 		extension.update_override_method_player_setting()
@@ -149,24 +147,20 @@ OutlineSystem.on_add_extension = function (self, world, unit, extension_name)
 	extension.set_outline_color = function (color)
 		extension.outline_color = OutlineSettings.colors[color]
 		extension.new_color = true
-
-		return 
 	end
+
 	extension.reapply_outline = function ()
 		extension.reapply = true
-
-		return 
 	end
+
 	extension.set_method = function (method)
 		extension.method = method
-
-		return 
 	end
+
 	extension.set_distance = function (distance_type)
 		extension.distance = OutlineSettings.ranges[distance_type]
-
-		return 
 	end
+
 	extension.set_pinged = function (pinged)
 		if pinged then
 			if not extension.pinged then
@@ -196,9 +190,8 @@ OutlineSystem.on_add_extension = function (self, world, unit, extension_name)
 		end
 
 		extension.pinged = pinged
-
-		return 
 	end
+
 	extension.outlined = false
 	extension.new_color = false
 
@@ -209,19 +202,18 @@ OutlineSystem.on_add_extension = function (self, world, unit, extension_name)
 
 	return extension
 end
+
 OutlineSystem.on_remove_extension = function (self, unit, extension_name)
 	self.unit_extension_data[unit] = nil
 
 	table.remove(self.units, table.find(self.units, unit))
 	ScriptUnit.remove_extension(unit, self.NAME)
-
-	return 
 end
+
 OutlineSystem.local_player_created = function (self, player)
 	self.camera_unit = player.camera_follow_unit
-
-	return 
 end
+
 OutlineSystem._is_cutscene_active = function (self)
 	local cutscene_system = self.cutscene_system
 
@@ -231,17 +223,18 @@ OutlineSystem._is_cutscene_active = function (self)
 
 	return cutscene_system.active_camera and not cutscene_system.ingame_hud_enabled
 end
+
 OutlineSystem.update = function (self, context, t)
 	if #self.units == 0 then
-		return 
+		return
 	end
 
 	if script_data.disable_outlines then
-		return 
+		return
 	end
 
 	if not self.camera_unit then
-		return 
+		return
 	end
 
 	local checks_per_frame = 4
@@ -287,9 +280,8 @@ OutlineSystem.update = function (self, context, t)
 	end
 
 	self.current_index = current_index
-
-	return 
 end
+
 OutlineSystem.outline_unit = function (self, unit, flag, channel, do_outline, apply_method, is_reapply)
 	if Unit.has_data(unit, "outlined_meshes") then
 		local i = 0
@@ -321,9 +313,8 @@ OutlineSystem.outline_unit = function (self, unit, flag, channel, do_outline, ap
 	else
 		error(sprintf("Non-existant apply method %s", apply_method))
 	end
-
-	return 
 end
+
 OutlineSystem.raycast_result = function (self, unit_center)
 	local physics_world = self.physics_world
 	local camera_position = Unit.local_position(self.camera_unit, 0)
@@ -333,6 +324,7 @@ OutlineSystem.raycast_result = function (self, unit_center)
 
 	return result, num_hits
 end
+
 OutlineSystem.distance_to_unit = function (self, unit)
 	local camera_position = Unit.local_position(self.camera_unit, 0)
 	local pose, radius = Unit.box(unit)
@@ -341,20 +333,24 @@ OutlineSystem.distance_to_unit = function (self, unit)
 
 	return distance
 end
+
 OutlineSystem.never = function (self, unit, extension)
 	return false
 end
+
 OutlineSystem.ai_alive = function (self, unit, extension)
 	local active_cutscene = self._is_cutscene_active(self)
 	local alive = AiUtils.unit_alive(unit)
 
 	return alive and not active_cutscene
 end
+
 OutlineSystem.always = function (self, unit, extension)
 	local active_cutscene = self._is_cutscene_active(self)
 
 	return not active_cutscene
 end
+
 OutlineSystem.visible = function (self, unit, extension)
 	local pose, radius = Unit.box(unit)
 	local unit_center = Matrix4x4.translation(pose)
@@ -363,6 +359,7 @@ OutlineSystem.visible = function (self, unit, extension)
 
 	return not in_darkness and not self.raycast_result(self, unit_center) and not active_cutscene
 end
+
 OutlineSystem.not_in_dark = function (self, unit, extension)
 	local pose, radius = Unit.box(unit)
 	local unit_center = Matrix4x4.translation(pose)
@@ -371,11 +368,13 @@ OutlineSystem.not_in_dark = function (self, unit, extension)
 
 	return not in_darkness and not active_cutscene
 end
+
 OutlineSystem.not_visible = function (self, unit, extension)
 	local active_cutscene = self._is_cutscene_active(self)
 
 	return not self.visible(self, unit, extension) and not active_cutscene
 end
+
 OutlineSystem.within_distance_and_not_in_dark = function (self, unit, extension)
 	if not self.within_distance(self, unit, extension) then
 		return false
@@ -388,16 +387,19 @@ OutlineSystem.within_distance_and_not_in_dark = function (self, unit, extension)
 
 	return not in_darkness and not active_cutscene
 end
+
 OutlineSystem.within_distance = function (self, unit, extension)
 	local active_cutscene = self._is_cutscene_active(self)
 
 	return self.distance_to_unit(self, unit) <= extension.distance and not active_cutscene
 end
+
 OutlineSystem.outside_distance = function (self, unit, extension)
 	local active_cutscene = self._is_cutscene_active(self)
 
 	return extension.distance < self.distance_to_unit(self, unit) and not active_cutscene
 end
+
 OutlineSystem.outside_distance_or_not_visible = function (self, unit, extension)
 	local active_cutscene = self._is_cutscene_active(self)
 
@@ -411,6 +413,7 @@ OutlineSystem.outside_distance_or_not_visible = function (self, unit, extension)
 
 	return false
 end
+
 OutlineSystem.within_distance_and_visible = function (self, unit, extension)
 	if self.within_distance(self, unit, extension) and self.visible(self, unit, extension) then
 		local active_cutscene = self._is_cutscene_active(self)
@@ -420,6 +423,7 @@ OutlineSystem.within_distance_and_visible = function (self, unit, extension)
 
 	return false
 end
+
 OutlineSystem.conditional_within_distance = function (self, unit, extension)
 	if self.within_distance(self, unit, extension) then
 		local interaction_type = Unit.get_data(unit, "interaction_data", "interaction_type")
@@ -440,4 +444,4 @@ OutlineSystem.conditional_within_distance = function (self, unit, extension)
 	return false
 end
 
-return 
+return

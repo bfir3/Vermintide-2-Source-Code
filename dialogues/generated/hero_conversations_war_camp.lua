@@ -3408,6 +3408,4 @@ return function ()
 			}
 		}
 	})
-
-	return 
 end

@@ -1,4 +1,5 @@
 PlayerBotUnitFirstPerson = class(PlayerBotUnitFirstPerson)
+
 PlayerBotUnitFirstPerson.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.world = extension_init_context.world
@@ -50,28 +51,25 @@ PlayerBotUnitFirstPerson.init = function (self, extension_init_context, unit, ex
 	if script_data.benchmark then
 		Unit.animation_event(self.first_person_unit, "enable_headbob")
 	end
+end
 
-	return 
-end
 PlayerBotUnitFirstPerson.reset = function (self)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.extensions_ready = function (self)
 	self.locomotion_extension = ScriptUnit.extension(self.unit, "locomotion_system")
 	self.inventory_extension = ScriptUnit.extension(self.unit, "inventory_system")
 	self.attachment_extension = ScriptUnit.extension(self.unit, "attachment_system")
 
 	self.set_first_person_mode(self, true)
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.destroy = function (self)
 	local unit_spawner = Managers.state.unit_spawner
 
 	unit_spawner.mark_for_deletion(unit_spawner, self.first_person_unit)
 	unit_spawner.mark_for_deletion(unit_spawner, self.first_person_attachment_unit)
-
-	return 
 end
 
 local function ease_out_quad(t, b, c, d)
@@ -98,21 +96,20 @@ PlayerBotUnitFirstPerson.update_player_height = function (self, t)
 		Debug.text("self.player_height_change_start_time = " .. tostring(self.player_height_change_start_time))
 		Debug.text("time_changing_height = " .. tostring(time_changing_height))
 	end
-
-	return 
 end
+
 PlayerBotUnitFirstPerson._player_height_from_name = function (self, name)
 	local profile = self.profile
 
 	return profile.first_person_heights[name]
 end
+
 PlayerBotUnitFirstPerson.update = function (self, unit, input, dt, context, t)
 	self.update_player_height(self, t)
 	self.update_rotation(self, t, dt)
 	self.update_position(self)
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.update_rotation = function (self, t, dt)
 	local first_person_unit = self.first_person_unit
 
@@ -134,64 +131,66 @@ PlayerBotUnitFirstPerson.update_rotation = function (self, t, dt)
 
 		Unit.set_local_rotation(first_person_unit, 0, look_rotation)
 	end
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.update_position = function (self)
 	local position_root = Unit.local_position(self.unit, 0)
 	local offset_height = Vector3(0, 0, self.player_height_current)
 	local position = position_root + offset_height
 
 	Unit.set_local_position(self.first_person_unit, 0, position)
+end
 
-	return 
-end
 PlayerBotUnitFirstPerson.apply_recoil = function (self)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.get_first_person_unit = function (self)
 	return self.first_person_unit
 end
+
 PlayerBotUnitFirstPerson.get_first_person_mesh_unit = function (self)
 	return self.first_person_attachment_unit
 end
+
 PlayerBotUnitFirstPerson.set_look_delta = function (self, look_delta)
 	self.look_delta = look_delta
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.play_animation_event = function (self, anim_event)
 	Unit.animation_event(self.first_person_unit, anim_event)
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.current_position = function (self)
 	return Unit.local_position(self.first_person_unit, 0)
 end
+
 PlayerBotUnitFirstPerson.current_rotation = function (self)
 	return Unit.local_rotation(self.first_person_unit, 0)
 end
+
 PlayerBotUnitFirstPerson.current_camera_position = function (self)
 	return Unit.local_position(self.first_person_unit, 0)
 end
+
 PlayerBotUnitFirstPerson.set_rotation = function (self, new_rotation)
 	Unit.set_local_rotation(self.first_person_unit, 0, new_rotation)
 	Unit.set_local_rotation(self.unit, 0, new_rotation)
 	self.look_rotation:store(new_rotation)
+end
 
-	return 
-end
 PlayerBotUnitFirstPerson.force_look_rotation = function (self, rot)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.set_wanted_player_height = function (self, state, t, time_to_change)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.toggle_visibility = function (self)
 	self.set_first_person_mode(self, not self.first_person_mode)
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.set_first_person_mode = function (self, active)
 	self.first_person_mode = active
 
@@ -203,9 +202,8 @@ PlayerBotUnitFirstPerson.set_first_person_mode = function (self, active)
 		self.inventory_extension:show_third_person_inventory(true)
 		self.attachment_extension:show_attachments(true)
 	end
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.debug_set_first_person_mode = function (self, active, override)
 	for k, v in pairs(self.flow_unit_attachments) do
 		Unit.set_unit_visibility(v, not active)
@@ -225,52 +223,58 @@ PlayerBotUnitFirstPerson.debug_set_first_person_mode = function (self, active, o
 
 		self.set_first_person_mode(self, self.first_person_mode)
 	end
+end
 
-	return 
-end
 PlayerBotUnitFirstPerson.hide_weapons = function (self)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.unhide_weapons = function (self)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.animation_set_variable = function (self, variable_name, value)
 	if self.first_person_debug then
 		local variable = Unit.animation_find_variable(self.first_person_unit, variable_name)
 
 		Unit.animation_set_variable(self.first_person_unit, variable, value)
 	end
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.animation_event = function (self, event)
 	if self.first_person_debug then
 		Unit.animation_event(self.first_person_unit, event)
 	end
+end
 
-	return 
-end
 PlayerBotUnitFirstPerson.increase_aim_assist_multiplier = function (self)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.reset_aim_assist_multiplier = function (self)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.is_in_view = function (self, position)
 	return true
 end
+
 PlayerBotUnitFirstPerson.is_within_default_view = function (self, position)
 	return true
 end
+
 PlayerBotUnitFirstPerson.create_screen_particles = function (self, ...)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.stop_spawning_screen_particles = function (self, ...)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.destroy_screen_particles = function (self, ...)
-	return 
+	return
 end
+
 PlayerBotUnitFirstPerson.play_hud_sound_event = function (self, event, wwise_source_id, play_on_husk)
 	if play_on_husk and not LEVEL_EDITOR_TEST then
 		self.play_sound_event(self, event)
@@ -282,50 +286,54 @@ PlayerBotUnitFirstPerson.play_hud_sound_event = function (self, event, wwise_sou
 
 		network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_sound_event", unit_id, event_id)
 	end
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.play_sound_event = function (self, event, position)
 	local sound_position = position or self.current_position(self)
 	local wwise_source_id, wwise_world = WwiseUtils.make_position_auto_source(self.world, sound_position)
 
 	WwiseWorld.set_switch(wwise_world, "husk", "true", wwise_source_id)
 	WwiseWorld.trigger_event(wwise_world, event, wwise_source_id)
-
-	return 
 end
+
 PlayerUnitFirstPerson.play_unit_sound_event = function (self, event, unit, node_id, play_on_husk)
 	local event_id = NetworkLookup.sound_events[event]
 	local wwise_source_id, wwise_world = WwiseUtils.make_unit_auto_source(self.world, unit, node_id)
 
 	WwiseWorld.set_switch(wwise_world, "husk", "true", wwise_source_id)
 	WwiseWorld.trigger_event(wwise_world, event, wwise_source_id)
-
-	return 
 end
+
 PlayerBotUnitFirstPerson.play_camera_effect_sequence = function (self, event, t)
-	return 
-end
-PlayerBotUnitFirstPerson.enable_rig_movement = function (self)
-	return 
-end
-PlayerBotUnitFirstPerson.disable_rig_movement = function (self)
-	return 
-end
-PlayerBotUnitFirstPerson.enable_rig_offset = function (self)
-	return 
-end
-PlayerBotUnitFirstPerson.disable_rig_offset = function (self)
-	return 
-end
-PlayerBotUnitFirstPerson.change_state = function (self, state)
-	return 
-end
-PlayerBotUnitFirstPerson.play_camera_effect_sequence = function (self)
-	return 
-end
-PlayerBotUnitFirstPerson.play_camera_recoil = function (self)
-	return 
+	return
 end
 
-return 
+PlayerBotUnitFirstPerson.enable_rig_movement = function (self)
+	return
+end
+
+PlayerBotUnitFirstPerson.disable_rig_movement = function (self)
+	return
+end
+
+PlayerBotUnitFirstPerson.enable_rig_offset = function (self)
+	return
+end
+
+PlayerBotUnitFirstPerson.disable_rig_offset = function (self)
+	return
+end
+
+PlayerBotUnitFirstPerson.change_state = function (self, state)
+	return
+end
+
+PlayerBotUnitFirstPerson.play_camera_effect_sequence = function (self)
+	return
+end
+
+PlayerBotUnitFirstPerson.play_camera_recoil = function (self)
+	return
+end
+
+return

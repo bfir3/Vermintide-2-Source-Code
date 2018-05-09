@@ -43,8 +43,6 @@ local function item_sort_func(item_1, item_2)
 	else
 		return item_2_power_level < item_1_power_level
 	end
-
-	return 
 end
 
 HeroWindowLoadoutInventory.on_enter = function (self, params, offset)
@@ -89,9 +87,8 @@ HeroWindowLoadoutInventory.on_enter = function (self, params, offset)
 			inventory_extension.check_and_drop_pickups(inventory_extension, "enter_inventory")
 		end
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -122,9 +119,8 @@ HeroWindowLoadoutInventory.create_ui_elements = function (self, params, offset)
 	end
 
 	self._setup_tab_widget(self)
-
-	return 
 end
+
 HeroWindowLoadoutInventory._setup_tab_widget = function (self)
 	local profile = SPProfiles[self.profile_index]
 	local careers = profile.careers
@@ -199,9 +195,8 @@ HeroWindowLoadoutInventory._setup_tab_widget = function (self)
 		hotspot_content[icon_name] = icon
 		hotspot_content.category_index = category_index
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory.on_exit = function (self, params)
 	print("[HeroViewWindow] Exit Substate HeroWindowLoadoutInventory")
 
@@ -210,9 +205,8 @@ HeroWindowLoadoutInventory.on_exit = function (self, params)
 	self._item_grid:destroy()
 
 	self._item_grid = nil
-
-	return 
 end
+
 HeroWindowLoadoutInventory.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -227,12 +221,12 @@ HeroWindowLoadoutInventory.update = function (self, dt, t)
 	self._update_loadout_sync(self)
 	self._update_page_info(self)
 	self.draw(self, dt)
+end
 
-	return 
-end
 HeroWindowLoadoutInventory.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 HeroWindowLoadoutInventory._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -248,9 +242,8 @@ HeroWindowLoadoutInventory._update_animations = function (self, dt)
 	end
 
 	local widgets_by_name = self._widgets_by_name
-
-	return 
 end
+
 HeroWindowLoadoutInventory._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -260,9 +253,8 @@ HeroWindowLoadoutInventory._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._is_button_hovered = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -270,9 +262,8 @@ HeroWindowLoadoutInventory._is_button_hovered = function (self, widget)
 	if hotspot.on_hover_enter then
 		return true
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._is_inventory_tab_hovered = function (self)
 	local widget = self._widgets_by_name.item_tabs
 	local widget_content = widget.content
@@ -287,9 +278,8 @@ HeroWindowLoadoutInventory._is_inventory_tab_hovered = function (self)
 			return i
 		end
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._is_inventory_tab_pressed = function (self)
 	local widget = self._widgets_by_name.item_tabs
 	local widget_content = widget.content
@@ -304,9 +294,8 @@ HeroWindowLoadoutInventory._is_inventory_tab_pressed = function (self)
 			return hotspot_content.category_index
 		end
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._select_tab_by_category_index = function (self, index)
 	local widget = self._widgets_by_name.item_tabs
 	local widget_content = widget.content
@@ -319,9 +308,8 @@ HeroWindowLoadoutInventory._select_tab_by_category_index = function (self, index
 		local category_index = hotspot_content.category_index
 		hotspot_content.is_selected = index == category_index
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local parent = self.parent
@@ -388,9 +376,8 @@ HeroWindowLoadoutInventory._handle_input = function (self, dt, t)
 		item_grid.set_item_page(item_grid, next_page_index)
 		self._play_sound(self, "play_gui_equipment_inventory_next_click")
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._update_page_info = function (self)
 	local current_page, total_pages = self._item_grid:get_page_info()
 
@@ -405,12 +392,12 @@ HeroWindowLoadoutInventory._update_page_info = function (self)
 		widgets_by_name.page_button_next.content.button_hotspot.disable_button = current_page == total_pages
 		widgets_by_name.page_button_previous.content.button_hotspot.disable_button = current_page == 1
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._get_actual_loadout_category_index = function (self, index)
 	return self._career_category_settings_index_lookup[index]
 end
+
 HeroWindowLoadoutInventory._update_selected_loadout_slot_index = function (self)
 	local index = self.parent:get_selected_loadout_slot_index()
 	local internal_slot_index = self._career_category_settings_index_lookup[index]
@@ -421,9 +408,8 @@ HeroWindowLoadoutInventory._update_selected_loadout_slot_index = function (self)
 		self._selected_loadout_slot_index = index
 		self._internal_slot_index = internal_slot_index
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._update_loadout_sync = function (self)
 	local item_grid = self._item_grid
 	local parent = self.parent
@@ -434,15 +420,13 @@ HeroWindowLoadoutInventory._update_loadout_sync = function (self)
 
 		item_grid.update_items_status(item_grid)
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._exit = function (self, selected_level)
 	self.exit = true
 	self.exit_level_id = selected_level
-
-	return 
 end
+
 HeroWindowLoadoutInventory.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -469,14 +453,12 @@ HeroWindowLoadoutInventory.draw = function (self, dt)
 	if gamepad_active then
 		self._menu_input_description:draw(ui_top_renderer, dt)
 	end
-
-	return 
 end
+
 HeroWindowLoadoutInventory._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroWindowLoadoutInventory._change_category_by_index = function (self, index, force_update)
 	local internal_slot_index = self._career_category_settings_index_lookup[index]
 
@@ -491,7 +473,7 @@ HeroWindowLoadoutInventory._change_category_by_index = function (self, index, fo
 	self._strict_slot_type = actual_category_name
 
 	if self._internal_slot_index == internal_slot_index then
-		return 
+		return
 	end
 
 	local category_setting = category_settings[internal_slot_index]
@@ -504,4 +486,4 @@ HeroWindowLoadoutInventory._change_category_by_index = function (self, index, fo
 	return true
 end
 
-return 
+return

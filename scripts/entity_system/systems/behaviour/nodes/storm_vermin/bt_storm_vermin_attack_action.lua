@@ -1,11 +1,11 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTStormVerminAttackAction = class(BTStormVerminAttackAction, BTNode)
+
 BTStormVerminAttackAction.init = function (self, ...)
 	BTStormVerminAttackAction.super.init(self, ...)
-
-	return 
 end
+
 BTStormVerminAttackAction.name = "BTStormVerminAttackAction"
 
 local function randomize(event)
@@ -14,8 +14,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTStormVerminAttackAction.enter = function (self, unit, blackboard, t)
@@ -64,9 +62,8 @@ BTStormVerminAttackAction.enter = function (self, unit, blackboard, t)
 	if target_unit_status_extension then
 		target_unit_status_extension.add_attack_intensity(target_unit_status_extension, attack_intensity * (0.75 + 0.5 * math.random()))
 	end
-
-	return 
 end
+
 BTStormVerminAttackAction._init_attack = function (self, unit, blackboard, t)
 	local action = blackboard.action
 	blackboard.move_state = "attacking"
@@ -127,9 +124,8 @@ BTStormVerminAttackAction._init_attack = function (self, unit, blackboard, t)
 			blackboard.bot_threat_at_t = t + action.bot_threat_start_time
 		end
 	end
-
-	return 
 end
+
 BTStormVerminAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.move_state = nil
 
@@ -158,9 +154,8 @@ BTStormVerminAttackAction.leave = function (self, unit, blackboard, t, reason, d
 	end
 
 	blackboard.action = nil
-
-	return 
 end
+
 BTStormVerminAttackAction.run = function (self, unit, blackboard, t, dt)
 	self.update_reset_attack(self, unit, t, dt, blackboard)
 
@@ -211,6 +206,7 @@ BTStormVerminAttackAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTStormVerminAttackAction._create_bot_threat = function (self, unit, blackboard)
 	local action = blackboard.action
 	local bot_threat_duration = action.bot_threat_duration
@@ -229,9 +225,8 @@ BTStormVerminAttackAction._create_bot_threat = function (self, unit, blackboard)
 			Managers.state.entity:system("ai_bot_group_system"):aoe_threat_created(pos, "oobb", size, rot, bot_threat_duration)
 		end
 	end
-
-	return 
 end
+
 BTStormVerminAttackAction.anim_cb_attack_vce = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
 	local game = network_manager.game(network_manager)
@@ -239,9 +234,8 @@ BTStormVerminAttackAction.anim_cb_attack_vce = function (self, unit, blackboard)
 	if game and blackboard.target_unit_status_extension then
 		DialogueSystem:TriggerAttack(blackboard.target_unit, unit, false, blackboard)
 	end
-
-	return 
 end
+
 BTStormVerminAttackAction.update_reset_attack = function (self, unit, t, dt, blackboard)
 	local action = blackboard.action
 	local reset_attack = blackboard.reset_attack
@@ -268,9 +262,8 @@ BTStormVerminAttackAction.update_reset_attack = function (self, unit, t, dt, bla
 			blackboard.reset_attack_delay = nil
 		end
 	end
-
-	return 
 end
+
 BTStormVerminAttackAction.attack = function (self, unit, t, dt, blackboard)
 	local locomotion = ScriptUnit.extension(unit, "locomotion_system")
 	local target_status_ext = blackboard.target_unit_status_extension
@@ -283,13 +276,13 @@ BTStormVerminAttackAction.attack = function (self, unit, t, dt, blackboard)
 	local locomotion_extension = blackboard.locomotion_extension
 
 	locomotion_extension.set_wanted_rotation(locomotion_extension, blackboard.attack_rotation:unbox())
-
-	return 
 end
+
 local debug_drawer_info = {
 	mode = "retained",
 	name = "BTStormVerminAttackAction"
 }
+
 BTStormVerminAttackAction.anim_cb_damage = function (self, unit, blackboard)
 	local action = blackboard.action
 	local world = Unit.world(unit)
@@ -335,7 +328,7 @@ BTStormVerminAttackAction.anim_cb_damage = function (self, unit, blackboard)
 
 	for target_unit, _ in pairs(hit_units) do
 		if not Unit.alive(target_unit) then
-			return 
+			return
 		end
 
 		local attack_direction = action.attack_directions and action.attack_directions[blackboard.attack_anim]
@@ -377,9 +370,8 @@ BTStormVerminAttackAction.anim_cb_damage = function (self, unit, blackboard)
 	end
 
 	blackboard.special_attacking_target = nil
-
-	return 
 end
+
 BTStormVerminAttackAction._calculate_cylinder_collision = function (self, action, self_pos, self_rot)
 	local radius = action.radius
 	local height = action.height
@@ -396,6 +388,7 @@ BTStormVerminAttackAction._calculate_cylinder_collision = function (self, action
 
 	return cylinder_center, size, rotation
 end
+
 BTStormVerminAttackAction._calculate_oobb_collision = function (self, action, self_pos, self_rot)
 	local range = action.range
 	local height = action.height
@@ -411,13 +404,13 @@ BTStormVerminAttackAction._calculate_oobb_collision = function (self, action, se
 
 	return oobb_pos, self_rot, size
 end
+
 BTStormVerminAttackAction.tag_catapult_enemy = function (unit, blackboard, action, target_unit, blocked)
 	blackboard.catapult_list = blackboard.catapult_list or {}
 	blackboard.catapult_list[target_unit] = blocked
 	blackboard.catapult_hit = true
-
-	return 
 end
+
 BTStormVerminAttackAction.catapult_enemies = function (unit, blackboard)
 	local list = blackboard.catapult_list
 
@@ -433,12 +426,11 @@ BTStormVerminAttackAction.catapult_enemies = function (unit, blackboard)
 	end
 
 	blackboard.catapult_hit = false
-
-	return 
 end
+
 BTStormVerminAttackAction.catapult_enemy = function (unit, blackboard, action, target_unit, blocked)
 	if not action.catapult then
-		return 
+		return
 	end
 
 	if blocked then
@@ -458,8 +450,6 @@ BTStormVerminAttackAction.catapult_enemy = function (unit, blackboard, action, t
 		Vector3.set_z(push_velocity, action.shove_z_speed)
 		StatusUtils.set_catapulted_network(target_unit, true, push_velocity)
 	end
-
-	return 
 end
 
-return 
+return

@@ -1,11 +1,11 @@
 PlayerCharacterStateKnockedDown = class(PlayerCharacterStateKnockedDown, PlayerCharacterState)
+
 PlayerCharacterStateKnockedDown.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "knocked_down")
 
 	local context = character_state_init_context
-
-	return 
 end
+
 PlayerCharacterStateKnockedDown.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	CharacterStateHelper.stop_weapon_actions(self.inventory_extension, "knocked_down")
 
@@ -57,9 +57,8 @@ PlayerCharacterStateKnockedDown.on_enter = function (self, unit, input, dt, cont
 
 	inventory_extension.check_and_drop_pickups(inventory_extension, "knocked_down")
 	status_extension.set_catapulted(status_extension, false)
-
-	return 
 end
+
 PlayerCharacterStateKnockedDown.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local first_person_extension = self.first_person_extension
 
@@ -73,9 +72,8 @@ PlayerCharacterStateKnockedDown.on_exit = function (self, unit, input, dt, conte
 	end
 
 	first_person_extension.set_wanted_player_height(first_person_extension, "stand", t)
-
-	return 
 end
+
 PlayerCharacterStateKnockedDown.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -90,7 +88,7 @@ PlayerCharacterStateKnockedDown.update = function (self, unit, input, dt, contex
 	if CharacterStateHelper.is_dead(status_extension) then
 		csm.change_state(csm, "dead")
 
-		return 
+		return
 	end
 
 	if self.pounced_down and not CharacterStateHelper.is_pounced_down(status_extension) then
@@ -116,7 +114,7 @@ PlayerCharacterStateKnockedDown.update = function (self, unit, input, dt, contex
 
 		csm.change_state(csm, "standing")
 
-		return 
+		return
 	end
 
 	local time_since_start = t - self.start_time
@@ -132,8 +130,6 @@ PlayerCharacterStateKnockedDown.update = function (self, unit, input, dt, contex
 
 	locomotion_extension.set_disable_rotation_update(locomotion_extension)
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, self.first_person_extension, status_extension, self.inventory_extension)
-
-	return 
 end
 
-return 
+return

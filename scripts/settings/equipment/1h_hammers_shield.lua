@@ -1033,4 +1033,4 @@ Weapons.one_handed_hammer_shield_template_2.actions.action_one.light_attack_left
 Weapons.one_handed_hammer_shield_template_2.actions.action_one.light_attack_right.range_mod = 1
 Weapons.one_handed_hammer_shield_template_2.actions.action_one.light_attack_last.range_mod = 1
 
-return 
+return

@@ -1,6 +1,7 @@
 ShowCursorStack = ShowCursorStack or {
 	stack_depth = 0
 }
+
 ShowCursorStack.render_cursor = function (allow_cursor_rendering)
 	ShowCursorStack.allow_cursor_rendering = allow_cursor_rendering
 
@@ -10,9 +11,8 @@ ShowCursorStack.render_cursor = function (allow_cursor_rendering)
 		Window.set_show_cursor(allow_cursor_rendering)
 		Window.set_clip_cursor(not allow_cursor_rendering or is_fullscreen)
 	end
-
-	return 
 end
+
 ShowCursorStack.push = function ()
 	if ShowCursorStack.stack_depth == 0 and ShowCursorStack.allow_cursor_rendering then
 		local is_fullscreen = Application.is_fullscreen and Application.is_fullscreen()
@@ -22,9 +22,8 @@ ShowCursorStack.push = function ()
 	end
 
 	ShowCursorStack.stack_depth = ShowCursorStack.stack_depth + 1
-
-	return 
 end
+
 ShowCursorStack.pop = function ()
 	ShowCursorStack.stack_depth = ShowCursorStack.stack_depth - 1
 
@@ -34,9 +33,8 @@ ShowCursorStack.pop = function ()
 		Window.set_show_cursor(false)
 		Window.set_clip_cursor(true)
 	end
-
-	return 
 end
+
 ShowCursorStack.update_clip_cursor = function ()
 	local is_fullscreen = Application.is_fullscreen and Application.is_fullscreen()
 	local allow_cursor_rendering = ShowCursorStack.allow_cursor_rendering
@@ -46,8 +44,6 @@ ShowCursorStack.update_clip_cursor = function ()
 	elseif 0 < ShowCursorStack.stack_depth then
 		Window.set_clip_cursor(is_fullscreen)
 	end
-
-	return 
 end
 
-return 
+return

@@ -1,5 +1,6 @@
 MatchmakingStateJoinGame = class(MatchmakingStateJoinGame)
 MatchmakingStateJoinGame.NAME = "MatchmakingStateJoinGame"
+
 MatchmakingStateJoinGame.init = function (self, params)
 	self._lobby = params.lobby
 	self._network_transmit = params.network_transmit
@@ -12,12 +13,12 @@ MatchmakingStateJoinGame.init = function (self, params)
 	self._hero_popup_at_t = nil
 	self._selected_hero_at_t = nil
 	self._show_popup = false
+end
 
-	return 
-end
 MatchmakingStateJoinGame.destroy = function (self)
-	return 
+	return
 end
+
 MatchmakingStateJoinGame.on_enter = function (self, state_context)
 	self.state_context = state_context
 	self.search_config = state_context.search_config
@@ -43,9 +44,8 @@ MatchmakingStateJoinGame.on_enter = function (self, state_context)
 	self._matchmaking_manager:send_system_chat_message("matchmaking_status_aquiring_profiles")
 
 	self._update_lobby_data_timer = 0
-
-	return 
 end
+
 MatchmakingStateJoinGame.on_exit = function (self)
 	if self._popup_join_lobby_handler then
 		if self._ingame_ui:unavailable_hero_popup_active() then
@@ -54,9 +54,8 @@ MatchmakingStateJoinGame.on_exit = function (self)
 
 		self._popup_join_lobby_handler = nil
 	end
-
-	return 
 end
+
 MatchmakingStateJoinGame.update = function (self, dt, t)
 	local popup_join_lobby_handler = self._popup_join_lobby_handler
 
@@ -133,6 +132,7 @@ MatchmakingStateJoinGame.update = function (self, dt, t)
 
 	return nil
 end
+
 MatchmakingStateJoinGame._update_lobby_data = function (self, dt, t)
 	self._update_lobby_data_timer = self._update_lobby_data_timer - dt
 
@@ -156,9 +156,8 @@ MatchmakingStateJoinGame._update_lobby_data = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 MatchmakingStateJoinGame._handle_popup_result = function (self, result, t)
 	local selected_hero_name = nil
 	local cancel = false
@@ -201,9 +200,10 @@ MatchmakingStateJoinGame._handle_popup_result = function (self, result, t)
 
 	return cancel
 end
+
 MatchmakingStateJoinGame.rpc_matchmaking_update_profiles_data = function (self, sender, client_cookie, host_cookie, profile_array, player_id_array)
 	if not self._handshaker_client:validate_cookies(client_cookie, host_cookie) then
-		return 
+		return
 	end
 
 	self._update_profiles_data(self, profile_array, player_id_array)
@@ -211,16 +211,14 @@ MatchmakingStateJoinGame.rpc_matchmaking_update_profiles_data = function (self, 
 	if self._popup_join_lobby_handler then
 		self._set_unavailable_heroes(self, self._lobby_data)
 	end
-
-	return 
 end
+
 MatchmakingStateJoinGame._update_profiles_data = function (self, profile_array, player_id_array)
 	SlotAllocator.unpack_after_transmission(profile_array, player_id_array, self._lobby_data)
 
 	self._matchmaking_manager.debug.profiles_data = self._lobby_data
-
-	return 
 end
+
 MatchmakingStateJoinGame.get_transition = function (self)
 	if self._join_lobby_data and self._next_transition_state then
 		local start_lobby_data = {
@@ -229,9 +227,8 @@ MatchmakingStateJoinGame.get_transition = function (self)
 
 		return self._next_transition_state, start_lobby_data
 	end
-
-	return 
 end
+
 MatchmakingStateJoinGame._spawn_join_popup = function (self)
 	local state_context = self.state_context
 	local peer_id = Network.peer_id()
@@ -247,16 +244,14 @@ MatchmakingStateJoinGame._spawn_join_popup = function (self)
 
 	local time_manager = Managers.time
 	self._hero_popup_at_t = time_manager.time(time_manager, "game")
-
-	return 
 end
+
 MatchmakingStateJoinGame._remove_join_popup = function (self)
 	self._ingame_ui:hide_unavailable_hero_popup()
 
 	self._popup_join_lobby_handler = nil
-
-	return 
 end
+
 MatchmakingStateJoinGame._set_unavailable_heroes = function (self, lobby_data)
 	local occupied_heroes = {}
 	local num_profiles = #SPProfiles
@@ -268,9 +263,8 @@ MatchmakingStateJoinGame._set_unavailable_heroes = function (self, lobby_data)
 	end
 
 	self._popup_join_lobby_handler:set_unavailable_heroes(occupied_heroes)
-
-	return 
 end
+
 MatchmakingStateJoinGame._request_profile_from_host = function (self, hero_index)
 	local lobby_client = self.lobby_client
 	local host = lobby_client.lobby_host(lobby_client)
@@ -287,12 +281,11 @@ MatchmakingStateJoinGame._request_profile_from_host = function (self, hero_index
 	self._matchmaking_manager.debug.text = "requesting_profile"
 	self._matchmaking_manager.debug.state = "hosted by: " .. (host_name or "unknown")
 	self._matchmaking_manager.debug.level = lobby_client.lobby_data(lobby_client, "selected_level_key")
-
-	return 
 end
+
 MatchmakingStateJoinGame.rpc_matchmaking_request_profile_reply = function (self, sender, client_cookie, host_cookie, profile, reply)
 	if not self._handshaker_client:validate_cookies(client_cookie, host_cookie) then
-		return 
+		return
 	end
 
 	local selected_hero_name = self._selected_hero_name
@@ -323,9 +316,8 @@ MatchmakingStateJoinGame.rpc_matchmaking_request_profile_reply = function (self,
 	local time_taken = (self._selected_hero_at_t and self._selected_hero_at_t - self._hero_popup_at_t) or 0
 
 	Managers.telemetry.events:ui_matchmaking_select_player(player, selected_hero_name, reason, time_taken)
-
-	return 
 end
+
 MatchmakingStateJoinGame._current_hero = function (self)
 	local peer_id = Network.peer_id()
 	local player = Managers.player:player_from_peer_id(peer_id)
@@ -335,6 +327,7 @@ MatchmakingStateJoinGame._current_hero = function (self)
 
 	return profile_index, profile_name
 end
+
 MatchmakingStateJoinGame._level_started = function (self)
 	local lobby_client = self.lobby_client
 	local selected_level_key = lobby_client.lobby_data(lobby_client, "selected_level_key")
@@ -343,29 +336,29 @@ MatchmakingStateJoinGame._level_started = function (self)
 
 	return level_started, level_key
 end
+
 MatchmakingStateJoinGame.loading_context = function (self)
 	return self._matchmaking_loading_context
 end
+
 MatchmakingStateJoinGame.rpc_matchmaking_join_game = function (self, sender, client_cookie, host_cookie)
 	if not self._handshaker_client:validate_cookies(client_cookie, host_cookie) then
-		return 
+		return
 	end
 
 	mm_printf_force("Transition from join due to rpc_matchmaking_join_game")
 	self._set_state_to_start_lobby(self)
-
-	return 
 end
+
 MatchmakingStateJoinGame.active_lobby = function (self)
 	return self.lobby_client
 end
+
 MatchmakingStateJoinGame._set_state_to_start_lobby = function (self)
 	self._matchmaking_manager:send_system_chat_message("matchmaking_status_joining_game")
 
 	self._matchmaking_manager.debug.text = "starting_game"
 	self._next_transition_state = "start_lobby"
-
-	return 
 end
 
-return 
+return

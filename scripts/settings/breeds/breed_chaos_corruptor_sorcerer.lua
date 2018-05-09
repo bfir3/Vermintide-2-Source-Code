@@ -196,8 +196,6 @@ local action_data = {
 		end,
 		custom_exit_function = function (unit, blackboard, t)
 			blackboard.corruptor_grab_stagger = nil
-
-			return 
 		end,
 		stagger_anims = {
 			{
@@ -403,4 +401,4 @@ local action_data = {
 }
 BreedActions.chaos_corruptor_sorcerer = table.create_copy(BreedActions.chaos_corruptor_sorcerer, action_data)
 
-return 
+return

@@ -2,21 +2,22 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTVortexWanderAction = class(BTVortexWanderAction, BTNode)
 local position_lookup = POSITION_LOOKUP
+
 BTVortexWanderAction.init = function (self, ...)
 	BTVortexWanderAction.super.init(self, ...)
-
-	return 
 end
+
 BTVortexWanderAction.name = "BTVortexWanderAction"
+
 BTVortexWanderAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
+end
 
-	return 
-end
 BTVortexWanderAction.leave = function (self, unit, blackboard, t, reason, destroy)
-	return 
+	return
 end
+
 BTVortexWanderAction.run = function (self, unit, blackboard, t, dt)
 	local vortex_data = blackboard.vortex_data
 
@@ -24,6 +25,7 @@ BTVortexWanderAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTVortexWanderAction._wander_around = function (self, unit, t, dt, blackboard, vortex_data)
 	local action = blackboard.action
 	local wander_state = vortex_data.wander_state
@@ -101,8 +103,6 @@ BTVortexWanderAction._wander_around = function (self, unit, t, dt, blackboard, v
 		end
 	elseif wander_state ~= "standing_still" and wander_state == "forced_standing_still" then
 	end
-
-	return 
 end
 
-return 
+return

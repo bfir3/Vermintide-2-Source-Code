@@ -2,6 +2,7 @@ require("scripts/network/lobby_psn")
 
 StateTitleScreenLoadSave = class(StateTitleScreenLoadSave)
 StateTitleScreenLoadSave.NAME = "StateTitleScreenLoadSave"
+
 StateTitleScreenLoadSave.on_enter = function (self, params)
 	print("[Gamestate] Enter Substate StateTitleScreenLoadSave")
 
@@ -20,15 +21,13 @@ StateTitleScreenLoadSave.on_enter = function (self, params)
 
 	self._title_start_ui:set_user_name(online_id or "FAILED TO RETRIEVE ONLINE ID")
 	self._setup_input(self)
-
-	return 
 end
+
 StateTitleScreenLoadSave._setup_input = function (self)
 	local input_manager = Managers.input
 	self.input_manager = input_manager
-
-	return 
 end
+
 StateTitleScreenLoadSave.update = function (self, dt, t)
 	local title_start_ui = self._title_start_ui
 
@@ -148,23 +147,22 @@ StateTitleScreenLoadSave.update = function (self, dt, t)
 
 	return self._next_state(self)
 end
+
 StateTitleScreenLoadSave._show_error = function (self, error_code)
 	self._show_error_dialog = true
 	local cb = callback(self, "cb_show_error_done")
 
 	Managers.system_dialog:open_error_dialog(error_code, cb)
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_show_error_done = function (self)
 	self._show_error_dialog = nil
 	self._state = "none"
 	self._new_state = StateTitleScreenMain
 
 	Managers.transition:hide_loading_icon()
-
-	return 
 end
+
 StateTitleScreenLoadSave._check_popup = function (self)
 	local result = Managers.popup:query_result(self._popup_id)
 
@@ -182,27 +180,24 @@ StateTitleScreenLoadSave._check_popup = function (self)
 	if result then
 		self._popup_id = nil
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._setup_playstation_plus_dialog = function (self)
 	NpCommerceDialog.initialize()
 
 	self._state = "playstation_plus_dialog"
 
 	self._title_start_ui:set_information_text(Localize("loading_wating_for_dialog"))
-
-	return 
 end
+
 StateTitleScreenLoadSave._load_save = function (self)
 	Managers.save:auto_load(SaveFileName, callback(self, "cb_load_done"))
 
 	self._state = "waiting_for_load"
 
 	self._title_start_ui:set_information_text(Localize("loading_loading_settings"))
-
-	return 
 end
+
 StateTitleScreenLoadSave._fetch_dlcs = function (self)
 	if not PS4DLC.is_initialized() then
 		PS4DLC.initialize()
@@ -213,9 +208,8 @@ StateTitleScreenLoadSave._fetch_dlcs = function (self)
 	self._state = "fetching_dlcs"
 
 	self._title_start_ui:set_information_text(Localize("loading_checking_downloadable_content"))
-
-	return 
 end
+
 StateTitleScreenLoadSave._signin = function (self)
 	require("scripts/managers/backend/backend_manager")
 
@@ -227,9 +221,8 @@ StateTitleScreenLoadSave._signin = function (self)
 	self._state = "signing_in"
 
 	self._title_start_ui:set_information_text(Localize("loading_signing_in"))
-
-	return 
 end
+
 StateTitleScreenLoadSave._signed_in_to_backend = function (self, result)
 	if result then
 		if Managers.play_go:installed() then
@@ -250,15 +243,13 @@ StateTitleScreenLoadSave._signed_in_to_backend = function (self, result)
 			self._new_state = StateTitleScreenMainMenu
 		end
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_fade_in_done = function (self)
 	self.parent.state = StateLoading
 	self.parent.parent.loading_context.restart_network = true
-
-	return 
 end
+
 StateTitleScreenLoadSave._handle_popup_result = function (self, result)
 	if result == "delete" then
 		Managers.save:delete_save(SaveFileName, callback(self, "cb_delete_save"))
@@ -274,9 +265,8 @@ StateTitleScreenLoadSave._handle_popup_result = function (self, result)
 	else
 		ferror("We don't support this result %q", result)
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_load_done = function (self, result)
 	if result.error and result.error ~= "NOT_FOUND" then
 		printf("[StateTitleScreenLoadSave] Error when loading save data: %q", result.error)
@@ -312,16 +302,14 @@ StateTitleScreenLoadSave.cb_load_done = function (self, result)
 			Network.log(Network.MESSAGES)
 		end
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave._show_support_info = function (self)
 	local support_id = BackendUtils.format_profile_hash(SaveData.backend_profile_hash, 14, 2, " ")
 	self._popup_id = Managers.popup:queue_popup(support_id, "Support ID", "support_info_done", Localize("button_back_to_title"))
 	self._state = "check_popup"
-
-	return 
 end
+
 StateTitleScreenLoadSave.cb_delete_save = function (self, result)
 	if result.error then
 		Application.warning(string.format("[StateTitleScreenLoadSave] Error when overriding save data %q", result.error))
@@ -329,18 +317,16 @@ StateTitleScreenLoadSave.cb_delete_save = function (self, result)
 
 	print("[StateTitleScreenLoadSave] Save override done")
 	self._load_save(self)
-
-	return 
 end
+
 StateTitleScreenLoadSave._next_state = function (self)
 	if not Managers.popup:has_popup() then
 		return self._new_state
 	end
-
-	return 
 end
+
 StateTitleScreenLoadSave.on_exit = function (self)
-	return 
+	return
 end
 
-return 
+return

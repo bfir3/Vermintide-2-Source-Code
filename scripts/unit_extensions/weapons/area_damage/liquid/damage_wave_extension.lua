@@ -3,6 +3,7 @@ local unit_alive = Unit.alive
 local player_and_bot_units = PLAYER_AND_BOT_UNITS
 local position_lookup = POSITION_LOOKUP
 local impact_hit_units = {}
+
 DamageWaveExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	local entity_manager = Managers.state.entity
@@ -64,18 +65,16 @@ DamageWaveExtension.init = function (self, extension_init_context, unit, extensi
 	self.apply_impact_buff_to_ai = template.apply_impact_buff_to_ai
 	self.time_of_life = template.time_of_life
 	self.launch_animation = template.launch_animation
-
-	return 
 end
+
 DamageWaveExtension.set_update_func = function (self, update_func, init_func, t)
 	self._update_func = update_func
 
 	if init_func then
 		init_func(self, t)
 	end
-
-	return 
 end
+
 DamageWaveExtension._calculate_oobb_collision = function (self, width, range, height, offset_forward, offset_up, self_pos, self_rot)
 	local half_width = width * 0.5
 	local half_range = range * 0.5
@@ -87,6 +86,7 @@ DamageWaveExtension._calculate_oobb_collision = function (self, width, range, he
 
 	return oobb_pos, self_rot, size
 end
+
 DamageWaveExtension.launch_wave = function (self, target_unit, optional_target_pos)
 	local target_pos = optional_target_pos
 	target_pos = target_pos or position_lookup[target_unit]
@@ -163,9 +163,8 @@ DamageWaveExtension.launch_wave = function (self, target_unit, optional_target_p
 	end
 
 	self.is_launched = true
-
-	return 
 end
+
 DamageWaveExtension.destroy = function (self)
 	local unit = self.unit
 	local player_units_inside = self.player_units_inside
@@ -221,12 +220,11 @@ DamageWaveExtension.destroy = function (self)
 	end
 
 	table.clear(impact_hit_units)
-
-	return 
 end
+
 DamageWaveExtension.abort = function (self)
 	if not unit_alive(self.unit) then
-		return 
+		return
 	end
 
 	local unit = self.unit
@@ -244,9 +242,8 @@ DamageWaveExtension.abort = function (self)
 	local node_id = 0
 
 	network_manager.rpc_play_particle_effect(network_manager, nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, position, rotation, false)
-
-	return 
 end
+
 DamageWaveExtension.move_wave = function (self, unit, t, dt, total_dist, grow)
 	local acceleration = self.acceleration
 	local current_speed = self.wave_speed
@@ -305,9 +302,10 @@ DamageWaveExtension.move_wave = function (self, unit, t, dt, total_dist, grow)
 
 	return to_target_dir, dist, success
 end
+
 DamageWaveExtension.on_hit_by_wave = function (hit_unit, unit, parent)
 	if impact_hit_units[hit_unit] then
-		return 
+		return
 	end
 
 	local world = parent.world
@@ -349,10 +347,10 @@ DamageWaveExtension.on_hit_by_wave = function (hit_unit, unit, parent)
 	end
 
 	impact_hit_units[hit_unit] = true
-
-	return 
 end
+
 local BLOB_EXTRA_SAFE_DISTANCE = 0.5
+
 DamageWaveExtension.wave_arrived = function (self, t, unit)
 	self.state = "lingering"
 	self.linger_time = t + self.time_of_life
@@ -405,12 +403,11 @@ DamageWaveExtension.wave_arrived = function (self, t, unit)
 			rim_nodes[#rim_nodes + 1] = Vector3Box(rim_position_forward)
 		end
 	end
-
-	return 
 end
+
 DamageWaveExtension.wavefront_impact = function (self, t, impact_position, radius, ai_push_data, attacker_unit, wave_dir)
 	if not ai_push_data then
-		return 
+		return
 	end
 
 	local BLACKBOARDS = BLACKBOARDS
@@ -459,9 +456,8 @@ DamageWaveExtension.wavefront_impact = function (self, t, impact_position, radiu
 			ai_hit_by_wavefront[hit_unit] = true
 		end
 	end
-
-	return 
 end
+
 DamageWaveExtension.check_overlap = function (self, unit, target_unit, wave_radius, p1, p2, buff_system, num_blobs)
 	local player_units_inside = self.player_units_inside
 	local test_pos = position_lookup[target_unit]
@@ -500,16 +496,15 @@ DamageWaveExtension.check_overlap = function (self, unit, target_unit, wave_radi
 			player_units_inside[target_unit] = buff_system.add_buff(buff_system, target_unit, buff_template_name, unit, true)
 		end
 	end
-
-	return 
 end
+
 DamageWaveExtension.update = function (self, unit, input, dt, context, t)
 	if not AiUtils.unit_alive(self.source_unit) and not self.is_launched then
 		self.abort(self)
 	end
 
 	if not self.is_launched then
-		return 
+		return
 	end
 
 	local state = self.state
@@ -558,9 +553,8 @@ DamageWaveExtension.update = function (self, unit, input, dt, context, t)
 
 	Unit.set_local_rotation(unit, 0, Quaternion.look(self.wave_direction:unbox()))
 	self.update_blob_overlaps(self)
-
-	return 
 end
+
 DamageWaveExtension.insert_blob = function (self, position, radius, rotation, nav_world)
 	local nav_cost_map_volume_id = nil
 
@@ -610,9 +604,8 @@ DamageWaveExtension.insert_blob = function (self, position, radius, rotation, na
 			rim_nodes[#rim_nodes + 1] = Vector3Box(rim_position_backward)
 		end
 	end
-
-	return 
 end
+
 DamageWaveExtension.insert_fx = function (self, position, rotation)
 	local fx_list = self.fx_list
 	local fx_id = World.create_particles(self.world, self.fx_name_filled, position, rotation)
@@ -625,15 +618,14 @@ DamageWaveExtension.insert_fx = function (self, position, rotation)
 	if unit_id then
 		self.network_transmit:send_rpc_clients("rpc_add_damage_wave_fx", unit_id, position)
 	end
-
-	return 
 end
+
 DamageWaveExtension.update_blob_overlaps = function (self)
 	local blobs = self.blobs
 	local num_blobs = #blobs
 
 	if num_blobs < 1 then
-		return 
+		return
 	end
 
 	local unit = self.unit
@@ -654,7 +646,7 @@ DamageWaveExtension.update_blob_overlaps = function (self)
 	end
 
 	if not self.apply_buff_to_ai then
-		return 
+		return
 	end
 
 	local blobs_per_frame = 1
@@ -721,12 +713,12 @@ DamageWaveExtension.update_blob_overlaps = function (self)
 	end
 
 	self.ai_blob_index = blob_index
-
-	return 
 end
+
 DamageWaveExtension.get_rim_nodes = function (self)
 	return self.rim_nodes, true
 end
+
 DamageWaveExtension.is_position_inside = function (self, position, nav_cost_map_table)
 	local blobs = self.blobs
 	local num_blobs = #blobs
@@ -752,6 +744,7 @@ DamageWaveExtension.is_position_inside = function (self, position, nav_cost_map_
 
 	return distance_sq <= wave_radius_sq
 end
+
 DamageWaveExtension.hot_join_sync = function (self, sender)
 	local launched = self.is_launched
 
@@ -776,12 +769,12 @@ DamageWaveExtension.hot_join_sync = function (self, sender)
 			network_transmit.send_rpc(network_transmit, "rpc_damage_wave_set_state", sender, unit_id, NetworkLookup.damage_wave_states.running)
 		end
 	end
-
-	return 
 end
+
 local segments = 20
 local half_segments = segments / 2
 local wave_length = 1
+
 DamageWaveExtension.debug_render_wave = function (self, t, dt, pos, travel_dir, height)
 	local k = 0
 
@@ -793,9 +786,8 @@ DamageWaveExtension.debug_render_wave = function (self, t, dt, pos, travel_dir, 
 
 		k = k + 1
 	end
-
-	return 
 end
+
 DamageWaveExtension.debug_render_blobs = function (self)
 	local blobs = self.blobs
 
@@ -835,8 +827,6 @@ DamageWaveExtension.debug_render_blobs = function (self)
 			QuickDrawer:sphere(pos, 0.3, Color(255, 0, 60))
 		end
 	end
-
-	return 
 end
 
-return 
+return

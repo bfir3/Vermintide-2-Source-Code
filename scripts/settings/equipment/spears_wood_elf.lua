@@ -1172,4 +1172,4 @@ Weapons.two_handed_spears_elf_template_1_t3_un = table.clone(Weapons.two_handed_
 Weapons.two_handed_spears_elf_template_1_t3_un.actions.action_inspect.default.anim_event = "inspect_start_2"
 Weapons.two_handed_spears_elf_template_1_t3_un.actions.action_inspect.default.anim_end_event = "inspect_end_2"
 
-return 
+return

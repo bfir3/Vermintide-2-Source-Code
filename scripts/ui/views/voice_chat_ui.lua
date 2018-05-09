@@ -216,6 +216,7 @@ local name_widget_definitions = {
 	UIWidgets.create_simple_text("player_3", "name_slot_3", nil, nil, name_style, nil, RETAINED_MODE_ENABLED),
 	UIWidgets.create_simple_text("player_4", "name_slot_4", nil, nil, name_style, nil, RETAINED_MODE_ENABLED)
 }
+
 VoiceChatUI.init = function (self, ingame_ui_context)
 	self.ui_top_renderer = ingame_ui_context.ui_top_renderer
 	self.player_manager = ingame_ui_context.player_manager
@@ -227,14 +228,12 @@ VoiceChatUI.init = function (self, ingame_ui_context)
 	self._dirty = false
 
 	self.create_ui_elements(self)
-
-	return 
 end
+
 VoiceChatUI.set_input_manager = function (self, input_manager)
 	self.input_manager = input_manager
-
-	return 
 end
+
 VoiceChatUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_top_renderer)
 
@@ -263,9 +262,8 @@ VoiceChatUI.create_ui_elements = function (self)
 		widget.content.visible = false
 		self.name_widgets[#self.name_widgets + 1] = widget
 	end
-
-	return 
 end
+
 VoiceChatUI.destroy = function (self)
 	if self.icon_widgets then
 		for _, widget in ipairs(self.icon_widgets) do
@@ -292,10 +290,10 @@ VoiceChatUI.destroy = function (self)
 	end
 
 	GarbageLeakDetector.register_object(self, "voice_chat_ui")
-
-	return 
 end
+
 local MEMBERS = {}
+
 VoiceChatUI.update = function (self, dt)
 	local talked_last_frame = self._talked_last_frame
 	local talking_this_frame = self._talking_this_frame
@@ -398,12 +396,11 @@ VoiceChatUI.update = function (self, dt)
 	self._talked_last_frame = talking_this_frame
 
 	self.draw(self, dt)
-
-	return 
 end
+
 VoiceChatUI.draw = function (self, dt)
 	if not self._dirty then
-		return 
+		return
 	end
 
 	local ui_top_renderer = self.ui_top_renderer
@@ -421,8 +418,6 @@ VoiceChatUI.draw = function (self, dt)
 	UIRenderer.end_pass(ui_top_renderer)
 
 	self._dirty = false
-
-	return 
 end
 
-return 
+return

@@ -2,11 +2,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTRatlingGunnerWindUpAction = class(BTRatlingGunnerWindUpAction, BTNode)
 BTRatlingGunnerWindUpAction.name = "BTRatlingGunnerWindUpAction"
+
 BTRatlingGunnerWindUpAction.init = function (self, ...)
 	BTRatlingGunnerWindUpAction.super.init(self, ...)
-
-	return 
 end
+
 BTRatlingGunnerWindUpAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local data = blackboard.attack_pattern_data or {}
@@ -30,7 +30,7 @@ BTRatlingGunnerWindUpAction.enter = function (self, unit, blackboard, t)
 		blackboard.attack_pattern_data = data
 		blackboard.action = action
 
-		return 
+		return
 	end
 
 	data.wind_up_timer = AiUtils.random(action.wind_up_time[1], action.wind_up_time[2])
@@ -61,9 +61,8 @@ BTRatlingGunnerWindUpAction.enter = function (self, unit, blackboard, t)
 	local ai_navigation = blackboard.navigation_extension
 
 	ai_navigation.set_max_speed(ai_navigation, blackboard.breed.walk_speed)
-
-	return 
 end
+
 BTRatlingGunnerWindUpAction._update_target = function (self, unit, blackboard, data, t)
 	local target_unit, node_name, old_target_visible = PerceptionUtils.pick_ratling_gun_target(unit, blackboard)
 
@@ -95,9 +94,8 @@ BTRatlingGunnerWindUpAction._update_target = function (self, unit, blackboard, d
 	else
 		data.target_check = t + 0.1 + Math.random() * 0.05
 	end
-
-	return 
 end
+
 BTRatlingGunnerWindUpAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	AiUtils.clear_temp_anim_event(unit)
 
@@ -111,9 +109,8 @@ BTRatlingGunnerWindUpAction.leave = function (self, unit, blackboard, t, reason,
 	local data = blackboard.attack_pattern_data or {}
 
 	AiUtils.clear_anim_event(data)
-
-	return 
 end
+
 BTRatlingGunnerWindUpAction.run = function (self, unit, blackboard, t, dt)
 	local data = blackboard.attack_pattern_data
 
@@ -154,4 +151,4 @@ BTRatlingGunnerWindUpAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

@@ -4,23 +4,22 @@ local unit_alive = Unit.alive
 local Profiler = Profiler
 
 local function nop()
-	return 
+	return
 end
 
 BTSelector_chaos_exalted_champion_warcamp = class(BTSelector_chaos_exalted_champion_warcamp, BTNode)
 BTSelector_chaos_exalted_champion_warcamp.name = "BTSelector_chaos_exalted_champion_warcamp"
+
 BTSelector_chaos_exalted_champion_warcamp.init = function (self, ...)
 	BTSelector_chaos_exalted_champion_warcamp.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTSelector_chaos_exalted_champion_warcamp.leave = function (self, unit, blackboard, t, reason)
 	self.set_running_child(self, unit, blackboard, t, nil, reason)
-
-	return 
 end
+
 BTSelector_chaos_exalted_champion_warcamp.run = function (self, unit, blackboard, t, dt)
 	local child_running = self.current_running_child(self, blackboard)
 	local children = self._children
@@ -212,13 +211,10 @@ BTSelector_chaos_exalted_champion_warcamp.run = function (self, unit, blackboard
 	if result ~= "failed" then
 		return result, evaluate
 	end
-
-	return 
 end
+
 BTSelector_chaos_exalted_champion_warcamp.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

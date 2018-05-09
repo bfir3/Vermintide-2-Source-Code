@@ -1,14 +1,15 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTPackMasterSkulkAroundAction = class(BTPackMasterSkulkAroundAction, BTNode)
+
 BTPackMasterSkulkAroundAction.init = function (self, ...)
 	BTPackMasterSkulkAroundAction.super.init(self, ...)
 
 	self.navigation_group_manager = Managers.state.conflict.navigation_group_manager
-
-	return 
 end
+
 BTPackMasterSkulkAroundAction.name = "BTPackMasterSkulkAroundAction"
+
 BTPackMasterSkulkAroundAction.enter = function (self, unit, blackboard, t)
 	LocomotionUtils.set_animation_driven_movement(unit, false)
 
@@ -31,9 +32,8 @@ BTPackMasterSkulkAroundAction.enter = function (self, unit, blackboard, t)
 	locomotion_extension.set_rotation_speed(locomotion_extension, 5)
 
 	blackboard.attack_cooldown = blackboard.attack_cooldown or 0
-
-	return 
 end
+
 BTPackMasterSkulkAroundAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
 	blackboard.skulk_in_los = nil
@@ -53,10 +53,10 @@ BTPackMasterSkulkAroundAction.leave = function (self, unit, blackboard, t, reaso
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 local test_points = {}
+
 BTPackMasterSkulkAroundAction.run = function (self, unit, blackboard, t, dt)
 	if not AiUtils.is_of_interest_to_packmaster(unit, blackboard.target_unit) then
 		return "failed"
@@ -148,6 +148,7 @@ BTPackMasterSkulkAroundAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTPackMasterSkulkAroundAction.get_new_goal = function (self, unit, blackboard)
 	local target_unit = blackboard.target_unit
 
@@ -175,9 +176,8 @@ BTPackMasterSkulkAroundAction.get_new_goal = function (self, unit, blackboard)
 			blackboard.skulk_goal_get_fails = fails + 1
 		end
 	end
-
-	return 
 end
+
 BTPackMasterSkulkAroundAction.debug = function (self, unit, blackboard)
 	local pos = POSITION_LOOKUP[unit]
 
@@ -206,8 +206,6 @@ BTPackMasterSkulkAroundAction.debug = function (self, unit, blackboard)
 
 		QuickDrawer:sphere(pos + Vector3(0, 0, 2), 0.5, Color(255, 43, 43, 207))
 	end
-
-	return 
 end
 
-return 
+return

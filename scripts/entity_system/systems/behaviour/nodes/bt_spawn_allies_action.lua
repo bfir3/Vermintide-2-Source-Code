@@ -1,9 +1,9 @@
 BTSpawnAllies = class(BTSpawnAllies, BTNode)
+
 BTSpawnAllies.init = function (self, ...)
 	BTSpawnAllies.super.init(self, ...)
-
-	return 
 end
+
 BTSpawnAllies.name = "BTSpawnAllies"
 
 local function randomize(event)
@@ -12,8 +12,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTSpawnAllies.enter = function (self, unit, blackboard, t)
@@ -94,9 +92,8 @@ BTSpawnAllies.enter = function (self, unit, blackboard, t)
 
 		blackboard.played_stinger = true
 	end
-
-	return 
 end
+
 BTSpawnAllies.leave = function (self, unit, blackboard, t, reason)
 	local nav_ext = blackboard.navigation_extension
 
@@ -127,9 +124,8 @@ BTSpawnAllies.leave = function (self, unit, blackboard, t, reason)
 	end
 
 	blackboard.active_node = nil
-
-	return 
 end
+
 BTSpawnAllies._activate_ward = function (self, unit, blackboard)
 	local ward_function = blackboard.action.ward_function
 
@@ -138,27 +134,22 @@ BTSpawnAllies._activate_ward = function (self, unit, blackboard)
 
 		ward_function(unit, true, true)
 	end
-
-	return 
 end
 
 local function draw(shape, ...)
 	if script_data.ai_champion_spawn_debug then
 		QuickDrawerStay[shape](QuickDrawerStay, ...)
 	end
-
-	return 
 end
 
 local function dprint(...)
 	if script_data.ai_champion_spawn_debug then
 		print(...)
 	end
-
-	return 
 end
 
 local SPAWN_POS_TEMP = {}
+
 BTSpawnAllies.find_spawn_point = function (unit, blackboard, action, data, override_spawn_group)
 	local spawn_group = override_spawn_group or action.optional_go_to_spawn or action.spawn_group
 	local spawner_system = Managers.state.entity:system("spawner_system")
@@ -287,6 +278,7 @@ BTSpawnAllies.find_spawn_point = function (unit, blackboard, action, data, overr
 
 	return call_position
 end
+
 BTSpawnAllies._spawn = function (self, unit, data, blackboard, t)
 	local action = blackboard.action
 
@@ -331,9 +323,8 @@ BTSpawnAllies._spawn = function (self, unit, data, blackboard, t)
 
 		conflict_director.horde_spawner:execute_event_horde(t, terror_event_id, composition_type, limit_spawners, silent, nil, strictly_not_close_to_players)
 	end
-
-	return 
 end
+
 BTSpawnAllies.run = function (self, unit, blackboard, t, dt)
 	local data = blackboard.spawning_allies
 
@@ -365,16 +356,13 @@ BTSpawnAllies.run = function (self, unit, blackboard, t, dt)
 
 		return "running"
 	end
-
-	return 
 end
+
 BTSpawnAllies._release_animation_lock = function (self, unit, blackboard)
 	blackboard.follow_animation_locked = nil
 
 	LocomotionUtils.set_animation_driven_movement(unit, false)
 	blackboard.locomotion_extension:use_lerp_rotation(true)
-
-	return 
 end
 
-return 
+return

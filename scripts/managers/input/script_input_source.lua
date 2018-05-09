@@ -1,13 +1,13 @@
 require("scripts/settings/script_input_settings")
 
 ScriptInputSource = class(ScriptInputSource, InputSource)
+
 ScriptInputSource.init = function (self, slot, mapping_template)
 	ScriptInputSource.super.init(self, slot, mapping_template)
 
 	self._active = false
-
-	return 
 end
+
 ScriptInputSource.start = function (self, input_table, loop)
 	self._input_settings = input_table
 	self._input_settings_copy = table.clone(input_table)
@@ -15,16 +15,14 @@ ScriptInputSource.start = function (self, input_table, loop)
 	self._active = true
 	self._active_time = 0
 	self._loop = loop
-
-	return 
 end
+
 ScriptInputSource.clear = function (self)
 	ScriptInputSource.super.clear(self)
 
 	self._active = false
-
-	return 
 end
+
 ScriptInputSource.get = function (self, name)
 	fassert(self.mapping_table, "Trying to access unmapped input source.")
 
@@ -39,13 +37,13 @@ ScriptInputSource.get = function (self, name)
 
 	return (self._active and self._input[name]) or ScriptInputSource.super.get(self, name)
 end
+
 ScriptInputSource.update = function (self, dt, t)
 	if self._active then
 		self._update_input(self, dt, t)
 	end
-
-	return 
 end
+
 ScriptInputSource._update_input = function (self, dt, t)
 	local input = {}
 
@@ -77,8 +75,6 @@ ScriptInputSource._update_input = function (self, dt, t)
 	if #self._input_settings_copy == 0 and self._loop then
 		self.start(self, self._input_settings, true)
 	end
-
-	return 
 end
 
-return 
+return

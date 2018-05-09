@@ -2,6 +2,7 @@ require("scripts/unit_extensions/generic/generic_state_machine")
 
 PlayerBotInput = class(PlayerBotInput)
 local POSITION_LOOKUP = POSITION_LOOKUP
+
 PlayerBotInput.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.move = {
@@ -43,9 +44,8 @@ PlayerBotInput.init = function (self, extension_init_context, unit, extension_in
 	self._world = extension_init_context.world
 	self._nav_world = Managers.state.entity:system("ai_system"):nav_world()
 	self._game = Managers.state.network:game()
-
-	return 
 end
+
 PlayerBotInput.extensions_ready = function (self, world, unit)
 	local ext = ScriptUnit.extension
 	self._navigation_extension = ext(unit, "ai_navigation_system")
@@ -53,29 +53,28 @@ PlayerBotInput.extensions_ready = function (self, world, unit)
 	self._first_person_extension = ext(unit, "first_person_system")
 	self._ai_bot_group_extension = ext(unit, "ai_bot_group_system")
 	self._locomotion_extension = ext(unit, "locomotion_system")
+end
 
-	return 
-end
 PlayerBotInput.destroy = function (self)
-	return 
+	return
 end
+
 PlayerBotInput.reset = function (self)
-	return 
+	return
 end
+
 PlayerBotInput.pre_update = function (self, unit, input, dt, context, t)
 	local position = POSITION_LOOKUP[unit]
 	local success, altitude = GwNavQueries.triangle_from_position(self._nav_world, position, 1.1, 0.5)
 	self._position_on_navmesh = (success and Vector3(position.x, position.y, altitude)) or position
-
-	return 
 end
+
 PlayerBotInput.update = function (self, unit, input, dt, context, t)
 	table.clear(self._input)
 	self._update_movement(self, dt, t)
 	self._update_actions(self)
-
-	return 
 end
+
 PlayerBotInput._update_actions = function (self)
 	local input = self._input
 
@@ -208,18 +207,16 @@ PlayerBotInput._update_actions = function (self)
 		input.dodge_hold = true
 		self._dodge = false
 	end
-
-	return 
 end
+
 PlayerBotInput._update_debug_text = function (self, unit, input)
 	if script_data.debug_unit ~= unit or not script_data.ai_bots_input_debug then
-		return 
+		return
 	end
 
 	table.dump(input, nil, nil, Debug.text)
-
-	return 
 end
+
 PlayerBotInput._debug_aim_target_sine_curve = function (self, dt, t)
 	local pos = Vector3(-70.1625, -90.9497, -7.42347)
 	local z = 6 - 3 * math.sin(t)
@@ -235,19 +232,16 @@ PlayerBotInput._debug_aim_target_sine_curve = function (self, dt, t)
 	})
 
 	drawer.sphere(drawer, pos, 0.5, Color(255, 0, 0))
-
-	return 
 end
+
 PlayerBotInput.set_aim_position = function (self, position)
 	self._aim_target:store(position)
-
-	return 
 end
+
 PlayerBotInput.set_aim_rotation = function (self, rotation)
 	self._aim_rotation:store(rotation)
-
-	return 
 end
+
 PlayerBotInput.set_aiming = function (self, aiming, soft, use_rotation)
 	self._aiming = aiming
 	self._aim_with_rotation = (use_rotation and aiming) or false
@@ -257,80 +251,67 @@ PlayerBotInput.set_aiming = function (self, aiming, soft, use_rotation)
 	else
 		self._soft_aiming = false
 	end
-
-	return 
 end
+
 PlayerBotInput.set_look_at_player = function (self, player_unit, rotation_allowed)
 	self._look_at_player = player_unit
 	self._look_at_player_rotation_allowed = not not rotation_allowed
-
-	return 
 end
+
 PlayerBotInput.defend = function (self)
 	self._defend = true
-
-	return 
 end
+
 PlayerBotInput.activate_ability = function (self)
 	self._activate_ability = true
-
-	return 
 end
+
 PlayerBotInput.melee_push = function (self)
 	self._melee_push = true
-
-	return 
 end
+
 PlayerBotInput.hold_attack = function (self)
 	self._hold_attack = true
-
-	return 
 end
+
 PlayerBotInput.tap_attack = function (self)
 	self._tap_attack = true
-
-	return 
 end
+
 PlayerBotInput.charge_shot = function (self)
 	self._charge_shot = true
-
-	return 
 end
+
 PlayerBotInput.fire = function (self)
 	self._fire = true
-
-	return 
 end
+
 PlayerBotInput.fire_hold = function (self)
 	self._fire_hold = true
-
-	return 
 end
+
 PlayerBotInput.interact = function (self)
 	self._interact = true
-
-	return 
 end
+
 PlayerBotInput.weapon_reload = function (self)
 	self._weapon_reload = true
-
-	return 
 end
+
 PlayerBotInput.dodge = function (self)
 	self._dodge = true
-
-	return 
 end
+
 PlayerBotInput.wield = function (self, slot)
 	self._slot_to_wield = slot
-
-	return 
 end
+
 local Quaternion_look = Quaternion.look
 local Quaternion_multiply = Quaternion.multiply
 local MOVE_SCALE_START_DIST_SQ = 0.010000000000000002
 local MOVE_SCALE_FACTOR = 99.995
 local MOVE_SCALE_MIN = 5e-05
+
 PlayerBotInput._update_wanted_rotation_for_attract_mode = function (self, dt, rotation, current_goal, on_ladder, ladder_unit, camera_position)
 	local transition_jump = nil
 	local player_bot_navigation = self._navigation_extension
@@ -383,11 +364,11 @@ PlayerBotInput._update_wanted_rotation_for_attract_mode = function (self, dt, ro
 
 	return wanted_rotation, transition_jump
 end
+
 PlayerBotInput.set_bot_in_attract_mode_focus = function (self, is_in_focus)
 	self._bot_in_attract_mode_focus = is_in_focus
-
-	return 
 end
+
 PlayerBotInput._update_movement = function (self, dt, t)
 	local unit = self.unit
 	local player_bot_navigation = self._navigation_extension
@@ -574,9 +555,8 @@ PlayerBotInput._update_movement = function (self, dt, t)
 
 		self._avoiding_aoe_threat = false
 	end
-
-	return 
 end
+
 PlayerBotInput.get = function (self, input_key)
 	if input_key == "look" then
 		return Vector3(self.look.x, self.look.y, 0)
@@ -585,79 +565,86 @@ PlayerBotInput.get = function (self, input_key)
 	elseif self._input[input_key] ~= nil then
 		return self._input[input_key]
 	end
+end
 
-	return 
-end
 PlayerBotInput.set_enabled = function (self, enabled)
-	return 
+	return
 end
+
 PlayerBotInput.get_buffer = function (self, input_key)
-	return 
+	return
 end
+
 PlayerBotInput.add_buffer = function (self, input_key)
-	return 
+	return
 end
+
 PlayerBotInput.reset_input_buffer = function (self, input_key)
-	return 
+	return
 end
+
 PlayerBotInput.clear_input_buffer = function (self, input_key)
-	return 
+	return
 end
+
 PlayerBotInput.reset_wield_switch_buffer = function (self)
-	return 
+	return
 end
+
 PlayerBotInput.set_last_scroll_value = function (self)
-	return 
+	return
 end
+
 PlayerBotInput.get_last_scroll_value = function (self)
-	return 
+	return
 end
+
 PlayerBotInput.move = function (self, vector)
 	self.move.x = vector.x
 	self.move.y = vector.y
-
-	return 
 end
+
 PlayerBotInput.look = function (self, vector)
 	self.look.x = vector.x
 	self.look.y = vector.y
-
-	return 
 end
+
 PlayerBotInput.move_forward = function (self)
 	self.move.x = 0
 	self.move.y = 1
-
-	return 
 end
+
 PlayerBotInput.rotate_right = function (self)
 	self.look.x = 0.1
 	self.look.y = 0
-
-	return 
 end
+
 PlayerBotInput.not_moving = function (self)
 	return self.move.x == 0 and self.move.y == 0
 end
+
 PlayerBotInput.move_towards = function (self, target_position)
 	self.target_position = (target_position and Vector3Box(target_position)) or nil
-
-	return 
 end
+
 PlayerBotInput.get_wield_cooldown = function (self)
 	return false
 end
+
 PlayerBotInput.add_wield_cooldown = function (self, cooldown_time)
-	return 
+	return
 end
+
 PlayerBotInput.released_input = function (self, input)
 	return not self._input[input]
 end
+
 PlayerBotInput.add_stun_buffer = function (self, input_key)
-	return 
+	return
 end
+
 PlayerBotInput.reset_release_input = function (self)
 	return true
 end
 
-return 
+return

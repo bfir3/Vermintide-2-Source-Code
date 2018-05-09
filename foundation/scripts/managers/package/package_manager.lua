@@ -3,20 +3,18 @@ local function debug_print(format, ...)
 	end
 
 	print(string.format("[PackageManager] " .. format, ...))
-
-	return 
 end
 
 PackageManager = PackageManager or {}
+
 PackageManager.init = function (self)
 	self._packages = {}
 	self._asynch_packages = {}
 	self._references = {}
 	self._queued_async_packages = {}
 	self._queue_order = {}
-
-	return 
 end
+
 PackageManager.load = function (self, package_name, reference_name, callback, asynchronous, prioritize)
 	debug_print("Load:  %s, %s, %s, %s", package_name, reference_name, (asynchronous and "async-read") or "sync-read", (prioritize and "prioritized") or "")
 	assert(reference_name ~= nil, "No reference name passed when loading package")
@@ -93,9 +91,8 @@ PackageManager.load = function (self, package_name, reference_name, callback, as
 			}
 		end
 	end
-
-	return 
 end
+
 PackageManager.force_load = function (self, package_name)
 	debug_print("Force_load:  %s", package_name)
 
@@ -118,9 +115,8 @@ PackageManager.force_load = function (self, package_name)
 	end
 
 	self._pop_queue(self)
-
-	return 
 end
+
 PackageManager.force_load_queued_package = function (self, package_name)
 	debug_print("Force_load_queued_package:  %s", package_name)
 
@@ -147,9 +143,8 @@ PackageManager.force_load_queued_package = function (self, package_name)
 
 	table.remove(self._queue_order, index)
 	self._pop_queue(self)
-
-	return 
 end
+
 PackageManager._pop_queue = function (self)
 	local queued_package_name = nil
 	local index = 1
@@ -183,9 +178,8 @@ PackageManager._pop_queue = function (self)
 	else
 		table.clear(self._queue_order)
 	end
-
-	return 
 end
+
 PackageManager.unload = function (self, package_name, reference_name)
 	local references = self._references[package_name]
 
@@ -226,9 +220,8 @@ PackageManager.unload = function (self, package_name, reference_name)
 	else
 		debug_print("Unload:  %s, %s -> Package still referenced, NOT unloaded:", package_name, reference_name)
 	end
-
-	return 
 end
+
 PackageManager.can_unload = function (self, package_name)
 	local resource_handle = self._packages[package_name]
 
@@ -242,6 +235,7 @@ PackageManager.can_unload = function (self, package_name)
 
 	return true
 end
+
 PackageManager.destroy = function (self)
 	debug_print("Destroy()")
 	table.clear(self._queue_order)
@@ -258,12 +252,12 @@ PackageManager.destroy = function (self)
 			self.unload(self, package_name, reference_name)
 		end
 	end
-
-	return 
 end
+
 PackageManager.is_loading = function (self, package)
 	return self._packages[package] == nil and (self._asynch_packages[package] ~= nil or self._queued_async_packages[package] ~= nil)
 end
+
 PackageManager.has_loaded = function (self, package, reference_name)
 	local loaded = self._packages[package] ~= nil and self._asynch_packages[package] == nil and self._queued_async_packages[package] == nil
 
@@ -272,9 +266,8 @@ PackageManager.has_loaded = function (self, package, reference_name)
 	else
 		return loaded
 	end
-
-	return 
 end
+
 PackageManager.reference_count = function (self, package, reference_name)
 	local reference_count = 0
 
@@ -284,6 +277,7 @@ PackageManager.reference_count = function (self, package, reference_name)
 
 	return reference_count
 end
+
 PackageManager.update = function (self)
 	for package_name, package in pairs(self._asynch_packages) do
 		local resource_handle = package.handle
@@ -295,9 +289,8 @@ PackageManager.update = function (self)
 			break
 		end
 	end
-
-	return 
 end
+
 PackageManager.dump_reference_counter = function (self, reference_name)
 	printf("[PackageManager] Dumping reference counters for %s", reference_name)
 
@@ -310,9 +303,8 @@ PackageManager.dump_reference_counter = function (self, reference_name)
 	end
 
 	printf("[PackageManager] Done!")
-
-	return 
 end
+
 local PM_UNIT_TEST = false
 
 if PM_UNIT_TEST then
@@ -321,8 +313,6 @@ if PM_UNIT_TEST then
 
 	local function printf(f, ...)
 		print(string.format(f, ...))
-
-		return 
 	end
 
 	rawset(_G, "printf", printf)
@@ -330,12 +320,11 @@ if PM_UNIT_TEST then
 	table.is_empty = function (t)
 		return next(t) == nil
 	end
+
 	table.clear = function (t)
 		for key, _ in pairs(t) do
 			t[key] = nil
 		end
-
-		return 
 	end
 
 	debug_print("Running package manager unit test")
@@ -385,4 +374,4 @@ if PM_UNIT_TEST then
 	script_data.package_debug = old_debug
 end
 
-return 
+return

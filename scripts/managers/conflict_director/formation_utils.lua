@@ -27,6 +27,7 @@ FormationUtils = {
 		return formation, k
 	end
 }
+
 FormationUtils.make_encampment = function (encampment_template)
 	local encampment = {
 		army_size = 0,
@@ -46,6 +47,7 @@ FormationUtils.make_encampment = function (encampment_template)
 
 	return encampment
 end
+
 local FORMATION_COLORS = {
 	light = {
 		222,
@@ -68,6 +70,7 @@ local FORMATION_COLORS = {
 		40
 	}
 }
+
 FormationUtils.draw_encampment = function (encampment, pos, rot, drawer)
 	drawer = drawer or QuickDrawer
 
@@ -82,9 +85,8 @@ FormationUtils.draw_encampment = function (encampment, pos, rot, drawer)
 
 		FormationUtils.draw_formation(formation, fpos, frot, color, drawer)
 	end
-
-	return 
 end
+
 FormationUtils.draw_formation = function (formation, pos, rot, color, drawer)
 	drawer.line(drawer, pos, pos + Vector3(0, 0, 3), color)
 
@@ -99,9 +101,8 @@ FormationUtils.draw_formation = function (formation, pos, rot, color, drawer)
 
 		drawer.sphere(drawer, spawn_pos, 0.5, color)
 	end
-
-	return 
 end
+
 FormationUtils.spawn_formation = function (formation, pos, rot, breed_name, group_template)
 	local conflict_director = Managers.state.conflict
 	local nav_world = conflict_director.nav_world
@@ -125,9 +126,8 @@ FormationUtils.spawn_formation = function (formation, pos, rot, breed_name, grou
 			conflict_director.spawn_queued_unit(conflict_director, breed, Vector3Box(spawn_pos), QuaternionBox(formation_rot), spawn_category, nil, spawn_type, nil, group_template)
 		end
 	end
-
-	return 
 end
+
 FormationUtils.spawn_encampment = function (encampment, pos, rot, unit_composition)
 	local group_template = {
 		template = "encampment",
@@ -149,8 +149,6 @@ FormationUtils.spawn_encampment = function (encampment, pos, rot, unit_compositi
 
 		FormationUtils.spawn_formation(formation, fpos, rot, breed_name, group_template)
 	end
-
-	return 
 end
 
-return 
+return

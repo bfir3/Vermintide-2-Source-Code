@@ -69,8 +69,6 @@ function remove_node(nodes, node)
 			break
 		end
 	end
-
-	return 
 end
 
 function reconstruct_path(path, came_from, current_node)
@@ -81,8 +79,6 @@ function reconstruct_path(path, came_from, current_node)
 	else
 		return path
 	end
-
-	return 
 end
 
 LuaAStar.a_star_plain = function (nodes, node1, node2)
@@ -132,11 +128,11 @@ LuaAStar.a_star_plain = function (nodes, node1, node2)
 
 	return nil
 end
+
 LuaAStar.clear_cached_paths = function ()
 	cached_paths = nil
-
-	return 
 end
+
 LuaAStar.a_star_cached = function (nodes, a1, a2)
 	if not cached_paths[a1] then
 		cached_paths[a1] = {}
@@ -155,4 +151,4 @@ LuaAStar.a_star_cached = function (nodes, a1, a2)
 	return path, length
 end
 
-return 
+return

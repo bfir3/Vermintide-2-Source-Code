@@ -27,6 +27,7 @@ local extensions = {
 	"PlayerProjectileHuskExtension"
 }
 local PLAYER_PROJECTILE_LIFETIME = 10
+
 ProjectileSystem.init = function (self, entity_system_creation_context, system_name)
 	ProjectileSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -38,6 +39,7 @@ ProjectileSystem.init = function (self, entity_system_creation_context, system_n
 	self.network_manager = entity_system_creation_context.network_manager
 	self.player_projectile_units = {}
 	self.owner_units_count = 0
+
 	self.projectile_owner_destroy_callback = function (destroyed_projectile_owner_unit)
 		for owner_unit, projectiles in pairs(self.player_projectile_units) do
 			if owner_unit == destroyed_projectile_owner_unit then
@@ -53,27 +55,26 @@ ProjectileSystem.init = function (self, entity_system_creation_context, system_n
 
 		self.player_projectile_units[destroyed_projectile_owner_unit] = nil
 		self.owner_units_count = self.owner_units_count - 1
-
-		return 
 	end
+
 	local max_index = NetworkConstants.light_weight_projectile_index.max
 	self._light_weight = {
 		current_index = 0,
 		projectiles = Script.new_array(max_index),
 		max_index = max_index
 	}
-
-	return 
 end
+
 ProjectileSystem.on_add_extension = function (self, world, unit, extension_name, ...)
 	return ExtensionSystemBase.on_add_extension(self, world, unit, extension_name, ...)
 end
+
 ProjectileSystem.on_remove_extension = function (self, unit, extension_name)
 	ExtensionSystemBase.on_remove_extension(self, unit, extension_name)
-
-	return 
 end
+
 local projectiles_to_remove = {}
+
 ProjectileSystem.update = function (self, context, t)
 	ProjectileSystem.super.update(self, context, t)
 
@@ -99,14 +100,12 @@ ProjectileSystem.update = function (self, context, t)
 
 	table.clear(projectiles_to_remove)
 	self._update_light_weight_projectiles(self, context.dt, t, self._light_weight)
-
-	return 
 end
+
 ProjectileSystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
-
-	return 
 end
+
 ProjectileSystem.spawn_flame_wave_projectile = function (self, owner_unit, scale, item_name, item_template_name, action_name, sub_action_name, position, flat_angle, lateral_speed, initial_forward_speed, age, neighbour_lateral_speed, distance_travelled)
 	local action = Weapons[item_template_name].actions[action_name][sub_action_name]
 	local projectile_info = action.projectile_info
@@ -154,9 +153,8 @@ ProjectileSystem.spawn_flame_wave_projectile = function (self, owner_unit, scale
 	local projectile_unit = Managers.state.unit_spawner:spawn_network_unit(projectile_unit_name, projectile_info.projectile_unit_template_name, extension_init_data, position, rotation)
 
 	self._add_player_projectile_reference(self, owner_unit, projectile_unit)
-
-	return 
 end
+
 ProjectileSystem.spawn_player_projectile = function (self, owner_unit, position, rotation, scale, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, fast_forward_time, is_critical_strike, power_level, gaze_settings)
 	local action = Weapons[item_template_name].actions[action_name][sub_action_name]
 	local projectile_info = action.projectile_info
@@ -221,25 +219,22 @@ ProjectileSystem.spawn_player_projectile = function (self, owner_unit, position,
 	local projectile_unit = Managers.state.unit_spawner:spawn_network_unit(projectile_unit_name, projectile_info.projectile_unit_template_name or "player_projectile_unit", extension_init_data, position, rotation)
 
 	self._add_player_projectile_reference(self, owner_unit, projectile_unit)
-
-	return 
 end
+
 ProjectileSystem.rpc_projectile_stopped = function (self, sender, go_id)
 	local unit = self.unit_storage:unit(go_id)
 	local locomotion_extension = ScriptUnit.extension(unit, "projectile_locomotion_system")
 
 	locomotion_extension.stop(locomotion_extension)
-
-	return 
 end
+
 ProjectileSystem.rpc_drop_projectile = function (self, sender, go_id)
 	local unit = self.unit_storage:unit(go_id)
 	local locomotion_extension = ScriptUnit.extension(unit, "projectile_locomotion_system")
 
 	locomotion_extension.drop(locomotion_extension)
-
-	return 
 end
+
 ProjectileSystem.rpc_spawn_pickup_projectile = function (self, sender, projectile_unit_name_id, projectile_unit_template_name_id, network_position, network_rotation, network_velocity, network_angular_velocity, pickup_name_id, pickup_spawn_type_id)
 	local projectile_unit_name = NetworkLookup.husks[projectile_unit_name_id]
 	local projectile_unit_template_name = NetworkLookup.go_types[projectile_unit_template_name_id]
@@ -261,9 +256,8 @@ ProjectileSystem.rpc_spawn_pickup_projectile = function (self, sender, projectil
 	local position = AiAnimUtils.position_network_scale(network_position)
 	local rotation = AiAnimUtils.rotation_network_scale(network_rotation)
 	local projectile_unit = Managers.state.unit_spawner:spawn_network_unit(projectile_unit_name, projectile_unit_template_name, extension_init_data, position, rotation)
-
-	return 
 end
+
 ProjectileSystem.rpc_spawn_pickup_projectile_limited = function (self, sender, projectile_unit_name_id, projectile_unit_template_name_id, network_position, network_rotation, network_velocity, network_angular_velocity, pickup_name_id, spawner_unit_id, limited_item_id, pickup_spawn_type_id)
 	local projectile_unit_name = NetworkLookup.husks[projectile_unit_name_id]
 	local projectile_unit_template_name = NetworkLookup.go_types[projectile_unit_template_name_id]
@@ -291,9 +285,8 @@ ProjectileSystem.rpc_spawn_pickup_projectile_limited = function (self, sender, p
 	local position = AiAnimUtils.position_network_scale(network_position)
 	local rotation = AiAnimUtils.rotation_network_scale(network_rotation)
 	local projectile_unit = Managers.state.unit_spawner:spawn_network_unit(projectile_unit_name, projectile_unit_template_name, extension_init_data, position, rotation)
-
-	return 
 end
+
 ProjectileSystem.rpc_spawn_explosive_pickup_projectile = function (self, sender, projectile_unit_name_id, projectile_unit_template_name_id, network_position, network_rotation, network_velocity, network_angular_velocity, pickup_name_id, damage, explode_time, fuse_time, item_name_id, pickup_spawn_type_id)
 	local projectile_unit_name = NetworkLookup.husks[projectile_unit_name_id]
 	local projectile_unit_template_name = NetworkLookup.go_types[projectile_unit_template_name_id]
@@ -335,9 +328,8 @@ ProjectileSystem.rpc_spawn_explosive_pickup_projectile = function (self, sender,
 	local position = AiAnimUtils.position_network_scale(network_position)
 	local rotation = AiAnimUtils.rotation_network_scale(network_rotation)
 	local projectile_unit = Managers.state.unit_spawner:spawn_network_unit(projectile_unit_name, projectile_unit_template_name, extension_init_data, position, rotation)
-
-	return 
 end
+
 ProjectileSystem.rpc_spawn_explosive_pickup_projectile_limited = function (self, sender, projectile_unit_name_id, projectile_unit_template_name_id, network_position, network_rotation, network_velocity, network_angular_velocity, pickup_name_id, spawner_unit_id, limited_item_id, damage, explode_time, fuse_time, item_name_id, pickup_spawn_type_id)
 	local projectile_unit_name = NetworkLookup.husks[projectile_unit_name_id]
 	local projectile_unit_template_name = NetworkLookup.go_types[projectile_unit_template_name_id]
@@ -385,9 +377,8 @@ ProjectileSystem.rpc_spawn_explosive_pickup_projectile_limited = function (self,
 	local position = AiAnimUtils.position_network_scale(network_position)
 	local rotation = AiAnimUtils.rotation_network_scale(network_rotation)
 	local projectile_unit = Managers.state.unit_spawner:spawn_network_unit(projectile_unit_name, projectile_unit_template_name, extension_init_data, position, rotation)
-
-	return 
 end
+
 ProjectileSystem.spawn_true_flight_projectile = function (self, owner_unit, target_unit, true_flight_template_name, position, rotation, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, scale, is_critical_strike, power_level)
 	local action = Weapons[item_template_name].actions[action_name][sub_action_name]
 	local projectile_info = action.projectile_info
@@ -433,9 +424,8 @@ ProjectileSystem.spawn_true_flight_projectile = function (self, owner_unit, targ
 	local projectile_unit = Managers.state.unit_spawner:spawn_network_unit(projectile_unit_name, "true_flight_projectile_unit", extension_init_data, position, rotation)
 
 	self._add_player_projectile_reference(self, owner_unit, projectile_unit)
-
-	return 
 end
+
 ProjectileSystem._add_player_projectile_reference = function (self, owner_unit, projectile_unit)
 	local t = Managers.time:time("game")
 
@@ -447,16 +437,14 @@ ProjectileSystem._add_player_projectile_reference = function (self, owner_unit, 
 	end
 
 	self.player_projectile_units[owner_unit][projectile_unit] = t + PLAYER_PROJECTILE_LIFETIME
-
-	return 
 end
+
 ProjectileSystem._remove_player_projectile_reference = function (self, projectile_unit)
 	for owner_unit, projectiles in pairs(self.player_projectile_units) do
 		projectiles[projectile_unit] = nil
 	end
-
-	return 
 end
+
 ProjectileSystem.rpc_generic_impact_projectile_impact = function (self, sender, unit_id, hit_go_unit_id, hit_level_unit_id, position, direction, normal, actor_index)
 	if self.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_generic_impact_projectile_impact", sender, unit_id, hit_go_unit_id, position, direction, normal, actor_index)
@@ -479,9 +467,8 @@ ProjectileSystem.rpc_generic_impact_projectile_impact = function (self, sender, 
 
 		projectile_extension.impact(projectile_extension, hit_unit, position, direction, normal, actor)
 	end
-
-	return 
 end
+
 ProjectileSystem.rpc_generic_impact_projectile_force_impact = function (self, sender, unit_id, position)
 	if self.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_generic_impact_projectile_force_impact", sender, unit_id, position)
@@ -492,9 +479,8 @@ ProjectileSystem.rpc_generic_impact_projectile_force_impact = function (self, se
 	local projectile_extension = ScriptUnit.extension(unit, "projectile_system")
 
 	projectile_extension.force_impact(projectile_extension, unit, position)
-
-	return 
 end
+
 ProjectileSystem.rpc_player_projectile_impact_level = function (self, sender, unit_id, hit_unit_id, position, direction, normal, actor_index)
 	if self.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_player_projectile_impact_level", sender, unit_id, hit_unit_id, position, direction, normal, actor_index)
@@ -510,9 +496,8 @@ ProjectileSystem.rpc_player_projectile_impact_level = function (self, sender, un
 
 		projectile_extension.impact_level(projectile_extension, hit_unit, position, direction, normal, actor, hit_unit_id)
 	end
-
-	return 
 end
+
 ProjectileSystem.rpc_player_projectile_impact_dynamic = function (self, sender, unit_id, hit_unit_id, position, direction, normal, actor_index)
 	if self.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_player_projectile_impact_dynamic", sender, unit_id, hit_unit_id, position, direction, normal, actor_index)
@@ -528,9 +513,8 @@ ProjectileSystem.rpc_player_projectile_impact_dynamic = function (self, sender, 
 
 		projectile_extension.impact_dynamic(projectile_extension, hit_unit, position, direction, normal, actor)
 	end
-
-	return 
 end
+
 ProjectileSystem.create_light_weight_projectile = function (self, damage_source, owner_unit, position, direction, speed, range, collision_filter, impact_data, effect_name)
 	local world = self.world
 	local is_server = self.is_server
@@ -611,9 +595,8 @@ ProjectileSystem.create_light_weight_projectile = function (self, damage_source,
 
 	data.projectiles[new_index] = projectile
 	data.current_index = new_index
-
-	return 
 end
+
 ProjectileSystem.hot_join_sync = function (self, joining_client)
 	ProjectileSystem.super.hot_join_sync(self, joining_client)
 
@@ -632,25 +615,22 @@ ProjectileSystem.hot_join_sync = function (self, joining_client)
 
 		transmit.send_rpc(transmit, "rpc_client_spawn_light_weight_projectile", joining_client, NetworkLookup.damage_sources[projectile.damage_source], owner_unit_id, position, direction, speed, NetworkLookup.light_weight_projectile_particle_effects[effect_name])
 	end
-
-	return 
 end
+
 ProjectileSystem.rpc_client_spawn_light_weight_projectile = function (self, sender, damage_source_id, owner_unit_id, position, direction, speed, effect_id)
 	local effect_name = NetworkLookup.light_weight_projectile_particle_effects[effect_id]
 	local owner_unit = self.unit_storage:unit(owner_unit_id)
 	local damage_source = NetworkLookup.damage_sources[damage_source_id]
 
 	self.create_light_weight_projectile(self, damage_source, owner_unit, position, direction, speed, nil, nil, nil, effect_name)
-
-	return 
 end
+
 ProjectileSystem.rpc_client_despawn_light_weight_projectile = function (self, sender, index)
 	local data = self._light_weight
 
 	self._remove_light_weight_projectile(self, data, index)
-
-	return 
 end
+
 ProjectileSystem.rpc_client_create_aoe = function (self, sender, owner_unit_id, position, damage_source_id, explosion_template_id)
 	local world = self.world
 	local owner_unit = self.unit_storage:unit(owner_unit_id)
@@ -659,9 +639,8 @@ ProjectileSystem.rpc_client_create_aoe = function (self, sender, owner_unit_id, 
 	local explosion_template = ExplosionTemplates[explosion_template_name]
 
 	DamageUtils.create_aoe(world, owner_unit, position, damage_source, explosion_template)
-
-	return 
 end
+
 ProjectileSystem._remove_light_weight_projectile = function (self, data, index)
 	local world = self.world
 	local projectiles = data.projectiles
@@ -693,18 +672,17 @@ ProjectileSystem._remove_light_weight_projectile = function (self, data, index)
 	if self.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients("rpc_client_despawn_light_weight_projectile", index)
 	end
-
-	return 
 end
+
 ProjectileSystem.physics_cb_light_weight_projectile_hit = function (self, projectile_data, hits)
 	if not hits then
-		return 
+		return
 	end
 
 	if not Unit.alive(projectile_data.owner_unit) then
 		self._remove_light_weight_projectile(self, self._light_weight, projectile_data.index)
 
-		return 
+		return
 	end
 
 	local impact_data = projectile_data.impact_data
@@ -715,19 +693,18 @@ ProjectileSystem.physics_cb_light_weight_projectile_hit = function (self, projec
 	elseif impact_data.max_penetrations then
 		impact_data.max_penetrations = impact_data.max_penetrations - hit_data.hits
 	end
-
-	return 
 end
+
 ProjectileSystem._update_light_weight_projectiles = function (self, dt, t, data)
 	if self.is_server then
 		self._server_update_light_weight_projectiles(self, dt, t, data)
 	else
 		self._client_update_light_weight_projectiles(self, dt, t, data)
 	end
-
-	return 
 end
+
 local remove_list = {}
+
 ProjectileSystem._server_update_light_weight_projectiles = function (self, dt, t, data)
 	local projectiles = data.projectiles
 	local index = data.current_index
@@ -759,9 +736,8 @@ ProjectileSystem._server_update_light_weight_projectiles = function (self, dt, t
 	end
 
 	table.clear(remove_list)
-
-	return 
 end
+
 ProjectileSystem._client_update_light_weight_projectiles = function (self, dt, t, data)
 	local projectiles = data.projectiles
 	local index = data.current_index
@@ -773,9 +749,8 @@ ProjectileSystem._client_update_light_weight_projectiles = function (self, dt, t
 
 		self._move_light_weight_projectile(self, dt, world, projectile, debug)
 	end
-
-	return 
 end
+
 ProjectileSystem._move_light_weight_projectile = function (self, dt, world, projectile, debug)
 	local pos = projectile.position:unbox()
 	local dir = projectile.direction:unbox()
@@ -799,4 +774,4 @@ ProjectileSystem._move_light_weight_projectile = function (self, dt, world, proj
 	return pos, dir, dist
 end
 
-return 
+return

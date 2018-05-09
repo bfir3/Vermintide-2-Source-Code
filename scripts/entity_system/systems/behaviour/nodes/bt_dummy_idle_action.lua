@@ -1,11 +1,11 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTDummyIdleAction = class(BTDummyIdleAction, BTNode)
+
 BTDummyIdleAction.init = function (self, ...)
 	BTDummyIdleAction.super.init(self, ...)
-
-	return 
 end
+
 BTDummyIdleAction.name = "BTDummyIdleAction"
 
 local function randomize(event)
@@ -14,8 +14,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTDummyIdleAction.enter = function (self, unit, blackboard, t)
@@ -33,15 +31,16 @@ BTDummyIdleAction.enter = function (self, unit, blackboard, t)
 
 		blackboard.move_state = "idle"
 	end
+end
 
-	return 
-end
 BTDummyIdleAction.leave = function (self, unit, blackboard, t, reason, destroy)
-	return 
+	return
 end
+
 local Unit_alive = Unit.alive
+
 BTDummyIdleAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

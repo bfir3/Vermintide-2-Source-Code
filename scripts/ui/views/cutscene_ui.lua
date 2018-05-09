@@ -3,6 +3,7 @@ local ui_settings = UISettings.cutscene_ui
 local math_ease_cubic = math.easeCubic
 local array = pdArray
 CutsceneUI = class(CutsceneUI)
+
 CutsceneUI.init = function (self, ingame_ui_context, cutscene_system)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -23,9 +24,8 @@ CutsceneUI.init = function (self, ingame_ui_context, cutscene_system)
 	self.fx_text_popup_widgets = {}
 	self.fx_text_popup_widgets_pool = {}
 	self.letterbox_enabled = false
-
-	return 
 end
+
 CutsceneUI.destroy = function (self)
 	self.ui_renderer = nil
 	self.ingame_ui = nil
@@ -37,9 +37,8 @@ CutsceneUI.destroy = function (self)
 	self.fx_fade_widgets_pool = nil
 	self.fx_text_popup_widgets = nil
 	self.fx_text_popup_widgets_pool = nil
-
-	return 
 end
+
 CutsceneUI.update = function (self, dt)
 	self.check_for_fade(self)
 
@@ -77,12 +76,12 @@ CutsceneUI.update = function (self, dt)
 	end
 
 	self.draw_game_logo_widget(self, dt)
-
-	return 
 end
+
 CutsceneUI.do_draw = function (self)
 	return self.letterbox_enabled or 0 < #self.fx_fade_widgets or 0 < #self.fx_text_popup_widgets
 end
+
 CutsceneUI.prepare_draw = function (self)
 	local widgets = self.fx_fade_widgets
 	local pool = self.fx_fade_widgets_pool
@@ -107,9 +106,8 @@ CutsceneUI.prepare_draw = function (self)
 			pool[#pool + 1] = table.remove(widgets, i)
 		end
 	end
-
-	return 
 end
+
 CutsceneUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -141,9 +139,8 @@ CutsceneUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 CutsceneUI.draw_game_logo_widget = function (self, dt)
 	if self.draw_game_logo then
 		local ui_renderer = self.ui_renderer
@@ -153,9 +150,8 @@ CutsceneUI.draw_game_logo_widget = function (self, dt)
 		UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt)
 		UIRenderer.end_pass(ui_renderer)
 	end
-
-	return 
 end
+
 CutsceneUI.handle_event_queue = function (self, queue)
 	local at, an = array.data(queue)
 	local i = 1
@@ -176,14 +172,12 @@ CutsceneUI.handle_event_queue = function (self, queue)
 
 		i = i + 2
 	end
-
-	return 
 end
+
 CutsceneUI.set_letterbox_enabled = function (self, enabled)
 	self.letterbox_enabled = enabled
-
-	return 
 end
+
 CutsceneUI.set_player_input_enabled = function (self, enabled)
 	local input_manager = self.input_manager
 
@@ -210,12 +204,12 @@ CutsceneUI.set_player_input_enabled = function (self, enabled)
 			input_manager.block_device_except_service(input_manager, "cutscene", "gamepad")
 		end
 	end
-
-	return 
 end
+
 CutsceneUI.input_service = function (self)
 	return self.input_manager:get_service("cutscene")
 end
+
 CutsceneUI.fx_fade = function (self, fade_in_time, hold_time, fade_out_time, color)
 	local settings = ui_settings.fx_fade
 	fade_in_time = fade_in_time or settings.fade_in_time
@@ -242,16 +236,13 @@ CutsceneUI.fx_fade = function (self, fade_in_time, hold_time, fade_out_time, col
 		else
 			return 0
 		end
-
-		return 
 	end
 
 	UIWidget.animate(widget, UIAnimation.init(UIAnimation.function_by_time, target, target_index, start_alpha, target_alpha, anim_time, anim_func))
 
 	self.fx_fade_widgets[#self.fx_fade_widgets + 1] = widget
-
-	return 
 end
+
 CutsceneUI.fx_text_popup = function (self, fade_in_time, hold_time, fade_out_time, text)
 	local settings = ui_settings.fx_text_popup
 	fade_in_time = fade_in_time or settings.fade_in_time
@@ -278,17 +269,14 @@ CutsceneUI.fx_text_popup = function (self, fade_in_time, hold_time, fade_out_tim
 		else
 			return 0
 		end
-
-		return 
 	end
 
 	UIWidget.animate(widget, UIAnimation.init(UIAnimation.function_by_time, target, target_index, start_alpha, target_alpha, anim_time, anim_func))
 
 	widget.content.text = text
 	self.fx_text_popup_widgets[#self.fx_text_popup_widgets + 1] = widget
-
-	return 
 end
+
 CutsceneUI.check_for_fade = function (self)
 	local cutscene_system = self.cutscene_system
 
@@ -307,25 +295,20 @@ CutsceneUI.check_for_fade = function (self)
 			self.fade_out_logo(self, fade_time)
 		end
 	end
-
-	return 
 end
+
 CutsceneUI.fade_in_logo = function (self, fade_time)
 	local ui_animations = self.ui_animations
 	self.draw_game_logo = true
-
-	return 
 end
+
 CutsceneUI.fade_out_logo = function (self, fade_time)
 	local ui_animations = self.ui_animations
 	self.draw_game_logo = true
-
-	return 
 end
+
 CutsceneUI.on_fade_out_complete = function (self)
 	self.draw_game_logo = nil
-
-	return 
 end
 
-return 
+return

@@ -10,8 +10,6 @@ local function base_require(path, ...)
 	}) do
 		require(string.format("foundation/scripts/%s/%s", path, s))
 	end
-
-	return 
 end
 
 local function core_require(path, ...)
@@ -20,8 +18,6 @@ local function core_require(path, ...)
 	}) do
 		require("core/" .. path .. "/" .. s)
 	end
-
-	return 
 end
 
 local function game_require(path, ...)
@@ -30,8 +26,6 @@ local function game_require(path, ...)
 	}) do
 		require("scripts/" .. path .. "/" .. s)
 	end
-
-	return 
 end
 
 local function foundation_require(path, ...)
@@ -40,8 +34,6 @@ local function foundation_require(path, ...)
 	}) do
 		require("foundation/scripts/" .. path .. "/" .. s)
 	end
-
-	return 
 end
 
 require("scripts/settings/dlc_settings")
@@ -72,8 +64,6 @@ local function profile(t, alias)
 		t[num + 1] = scope
 		scope.start_time = os.clock()
 	end
-
-	return 
 end
 
 local function profile_end(t)
@@ -93,8 +83,6 @@ local function profile_end(t)
 
 	print("")
 	print("\t unaccounted: ", total - acc)
-
-	return 
 end
 
 Boot.setup = function (self)
@@ -138,8 +126,6 @@ Boot.setup = function (self)
 	Boot.render = Boot.booting_render
 
 	create_startup_world()
-
-	return 
 end
 
 local function xb1_format_locale(language_id)
@@ -213,8 +199,6 @@ Boot._init_localizer = function (self)
 	else
 		Application.set_resource_property_preference_order(language, default_language)
 	end
-
-	return 
 end
 
 local function init_development_parameters()
@@ -263,8 +247,6 @@ local function init_development_parameters()
 	end
 
 	print("*****************************************************************")
-
-	return 
 end
 
 Boot.booting_update = function (self, dt)
@@ -352,42 +334,35 @@ Boot.booting_update = function (self, dt)
 
 	return false
 end
+
 Boot.booting_render = function (self)
 	render_startup_world()
-
-	return 
 end
+
 Boot._require_scripts = function (self)
 	base_require("util", "verify_plugins", "clipboard", "error", "patches", "class", "callback", "rectangle", "state_machine", "visual_state_machine", "misc_util", "stack", "grow_queue", "table", "math", "vector3", "quaternion", "script_world", "script_viewport", "script_camera", "script_unit", "frame_table", "path")
 	base_require("debug", "table_trap")
 	base_require("managers", "world/world_manager", "player/player", "free_flight/free_flight_manager", "state/state_machine_manager", "time/time_manager", "token/token_manager")
-
-	return 
 end
+
 Boot._init_managers = function (self)
 	Managers.time = TimeManager:new()
 	Managers.world = WorldManager:new()
 	Managers.token = TokenManager:new()
 	Managers.state_machine = StateMachineManager:new()
-
-	return 
 end
+
 Boot.game_render = function (self)
 	Managers.world:render()
 	self._machine:render()
-
-	return 
 end
+
 Boot._setup_statemachine = function (self, start_state, params)
 	self._machine = GameStateMachine:new(self, start_state, params, true)
-
-	return 
 end
 
 function init()
 	Boot:setup()
-
-	return 
 end
 
 function update(dt)
@@ -400,20 +375,14 @@ function update(dt)
 			Boot:game_update(dt)
 		end
 	end
-
-	return 
 end
 
 function render()
 	Boot:render()
-
-	return 
 end
 
 function shutdown()
 	Boot:shutdown()
-
-	return 
 end
 
 function create_startup_world()
@@ -429,8 +398,6 @@ function create_startup_world()
 	Viewport.set_data(Boot.viewport, "camera", camera)
 
 	Boot.gui = World.create_screen_gui(Boot.world, "immediate")
-
-	return 
 end
 
 function update_startup_world(dt)
@@ -438,8 +405,6 @@ function update_startup_world(dt)
 
 	Gui.rect(Boot.gui, Vector3(0, 0, 999), Vector2(w, h), Color(255, 0, 0, 0))
 	World.update_scene(Boot.world, dt)
-
-	return 
 end
 
 function render_startup_world()
@@ -449,8 +414,6 @@ function render_startup_world()
 	local camera = Viewport.get_data(Boot.viewport, "camera")
 
 	Application.render_world(world, camera, viewport, shading_env)
-
-	return 
 end
 
 function destroy_startup_world()
@@ -461,11 +424,10 @@ function destroy_startup_world()
 	Boot.viewport = nil
 	Boot.shading_env = nil
 	Boot.gui = nil
-
-	return 
 end
 
 ReplayBoot = ReplayBoot or {}
+
 ReplayBoot.init = function (self)
 	Application.set_time_step_policy("throttle", 60, "no_smoothing", "debt_payback", 0)
 
@@ -489,16 +451,14 @@ ReplayBoot.init = function (self)
 	ExtendedReplay.set_world(self._world)
 
 	Managers.replay = ReplayManager:new(self._world)
-
-	return 
 end
+
 ReplayBoot.update = function (self, dt)
 	dt = Managers.replay:update(dt)
 
 	World.update(self._world, dt)
-
-	return 
 end
+
 ReplayBoot.render = function (self)
 	local render_objects = ExtendedReplay.render_objects()
 
@@ -507,9 +467,8 @@ ReplayBoot.render = function (self)
 
 		Application.render_world(self._world, camera, render_objects.viewport, render_objects.shading_environment)
 	end
-
-	return 
 end
+
 ReplayBoot.shutdown = function (self)
 	Managers:destroy()
 	Application.release_world(self._world)
@@ -518,32 +477,22 @@ ReplayBoot.shutdown = function (self)
 		package.unload(package)
 		Application.release_resource_package(package)
 	end
-
-	return 
 end
 
 function replay_init()
 	ReplayBoot:init()
-
-	return 
 end
 
 function replay_update(dt)
 	ReplayBoot:update(dt)
-
-	return 
 end
 
 function replay_render()
 	ReplayBoot:render()
-
-	return 
 end
 
 function replay_shutdown()
 	ReplayBoot:shutdown()
-
-	return 
 end
 
 function force_render(dt)
@@ -552,8 +501,6 @@ function force_render(dt)
 	end
 
 	render()
-
-	return 
 end
 
 Boot.game_update = function (self, real_world_dt)
@@ -589,7 +536,7 @@ Boot.game_update = function (self, real_world_dt)
 
 		Application.quit()
 
-		return 
+		return
 	end
 
 	if LEVEL_EDITOR_TEST and Keyboard.pressed(Keyboard.button_index("f5")) then
@@ -654,9 +601,8 @@ Boot.game_update = function (self, real_world_dt)
 	self._machine:post_update(dt)
 	FrameTable.swap_tables()
 	FrameTable.clear_tables()
-
-	return 
 end
+
 Boot.shutdown = function (self, dt)
 	if Boot.has_booted then
 		self._machine:destroy(true)
@@ -668,9 +614,8 @@ Boot.shutdown = function (self, dt)
 			ResourcePackage.unload(handle)
 		end
 	end
-
-	return 
 end
+
 Bulldozer = Bulldozer or {}
 
 function project_setup()
@@ -794,9 +739,8 @@ Bulldozer.setup = function (self)
 	self._init_managers(self)
 	profile(p, "managers")
 	profile_end(p)
-
-	return 
 end
+
 Bulldozer._set_ps4_content_restrictions = function (self)
 	local t_us = {
 		{
@@ -1084,9 +1028,8 @@ Bulldozer._set_ps4_content_restrictions = function (self)
 	else
 		NpCheck.set_content_restriction(18, t_eu)
 	end
-
-	return 
 end
+
 Bulldozer._handle_revision_info = function (self)
 	script_data.settings = Application.settings()
 	script_data.build_identifier = Application.build_identifier()
@@ -1180,9 +1123,8 @@ Bulldozer._handle_revision_info = function (self)
 	if Development.parameter("paste_revision_to_clipboard") then
 		Clipboard.put(string.format("%s | %s", tostring(script_data.settings.content_revision), tostring(script_data.build_identifier)))
 	end
-
-	return 
 end
+
 Bulldozer._require_scripts = function (self)
 	foundation_require("managers", "localization/localization_manager", "event/event_manager")
 	foundation_require("util", "local_require")
@@ -1201,9 +1143,8 @@ Bulldozer._require_scripts = function (self)
 
 	game_require("helpers", "effect_helper", "weapon_helper", "item_helper", "lorebook_helper", "ui_atlas_helper", "scoreboard_helper")
 	game_require("network", "unit_spawner", "unit_storage", "network_unit")
-
-	return 
 end
+
 Bulldozer._handle_win32_graphics_quality = function (self)
 	local p = profile_start("Bulldozer:_handle_win32_graphics_quality()")
 	local graphics_quality = Application.user_setting("graphics_quality")
@@ -1228,8 +1169,6 @@ Bulldozer._handle_win32_graphics_quality = function (self)
 		else
 			return false
 		end
-
-		return 
 	end
 
 	local dirty = false
@@ -1256,8 +1195,6 @@ Bulldozer._handle_win32_graphics_quality = function (self)
 				dirty = true
 			end
 		end
-
-		return 
 	end
 
 	if graphics_quality == nil then
@@ -1267,7 +1204,7 @@ Bulldozer._handle_win32_graphics_quality = function (self)
 	end
 
 	if LEVEL_EDITOR_TEST or graphics_quality == "custom" or not GraphicsQuality[graphics_quality] then
-		return 
+		return
 	end
 
 	local settings = GraphicsQuality[graphics_quality]
@@ -1343,23 +1280,20 @@ Bulldozer._handle_win32_graphics_quality = function (self)
 	Application.save_user_settings()
 	profile(p, "save")
 	profile_end(p)
-
-	return 
 end
+
 Bulldozer._init_random = function (self)
 	local seed = (os.clock() * 10000) % 1000
 
 	math.randomseed(seed)
 	math.random(5, 30000)
-
-	return 
 end
+
 Bulldozer._init_mouse = function (self)
 	Window.set_cursor("gui/cursors/mouse_cursor")
 	Window.set_clip_cursor(true)
-
-	return 
 end
+
 Bulldozer._init_managers = function (self)
 	self._init_localization_manager(self)
 	require("scripts/ui/views/ingame_ui")
@@ -1407,9 +1341,8 @@ Bulldozer._init_managers = function (self)
 	if GameSettingsDevelopment.use_leaderboards or Development.parameter("use_leaderboards") then
 		Managers.leaderboards = LeaderboardManager:new()
 	end
-
-	return 
 end
+
 Bulldozer._init_backend = function (self)
 	local backend = "ScriptBackendPlayFab"
 	local mirror = "PlayFabMirror"
@@ -1420,16 +1353,14 @@ Bulldozer._init_backend = function (self)
 	end
 
 	Managers.backend = BackendManagerPlayFab:new(backend, mirror, "DataServerQueue")
-
-	return 
 end
+
 Bulldozer._init_backend_xbox = function (self)
 	local backend = "ScriptBackendPlayFabXbox"
 	local mirror = "PlayFabMirror"
 	Managers.backend = BackendManagerPlayFab:new(backend, mirror, "DataServerQueue")
-
-	return 
 end
+
 Bulldozer._load_win32_user_settings = function (self)
 	local max_fps = Application.user_setting("max_fps")
 
@@ -1446,13 +1377,13 @@ Bulldozer._load_win32_user_settings = function (self)
 	if max_frames then
 		Application.set_max_frame_stacking(max_frames)
 	end
-
-	return 
 end
+
 Bulldozer._demo_setup = function (self)
 	Application.save_user_settings = function ()
-		return 
+		return
 	end
+
 	local key_combinations_allowed = DemoSettings.key_combinations_allowed
 
 	for key, enabled in pairs(key_combinations_allowed) do
@@ -1460,9 +1391,8 @@ Bulldozer._demo_setup = function (self)
 	end
 
 	Managers.package:load("resource_packages/demo", "boot")
-
-	return 
 end
+
 Bulldozer._init_localization_manager = function (self)
 	Managers.localizer = LocalizationManager:new("localization/game")
 
@@ -1510,9 +1440,8 @@ Bulldozer._init_localization_manager = function (self)
 	end
 
 	Managers.localizer:add_macro("KEY", key_parser)
-
-	return 
 end
+
 Bulldozer.entrypoint = function (self)
 	local args = {
 		Application.argv()
@@ -1577,4 +1506,4 @@ Bulldozer.entrypoint = function (self)
 	return StateSplashScreen, {}
 end
 
-return 
+return

@@ -1,4 +1,5 @@
 PlayerEyeTrackingExtension = class(PlayerEyeTrackingExtension)
+
 PlayerEyeTrackingExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.world = extension_init_context.world
 	self.physics_world = World.get_data(self.world, "physics_world")
@@ -32,31 +33,28 @@ PlayerEyeTrackingExtension.init = function (self, extension_init_context, unit, 
 			Tobii.set_extended_view_use_head_tracking(tobii_extended_view_use_head_tracking)
 		end
 	end
-
-	return 
 end
+
 PlayerEyeTrackingExtension.update = function (self, unit, input, dt, context, t)
 	if not rawget(_G, "Tobii") or not Application.user_setting("tobii_eyetracking") then
-		return 
+		return
 	end
 
 	self.is_connected = Tobii.get_is_connected()
 
 	if not self.is_connected then
-		return 
+		return
 	end
 
 	self.update_extended_view(self, dt)
 	self.update_forward_rayhit(self)
 	self.calc_gaze_forward(self)
-
-	return 
 end
+
 PlayerEyeTrackingExtension.set_eyetracking_options_opened = function (self, opened)
 	self.eyetracking_options_opened = opened
-
-	return 
 end
+
 PlayerEyeTrackingExtension.update_extended_view = function (self, dt)
 	if self.is_aiming then
 		self.current_fade_out_time = self.current_fade_out_time + dt
@@ -94,12 +92,12 @@ PlayerEyeTrackingExtension.update_extended_view = function (self, dt)
 	end
 
 	Managers.state.camera:set_tobii_extended_view(self.extended_view.yaw, self.extended_view.pitch)
-
-	return 
 end
+
 PlayerEyeTrackingExtension.get_extended_view = function (self, rotation)
 	return self.extended_view.yaw, self.extended_view.pitch
 end
+
 PlayerEyeTrackingExtension.get_direction_without_extended_view = function (self, rotation)
 	if not Application.user_setting("tobii_extended_view") then
 		return rotation
@@ -113,6 +111,7 @@ PlayerEyeTrackingExtension.get_direction_without_extended_view = function (self,
 
 	return Quaternion.multiply(rotation, total_offset)
 end
+
 PlayerEyeTrackingExtension.update_forward_rayhit = function (self)
 	local first_person_extension = ScriptUnit.extension(self.unit, "first_person_system")
 	local cam_position = first_person_extension.current_position(first_person_extension)
@@ -129,9 +128,8 @@ PlayerEyeTrackingExtension.update_forward_rayhit = function (self)
 	else
 		self.forward_rayhit_position = Vector3Box(world_pos)
 	end
-
-	return 
 end
+
 PlayerEyeTrackingExtension.update_gaze_rayhit = function (self)
 	local first_person_extension = ScriptUnit.extension(self.unit, "first_person_system")
 	local position = first_person_extension.current_position(first_person_extension)
@@ -147,9 +145,8 @@ PlayerEyeTrackingExtension.update_gaze_rayhit = function (self)
 	else
 		self.gaze_rayhit_position = Vector3Box(world_pos)
 	end
-
-	return 
 end
+
 PlayerEyeTrackingExtension.calc_gaze_forward = function (self)
 	local first_person_extension = ScriptUnit.extension(self.unit, "first_person_system")
 	local gaze_point_x, gaze_point_y = Tobii.get_gaze_point()
@@ -166,48 +163,52 @@ PlayerEyeTrackingExtension.calc_gaze_forward = function (self)
 	local forward = Vector3.normalize(gaze_in_world - current_position)
 
 	self.current_gaze_forward:store(forward)
-
-	return 
 end
+
 PlayerEyeTrackingExtension.gaze_forward = function (self)
 	return self.current_gaze_forward:unbox()
 end
+
 PlayerEyeTrackingExtension.gaze_rotation = function (self)
 	local forward = self.gaze_forward(self)
 
 	return Quaternion.look(forward, Vector3.up())
 end
+
 PlayerEyeTrackingExtension.get_forward_rayhit = function (self)
 	return (self.forward_rayhit_position and self.forward_rayhit_position:unbox()) or nil
 end
+
 PlayerEyeTrackingExtension.get_gaze_rayhit = function (self)
 	self.update_gaze_rayhit(self)
 
 	return (self.gaze_rayhit_position and self.gaze_rayhit_position:unbox()) or nil
 end
+
 PlayerEyeTrackingExtension.get_is_aiming = function (self)
 	return self.is_aiming
 end
+
 PlayerEyeTrackingExtension.set_is_aiming = function (self, is_aiming)
 	self.is_aiming = is_aiming
-
-	return 
 end
+
 PlayerEyeTrackingExtension.get_aim_at_gaze_cancelled = function (self)
 	return self.is_aiming_cancelled
 end
+
 PlayerEyeTrackingExtension.set_aim_at_gaze_cancelled = function (self, is_cancelled)
 	self.is_aiming_cancelled = is_cancelled
-
-	return 
 end
+
 PlayerEyeTrackingExtension.get_is_feature_enabled = function (self, feature)
 	local HAS_TOBII = rawget(_G, "Tobii") and Application.user_setting("tobii_eyetracking")
 
 	return HAS_TOBII and self.is_connected and Application.user_setting(feature) and Tobii.get_time_since_last_gaze_point() < 5
 end
+
 PlayerEyeTrackingExtension.get_is_connected = function (self)
 	return self.is_connected
 end
 
-return 
+return

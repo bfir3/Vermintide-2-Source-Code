@@ -3,12 +3,13 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 local position_lookup = POSITION_LOOKUP
 local player_and_bot_units = PLAYER_AND_BOT_UNITS
 BTJumpSlamImpactAction = class(BTJumpSlamImpactAction, BTNode)
+
 BTJumpSlamImpactAction.init = function (self, ...)
 	BTJumpSlamImpactAction.super.init(self, ...)
-
-	return 
 end
+
 BTJumpSlamImpactAction.name = "BTJumpSlamImpactAction"
+
 BTJumpSlamImpactAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local target_unit = blackboard.target_unit
@@ -16,9 +17,8 @@ BTJumpSlamImpactAction.enter = function (self, unit, blackboard, t)
 	blackboard.active_node = BTJumpSlamImpactAction
 	blackboard.attack_finished = nil
 	blackboard.attacking_target = target_unit
-
-	return 
 end
+
 BTJumpSlamImpactAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
 	blackboard.active_node = nil
@@ -28,9 +28,8 @@ BTJumpSlamImpactAction.leave = function (self, unit, blackboard, t, reason, dest
 
 	blackboard.navigation_extension:set_enabled(true)
 	LocomotionUtils.set_animation_driven_movement(unit, false, true)
-
-	return 
 end
+
 BTJumpSlamImpactAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.anim_cb_damage then
 		blackboard.anim_cb_damage = nil
@@ -44,6 +43,7 @@ BTJumpSlamImpactAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTJumpSlamImpactAction.jump_slam_impact = function (self, unit, blackboard, t)
 	local action = blackboard.action
 	local impact_position = position_lookup[unit]
@@ -53,24 +53,22 @@ BTJumpSlamImpactAction.jump_slam_impact = function (self, unit, blackboard, t)
 	if action.catapult_players then
 		BTJumpSlamImpactAction.catapult_players(impact_position, action.catapult_within_radius, action.catapulted_player_speed)
 	end
-
-	return 
 end
+
 BTJumpSlamImpactAction.catapult_players = function (impact_position, radius, speed)
 	for i = 1, #player_and_bot_units, 1 do
 		local target_unit = player_and_bot_units[i]
 
 		BTJumpSlamImpactAction.catapult_player(target_unit, impact_position, radius, speed)
 	end
-
-	return 
 end
+
 BTJumpSlamImpactAction.catapult_player = function (target_unit, impact_position, radius, push_speed)
 	local target_position = position_lookup[target_unit]
 	local towards_player = target_position - impact_position
 
 	if radius < Vector3.length(towards_player) then
-		return 
+		return
 	end
 
 	local angle = math.pi / 6
@@ -81,10 +79,10 @@ BTJumpSlamImpactAction.catapult_player = function (target_unit, impact_position,
 	push_velocity.z = height
 
 	StatusUtils.set_catapulted_network(target_unit, true, push_velocity)
-
-	return 
 end
+
 local ai_units = {}
+
 BTJumpSlamImpactAction.impact_damage = function (attacking_unit, t, radius, stagger_length, impact, damage, damage_type, hit_react_type, max_damage_radius, impact_position)
 	local falloff_radius = radius - max_damage_radius
 	local num_ai_units = AiUtils.broadphase_query(impact_position, radius, ai_units)
@@ -133,8 +131,6 @@ BTJumpSlamImpactAction.impact_damage = function (attacking_unit, t, radius, stag
 			end
 		end
 	end
-
-	return 
 end
 
-return 
+return

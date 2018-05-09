@@ -25,6 +25,7 @@ local found_cover_points = {}
 local temp_horde_spawners = {}
 local temp_hidden_spawners = {}
 local player_positions = PLAYER_POSITIONS
+
 HordeSpawner.init = function (self, world, cover_points_broadphase)
 	self.cover_broadphase = cover_points_broadphase
 	self.hordes = {}
@@ -34,16 +35,12 @@ HordeSpawner.init = function (self, world, cover_points_broadphase)
 	self.num_paced_hordes = 0
 	self.world = world
 	self.physics_world = World.physics_world(world)
-
-	return 
 end
 
 local function remove_index_from_array(array, index)
 	local end_index = #array
 	array[index] = array[end_index]
 	array[end_index] = nil
-
-	return 
 end
 
 local function copy_array(a, b)
@@ -57,8 +54,6 @@ local function copy_array(a, b)
 	for i = source_size + 1, dest_size, 1 do
 		b[i] = nil
 	end
-
-	return 
 end
 
 HordeSpawner.horde = function (self, horde_type, extra_data, no_fallback)
@@ -97,9 +92,8 @@ HordeSpawner.horde = function (self, horde_type, extra_data, no_fallback)
 	else
 		self.execute_ambush_horde(self, extra_data, no_fallback)
 	end
-
-	return 
 end
+
 HordeSpawner.execute_fallback = function (self, horde_type, fallback, reason, extra_data)
 	if fallback then
 		if script_data.debug_player_intensity then
@@ -108,7 +102,7 @@ HordeSpawner.execute_fallback = function (self, horde_type, fallback, reason, ex
 
 		print("Failed to start horde, all fallbacks failed at this place")
 
-		return 
+		return
 	end
 
 	print(reason)
@@ -118,9 +112,8 @@ HordeSpawner.execute_fallback = function (self, horde_type, fallback, reason, ex
 	elseif horde_type == "vector" then
 		self.execute_ambush_horde(self, extra_data, "fallback")
 	end
-
-	return 
 end
+
 HordeSpawner.execute_event_horde = function (self, t, terror_event_id, composition_type, limit_spawners, silent, group_template, strictly_not_close_to_players)
 	local composition = CurrentHordeSettings.compositions[composition_type]
 	local index = LoadedDice.roll_easy(composition.loaded_probs)
@@ -146,6 +139,7 @@ HordeSpawner.execute_event_horde = function (self, t, terror_event_id, compositi
 
 	return horde
 end
+
 HordeSpawner.max_composition_size = function (self, composition_name)
 	local max_size = 0
 	local composition = CurrentHordeSettings.compositions[composition_name]
@@ -169,6 +163,7 @@ HordeSpawner.max_composition_size = function (self, composition_name)
 
 	return max_size
 end
+
 HordeSpawner.running_horde = function (self)
 	return self._running_horde_type, self._running_horde_sound_settings
 end
@@ -177,8 +172,6 @@ function random_array_insert(array, size, data)
 	local swap = math.random(1, size)
 	array[size + 1] = array[swap]
 	array[swap] = data
-
-	return 
 end
 
 local ok_spawner_breeds = {
@@ -187,6 +180,7 @@ local ok_spawner_breeds = {
 }
 local spawn_list_a = {}
 local spawn_list_b = {}
+
 HordeSpawner.compose_horde_spawn_list = function (self, variant)
 	local i = 1
 
@@ -216,6 +210,7 @@ HordeSpawner.compose_horde_spawn_list = function (self, variant)
 
 	return sum, sum_a, sum_b
 end
+
 HordeSpawner.compose_blob_horde_spawn_list = function (self, composition_type)
 	local composition = CurrentHordeSettings.compositions[composition_type]
 	local index = LoadedDice.roll_easy(composition.loaded_probs)
@@ -252,11 +247,10 @@ local function pop_array(array)
 
 		return breed_name
 	end
-
-	return 
 end
 
 local use_horde = false
+
 HordeSpawner.pop_random_any_breed = function (self)
 	use_horde = not use_horde
 	local breed = nil
@@ -269,11 +263,13 @@ HordeSpawner.pop_random_any_breed = function (self)
 
 	return breed
 end
+
 HordeSpawner.pop_random_horde_breed_only = function (self)
 	local breed = pop_array(spawn_list_a)
 
 	return breed
 end
+
 HordeSpawner.execute_ambush_horde = function (self, extra_data, fallback, override_epicenter_pos)
 	print("setting up ambush-horde")
 
@@ -336,13 +332,13 @@ HordeSpawner.execute_ambush_horde = function (self, extra_data, fallback, overri
 		if n_horde_spawners <= 0 then
 			self.execute_fallback(self, "ambush", fallback, "ambush horde failed to find spawners, starts a vector-horde instead")
 
-			return 
+			return
 		end
 
 		if n_horde_spawners_hidden <= 0 and variant.must_use_hidden_spawners then
 			self.execute_fallback(self, "ambush", fallback, "ambush horde failed to find any kind of hidden spawners for their none-horde compatable units, starts a vector-horde instead")
 
-			return 
+			return
 		end
 	end
 
@@ -488,12 +484,11 @@ HordeSpawner.execute_ambush_horde = function (self, extra_data, fallback, overri
 	hordes[id] = horde
 	self.last_paced_horde_type = "ambush"
 	self.num_paced_hordes = self.num_paced_hordes + 1
-
-	return 
 end
+
 HordeSpawner.replace_hidden_spawners = function (self, hidden_spawners, spawner_in_sight, offending_player_pos)
 	if spawner_in_sight.dont_move then
-		return 
+		return
 	end
 
 	local epicenter_pos = Unit.local_position(spawner_in_sight.cover_point_unit, 0)
@@ -522,7 +517,7 @@ HordeSpawner.replace_hidden_spawners = function (self, hidden_spawners, spawner_
 
 			spawner_in_sight.dont_move = true
 
-			return 
+			return
 		end
 
 		table.clear_array(found_cover_points, #found_cover_points)
@@ -540,7 +535,7 @@ HordeSpawner.replace_hidden_spawners = function (self, hidden_spawners, spawner_
 
 		spawner_in_sight.dont_move = true
 
-		return 
+		return
 	end
 
 	print("replace_hidden_spawners -> replacing hidden spawners!")
@@ -561,6 +556,7 @@ HordeSpawner.replace_hidden_spawners = function (self, hidden_spawners, spawner_
 
 	return true
 end
+
 HordeSpawner.find_vector_horde_spawners = function (self, epicenter_pos, main_target_pos)
 	local settings = CurrentHordeSettings.vector
 	local min_dist = settings.min_horde_spawner_dist
@@ -581,11 +577,12 @@ HordeSpawner.find_vector_horde_spawners = function (self, epicenter_pos, main_ta
 	}, found_cover_points, hidden_min_dist, hidden_max_dist, main_target_pos)
 
 	if #horde_spawners <= 0 and #found_cover_points <= 0 then
-		return 
+		return
 	end
 
 	return "success", horde_spawners, found_cover_points
 end
+
 HordeSpawner.find_good_vector_horde_pos = function (self, main_target_pos, distance, check_reachable)
 	local success, horde_spawners, found_cover_points = nil
 	local epicenter_pos = self.get_point_on_main_path(self, main_target_pos, distance, check_reachable)
@@ -610,6 +607,7 @@ HordeSpawner.find_good_vector_horde_pos = function (self, main_target_pos, dista
 
 	return success, horde_spawners, found_cover_points, epicenter_pos
 end
+
 HordeSpawner.execute_vector_horde = function (self, extra_data, fallback)
 	local settings = CurrentHordeSettings.vector
 	local max_spawners = settings.max_spawners
@@ -636,7 +634,7 @@ HordeSpawner.execute_vector_horde = function (self, extra_data, fallback)
 	if not main_target_pos then
 		self.execute_fallback(self, "vector", fallback, "WARNING: vector horde could not find an main_target_pos, use fallback instead")
 
-		return 
+		return
 	end
 
 	local roll = math.random()
@@ -663,7 +661,7 @@ HordeSpawner.execute_vector_horde = function (self, extra_data, fallback)
 	if not success then
 		self.execute_fallback(self, "vector", fallback, "vector horde could not find an epicenter or spawners, use fallback instead")
 
-		return 
+		return
 	end
 
 	local num_to_spawn, num_horde_breed, num_hidden_breed = self.compose_horde_spawn_list(self, variant)
@@ -789,7 +787,7 @@ HordeSpawner.execute_vector_horde = function (self, extra_data, fallback)
 			if spawn_counter == 0 then
 				self.execute_fallback(self, "vector", fallback, "Vector horde spawn failed - no matching spawners found!")
 
-				return 
+				return
 			end
 
 			break
@@ -817,9 +815,8 @@ HordeSpawner.execute_vector_horde = function (self, extra_data, fallback)
 
 	self.last_paced_horde_type = "vector"
 	self.num_paced_hordes = self.num_paced_hordes + 1
-
-	return 
 end
+
 HordeSpawner.get_pos_ahead_or_behind_players_on_mainpath = function (self, check_ahead, dist, raw_dist)
 	local conflict_director = Managers.state.conflict
 	local main_path_info = conflict_director.main_path_info
@@ -878,9 +875,8 @@ HordeSpawner.get_pos_ahead_or_behind_players_on_mainpath = function (self, check
 	else
 		return false
 	end
-
-	return 
 end
+
 HordeSpawner.execute_vector_blob_horde = function (self, extra_data, fallback)
 	local settings = CurrentHordeSettings.vector_blob
 	local roll = math.random()
@@ -906,7 +902,7 @@ HordeSpawner.execute_vector_blob_horde = function (self, extra_data, fallback)
 	if not blob_pos then
 		print("\no spawn position found at all, failing horde")
 
-		return 
+		return
 	end
 
 	local composition_type = CurrentHordeSettings.vector_blob_composition or "medium"
@@ -991,9 +987,8 @@ HordeSpawner.execute_vector_blob_horde = function (self, extra_data, fallback)
 	hordes[id] = horde
 	self.last_paced_horde_type = "vector_blob"
 	self.num_paced_hordes = self.num_paced_hordes + 1
-
-	return 
 end
+
 HordeSpawner.spawn_unit = function (self, hidden_spawn, breed_name, goal_pos, horde)
 	local cover_point_unit = hidden_spawn.cover_point_unit
 	local pos = Unit.local_position(cover_point_unit, 0)
@@ -1006,17 +1001,15 @@ HordeSpawner.spawn_unit = function (self, hidden_spawn, breed_name, goal_pos, ho
 
 	self.conflict_director:spawn_queued_unit(breed, Vector3Box(pos), QuaternionBox(spawn_rot), spawn_category, spawn_animation, spawn_type, nil, horde.group_template)
 	self.conflict_director:add_horde(1)
-
-	return 
 end
+
 HordeSpawner.play_sound = function (self, stinger_name, pos)
 	local wwise_world = Managers.world:wwise_world(self.world)
 	local wwise_playing_id, wwise_source_id = WwiseWorld.trigger_event(wwise_world, stinger_name, pos)
 
 	Managers.state.network.network_transmit:send_rpc_clients("rpc_server_audio_event_at_pos", NetworkLookup.sound_events[stinger_name], pos)
-
-	return 
 end
+
 HordeSpawner.create_event_horde_no_horde_spawners = function (self, horde, variant, t)
 	local conflict_director = Managers.state.conflict
 	local main_path_info = conflict_director.main_path_info
@@ -1064,6 +1057,7 @@ HordeSpawner.create_event_horde_no_horde_spawners = function (self, horde, varia
 
 	return false
 end
+
 HordeSpawner.update_event_horde_no_horde_spawners = function (self, horde, t)
 	if not horde.started then
 		if horde.start_time < t then
@@ -1086,6 +1080,7 @@ HordeSpawner.update_event_horde_no_horde_spawners = function (self, horde, t)
 
 	return false
 end
+
 HordeSpawner.update_event_horde = function (self, horde, t)
 	if not horde.started then
 		if horde.start_time < t then
@@ -1110,6 +1105,7 @@ HordeSpawner.update_event_horde = function (self, horde, t)
 
 	return false
 end
+
 HordeSpawner.spawner_in_view_of_players = function (self, spawner)
 	local spawner_pos = Unit.local_position(spawner.cover_point_unit, 0) + Vector3(0, 0, 1)
 
@@ -1133,9 +1129,8 @@ HordeSpawner.spawner_in_view_of_players = function (self, spawner)
 			end
 		end
 	end
-
-	return 
 end
+
 HordeSpawner.update_horde = function (self, horde, t)
 	if not horde.started then
 		if horde.start_time < t then
@@ -1153,7 +1148,7 @@ HordeSpawner.update_horde = function (self, horde, t)
 
 			horde.started = true
 		else
-			return 
+			return
 		end
 	end
 
@@ -1197,9 +1192,8 @@ HordeSpawner.update_horde = function (self, horde, t)
 	if horde.num_to_spawn <= horde.spawned then
 		return true
 	end
-
-	return 
 end
+
 HordeSpawner.update = function (self, t, dt)
 	local hordes = self.hordes
 	local num_hordes = #hordes
@@ -1247,9 +1241,8 @@ HordeSpawner.update = function (self, t, dt)
 	if script_data.debug_hordes then
 		self.debug_hordes(self, t)
 	end
-
-	return 
 end
+
 HordeSpawner.debug_hordes = function (self, t)
 	local s = "Hordes - now: " .. self.conflict_director:horde_size() .. " (" .. tostring(self._running_horde_type or "none") .. ") "
 	local hordes = self.hordes
@@ -1262,10 +1255,10 @@ HordeSpawner.debug_hordes = function (self, t)
 	end
 
 	Debug.text(s)
-
-	return 
 end
+
 local found_units = {}
+
 HordeSpawner.hidden_cover_points = function (self, broadphase, epicenter_pos, player_pos_list, found_cover_points, min_rad, max_rad, main_target_pos)
 	local distance_squared = Vector3.distance_squared
 	local vector3_normalize = Vector3.normalize
@@ -1315,9 +1308,8 @@ HordeSpawner.hidden_cover_points = function (self, broadphase, epicenter_pos, pl
 			end
 		end
 	end
-
-	return 
 end
+
 HordeSpawner.calc_sectors = function (self, center_pos, list, sectors)
 	local unit_local_position = Unit.local_position
 	local vector3_normalize = Vector3.normalize
@@ -1333,9 +1325,8 @@ HordeSpawner.calc_sectors = function (self, center_pos, list, sectors)
 		local sector = sectors[sector_index]
 		sector[#sector + 1] = unit
 	end
-
-	return 
 end
+
 HordeSpawner.render_sectors = function (self, sectors)
 	local unit_local_position = Unit.local_position
 	local sector_colors = {
@@ -1362,9 +1353,8 @@ HordeSpawner.render_sectors = function (self, sectors)
 			QuickDrawerStay:sphere(pos, 2, sector_color)
 		end
 	end
-
-	return 
 end
+
 HordeSpawner.reset_sectors = function (self, sectors)
 	for i = 1, num_sectors, 1 do
 		local sector = sectors[i]
@@ -1373,8 +1363,6 @@ HordeSpawner.reset_sectors = function (self, sectors)
 			sector[j] = nil
 		end
 	end
-
-	return 
 end
 
 function test_sectors()
@@ -1409,8 +1397,6 @@ function test_sectors()
 			print("BAd sector index: ", sector_index)
 		end
 	end
-
-	return 
 end
 
 HordeSpawner.filter_dist = function (self, center_pos, list, min_rad_squared, max_rad_squared)
@@ -1429,9 +1415,8 @@ HordeSpawner.filter_dist = function (self, center_pos, list, min_rad_squared, ma
 			size = size - 1
 		end
 	end
-
-	return 
 end
+
 HordeSpawner.filter_angle = function (self, center_pos, pos_list, dot_angle)
 	dot_angle = dot_angle or -0.9
 	local vector3_normalize = Vector3.normalize
@@ -1452,9 +1437,8 @@ HordeSpawner.filter_angle = function (self, center_pos, pos_list, dot_angle)
 			size = size - 1
 		end
 	end
-
-	return 
 end
+
 HordeSpawner.get_point_on_main_path = function (self, pos, distance, confirm_with_far_astar)
 	local level_analysis = self.conflict_director.level_analysis
 	local main_paths = level_analysis.get_main_paths(level_analysis)
@@ -1470,4 +1454,4 @@ HordeSpawner.get_point_on_main_path = function (self, pos, distance, confirm_wit
 	return behind_pos
 end
 
-return 
+return

@@ -11,8 +11,6 @@ local function enemy_variation_tint_meshes(unit, meshes, material, variable, val
 			Material.set_scalar(current_material, variable, value)
 		end
 	end
-
-	return 
 end
 
 local function enemy_variation_tint_part(unit, variation, material_result)
@@ -54,8 +52,6 @@ local function enemy_variation_tint_materials(unit, variationsettings, material_
 	for i = 1, #material_sections, 1 do
 		enemy_variation_tint_part(unit, variationsettings.material_variations[material_sections[i]], material_result)
 	end
-
-	return 
 end
 
 local function enemy_variation_enable_parts(unit, variationsettings, body_parts, group_result, material_result)
@@ -81,8 +77,6 @@ local function enemy_variation_enable_parts(unit, variationsettings, body_parts,
 			enemy_variation_enable_parts(unit, variationsettings, variation.enables, group_result, material_result)
 		end
 	end
-
-	return 
 end
 
 local function enemy_variation_scale_nodes(unit, variationsettings, scaling_result)
@@ -109,8 +103,6 @@ local function enemy_variation_scale_nodes(unit, variationsettings, scaling_resu
 			scaling_result[node_to_scale_up] = 1
 		end
 	end
-
-	return 
 end
 
 function flow_callback_enemy_variation(params)
@@ -279,8 +271,6 @@ local function enemy_dismember_set_variations_on_unit(new_unit, variation_data)
 			Unit.set_local_scale(new_unit, node_id, Vector3(scale_value, scale_value, scale_value))
 		end
 	end
-
-	return 
 end
 
 local function enemy_dismember_set_baked_variations_on_unit(new_unit, baked_variation)
@@ -291,8 +281,6 @@ local function enemy_dismember_set_baked_variations_on_unit(new_unit, baked_vari
 			Unit.set_visibility(new_unit, "var" .. baked_variation, true)
 		end
 	end
-
-	return 
 end
 
 local function enemy_dismember_set_variations(unit, gib_unit, stump_unit)
@@ -300,7 +288,7 @@ local function enemy_dismember_set_variations(unit, gib_unit, stump_unit)
 	local baked_variation = Unit.get_data(unit, "gib_variation")
 
 	if variation_data == nil and baked_variation == nil then
-		return 
+		return
 	end
 
 	if variation_data ~= nil then
@@ -322,8 +310,6 @@ local function enemy_dismember_set_variations(unit, gib_unit, stump_unit)
 			enemy_dismember_set_baked_variations_on_unit(stump_unit, baked_variation)
 		end
 	end
-
-	return 
 end
 
 local function enemy_dismember_kill_actors(unit, actors)
@@ -334,8 +320,6 @@ local function enemy_dismember_kill_actors(unit, actors)
 			Unit.destroy_actor(unit, actors[i])
 		end
 	end
-
-	return 
 end
 
 local function enemy_dismember(params, spawn_gib)
@@ -350,7 +334,7 @@ local function enemy_dismember(params, spawn_gib)
 	if breed_type == nil then
 		print("[enemy_dismember] Skipped gib due to missing breed data")
 
-		return 
+		return
 	end
 
 	if params.baked then
@@ -360,7 +344,7 @@ local function enemy_dismember(params, spawn_gib)
 	if UnitGibSettings[breed_type] == nil then
 		print("[enemy_dismember] Skipped gib due to missing breed in settings file -> " .. breed_type)
 
-		return 
+		return
 	end
 
 	local bodypart = params.bodypart
@@ -368,7 +352,7 @@ local function enemy_dismember(params, spawn_gib)
 	if UnitGibSettings[breed_type].parts[bodypart] == nil then
 		print("[enemy_dismember] Skipped gib due to missing body part for breed in settings file -> " .. breed_type .. " -> " .. bodypart)
 
-		return 
+		return
 	end
 
 	local gibsettings = UnitGibSettings[breed_type].parts[bodypart]
@@ -451,8 +435,6 @@ local function enemy_dismember(params, spawn_gib)
 
 		unit_inventory_extension.stump_items = stump_items
 	end
-
-	return 
 end
 
 function enemy_explode(params)
@@ -467,7 +449,7 @@ function enemy_explode(params)
 	if breed_type == nil then
 		print("[enemy_dismember] Skipped explode due to missing breed data")
 
-		return 
+		return
 	end
 
 	if params.baked then
@@ -477,13 +459,13 @@ function enemy_explode(params)
 	if UnitGibSettings[breed_type] == nil then
 		print("[enemy_dismember] Skipped explode due to missing breed in settings file -> " .. breed_type)
 
-		return 
+		return
 	end
 
 	if UnitGibSettings[breed_type].explode == nil then
 		print("[enemy_dismember] Skipped explode due to missing explode info for breed in settings file -> " .. breed_type)
 
-		return 
+		return
 	end
 
 	local explodesettings = UnitGibSettings[breed_type].explode
@@ -491,7 +473,7 @@ function enemy_explode(params)
 	if explodesettings.part_combos == nil then
 		print("[enemy_dismember] Skipped explode due to missing part combo info for breed in settings file -> " .. breed_type)
 
-		return 
+		return
 	end
 
 	local world = Unit.world(unit)
@@ -527,8 +509,6 @@ function enemy_explode(params)
 
 	Unit.set_unit_visibility(unit, false)
 	Unit.disable_physics(unit)
-
-	return 
 end
 
 function flow_callback_enemy_gib(params)
@@ -549,4 +529,4 @@ function flow_callback_enemy_explode(params)
 	return {}
 end
 
-return 
+return

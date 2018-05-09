@@ -309,8 +309,6 @@ LiquidAreaDamageTemplates = {
 						end
 					end
 				end
-
-				return 
 			end
 		},
 		stormfiend_firewall = {
@@ -741,8 +739,6 @@ LiquidAreaDamageTemplates = {
 			local firing_time = action.firing_time
 			self._firing_time_deadline = t + firing_time
 		end
-
-		return 
 	end,
 	bile_troll_vomit_update = function (self, t, dt)
 		local vomit_unit = self._vomit_unit
@@ -761,8 +757,6 @@ LiquidAreaDamageTemplates = {
 
 			return false
 		end
-
-		return 
 	end,
 	bile_troll_vomit_ground_base_condition = function (unit)
 		local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
@@ -776,4 +770,4 @@ LiquidAreaDamageTemplates = {
 	end
 }
 
-return 
+return

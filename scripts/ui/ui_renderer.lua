@@ -54,6 +54,7 @@ local Gui_bitmap_uv = Gui.bitmap_uv
 local Gui_bitmap = Gui.bitmap
 local Gui_update_bitmap_uv = Gui.update_bitmap_uv
 local Gui_update_bitmap = Gui.update_bitmap
+
 UIRenderer.script_draw_bitmap = function (gui, render_settings, material, gui_position, gui_size, color, masked, saturated, retained_id)
 	local snap_pixel_positions = render_settings and render_settings.snap_pixel_positions
 
@@ -98,9 +99,8 @@ UIRenderer.script_draw_bitmap = function (gui, render_settings, material, gui_po
 	else
 		return Gui_bitmap(gui, material, gui_position, gui_size, color)
 	end
-
-	return 
 end
+
 UIRenderer.script_draw_bitmap_uv = function (gui, render_settings, material, uvs, gui_position, gui_size, color, masked, saturated, retained_id)
 	local texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(material)
 	local snap_pixel_positions = render_settings and render_settings.snap_pixel_positions
@@ -147,13 +147,13 @@ UIRenderer.script_draw_bitmap_uv = function (gui, render_settings, material, uvs
 			return Gui_bitmap_uv(gui, material, Vector2(uv00[1], uv00[2]), Vector2(uv11[1], uv11[2]), gui_position, gui_size, color)
 		end
 	end
-
-	return 
 end
+
 local Gui_update_bitmap_3d_uv = Gui.update_bitmap_3d_uv
 local Gui_bitmap_3d_uv = Gui.bitmap_3d_uv
 local Gui_update_bitmap_3d = Gui.update_bitmap_3d
 local Gui_bitmap_3d = Gui.bitmap_3d
+
 UIRenderer.script_draw_bitmap_3d = function (gui, render_settings, material, tm, gui_layer, gui_size, color, masked, retained_id)
 	local texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(material)
 	local alpha_multiplier = (render_settings and render_settings.alpha_multiplier) or 1
@@ -181,9 +181,8 @@ UIRenderer.script_draw_bitmap_3d = function (gui, render_settings, material, tm,
 	else
 		return Gui_bitmap_3d(gui, material, tm, Vector3.zero(), gui_layer, gui_size, color)
 	end
-
-	return 
 end
+
 UIRenderer.create = function (world, ...)
 	local gui = World.create_screen_gui(world, "immediate", ...)
 	local gui_retained = World.create_screen_gui(world, ...)
@@ -210,6 +209,7 @@ UIRenderer.create = function (world, ...)
 		render_settings = StrictNil
 	}))
 end
+
 UIRenderer.create_video_player = function (self, world, resource, set_loop)
 	assert(not self.video_player)
 
@@ -218,17 +218,15 @@ UIRenderer.create_video_player = function (self, world, resource, set_loop)
 	if set_loop == false then
 		VideoPlayer.set_loop(self.video_player, false)
 	end
-
-	return 
 end
+
 UIRenderer.destroy_video_player = function (self, world)
 	assert(self.video_player)
 	World.destroy_video_player(world or self.world, self.video_player)
 
 	self.video_player = nil
-
-	return 
 end
+
 UIRenderer.destroy = function (self, world)
 	if self.video_player then
 		World.destroy_video_player(self.world, self.video_player)
@@ -238,9 +236,8 @@ UIRenderer.destroy = function (self, world)
 
 	World.destroy_gui(world, self.gui)
 	World.destroy_gui(world, self.gui_retained)
-
-	return 
 end
+
 UIRenderer.clear_scenegraph_queue = function (self)
 	self.ui_scenegraph = nil
 
@@ -248,9 +245,8 @@ UIRenderer.clear_scenegraph_queue = function (self)
 	pdArray.set_empty(self.clipping_rects)
 
 	self.current_clipping_rect = nil
-
-	return 
 end
+
 UIRenderer.begin_pass = function (self, ui_scenegraph, input_service, dt, parent_scenegraph_id, render_settings)
 	if self.ui_scenegraph then
 		local old_scenegraph = self.ui_scenegraph
@@ -318,9 +314,8 @@ UIRenderer.begin_pass = function (self, ui_scenegraph, input_service, dt, parent
 			self.debug_startpoint = nil
 		end
 	end
-
-	return 
 end
+
 UIRenderer.end_pass = function (self)
 	self.render_settings = nil
 
@@ -329,9 +324,8 @@ UIRenderer.end_pass = function (self)
 	else
 		self.ui_scenegraph = nil
 	end
-
-	return 
 end
+
 UIRenderer.draw_widget = function (self, ui_widget)
 	local animations = ui_widget.animations
 
@@ -346,12 +340,10 @@ UIRenderer.draw_widget = function (self, ui_widget)
 	end
 
 	UIRenderer.draw_element(self, ui_widget.element, ui_widget.style, ui_widget.style_global, ui_widget.scenegraph_id, ui_widget.content, animations, ui_widget.offset)
-
-	return 
 end
 
 local function nop()
-	return 
+	return
 end
 
 UIRenderer.draw_element = function (self, ui_element, ui_style, ui_style_global, scenegraph_id, ui_content, ui_animations, offset)
@@ -478,9 +470,8 @@ UIRenderer.draw_element = function (self, ui_element, ui_style, ui_style_global,
 	end
 
 	ui_element.dirty = nil
-
-	return 
 end
+
 UIRenderer.set_element_visible = function (self, ui_element, visible)
 	local pass_datas = ui_element.pass_data
 	local UIPasses = UIPasses
@@ -502,9 +493,8 @@ UIRenderer.set_element_visible = function (self, ui_element, visible)
 			end
 		end
 	end
-
-	return 
 end
+
 UIRenderer.draw_border_fill_rect = function (self, lower_left_corner, size, color)
 	local Gui_rect = Gui.rect
 	local math_min = math.min
@@ -560,9 +550,8 @@ UIRenderer.draw_border_fill_rect = function (self, lower_left_corner, size, colo
 
 		Gui_rect(self.gui, draw_position, draw_size, color)
 	end
-
-	return 
 end
+
 UIRenderer.draw_rect = function (self, lower_left_corner, size, color, retained_id)
 	local render_settings = self.render_settings
 	local alpha_multiplier = (render_settings and render_settings.alpha_multiplier) or 1
@@ -575,9 +564,8 @@ UIRenderer.draw_rect = function (self, lower_left_corner, size, color, retained_
 	else
 		return Gui.rect(self.gui, UIScaleVectorToResolution(lower_left_corner), UIScaleVectorToResolution(size), color)
 	end
-
-	return 
 end
+
 UIRenderer.draw_rect_rotated = function (self, size, position, angle, pivot, color)
 	size = UIScaleVectorToResolution(size)
 	local scaled_pivot = UIScaleVectorToResolution(pivot)
@@ -594,9 +582,8 @@ UIRenderer.draw_rect_rotated = function (self, size, position, angle, pivot, col
 	color = Color(color[1] * alpha_multiplier, color[2], color[3], color[4])
 
 	Gui.rect_3d(self.gui, tm, Vector3.zero(), position[3], size, color)
-
-	return 
 end
+
 local font_name = "gw_arial_16"
 local font_mtrl = "materials/fonts/" .. font_name
 
@@ -672,8 +659,6 @@ local function debug_draw_texture(self, pos, size, texture)
 			position[3]
 		})
 	end
-
-	return 
 end
 
 local uvs_draw_texture_flip_horizontal = {
@@ -686,6 +671,7 @@ local uvs_draw_texture_flip_horizontal = {
 		1
 	}
 }
+
 UIRenderer.draw_texture_flip_horizontal = function (self, material, lower_left_corner, size, color, masked, saturated)
 	if script_data.ui_debug_draw_texture and 0 < Keyboard.button(Keyboard.button_index("v")) then
 		debug_draw_texture(self, lower_left_corner, size, material)
@@ -696,6 +682,7 @@ UIRenderer.draw_texture_flip_horizontal = function (self, material, lower_left_c
 
 	return UIRenderer.script_draw_bitmap_uv(self.gui, self.render_settings, material, uvs_draw_texture_flip_horizontal, gui_position, size, color, masked, saturated)
 end
+
 UIRenderer.draw_texture = function (self, material, lower_left_corner, size, color, masked, saturated, retained_id)
 	local scale = RESOLUTION_LOOKUP.scale
 	local gui_position = Vector3(lower_left_corner[1] * scale, lower_left_corner[2] * scale, lower_left_corner[3] or 0)
@@ -708,9 +695,8 @@ UIRenderer.draw_texture = function (self, material, lower_left_corner, size, col
 	else
 		return UIRenderer.script_draw_bitmap(self.gui, self.render_settings, material, gui_position, gui_size, color, masked, saturated)
 	end
-
-	return 
 end
+
 UIRenderer.draw_texture_uv = function (self, material, lower_left_corner, size, uvs, color, masked, saturated, retained_id)
 	if script_data.ui_debug_draw_texture and 0 < Keyboard.button(Keyboard.button_index("v")) then
 		debug_draw_texture(self, lower_left_corner, size, material)
@@ -726,9 +712,8 @@ UIRenderer.draw_texture_uv = function (self, material, lower_left_corner, size, 
 	else
 		return UIRenderer.script_draw_bitmap_uv(self.gui, self.render_settings, material, uvs, gui_position, size, color, masked, saturated)
 	end
-
-	return 
 end
+
 UIRenderer.draw_gradient_mask_texture = function (self, material, lower_left_corner, size, color, gradient_threshold, retained_id)
 	if script_data.ui_debug_draw_texture and 0 < Keyboard.button(Keyboard.button_index("v")) then
 		debug_draw_texture(self, lower_left_corner, size, material)
@@ -751,10 +736,10 @@ UIRenderer.draw_gradient_mask_texture = function (self, material, lower_left_cor
 	else
 		return UIRenderer.script_draw_bitmap(self.gui, self.render_settings, material, gui_position, gui_size, color, masked, nil)
 	end
-
-	return 
 end
+
 local tile_sizes_dummy = {}
+
 UIRenderer.draw_multi_texture = function (self, materials, lower_left_corner, texture_size, texture_sizes, texture_offsets, tile_sizes, axis, spacing, direction, draw_count, texture_colors, color, masked, texture_saturation, saturated, retained_ids)
 	local UIRenderer_script_draw_bitmap = UIRenderer.script_draw_bitmap
 	local UIRenderer_draw_tiled_texture = UIRenderer.draw_tiled_texture
@@ -775,7 +760,7 @@ UIRenderer.draw_multi_texture = function (self, materials, lower_left_corner, te
 	local num_draws = draw_count or #materials
 
 	if num_draws <= 0 then
-		return 
+		return
 	end
 
 	local new_retained_ids = nil
@@ -904,6 +889,7 @@ UIRenderer.draw_multi_texture = function (self, materials, lower_left_corner, te
 
 	return new_retained_ids
 end
+
 local uvs_draw_tiled_texture = {
 	{
 		0,
@@ -914,6 +900,7 @@ local uvs_draw_tiled_texture = {
 		1
 	}
 }
+
 UIRenderer.draw_tiled_texture = function (self, material, lower_left_corner, size, texture_size, color, masked, saturated, retained_ids)
 	local UIRenderer_script_draw_bitmap_uv = UIRenderer.script_draw_bitmap_uv
 	local position = UIScaleVectorToResolution(lower_left_corner)
@@ -965,6 +952,7 @@ UIRenderer.draw_tiled_texture = function (self, material, lower_left_corner, siz
 
 	return retained_id
 end
+
 UIRenderer.draw_centered_texture_amount = function (self, material, lower_left_corner, size, texture_size, texture_amount, axis, spacing, color, texture_colors, masked, retained_ids)
 	local position = UIScaleVectorToResolution(lower_left_corner)
 	local area_size = UIScaleVectorToResolution(size)
@@ -1000,6 +988,7 @@ UIRenderer.draw_centered_texture_amount = function (self, material, lower_left_c
 
 	return new_retained_ids
 end
+
 UIRenderer.draw_centered_uv_texture_amount = function (self, material, lower_left_corner, size, default_texture_size, texture_sizes, texture_uvs, texture_amount, axis, spacing, color, masked, saturated)
 	local position = UIScaleVectorToResolution(lower_left_corner)
 	local area_size = UIScaleVectorToResolution(size)
@@ -1018,9 +1007,8 @@ UIRenderer.draw_centered_uv_texture_amount = function (self, material, lower_lef
 
 		UIRenderer.script_draw_bitmap_uv(gui, self.render_settings, (is_material_table and material[i]) or material, uvs, texture_position, draw_size, color, masked, saturated)
 	end
-
-	return 
 end
+
 UIRenderer.draw_texture_rotated = function (self, material, size, position, angle, pivot, color, masked, retained_id)
 	size = UIScaleVectorToResolution(size)
 	local scaled_pivot = UIScaleVectorToResolution(pivot)
@@ -1052,17 +1040,17 @@ UIRenderer.draw_texture_rotated = function (self, material, size, position, angl
 	else
 		return UIRenderer.script_draw_bitmap_3d(gui, render_settings, material, tm, position[3], size, color, masked)
 	end
-
-	return 
 end
+
 local draw_text_var_args = {}
+
 UIRenderer.draw_text = function (self, text, font_material, font_size, font_name, position, color, retained_id, color_override)
 	if self.current_clipping_rect then
 		local min, max = Gui.text_extents(self.gui, text, font_material, font_size)
 		local size = max - min
 
 		if not UIRenderer.is_clipped(self, position, size) then
-			return 
+			return
 		end
 	end
 
@@ -1107,13 +1095,14 @@ UIRenderer.draw_text = function (self, text, font_material, font_size, font_name
 
 	return return_value
 end
+
 UIRenderer.draw_justified_text = function (self, text, font_material, font_size, font_name, position, color, retained_id, justify_width, ...)
 	if self.current_clipping_rect then
 		local min, max = Gui.text_extents(self.gui, text, font_material, font_size)
 		local size = max - min
 
 		if not UIRenderer.is_clipped(self, position, size) then
-			return 
+			return
 		end
 	end
 
@@ -1129,9 +1118,8 @@ UIRenderer.draw_justified_text = function (self, text, font_material, font_size,
 	else
 		Gui.text(self.gui, text, font_material, font_size, font_name, ui_position, color, "justify", UIScaleScalarToResolution(justify_width), ...)
 	end
-
-	return 
 end
+
 UIRenderer.word_wrap = function (self, text, font_material, size, width, option)
 	local whitespace = " \u3002\uff0c"
 	local soft_dividers = "-+&/*"
@@ -1148,6 +1136,7 @@ UIRenderer.word_wrap = function (self, text, font_material, size, width, option)
 
 	return rows, return_indices
 end
+
 UIRenderer.text_size = function (self, text, font_material, font_size, ...)
 	local min, max, caret = Gui.text_extents(self.gui, text, font_material, font_size, ...)
 	local inv_scaling = RESOLUTION_LOOKUP.inv_scale
@@ -1156,6 +1145,7 @@ UIRenderer.text_size = function (self, text, font_material, font_size, ...)
 
 	return width, height, min
 end
+
 UIRenderer.draw_video = function (self, material_name, position, size, color)
 	local gui = self.gui
 	local video_player = self.video_player
@@ -1170,6 +1160,7 @@ UIRenderer.draw_video = function (self, material_name, position, size, color)
 
 	return is_complete
 end
+
 UIRenderer.draw_splash_video = function (self, material_name, position, size, color)
 	local video_player = self.video_player
 
@@ -1199,9 +1190,8 @@ UIRenderer.draw_splash_video = function (self, material_name, position, size, co
 	color = color and Color(color[1] * alpha_multiplier, color[2], color[3], color[4])
 
 	Gui.video(gui, material_name, video_player, Vector2(w * 0.5 - width * 0.5, h * 0.5 - height * 0.5, position[3]), Vector2(width, height), color)
-
-	return 
 end
+
 local circleVerts = {}
 local CIRCLE_VERTS = 32
 
@@ -1235,9 +1225,8 @@ UIRenderer.draw_circle = function (self, position, radius, size, color)
 	local p3 = Vector3(x + circleVerts[1] * radius, 0, y + circleVerts[2] * radius)
 
 	Gui_triangle(gui, p1, p2, p3, layer, color)
-
-	return 
 end
+
 UIRenderer.draw_rounded_rect = function (self, position, size, radius, color)
 	local Gui_triangle = Gui.triangle
 	position = UIScaleVectorToResolution(position)
@@ -1296,38 +1285,38 @@ UIRenderer.draw_rounded_rect = function (self, position, size, radius, color)
 	p3 = Vector3((x + w) - radius + circleVerts[1] * radius, 0, (y + h) - radius + circleVerts[2] * radius)
 
 	Gui_triangle(gui, p1, p2, p3, layer, color)
-
-	return 
 end
+
 UIRenderer.is_clipped = function (self, position, size)
 	local x0, y0, x1, y1 = unpack(self.current_clipping_rect)
 
 	return position.y <= y1 and y0 <= position.y + size.y and position.x <= x1 and x0 <= position.x + size.x
 end
+
 UIRenderer.clip_is_enclosing = function (position, size)
 	local x0, y0, x1, y1 = unpack(self.current_clipping_rect)
 
 	return y0 <= position.y and position.y + size.y <= y1 and x0 <= position.x and position.x + size.x <= x1
 end
+
 UIRenderer.push_mouse_clip = function (self, scenegraph_id)
 	self.mouse_clip = scenegraph_id
 	self.mouse_clip_pos = UISceneGraph.get_world_position(self.ui_scenegraph, scenegraph_id)
 	self.mouse_clip_size = UISceneGraph.get_size(self.ui_scenegraph, scenegraph_id)
-
-	return 
 end
+
 UIRenderer.pop_mouse_clip = function (self)
 	self.mouse_clip = nil
 	self.mouse_clip_pos = nil
 	self.mouse_clip_size = nil
-
-	return 
 end
+
 local NilCursor = {
 	0,
 	0,
 	0
 }
+
 UIRenderer.scaled_cursor_position_by_scenegraph = function (input_service, scenegraph, scenegraph_id, ignore_scale)
 	local cursor = input_service.get(input_service, "cursor") or NilCursor
 	local scaled_cursor = (not ignore_scale and UIInverseScaleVectorToResolution(cursor)) or cursor
@@ -1337,6 +1326,7 @@ UIRenderer.scaled_cursor_position_by_scenegraph = function (input_service, scene
 
 	return scaled_cursor
 end
+
 UIRenderer.crop_text = function (text, max_chars)
 	local text_length = UTF8Utils.string_length(text)
 
@@ -1348,7 +1338,9 @@ UIRenderer.crop_text = function (text, max_chars)
 
 	return text
 end
+
 local crop_suffix = "..."
+
 UIRenderer.crop_text_width = function (self, text, max_width, style)
 	local font, scaled_font_size = UIFontByResolution(style)
 	local text_width = UIRenderer.text_size(self, text, font[1], scaled_font_size)
@@ -1374,6 +1366,7 @@ UIRenderer.crop_text_width = function (self, text, max_width, style)
 
 	return text
 end
+
 UIRenderer.scaled_font_size_by_width = function (self, text, max_width, style)
 	local font, scaled_font_size = UIFontByResolution(style)
 	local text_width = UIRenderer.text_size(self, text, font[1], scaled_font_size)
@@ -1402,6 +1395,7 @@ UIRenderer.scaled_font_size_by_width = function (self, text, max_width, style)
 
 	return new_font_size
 end
+
 local uvs = {
 	{
 		0,
@@ -1432,6 +1426,7 @@ local uvs_u = {
 		0
 	}
 }
+
 UIRenderer.draw_texture_frame = function (self, position, size, texture_id, texture_size, texture_sizes, color, masked, saturated, only_corners)
 	local UIRenderer_script_draw_bitmap_uv = UIRenderer.script_draw_bitmap_uv
 	local gui = self.gui
@@ -1490,7 +1485,7 @@ UIRenderer.draw_texture_frame = function (self, position, size, texture_id, text
 	UIRenderer_script_draw_bitmap_uv(gui, self.render_settings, texture_id, uvs, Vector3(x_pos + corner_size_x, y_pos + corner_size_y, layer), size - corner_size_vec * 2, color, masked, saturated)
 
 	if only_corners then
-		return 
+		return
 	end
 
 	local tile_vertical_size = vertical
@@ -1531,20 +1526,16 @@ UIRenderer.draw_texture_frame = function (self, position, size, texture_id, text
 
 	UIRenderer_script_draw_bitmap_uv(gui, self.render_settings, texture_id, uvs, Vector3(tile_pos_x, y_pos, layer), tile_horizontal_size_vec, color, masked, saturated)
 	UIRenderer_script_draw_bitmap_uv(gui, self.render_settings, texture_id, uvs_u, Vector3(tile_pos_x, (y_pos + y_size) - tile_horizontal_size_y, layer), tile_horizontal_size_vec, color, masked, saturated)
-
-	return 
 end
+
 UIRenderer.destroy_bitmap = function (self, retained_id)
 	Gui.destroy_bitmap(self.gui_retained, retained_id)
-
-	return 
 end
+
 UIRenderer.destroy_text = function (self, retained_id)
 	Gui.destroy_text(self.gui_retained, retained_id)
-
-	return 
 end
 
 require("scripts/ui/ui_passes")
 
-return 
+return

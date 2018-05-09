@@ -12,8 +12,6 @@ local function debug_print(...)
 	if script_data.debug_storm_vermin_patrol then
 		print(...)
 	end
-
-	return 
 end
 
 local TURN_SPEED = math.pi * 0.7
@@ -50,8 +48,6 @@ AIGroupTemplates.spline_patrol = {
 		enter_state_find_path_entry(nav_world, group)
 
 		group.resycnc_anchor_indexes_at = t + 5
-
-		return 
 	end,
 	destroy = function (world, nav_world, group, unit)
 		local nav_data = group.nav_data
@@ -76,14 +72,12 @@ AIGroupTemplates.spline_patrol = {
 				name = "storm_vermin_patrol_targeting_retained"
 			}):reset()
 		end
-
-		return 
 	end,
 	update = function (world, nav_world, group, t, dt)
 		remove_dead_units(group)
 
 		if group.num_indexed_members == 0 or group.patrol_path_broken then
-			return 
+			return
 		end
 
 		if script_data.debug_storm_vermin_patrol then
@@ -102,7 +96,7 @@ AIGroupTemplates.spline_patrol = {
 			local door_found = check_for_doors(group)
 
 			if door_found then
-				return 
+				return
 			end
 
 			update_spline_anchor_points(nav_world, group, dt)
@@ -119,13 +113,9 @@ AIGroupTemplates.spline_patrol = {
 		elseif state == "in_combat" then
 			check_if_players_dead(nav_world, group, t, dt)
 		end
-
-		return 
 	end,
 	setup_group = function (world, nav_world, group, first_unit)
 		group.target_units = {}
-
-		return 
 	end,
 	BT_debug = function (group)
 		return {
@@ -146,16 +136,12 @@ function play_sound(group, event)
 	local sound_event = sound_settings[event]
 
 	audio_system.play_audio_unit_event(audio_system, sound_event, group.wwise_source_unit)
-
-	return 
 end
 
 function pick_sound_source_unit(group)
 	local wanted_unit_i = math.ceil(group.num_indexed_members * 0.5)
 	local wanted_unit = group.indexed_members[wanted_unit_i]
 	group.wwise_source_unit = wanted_unit
-
-	return 
 end
 
 function update_animation_triggered_sounds(group)
@@ -187,8 +173,6 @@ function update_animation_triggered_sounds(group)
 
 		audio_system.play_audio_unit_event(audio_system, patrol_voice_sound, source_unit)
 	end
-
-	return 
 end
 
 local function set_spline_speed(spline, speed, group)
@@ -199,8 +183,6 @@ local function set_spline_speed(spline, speed, group)
 	local movement = spline.movement(spline)
 
 	movement.set_speed(movement, spline_speed)
-
-	return 
 end
 
 function set_state(group, state_name)
@@ -208,8 +190,6 @@ function set_state(group, state_name)
 
 	group.previous_state = group.state
 	group.state = state_name
-
-	return 
 end
 
 local dead_units = {}
@@ -276,8 +256,6 @@ function remove_dead_units(group)
 			group_targets[target_unit] = nil
 		end
 	end
-
-	return 
 end
 
 function calculate_group_middle_position(group)
@@ -372,8 +350,6 @@ function change_path_direction(group, current_node_index)
 	end
 
 	debug_print("[StormVerminPatrol] Changed path direction:", current_node_index, "New node:", new_node_index, "New direction:", new_direction)
-
-	return 
 end
 
 local function find_patrol_spline(world, group)
@@ -532,8 +508,6 @@ function init_group(nav_world, group, world)
 	group.nav_data.node_data = node_data
 	group.nav_data.node_list = nil
 	group.nav_data.node_direction = nil
-
-	return 
 end
 
 function enter_state_find_path_entry(nav_world, group)
@@ -555,8 +529,6 @@ function enter_state_find_path_entry(nav_world, group)
 	end
 
 	enter_state_forming(nav_world, group)
-
-	return 
 end
 
 function pick_entry_node(nav_world, group)
@@ -612,8 +584,6 @@ function pick_entry_node(nav_world, group)
 	for i = 1, #anchors, 1 do
 		anchors[i].node_index = node_index
 	end
-
-	return 
 end
 
 function set_path_direction(group, direction, current_direction)
@@ -645,8 +615,6 @@ function set_path_direction(group, direction, current_direction)
 			end
 		end
 	end
-
-	return 
 end
 
 function enter_state_forming(nav_world, group)
@@ -681,7 +649,7 @@ function enter_state_forming(nav_world, group)
 			drawer.sphere(drawer, goal_destination, 0.4, Colors.get("red"))
 		end
 
-		return 
+		return
 	end
 
 	goal_destination.z = altitude
@@ -759,8 +727,6 @@ function enter_state_forming(nav_world, group)
 	if script_data.debug_storm_vermin_patrol then
 		debug_draw_formation(group)
 	end
-
-	return 
 end
 
 function debug_draw_formation(group)
@@ -806,8 +772,6 @@ function debug_draw_formation(group)
 		drawer.vector(drawer, anchor_position + offset_y, anchor.wanted_direction:unbox() * 0.2, Colors.get("pink"))
 		drawer.line(drawer, target_node_position + offset_y, target_node_position, Colors.get("pink"))
 	end
-
-	return 
 end
 
 function set_forming_positions(nav_world, group)
@@ -846,7 +810,7 @@ function set_forming_positions(nav_world, group)
 	if invalid_path then
 		set_patrol_path_broken(group)
 
-		return 
+		return
 	end
 
 	table.reverse(points)
@@ -868,8 +832,6 @@ function set_forming_positions(nav_world, group)
 		Debug.storm_vermin_patrols_done = Debug.storm_vermin_patrols_done or -1
 		Debug.storm_vermin_patrols_done = Debug.storm_vermin_patrols_done + 1
 	end
-
-	return 
 end
 
 function update_units(nav_world, group, t, dt)
@@ -971,8 +933,6 @@ function update_units(nav_world, group, t, dt)
 
 		set_spline_speed(spline, spline_speed, group)
 	end
-
-	return 
 end
 
 local in_formation_check_timer = 0
@@ -1001,8 +961,6 @@ function check_is_in_formation(group, dt)
 	if in_formation then
 		enter_state_patrolling(group)
 	end
-
-	return 
 end
 
 function enter_state_patrolling(group)
@@ -1036,8 +994,6 @@ function enter_state_patrolling(group)
 	end
 
 	play_sound(group, "FORMATED")
-
-	return 
 end
 
 function update_spline_anchor_points(nav_world, group, dt)
@@ -1103,7 +1059,7 @@ function update_spline_anchor_points(nav_world, group, dt)
 		change_path_direction(group, last_node)
 		enter_state_patrolling(group)
 
-		return 
+		return
 	end
 
 	local is_circular_spline = group.anchors[1].is_circular_spline
@@ -1128,8 +1084,6 @@ function update_spline_anchor_points(nav_world, group, dt)
 			enter_state_patrolling(group)
 		end
 	end
-
-	return 
 end
 
 local end_points = {}
@@ -1209,8 +1163,6 @@ function update_anchor_positions(nav_world, group, dt)
 			end
 		end
 	end
-
-	return 
 end
 
 function update_anchor_direction(nav_world, group, dt)
@@ -1319,8 +1271,6 @@ function update_anchor_direction(nav_world, group, dt)
 			blackboard.anchor_direction = anchor.current_direction
 		end
 	end
-
-	return 
 end
 
 function is_valid_target_unit(target_unit)
@@ -1367,8 +1317,6 @@ function check_for_players(nav_world, group, t, dt)
 			enter_state_combat(group)
 		end
 	end
-
-	return 
 end
 
 function check_for_doors(group)
@@ -1387,8 +1335,6 @@ function check_for_doors(group)
 			return true
 		end
 	end
-
-	return 
 end
 
 local function sort_anchors_asc(anchor_a, anchor_b)
@@ -1402,8 +1348,6 @@ local function sort_anchors_asc(anchor_a, anchor_b)
 	else
 		return path_percentage_b < path_percentage_a
 	end
-
-	return 
 end
 
 function enter_state_opening_door(group, door_unit)
@@ -1432,8 +1376,6 @@ function enter_state_opening_door(group, door_unit)
 
 		set_spline_speed(spline, spline_speed, group)
 	end
-
-	return 
 end
 
 function update_state_opening_door(group)
@@ -1463,8 +1405,6 @@ function update_state_opening_door(group)
 
 		set_state(group, "patrolling")
 	end
-
-	return 
 end
 
 function enter_state_controlled_advance(nav_world, group, t)
@@ -1518,8 +1458,6 @@ function enter_state_controlled_advance(nav_world, group, t)
 
 	set_state(group, "controlled_advance")
 	play_sound(group, "PLAYER_SPOTTED")
-
-	return 
 end
 
 function acquire_targets(group)
@@ -1560,8 +1498,6 @@ function acquire_targets(group)
 			blackboard.SVP_target_unit = selected_target_unit
 		end
 	end
-
-	return 
 end
 
 function controlled_advance(nav_world, group, t, dt)
@@ -1601,8 +1537,6 @@ function controlled_advance(nav_world, group, t, dt)
 	if should_attack or group.attack_latest_t < t then
 		enter_state_combat(group)
 	end
-
-	return 
 end
 
 function switch_perception(group, breed_perception_name, breed_target_selection_name)
@@ -1627,8 +1561,6 @@ function switch_perception(group, breed_perception_name, breed_target_selection_
 
 		ai_extension.set_perception(ai_extension, perception_name, target_selection_name)
 	end
-
-	return 
 end
 
 function enter_state_combat(group)
@@ -1672,8 +1604,6 @@ function enter_state_combat(group)
 	if group.has_extra_breed then
 		play_sound(group, "CHARGE_EXTRA")
 	end
-
-	return 
 end
 
 function check_if_players_dead(nav_world, group, t, dt)
@@ -1715,8 +1645,6 @@ function check_if_players_dead(nav_world, group, t, dt)
 			group.patrol_in_combat = false
 		end
 	end
-
-	return 
 end
 
 function set_patrol_path_broken(group)
@@ -1732,8 +1660,6 @@ function set_patrol_path_broken(group)
 
 		Managers.state.conflict:destroy_unit(unit, blackboard, "patrol_path_broken")
 	end
-
-	return 
 end
 
-return 
+return

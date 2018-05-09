@@ -14,16 +14,14 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTSmashDoorAction.init = function (self, ...)
 	BTSmashDoorAction.super.init(self, ...)
-
-	return 
 end
+
 BTSmashDoorAction.name = "BTSmashDoorAction"
+
 BTSmashDoorAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local smart_object = blackboard.next_smart_object_data
@@ -57,9 +55,8 @@ BTSmashDoorAction.enter = function (self, unit, blackboard, t)
 	locomotion_extension.set_rotation_speed(locomotion_extension, rotation_speed)
 
 	blackboard.spawn_to_running = nil
-
-	return 
 end
+
 BTSmashDoorAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local locomotion_extension = blackboard.locomotion_extension
 
@@ -86,9 +83,8 @@ BTSmashDoorAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.is_smashing_door = nil
 	blackboard.is_opening_door = nil
 	blackboard.smash_door.target_unit = nil
-
-	return 
 end
+
 BTSmashDoorAction.run = function (self, unit, blackboard, t, dt)
 	if not Unit.alive(blackboard.smash_door.target_unit) then
 		return "failed"
@@ -116,13 +112,13 @@ BTSmashDoorAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTSmashDoorAction.StateInit.on_enter = function (self, params)
 	self.blackboard = params.blackboard
 	self.unit = params.unit
 	self.entrance_pos = params.entrance_pos
-
-	return 
 end
+
 BTSmashDoorAction.StateInit.update = function (self, dt, t)
 	local unit = self.unit
 	local blackboard = self.blackboard
@@ -149,9 +145,8 @@ BTSmashDoorAction.StateInit.update = function (self, dt, t)
 			blackboard.smash_door.failed = true
 		end
 	end
-
-	return 
 end
+
 BTSmashDoorAction.StateMovingToSmartObjectEntrance.on_enter = function (self, params)
 	self.blackboard = params.blackboard
 	self.unit = params.unit
@@ -162,9 +157,8 @@ BTSmashDoorAction.StateMovingToSmartObjectEntrance.on_enter = function (self, pa
 	if params.action.move_anim then
 		Managers.state.network:anim_event(params.unit, params.action.move_anim)
 	end
-
-	return 
 end
+
 BTSmashDoorAction.StateMovingToSmartObjectEntrance.update = function (self, dt, t)
 	local unit = self.unit
 	local blackboard = self.blackboard
@@ -197,9 +191,8 @@ BTSmashDoorAction.StateMovingToSmartObjectEntrance.update = function (self, dt, 
 
 		return BTSmashDoorAction.StateAttacking
 	end
-
-	return 
 end
+
 BTSmashDoorAction.StateOpening.on_enter = function (self, params)
 	local blackboard = params.blackboard
 	local unit = params.unit
@@ -216,9 +209,8 @@ BTSmashDoorAction.StateOpening.on_enter = function (self, params)
 	local rotation = LocomotionUtils.rotation_towards_unit(unit, target_unit)
 
 	locomotion_extension.set_wanted_rotation(locomotion_extension, rotation)
-
-	return 
 end
+
 BTSmashDoorAction.StateOpening.update = function (self, dt, t)
 	local blackboard = self.blackboard
 	local target_unit = self.target_unit
@@ -239,9 +231,8 @@ BTSmashDoorAction.StateOpening.update = function (self, dt, t)
 
 		blackboard.is_opening_door = true
 	end
-
-	return 
 end
+
 BTSmashDoorAction.StateAttacking.on_enter = function (self, params)
 	local target_unit = params.blackboard.smash_door.target_unit
 	local blackboard = params.blackboard
@@ -257,9 +248,8 @@ BTSmashDoorAction.StateAttacking.on_enter = function (self, params)
 	door_extension.num_attackers = door_extension.num_attackers + 1
 
 	self.attack(self)
-
-	return 
 end
+
 BTSmashDoorAction.StateAttacking.update = function (self, dt, t)
 	local blackboard = self.blackboard
 	local target_unit = self.target_unit
@@ -272,16 +262,14 @@ BTSmashDoorAction.StateAttacking.update = function (self, dt, t)
 	if blackboard.attack_finished then
 		self.attack(self)
 	end
-
-	return 
 end
+
 BTSmashDoorAction.StateAttacking.on_exit = function (self)
 	local target_unit = self.target_unit
 	local door_extension = ScriptUnit.extension(target_unit, "door_system")
 	door_extension.num_attackers = door_extension.num_attackers - 1
-
-	return 
 end
+
 BTSmashDoorAction.StateAttacking.attack = function (self)
 	local target_unit = self.target_unit
 	local unit = self.unit
@@ -305,9 +293,8 @@ BTSmashDoorAction.StateAttacking.attack = function (self)
 
 		blackboard.attack_finished = true
 	end
-
-	return 
 end
+
 BTSmashDoorAction.StateMovingToSmartObjectExit.on_enter = function (self, params)
 	self.blackboard = params.blackboard
 	self.unit = params.unit
@@ -317,9 +304,8 @@ BTSmashDoorAction.StateMovingToSmartObjectExit.on_enter = function (self, params
 	if params.action.move_anim then
 		Managers.state.network:anim_event(params.unit, params.action.move_anim)
 	end
-
-	return 
 end
+
 BTSmashDoorAction.StateMovingToSmartObjectExit.update = function (self, dt, t)
 	local unit = self.unit
 	local blackboard = self.blackboard
@@ -340,17 +326,14 @@ BTSmashDoorAction.StateMovingToSmartObjectExit.update = function (self, dt, t)
 	else
 		blackboard.smash_door.done = true
 	end
-
-	return 
 end
+
 BTSmashDoorAction.anim_cb_damage = function (self, unit, blackboard)
 	if blackboard.smash_door.target_unit then
 		local action = blackboard.action
 
 		AiUtils.damage_target(blackboard.smash_door.target_unit, unit, action, action.damage)
 	end
-
-	return 
 end
 
-return 
+return

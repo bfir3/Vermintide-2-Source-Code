@@ -223,6 +223,7 @@ local widget_definitions = {
 	}
 }
 GDCStartUI = class(GDCStartUI)
+
 GDCStartUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -238,9 +239,8 @@ GDCStartUI.init = function (self, ingame_ui_context)
 	self.network_event_delegate:register(self, "rpc_on_skip_gdc_intro")
 	rawset(_G, "GDCStartUI_pointer", self)
 	self.create_ui_elements(self)
-
-	return 
 end
+
 GDCStartUI.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph)
 	self.logo_widget = UIWidget.init(widget_definitions.logo)
@@ -252,9 +252,8 @@ GDCStartUI.create_ui_elements = function (self)
 	local input_widget_style = self.input_widget.style
 	self.ui_animations.button_text_pulse = UIAnimation.init(UIAnimation.pulse_animation, input_widget_style.button_text.text_color, 1, 100, 255, 2)
 	self.ui_animations.button_texture_pulse = UIAnimation.init(UIAnimation.pulse_animation, input_widget_style.icon_styles.color, 1, 100, 255, 2)
-
-	return 
 end
+
 GDCStartUI.update = function (self, dt)
 	local peer_id = self.peer_id
 	local my_player = self.player_manager:player_from_peer_id(peer_id)
@@ -285,9 +284,8 @@ GDCStartUI.update = function (self, dt)
 	end
 
 	self.draw(self, dt)
-
-	return 
 end
+
 GDCStartUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -301,27 +299,23 @@ GDCStartUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 GDCStartUI.destroy = function (self)
 	self.network_event_delegate:unregister(self)
 	rawset(_G, "GDCStartUI_pointer", nil)
 	GarbageLeakDetector.register_object(self, "GDCStartUI")
-
-	return 
 end
+
 GDCStartUI.start_gdc_intro = function (self)
 	self.draw_intro = true
-
-	return 
 end
+
 GDCStartUI.end_gdc_intro = function (self)
 	self.draw_intro = nil
 	self.intro_complete = true
-
-	return 
 end
+
 GDCStartUI.rpc_on_skip_gdc_intro = function (self, sender)
 	if Managers.player.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_on_skip_gdc_intro", self.peer_id)
@@ -341,12 +335,11 @@ GDCStartUI.rpc_on_skip_gdc_intro = function (self, sender)
 			LevelHelper:flow_event(world, "gdc_intro_complete")
 		end
 	end
-
-	return 
 end
+
 GDCStartUI.check_start_input = function (self, input_service)
 	if self.input_pressed or not self.input_widget then
-		return 
+		return
 	end
 
 	local ignore_player_count = Development.parameter("gdc_ignore_minimum_players")
@@ -382,9 +375,8 @@ GDCStartUI.check_start_input = function (self, input_service)
 
 		self.num_of_human_players = num_of_human_players
 	end
-
-	return 
 end
+
 GDCStartUI.set_input_text = function (self, optinal_text)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -470,9 +462,8 @@ GDCStartUI.set_input_text = function (self, optinal_text)
 	ui_scenegraph.input_text.position[2] = (scaled_font_size == text_style.font_size and 3) or 0
 	ui_scenegraph.input_prefix_text.position[2] = ui_scenegraph.input_text.position[2]
 	ui_scenegraph.input.position[1] = -((text_width + texture_size_x) * 0.5) + prefix_text_width
-
-	return 
 end
+
 GDCStartUI.get_text_width = function (self, text_style, text)
 	local font, scaled_font_size = UIFontByResolution(text_style)
 	local width, height, min = UIRenderer.text_size(self.ui_renderer, text, font[1], scaled_font_size)
@@ -480,4 +471,4 @@ GDCStartUI.get_text_width = function (self, text_style, text)
 	return width, scaled_font_size
 end
 
-return 
+return

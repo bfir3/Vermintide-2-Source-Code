@@ -1145,4 +1145,4 @@ LevelSettings.warcamp = {
 	}
 }
 
-return 
+return

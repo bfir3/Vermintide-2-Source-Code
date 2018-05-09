@@ -243,4 +243,4 @@ SurvivalEndWaveByDifficulty = {
 	survival_hard = 13
 }
 
-return 
+return

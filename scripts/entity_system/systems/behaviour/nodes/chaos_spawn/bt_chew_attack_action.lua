@@ -4,11 +4,11 @@ BTChewAttackAction = class(BTChewAttackAction, BTNode)
 BTChewAttackAction.name = "BTChewAttackAction"
 local PLAYER_POSITIONS = PLAYER_POSITIONS
 local PLAYER_UNITS = PLAYER_UNITS
+
 BTChewAttackAction.init = function (self, ...)
 	BTChewAttackAction.super.init(self, ...)
-
-	return 
 end
+
 BTChewAttackAction.enter = function (self, unit, blackboard, t)
 	local network_manager = Managers.state.network
 	local action = self._tree_node.action_data
@@ -16,7 +16,7 @@ BTChewAttackAction.enter = function (self, unit, blackboard, t)
 	blackboard.active_node = self
 
 	if not Unit.alive(blackboard.victim_grabbed) then
-		return 
+		return
 	end
 
 	if blackboard.grabbed_state ~= "chew" then
@@ -34,9 +34,8 @@ BTChewAttackAction.enter = function (self, unit, blackboard, t)
 	local victim_profile = ScriptUnit.extension(victim, "dialogue_system").context.player_profile
 
 	Managers.state.entity:system("surrounding_aware_system"):add_system_event(unit, "enemy_attack", DialogueSettings.discover_enemy_attack_distance, "attack_tag", "chaos_spawn_eating", "target_name", victim_profile)
-
-	return 
 end
+
 BTChewAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.navigation_extension:set_enabled(true)
 
@@ -51,10 +50,10 @@ BTChewAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 		blackboard.has_grabbed_victim = nil
 		blackboard.victim_grabbed = nil
 	end
-
-	return 
 end
+
 local Unit_alive = Unit.alive
+
 BTChewAttackAction.run = function (self, unit, blackboard, t, dt)
 	local victim_grabbed = blackboard.victim_grabbed
 
@@ -72,6 +71,7 @@ BTChewAttackAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTChewAttackAction.anim_cb_chew_attack = function (self, unit, blackboard)
 	local action = blackboard.action
 
@@ -90,8 +90,6 @@ BTChewAttackAction.anim_cb_chew_attack = function (self, unit, blackboard)
 	if action.max_chew_attacks <= blackboard.chew_attacks_done then
 		blackboard.wants_to_throw = true
 	end
-
-	return 
 end
 
-return 
+return

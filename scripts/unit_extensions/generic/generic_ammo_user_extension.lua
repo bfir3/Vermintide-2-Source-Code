@@ -1,5 +1,6 @@
 script_data.infinite_ammo = script_data.infinite_ammo or Development.parameter("infinite_ammo")
 GenericAmmoUserExtension = class(GenericAmmoUserExtension)
+
 GenericAmmoUserExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.owner_unit = extension_init_data.owner_unit
@@ -28,14 +29,12 @@ GenericAmmoUserExtension.init = function (self, extension_init_context, unit, ex
 	if ScriptUnit.has_extension(self.owner_unit, "first_person_system") then
 		self.first_person_extension = ScriptUnit.extension(self.owner_unit, "first_person_system")
 	end
-
-	return 
 end
+
 GenericAmmoUserExtension.extensions_ready = function (self, world, unit)
 	self.apply_buffs(self)
-
-	return 
 end
+
 GenericAmmoUserExtension.apply_buffs = function (self)
 	if self.slot_name == "slot_ranged" or self.slot_name == "slot_career_skill_weapon" then
 		local buff_extension = ScriptUnit.extension(self.owner_unit, "buff_system")
@@ -46,12 +45,12 @@ GenericAmmoUserExtension.apply_buffs = function (self)
 	end
 
 	self.reset(self)
+end
 
-	return 
-end
 GenericAmmoUserExtension.destroy = function (self)
-	return 
+	return
 end
+
 GenericAmmoUserExtension.reset = function (self)
 	if self.ammo_immediately_available then
 		self.current_ammo = self.start_ammo
@@ -61,9 +60,8 @@ GenericAmmoUserExtension.reset = function (self)
 
 	self.available_ammo = self.start_ammo - self.current_ammo
 	self.shots_fired = 0
-
-	return 
 end
+
 GenericAmmoUserExtension.update = function (self, unit, input, dt, context, t)
 	if 0 < self.shots_fired then
 		self.current_ammo = self.current_ammo - self.shots_fired
@@ -163,9 +161,8 @@ GenericAmmoUserExtension.update = function (self, unit, input, dt, context, t)
 			end
 		end
 	end
-
-	return 
 end
+
 GenericAmmoUserExtension.start_reload_animation = function (self, reload_time)
 	local reload_event = self.reload_event
 	local num_missing = self.ammo_per_clip - self.current_ammo
@@ -199,12 +196,11 @@ GenericAmmoUserExtension.start_reload_animation = function (self, reload_time)
 			end
 		end
 	end
-
-	return 
 end
+
 GenericAmmoUserExtension.add_ammo = function (self, amount)
 	if self.destroy_when_out_of_ammo then
-		return 
+		return
 	end
 
 	if self.available_ammo == 0 and self.current_ammo == 0 then
@@ -229,18 +225,16 @@ GenericAmmoUserExtension.add_ammo = function (self, amount)
 	else
 		self.available_ammo = self.max_ammo - self.current_ammo - self.shots_fired
 	end
-
-	return 
 end
+
 GenericAmmoUserExtension.add_ammo_to_reserve = function (self, amount)
 	if self.ammo_immediately_available then
 		self.current_ammo = math.min(self.max_ammo, self.current_ammo + amount)
 	else
 		self.available_ammo = math.min(self.max_ammo - self.current_ammo, self.available_ammo + amount)
 	end
-
-	return 
 end
+
 GenericAmmoUserExtension.use_ammo = function (self, ammo_used)
 	if not self.destroy_when_out_of_ammo and script_data.infinite_ammo then
 		ammo_used = 0
@@ -274,9 +268,8 @@ GenericAmmoUserExtension.use_ammo = function (self, ammo_used)
 	end
 
 	assert(0 <= self.ammo_count(self), "ammo went below 0")
-
-	return 
 end
+
 GenericAmmoUserExtension.start_reload = function (self, play_reload_animation)
 	assert(self.can_reload(self), "Tried to start reloading without being able to reload")
 	assert(self.next_reload_time == nil, "next_reload_time is nil")
@@ -290,9 +283,8 @@ GenericAmmoUserExtension.start_reload = function (self, play_reload_animation)
 	local event_name = "reload_started"
 
 	dialogue_input.trigger_dialogue_event(dialogue_input, event_name, event_data)
-
-	return 
 end
+
 GenericAmmoUserExtension.abort_reload = function (self)
 	assert(self.is_reloading(self))
 
@@ -300,21 +292,24 @@ GenericAmmoUserExtension.abort_reload = function (self)
 	self.next_reload_time = nil
 
 	Unit.flow_event(self.unit, "stop_reload_sound")
-
-	return 
 end
+
 GenericAmmoUserExtension.ammo_count = function (self)
 	return self.current_ammo - self.shots_fired
 end
+
 GenericAmmoUserExtension.clip_size = function (self)
 	return self.ammo_per_clip
 end
+
 GenericAmmoUserExtension.remaining_ammo = function (self)
 	return self.available_ammo
 end
+
 GenericAmmoUserExtension.ammo_available_immediately = function (self)
 	return self.ammo_immediately_available
 end
+
 GenericAmmoUserExtension.can_reload = function (self)
 	if self.is_reloading(self) then
 		return false
@@ -330,24 +325,31 @@ GenericAmmoUserExtension.can_reload = function (self)
 
 	return 0 < self.available_ammo
 end
+
 GenericAmmoUserExtension.total_remaining_ammo = function (self)
 	return self.remaining_ammo(self) + self.ammo_count(self)
 end
+
 GenericAmmoUserExtension.total_ammo_fraction = function (self)
 	return (self.remaining_ammo(self) + self.ammo_count(self)) / self.max_ammo
 end
+
 GenericAmmoUserExtension.get_max_ammo = function (self)
 	return self.max_ammo
 end
+
 GenericAmmoUserExtension.is_reloading = function (self)
 	return self.next_reload_time ~= nil
 end
+
 GenericAmmoUserExtension.full_ammo = function (self)
 	return self.remaining_ammo(self) + self.ammo_count(self) == self.max_ammo
 end
+
 GenericAmmoUserExtension.using_single_clip = function (self)
 	return self.single_clip
 end
+
 GenericAmmoUserExtension.instant_reload = function (self, bonus_ammo, reload_anim_event)
 	if not bonus_ammo then
 		local reload_amount = self.ammo_per_clip - self.current_ammo
@@ -379,8 +381,6 @@ GenericAmmoUserExtension.instant_reload = function (self, bonus_ammo, reload_ani
 			end
 		end
 	end
-
-	return 
 end
 
-return 
+return

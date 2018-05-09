@@ -4,14 +4,15 @@ BTSuicideRunAction = class(BTSuicideRunAction, BTNode)
 BTSuicideRunAction.StateInit = class(BTSuicideRunAction.StateInit)
 BTSuicideRunAction.StateMove = class(BTSuicideRunAction.StateMove)
 BTSuicideRunAction.StateExplode = class(BTSuicideRunAction.StateExplode)
+
 BTSuicideRunAction.init = function (self, ...)
 	BTSuicideRunAction.super.init(self, ...)
-
-	return 
 end
+
 BTSuicideRunAction.name = "BTSuicideRunAction"
 local position_lookup = POSITION_LOOKUP
 local UPDATE_MOVE_INTERVAL = 0.25
+
 BTSuicideRunAction.enter = function (self, unit, blackboard, t)
 	blackboard.suicide_run = blackboard.suicide_run or {}
 	local action = self._tree_node.action_data
@@ -35,7 +36,7 @@ BTSuicideRunAction.enter = function (self, unit, blackboard, t)
 
 		suicide_run.instant_explode = true
 
-		return 
+		return
 	end
 
 	local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
@@ -44,9 +45,8 @@ BTSuicideRunAction.enter = function (self, unit, blackboard, t)
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "enemy_attack", event_data)
 	Managers.state.entity:system("surrounding_aware_system"):add_system_event(unit, "enemy_attack", DialogueSettings.suicide_run_broadcast_range, "attack_tag", "pwg_suicide_run")
-
-	return 
 end
+
 BTSuicideRunAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
@@ -55,9 +55,8 @@ BTSuicideRunAction.leave = function (self, unit, blackboard, t, reason, destroy)
 
 	blackboard.anim_cb_move = nil
 	blackboard.attack_finished = nil
-
-	return 
 end
+
 BTSuicideRunAction.update_target_position = function (self, unit, blackboard, ai_navigation, stop)
 	if Unit.alive(blackboard.target_unit) and not stop then
 		local whereabouts_extension = ScriptUnit.extension(blackboard.target_unit, "whereabouts_system")
@@ -67,14 +66,12 @@ BTSuicideRunAction.update_target_position = function (self, unit, blackboard, ai
 	else
 		ai_navigation.stop(ai_navigation)
 	end
-
-	return 
 end
+
 BTSuicideRunAction.play_unit_audio = function (self, unit, blackboard, sound_name)
 	Managers.state.entity:system("audio_system"):play_audio_unit_event(sound_name, unit)
-
-	return 
 end
+
 BTSuicideRunAction.run = function (self, unit, blackboard, t, dt)
 	local suicide_run = blackboard.suicide_run
 
@@ -89,9 +86,8 @@ BTSuicideRunAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "running"
 	end
-
-	return 
 end
+
 BTSuicideRunAction.StateInit.on_enter = function (self, params)
 	local unit = params.unit
 	local blackboard = params.blackboard
@@ -112,9 +108,8 @@ BTSuicideRunAction.StateInit.on_enter = function (self, params)
 
 	self.unit = unit
 	self.blackboard = blackboard
-
-	return 
 end
+
 BTSuicideRunAction.StateInit.update = function (self, dt, t)
 	local unit = self.unit
 	local blackboard = self.blackboard
@@ -141,9 +136,8 @@ BTSuicideRunAction.StateInit.update = function (self, dt, t)
 	if instant_explode then
 		return BTSuicideRunAction.StateExplode
 	end
-
-	return 
 end
+
 BTSuicideRunAction.StateMove.on_enter = function (self, params)
 	local unit = params.unit
 	local blackboard = params.blackboard
@@ -162,9 +156,8 @@ BTSuicideRunAction.StateMove.on_enter = function (self, params)
 	self.unit = unit
 	self.blackboard = blackboard
 	self.explode_timer = blackboard.suicide_run.action.suicide_explosion_timer
-
-	return 
 end
+
 BTSuicideRunAction.StateMove.update = function (self, dt, t)
 	local unit = self.unit
 	local blackboard = self.blackboard
@@ -185,9 +178,8 @@ BTSuicideRunAction.StateMove.update = function (self, dt, t)
 	if move_done or proximity < 2 or blackboard.no_path_found then
 		return BTSuicideRunAction.StateExplode
 	end
-
-	return 
 end
+
 BTSuicideRunAction.StateExplode.on_enter = function (self, params)
 	local unit = params.unit
 	local blackboard = params.blackboard
@@ -200,9 +192,8 @@ BTSuicideRunAction.StateExplode.on_enter = function (self, params)
 
 	self.unit = unit
 	self.blackboard = blackboard
-
-	return 
 end
+
 BTSuicideRunAction.StateExplode.update = function (self, dt, t)
 	local unit = self.unit
 	local blackboard = self.blackboard
@@ -210,14 +201,12 @@ BTSuicideRunAction.StateExplode.update = function (self, dt, t)
 	local ready_to_explode = blackboard.attack_finished
 
 	if not ready_to_explode then
-		return 
+		return
 	end
 
 	AiUtils.kill_unit(unit)
 
 	suicide_run.done = true
-
-	return 
 end
 
-return 
+return

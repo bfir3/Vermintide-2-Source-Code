@@ -37,6 +37,7 @@ local extensions = {
 	"OverpoweredBlobHealthExtension",
 	"TrainingDummyHealthExtension"
 }
+
 HealthSystem.init = function (self, entity_system_creation_context, system_name)
 	HealthSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -50,14 +51,12 @@ HealthSystem.init = function (self, entity_system_creation_context, system_name)
 	self.updateable_unit_extensions = {}
 	self.active_damage_buffer_index = 1
 	self.extension_init_context.system_data = self
-
-	return 
 end
+
 HealthSystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
-
-	return 
 end
+
 HealthSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	local extension = ScriptUnit.add_extension(self.extension_init_context, unit, extension_name, self.NAME, extension_init_data)
 	self.unit_extensions[unit] = extension
@@ -72,6 +71,7 @@ HealthSystem.on_add_extension = function (self, world, unit, extension_name, ext
 
 	return extension
 end
+
 HealthSystem.on_remove_extension = function (self, unit, extension_name)
 	fassert(ScriptUnit.has_extension(unit, self.NAME), "Trying to remove non-existing extension %q from unit %s", extension_name, unit)
 	ScriptUnit.remove_extension(unit, self.NAME)
@@ -79,18 +79,16 @@ HealthSystem.on_remove_extension = function (self, unit, extension_name)
 	self.unit_extensions[unit] = nil
 	self.player_unit_extensions[unit] = nil
 	self.updateable_unit_extensions[unit] = nil
-
-	return 
 end
+
 HealthSystem.hot_join_sync = function (self, sender)
 	for unit, extension in pairs(self.unit_extensions) do
 		if extension.hot_join_sync then
 			extension.hot_join_sync(extension, sender)
 		end
 	end
-
-	return 
 end
+
 HealthSystem.update = function (self, context, t)
 	self.active_damage_buffer_index = 3 - self.active_damage_buffer_index
 	local active_damage_buffer_index = self.active_damage_buffer_index
@@ -111,18 +109,16 @@ HealthSystem.update = function (self, context, t)
 	for unit, extension in pairs(self.updateable_unit_extensions) do
 		extension.update(extension, dt, context, t)
 	end
-
-	return 
 end
+
 HealthSystem._assist_shield = function (self, target_unit, shield_amount)
 	local health_extension = self.unit_extensions[target_unit]
 	local status_extension = ScriptUnit.extension(target_unit, "status_system")
 
 	health_extension.shield(health_extension, shield_amount)
 	status_extension.set_shielded(status_extension, true)
-
-	return 
 end
+
 HealthSystem.suicide = function (self, unit)
 	if not unit or not Unit.alive(unit) then
 		if not unit then
@@ -131,7 +127,7 @@ HealthSystem.suicide = function (self, unit)
 			print("Trying suicide but already dead")
 		end
 
-		return 
+		return
 	end
 
 	local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -142,10 +138,10 @@ HealthSystem.suicide = function (self, unit)
 	health_extension.state = "knocked_down"
 
 	DamageUtils.add_damage_network(unit, unit, 255, "torso", "cutting", Vector3(1, 0, 0), "suicide")
-
-	return 
 end
+
 local debug_units = {}
+
 HealthSystem.update_debug = function (self)
 	if script_data.damage_debug then
 		for unit, extension in pairs(self.unit_extensions) do
@@ -181,7 +177,7 @@ HealthSystem.update_debug = function (self)
 		local player = Managers.player:local_player()
 
 		if player == nil then
-			return 
+			return
 		end
 
 		local player_unit = player.player_unit
@@ -285,9 +281,8 @@ HealthSystem.update_debug = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 HealthSystem.rpc_add_damage = function (self, sender, victim_unit_go_id, victim_unit_is_level_unit, attacker_unit_go_id, attacker_is_level_unit, damage_amount, hit_zone_id, damage_type_id, damage_direction, damage_source_id, hit_ragdoll_actor_id, hit_react_type_id, is_dead, is_critical_strike, added_dot)
 	fassert(not self.is_server, "Tried sending rpc_add_damage to something other than client")
 
@@ -301,7 +296,7 @@ HealthSystem.rpc_add_damage = function (self, sender, victim_unit_go_id, victim_
 	end
 
 	if not Unit.alive(victim_unit) then
-		return 
+		return
 	end
 
 	local attacker_unit = nil
@@ -339,9 +334,8 @@ HealthSystem.rpc_add_damage = function (self, sender, victim_unit_go_id, victim_
 
 		death_system.kill_unit(death_system, victim_unit, killing_blow)
 	end
-
-	return 
 end
+
 HealthSystem.rpc_add_damage_network = function (self, sender, victim_unit_go_id, victim_unit_is_level_unit, attacker_unit_go_id, attacker_is_level_unit, damage_amount, hit_zone_id, damage_type_id, damage_direction, damage_source_id, hit_react_type_id, is_critical_strike, added_dot)
 	fassert(self.is_server, "Tried sending rpc_add_damage_network to something other than the server")
 
@@ -355,7 +349,7 @@ HealthSystem.rpc_add_damage_network = function (self, sender, victim_unit_go_id,
 	end
 
 	if not Unit.alive(victim_unit) then
-		return 
+		return
 	end
 
 	local attacker_unit = nil
@@ -372,18 +366,16 @@ HealthSystem.rpc_add_damage_network = function (self, sender, victim_unit_go_id,
 	local hit_react_type = NetworkLookup.hit_react_types[hit_react_type_id]
 
 	DamageUtils.add_damage_network(victim_unit, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source, nil, nil, nil, hit_react_type, is_critical_strike, added_dot)
-
-	return 
 end
+
 HealthSystem.rpc_damage_taken_overcharge = function (self, sender, unit_go_id, damage)
 	local unit = self.unit_storage:unit(unit_go_id)
 
 	if unit then
 		DamageUtils.apply_damage_to_overcharge(unit, damage)
 	end
-
-	return 
 end
+
 HealthSystem.rpc_heal = function (self, sender, target_unit_go_id, target_unit_is_level_unit, healer_unit_go_id, healer_unit_is_level_unit, heal_amount, heal_type_id)
 	local target_unit = nil
 	local unit_storage = self.unit_storage
@@ -395,7 +387,7 @@ HealthSystem.rpc_heal = function (self, sender, target_unit_go_id, target_unit_i
 	end
 
 	if not Unit.alive(target_unit) then
-		return 
+		return
 	end
 
 	local healer_unit = nil
@@ -433,24 +425,22 @@ HealthSystem.rpc_heal = function (self, sender, target_unit_go_id, target_unit_i
 			healer_buff_extension.trigger_procs(healer_buff_extension, "on_healed_ally", target_unit, heal_amount, heal_type)
 		end
 	end
-
-	return 
 end
+
 HealthSystem.rpc_remove_assist_shield = function (self, sender, unit_go_id)
 	local unit = self.unit_storage:unit(unit_go_id)
 	local health_extension = self.unit_extensions[unit]
 
 	health_extension.remove_assist_shield(health_extension, "blocked_damage")
-
-	return 
 end
+
 HealthSystem.rpc_request_heal = function (self, sender, unit_go_id, heal_amount, heal_type_id)
 	fassert(self.is_server or LEVEL_EDITOR_TEST, "Trying to request a heal from a client")
 
 	local unit = self.unit_storage:unit(unit_go_id)
 
 	if not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local heal_type = NetworkLookup.heal_types[heal_type_id]
@@ -460,16 +450,14 @@ HealthSystem.rpc_request_heal = function (self, sender, unit_go_id, heal_amount,
 	else
 		DamageUtils.heal_network(unit, unit, heal_amount, heal_type)
 	end
-
-	return 
 end
+
 HealthSystem.rpc_suicide = function (self, sender, go_id)
 	local unit = self.unit_storage:unit(go_id)
 
 	self.suicide(self, unit)
-
-	return 
 end
+
 HealthSystem.rpc_sync_damage_taken = function (self, sender, go_id, is_level_unit, set_max_health, amount, state_id)
 	local unit = nil
 	local unit_storage = self.unit_storage
@@ -481,7 +469,7 @@ HealthSystem.rpc_sync_damage_taken = function (self, sender, go_id, is_level_uni
 	end
 
 	if not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local health_extension = self.unit_extensions[unit]
@@ -493,20 +481,19 @@ HealthSystem.rpc_sync_damage_taken = function (self, sender, go_id, is_level_uni
 		health_extension.damage = amount
 		health_extension.state = state
 	end
-
-	return 
 end
+
 HealthSystem.rpc_take_falling_damage = function (self, sender, go_id, fall_height)
 	local unit = self.unit_storage:unit(go_id)
 
 	if not unit or not Unit.alive(unit) then
-		return 
+		return
 	end
 
 	local player_health_extension = self.player_unit_extensions[unit]
 
 	if not player_health_extension then
-		return 
+		return
 	end
 
 	fall_height = fall_height * 0.25
@@ -528,9 +515,8 @@ HealthSystem.rpc_take_falling_damage = function (self, sender, go_id, fall_heigh
 
 		DamageUtils.add_damage_network(unit, unit, fall_damage, hit_zone_name, damage_type, damage_direction, "ground_impact")
 	end
-
-	return 
 end
+
 HealthSystem.rpc_request_revive = function (self, sender, revived_unit_go_id, reviver_unit_go_id)
 	fassert(self.is_server or LEVEL_EDITOR_TEST, "Trying to request a revive from a client")
 
@@ -544,14 +530,12 @@ HealthSystem.rpc_request_revive = function (self, sender, revived_unit_go_id, re
 	local interactable_player = player_manager.unit_owner(player_manager, revived_unit)
 
 	if not interactor_player or not interactable_player then
-		return 
+		return
 	end
 
 	local interactable_pos = POSITION_LOOKUP[revived_unit]
 
 	Managers.telemetry.events:player_revived(interactor_player, interactable_player, interactable_pos)
-
-	return 
 end
 
-return 
+return

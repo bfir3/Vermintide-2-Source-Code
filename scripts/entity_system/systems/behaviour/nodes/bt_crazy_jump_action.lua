@@ -3,19 +3,17 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 BTCrazyJumpAction = class(BTCrazyJumpAction, BTNode)
 local position_lookup = POSITION_LOOKUP
 local PLAYER_AND_BOT_UNITS = PLAYER_AND_BOT_UNITS
+
 BTCrazyJumpAction.init = function (self, ...)
 	BTCrazyJumpAction.super.init(self, ...)
-
-	return 
 end
+
 BTCrazyJumpAction.name = "BTCrazyJumpAction"
 
 local function debug3d(unit, text, color_name)
 	if script_data.debug_ai_movement then
 		Debug.world_sticky_text(position_lookup[unit], text, color_name)
 	end
-
-	return 
 end
 
 BTCrazyJumpAction.enter = function (self, unit, blackboard, t)
@@ -52,9 +50,8 @@ BTCrazyJumpAction.enter = function (self, unit, blackboard, t)
 
 	locomotion_extension.set_gravity(locomotion_extension, blackboard.breed.jump_gravity)
 	locomotion_extension.set_check_falling(locomotion_extension, false)
-
-	return 
 end
+
 BTCrazyJumpAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.skulk_pos = nil
 	blackboard.comitted_to_target = false
@@ -89,10 +86,10 @@ BTCrazyJumpAction.leave = function (self, unit, blackboard, t, reason, destroy)
 
 	navigation_extension.set_enabled(navigation_extension, true)
 	locomotion_extension.set_check_falling(locomotion_extension, true)
-
-	return 
 end
+
 local enter_snap_state_distance = 2.7
+
 BTCrazyJumpAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion = blackboard.locomotion_extension
 	local data = blackboard.jump_data
@@ -367,6 +364,7 @@ BTCrazyJumpAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTCrazyJumpAction.create_bot_threat = function (self, unit, blackboard, t)
 	local first_person_extension = ScriptUnit.has_extension(blackboard.target_unit, "first_person_system")
 
@@ -389,10 +387,10 @@ BTCrazyJumpAction.create_bot_threat = function (self, unit, blackboard, t)
 			ai_bot_group_system.aoe_threat_created(ai_bot_group_system, obstacle_position, "oobb", obstacle_size, obstacle_rotation, bot_threat_duration)
 		end
 	end
-
-	return 
 end
+
 local use_overlap = true
+
 BTCrazyJumpAction.check_colliding_players = function (self, unit, blackboard, pos)
 	if use_overlap then
 		local radius = 1
@@ -428,9 +426,8 @@ BTCrazyJumpAction.check_colliding_players = function (self, unit, blackboard, po
 
 		return hit_unit
 	end
-
-	return 
 end
+
 BTCrazyJumpAction.setup_jump = function (self, unit, blackboard, data)
 	local jump_target_pos = data.jump_target_pos:unbox()
 	local jump_velocity = data.jump_velocity_boxed:unbox()
@@ -456,23 +453,22 @@ BTCrazyJumpAction.setup_jump = function (self, unit, blackboard, data)
 	animation_system.start_anim_variable_update_by_distance(animation_system, unit, data.anim_jump_rot_var, jump_target_pos, 2, true)
 
 	data.updating_jump_rot = true
-
-	return 
 end
+
 BTCrazyJumpAction.update_anim_variable_done = function (self, unit, data)
 	local animation_system = Managers.state.entity:system("animation_system")
 
 	animation_system.set_update_anim_variable_done(animation_system, unit)
 
 	data.updating_jump_rot = false
-
-	return 
 end
+
 local INDEX_POSITION = 1
 local INDEX_DISTANCE = 2
 local INDEX_NORMAL = 3
 local INDEX_ACTOR = 4
 local hit_units = {}
+
 BTCrazyJumpAction.ray_cast = function (from, to, blackboard, ignore_unit)
 	local direction = to - from
 	local normalized_direction = Vector3.normalize(direction)
@@ -504,6 +500,7 @@ BTCrazyJumpAction.ray_cast = function (from, to, blackboard, ignore_unit)
 
 	return nil
 end
+
 BTCrazyJumpAction.debug = function (self, unit, blackboard, data, t)
 	if data.state == "in_air" or data.state == "snapping" then
 		local callback_context = data.overlap_context
@@ -522,8 +519,6 @@ BTCrazyJumpAction.debug = function (self, unit, blackboard, data, t)
 			QuickDrawer:sphere(closest_point_on_velocity, 0.05, Color(255, 0, 200, 100))
 		end
 	end
-
-	return 
 end
 
-return 
+return

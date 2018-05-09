@@ -2,6 +2,7 @@ require("scripts/unit_extensions/generic/generic_state_machine")
 
 PlayerWhereaboutsExtension = class(PlayerWhereaboutsExtension)
 local position_lookup = POSITION_LOOKUP
+
 PlayerWhereaboutsExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.nav_world = Managers.state.entity:system("ai_system"):nav_world()
@@ -18,9 +19,8 @@ PlayerWhereaboutsExtension.init = function (self, extension_init_context, unit, 
 	self._jump_position = Vector3Box(Vector3.invalid_vector())
 	self._fall_position = Vector3Box(Vector3.invalid_vector())
 	self._free_fall_position = Vector3Box(Vector3.invalid_vector())
-
-	return 
 end
+
 PlayerWhereaboutsExtension._setup = function (self, nav_world, unit)
 	local position = position_lookup[unit]
 	local level_settings = LevelHelper:current_level_settings()
@@ -32,38 +32,33 @@ PlayerWhereaboutsExtension._setup = function (self, nav_world, unit)
 	else
 		self.last_pos_on_nav_mesh = Vector3Box(Vector3.invalid_vector())
 	end
+end
 
-	return 
-end
 PlayerWhereaboutsExtension.destroy = function (self)
-	return 
+	return
 end
+
 PlayerWhereaboutsExtension.set_is_onground = function (self)
 	self._input.is_onground = true
-
-	return 
 end
+
 PlayerWhereaboutsExtension.set_fell = function (self, player_state)
 	self._input.fell = true
 	self._input.player_state = player_state
-
-	return 
 end
+
 PlayerWhereaboutsExtension.set_jumped = function (self)
 	self._input.jumped = true
-
-	return 
 end
+
 PlayerWhereaboutsExtension.set_landed = function (self)
 	self._input.landed = true
-
-	return 
 end
+
 PlayerWhereaboutsExtension.set_no_landing = function (self)
 	self._input.no_landing = true
-
-	return 
 end
+
 PlayerWhereaboutsExtension.update = function (self, unit, input, dt, context, t)
 	local pos = position_lookup[unit]
 	local input = self._input
@@ -78,15 +73,16 @@ PlayerWhereaboutsExtension.update = function (self, unit, input, dt, context, t)
 	end
 
 	table.clear(input)
-
-	return 
 end
+
 PlayerWhereaboutsExtension.last_position_onground_on_navmesh = function (self)
 	local pos = self._last_onground_pos_on_nav_mesh:unbox()
 
 	return (Vector3.is_valid(pos) and pos) or nil
 end
+
 local EPSILON = 0.0001
+
 PlayerWhereaboutsExtension._find_start_position = function (self, current_position, perform_distance_check)
 	local last_pos = self._last_onground_pos_on_nav_mesh:unbox()
 
@@ -103,9 +99,8 @@ PlayerWhereaboutsExtension._find_start_position = function (self, current_positi
 			return last_pos
 		end
 	end
-
-	return 
 end
+
 PlayerWhereaboutsExtension._check_bot_nav_transition = function (self, nav_world, input, current_position)
 	if input.jumped then
 		fassert(not self._falling and not self._jumping, "Tried to jump or fall while falling without aborting landing")
@@ -172,9 +167,8 @@ PlayerWhereaboutsExtension._check_bot_nav_transition = function (self, nav_world
 			self._falling = false
 		end
 	end
-
-	return 
 end
+
 PlayerWhereaboutsExtension._get_closest_positions = function (self, pos, is_onground, point_list)
 	local nav_world = self.nav_world
 	self.player_on_nav_mesh = GwNavQueries.triangle_from_position(nav_world, pos, 0.2, 0.3)
@@ -186,7 +180,7 @@ PlayerWhereaboutsExtension._get_closest_positions = function (self, pos, is_ongr
 			self._last_onground_pos_on_nav_mesh:store(pos)
 		end
 
-		return 
+		return
 	end
 
 	local p = GwNavQueries.inside_position_from_outside_position(nav_world, pos, 3, 3, 2.1, 0.5)
@@ -198,7 +192,7 @@ PlayerWhereaboutsExtension._get_closest_positions = function (self, pos, is_ongr
 			point_list[i] = nil
 		end
 
-		return 
+		return
 	end
 
 	local p = GwNavQueries.inside_position_from_outside_position(nav_world, pos, 5, 5, 10, 0.5)
@@ -210,7 +204,7 @@ PlayerWhereaboutsExtension._get_closest_positions = function (self, pos, is_ongr
 			point_list[i] = nil
 		end
 
-		return 
+		return
 	end
 
 	local list_size = #point_list
@@ -220,17 +214,16 @@ PlayerWhereaboutsExtension._get_closest_positions = function (self, pos, is_ongr
 	end
 
 	LocomotionUtils.closest_mesh_positions_outward(nav_world, pos, 10, point_list)
-
-	return 
 end
+
 PlayerWhereaboutsExtension.closest_positions_when_outside_navmesh = function (self)
 	return self.closest_positions, self.player_on_nav_mesh
 end
+
 PlayerWhereaboutsExtension.set_new_hang_ledge_position = function (self, hang_ledge_position)
 	self.hang_ledge_position = Vector3Box(hang_ledge_position)
-
-	return 
 end
+
 PlayerWhereaboutsExtension._calculate_hang_ledge_spawn_position = function (self, hang_ledge_position)
 	local nav_world = self.nav_world
 	local p = GwNavQueries.inside_position_from_outside_position(nav_world, hang_ledge_position, 5, 5, 10, 0.5)
@@ -242,12 +235,12 @@ PlayerWhereaboutsExtension._calculate_hang_ledge_spawn_position = function (self
 
 		self.hang_ledge_spawn_position = Vector3Box(hang_ledge_position)
 	end
-
-	return 
 end
+
 PlayerWhereaboutsExtension.get_hang_ledge_spawn_position = function (self)
 	return self.hang_ledge_spawn_position:unbox()
 end
+
 PlayerWhereaboutsExtension._debug_draw = function (self, unit_position, point_list, t)
 	local last_onground_pos_on_nav_mesh = self._last_onground_pos_on_nav_mesh:unbox()
 
@@ -267,8 +260,6 @@ PlayerWhereaboutsExtension._debug_draw = function (self, unit_position, point_li
 
 		QuickDrawer:sphere(pos + Vector3(0, 0, 0.25), 0.77, Color(255, 144, 23, 67))
 	end
-
-	return 
 end
 
-return 
+return

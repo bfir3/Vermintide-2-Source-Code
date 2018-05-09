@@ -4,18 +4,15 @@ BTNinjaSkulkAction = class(BTNinjaSkulkAction, BTNode)
 BTNinjaSkulkAction.name = "BTNinjaSkulkAction"
 local position_lookup = POSITION_LOOKUP
 local script_data = script_data
+
 BTNinjaSkulkAction.init = function (self, ...)
 	BTNinjaSkulkAction.super.init(self, ...)
-
-	return 
 end
 
 local function debug3d(unit, text, color_name)
 	if script_data.debug_ai_movement then
 		Debug.world_sticky_text(position_lookup[unit], text, color_name)
 	end
-
-	return 
 end
 
 BTNinjaSkulkAction.enter = function (self, unit, blackboard, t)
@@ -52,9 +49,8 @@ BTNinjaSkulkAction.enter = function (self, unit, blackboard, t)
 
 		ai_navigation.move_to(ai_navigation, pos)
 	end
-
-	return 
 end
+
 BTNinjaSkulkAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if reason == "aborted" then
 	end
@@ -66,11 +62,11 @@ BTNinjaSkulkAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 local test_points = {}
 local close_range = 8
+
 BTNinjaSkulkAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion = blackboard.locomotion_extension
 	local breed = blackboard.breed
@@ -242,6 +238,7 @@ BTNinjaSkulkAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 local segment_list = {}
 local relative_positions = {
 	0.4,
@@ -251,6 +248,7 @@ local relative_positions = {
 	0,
 	1.5
 }
+
 BTNinjaSkulkAction.check_free_los = function (self, unit, blackboard, data)
 	local p2 = Unit.world_position(blackboard.target_unit, 0) + Vector3(0, 0, 0.2)
 	local enemy_pos = POSITION_LOOKUP[blackboard.target_unit]
@@ -272,6 +270,7 @@ BTNinjaSkulkAction.check_free_los = function (self, unit, blackboard, data)
 
 	return in_los
 end
+
 BTNinjaSkulkAction.try_dodge_pos = function (self, unit, blackboard, pos, dodge_pos)
 	local success, z = GwNavQueries.triangle_from_position(blackboard.nav_world, dodge_pos, 3, 3)
 
@@ -296,11 +295,11 @@ BTNinjaSkulkAction.try_dodge_pos = function (self, unit, blackboard, pos, dodge_
 			return true
 		end
 	end
-
-	return 
 end
+
 local dodge_dist = 2
 local dodge_dist_check = dodge_dist - 0.3
+
 BTNinjaSkulkAction.dodge = function (self, unit, blackboard, dodge_vec, aim_vec)
 	local pos = position_lookup[unit]
 	local velocity = blackboard.locomotion_extension:current_velocity()
@@ -319,7 +318,7 @@ BTNinjaSkulkAction.dodge = function (self, unit, blackboard, dodge_vec, aim_vec)
 		local pass_check_pos = pos + dodge_dir * dodge_dist_check
 		blackboard.dodge_pos = Vector3Box(pass_check_pos)
 
-		return 
+		return
 	end
 
 	dodge_pos = pos - dodge_dir * dodge_dist
@@ -328,9 +327,8 @@ BTNinjaSkulkAction.dodge = function (self, unit, blackboard, dodge_vec, aim_vec)
 		local pass_check_pos = pos - dodge_dir * dodge_dist_check
 		blackboard.dodge_pos = Vector3Box(pass_check_pos)
 	end
-
-	return 
 end
+
 BTNinjaSkulkAction.in_crosshairs = function (self, unit, blackboard, t, data)
 	local units = PLAYER_AND_BOT_UNITS
 
@@ -350,9 +348,8 @@ BTNinjaSkulkAction.in_crosshairs = function (self, unit, blackboard, t, data)
 			data.aiming_at_me = status_extension.aim_unit
 		end
 	end
-
-	return 
 end
+
 BTNinjaSkulkAction.get_fallback_goal = function (self, unit, blackboard)
 	table.clear(test_points)
 
@@ -371,9 +368,8 @@ BTNinjaSkulkAction.get_fallback_goal = function (self, unit, blackboard)
 
 		return true
 	end
-
-	return 
 end
+
 BTNinjaSkulkAction.set_goal_at_target = function (self, unit, blackboard)
 	local pos = POSITION_LOOKUP[blackboard.target_unit] + Vector3(0, 0, 0)
 	pos = ConflictUtils.find_center_tri(blackboard.nav_world, pos)
@@ -385,9 +381,8 @@ BTNinjaSkulkAction.set_goal_at_target = function (self, unit, blackboard)
 
 		blackboard.navigation_extension:move_to(pos)
 	end
-
-	return 
 end
+
 BTNinjaSkulkAction.get_new_goal = function (self, unit, blackboard)
 	local target_unit = blackboard.target_unit
 
@@ -411,14 +406,12 @@ BTNinjaSkulkAction.get_new_goal = function (self, unit, blackboard)
 			return true
 		end
 	end
-
-	return 
 end
+
 BTNinjaSkulkAction.anim_cb_dodge_finished = function (self, unit, params)
 	blackboard.anim_cb_dodge_finished = nil
-
-	return 
 end
+
 BTNinjaSkulkAction.debug = function (self, unit, blackboard)
 	if blackboard.skulk_pos then
 		local pos = blackboard.skulk_pos:unbox()
@@ -443,8 +436,6 @@ BTNinjaSkulkAction.debug = function (self, unit, blackboard)
 
 		QuickDrawer:sphere(pos + Vector3(0, 0, 2), 0.5, Color(255, 43, 43, 207))
 	end
-
-	return 
 end
 
-return 
+return

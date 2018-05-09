@@ -1,5 +1,6 @@
 local definitions = local_require("scripts/ui/views/tutorial_tooltip_ui_definitions")
 TutorialTooltipUI = class(TutorialTooltipUI)
+
 TutorialTooltipUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.input_manager = ingame_ui_context.input_manager
@@ -8,12 +9,12 @@ TutorialTooltipUI.init = function (self, ingame_ui_context)
 	self.tutorial_tooltip_input_widgets = {}
 
 	self.create_ui_elements(self)
+end
 
-	return 
-end
 TutorialTooltipUI.destroy = function (self)
-	return 
+	return
 end
+
 TutorialTooltipUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
@@ -23,9 +24,8 @@ TutorialTooltipUI.create_ui_elements = function (self)
 	for i = 1, definitions.NUMBER_OF_TOOLTIP_INPUT_WIDGETS, 1 do
 		self.tutorial_tooltip_input_widgets[i] = UIWidget.init(definitions.tutorial_tooltip_input_widgets[i])
 	end
-
-	return 
 end
+
 TutorialTooltipUI.button_texture_data_by_input_action = function (self, input_action, alt_button_name)
 	local input_manager = self.input_manager
 	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
@@ -44,9 +44,8 @@ TutorialTooltipUI.button_texture_data_by_input_action = function (self, input_ac
 
 		return UISettings.get_gamepad_input_texture_data(input_service, input_action, gamepad_active)
 	end
-
-	return 
 end
+
 TutorialTooltipUI.update = function (self, tooltip_tutorial, player_unit, dt)
 	if next(self.tutorial_tooltip_animations) ~= nil then
 		self.set_dirty(self)
@@ -184,9 +183,8 @@ TutorialTooltipUI.update = function (self, tooltip_tutorial, player_unit, dt)
 			return self.tutorial_tooltip_widget, tooltip_name
 		end
 	end
-
-	return 
 end
+
 TutorialTooltipUI.draw = function (self, dt, t)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -200,9 +198,8 @@ TutorialTooltipUI.draw = function (self, dt, t)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 TutorialTooltipUI.set_dirty = function (self)
 	self.tutorial_tooltip_widget.element.dirty = true
 	local input_widgets = self.tutorial_tooltip_input_widgets
@@ -211,9 +208,8 @@ TutorialTooltipUI.set_dirty = function (self)
 		local widget = input_widgets[i]
 		widget.element.dirty = true
 	end
-
-	return 
 end
+
 TutorialTooltipUI.hide = function (self)
 	local ui_renderer = self.ui_renderer
 	self.active_tooltip_name = nil
@@ -227,20 +223,18 @@ TutorialTooltipUI.hide = function (self)
 
 		UIRenderer.set_element_visible(ui_renderer, widget.element, false)
 	end
-
-	return 
 end
+
 local FADE_TIME = 0.1
+
 TutorialTooltipUI.fade_in = function (self)
 	self._fade(self, 0, 255, FADE_TIME)
-
-	return 
 end
+
 TutorialTooltipUI.fade_out = function (self)
 	self._fade(self, 255, 0, FADE_TIME)
-
-	return 
 end
+
 TutorialTooltipUI._fade = function (self, from_alpha, to_alpha, duration)
 	local widget_style = self.tutorial_tooltip_widget.style
 	local bg_style = widget_style.background
@@ -261,9 +255,8 @@ TutorialTooltipUI._fade = function (self, from_alpha, to_alpha, duration)
 		self.tutorial_tooltip_animations["tooltip_input_button_" .. i] = UIAnimation.init(UIAnimation.function_by_time, button_text_style.text_color, 1, from_alpha, to_alpha, duration, math.easeInCubic)
 		self.tutorial_tooltip_animations["tooltip_input_icon_" .. i] = UIAnimation.init(UIAnimation.function_by_time, icon_style.color, 1, from_alpha, to_alpha, duration, math.easeInCubic)
 	end
-
-	return 
 end
+
 TutorialTooltipUI.has_completed_fade = function (self)
 	if next(self.tutorial_tooltip_animations) ~= nil then
 		return false
@@ -271,6 +264,7 @@ TutorialTooltipUI.has_completed_fade = function (self)
 
 	return true
 end
+
 TutorialTooltipUI.set_visible = function (self, visible)
 	self._is_visible = visible
 	local ui_renderer = self.ui_renderer
@@ -280,8 +274,6 @@ TutorialTooltipUI.set_visible = function (self, visible)
 	end
 
 	UIRenderer.set_element_visible(ui_renderer, self.tutorial_tooltip_widget.element, visible)
-
-	return 
 end
 
-return 
+return

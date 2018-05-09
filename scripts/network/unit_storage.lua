@@ -3,8 +3,6 @@ local function bimap_add(bm, a, b)
 
 	bm[b] = a
 	bm[a] = b
-
-	return 
 end
 
 local function bimap_remove(bm, a)
@@ -13,24 +11,23 @@ local function bimap_remove(bm, a)
 	assert(b, "bimap_remove")
 
 	bm[a], bm[b] = nil
-
-	return 
 end
 
 local type = type
 NetworkUnitStorage = class(NetworkUnitStorage)
+
 NetworkUnitStorage.init = function (self)
 	self.map_goid_to_unit = {}
 	self.bimap_goid_unit = {}
 	self.map_goid_to_gotype = {}
 	self.map_goid_to_owner = {}
 	self.owner_goid_array = {}
-
-	return 
 end
+
 NetworkUnitStorage.units = function (self)
 	return self.map_goid_to_unit
 end
+
 NetworkUnitStorage.go_id = function (self, o)
 	if type(o) == "number" then
 		return o
@@ -38,6 +35,7 @@ NetworkUnitStorage.go_id = function (self, o)
 
 	return self.bimap_goid_unit[o]
 end
+
 NetworkUnitStorage.unit = function (self, o)
 	if type(o) == "number" then
 		return self.map_goid_to_unit[o]
@@ -45,6 +43,7 @@ NetworkUnitStorage.unit = function (self, o)
 
 	return o
 end
+
 NetworkUnitStorage.remove = function (self, o)
 	local unit = self.unit(self, o)
 	local go_id = self.go_id(self, o)
@@ -56,9 +55,8 @@ NetworkUnitStorage.remove = function (self, o)
 
 	bimap_remove(self.bimap_goid_unit, unit)
 	NetworkUnit.reset_unit(unit)
-
-	return 
 end
+
 NetworkUnitStorage.remove_owner = function (self, o)
 	local unit = self.unit(self, o)
 	local go_id = self.go_id(self, o)
@@ -70,9 +68,8 @@ NetworkUnitStorage.remove_owner = function (self, o)
 	end
 
 	NetworkUnit.set_owner_peer_id(unit, nil)
-
-	return 
 end
+
 NetworkUnitStorage.set_owner = function (self, o, owner)
 	self.remove_owner(self, o)
 
@@ -89,14 +86,14 @@ NetworkUnitStorage.set_owner = function (self, o, owner)
 	self.map_goid_to_owner[go_id] = owner
 
 	NetworkUnit.set_owner_peer_id(unit, owner)
-
-	return 
 end
+
 NetworkUnitStorage.owner = function (self, o)
 	local go_id = self.go_id(self, o)
 
 	return self.map_goid_to_owner[go_id]
 end
+
 NetworkUnitStorage.add_unit = function (self, unit, go_id, owner)
 	assert(go_id ~= NetworkConstants.invalid_game_object_id, "invalid go_id")
 
@@ -108,19 +105,17 @@ NetworkUnitStorage.add_unit = function (self, unit, go_id, owner)
 	if owner then
 		self.set_owner(self, unit, owner)
 	end
-
-	return 
 end
+
 NetworkUnitStorage.add_unit_info = function (self, unit, go_id, go_type, owner)
 	self.map_goid_to_gotype[go_id] = go_type
 
 	NetworkUnit.set_game_object_type(unit, go_type)
 	self.add_unit(self, unit, go_id, owner)
-
-	return 
 end
+
 NetworkUnitStorage.go_type = function (self, o)
 	return self.map_goid_to_gotype[self.go_id(self, o)]
 end
 
-return 
+return

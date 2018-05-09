@@ -5,6 +5,7 @@ local fade_min = 0.1
 local margin = 50
 local lost_gaze_threshhold = 1
 local DEBUG_BOUNDING_BOXES = false
+
 UICleanUI.create = function ()
 	return {
 		dirty = true,
@@ -291,8 +292,6 @@ UICleanUI.update = function (self, dt, context)
 			ScriptGUI.icrect(gui, res_x, res_y, cluster.bounding_box[1], res_y - cluster.bounding_box[2], cluster.bounding_box[3], res_y - cluster.bounding_box[4], 1, color)
 		end
 	end
-
-	return 
 end
 
-return 
+return

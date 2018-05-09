@@ -1,9 +1,9 @@
 PlayerCharacterStateInVortex = class(PlayerCharacterStateInVortex, PlayerCharacterState)
+
 PlayerCharacterStateInVortex.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "in_vortex")
-
-	return 
 end
+
 PlayerCharacterStateInVortex.on_enter = function (self, unit, input, dt, context, t, previous_state)
 	local game = Managers.state.network:game()
 	self.game = game
@@ -59,9 +59,8 @@ PlayerCharacterStateInVortex.on_enter = function (self, unit, input, dt, context
 
 	CharacterStateHelper.play_animation_event(unit, animation_event)
 	CharacterStateHelper.play_animation_event_first_person(first_person_extension, animation_event)
-
-	return 
 end
+
 PlayerCharacterStateInVortex.on_exit = function (self, unit, input, dt, context, t, next_state)
 	self.vortex_unit_go_id = nil
 	self.vortex_full_inner_radius = nil
@@ -93,9 +92,8 @@ PlayerCharacterStateInVortex.on_exit = function (self, unit, input, dt, context,
 			end
 		end
 	end
-
-	return 
 end
+
 PlayerCharacterStateInVortex.update_spin_velocity = function (self, unit, vortex_unit, vortex_unit_go_id, dt)
 	local game = self.game
 	local radius_percentage = GameSession.game_object_field(game, vortex_unit_go_id, "inner_radius_percentage")
@@ -120,6 +118,7 @@ PlayerCharacterStateInVortex.update_spin_velocity = function (self, unit, vortex
 
 	return spinn_dir
 end
+
 PlayerCharacterStateInVortex.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local status_extension = self.status_extension
@@ -134,13 +133,13 @@ PlayerCharacterStateInVortex.update = function (self, unit, input, dt, context, 
 
 		csm.change_state(csm, "catapulted", params)
 
-		return 
+		return
 	end
 
 	if not status_extension.is_valid_vortex_target(status_extension) then
 		CharacterStateHelper.do_common_state_transitions(status_extension, csm)
 
-		return 
+		return
 	end
 
 	if not CharacterStateHelper.is_in_vortex(status_extension) then
@@ -150,7 +149,7 @@ PlayerCharacterStateInVortex.update = function (self, unit, input, dt, context, 
 			csm.change_state(csm, "falling")
 		end
 
-		return 
+		return
 	end
 
 	local input_extension = self.input_extension
@@ -184,8 +183,6 @@ PlayerCharacterStateInVortex.update = function (self, unit, input, dt, context, 
 
 		first_person_extension.force_look_rotation(first_person_extension, rot)
 	end
-
-	return 
 end
 
-return 
+return

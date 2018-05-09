@@ -6,6 +6,7 @@ local animation_definitions = definitions.animation_definitions
 local DO_RELOAD = false
 HeroWindowPrestige = class(HeroWindowPrestige)
 HeroWindowPrestige.NAME = "HeroWindowPrestige"
+
 HeroWindowPrestige.on_enter = function (self, params, offset)
 	print("[HeroViewWindow] Enter Substate HeroWindowPrestige")
 
@@ -34,16 +35,14 @@ HeroWindowPrestige.on_enter = function (self, params, offset)
 	self.hero_level = ExperienceSettings.get_level(experience)
 
 	self._setup_prestige_reward(self)
-
-	return 
 end
+
 HeroWindowPrestige.on_exit = function (self, params)
 	print("[HeroViewWindow] Exit Substate HeroWindowPrestige")
 
 	self.ui_animator = nil
-
-	return 
 end
+
 HeroWindowPrestige.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -77,9 +76,8 @@ HeroWindowPrestige.create_ui_elements = function (self, params, offset)
 		window_position[2] = window_position[2] + offset[2]
 		window_position[3] = window_position[3] + offset[3]
 	end
-
-	return 
 end
+
 HeroWindowPrestige._setup_prestige_reward = function (self)
 	local widgets_by_name = self._widgets_by_name
 	local hero_name = self.hero_name
@@ -112,9 +110,8 @@ HeroWindowPrestige._setup_prestige_reward = function (self)
 	local can_prestige = ProgressionUnlocks.can_upgrade_prestige(hero_name)
 	widgets_by_name.prestige_button.content.button_hotspot.disable_button = not can_prestige
 	widgets_by_name.unable_description_text.content.visible = not can_prestige
-
-	return 
 end
+
 HeroWindowPrestige.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -125,12 +122,12 @@ HeroWindowPrestige.update = function (self, dt, t)
 	self._update_animations(self, dt)
 	self._handle_input(self, dt, t)
 	self.draw(self, dt)
+end
 
-	return 
-end
 HeroWindowPrestige.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 HeroWindowPrestige._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -144,9 +141,8 @@ HeroWindowPrestige._update_animations = function (self, dt)
 			animations[animation_name] = nil
 		end
 	end
-
-	return 
 end
+
 HeroWindowPrestige._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -156,9 +152,8 @@ HeroWindowPrestige._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroWindowPrestige._is_button_released = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -168,9 +163,8 @@ HeroWindowPrestige._is_button_released = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroWindowPrestige._is_stepper_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot_left = content.button_hotspot_left
@@ -185,9 +179,8 @@ HeroWindowPrestige._is_stepper_button_pressed = function (self, widget)
 
 		return true, 1
 	end
-
-	return 
 end
+
 HeroWindowPrestige._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local widgets_by_name = self._widgets_by_name
@@ -240,9 +233,8 @@ HeroWindowPrestige._handle_input = function (self, dt, t)
 			return true
 		end
 	end
-
-	return 
 end
+
 HeroWindowPrestige.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -272,14 +264,12 @@ HeroWindowPrestige.draw = function (self, dt)
 
 		UIRenderer.end_pass(ui_top_renderer)
 	end
-
-	return 
 end
+
 HeroWindowPrestige._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroWindowPrestige._set_prestige_reward_portrait_frame = function (self, frame_settings_name)
 	local career_index = self.career_index
 	local profile_index = self.profile_index
@@ -297,8 +287,6 @@ HeroWindowPrestige._set_prestige_reward_portrait_frame = function (self, frame_s
 	end
 
 	self._reward_portrait_widget = widget
-
-	return 
 end
 
-return 
+return

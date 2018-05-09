@@ -1,11 +1,11 @@
 PlayerCharacterStateStanding = class(PlayerCharacterStateStanding, PlayerCharacterState)
+
 PlayerCharacterStateStanding.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "standing")
 
 	local context = character_state_init_context
-
-	return 
 end
+
 PlayerCharacterStateStanding.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	local unit = self.unit
 	local input_extension = self.input_extension
@@ -26,19 +26,19 @@ PlayerCharacterStateStanding.on_enter = function (self, unit, input, dt, context
 	self.time_when_can_be_pushed = t + movement_settings_table.soft_collision.grace_time_pushed_entering_standing
 
 	if CharacterStateHelper.is_interacting(self.interactor_extension) or CharacterStateHelper.is_starting_interaction(self.input_extension, self.interactor_extension) then
-		return 
+		return
 	end
 
 	self.current_animation = "idle"
 
 	CharacterStateHelper.play_animation_event(unit, "idle")
 	CharacterStateHelper.play_animation_event_first_person(first_person_extension, "idle")
+end
 
-	return 
-end
 PlayerCharacterStateStanding.on_exit = function (self, unit, input, dt, context, t, next_state)
-	return 
+	return
 end
+
 PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local world = self.world
@@ -54,37 +54,37 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 	end
 
 	if CharacterStateHelper.do_common_state_transitions(status_extension, csm) then
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_waiting_for_assisted_respawn(status_extension) then
 		csm.change_state(csm, "waiting_for_assisted_respawn")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_using_transport(status_extension) then
 		csm.change_state(csm, "using_transport")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_ledge_hanging(world, unit, self.temp_params) then
 		csm.change_state(csm, "ledge_hanging", self.temp_params)
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_overcharge_exploding(status_extension) then
 		csm.change_state(csm, "overcharge_exploding")
 
-		return 
+		return
 	end
 
 	if not csm.state_next and status_extension.do_leap then
 		csm.change_state(csm, "leaping")
 
-		return 
+		return
 	end
 
 	CharacterStateHelper.update_dodge_lock(unit, input_extension, status_extension)
@@ -100,7 +100,7 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 
 		csm.change_state(csm, "stunned", params)
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_block_broken(status_extension) then
@@ -111,7 +111,7 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 
 		csm.change_state(csm, "stunned", params)
 
-		return 
+		return
 	end
 
 	local start_dodge, dodge_direction = CharacterStateHelper.check_to_start_dodge(unit, input_extension, status_extension, t)
@@ -122,13 +122,13 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 
 		csm.change_state(csm, "dodging", params)
 
-		return 
+		return
 	end
 
 	if locomotion_extension.is_animation_driven(locomotion_extension) then
 		csm.change_state(csm, "walking")
 
-		return 
+		return
 	end
 
 	local interactor_extension = self.interactor_extension
@@ -147,7 +147,7 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 			csm.change_state(csm, "interacting", params)
 		end
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_interacting(interactor_extension) then
@@ -162,7 +162,7 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 			csm.change_state(csm, "interacting", params)
 		end
 
-		return 
+		return
 	end
 
 	local is_crouching = status_extension.is_crouching(status_extension)
@@ -175,7 +175,7 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 		csm.change_state(csm, "jumping")
 		first_person_extension.change_state(first_person_extension, "jumping")
 
-		return 
+		return
 	end
 
 	local is_moving = CharacterStateHelper.has_move_input(input_extension)
@@ -186,14 +186,14 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 		csm.change_state(csm, "walking", params)
 		first_person_extension.change_state(first_person_extension, "walking")
 
-		return 
+		return
 	end
 
 	if not locomotion_extension.is_on_ground(locomotion_extension) then
 		csm.change_state(csm, "falling")
 		first_person_extension.change_state(first_person_extension, "falling")
 
-		return 
+		return
 	end
 
 	if input_extension.get(input_extension, "character_inspecting") then
@@ -205,12 +205,12 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 				if Managers.state.game_mode:level_key() == "inn_level" then
 					csm.change_state(csm, "inspecting")
 
-					return 
+					return
 				end
 			else
 				csm.change_state(csm, "inspecting")
 
-				return 
+				return
 			end
 		end
 	end
@@ -227,8 +227,6 @@ PlayerCharacterStateStanding.update = function (self, unit, input, dt, context, 
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, self.first_person_extension, status_extension, self.inventory_extension)
 	CharacterStateHelper.update_weapon_actions(t, unit, input_extension, inventory_extension, self.health_extension)
 	CharacterStateHelper.reload(input_extension, inventory_extension, status_extension)
-
-	return 
 end
 
-return 
+return

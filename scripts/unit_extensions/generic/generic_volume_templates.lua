@@ -15,8 +15,6 @@ GenericVolumeTemplates.functions = {
 				}
 				local buff_extension = ScriptUnit.extension(unit, "buff_system")
 				data.buff_id = buff_extension.add_buff(buff_extension, "damage_volume_generic_dot", params)
-
-				return 
 			end,
 			on_exit = function (unit, data)
 				local buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -24,8 +22,6 @@ GenericVolumeTemplates.functions = {
 				buff_extension.remove_buff(buff_extension, data.buff_id)
 
 				data.buff_id = nil
-
-				return 
 			end
 		},
 		generic_insta_kill = {
@@ -33,8 +29,6 @@ GenericVolumeTemplates.functions = {
 				local health_extension = ScriptUnit.extension(unit, "health_system")
 
 				health_extension.die(health_extension, "volume_insta_kill")
-
-				return 
 			end
 		},
 		catacombs_corpse_pit = {
@@ -45,8 +39,6 @@ GenericVolumeTemplates.functions = {
 					attacker_unit = unit
 				}
 				data.buff_id = buff_extension.add_buff(buff_extension, "catacombs_corpse_pit", params)
-
-				return 
 			end,
 			on_exit = function (unit, data)
 				local buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -54,8 +46,6 @@ GenericVolumeTemplates.functions = {
 				buff_extension.remove_buff(buff_extension, data.buff_id)
 
 				data.buff_id = nil
-
-				return 
 			end
 		}
 	},
@@ -66,15 +56,11 @@ GenericVolumeTemplates.functions = {
 				local multiplier = data.settings.speed_multiplier
 
 				buff_system.add_volume_buff_multiplier(buff_system, unit, "movement_volume_generic_slowdown", multiplier)
-
-				return 
 			end,
 			on_exit = function (unit, data)
 				local buff_system = Managers.state.entity:system("buff_system")
 
 				buff_system.remove_volume_buff_multiplier(buff_system, unit, "movement_volume_generic_slowdown")
-
-				return 
 			end
 		}
 	},
@@ -94,8 +80,6 @@ GenericVolumeTemplates.functions = {
 
 					RPC.rpc_set_current_location(player.peer_id, unit_id, location_id)
 				end
-
-				return 
 			end
 		}
 	},
@@ -111,8 +95,6 @@ GenericVolumeTemplates.functions = {
 						Level.trigger_event(data.level, event)
 					end
 				end
-
-				return 
 			end
 		},
 		all_alive_players_outside = {
@@ -126,8 +108,6 @@ GenericVolumeTemplates.functions = {
 						Level.trigger_event(data.level, event)
 					end
 				end
-
-				return 
 			end
 		},
 		all_alive_players_inside = {
@@ -140,8 +120,6 @@ GenericVolumeTemplates.functions = {
 
 					data.all_players_inside = true
 				end
-
-				return 
 			end,
 			on_exit = function (unit, data)
 				local event = data.params.event_on_exit
@@ -152,8 +130,6 @@ GenericVolumeTemplates.functions = {
 
 					data.all_players_inside = false
 				end
-
-				return 
 			end
 		},
 		ai_inside = {
@@ -163,8 +139,6 @@ GenericVolumeTemplates.functions = {
 				if event then
 					Level.trigger_event(data.level, event)
 				end
-
-				return 
 			end
 		},
 		players_inside = {
@@ -177,8 +151,6 @@ GenericVolumeTemplates.functions = {
 
 					data.params.player_entered = true
 				end
-
-				return 
 			end,
 			on_exit = function (unit, data)
 				local volume_system = Managers.state.entity:system("volume_system")
@@ -192,8 +164,6 @@ GenericVolumeTemplates.functions = {
 
 					data.params.player_entered = false
 				end
-
-				return 
 			end,
 			on_destroy = function (unit, data)
 				local volume_system = Managers.state.entity:system("volume_system")
@@ -207,8 +177,6 @@ GenericVolumeTemplates.functions = {
 
 					data.params.player_entered = false
 				end
-
-				return 
 			end
 		}
 	},
@@ -216,8 +184,6 @@ GenericVolumeTemplates.functions = {
 		pickup_projectiles = {
 			on_enter = function (unit, dt, t, data)
 				Managers.state.unit_spawner:mark_for_deletion(unit)
-
-				return 
 			end
 		}
 	}
@@ -242,7 +208,7 @@ GenericVolumeTemplates.filters = {
 		local status_extension = ScriptUnit.extension(unit, "status_system")
 
 		if status_extension.is_disabled(status_extension) then
-			return 
+			return
 		end
 
 		local volume_system = Managers.state.entity:system("volume_system")
@@ -251,4 +217,4 @@ GenericVolumeTemplates.filters = {
 	end
 }
 
-return 
+return

@@ -16,15 +16,16 @@ local Vector3_length = Vector3.length
 local DEFAULT_MIN_ALERT_FRIENDS_DIST = 7
 local DEFAULT_MAX_ALERT_FRIENDS_DIST = 30
 local DEFAULT_FRIENDS_ALERT_RANGE = 3
+
 BTClanRatFollowAction.init = function (self, ...)
 	BTClanRatFollowAction.super.init(self, ...)
 
 	self.next_time_to_trigger_running_dialogue = 0
 	self.triggered_units = {}
-
-	return 
 end
+
 BTClanRatFollowAction.name = "BTClanRatFollowAction"
+
 BTClanRatFollowAction.enter = function (self, unit, blackboard, t)
 	local action_data = self._tree_node.action_data
 	blackboard.action = action_data
@@ -80,9 +81,8 @@ BTClanRatFollowAction.enter = function (self, unit, blackboard, t)
 
 		blackboard.walking_direction = walk_dir
 	end
-
-	return 
 end
+
 BTClanRatFollowAction._should_walk = function (self, destination, self_pos, max_distance_sq, rotation_towards_target)
 	local diff_vector = destination - self_pos
 	local direct_distance = Vector3.dot(Quaternion.forward(rotation_towards_target), diff_vector)
@@ -91,6 +91,7 @@ BTClanRatFollowAction._should_walk = function (self, destination, self_pos, max_
 
 	return distance_sq < max_distance_sq
 end
+
 BTClanRatFollowAction._slow_approach = function (self, destination, self_pos, action_data, rotation_towards_target)
 	local breed = action_data
 	local slow_approach_distance_sq = breed.slow_approach_distance_sq
@@ -107,6 +108,7 @@ BTClanRatFollowAction._slow_approach = function (self, destination, self_pos, ac
 
 	return use_slow_approach
 end
+
 BTClanRatFollowAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.active_node = nil
 
@@ -134,10 +136,10 @@ BTClanRatFollowAction.leave = function (self, unit, blackboard, t, reason, destr
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
 
 	self.triggered_units[unit] = nil
-
-	return 
 end
+
 local Unit_alive = Unit.alive
+
 BTClanRatFollowAction.run = function (self, unit, blackboard, t, dt)
 	if not Unit_alive(blackboard.target_unit) then
 		return "done"
@@ -193,6 +195,7 @@ BTClanRatFollowAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running", should_evaluate
 end
+
 BTClanRatFollowAction._update_walking = function (self, unit, blackboard, dt, t)
 	local target = blackboard.target_unit
 	local locomotion_extension = blackboard.locomotion_extension
@@ -222,7 +225,7 @@ BTClanRatFollowAction._update_walking = function (self, unit, blackboard, dt, t)
 
 		Managers.state.network:anim_event(unit, run_anim)
 
-		return 
+		return
 	end
 
 	local walk_anims = action_data.walk_anims
@@ -241,8 +244,6 @@ BTClanRatFollowAction._update_walking = function (self, unit, blackboard, dt, t)
 		blackboard.move_state = "moving"
 		blackboard.walking_direction = walk_dir
 	end
-
-	return 
 end
 
 local function randomize(event)
@@ -251,8 +252,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTClanRatFollowAction._calculate_walk_animation = function (self, walk_dir, walk_anims)
@@ -270,6 +269,7 @@ BTClanRatFollowAction._calculate_walk_animation = function (self, walk_dir, walk
 
 	return anim
 end
+
 BTClanRatFollowAction._calculate_walk_dir = function (self, right_vector, forward_vector, dir, pos, walk_anims)
 	local right_dot = Vector3.dot(right_vector, dir)
 	local fwd_dot = Vector3.dot(forward_vector, dir)
@@ -289,6 +289,7 @@ BTClanRatFollowAction._calculate_walk_dir = function (self, right_vector, forwar
 
 	return dir
 end
+
 BTClanRatFollowAction.follow = function (self, unit, blackboard, t, dt)
 	local breed = blackboard.breed
 	local target_unit = blackboard.target_unit
@@ -383,9 +384,8 @@ BTClanRatFollowAction.follow = function (self, unit, blackboard, t, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 BTClanRatFollowAction._calculate_run_speed = function (self, unit, target_unit, blackboard, target_locomotion)
 	local target_distance = blackboard.target_dist
 	local destination_distance = blackboard.destination_dist
@@ -407,6 +407,7 @@ BTClanRatFollowAction._calculate_run_speed = function (self, unit, target_unit, 
 
 	return new_speed
 end
+
 BTClanRatFollowAction.start_move_animation = function (self, unit, blackboard)
 	self.set_start_move_animation_lock(self, unit, blackboard, true)
 
@@ -426,9 +427,8 @@ BTClanRatFollowAction.start_move_animation = function (self, unit, blackboard)
 
 	blackboard.move_animation_name = animation_name
 	blackboard.start_anim_locked = true
-
-	return 
 end
+
 BTClanRatFollowAction.start_move_rotation = function (self, unit, blackboard, t, dt)
 	if blackboard.move_animation_name == "move_start_fwd" or blackboard.move_animation_name == "move_start_fwd_jog" then
 		self.set_start_move_animation_lock(self, unit, blackboard, false)
@@ -444,9 +444,8 @@ BTClanRatFollowAction.start_move_rotation = function (self, unit, blackboard, t,
 
 		LocomotionUtils.set_animation_rotation_scale(unit, rot_scale)
 	end
-
-	return 
 end
+
 BTClanRatFollowAction.set_start_move_animation_lock = function (self, unit, blackboard, should_lock_ani)
 	local locomotion_extension = blackboard.locomotion_extension
 
@@ -458,10 +457,10 @@ BTClanRatFollowAction.set_start_move_animation_lock = function (self, unit, blac
 		LocomotionUtils.set_animation_driven_movement(unit, false)
 		LocomotionUtils.set_animation_rotation_scale(unit, 1)
 	end
-
-	return 
 end
+
 local nearby_units = {}
+
 BTClanRatFollowAction.do_dialogue = function (self, unit, blackboard, t, dt)
 	if self.next_time_to_trigger_running_dialogue < t and self.triggered_units[unit] == nil then
 		local distance = math.ceil(Vector3.distance(POSITION_LOOKUP[unit], POSITION_LOOKUP[blackboard.target_unit]))
@@ -479,8 +478,6 @@ BTClanRatFollowAction.do_dialogue = function (self, unit, blackboard, t, dt)
 			dialogue_input.trigger_networked_dialogue_event(dialogue_input, "running", event_data)
 		end
 	end
-
-	return 
 end
 
-return 
+return

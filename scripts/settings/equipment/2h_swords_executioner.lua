@@ -906,4 +906,4 @@ Weapons.two_handed_swords_executioner_template_1_t3_un = table.create_copy(Weapo
 Weapons.two_handed_swords_executioner_template_1_t3_un.actions.action_inspect.action_inspect_hold.anim_event = "inspect_start_2"
 Weapons.two_handed_swords_executioner_template_1_t3_un.actions.action_inspect.action_inspect_hold.anim_end_event = "inspect_end_2"
 
-return 
+return

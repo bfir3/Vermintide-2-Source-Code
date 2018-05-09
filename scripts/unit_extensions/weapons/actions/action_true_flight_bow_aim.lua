@@ -1,6 +1,7 @@
 require("scripts/unit_extensions/weapons/projectiles/true_flight_templates")
 
 ActionTrueFlightBowAim = class(ActionTrueFlightBowAim)
+
 ActionTrueFlightBowAim.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.weapon_unit = weapon_unit
@@ -14,9 +15,8 @@ ActionTrueFlightBowAim.init = function (self, world, item_name, is_server, owner
 	end
 
 	self.first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-
-	return 
 end
+
 ActionTrueFlightBowAim.client_owner_start_action = function (self, new_action, t, chain_action_data)
 	self.current_action = new_action
 	self.aim_timer = 0
@@ -74,9 +74,8 @@ ActionTrueFlightBowAim.client_owner_start_action = function (self, new_action, t
 	if spread_template_override then
 		self.spread_extension:override_spread_template(spread_template_override)
 	end
-
-	return 
 end
+
 ActionTrueFlightBowAim.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local current_action = self.current_action
 	local owner_unit = self.owner_unit
@@ -215,9 +214,8 @@ ActionTrueFlightBowAim.client_owner_post_update = function (self, dt, t, world, 
 	end
 
 	self.aim_timer = self.aim_timer + dt
-
-	return 
 end
+
 ActionTrueFlightBowAim._get_visible_targets = function (self, aimed_target, num_targets, is_bot)
 	local first_person_extension = self.first_person_extension
 	local own_position = first_person_extension.current_position(first_person_extension)
@@ -258,6 +256,7 @@ ActionTrueFlightBowAim._get_visible_targets = function (self, aimed_target, num_
 
 	return targets
 end
+
 ActionTrueFlightBowAim.finish = function (self, reason, data)
 	local current_action = self.current_action
 	local owner_unit = self.owner_unit
@@ -324,4 +323,4 @@ ActionTrueFlightBowAim.finish = function (self, reason, data)
 	return chain_action_data
 end
 
-return 
+return

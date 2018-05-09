@@ -7,6 +7,7 @@ local scenegraph_definition = definitions.scenegraph_definition
 local animation_definitions = definitions.animations
 local DO_RELOAD = false
 EndScreenUI = class(EndScreenUI)
+
 EndScreenUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_top_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -33,9 +34,8 @@ EndScreenUI.init = function (self, ingame_ui_context)
 	self.create_ui_elements(self)
 
 	self.act_presentation_ui = ActPresentationUI:new(ingame_ui_context)
-
-	return 
 end
+
 EndScreenUI.destroy = function (self)
 	if self.voting_data then
 		self.voting_data = nil
@@ -50,9 +50,8 @@ EndScreenUI.destroy = function (self)
 
 	rawset(_G, "EndScreenUI_pointer", nil)
 	GarbageLeakDetector.register_object(self, "EndScreenUI")
-
-	return 
 end
+
 EndScreenUI.create_ui_elements = function (self)
 	DO_RELOAD = false
 	self.draw_flags = {
@@ -88,12 +87,12 @@ EndScreenUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
-
-	return 
 end
+
 EndScreenUI.input_service = function (self)
 	return self.input_manager:get_service("end_screen_ui")
 end
+
 EndScreenUI.on_enter = function (self, game_won, checkpoint_available, level_key, previous_completed_difficulty_index)
 	self.is_active = true
 	local input_manager = self.input_manager
@@ -119,9 +118,8 @@ EndScreenUI.on_enter = function (self, game_won, checkpoint_available, level_key
 	end
 
 	Wwise.set_state("override", "false")
-
-	return 
 end
+
 EndScreenUI.on_exit = function (self)
 	local draw_flags = self.draw_flags
 	self.is_active = false
@@ -135,31 +133,28 @@ EndScreenUI.on_exit = function (self)
 	end
 
 	WwiseWorld.trigger_event(self.wwise_world, "hud_in_inventory_state_off")
-
-	return 
 end
+
 EndScreenUI.on_complete = function (self)
 	self.is_complete = true
-
-	return 
 end
+
 EndScreenUI.fade_in_complete = function (self)
 	return self._fade_in_completed
 end
+
 EndScreenUI.fade_in_background = function (self)
 	self.background_in_anim_id = self.ui_animator:start_animation("fade_in_background", {
 		self.background_rect_widget
 	}, scenegraph_definition, self.draw_flags)
-
-	return 
 end
+
 EndScreenUI.fade_out_background = function (self)
 	self.background_out_anim_id = self.ui_animator:start_animation("fade_out_background", {
 		self.background_rect_widget
 	}, scenegraph_definition, self.draw_flags)
-
-	return 
 end
+
 EndScreenUI.show_text_screen = function (self)
 	local game_won = self._game_won
 	local params = {
@@ -177,16 +172,15 @@ EndScreenUI.show_text_screen = function (self)
 	else
 		self.banner_anim_id = self.ui_animator:start_animation("defeat", self._defeat_widgets_by_name, scenegraph_definition, params)
 	end
-
-	return 
 end
+
 EndScreenUI.update = function (self, dt)
 	if DO_RELOAD then
 		self.create_ui_elements(self)
 	end
 
 	if not self.is_active then
-		return 
+		return
 	end
 
 	local ui_animator = self.ui_animator
@@ -222,9 +216,8 @@ EndScreenUI.update = function (self, dt)
 	end
 
 	self.draw(self, dt)
-
-	return 
 end
+
 EndScreenUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -258,13 +251,10 @@ EndScreenUI.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 EndScreenUI.play_sound = function (self, event)
 	WwiseWorld.trigger_event(self.wwise_world, event)
-
-	return 
 end
 
-return 
+return

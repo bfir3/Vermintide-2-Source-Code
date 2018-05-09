@@ -43,6 +43,7 @@ inventory_entry_stance_bar_lookup_table = {}
 inventory_entry_stance_bar_fill_lookup_table = {}
 inventory_entry_stance_bar_lit_lookup_table = {}
 inventory_entry_stance_bar_glow_lookup_table = {}
+
 PlayerInventoryUI.init = function (self, ingame_ui_context)
 	self.platform = PLATFORM
 	self.ui_renderer = ingame_ui_context.ui_renderer
@@ -61,14 +62,12 @@ PlayerInventoryUI.init = function (self, ingame_ui_context)
 	}
 	local gamepad_active = self.input_manager:is_device_active("gamepad")
 	self._visible = not gamepad_active
-
-	return 
 end
+
 PlayerInventoryUI.destroy = function (self)
 	self.set_visible(self, false)
-
-	return 
 end
+
 local inventory_widget_definitions = {
 	definitions.top_inventory_widget_definition,
 	definitions.inventory_widget_definition,
@@ -76,6 +75,7 @@ local inventory_widget_definitions = {
 	definitions.small_inventory_widget_definition,
 	definitions.small_inventory_widget_definition
 }
+
 PlayerInventoryUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
@@ -97,9 +97,8 @@ PlayerInventoryUI.create_ui_elements = function (self)
 		widget.scenegraph_id = inventory_slot_lookup_table[i]
 		self.inventory_widgets[i] = UIWidget.init(widget)
 	end
-
-	return 
 end
+
 PlayerInventoryUI.set_visible = function (self, visible)
 	if visible then
 		local gamepad_active = self.input_manager:is_device_active("gamepad")
@@ -116,15 +115,13 @@ PlayerInventoryUI.set_visible = function (self, visible)
 	end
 
 	self._visible = visible
-
-	return 
 end
 
 local function get_ammunition_count(left_hand_wielded_unit, right_hand_wielded_unit, item_template)
 	local ammo_extension = nil
 
 	if not item_template.ammo_data then
-		return 
+		return
 	end
 
 	local ammo_unit_hand = item_template.ammo_data.ammo_hand
@@ -134,7 +131,7 @@ local function get_ammunition_count(left_hand_wielded_unit, right_hand_wielded_u
 	elseif ammo_unit_hand == "left" then
 		ammo_extension = ScriptUnit.extension(left_hand_wielded_unit, "ammo_system")
 	else
-		return 
+		return
 	end
 
 	local single_clip = ammo_extension.using_single_clip(ammo_extension)
@@ -152,6 +149,7 @@ PlayerInventoryUI.overcharge_amount = function (self, unit)
 
 	return overcharge_fraction, threshold_fraction, anim_blend_overcharge
 end
+
 PlayerInventoryUI.update = function (self, dt, t, my_player)
 	local ui_scenegraph = self.ui_scenegraph
 	local input_manager = self.input_manager
@@ -188,7 +186,7 @@ PlayerInventoryUI.update = function (self, dt, t, my_player)
 	end
 
 	if not self._visible then
-		return 
+		return
 	end
 
 	self.update_slot_animations(self, dt)
@@ -214,21 +212,18 @@ PlayerInventoryUI.update = function (self, dt, t, my_player)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 PlayerInventoryUI.on_gamepad_activated = function (self)
 	local gamepad_layout = Application.user_setting("gamepad_layout")
 
 	self.set_visible(self, false)
-
-	return 
 end
+
 PlayerInventoryUI.on_gamepad_deactivated = function (self)
 	self.set_visible(self, true)
-
-	return 
 end
+
 PlayerInventoryUI.update_inventory_slots = function (self, dt, ui_scenegraph, ui_renderer, my_player)
 	local profile_synchronizer = self.profile_synchronizer
 	local player_unit = my_player.player_unit
@@ -405,9 +400,8 @@ PlayerInventoryUI.update_inventory_slots = function (self, dt, ui_scenegraph, ui
 			UIRenderer.draw_widget(ui_renderer, widget)
 		end
 	end
-
-	return 
 end
+
 PlayerInventoryUI.update_inventory_slots_positions = function (self, dt)
 	local scenegraph_definition = definitions.scenegraph_definition
 	local selected_index = self.selected_index or 0
@@ -440,12 +434,11 @@ PlayerInventoryUI.update_inventory_slots_positions = function (self, dt)
 		ui_scenegraph[scenegraph_root_id].position[2] = height_offset + widget_height * 0.5
 		height_offset = height_offset + widget_height + slot_spacing
 	end
-
-	return 
 end
+
 PlayerInventoryUI.on_inventory_selected_slot_changed = function (self, new_index)
 	if self.selected_index == new_index then
-		return 
+		return
 	end
 
 	local duration = self.add_animation_for_slot_index(self, new_index, true)
@@ -461,6 +454,7 @@ PlayerInventoryUI.on_inventory_selected_slot_changed = function (self, new_index
 
 	return true
 end
+
 PlayerInventoryUI.add_animation_for_slot_index = function (self, index, selected, optional_duration)
 	local animations = self.slot_animations
 	local ui_scenegraph = self.ui_scenegraph
@@ -529,15 +523,15 @@ PlayerInventoryUI.add_animation_for_slot_index = function (self, index, selected
 
 	return duration
 end
+
 PlayerInventoryUI.update_slot_animations = function (self, dt)
 	local animations = self.slot_animations
 
 	for scenegraph_id, animation_data in pairs(animations) do
 		animations[scenegraph_id] = self.animate_slot_widget(self, animation_data, dt)
 	end
-
-	return 
 end
+
 PlayerInventoryUI.animate_slot_widget = function (self, animation_data, dt)
 	local ui_scenegraph = self.ui_scenegraph
 	local scenegraph_definition = definitions.scenegraph_definition
@@ -658,8 +652,6 @@ PlayerInventoryUI.animate_slot_widget = function (self, animation_data, dt)
 
 		return nil
 	end
-
-	return 
 end
 
-return 
+return

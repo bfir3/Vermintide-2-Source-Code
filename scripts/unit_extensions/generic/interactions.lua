@@ -75,8 +75,6 @@ InteractionDefinitions.player_generic = {
 
 				return display_name, interaction_action_description
 			end
-
-			return 
 		end,
 		can_interact = function (interactor_unit, interactable_unit, data, config)
 			local result = InteractionHelper.choose_player_interaction(interactor_unit, interactable_unit)
@@ -90,8 +88,6 @@ InteractionDefinitions.player_generic = {
 		else
 			return InteractionDefinitions.player_generic.default_config
 		end
-
-		return 
 	end
 }
 
@@ -101,8 +97,6 @@ local function _add_heal_telemetry(healer_player, target_player, position)
 	else
 		Managers.telemetry.events:player_healed_ally(healer_player, target_player, position)
 	end
-
-	return 
 end
 
 local function _drop_pickup(interactor_unit, pickup_name)
@@ -117,8 +111,6 @@ local function _drop_pickup(interactor_unit, pickup_name)
 	local network_manager = Managers.state.network
 
 	network_manager.network_transmit:send_rpc_server("rpc_spawn_pickup_with_physics", pickup_name_id, final_position, rotation, pickup_spawn_type_id)
-
-	return 
 end
 
 InteractionDefinitions.revive = {
@@ -140,8 +132,6 @@ InteractionDefinitions.revive = {
 			revivee_status_extension.set_knocked_down_bleed_buff_paused(revivee_status_extension, true)
 
 			data.done_time = t + duration
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			local health_extension = ScriptUnit.extension(interactor_unit, "health_system")
@@ -173,7 +163,7 @@ InteractionDefinitions.revive = {
 				local interactable_player = player_manager.unit_owner(player_manager, interactable_unit)
 
 				if not interactor_player or not interactable_player then
-					return 
+					return
 				end
 
 				local interactable_pos = POSITION_LOOKUP[interactable_unit]
@@ -188,8 +178,6 @@ InteractionDefinitions.revive = {
 					revivee_status_extension.set_knocked_down_bleed_buff_paused(revivee_status_extension, false)
 				end
 			end
-
-			return 
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
@@ -245,11 +233,9 @@ InteractionDefinitions.revive = {
 
 				dialogue_input.trigger_dialogue_event(dialogue_input, "start_revive", event_data)
 			end
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
-			return 
+			return
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 			data.start_time = nil
@@ -277,8 +263,6 @@ InteractionDefinitions.revive = {
 					first_person_extension.set_wanted_player_height(first_person_extension, "knocked_down", t)
 				end
 			end
-
-			return 
 		end,
 		get_progress = function (data, config, t)
 			local duration = data.duration
@@ -321,8 +305,6 @@ InteractionDefinitions.revive = {
 
 				return display_name, interaction_action_description
 			end
-
-			return 
 		end
 	}
 }
@@ -339,8 +321,6 @@ InteractionDefinitions.pull_up = {
 	server = {
 		start = function (world, interactor_unit, interactable_unit, data, config, t)
 			data.done_time = t + config.duration
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			local health_extension = ScriptUnit.extension(interactor_unit, "health_system")
@@ -360,8 +340,6 @@ InteractionDefinitions.pull_up = {
 			if result == InteractionResult.SUCCESS then
 				StatusUtils.set_pulled_up_network(interactable_unit, true, (Unit.alive(interactor_unit) and interactor_unit) or nil)
 			end
-
-			return 
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
@@ -398,11 +376,9 @@ InteractionDefinitions.pull_up = {
 
 				dialogue_input.trigger_dialogue_event(dialogue_input, "start_revive", event_data)
 			end
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
-			return 
+			return
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 			data.start_time = nil
@@ -423,8 +399,6 @@ InteractionDefinitions.pull_up = {
 					first_person_extension.set_wanted_player_height(first_person_extension, "knocked_down", t)
 				end
 			end
-
-			return 
 		end,
 		get_progress = function (data, config, t)
 			if config.duration == 0 then
@@ -456,8 +430,6 @@ InteractionDefinitions.pull_up = {
 
 				return display_name, "interaction_action_pull_up"
 			end
-
-			return 
 		end
 	}
 }
@@ -473,8 +445,6 @@ InteractionDefinitions.release_from_hook = {
 	server = {
 		start = function (world, interactor_unit, interactable_unit, data, config, t)
 			data.done_time = t + config.duration
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			if data.done_time < t then
@@ -487,8 +457,6 @@ InteractionDefinitions.release_from_hook = {
 			if result == InteractionResult.SUCCESS then
 				StatusUtils.set_grabbed_by_pack_master_network("pack_master_dropping", interactable_unit, true, nil)
 			end
-
-			return 
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
@@ -513,18 +481,14 @@ InteractionDefinitions.release_from_hook = {
 			event_data.target_name = ScriptUnit.extension(interactable_unit, "dialogue_system").context.player_profile
 
 			dialogue_input.trigger_dialogue_event(dialogue_input, "start_revive", event_data)
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
-			return 
+			return
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 			data.start_time = nil
 
 			Unit.animation_event(interactor_unit, "interaction_end")
-
-			return 
 		end,
 		get_progress = function (data, config, t)
 			if config.duration == 0 then
@@ -557,8 +521,6 @@ InteractionDefinitions.release_from_hook = {
 
 				return display_name, "interact_release_from_hook"
 			end
-
-			return 
 		end
 	}
 }
@@ -574,8 +536,6 @@ InteractionDefinitions.assisted_respawn = {
 	server = {
 		start = function (world, interactor_unit, interactable_unit, data, config, t)
 			data.done_time = t + config.duration
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			if data.done_time < t then
@@ -588,8 +548,6 @@ InteractionDefinitions.assisted_respawn = {
 			if result == InteractionResult.SUCCESS then
 				StatusUtils.set_respawned_network(interactable_unit, true, interactor_unit)
 			end
-
-			return 
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
@@ -611,11 +569,9 @@ InteractionDefinitions.assisted_respawn = {
 
 			Unit.animation_set_variable(interactor_unit, interaction_duration_variable, config.duration)
 			Unit.animation_event(interactor_unit, "interaction_revive")
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
-			return 
+			return
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 			data.start_time = nil
@@ -628,8 +584,6 @@ InteractionDefinitions.assisted_respawn = {
 			else
 				Unit.animation_event(interactable_unit, "revive_abort")
 			end
-
-			return 
 		end,
 		get_progress = function (data, config, t)
 			if config.duration == 0 then
@@ -661,8 +615,6 @@ InteractionDefinitions.assisted_respawn = {
 
 				return display_name, "interaction_action_assisted_respawn"
 			end
-
-			return 
 		end
 	}
 }
@@ -686,8 +638,6 @@ InteractionDefinitions.smartobject = {
 			local interactable_position = Unit.world_position(interactable_unit, 0)
 			local start_offset = interactor_position - interactable_position
 			data.start_offset = Vector3Box(start_offset)
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			local health_extension = ScriptUnit.extension(interactor_unit, "health_system")
@@ -714,7 +664,7 @@ InteractionDefinitions.smartobject = {
 			return InteractionResult.ONGOING
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
-			return 
+			return
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local used = Unit.get_data(interactable_unit, "interaction_data", "used")
@@ -750,11 +700,9 @@ InteractionDefinitions.smartobject = {
 
 			CharacterStateHelper.stop_weapon_actions(inventory_extension, "interacting")
 			Unit.set_data(interactable_unit, "interaction_data", "being_used", true)
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
-			return 
+			return
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 			data.start_time = nil
@@ -766,8 +714,6 @@ InteractionDefinitions.smartobject = {
 			end
 
 			Unit.set_data(interactable_unit, "interaction_data", "being_used", false)
-
-			return 
 		end,
 		get_progress = function (data, config, t)
 			if data.duration == 0 then
@@ -798,8 +744,6 @@ InteractionDefinitions.pickup_object = {
 		start = function (world, interactor_unit, interactable_unit, data, config, t)
 			local duration = Unit.get_data(interactable_unit, "interaction_data", "interaction_length")
 			data.done_time = t + duration
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			local health_extension = ScriptUnit.extension(interactor_unit, "health_system")
@@ -835,8 +779,6 @@ InteractionDefinitions.pickup_object = {
 					interactor_buff_extension.trigger_procs(interactor_buff_extension, "on_consumable_picked_up", interactable_unit, pickup_settings)
 				end
 			end
-
-			return 
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			return true
@@ -848,11 +790,9 @@ InteractionDefinitions.pickup_object = {
 			data.duration = duration
 
 			fassert(duration, "Interacting with %q that has no interaction length", interactable_unit)
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
-			return 
+			return
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 			data.start_time = nil
@@ -1194,8 +1134,6 @@ InteractionDefinitions.pickup_object = {
 					end
 				end
 			end
-
-			return 
 		end,
 		get_progress = function (data, config, t)
 			if data.duration == 0 then
@@ -1319,8 +1257,6 @@ InteractionDefinitions.give_item = {
 	server = {
 		start = function (world, interactor_unit, interactable_unit, data, config, t)
 			data.done_time = t + config.duration
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			local interactor_health_extension = ScriptUnit.extension(interactor_unit, "health_system")
@@ -1348,7 +1284,7 @@ InteractionDefinitions.give_item = {
 			return InteractionResult.ONGOING
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
-			return 
+			return
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
@@ -1359,10 +1295,10 @@ InteractionDefinitions.give_item = {
 	},
 	client = {
 		start = function (world, interactor_unit, interactable_unit, data, config, t)
-			return 
+			return
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
-			return 
+			return
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 			data.start_time = nil
@@ -1400,8 +1336,6 @@ InteractionDefinitions.give_item = {
 					end
 				end
 			end
-
-			return 
 		end,
 		get_progress = function (data, config, t)
 			if config.duration == 0 then
@@ -1441,8 +1375,6 @@ InteractionDefinitions.give_item = {
 			local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
 			local wielded_slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
 			interactor_data.item_slot_name = wielded_slot_name
-
-			return 
 		end,
 		hud_description = function (interactable_unit, data, config)
 			if interactable_unit and Unit.alive(interactable_unit) then
@@ -1461,8 +1393,6 @@ InteractionDefinitions.give_item = {
 
 				return display_name, "interaction_action_give"
 			end
-
-			return 
 		end
 	}
 }
@@ -1477,8 +1407,6 @@ InteractionDefinitions.heal = {
 	server = {
 		start = function (world, interactor_unit, interactable_unit, data, config, t)
 			data.done_time = t + config.duration
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			local interactor_health_extension = ScriptUnit.extension(interactor_unit, "health_system")
@@ -1512,7 +1440,7 @@ InteractionDefinitions.heal = {
 				local buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
 
 				if interactor_unit == interactable_unit and buff_extension.has_buff_type(buff_extension, "trait_necklace_no_healing_health_regen") then
-					return 
+					return
 				end
 
 				if attack_template.heal_type == "bandage" then
@@ -1540,8 +1468,6 @@ InteractionDefinitions.heal = {
 
 				_add_heal_telemetry(interactor_player, interactable_player, interactable_pos)
 			end
-
-			return 
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
@@ -1562,11 +1488,9 @@ InteractionDefinitions.heal = {
 			event_data.target_name = ScriptUnit.extension(interactable_unit, "dialogue_system").context.player_profile
 
 			interactor_dialogue_input.trigger_dialogue_event(interactor_dialogue_input, "heal_start", event_data)
-
-			return 
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
-			return 
+			return
 		end,
 		stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 			data.start_time = nil
@@ -1576,7 +1500,7 @@ InteractionDefinitions.heal = {
 			local owner_player = Managers.player:unit_owner(interactor_unit)
 
 			if not owner_player then
-				return 
+				return
 			end
 
 			if result == InteractionResult.SUCCESS then
@@ -1586,7 +1510,7 @@ InteractionDefinitions.heal = {
 					local _, procced = buff_extension.apply_buffs_to_value(buff_extension, 0, StatBuffIndex.NOT_CONSUME_MEDPACK)
 
 					if interactor_unit == interactable_unit and buff_extension.has_buff_type(buff_extension, "trait_necklace_no_healing_health_regen") then
-						return 
+						return
 					end
 
 					if not procced then
@@ -1616,8 +1540,6 @@ InteractionDefinitions.heal = {
 				interactable_dialogue_input.trigger_dialogue_event(interactable_dialogue_input, "heal_completed", event_data)
 				StatisticsUtil.register_heal(interactor_unit, interactable_unit, data.statistics_db)
 			end
-
-			return 
 		end,
 		get_progress = function (data, config, t)
 			if config.duration == 0 then
@@ -1656,8 +1578,6 @@ InteractionDefinitions.heal = {
 			local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
 			local wielded_slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
 			interactor_data.item_slot_name = wielded_slot_name
-
-			return 
 		end,
 		hud_description = function (interactable_unit, data, config)
 			if interactable_unit and Unit.alive(interactable_unit) then
@@ -1681,8 +1601,6 @@ InteractionDefinitions.heal = {
 
 				return display_name, interaction_action_description
 			end
-
-			return 
 		end,
 		camera_node = function (interactor_unit, interactable_unit)
 			if interactor_unit == interactable_unit then
@@ -1690,13 +1608,12 @@ InteractionDefinitions.heal = {
 			else
 				return "heal_other"
 			end
-
-			return 
 		end
 	}
 }
 InteractionDefinitions.linker_transportation_unit = InteractionDefinitions.linker_transportation_unit or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.linker_transportation_unit.config.swap_to_3p = false
+
 InteractionDefinitions.linker_transportation_unit.client.hud_description = function (interactable_unit, data, config, key_tail)
 	local interaction_action_description = "interaction_action_activate"
 
@@ -1710,6 +1627,7 @@ InteractionDefinitions.linker_transportation_unit.client.hud_description = funct
 
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), interaction_action_description
 end
+
 InteractionDefinitions.linker_transportation_unit.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -1724,10 +1642,10 @@ InteractionDefinitions.linker_transportation_unit.client.stop = function (world,
 	end
 
 	Unit.set_data(interactable_unit, "interaction_data", "being_used", false)
-
-	return 
 end
+
 local player_units = {}
+
 InteractionDefinitions.linker_transportation_unit.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	local transport_extension = ScriptUnit.extension(interactable_unit, "transportation_system")
 	local can_interact = transport_extension.can_interact(transport_extension, interactor_unit)
@@ -1769,10 +1687,12 @@ InteractionDefinitions.linker_transportation_unit.client.can_interact = function
 
 	return true
 end
+
 InteractionDefinitions.door = InteractionDefinitions.door or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.door.config.swap_to_3p = false
 InteractionDefinitions.door.config.block_other_interactions = true
 InteractionDefinitions.door.config.allow_movement = true
+
 InteractionDefinitions.door.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -1783,9 +1703,8 @@ InteractionDefinitions.door.client.stop = function (world, interactor_unit, inte
 	end
 
 	Unit.set_data(interactable_unit, "interaction_data", "being_used", false)
-
-	return 
 end
+
 InteractionDefinitions.door.client.hud_description = function (interactable_unit, data, config)
 	local door_extension = ScriptUnit.extension(interactable_unit, "door_system")
 	local is_open = door_extension.is_open(door_extension)
@@ -1793,11 +1712,13 @@ InteractionDefinitions.door.client.hud_description = function (interactable_unit
 
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), interaction_action_description
 end
+
 local pickup_params = {}
 InteractionDefinitions.chest = InteractionDefinitions.chest or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.chest.config.swap_to_3p = false
 InteractionDefinitions.chest.config.block_other_interactions = true
 InteractionDefinitions.chest.config.allow_movement = true
+
 InteractionDefinitions.chest.client.start = function (world, interactor_unit, interactable_unit, data, config, t)
 	data.start_time = t
 	local duration = Unit.get_data(interactable_unit, "interaction_data", "interaction_length")
@@ -1824,16 +1745,15 @@ InteractionDefinitions.chest.client.start = function (world, interactor_unit, in
 	end
 
 	Unit.set_data(interactable_unit, "interaction_data", "being_used", true)
-
-	return 
 end
+
 InteractionDefinitions.chest.server.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 	local success = result == InteractionResult.SUCCESS
 	local can_spawn_dice = Unit.get_data(interactable_unit, "can_spawn_dice")
 
 	if not can_spawn_dice then
-		return 
+		return
 	end
 
 	table.clear(pickup_params)
@@ -1868,14 +1788,15 @@ InteractionDefinitions.chest.server.stop = function (world, interactor_unit, int
 	end
 
 	Unit.set_data(interactable_unit, "interaction_data", "being_used", false)
-
-	return 
 end
+
 InteractionDefinitions.inventory_access = InteractionDefinitions.inventory_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.inventory_access.config.swap_to_3p = false
+
 InteractionDefinitions.inventory_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return true
 end
+
 InteractionDefinitions.inventory_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -1885,17 +1806,19 @@ InteractionDefinitions.inventory_access.client.stop = function (world, interacto
 
 		data.ingame_ui:transition_with_fade("hero_view_force", menu_state, menu_sub_state)
 	end
-
-	return 
 end
+
 InteractionDefinitions.inventory_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
+
 InteractionDefinitions.prestige_access = InteractionDefinitions.prestige_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.prestige_access.config.swap_to_3p = false
+
 InteractionDefinitions.prestige_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return true
 end
+
 InteractionDefinitions.prestige_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -1905,17 +1828,19 @@ InteractionDefinitions.prestige_access.client.stop = function (world, interactor
 
 		data.ingame_ui:transition_with_fade("hero_view_force", menu_state, menu_sub_state)
 	end
-
-	return 
 end
+
 InteractionDefinitions.prestige_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return false
 end
+
 InteractionDefinitions.prestige_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
+
 InteractionDefinitions.forge_access = InteractionDefinitions.forge_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.forge_access.config.swap_to_3p = false
+
 InteractionDefinitions.forge_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -1925,17 +1850,19 @@ InteractionDefinitions.forge_access.client.stop = function (world, interactor_un
 
 		data.ingame_ui:transition_with_fade("hero_view_force", menu_state, menu_sub_state)
 	end
-
-	return 
 end
+
 InteractionDefinitions.forge_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return true
 end
+
 InteractionDefinitions.forge_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
+
 InteractionDefinitions.talents_access = InteractionDefinitions.talents_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.talents_access.config.swap_to_3p = false
+
 InteractionDefinitions.talents_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -1945,17 +1872,19 @@ InteractionDefinitions.talents_access.client.stop = function (world, interactor_
 
 		data.ingame_ui:transition_with_fade("hero_view_force", menu_state, menu_sub_state)
 	end
-
-	return 
 end
+
 InteractionDefinitions.talents_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return true
 end
+
 InteractionDefinitions.talents_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
+
 InteractionDefinitions.cosmetics_access = InteractionDefinitions.cosmetics_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.cosmetics_access.config.swap_to_3p = false
+
 InteractionDefinitions.cosmetics_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -1965,17 +1894,19 @@ InteractionDefinitions.cosmetics_access.client.stop = function (world, interacto
 
 		data.ingame_ui:transition_with_fade("hero_view_force", menu_state, menu_sub_state)
 	end
-
-	return 
 end
+
 InteractionDefinitions.cosmetics_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return true
 end
+
 InteractionDefinitions.cosmetics_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
+
 InteractionDefinitions.loot_access = InteractionDefinitions.loot_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.loot_access.config.swap_to_3p = false
+
 InteractionDefinitions.loot_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -1984,17 +1915,19 @@ InteractionDefinitions.loot_access.client.stop = function (world, interactor_uni
 
 		data.ingame_ui:transition_with_fade("hero_view_force", menu_state)
 	end
-
-	return 
 end
+
 InteractionDefinitions.loot_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return true
 end
+
 InteractionDefinitions.loot_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
+
 InteractionDefinitions.characters_access = InteractionDefinitions.characters_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.characters_access.config.swap_to_3p = false
+
 InteractionDefinitions.characters_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -2003,42 +1936,44 @@ InteractionDefinitions.characters_access.client.stop = function (world, interact
 
 		data.ingame_ui:transition_with_fade("character_selection_force", menu_state)
 	end
-
-	return 
 end
+
 InteractionDefinitions.characters_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	local is_game_matchmaking = Managers.matchmaking:is_game_matchmaking()
 
 	return not is_game_matchmaking
 end
+
 InteractionDefinitions.characters_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
+
 InteractionDefinitions.altar_access = InteractionDefinitions.altar_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.altar_access.config.swap_to_3p = false
+
 InteractionDefinitions.altar_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
 	if result == InteractionResult.SUCCESS and not data.is_husk then
 		data.ingame_ui:transition_with_fade("altar_view_force")
 	end
-
-	return 
 end
+
 InteractionDefinitions.altar_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return false
 end
+
 InteractionDefinitions.quest_access = InteractionDefinitions.quest_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.quest_access.config.swap_to_3p = false
+
 InteractionDefinitions.quest_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
 	if result == InteractionResult.SUCCESS and not data.is_husk then
 		data.ingame_ui:transition_with_fade("quest_view_force")
 	end
-
-	return 
 end
+
 InteractionDefinitions.quest_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	local can_use = false
 	local backend_settings = GameSettingsDevelopment.backend_settings
@@ -2047,6 +1982,7 @@ InteractionDefinitions.quest_access.client.can_interact = function (interactor_u
 
 	return can_interact, fail_reason
 end
+
 InteractionDefinitions.quest_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	if fail_reason and fail_reason == "quest_access_locked" then
 		return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "dlc1_3_1_interact_open_quests_blocked"
@@ -2054,22 +1990,25 @@ InteractionDefinitions.quest_access.client.hud_description = function (interacta
 
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
+
 InteractionDefinitions.journal_access = InteractionDefinitions.journal_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.journal_access.config.swap_to_3p = false
+
 InteractionDefinitions.journal_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
 	if result == InteractionResult.SUCCESS and not data.is_husk then
 		data.ingame_ui:transition_with_fade("lorebook_view_force")
 	end
-
-	return 
 end
+
 InteractionDefinitions.journal_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return true
 end
+
 InteractionDefinitions.map_access = InteractionDefinitions.map_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.map_access.config.swap_to_3p = false
+
 InteractionDefinitions.map_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -2078,28 +2017,29 @@ InteractionDefinitions.map_access.client.stop = function (world, interactor_unit
 
 		data.ingame_ui:transition_with_fade("start_game_view_force", menu_state)
 	end
-
-	return 
 end
+
 InteractionDefinitions.map_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
+
 InteractionDefinitions.map_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	local is_game_matchmaking = Managers.matchmaking:is_game_matchmaking()
 
 	return not is_game_matchmaking
 end
+
 InteractionDefinitions.unlock_key_access = InteractionDefinitions.unlock_key_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.unlock_key_access.config.swap_to_3p = false
+
 InteractionDefinitions.unlock_key_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
 	if result == InteractionResult.SUCCESS and not data.is_husk then
 		data.ingame_ui:transition_with_fade("unlock_key_force")
 	end
-
-	return 
 end
+
 InteractionDefinitions.unlock_key_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return true
 end
@@ -2120,6 +2060,7 @@ end
 
 InteractionDefinitions.pictureframe = InteractionDefinitions.pictureframe or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.pictureframe.config.swap_to_3p = false
+
 InteractionDefinitions.pictureframe.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -2128,30 +2069,35 @@ InteractionDefinitions.pictureframe.client.stop = function (world, interactor_un
 
 		decoration_system.interacted_with(decoration_system, interactable_unit)
 	end
-
-	return 
 end
+
 InteractionDefinitions.pictureframe.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	local decoration_system = Managers.state.entity:system("keep_decoration_system")
 	local can_interact = decoration_system.can_interact(decoration_system, interactable_unit)
 
 	return can_interact
 end
+
 InteractionDefinitions.pictureframe.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), Unit.get_data(interactable_unit, "interaction_data", "hud_interaction_action")
 end
+
 InteractionDefinitions.no_interaction_hud_only = InteractionDefinitions.no_interaction_hud_only or table.clone(InteractionDefinitions.smartobject)
+
 InteractionDefinitions.no_interaction_hud_only.client.hud_description = function (interactable_unit, data, config, key_tail)
 	local hud_text_line_1 = Unit.get_data(interactable_unit, "interaction_data", "hud_text_line_1")
 	local hud_text_line_2 = Unit.get_data(interactable_unit, "interaction_data", "hud_text_line_2")
 
 	return hud_text_line_1, hud_text_line_2
 end
+
 InteractionDefinitions.no_interaction_hud_only.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return false, ""
 end
+
 InteractionDefinitions.achievement_access = InteractionDefinitions.achievement_access or table.clone(InteractionDefinitions.smartobject)
 InteractionDefinitions.achievement_access.config.swap_to_3p = false
+
 InteractionDefinitions.achievement_access.client.stop = function (world, interactor_unit, interactable_unit, data, config, t, result)
 	data.start_time = nil
 
@@ -2161,14 +2107,14 @@ InteractionDefinitions.achievement_access.client.stop = function (world, interac
 
 		data.ingame_ui:transition_with_fade("hero_view_force", menu_state, menu_sub_state)
 	end
-
-	return 
 end
+
 InteractionDefinitions.achievement_access.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	return true
 end
+
 InteractionDefinitions.achievement_access.client.hud_description = function (interactable_unit, data, config, fail_reason, interactor_unit)
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), "interaction_action_open"
 end
 
-return 
+return

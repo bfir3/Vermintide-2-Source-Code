@@ -415,4 +415,4 @@ weapon_template.tooltip_detail = {
 Weapons = Weapons or {}
 Weapons.longbow_bodkin_template_1 = table.clone(weapon_template)
 
-return 
+return

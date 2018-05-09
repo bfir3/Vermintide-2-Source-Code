@@ -1,4 +1,5 @@
 ActionCharge = class(ActionCharge)
+
 ActionCharge.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.world = world
 	self.owner_unit = owner_unit
@@ -27,9 +28,8 @@ ActionCharge.init = function (self, world, item_name, is_server, owner_unit, dam
 	if ScriptUnit.has_extension(weapon_unit, "spread_system") then
 		self.spread_extension = ScriptUnit.extension(weapon_unit, "spread_system")
 	end
-
-	return 
 end
+
 ActionCharge.client_owner_start_action = function (self, new_action, t)
 	local owner_unit = self.owner_unit
 	self.current_action = new_action
@@ -109,9 +109,8 @@ ActionCharge.client_owner_start_action = function (self, new_action, t)
 
 		inventory_extension.set_loaded_projectile_override(inventory_extension, loaded_projectile_settings)
 	end
-
-	return 
 end
+
 ActionCharge.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local current_action = self.current_action
 	local charge_time = self.charge_time
@@ -219,9 +218,8 @@ ActionCharge.client_owner_post_update = function (self, dt, t, world, can_damage
 	end
 
 	self.charge_level = charge_level
-
-	return 
 end
+
 ActionCharge.finish = function (self, reason)
 	local owner_unit = self.owner_unit
 	local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
@@ -299,6 +297,7 @@ ActionCharge.finish = function (self, reason)
 		charge_level = self.charge_level
 	}
 end
+
 ActionCharge.destroy = function (self)
 	if self.particle_id then
 		World.destroy_particles(self.world, self.particle_id)
@@ -326,8 +325,6 @@ ActionCharge.destroy = function (self)
 
 		self._rumble_effect_id = nil
 	end
-
-	return 
 end
 
-return 
+return

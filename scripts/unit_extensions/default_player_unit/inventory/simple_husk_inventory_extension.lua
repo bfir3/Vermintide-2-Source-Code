@@ -1,4 +1,5 @@
 SimpleHuskInventoryExtension = class(SimpleHuskInventoryExtension)
+
 SimpleHuskInventoryExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self._world = extension_init_context.world
 	self._unit = unit
@@ -12,9 +13,8 @@ SimpleHuskInventoryExtension.init = function (self, extension_init_context, unit
 	}
 	self.current_item_buffs = {}
 	self._show_third_person = false
-
-	return 
 end
+
 SimpleHuskInventoryExtension.destroy = function (self)
 	if Managers.player.is_server then
 		for slot_name, slot_data in pairs(self._equipment.slots) do
@@ -28,9 +28,8 @@ SimpleHuskInventoryExtension.destroy = function (self)
 
 	GearUtils.destroy_equipment(self._world, self._equipment)
 	self._despawn_attached_units(self)
-
-	return 
 end
+
 SimpleHuskInventoryExtension.drop_level_event_item = function (self, slot_data)
 	local item_template = self.get_item_template(self, slot_data)
 	local action = item_template.actions.action_one.default
@@ -51,12 +50,12 @@ SimpleHuskInventoryExtension.drop_level_event_item = function (self, slot_data)
 	end
 
 	self.destroy_slot(self, "slot_level_event")
-
-	return 
 end
+
 SimpleHuskInventoryExtension.equipment = function (self)
 	return self._equipment
 end
+
 SimpleHuskInventoryExtension.add_equipment = function (self, slot_name, item_name, skin_name)
 	local item_data = ItemMasterList[item_name]
 	local slot_buffs = self._slot_buffs[slot_name]
@@ -77,9 +76,8 @@ SimpleHuskInventoryExtension.add_equipment = function (self, slot_name, item_nam
 		id = slot_name,
 		skin = skin_name
 	}
-
-	return 
 end
+
 SimpleHuskInventoryExtension.add_equipment_limited_item = function (self, slot_name, item_name, spawner_unit, limited_item_id)
 	local item_data = ItemMasterList[item_name]
 	self._equipment.slots[slot_name] = {
@@ -90,15 +88,14 @@ SimpleHuskInventoryExtension.add_equipment_limited_item = function (self, slot_n
 			id = limited_item_id
 		}
 	}
-
-	return 
 end
+
 SimpleHuskInventoryExtension.destroy_slot = function (self, slot_name)
 	local equipment = self._equipment
 	local slot_data = equipment.slots[slot_name]
 
 	if slot_data == nil then
-		return 
+		return
 	end
 
 	if Managers.player.is_server and slot_data.limited_item_data then
@@ -106,9 +103,8 @@ SimpleHuskInventoryExtension.destroy_slot = function (self, slot_name)
 	end
 
 	GearUtils.destroy_slot(self._world, self._unit, slot_data, equipment, true)
-
-	return 
 end
+
 SimpleHuskInventoryExtension.evaluate_limited_item_state = function (self, slot_data)
 	local limited_item_data = slot_data.limited_item_data
 	local spawner_unit = limited_item_data.spawner_unit
@@ -120,9 +116,8 @@ SimpleHuskInventoryExtension.evaluate_limited_item_state = function (self, slot_
 
 		limited_item_track_system.held_limited_item_destroyed(limited_item_track_system, spawner_unit, limited_item_id)
 	end
-
-	return 
 end
+
 SimpleHuskInventoryExtension._setup_equipment = function (self, world, unit_3p, profile)
 	local equipment = {
 		slots = {}
@@ -130,9 +125,11 @@ SimpleHuskInventoryExtension._setup_equipment = function (self, world, unit_3p, 
 
 	return equipment
 end
+
 SimpleHuskInventoryExtension.update = function (self)
-	return 
+	return
 end
+
 SimpleHuskInventoryExtension.wield = function (self, slot_name)
 	local equipment = self._equipment
 
@@ -162,9 +159,8 @@ SimpleHuskInventoryExtension.wield = function (self, slot_name)
 			end
 		end
 	end
-
-	return 
 end
+
 SimpleHuskInventoryExtension._despawn_attached_units = function (self)
 	local attached_units = self._attached_units
 	local world = self._world
@@ -174,12 +170,11 @@ SimpleHuskInventoryExtension._despawn_attached_units = function (self)
 
 		attached_units[index] = nil
 	end
-
-	return 
 end
+
 SimpleHuskInventoryExtension._spawn_attached_units = function (self, attached_units)
 	if attached_units == nil then
-		return 
+		return
 	end
 
 	local unit = self._unit
@@ -190,9 +185,8 @@ SimpleHuskInventoryExtension._spawn_attached_units = function (self, attached_un
 		local spawned_unit = AttachmentUtils.create_weapon_visual_attachment(world, unit, attached_unit.unit, attached_unit.attachment_node_linking)
 		own_attached_units[index] = spawned_unit
 	end
-
-	return 
 end
+
 SimpleHuskInventoryExtension.add_buffs_to_slot = function (self, slot_name, buff_name_1, buff_data_type_1, value_1, buff_name_2, buff_data_type_2, value_2, buff_name_3, buff_data_type_3, value_3, buff_name_4, buff_data_type_4, value_4)
 	local slot_buffs = self._slot_buffs[slot_name]
 
@@ -219,10 +213,10 @@ SimpleHuskInventoryExtension.add_buffs_to_slot = function (self, slot_name, buff
 			[buff_data_type_4] = value_4
 		}
 	end
-
-	return 
 end
+
 local params = {}
+
 SimpleHuskInventoryExtension._apply_buffs = function (self, buffs)
 	local buff_extension = ScriptUnit.extension(self._unit, "buff_system")
 	local current_item_buffs = self.current_item_buffs
@@ -247,9 +241,8 @@ SimpleHuskInventoryExtension._apply_buffs = function (self, buffs)
 		current_item_buffs[index] = buff_extension.add_buff(buff_extension, buff_name, params)
 		index = index + 1
 	end
-
-	return 
 end
+
 SimpleHuskInventoryExtension.show_third_person_inventory = function (self, show)
 	self._show_third_person = show
 	local right_hand_wielded_unit = self._equipment.right_hand_wielded_unit_3p
@@ -326,15 +319,15 @@ SimpleHuskInventoryExtension.show_third_person_inventory = function (self, show)
 			self._spawn_attached_units(self, item_template.third_person_attached_units)
 		end
 	end
-
-	return 
 end
+
 SimpleHuskInventoryExtension.get_item_template = function (self, slot_data)
 	local item_data = slot_data.item_data
 	local item_template = BackendUtils.get_item_template(item_data)
 
 	return item_template
 end
+
 SimpleHuskInventoryExtension.get_wielded_slot_item_template = function (self)
 	local wielded_slot_name = self.wielded_slot
 	local equipment = self._equipment
@@ -348,26 +341,29 @@ SimpleHuskInventoryExtension.get_wielded_slot_item_template = function (self)
 
 	return item_template
 end
+
 SimpleHuskInventoryExtension.hot_join_sync = function (self, sender)
 	GearUtils.hot_join_sync(sender, self._unit, self._equipment)
-
-	return 
 end
+
 SimpleHuskInventoryExtension.get_wielded_slot_name = function (self)
 	local equipment = self._equipment
 	local wielded_slot = equipment.wielded_slot
 
 	return wielded_slot
 end
+
 SimpleHuskInventoryExtension.get_slot_data = function (self, slot_id)
 	local equipment = self._equipment
 	local slots = equipment.slots
 
 	return slots[slot_id]
 end
+
 SimpleHuskInventoryExtension.set_loaded_projectile_override = function (self)
-	return 
+	return
 end
+
 SimpleHuskInventoryExtension.override_career_skill_item_template = function (self, item_data)
 	local override_item_template = nil
 	local slot_to_use = item_data.slot_to_use
@@ -387,13 +383,14 @@ SimpleHuskInventoryExtension.override_career_skill_item_template = function (sel
 
 	return override_item_template
 end
+
 SimpleHuskInventoryExtension._wield_slot = function (self, world, equipment, slot_name, unit_1p, unit_3p)
 	local slot = equipment.slots[slot_name]
 
 	if not slot then
 		print("Cannot wield item from " .. tostring(slot_name) .. " since this slot does not exist.")
 
-		return 
+		return
 	end
 
 	local item_data = slot.item_data
@@ -401,7 +398,7 @@ SimpleHuskInventoryExtension._wield_slot = function (self, world, equipment, slo
 	if not item_data then
 		print("Cannot wield item from " .. tostring(slot_name) .. " since it is empty.")
 
-		return 
+		return
 	end
 
 	GearUtils.destroy_equipment(world, equipment)
@@ -477,8 +474,9 @@ SimpleHuskInventoryExtension._wield_slot = function (self, world, equipment, slo
 
 	return item_data
 end
+
 SimpleHuskInventoryExtension.is_showing_third_person_inventory = function (self)
 	return self._show_third_person
 end
 
-return 
+return

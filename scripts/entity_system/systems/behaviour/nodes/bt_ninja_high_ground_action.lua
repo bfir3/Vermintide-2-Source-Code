@@ -3,12 +3,13 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 BTNinjaHighGroundAction = class(BTNinjaHighGroundAction, BTClimbAction)
 local position_lookup = POSITION_LOOKUP
 local alive = POSITION_LOOKUP
+
 BTNinjaHighGroundAction.init = function (self, ...)
 	BTNinjaHighGroundAction.super.init(self, ...)
-
-	return 
 end
+
 BTNinjaHighGroundAction.name = "BTNinjaHighGroundAction"
+
 BTNinjaHighGroundAction.enter = function (self, unit, blackboard, t)
 	blackboard.high_ground_opportunity = nil
 
@@ -29,9 +30,8 @@ BTNinjaHighGroundAction.enter = function (self, unit, blackboard, t)
 	if not blackboard.high_ground_opportunity then
 		BTClimbAction.enter(self, unit, blackboard, t)
 	end
-
-	return 
 end
+
 BTNinjaHighGroundAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if blackboard.high_ground_opportunity then
 		if reason == "aborted" then
@@ -87,9 +87,8 @@ BTNinjaHighGroundAction.leave = function (self, unit, blackboard, t, reason, des
 	end
 
 	blackboard.fence_jumping = false
-
-	return 
 end
+
 BTNinjaHighGroundAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.high_ground_opportunity then
 		return "running"
@@ -106,14 +105,13 @@ BTNinjaHighGroundAction.run = function (self, unit, blackboard, t, dt)
 
 		return BTClimbAction.run(self, unit, blackboard, t, dt)
 	end
-
-	return 
 end
+
 BTNinjaHighGroundAction.try_jump = function (self, unit, blackboard, t, pos1, force_idle)
 	local target_unit = blackboard.target_unit
 
 	if not alive[target_unit] then
-		return 
+		return
 	end
 
 	local physics_world = World.get_data(blackboard.world, "physics_world")
@@ -163,8 +161,6 @@ BTNinjaHighGroundAction.try_jump = function (self, unit, blackboard, t, pos1, fo
 	else
 		print("simple los failed")
 	end
-
-	return 
 end
 
-return 
+return

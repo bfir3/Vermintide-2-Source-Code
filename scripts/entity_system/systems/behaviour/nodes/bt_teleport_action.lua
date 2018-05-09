@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTTeleportAction = class(BTTeleportAction, BTNode)
+
 BTTeleportAction.init = function (self, ...)
 	BTTeleportAction.super.init(self, ...)
-
-	return 
 end
+
 BTTeleportAction.name = "BTTeleportAction"
+
 BTTeleportAction.enter = function (self, unit, blackboard, t)
 	local unit_position = POSITION_LOOKUP[unit]
 	local next_smart_object_data = blackboard.next_smart_object_data
@@ -16,18 +17,16 @@ BTTeleportAction.enter = function (self, unit, blackboard, t)
 	blackboard.smart_object_data = smart_object_data
 	blackboard.teleport_position = Vector3Box(exit_pos)
 	blackboard.entrance_position = Vector3Box(entrance_pos)
-
-	return 
 end
+
 BTTeleportAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.teleport_position = nil
 	blackboard.entrance_position = nil
 	blackboard.teleport_timeout = nil
 	local navigation_extension = blackboard.navigation_extension
 	slot7 = navigation_extension.is_using_smart_object(navigation_extension) and navigation_extension.use_smart_object(navigation_extension, false)
-
-	return 
 end
+
 BTTeleportAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.smart_object_data ~= blackboard.next_smart_object_data.smart_object_data then
 		return "failed"
@@ -58,8 +57,6 @@ BTTeleportAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "running"
 	end
-
-	return 
 end
 
-return 
+return

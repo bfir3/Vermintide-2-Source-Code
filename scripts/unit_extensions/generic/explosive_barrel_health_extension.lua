@@ -1,4 +1,5 @@
 ExplosiveBarrelHealthExtension = class(ExplosiveBarrelHealthExtension, GenericHealthExtension)
+
 ExplosiveBarrelHealthExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	ExplosiveBarrelHealthExtension.super.init(self, extension_init_context, unit, extension_init_data)
 
@@ -22,9 +23,8 @@ ExplosiveBarrelHealthExtension.init = function (self, extension_init_context, un
 		self.owner_unit_health_extension = ScriptUnit.extension(owner_unit, "health_system")
 		self.ignored_damage_types = extension_init_data.ignored_damage_types
 	end
-
-	return 
 end
+
 ExplosiveBarrelHealthExtension.update = function (self, dt, context, t)
 	local owner_unit_health_extension = self.owner_unit_health_extension
 
@@ -71,9 +71,8 @@ ExplosiveBarrelHealthExtension.update = function (self, dt, context, t)
 			self.played_fuse_out = true
 		end
 	end
-
-	return 
 end
+
 ExplosiveBarrelHealthExtension.add_damage = function (self, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike)
 	if 0 < damage_amount and self.damage < self.health and not self.ignited then
 		local unit = self.unit
@@ -100,9 +99,8 @@ ExplosiveBarrelHealthExtension.add_damage = function (self, attacker_unit, damag
 	damage_amount = (self.instaexplode and damage_amount) or 0
 
 	ExplosiveBarrelHealthExtension.super.add_damage(self, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike)
-
-	return 
 end
+
 ExplosiveBarrelHealthExtension.health_data = function (self)
 	local data = {
 		fuse_time = self.fuse_time,
@@ -112,4 +110,4 @@ ExplosiveBarrelHealthExtension.health_data = function (self)
 	return data
 end
 
-return 
+return

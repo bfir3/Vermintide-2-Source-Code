@@ -6,17 +6,16 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTJumpToPositionAction = class(BTJumpToPositionAction, BTNode)
+
 BTJumpToPositionAction.init = function (self, ...)
 	BTJumpToPositionAction.super.init(self, ...)
-
-	return 
 end
+
 BTJumpToPositionAction.name = "BTJumpToPositionAction"
+
 BTJumpToPositionAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -40,9 +39,8 @@ BTJumpToPositionAction.enter = function (self, unit, blackboard, t)
 	locomotion_extension.set_rotation_speed(locomotion_extension, 10)
 
 	blackboard.jump_state = "moving_to_ledge"
-
-	return 
 end
+
 BTJumpToPositionAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.jump_spline_ground = nil
 	blackboard.jump_spline_ledge = nil
@@ -70,9 +68,8 @@ BTJumpToPositionAction.leave = function (self, unit, blackboard, t, reason, dest
 
 	local hit_reaction_extension = ScriptUnit.extension(unit, "hit_reaction_system")
 	hit_reaction_extension.force_ragdoll_on_death = nil
-
-	return 
 end
+
 BTJumpToPositionAction.run = function (self, unit, blackboard, t, dt)
 	local navigation_extension = blackboard.navigation_extension
 	local locomotion_extension = blackboard.locomotion_extension
@@ -149,4 +146,4 @@ BTJumpToPositionAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

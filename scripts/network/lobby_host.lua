@@ -6,11 +6,10 @@ local function dprintf(text, ...)
 	if DEBUG_LOBBY_HOST then
 		printf(text, ...)
 	end
-
-	return 
 end
 
 LobbyHost = class(LobbyHost)
+
 LobbyHost.init = function (self, network_options, lobby)
 	local config_file_name = network_options.config_file_name
 	local project_hash = network_options.project_hash
@@ -24,9 +23,8 @@ LobbyHost.init = function (self, network_options, lobby)
 	self.lobby = lobby or LobbyInternal.create_lobby(network_options)
 	self.peer_id = Network.peer_id()
 	self.platform = PLATFORM
-
-	return 
 end
+
 LobbyHost.destroy = function (self)
 	print("[LobbyHost] Destroying")
 
@@ -47,9 +45,8 @@ LobbyHost.destroy = function (self)
 	self.lobby = nil
 
 	GarbageLeakDetector.register_object(self, "Lobby Host")
-
-	return 
 end
+
 LobbyHost.update = function (self, dt)
 	local lobby = self.lobby
 	local lobby_state = lobby.state(lobby)
@@ -98,9 +95,8 @@ LobbyHost.update = function (self, dt)
 	if self.lobby_members then
 		self.lobby_members:update()
 	end
-
-	return 
 end
+
 LobbyHost.set_lobby_data = function (self, lobby_data_table)
 	fassert(lobby_data_table.Host == nil, "Tell Staffan about this!!")
 	dprintf("Set lobby begin:")
@@ -121,42 +117,52 @@ LobbyHost.set_lobby_data = function (self, lobby_data_table)
 	end
 
 	dprintf("Set lobby end.")
-
-	return 
 end
+
 LobbyHost.get_stored_lobby_data = function (self)
 	return self.lobby_data_table
 end
+
 LobbyHost.members = function (self)
 	return self.lobby_members
 end
+
 LobbyHost.lobby_data = function (self, key)
 	return self.lobby:data(key)
 end
+
 LobbyHost.invite_target = function (self)
 	return self.lobby
 end
+
 LobbyHost.is_dedicated_server = function (self)
 	return false
 end
+
 LobbyHost.lobby_host = function (self)
 	return self.lobby:lobby_host()
 end
+
 LobbyHost.user_name = function (self, peer_id)
 	return self.lobby:user_name(peer_id)
 end
+
 LobbyHost.id = function (self)
 	return (LobbyInternal.lobby_id and LobbyInternal.lobby_id(self.lobby)) or "no_id"
 end
+
 LobbyHost.is_joined = function (self)
 	return self.state == LobbyState.JOINED
 end
+
 LobbyHost.get_network_hash = function (self)
 	return self.network_hash
 end
+
 LobbyHost.get_max_members = function (self)
 	return self.max_members
 end
+
 LobbyHost.set_lobby = function (self, lobby)
 	print("leaving old lobby")
 	LobbyInternal.leave_lobby(self.lobby)
@@ -167,8 +173,6 @@ LobbyHost.set_lobby = function (self, lobby)
 	self.set_lobby_data(self, lobby_data_table)
 
 	self.lobby_members = LobbyMembers:new(lobby)
-
-	return 
 end
 
-return 
+return

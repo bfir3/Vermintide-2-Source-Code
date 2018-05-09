@@ -155,6 +155,7 @@ ProjectileTemplates.impact_templates = {
 		}
 	}
 }
+
 ProjectileTemplates.get_trajectory_template = function (trajectory_template_name, is_husk)
 	local templates = ProjectileTemplates.trajectory_templates
 	local husk_key = (is_husk == true and "husk") or (is_husk == false and "unit")
@@ -162,6 +163,7 @@ ProjectileTemplates.get_trajectory_template = function (trajectory_template_name
 
 	return template
 end
+
 ProjectileTemplates.get_impact_template = function (impact_template_name)
 	local templates = ProjectileTemplates.impact_templates
 	local template = templates[impact_template_name]
@@ -203,4 +205,4 @@ function check_for_afro_hit(recent_impacts, num_impacts)
 	return hit_unit, actor_index, hit_actor, node_index, only_hit_afro, non_afro_hit_index
 end
 
-return 
+return

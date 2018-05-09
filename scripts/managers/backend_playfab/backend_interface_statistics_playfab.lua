@@ -1,8 +1,10 @@
 local PlayFabClientApi = require("PlayFab.PlayFabClientApi")
 BackendInterfaceStatisticsPlayFab = class(BackendInterfaceStatisticsPlayFab)
+
 BackendInterfaceStatisticsPlayFab.update = function (self, dt)
-	return 
+	return
 end
+
 BackendInterfaceStatisticsPlayFab.init = function (self, mirror)
 	self._mirror = mirror
 
@@ -19,8 +21,6 @@ BackendInterfaceStatisticsPlayFab.init = function (self, mirror)
 		end
 
 		self._ready = true
-
-		return 
 	end
 
 	local request = {
@@ -28,12 +28,12 @@ BackendInterfaceStatisticsPlayFab.init = function (self, mirror)
 	}
 
 	PlayFabClientApi.ExecuteCloudScript(request, callback, callback)
-
-	return 
 end
+
 BackendInterfaceStatisticsPlayFab.ready = function (self)
 	return self._ready
 end
+
 BackendInterfaceStatisticsPlayFab.get_stats = function (self)
 	return self._mirror:get_stats()
 end
@@ -71,8 +71,6 @@ local function clear_dirty_flag(stats)
 	for _, stat in pairs(stats) do
 		stat.dirty = false
 	end
-
-	return 
 end
 
 BackendInterfaceStatisticsPlayFab.save = function (self, save_callback)
@@ -106,6 +104,7 @@ BackendInterfaceStatisticsPlayFab.save = function (self, save_callback)
 
 	return self._save_player_stats(self, stats_to_save, save_callback)
 end
+
 BackendInterfaceStatisticsPlayFab._save_player_stats = function (self, stats, save_callback)
 	local request = {
 		FunctionName = "savePlayerStatistics2",
@@ -124,18 +123,14 @@ BackendInterfaceStatisticsPlayFab._save_player_stats = function (self, stats, sa
 			print("[BackendInterfaceStatisticsPlayFab] Player statistics saved!")
 			save_callback(on_complete, true)
 		end
-
-		return 
 	end
 
 	return {
 		payload = table.clone(request),
 		callback = function (payload, on_complete)
 			PlayFabClientApi.ExecuteCloudScript(payload, callback(request_callback, on_complete), callback(request_callback, on_complete))
-
-			return 
 		end
 	}
 end
 
-return 
+return

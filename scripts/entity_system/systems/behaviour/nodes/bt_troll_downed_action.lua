@@ -5,11 +5,11 @@ BTTrollDownedAction.name = "BTTrollDownedAction"
 local POSITION_LOOKUP = POSITION_LOOKUP
 local PLAYER_POSITIONS = PLAYER_POSITIONS
 local script_data = script_data
+
 BTTrollDownedAction.init = function (self, ...)
 	BTTrollDownedAction.super.init(self, ...)
-
-	return 
 end
+
 BTTrollDownedAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -29,18 +29,16 @@ BTTrollDownedAction.enter = function (self, unit, blackboard, t)
 	blackboard.downed_state = "downed"
 
 	self.trigger_dialogue_event(self, unit, "chaos_troll_incapacitaded")
-
-	return 
 end
+
 BTTrollDownedAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	BTStaggerAction.clean_blackboard(nil, blackboard)
 	blackboard.navigation_extension:set_enabled(true)
 
 	blackboard.downed_end_finished = false
 	blackboard.downed_state = false
-
-	return 
 end
+
 BTTrollDownedAction.run = function (self, unit, blackboard, t, dt)
 	local action = blackboard.action
 	local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -65,13 +63,12 @@ BTTrollDownedAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTTrollDownedAction.trigger_dialogue_event = function (self, unit, dialogue_event)
 	local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, dialogue_event, event_data)
-
-	return 
 end
 
-return 
+return

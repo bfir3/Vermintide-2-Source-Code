@@ -4,6 +4,7 @@ local scenegraph_definition = definitions.scenegraph_definition
 ContractPresentationScreenUI = class(ContractPresentationScreenUI)
 local DO_RELOAD = false
 local AUTO_CONTINUE_DURATION = 8
+
 ContractPresentationScreenUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -25,9 +26,8 @@ ContractPresentationScreenUI.init = function (self, ingame_ui_context)
 	input_manager.map_device_to_service(input_manager, "contract_presentation_screen_ui", "gamepad")
 	self._create_ui_elements(self)
 	rawset(_G, "contract_log_ui", self)
-
-	return 
 end
+
 ContractPresentationScreenUI.on_enter = function (self, ignore_input_blocking)
 	local backend_settings = GameSettingsDevelopment.backend_settings
 
@@ -55,19 +55,18 @@ ContractPresentationScreenUI.on_enter = function (self, ignore_input_blocking)
 	else
 		self.is_complete = true
 	end
-
-	return 
 end
+
 ContractPresentationScreenUI.input_service = function (self)
 	return self.input_manager:get_service("contract_presentation_screen_ui")
 end
+
 ContractPresentationScreenUI.destroy = function (self)
 	self.ui_animator = nil
 
 	rawset(_G, "contract_log_ui", nil)
-
-	return 
 end
+
 ContractPresentationScreenUI.update = function (self, dt, t)
 	if DO_RELOAD then
 		self._create_ui_elements(self)
@@ -76,7 +75,7 @@ ContractPresentationScreenUI.update = function (self, dt, t)
 	end
 
 	if self.is_complete or not self.started then
-		return 
+		return
 	end
 
 	local ui_animator = self.ui_animator
@@ -101,9 +100,8 @@ ContractPresentationScreenUI.update = function (self, dt, t)
 	end
 
 	self._draw(self, dt)
-
-	return 
 end
+
 ContractPresentationScreenUI._update_continue_timer = function (self, dt)
 	local continue_timer = self.continue_timer
 
@@ -118,9 +116,8 @@ ContractPresentationScreenUI._update_continue_timer = function (self, dt)
 			self.continue_timer = continue_timer
 		end
 	end
-
-	return 
 end
+
 ContractPresentationScreenUI._draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -143,9 +140,8 @@ ContractPresentationScreenUI._draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 ContractPresentationScreenUI._create_ui_elements = function (self)
 	self.num_active_contract_widget = 0
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
@@ -162,9 +158,8 @@ ContractPresentationScreenUI._create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
-
-	return 
 end
+
 ContractPresentationScreenUI._initialize_active_contracts = function (self)
 	local all_contracts = self.quest_manager:get_contracts()
 	local active_contract_ids = {}
@@ -208,9 +203,8 @@ ContractPresentationScreenUI._initialize_active_contracts = function (self)
 	self.num_active_contract_widget = widget_index
 	self.contract_entries_by_index = contract_entries_by_index
 	self.contract_entries = contract_entries
-
-	return 
 end
+
 ContractPresentationScreenUI._set_contract_start_info_by_contract_id = function (self, widget, contract_id)
 	local quest_manager = self.quest_manager
 	local contract_template = quest_manager.get_contract_by_id(quest_manager, contract_id)
@@ -257,6 +251,7 @@ ContractPresentationScreenUI._set_contract_start_info_by_contract_id = function 
 
 	return task_data, tasks_total_progress, tasks_total_session_progress
 end
+
 ContractPresentationScreenUI._set_widget_task_amount = function (self, widget, amount)
 	widget.content.task_amount = amount
 	local widget_style = widget.style
@@ -283,9 +278,8 @@ ContractPresentationScreenUI._set_widget_task_amount = function (self, widget, a
 		local icon_size = texture_task_icon_style.size
 		texture_task_icon_style.offset[1] = task_start_offset + width_per_task * (i - 1) + width_per_task * 0.5 - icon_size[1] * 0.5
 	end
-
-	return 
 end
+
 ContractPresentationScreenUI._sync_contracts_task_progress = function (self)
 	local widgets = self._widgets
 	local contract_entries = self.contract_entries
@@ -295,9 +289,8 @@ ContractPresentationScreenUI._sync_contracts_task_progress = function (self)
 			self._sync_contract_task_progress(self, contract_id)
 		end
 	end
-
-	return 
 end
+
 ContractPresentationScreenUI._sync_contract_task_progress = function (self, contract_id)
 	local entry = self.contract_entries[contract_id]
 	local widget = entry.widget
@@ -309,9 +302,8 @@ ContractPresentationScreenUI._sync_contract_task_progress = function (self, cont
 	local value_text = tostring(task_value) .. "/" .. tostring(task_data.end_value)
 
 	self._set_widget_task_info(self, widget, index_count, nil, value_text)
-
-	return 
 end
+
 ContractPresentationScreenUI._set_widget_contract_progress = function (self, widget, progress)
 	local widget_content = widget.content
 	local widget_style = widget.style
@@ -323,9 +315,8 @@ ContractPresentationScreenUI._set_widget_contract_progress = function (self, wid
 	local progress_text = tostring(progress) .. "%"
 	local text = Localize("dlc1_3_1_contract_presentation_progress_prefix")
 	widget_content.bar_text = text .. ": " .. progress_text
-
-	return 
 end
+
 ContractPresentationScreenUI._set_widget_task_info = function (self, widget, index, text, value_text)
 	local widget_content = widget.content
 	local widget_style = widget.style
@@ -344,9 +335,8 @@ ContractPresentationScreenUI._set_widget_task_info = function (self, widget, ind
 	if value_text then
 		widget_content["task_value_" .. index] = value_text
 	end
-
-	return 
 end
+
 ContractPresentationScreenUI._get_text_size = function (self, text_style, text)
 	local ui_renderer = self.ui_renderer
 	local size = text_style.size
@@ -373,6 +363,7 @@ ContractPresentationScreenUI._get_text_size = function (self, text_style, text)
 
 	return num_texts * full_font_height, longest_width
 end
+
 ContractPresentationScreenUI._handle_animations = function (self)
 	local num_active_contract_widget = self.num_active_contract_widget
 	local ui_animator = self.ui_animator
@@ -393,13 +384,13 @@ ContractPresentationScreenUI._handle_animations = function (self)
 					entry.intro_started = true
 					entry.intro_anim_id = anim_id
 
-					return 
+					return
 				elseif entry.intro_anim_id and ui_animator.is_animation_completed(ui_animator, entry.intro_anim_id) then
 					ui_animator.stop_animation(ui_animator, entry.intro_anim_id)
 
 					entry.intro_anim_id = nil
 
-					return 
+					return
 				end
 
 				if entry.intro_started and not entry.intro_anim_id then
@@ -417,14 +408,14 @@ ContractPresentationScreenUI._handle_animations = function (self)
 										entry.task_anim_id = anim_id
 										entry.animating_task_index = animating_task_index
 
-										return 
+										return
 									end
 								end
 							end
 
 							entry.task_anims_done = true
 
-							return 
+							return
 						elseif entry.task_anim_id and ui_animator.is_animation_completed(ui_animator, entry.task_anim_id) then
 							ui_animator.stop_animation(ui_animator, entry.task_anim_id)
 
@@ -442,16 +433,16 @@ ContractPresentationScreenUI._handle_animations = function (self)
 										entry.task_anim_id = anim_id
 										entry.animating_task_index = animating_task_index
 
-										return 
+										return
 									end
 								end
 							end
 
 							entry.task_anims_done = true
 
-							return 
+							return
 						else
-							return 
+							return
 						end
 					elseif not entry.summary_anim_done then
 						if not entry.summary_started then
@@ -460,16 +451,16 @@ ContractPresentationScreenUI._handle_animations = function (self)
 							entry.summary_anim_id = anim_id
 							entry.summary_started = true
 
-							return 
+							return
 						elseif entry.summary_anim_id and ui_animator.is_animation_completed(ui_animator, entry.summary_anim_id) then
 							ui_animator.stop_animation(ui_animator, entry.summary_anim_id)
 
 							entry.summary_anim_id = nil
 							entry.summary_anim_done = true
 
-							return 
+							return
 						else
-							return 
+							return
 						end
 					elseif not entry.end_started then
 						if index < num_active_contract_widget then
@@ -477,7 +468,7 @@ ContractPresentationScreenUI._handle_animations = function (self)
 							entry.end_started = true
 							entry.end_anim_id = anim_id
 
-							return 
+							return
 						else
 							entry.animations_done = true
 						end
@@ -487,10 +478,10 @@ ContractPresentationScreenUI._handle_animations = function (self)
 						entry.end_anim_id = nil
 						entry.animations_done = true
 					else
-						return 
+						return
 					end
 				else
-					return 
+					return
 				end
 			end
 		end
@@ -499,9 +490,8 @@ ContractPresentationScreenUI._handle_animations = function (self)
 	else
 		return true
 	end
-
-	return 
 end
+
 ContractPresentationScreenUI._start_contract_animation = function (self, contract_id, animation_name, task_index)
 	local entry = contract_id and self.contract_entries[contract_id]
 	local widget_index = entry and entry.widget_index
@@ -519,4 +509,4 @@ ContractPresentationScreenUI._start_contract_animation = function (self, contrac
 	return self.ui_animator:start_animation(animation_name, self._widgets, scenegraph_definition, params)
 end
 
-return 
+return

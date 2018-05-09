@@ -50,8 +50,6 @@ local settings = {
 			for key, boxed_pos in pairs(portals) do
 				options[#options + 1] = key
 			end
-
-			return 
 		end,
 		func = function (options, index)
 			local local_player = Managers.player:local_player()
@@ -73,8 +71,6 @@ local settings = {
 			end
 
 			print("TELEPORT")
-
-			return 
 		end
 	},
 	{
@@ -131,8 +127,6 @@ local settings = {
 		setting_name = "reset_settings",
 		func = function ()
 			DebugScreen.reset_settings()
-
-			return 
 		end
 	},
 	{
@@ -171,8 +165,6 @@ local settings = {
 		is_boolean = true,
 		func = function ()
 			Managers.twitch:debug_activate_twitch_game_mode()
-
-			return 
 		end
 	},
 	{
@@ -416,8 +408,6 @@ local settings = {
 
 				Debug.sticky_text(debug_text)
 			end
-
-			return 
 		end
 	},
 	{
@@ -642,8 +632,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "achievement_reset",
 		func = function ()
 			Managers.state.achievement:reset()
-
-			return 
 		end
 	},
 	{
@@ -732,8 +720,6 @@ Features that make player mechanics nicer to work with.
 				local option = v
 				options[#options + 1] = option
 			end
-
-			return 
 		end
 	},
 	{
@@ -890,8 +876,6 @@ Features that make player mechanics nicer to work with.
 			for k, setting in pairs(HordeSettings) do
 				options[#options + 1] = setting.mini_patrol_composition
 			end
-
-			return 
 		end,
 		func = function (options, index)
 			local composition = options[index]
@@ -908,8 +892,6 @@ Features that make player mechanics nicer to work with.
 
 				Managers.state.conflict:mini_patrol(t, nil, composition, group_template)
 			end
-
-			return 
 		end
 	},
 	{
@@ -954,8 +936,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Toggle Pickup Spawners Draw Mode",
 		func = function ()
 			Managers.state.entity:system("pickup_system"):debug_draw_spread_pickups()
-
-			return 
 		end
 	},
 	{
@@ -1096,8 +1076,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "draw_patrol_routes",
 		func = function ()
 			Managers.state.conflict.level_analysis:draw_patrol_routes()
-
-			return 
 		end
 	},
 	{
@@ -1122,8 +1100,6 @@ Features that make player mechanics nicer to work with.
 
 				Managers.state.conflict.level_analysis:debug_spawn_boss_from_closest_spawner_to_player(only_draw)
 			end
-
-			return 
 		end
 	},
 	{
@@ -1133,8 +1109,6 @@ Features that make player mechanics nicer to work with.
 		func = function ()
 			print("All boss patrols injected into the main path now")
 			Managers.state.conflict.level_analysis:spawn_all_boss_spline_patrols()
-
-			return 
 		end
 	},
 	{
@@ -1144,8 +1118,6 @@ Features that make player mechanics nicer to work with.
 		func = function ()
 			print("All boss enemies are now injected into the main path!")
 			Managers.state.conflict.level_analysis:inject_all_bosses_into_main_path()
-
-			return 
 		end
 	},
 	{
@@ -1154,8 +1126,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "debug_draw_respaners",
 		func = function ()
 			Managers.state.spawn.respawn_handler:debug_draw_respaners()
-
-			return 
 		end
 	},
 	{
@@ -1164,8 +1134,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "debug_spawn_special",
 		func = function ()
 			Managers.state.conflict.specials_pacing:debug_spawn()
-
-			return 
 		end
 	},
 	{
@@ -1180,8 +1148,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "draw_navigation_group_connections",
 		func = function ()
 			Managers.state.conflict.navigation_group_manager:draw_group_connections()
-
-			return 
 		end
 	},
 	{
@@ -1455,8 +1421,6 @@ Features that make player mechanics nicer to work with.
 				printf("Changing pathfinding budget to %.1fms", ms)
 				GwNavWorld.set_pathfinder_budget(nav_world, ms * 0.001)
 			end
-
-			return 
 		end
 	},
 	{
@@ -1513,18 +1477,12 @@ Features that make player mechanics nicer to work with.
 				else
 					return false
 				end
-
-				return 
 			end)
-
-			return 
 		end,
 		func = function (options, index)
 			local level_name = options[index]
 
 			debug.load_level(level_name)
-
-			return 
 		end
 	},
 	{
@@ -4496,8 +4454,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "take_screenshot",
 		func = function ()
 			FrameCapture.screen_shot("console_send", 2)
-
-			return 
 		end
 	},
 	{
@@ -4561,8 +4517,6 @@ Features that make player mechanics nicer to work with.
 
 			Application.set_user_setting("render_settings", "simulate_color_blindness", on)
 			Application.apply_user_settings()
-
-			return 
 		end
 	},
 	{
@@ -4968,13 +4922,9 @@ Features that make player mechanics nicer to work with.
 					options[#options + 1] = string.match(file, "^.+/(.+)$")
 				end
 			end
-
-			return 
 		end,
 		func = function (options, index)
 			DebugVoByFile(options[index], false)
-
-			return 
 		end
 	},
 	{
@@ -5209,7 +5159,7 @@ Features that make player mechanics nicer to work with.
 			if option == "default" then
 				Application.set_time_step_policy("no_throttle")
 
-				return 
+				return
 			elseif option == "throttle_fps_1" then
 				fps = 1
 			elseif option == "throttle_fps_5" then
@@ -5225,8 +5175,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			Application.set_time_step_policy("throttle", fps)
-
-			return 
 		end
 	},
 	{
@@ -5614,8 +5562,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Set high texture quality",
 		func = function ()
 			DebugScreen.set_texture_quality(0)
-
-			return 
 		end
 	},
 	{
@@ -5624,8 +5570,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Set low texture quality",
 		func = function ()
 			DebugScreen.set_texture_quality(3)
-
-			return 
 		end
 	},
 	{
@@ -5796,8 +5740,6 @@ Features that make player mechanics nicer to work with.
 		},
 		func = function ()
 			Managers.backend:refresh_log_level()
-
-			return 
 		end
 	},
 	{
@@ -5813,8 +5755,6 @@ Features that make player mechanics nicer to work with.
 		category = "Progression",
 		func = function ()
 			Managers.state.game_mode:complete_level()
-
-			return 
 		end
 	},
 	{
@@ -5824,8 +5764,6 @@ Features that make player mechanics nicer to work with.
 		category = "Progression",
 		func = function ()
 			Managers.state.game_mode:fail_level()
-
-			return 
 		end
 	},
 	{
@@ -5834,8 +5772,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Complete act \"prologue\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("prologue", true)
-
-			return 
 		end
 	},
 	{
@@ -5844,8 +5780,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Uncomplete act \"prologue\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("prologue", false)
-
-			return 
 		end
 	},
 	{
@@ -5854,8 +5788,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Complete act \"act_1\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("act_1", true)
-
-			return 
 		end
 	},
 	{
@@ -5864,8 +5796,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Uncomplete act \"act_1\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("act_1", false)
-
-			return 
 		end
 	},
 	{
@@ -5874,8 +5804,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Complete act \"act_2\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("act_2", true)
-
-			return 
 		end
 	},
 	{
@@ -5884,8 +5812,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Uncomplete act \"act_2\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("act_2", false)
-
-			return 
 		end
 	},
 	{
@@ -5894,8 +5820,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Complete act \"act_3\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("act_3", true)
-
-			return 
 		end
 	},
 	{
@@ -5904,8 +5828,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Uncomplete act \"act_3\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("act_3", false)
-
-			return 
 		end
 	},
 	{
@@ -5914,8 +5836,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Complete act \"act_4\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("act_4", true)
-
-			return 
 		end
 	},
 	{
@@ -5924,8 +5844,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Uncomplete act \"act_4\"",
 		func = function ()
 			LevelUnlockUtils.debug_completed_act_levels("act_4", false)
-
-			return 
 		end
 	},
 	{
@@ -5934,8 +5852,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Set completed game difficulty Normal",
 		func = function ()
 			LevelUnlockUtils.debug_set_completed_game_difficulty(2)
-
-			return 
 		end
 	},
 	{
@@ -5944,8 +5860,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Set completed game difficulty Hard",
 		func = function ()
 			LevelUnlockUtils.debug_set_completed_game_difficulty(3)
-
-			return 
 		end
 	},
 	{
@@ -5954,8 +5868,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Set completed game difficulty Nightmare",
 		func = function ()
 			LevelUnlockUtils.debug_set_completed_game_difficulty(4)
-
-			return 
 		end
 	},
 	{
@@ -5964,8 +5876,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Set completed game difficulty Cataclysm",
 		func = function ()
 			LevelUnlockUtils.debug_set_completed_game_difficulty(5)
-
-			return 
 		end
 	},
 	{
@@ -5982,8 +5892,6 @@ Features that make player mechanics nicer to work with.
 			local end_experience = math.min(experience + 1000, ExperienceSettings.max_experience)
 
 			hero_attributes.set(hero_attributes, profile.display_name, "experience", end_experience)
-
-			return 
 		end
 	},
 	{
@@ -5998,8 +5906,6 @@ Features that make player mechanics nicer to work with.
 			local hero_attributes = Managers.backend:get_interface("hero_attributes")
 
 			hero_attributes.set(hero_attributes, profile.display_name, "experience", 0)
-
-			return 
 		end
 	},
 	{
@@ -6015,8 +5921,6 @@ Features that make player mechanics nicer to work with.
 
 			hero_attributes.set(hero_attributes, profile.display_name, "experience", 1000000)
 			debug.load_level("inn_level")
-
-			return 
 		end
 	},
 	{
@@ -6032,8 +5936,6 @@ Features that make player mechanics nicer to work with.
 
 			hero_attributes.set(hero_attributes, profile.display_name, "prestige", 0)
 			debug.load_level("inn_level")
-
-			return 
 		end
 	},
 	{
@@ -6042,8 +5944,6 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Wipe all progression(used for prestige)",
 		func = function ()
 			LevelUnlockUtils.set_all_acts_incompleted()
-
-			return 
 		end
 	},
 	{
@@ -6081,15 +5981,11 @@ Features that make player mechanics nicer to work with.
 				local option = v
 				options[#options + 1] = option
 			end
-
-			return 
 		end,
 		func = function (options, index)
 			local option = options[index]
 
 			Managers.state.crafting:debug_set_crafted_items_stat(option)
-
-			return 
 		end
 	},
 	{
@@ -6127,15 +6023,11 @@ Features that make player mechanics nicer to work with.
 				local option = v
 				options[#options + 1] = option
 			end
-
-			return 
 		end,
 		func = function (options, index)
 			local option = options[index]
 
 			Managers.state.crafting:debug_set_salvaged_items_stat(option)
-
-			return 
 		end
 	},
 	{
@@ -6176,8 +6068,6 @@ Features that make player mechanics nicer to work with.
 				local option = v
 				options[#options + 1] = option
 			end
-
-			return 
 		end
 	},
 	{
@@ -6285,8 +6175,6 @@ Features that make player mechanics nicer to work with.
 
 				loot_interface.generate_weapon_with_properties(loot_interface, item_key, properties_serialized)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6301,8 +6189,6 @@ Features that make player mechanics nicer to work with.
 			item_interface.award_item(item_interface, "skin_color_tint_blue")
 			item_interface.award_item(item_interface, "dr_slayer_hair_0001")
 			item_interface.award_item(item_interface, "dr_slayer_hair_0002")
-
-			return 
 		end
 	},
 	{
@@ -6318,8 +6204,6 @@ Features that make player mechanics nicer to work with.
 			item_interface.award_item(item_interface, "frame_0004")
 			item_interface.award_item(item_interface, "frame_0005")
 			item_interface.award_item(item_interface, "frame_0006")
-
-			return 
 		end
 	},
 	{
@@ -6338,8 +6222,6 @@ Features that make player mechanics nicer to work with.
 			item_interface.award_item(item_interface, "necklace_stamina_0001")
 			item_interface.award_item(item_interface, "necklace_stamina_0002")
 			item_interface.award_item(item_interface, "necklace_stamina_0003")
-
-			return 
 		end
 	},
 	{
@@ -6349,8 +6231,6 @@ Features that make player mechanics nicer to work with.
 		func = function ()
 			BackendUtils.remove_items_for_prestige(true)
 			ProgressionUnlocks.debug_reset_current_hero_template()
-
-			return 
 		end
 	},
 	{
@@ -6361,8 +6241,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.dr_ironbreaker
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6373,8 +6251,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.dr_slayer
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6385,8 +6261,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.dr_ranger
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6397,8 +6271,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.wh_zealot
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6409,8 +6281,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.wh_bountyhunter
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6421,8 +6291,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.wh_captain
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6433,8 +6301,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.es_poacher
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6445,8 +6311,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.es_fullplate
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6457,8 +6321,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.es_vanilla
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6469,8 +6331,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.we_shade
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6481,8 +6341,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.we_maiden
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6493,8 +6351,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.we_waywatcher
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6505,8 +6361,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.bw_sniper
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6517,8 +6371,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.bw_boomer
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6529,8 +6381,6 @@ Features that make player mechanics nicer to work with.
 			local hero_template = DebugHeroTemplates.bw_melee
 
 			ProgressionUnlocks.debug_use_hero_template(hero_template)
-
-			return 
 		end
 	},
 	{
@@ -6541,8 +6391,6 @@ Features that make player mechanics nicer to work with.
 		is_boolean = true,
 		func = function ()
 			debug.load_level("inn_level")
-
-			return 
 		end
 	},
 	{
@@ -6574,8 +6422,6 @@ Features that make player mechanics nicer to work with.
 					item_interface.award_item(item_interface, key)
 				end
 			end
-
-			return 
 		end
 	},
 	{
@@ -6601,8 +6447,6 @@ Features that make player mechanics nicer to work with.
 					item_interface.award_item(item_interface, key)
 				end
 			end
-
-			return 
 		end
 	},
 	{
@@ -6622,8 +6466,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			table.sort(options)
-
-			return 
 		end,
 		func = function (options, index)
 			local item_interface = Managers.backend:get_interface("items")
@@ -6632,8 +6474,6 @@ Features that make player mechanics nicer to work with.
 			if item then
 				item_interface.award_item(item_interface, item)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6653,8 +6493,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			table.sort(options)
-
-			return 
 		end,
 		func = function (options, index)
 			local item_interface = Managers.backend:get_interface("items")
@@ -6663,8 +6501,6 @@ Features that make player mechanics nicer to work with.
 			if item then
 				item_interface.award_item(item_interface, item)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6684,8 +6520,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			table.sort(options)
-
-			return 
 		end,
 		func = function (options, index)
 			local item_interface = Managers.backend:get_interface("items")
@@ -6694,8 +6528,6 @@ Features that make player mechanics nicer to work with.
 			if item then
 				item_interface.award_item(item_interface, item)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6716,8 +6548,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			table.sort(options)
-
-			return 
 		end,
 		func = function (options, index)
 			local item_interface = Managers.backend:get_interface("items")
@@ -6726,8 +6556,6 @@ Features that make player mechanics nicer to work with.
 			if item then
 				item_interface.award_item(item_interface, item)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6747,8 +6575,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			table.sort(options)
-
-			return 
 		end,
 		func = function (options, index)
 			local item_interface = Managers.backend:get_interface("items")
@@ -6757,8 +6583,6 @@ Features that make player mechanics nicer to work with.
 			if item then
 				item_interface.award_item(item_interface, item)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6778,8 +6602,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			table.sort(options)
-
-			return 
 		end,
 		func = function (options, index)
 			local item_interface = Managers.backend:get_interface("items")
@@ -6788,8 +6610,6 @@ Features that make player mechanics nicer to work with.
 			if item then
 				item_interface.award_item(item_interface, item)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6809,8 +6629,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			table.sort(options)
-
-			return 
 		end,
 		func = function (options, index)
 			local item_interface = Managers.backend:get_interface("items")
@@ -6819,8 +6637,6 @@ Features that make player mechanics nicer to work with.
 			if item then
 				item_interface.award_item(item_interface, item)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6840,8 +6656,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			table.sort(options)
-
-			return 
 		end,
 		func = function (options, index)
 			local item_interface = Managers.backend:get_interface("items")
@@ -6850,8 +6664,6 @@ Features that make player mechanics nicer to work with.
 			if item then
 				item_interface.award_item(item_interface, item)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6871,8 +6683,6 @@ Features that make player mechanics nicer to work with.
 			end
 
 			table.sort(options)
-
-			return 
 		end,
 		func = function (options, index)
 			local item_interface = Managers.backend:get_interface("items")
@@ -6881,8 +6691,6 @@ Features that make player mechanics nicer to work with.
 			if item then
 				item_interface.award_item(item_interface, item)
 			end
-
-			return 
 		end
 	},
 	{
@@ -6924,8 +6732,6 @@ if platform == "ps4" or platform == "xb1" then
 				options[5] = "Unspawn All Breed"
 				options[6] = "Unspawn Nearby Breed"
 				options[7] = "Unspawn Specials"
-
-				return 
 			end,
 			func = function (options, index)
 				local conflict_director = Managers.state.conflict
@@ -6955,8 +6761,6 @@ if platform == "ps4" or platform == "xb1" then
 						conflict_director.destroy_specials(conflict_director)
 					end
 				end
-
-				return 
 			end
 		},
 		{
@@ -6971,8 +6775,6 @@ if platform == "ps4" or platform == "xb1" then
 				options[2] = 50
 				options[3] = 100
 				options[4] = 200
-
-				return 
 			end,
 			func = function (options, index)
 				local debug_manager = Managers.state.debug
@@ -6984,8 +6786,6 @@ if platform == "ps4" or platform == "xb1" then
 					assert(time_scale_index, "[DebugScreen] Selected time scale not found in Managers.state.debug.time_scale_list")
 					debug_manager.set_time_scale(debug_manager, time_scale_index)
 				end
-
-				return 
 			end
 		}
 	}
@@ -7004,18 +6804,12 @@ end
 local callbacks = {
 	enable_locale_cycling = function (option)
 		enable_locale_cycling(option)
-
-		return 
 	end,
 	visualize_sound_occlusion = function (option)
 		World.visualize_sound_occlusion()
-
-		return 
 	end,
 	enable_chain_constraints = function (option)
 		World.enable_chain_constraints(option)
-
-		return 
 	end,
 	update_using_luajit = function (option)
 		if script_data.luajit_disabled then
@@ -7025,8 +6819,6 @@ local callbacks = {
 			jit.on()
 			print("lua jit is enabled")
 		end
-
-		return 
 	end,
 	enable_navigation_visual_debug = function (option)
 		if option and not VISUAL_DEBUGGING_ENABLED and Managers.state.entity then
@@ -7035,8 +6827,6 @@ local callbacks = {
 
 			GwNavWorld.init_visual_debug_server(nav_world, 4888)
 		end
-
-		return 
 	end
 }
 local data = {

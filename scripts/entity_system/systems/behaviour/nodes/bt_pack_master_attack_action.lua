@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTPackMasterAttackAction = class(BTPackMasterAttackAction, BTNode)
+
 BTPackMasterAttackAction.init = function (self, ...)
 	BTPackMasterAttackAction.super.init(self, ...)
-
-	return 
 end
+
 BTPackMasterAttackAction.name = "BTPackMasterAttackAction"
+
 BTPackMasterAttackAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -23,9 +24,8 @@ BTPackMasterAttackAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.navigation_extension:set_enabled(false)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
-
-	return 
 end
+
 BTPackMasterAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.move_state = nil
 
@@ -53,9 +53,8 @@ BTPackMasterAttackAction.leave = function (self, unit, blackboard, t, reason, de
 	blackboard.attack_cooldown = t + blackboard.action.cooldown
 	blackboard.action = nil
 	blackboard.create_bot_threat_at = nil
-
-	return 
 end
+
 BTPackMasterAttackAction.run = function (self, unit, blackboard, t, dt)
 	if not AiUtils.is_of_interest_to_packmaster(unit, blackboard.target_unit) then
 		return "failed"
@@ -77,6 +76,7 @@ BTPackMasterAttackAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTPackMasterAttackAction.attack = function (self, unit, t, dt, blackboard)
 	local action = blackboard.action
 	local locomotion_extension = blackboard.locomotion_extension
@@ -105,9 +105,8 @@ BTPackMasterAttackAction.attack = function (self, unit, t, dt, blackboard)
 	if blackboard.attack_time_ends < t then
 		blackboard.attack_aborted = true
 	end
-
-	return 
 end
+
 BTPackMasterAttackAction.attack_success = function (self, unit, blackboard)
 	if blackboard.active_node and blackboard.active_node == BTPackMasterAttackAction then
 		local target_unit = blackboard.target_unit
@@ -137,9 +136,8 @@ BTPackMasterAttackAction.attack_success = function (self, unit, blackboard)
 			first_person_extension.animation_event(first_person_extension, "shake_get_hit")
 		end
 	end
-
-	return 
 end
+
 BTPackMasterAttackAction.create_bot_threat = function (self, unit, blackboard, t)
 	local first_person_extension = ScriptUnit.has_extension(blackboard.target_unit, "first_person_system")
 
@@ -164,8 +162,6 @@ BTPackMasterAttackAction.create_bot_threat = function (self, unit, blackboard, t
 			ai_bot_group_system.aoe_threat_created(ai_bot_group_system, obstacle_position, "oobb", obstacle_size, obstacle_rotation, bot_threat_duration)
 		end
 	end
-
-	return 
 end
 
-return 
+return

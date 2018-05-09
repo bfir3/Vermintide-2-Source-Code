@@ -1,6 +1,7 @@
 local definitions = local_require("scripts/ui/hud_ui/ability_ui_definitions")
 local scenegraph_definition = definitions.scenegraph_definition
 AbilityUI = class(AbilityUI)
+
 AbilityUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -21,9 +22,8 @@ AbilityUI.init = function (self, ingame_ui_context)
 
 	event_manager.register(event_manager, self, "input_changed", "event_input_changed")
 	rawset(_G, "ability_ui", self)
-
-	return 
 end
+
 AbilityUI._create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -44,16 +44,15 @@ AbilityUI._create_ui_elements = function (self)
 	local ability_widget = self._widgets_by_name.ability
 
 	self.event_input_changed(self)
-
-	return 
 end
+
 AbilityUI._setup_activated_ability = function (self)
 	local player_manager = self.player_manager
 	local player = player_manager.local_player(player_manager, 1)
 	local player_unit = player.player_unit
 
 	if not player_unit then
-		return 
+		return
 	end
 
 	local peer_id = player.network_id(player)
@@ -62,7 +61,7 @@ AbilityUI._setup_activated_ability = function (self)
 	local career_index = career_extension.career_index(career_extension)
 
 	if not ability_data or not career_index then
-		return 
+		return
 	end
 
 	self._career_index = career_index
@@ -70,16 +69,15 @@ AbilityUI._setup_activated_ability = function (self)
 	local icon = ability_data.icon
 	local widget = self._widgets_by_name.ability
 	self._initialized = true
-
-	return 
 end
+
 AbilityUI._sync_ability_cooldown = function (self)
 	local player_manager = self.player_manager
 	local player = player_manager.local_player(player_manager, 1)
 	local player_unit = player.player_unit
 
 	if not player_unit then
-		return 
+		return
 	end
 
 	local peer_id = player.network_id(player)
@@ -92,7 +90,7 @@ AbilityUI._sync_ability_cooldown = function (self)
 	if self._career_index ~= career_index then
 		self._initialized = false
 
-		return 
+		return
 	end
 
 	self._ability_duration = ability_duration
@@ -111,18 +109,16 @@ AbilityUI._sync_ability_cooldown = function (self)
 			self._set_ability_cooldown_state(self, cooldown_fraction, not self._current_cooldown_fraction)
 		end
 	end
-
-	return 
 end
+
 AbilityUI._set_ability_activated = function (self, activated)
 	local widget = self._widgets_by_name.ability
 	local content = widget.content
 	local style = widget.style
 	widget.content.activated = activated
 	self._ability_activated = activated
-
-	return 
 end
+
 AbilityUI._set_ability_cooldown_state = function (self, cooldown_fraction, initialize)
 	self._current_cooldown_fraction = cooldown_fraction
 	local on_cooldown = cooldown_fraction ~= 0
@@ -145,14 +141,14 @@ AbilityUI._set_ability_cooldown_state = function (self, cooldown_fraction, initi
 
 	self._set_widget_dirty(self, widget)
 	self.set_dirty(self)
-
-	return 
 end
+
 AbilityUI._is_ability_input_pressed = function (self)
 	local input_service = self.input_manager:get_service("Player")
 
 	return input_service.get(input_service, "action_career_bw_1")
 end
+
 AbilityUI.destroy = function (self)
 	local event_manager = Managers.state.event
 
@@ -160,9 +156,8 @@ AbilityUI.destroy = function (self)
 	self.set_visible(self, false)
 	rawset(_G, "ability_ui", nil)
 	print("[AbilityUI] - Destroy")
-
-	return 
 end
+
 AbilityUI.set_visible = function (self, visible)
 	self._is_visible = visible
 	local ui_renderer = self.ui_renderer
@@ -172,9 +167,8 @@ AbilityUI.set_visible = function (self, visible)
 	end
 
 	self.set_dirty(self)
-
-	return 
 end
+
 AbilityUI.update = function (self, dt, t)
 	if not self._initialized then
 		self._setup_activated_ability(self)
@@ -193,32 +187,29 @@ AbilityUI.update = function (self, dt, t)
 		self._handle_resolution_modified(self)
 		self.draw(self, dt)
 	end
-
-	return 
 end
+
 AbilityUI._handle_resolution_modified = function (self)
 	if RESOLUTION_LOOKUP.modified then
 		self._on_resolution_modified(self)
 	end
-
-	return 
 end
+
 AbilityUI._on_resolution_modified = function (self)
 	for _, widget in ipairs(self._widgets) do
 		self._set_widget_dirty(self, widget)
 	end
 
 	self.set_dirty(self)
-
-	return 
 end
+
 AbilityUI.draw = function (self, dt)
 	if not self._is_visible then
-		return 
+		return
 	end
 
 	if not self._dirty then
-		return 
+		return
 	end
 
 	local ui_renderer = self.ui_renderer
@@ -235,24 +226,20 @@ AbilityUI.draw = function (self, dt)
 	UIRenderer.end_pass(ui_renderer)
 
 	self._dirty = false
-
-	return 
 end
+
 AbilityUI.set_dirty = function (self)
 	self._dirty = true
-
-	return 
 end
+
 AbilityUI._set_widget_dirty = function (self, widget)
 	widget.element.dirty = true
-
-	return 
 end
+
 AbilityUI._play_sound = function (self, sound_event)
 	WwiseWorld.trigger_event(self.wwise_world, sound_event)
-
-	return 
 end
+
 AbilityUI.event_input_changed = function (self)
 	local inventory_slots = InventorySettings.slots
 	local num_inventory_slots = #inventory_slots
@@ -262,9 +249,8 @@ AbilityUI.event_input_changed = function (self)
 	self._set_input(self, widget, input_action)
 	self._set_widget_dirty(self, widget)
 	self.set_dirty(self)
-
-	return 
 end
+
 AbilityUI._set_input = function (self, widget, input_action)
 	local texture_data, input_text, prefix_text = self._get_input_texture_data(self, input_action)
 	local text_length = (input_text and UTF8Utils.string_length(input_text)) or 0
@@ -274,9 +260,8 @@ AbilityUI._set_input = function (self, widget, input_action)
 	input_text = input_text and UIRenderer.crop_text_width(ui_renderer, input_text, max_length, input_style)
 	widget.content.input_text = input_text or ""
 	widget.content.input_action = input_action
-
-	return 
 end
+
 AbilityUI._get_input_texture_data = function (self, input_action)
 	local input_manager = self.input_manager
 	local input_service = input_manager.get_service(input_manager, "Player")
@@ -337,6 +322,7 @@ AbilityUI._get_input_texture_data = function (self, input_action)
 
 	return nil, ""
 end
+
 AbilityUI._update_ability_animations = function (self, dt)
 	if not self._is_visible then
 		return false
@@ -365,6 +351,7 @@ AbilityUI._update_ability_animations = function (self, dt)
 
 	return true
 end
+
 AbilityUI.set_alpha = function (self, alpha)
 	for widget_index, widget in pairs(self._widgets) do
 		self._set_widget_dirty(self, widget)
@@ -373,8 +360,6 @@ AbilityUI.set_alpha = function (self, alpha)
 	self.render_settings.alpha_multiplier = alpha
 
 	self.set_dirty(self)
-
-	return 
 end
 
-return 
+return

@@ -1,4 +1,5 @@
 PlayerProjectileHuskExtension = class(PlayerProjectileHuskExtension)
+
 PlayerProjectileHuskExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local owner_unit = extension_init_data.owner_unit
 	local item_name = extension_init_data.item_name
@@ -40,17 +41,16 @@ PlayerProjectileHuskExtension.init = function (self, extension_init_context, uni
 	self._is_critical_strike = extension_init_data.is_critical_strike
 
 	self.initialize_projectile(self, projectile_info, impact_data)
+end
 
-	return 
-end
 PlayerProjectileHuskExtension.destroy = function (self)
-	return 
+	return
 end
+
 PlayerProjectileHuskExtension.extensions_ready = function (self, world, unit)
 	self.locomotion_extension = ScriptUnit.extension(unit, "projectile_locomotion_system")
-
-	return 
 end
+
 PlayerProjectileHuskExtension.initialize_projectile = function (self, projectile_info, impact_data)
 	local unit = self.unit
 
@@ -94,33 +94,30 @@ PlayerProjectileHuskExtension.initialize_projectile = function (self, projectile
 	end
 
 	Unit.flow_event(unit, "lua_trail")
-
-	return 
 end
+
 PlayerProjectileHuskExtension.update = function (self, unit, input, _, context, t)
 	if not self.active then
 		if self.was_active then
 			self.was_active = false
 		end
 
-		return 
+		return
 	end
 
 	if self.is_timed then
 		self.handle_timed_events(self, t)
 	end
-
-	return 
 end
+
 PlayerProjectileHuskExtension.stop = function (self)
 	Unit.flow_event(self.unit, "lua_projectile_end")
 	self.locomotion_extension:stop()
 
 	self.stop_impacts = true
 	self.active = false
-
-	return 
 end
+
 PlayerProjectileHuskExtension.handle_timed_events = function (self, t)
 	if self.life_time <= t then
 		local unit = self.unit
@@ -133,16 +130,14 @@ PlayerProjectileHuskExtension.handle_timed_events = function (self, t)
 
 		self.stop(self)
 	end
-
-	return 
 end
+
 PlayerProjectileHuskExtension.impact_level = function (self, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, level_index)
 	local impact_data = self.impact_data
 
 	self.hit_level_unit(self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, self.hit_units, level_index)
-
-	return 
 end
+
 PlayerProjectileHuskExtension.impact_dynamic = function (self, hit_unit, hit_position, hit_direction, hit_normal, hit_actor)
 	local impact_data = self.impact_data
 	local breed = Unit.get_data(hit_unit, "breed")
@@ -157,9 +152,8 @@ PlayerProjectileHuskExtension.impact_dynamic = function (self, hit_unit, hit_pos
 	elseif not is_player then
 		self.hit_non_level_unit(self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, self.hit_units, ranged_boost_curve_multiplier)
 	end
-
-	return 
 end
+
 PlayerProjectileHuskExtension.hit_afro = function (self, breed, hit_actor)
 	local node = Actor.node(hit_actor)
 	local hit_zone = breed.hit_zones_lookup[node]
@@ -167,13 +161,14 @@ PlayerProjectileHuskExtension.hit_afro = function (self, breed, hit_actor)
 
 	return hit_zone_name == "afro", hit_zone_name
 end
+
 PlayerProjectileHuskExtension.hit_enemy = function (self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, breed, hit_units, ranged_boost_curve_multiplier)
 	if hit_actor == nil then
-		return 
+		return
 	end
 
 	if self.hit_afro(self, breed, hit_actor) then
-		return 
+		return
 	end
 
 	local owner_unit = self.owner_unit
@@ -224,9 +219,8 @@ PlayerProjectileHuskExtension.hit_enemy = function (self, impact_data, hit_unit,
 
 		self.stop(self)
 	end
-
-	return 
 end
+
 PlayerProjectileHuskExtension.hit_enemy_damage = function (self, damage_profile, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, breed, ranged_boost_curve_multiplier, hit_units)
 	local network_manager = Managers.state.network
 	local owner_unit = self.owner_unit
@@ -293,9 +287,10 @@ PlayerProjectileHuskExtension.hit_enemy_damage = function (self, damage_profile,
 
 	return hit_zone_name ~= "ward"
 end
+
 PlayerProjectileHuskExtension.hit_player = function (self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, hit_units, ranged_boost_curve_multiplier)
 	if hit_actor == nil then
-		return 
+		return
 	end
 
 	local difficulty_settings = Managers.state.difficulty:get_difficulty_settings()
@@ -322,9 +317,8 @@ PlayerProjectileHuskExtension.hit_player = function (self, impact_data, hit_unit
 			self.stop(self)
 		end
 	end
-
-	return 
 end
+
 PlayerProjectileHuskExtension.hit_player_damage = function (self, damage_profile, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, ranged_boost_curve_multiplier, hit_units)
 	local owner_unit = self.owner_unit
 	hit_units[hit_unit] = true
@@ -357,9 +351,8 @@ PlayerProjectileHuskExtension.hit_player_damage = function (self, damage_profile
 	if hit_effect then
 		EffectHelper.play_skinned_surface_material_effects(hit_effect, self.world, hit_unit, hit_position, hit_rotation, hit_normal, is_husk)
 	end
-
-	return 
 end
+
 PlayerProjectileHuskExtension.hit_level_unit = function (self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, hit_units, level_index, ranged_boost_curve_multiplier)
 	local has_health_extension = ScriptUnit.has_extension(hit_unit, "health_system")
 	local damage_profile_name = impact_data.damage_profile_prop or impact_data.damage_profile or "default"
@@ -405,7 +398,7 @@ PlayerProjectileHuskExtension.hit_level_unit = function (self, impact_data, hit_
 
 				self.num_bounces = self.num_bounces + 1
 
-				return 
+				return
 			end
 		end
 	end
@@ -421,14 +414,12 @@ PlayerProjectileHuskExtension.hit_level_unit = function (self, impact_data, hit_
 	end
 
 	self.stop(self)
-
-	return 
 end
+
 PlayerProjectileHuskExtension.hit_damagable_prop = function (self, damage_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, hit_units, level_index, ranged_boost_curve_multiplier)
 	hit_units[hit_unit] = true
-
-	return 
 end
+
 PlayerProjectileHuskExtension.hit_non_level_unit = function (self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, hit_units, ranged_boost_curve_multiplier)
 	local damage_profile_name = impact_data.damage_profile_prop or impact_data.damage_profile or "default"
 	local damage_profile = DamageProfileTemplates[damage_profile_name]
@@ -460,9 +451,8 @@ PlayerProjectileHuskExtension.hit_non_level_unit = function (self, impact_data, 
 	if stop_impacts then
 		self.stop(self)
 	end
-
-	return 
 end
+
 PlayerProjectileHuskExtension.hit_non_level_damagable_unit = function (self, damage_profile, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, hit_units, ranged_boost_curve_multiplier)
 	local network_manager = Managers.state.network
 	hit_units[hit_unit] = true
@@ -477,9 +467,8 @@ PlayerProjectileHuskExtension.hit_non_level_damagable_unit = function (self, dam
 
 		EffectHelper.play_surface_material_effects(hit_effect, world, hit_unit, hit_position, hit_rotation, hit_normal, nil, is_husk, nil, hit_actor)
 	end
-
-	return 
 end
+
 PlayerProjectileHuskExtension.link_projectile = function (self, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, damage)
 	local unit_spawner = Managers.state.unit_spawner
 	local projectile_linker_system = self.projectile_linker_system
@@ -536,9 +525,8 @@ PlayerProjectileHuskExtension.link_projectile = function (self, hit_unit, hit_po
 
 		projectile_linker_system.add_linked_projectile_reference(projectile_linker_system, owner_unit, projectile_dummy)
 	end
-
-	return 
 end
+
 PlayerProjectileHuskExtension.do_aoe = function (self, aoe_data, position)
 	local world = self.world
 	local owner_unit = self.owner_unit
@@ -562,8 +550,6 @@ PlayerProjectileHuskExtension.do_aoe = function (self, aoe_data, position)
 	if aoe_data.taunt and self.is_server then
 		DamageUtils.create_taunt(world, owner_unit, unit, position, aoe_data)
 	end
-
-	return 
 end
 
-return 
+return

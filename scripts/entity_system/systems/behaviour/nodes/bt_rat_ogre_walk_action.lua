@@ -1,13 +1,14 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTRatOgreWalkAction = class(BTRatOgreWalkAction, BTNode)
+
 BTRatOgreWalkAction.init = function (self, ...)
 	BTRatOgreWalkAction.super.init(self, ...)
-
-	return 
 end
+
 BTRatOgreWalkAction.name = "BTRatOgreWalkAction"
 local walk_distance = 5
+
 BTRatOgreWalkAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -37,18 +38,16 @@ BTRatOgreWalkAction.enter = function (self, unit, blackboard, t)
 	else
 		blackboard.ratogre_walking = false
 	end
-
-	return 
 end
+
 BTRatOgreWalkAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if reason == "aborted" then
 		blackboard.wait_for_ogre = true
 	else
 		blackboard.ratogre_walking = false
 	end
-
-	return 
 end
+
 BTRatOgreWalkAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion = blackboard.locomotion_extension
 
@@ -56,7 +55,9 @@ BTRatOgreWalkAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running", "evaluate"
 end
+
 local hit_units = {}
+
 BTRatOgreWalkAction.follow = function (self, unit, t, dt, blackboard, locomotion)
 	if 1 < blackboard.navigation_extension:number_failed_move_attempts() then
 		blackboard.move_state = nil
@@ -92,9 +93,8 @@ BTRatOgreWalkAction.follow = function (self, unit, t, dt, blackboard, locomotion
 
 		Managers.state.network:anim_event(unit, "idle")
 	end
-
-	return 
 end
+
 BTRatOgreWalkAction.find_patrol_goal = function (self, unit, blackboard, distance_passed_player)
 	local conflict_director = Managers.state.conflict
 	local info = conflict_director.main_path_info
@@ -124,4 +124,4 @@ BTRatOgreWalkAction.find_patrol_goal = function (self, unit, blackboard, distanc
 	return goal_pos
 end
 
-return 
+return

@@ -1,4 +1,5 @@
 BotNavTransitionExtension = class(BotNavTransitionExtension)
+
 BotNavTransitionExtension.init = function (self, extension_init_context, unit)
 	self._unit = unit
 	self._is_server = Managers.state.network.is_server
@@ -18,15 +19,12 @@ BotNavTransitionExtension.init = function (self, extension_init_context, unit)
 			self._transition_unit = transition_unit
 		end
 	end
-
-	return 
 end
+
 BotNavTransitionExtension.destroy = function (self)
 	if self._is_server and self._transition_unit then
 		Managers.state.bot_nav_transition:unregister_transition(self._transition_unit)
 	end
-
-	return 
 end
 
-return 
+return

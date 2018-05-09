@@ -5,11 +5,10 @@ local function rpc_local_print(rpc_name, ...)
 	if ignored_rpc_logs[rpc_name] == nil then
 		print("[LOCAL RPC] ", rpc_name, ...)
 	end
-
-	return 
 end
 
 NetworkTransmit = class(NetworkTransmit)
+
 NetworkTransmit.init = function (self, is_server, connection_handler)
 	self.is_server = is_server
 	self.peer_id = Network.peer_id()
@@ -26,29 +25,24 @@ NetworkTransmit.init = function (self, is_server, connection_handler)
 	self.local_rpc_buffer_index = 1
 	self.peer_ignore_list = {}
 	self.game_session = nil
-
-	return 
 end
+
 NetworkTransmit.set_game_session = function (self, session)
 	self.game_session = session
-
-	return 
 end
+
 NetworkTransmit.add_peer_ignore = function (self, peer_id)
 	self.peer_ignore_list[peer_id] = true
-
-	return 
 end
+
 NetworkTransmit.remove_peer_ignore = function (self, peer_id)
 	self.peer_ignore_list[peer_id] = nil
-
-	return 
 end
+
 NetworkTransmit.destroy = function (self)
 	GarbageLeakDetector.register_object(self, "NetworkTransmit")
-
-	return 
 end
+
 NetworkTransmit.queue_local_rpc = function (self, rpc_name, ...)
 	local local_rpc_buffer_index = self.local_rpc_buffer_index
 	local local_rpc_queue = self.local_rpc_queue[local_rpc_buffer_index]
@@ -59,9 +53,8 @@ NetworkTransmit.queue_local_rpc = function (self, rpc_name, ...)
 	pack_index[num_varargs + 2](local_rpc_queue, local_rpc_queue_n, rpc_name, num_varargs, ...)
 
 	self.local_rpc_queue_n[local_rpc_buffer_index] = local_rpc_queue_n + num_varargs + 2
-
-	return 
 end
+
 NetworkTransmit.transmit_local_rpcs = function (self)
 	local local_rpc_buffer_index = self.local_rpc_buffer_index
 	local local_rpc_queue_n = self.local_rpc_queue_n[local_rpc_buffer_index]
@@ -88,14 +81,12 @@ NetworkTransmit.transmit_local_rpcs = function (self)
 	assert(i == local_rpc_queue_n)
 
 	self.local_rpc_queue_n[local_rpc_buffer_index] = 0
-
-	return 
 end
+
 NetworkTransmit.set_network_event_delegate = function (self, network_event_delegate)
 	self.network_event_delegate = network_event_delegate
-
-	return 
 end
+
 NetworkTransmit.send_rpc = function (self, rpc_name, peer_id, ...)
 	local rpc = RPC[rpc_name]
 	local my_peer_id = self.peer_id
@@ -107,9 +98,8 @@ NetworkTransmit.send_rpc = function (self, rpc_name, peer_id, ...)
 	else
 		rpc(peer_id, ...)
 	end
-
-	return 
 end
+
 NetworkTransmit.send_rpc_server = function (self, rpc_name, ...)
 	local rpc = RPC[rpc_name]
 
@@ -121,9 +111,8 @@ NetworkTransmit.send_rpc_server = function (self, rpc_name, ...)
 		assert(self.server_peer_id, "We don't have any server connection when trying to send RPC %q", rpc_name)
 		rpc(self.server_peer_id, ...)
 	end
-
-	return 
 end
+
 NetworkTransmit.send_rpc_clients = function (self, rpc_name, ...)
 	assert(self.is_server, "Trying to send rpc %q on client to clients which is wrong. Only servers should use this function.", rpc_name)
 
@@ -135,7 +124,7 @@ NetworkTransmit.send_rpc_clients = function (self, rpc_name, ...)
 	local session = self.game_session
 
 	if not session then
-		return 
+		return
 	end
 
 	local peer_ignore_list = self.peer_ignore_list
@@ -145,9 +134,8 @@ NetworkTransmit.send_rpc_clients = function (self, rpc_name, ...)
 			rpc(peer_id, ...)
 		end
 	end
-
-	return 
 end
+
 NetworkTransmit.send_rpc_clients_except = function (self, rpc_name, except, ...)
 	assert(self.is_server)
 
@@ -159,7 +147,7 @@ NetworkTransmit.send_rpc_clients_except = function (self, rpc_name, except, ...)
 	local session = self.game_session
 
 	if not session then
-		return 
+		return
 	end
 
 	local peer_ignore_list = self.peer_ignore_list
@@ -169,9 +157,8 @@ NetworkTransmit.send_rpc_clients_except = function (self, rpc_name, except, ...)
 			rpc(peer_id, ...)
 		end
 	end
-
-	return 
 end
+
 NetworkTransmit.send_rpc_all = function (self, rpc_name, ...)
 	assert(self.is_server)
 
@@ -184,7 +171,7 @@ NetworkTransmit.send_rpc_all = function (self, rpc_name, ...)
 	local session = self.game_session
 
 	if not session then
-		return 
+		return
 	end
 
 	local peer_ignore_list = self.peer_ignore_list
@@ -194,9 +181,8 @@ NetworkTransmit.send_rpc_all = function (self, rpc_name, ...)
 			rpc(peer_id, ...)
 		end
 	end
-
-	return 
 end
+
 NetworkTransmit.send_rpc_all_except = function (self, rpc_name, except, ...)
 	assert(self.is_server)
 
@@ -213,7 +199,7 @@ NetworkTransmit.send_rpc_all_except = function (self, rpc_name, except, ...)
 	local session = self.game_session
 
 	if not session then
-		return 
+		return
 	end
 
 	local peer_ignore_list = self.peer_ignore_list
@@ -223,8 +209,6 @@ NetworkTransmit.send_rpc_all_except = function (self, rpc_name, except, ...)
 			rpc(peer_id, ...)
 		end
 	end
-
-	return 
 end
 
-return 
+return

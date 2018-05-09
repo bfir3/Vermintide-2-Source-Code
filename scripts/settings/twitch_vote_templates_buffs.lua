@@ -2,8 +2,6 @@ local function debug_print(message, ...)
 	if DEBUG_TWITCH then
 		print("[Twitch] " .. string.format(message, ...))
 	end
-
-	return 
 end
 
 TwitchVoteTemplates = TwitchVoteTemplates or {}
@@ -33,8 +31,6 @@ TwitchVoteTemplates.twitch_add_speed_potion_buff = {
 				end
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_add_damage_potion_buff = {
@@ -63,8 +59,6 @@ TwitchVoteTemplates.twitch_add_damage_potion_buff = {
 				end
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_add_cooldown_potion_buff = {
@@ -93,8 +87,6 @@ TwitchVoteTemplates.twitch_add_cooldown_potion_buff = {
 				end
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_grimoire_health_debuff = {
@@ -123,8 +115,6 @@ TwitchVoteTemplates.twitch_grimoire_health_debuff = {
 				end
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_no_overcharge_no_ammo_reloads = {
@@ -167,8 +157,6 @@ TwitchVoteTemplates.twitch_no_overcharge_no_ammo_reloads = {
 				end
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_health_regen = {
@@ -197,8 +185,6 @@ TwitchVoteTemplates.twitch_health_regen = {
 				end
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_health_degen = {
@@ -235,9 +221,7 @@ TwitchVoteTemplates.twitch_health_degen = {
 				end
 			end
 		end
-
-		return 
 	end
 }
 
-return 
+return

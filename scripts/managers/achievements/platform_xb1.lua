@@ -13,8 +13,6 @@ local platform_functions = {
 				achievement_manager._xbox_achievements_initialized = true
 			end
 		end
-
-		return 
 	end,
 	check_version_number = function ()
 		return true
@@ -27,7 +25,7 @@ local platform_functions = {
 	end,
 	unlock = function (template)
 		if not rawget(_G, "XB1Achievements") or Achievements.is_refreshing(XB1Achievements) then
-			return 
+			return
 		end
 
 		assert(template.ID_XB1, "[AchievementManager] There is no Achievement ID specified for achievement: " .. template.id)
@@ -51,8 +49,6 @@ local platform_functions = {
 	end,
 	reset = function ()
 		errorf("Tried to reset Achievements, not implemented!")
-
-		return 
 	end
 }
 

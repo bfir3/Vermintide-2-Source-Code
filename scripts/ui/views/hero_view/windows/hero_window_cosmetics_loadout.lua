@@ -5,6 +5,7 @@ local animation_definitions = definitions.animation_definitions
 local DO_RELOAD = false
 HeroWindowCosmeticsLoadout = class(HeroWindowCosmeticsLoadout)
 HeroWindowCosmeticsLoadout.NAME = "HeroWindowCosmeticsLoadout"
+
 HeroWindowCosmeticsLoadout.on_enter = function (self, params, offset)
 	print("[HeroViewWindow] Enter Substate HeroWindowCosmeticsLoadout")
 
@@ -29,9 +30,8 @@ HeroWindowCosmeticsLoadout.on_enter = function (self, params, offset)
 
 	self.hero_name = params.hero_name
 	self.career_index = params.career_index
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -56,16 +56,14 @@ HeroWindowCosmeticsLoadout.create_ui_elements = function (self, params, offset)
 		window_position[2] = window_position[2] + offset[2]
 		window_position[3] = window_position[3] + offset[3]
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout.on_exit = function (self, params)
 	print("[HeroViewWindow] Exit Substate HeroWindowCosmeticsLoadout")
 
 	self.ui_animator = nil
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -78,12 +76,12 @@ HeroWindowCosmeticsLoadout.update = function (self, dt, t)
 	self._update_selected_cosmetic_slot_index(self)
 	self._handle_input(self, dt, t)
 	self.draw(self, dt)
+end
 
-	return 
-end
 HeroWindowCosmeticsLoadout.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 HeroWindowCosmeticsLoadout._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -99,9 +97,8 @@ HeroWindowCosmeticsLoadout._update_animations = function (self, dt)
 	end
 
 	local widgets_by_name = self._widgets_by_name
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -111,9 +108,8 @@ HeroWindowCosmeticsLoadout._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local slot_index_hovered = self._is_equipment_slot_hovered(self)
@@ -128,9 +124,8 @@ HeroWindowCosmeticsLoadout._handle_input = function (self, dt, t)
 		parent.set_selected_cosmetic_slot_index(parent, slot_index_pressed)
 		self._play_sound(self, "play_gui_cosmetics_selection_click")
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._update_selected_cosmetic_slot_index = function (self)
 	local index = self.parent:get_selected_cosmetic_slot_index()
 
@@ -139,9 +134,8 @@ HeroWindowCosmeticsLoadout._update_selected_cosmetic_slot_index = function (self
 
 		self._selected_cosmetic_slot_index = index
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._update_loadout_sync = function (self)
 	local parent = self.parent
 	local loadout_sync_id = parent.loadout_sync_id
@@ -151,15 +145,13 @@ HeroWindowCosmeticsLoadout._update_loadout_sync = function (self)
 
 		self._loadout_sync_id = loadout_sync_id
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._exit = function (self, selected_level)
 	self.exit = true
 	self.exit_level_id = selected_level
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -181,14 +173,12 @@ HeroWindowCosmeticsLoadout.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._setup_slot_icons = function (self)
 	local slots = InventorySettings.slots_by_cosmetic_index
 
@@ -208,9 +198,8 @@ HeroWindowCosmeticsLoadout._setup_slot_icons = function (self)
 			content[slot_icon_name] = icon_texture
 		end
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._populate_loadout = function (self)
 	local hero_name = self.hero_name
 	local slots = InventorySettings.slots_by_cosmetic_index
@@ -228,9 +217,8 @@ HeroWindowCosmeticsLoadout._populate_loadout = function (self)
 			self._equip_item_presentation(self, item, slot)
 		end
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._equip_item_presentation = function (self, item, slot)
 	local item_data = item.data
 	local slot_type = item_data.slot_type
@@ -266,9 +254,8 @@ HeroWindowCosmeticsLoadout._equip_item_presentation = function (self, item, slot
 		local item_content = content[hotspot_name]
 		item_content[item_icon_name] = inventory_icon
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._is_equipment_slot_pressed = function (self)
 	local widget = self._widgets_by_name.loadout_grid
 	local content = widget.content
@@ -286,9 +273,8 @@ HeroWindowCosmeticsLoadout._is_equipment_slot_pressed = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._is_equipment_slot_hovered = function (self)
 	local widget = self._widgets_by_name.loadout_grid
 	local content = widget.content
@@ -306,9 +292,8 @@ HeroWindowCosmeticsLoadout._is_equipment_slot_hovered = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._set_equipment_slot_selected = function (self, column_index)
 	local widget = self._widgets_by_name.loadout_grid
 	local content = widget.content
@@ -323,9 +308,8 @@ HeroWindowCosmeticsLoadout._set_equipment_slot_selected = function (self, column
 			slot_hotspot.is_selected = column_index and column_index == k
 		end
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._is_equipment_slot_hovered_by_type = function (self, item_type)
 	local widget = self._widgets_by_name.loadout_grid
 	local content = widget.content
@@ -348,9 +332,8 @@ HeroWindowCosmeticsLoadout._is_equipment_slot_hovered_by_type = function (self, 
 			end
 		end
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsLoadout._highlight_equipment_slot_by_type = function (self, item_type)
 	local widget = self._widgets_by_name.loadout_grid
 	local content = widget.content
@@ -372,8 +355,6 @@ HeroWindowCosmeticsLoadout._highlight_equipment_slot_by_type = function (self, i
 			style[slot_hover_name].color[1] = (enabled and alpha) or 255
 		end
 	end
-
-	return 
 end
 
-return 
+return

@@ -773,8 +773,6 @@ local action_data = {
 		end,
 		custom_exit_function = function (unit, blackboard, t)
 			ai_shield_extension:set_is_blocking(true)
-
-			return 
 		end,
 		stagger_anims = {
 			{
@@ -1280,4 +1278,4 @@ action_data.frenzy_attack_ranged.combo_attacks.attack_1 = {
 }
 BreedActions.skaven_storm_vermin_with_shield = table.create_copy(BreedActions.skaven_storm_vermin_with_shield, action_data)
 
-return 
+return

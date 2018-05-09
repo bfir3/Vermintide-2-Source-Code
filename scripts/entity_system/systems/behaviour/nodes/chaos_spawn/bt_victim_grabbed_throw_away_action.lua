@@ -4,11 +4,11 @@ BTVictimGrabbedThrowAwayAction = class(BTVictimGrabbedThrowAwayAction, BTNode)
 BTVictimGrabbedThrowAwayAction.name = "BTVictimGrabbedThrowAwayAction"
 local PLAYER_POSITIONS = PLAYER_POSITIONS
 local PLAYER_UNITS = PLAYER_UNITS
+
 BTVictimGrabbedThrowAwayAction.init = function (self, ...)
 	BTVictimGrabbedThrowAwayAction.super.init(self, ...)
-
-	return 
 end
+
 BTVictimGrabbedThrowAwayAction.enter = function (self, unit, blackboard, t)
 	local network_manager = Managers.state.network
 	local animation = "attack_grabbed_throw"
@@ -54,9 +54,8 @@ BTVictimGrabbedThrowAwayAction.enter = function (self, unit, blackboard, t)
 			blackboard.drop_grabbed_player = true
 		end
 	end
-
-	return 
 end
+
 BTVictimGrabbedThrowAwayAction.find_throw_direction = function (self, unit, blackboard, ray_length)
 	local pos = POSITION_LOOKUP[unit] + Vector3.up()
 	local rot = Unit.local_rotation(unit, 0)
@@ -85,6 +84,7 @@ BTVictimGrabbedThrowAwayAction.find_throw_direction = function (self, unit, blac
 
 	return nil
 end
+
 BTVictimGrabbedThrowAwayAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.navigation_extension:set_enabled(true)
 
@@ -104,9 +104,8 @@ BTVictimGrabbedThrowAwayAction.leave = function (self, unit, blackboard, t, reas
 	blackboard.use_stored_throw_direction = nil
 	blackboard.drop_grabbed_player = nil
 	blackboard.chew_attacks_done = 0
-
-	return 
 end
+
 BTVictimGrabbedThrowAwayAction.catapult_player = function (self, unit, blackboard, throw_speed, throw_speed_z)
 	local victim_unit = blackboard.victim_grabbed
 	local victim_pos = POSITION_LOOKUP[victim_unit]
@@ -130,10 +129,10 @@ BTVictimGrabbedThrowAwayAction.catapult_player = function (self, unit, blackboar
 	StatusUtils.set_catapulted_network(victim_unit, true, velocity)
 
 	blackboard.anim_cb_throw = nil
-
-	return 
 end
+
 local Unit_alive = Unit.alive
+
 BTVictimGrabbedThrowAwayAction.run = function (self, unit, blackboard, t, dt)
 	local should_exit = blackboard.attack_finished or not Unit.alive(blackboard.victim_grabbed) or blackboard.drop_grabbed_player
 
@@ -155,4 +154,4 @@ BTVictimGrabbedThrowAwayAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

@@ -41,10 +41,10 @@ local CHEST_PRESENTATION_BONUS_TIME = 2
 local CHEST_PRESENTATION_EXIT_TIME = 1
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
 local glow_rarity_colors = {
@@ -225,6 +225,7 @@ local RELOAD_UI = false
 local DEBUG_MODE = false
 HeroViewStateLoot = class(HeroViewStateLoot)
 HeroViewStateLoot.NAME = "HeroViewStateLoot"
+
 HeroViewStateLoot.on_enter = function (self, params, optional_ignore_item_population)
 	self.parent:clear_wanted_state()
 	print("[HeroViewState] Enter Substate HeroViewStateLoot")
@@ -293,9 +294,8 @@ HeroViewStateLoot.on_enter = function (self, params, optional_ignore_item_popula
 
 	self.play_sound(self, "play_gui_chestroom_start")
 	self.disable_player_world(self)
-
-	return 
 end
+
 HeroViewStateLoot.disable_player_world = function (self)
 	if not self._player_world_disabled then
 		self._player_world_disabled = true
@@ -305,9 +305,8 @@ HeroViewStateLoot.disable_player_world = function (self)
 
 		ScriptWorld.deactivate_viewport(world, viewport)
 	end
-
-	return 
 end
+
 HeroViewStateLoot.enable_player_world = function (self)
 	if self._player_world_disabled then
 		self._player_world_disabled = false
@@ -317,9 +316,8 @@ HeroViewStateLoot.enable_player_world = function (self)
 
 		ScriptWorld.activate_viewport(world, viewport)
 	end
-
-	return 
 end
+
 HeroViewStateLoot.populate_items = function (self)
 	local widgets_by_name = self._widgets_by_name
 	local hero_name = self.hero_name
@@ -371,27 +369,27 @@ HeroViewStateLoot.populate_items = function (self)
 	self._item_grid = item_grid
 
 	self._select_grid_item(self, nil)
-
-	return 
 end
+
 HeroViewStateLoot._get_items_by_filter = function (self, item_filter)
 	local backend_items = Managers.backend:get_interface("items")
 	local items = backend_items.get_filtered_items(backend_items, item_filter)
 
 	return items
 end
+
 HeroViewStateLoot.get_background_world = function (self)
 	return self.parent:get_background_world()
 end
+
 HeroViewStateLoot.transitioning = function (self)
 	if self.exiting then
 		return true
 	else
 		return false
 	end
-
-	return 
 end
+
 HeroViewStateLoot._can_open_chests = function (self)
 	local backend_items = Managers.backend:get_interface("items")
 	local items = backend_items.get_all_backend_items(backend_items)
@@ -405,19 +403,21 @@ HeroViewStateLoot._can_open_chests = function (self)
 
 	return can_open
 end
+
 HeroViewStateLoot.wanted_menu_state = function (self)
 	return self._wanted_menu_state
 end
+
 HeroViewStateLoot.clear_wanted_menu_state = function (self)
 	self._wanted_menu_state = nil
-
-	return 
 end
+
 HeroViewStateLoot._wanted_state = function (self)
 	local new_state = self.parent:wanted_state()
 
 	return new_state
 end
+
 HeroViewStateLoot.create_ui_elements = function (self)
 	if self._preview_loot_widgets then
 		for _, widget in ipairs(self._preview_loot_widgets) do
@@ -491,9 +491,8 @@ HeroViewStateLoot.create_ui_elements = function (self)
 	widgets_by_name.item_cap_warning_text.content.visible = false
 
 	self._setup_reward_option_widgets(self)
-
-	return 
 end
+
 HeroViewStateLoot._setup_reward_option_widgets = function (self)
 	local reward_options = {}
 
@@ -509,9 +508,8 @@ HeroViewStateLoot._setup_reward_option_widgets = function (self)
 	end
 
 	self._reward_options = reward_options
-
-	return 
 end
+
 HeroViewStateLoot._setup_camera = function (self)
 	local camera_pose = nil
 	local level_name = viewport_widget_definition.style.viewport.level_name
@@ -532,33 +530,36 @@ HeroViewStateLoot._setup_camera = function (self)
 	self._camera_pose = camera_pose
 
 	self._position_camera(self)
-
-	return 
 end
+
 HeroViewStateLoot.set_camera_position = function (self, position)
 	local _, viewport = self.get_viewport_world(self)
 	local camera = ScriptViewport.camera(viewport)
 
 	return ScriptCamera.set_local_position(camera, position)
 end
+
 HeroViewStateLoot.set_camera_rotation = function (self, rotation)
 	local _, viewport = self.get_viewport_world(self)
 	local camera = ScriptViewport.camera(viewport)
 
 	return ScriptCamera.set_local_rotation(camera, rotation)
 end
+
 HeroViewStateLoot.get_camera_position = function (self)
 	local _, viewport = self.get_viewport_world(self)
 	local camera = ScriptViewport.camera(viewport)
 
 	return ScriptCamera.position(camera)
 end
+
 HeroViewStateLoot.get_camera_rotation = function (self)
 	local _, viewport = self.get_viewport_world(self)
 	local camera = ScriptViewport.camera(viewport)
 
 	return ScriptCamera.rotation(camera)
 end
+
 HeroViewStateLoot.get_viewport_world = function (self)
 	local previewer_pass_data = self.viewport_widget.element.pass_data[1]
 	local viewport = previewer_pass_data.viewport
@@ -566,6 +567,7 @@ HeroViewStateLoot.get_viewport_world = function (self)
 
 	return world, viewport
 end
+
 HeroViewStateLoot._position_camera = function (self, optional_pose)
 	local world, viewport = self.get_viewport_world(self)
 	local camera = ScriptViewport.camera(viewport)
@@ -578,9 +580,8 @@ HeroViewStateLoot._position_camera = function (self, optional_pose)
 		ScriptCamera.set_local_pose(camera, camera_pose)
 		ScriptCamera.force_update(world, camera)
 	end
-
-	return 
 end
+
 HeroViewStateLoot.on_exit = function (self, params)
 	print("[HeroViewState] Exit Substate HeroViewStateLoot")
 
@@ -648,12 +649,11 @@ HeroViewStateLoot.on_exit = function (self, params)
 	end
 
 	self.enable_player_world(self)
-
-	return 
 end
+
 HeroViewStateLoot._update_transition_timer = function (self, dt)
 	if not self._transition_timer then
-		return 
+		return
 	end
 
 	if self._transition_timer == 0 then
@@ -661,9 +661,8 @@ HeroViewStateLoot._update_transition_timer = function (self, dt)
 	else
 		self._transition_timer = math.max(self._transition_timer - dt, 0)
 	end
-
-	return 
 end
+
 HeroViewStateLoot.update = function (self, dt, t)
 	if RELOAD_UI then
 		self.create_ui_elements(self)
@@ -703,9 +702,8 @@ HeroViewStateLoot.update = function (self, dt, t)
 
 		return wanted_state or self._new_state
 	end
-
-	return 
 end
+
 HeroViewStateLoot.post_update = function (self, dt, t)
 	self.ui_animator:update(dt)
 
@@ -773,9 +771,8 @@ HeroViewStateLoot.post_update = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroViewStateLoot._update_animations = function (self, dt)
 	if self._chest_presentation_active then
 		self._animate_reward_options_entry(self, dt)
@@ -818,9 +815,8 @@ HeroViewStateLoot._update_animations = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroViewStateLoot.draw = function (self, dt)
 	local loot_ui_renderer = self.loot_ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -900,9 +896,8 @@ HeroViewStateLoot.draw = function (self, dt)
 	if gamepad_active then
 		self.menu_input_description:draw(loot_ui_renderer, dt)
 	end
-
-	return 
 end
+
 HeroViewStateLoot._set_debug_buttons_disable_state = function (self, is_disabled)
 	local debug_widgets = self._debug_widgets
 
@@ -911,9 +906,8 @@ HeroViewStateLoot._set_debug_buttons_disable_state = function (self, is_disabled
 		local hotspot = content.button_hotspot
 		hotspot.disable_button = is_disabled
 	end
-
-	return 
 end
+
 HeroViewStateLoot._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -923,9 +917,8 @@ HeroViewStateLoot._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroViewStateLoot._is_button_hovered = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -933,9 +926,8 @@ HeroViewStateLoot._is_button_hovered = function (self, widget)
 	if hotspot.on_hover_enter then
 		return true
 	end
-
-	return 
 end
+
 HeroViewStateLoot._is_option_tab_selected = function (self)
 	local widget = self._widgets_by_name.inventory_tabs
 	local widget_content = widget.content
@@ -950,9 +942,8 @@ HeroViewStateLoot._is_option_tab_selected = function (self)
 			return i
 		end
 	end
-
-	return 
 end
+
 HeroViewStateLoot._select_option_tab_by_index = function (self, index)
 	local widget = self._widgets_by_name.inventory_tabs
 	local widget_content = widget.content
@@ -964,9 +955,8 @@ HeroViewStateLoot._select_option_tab_by_index = function (self, index)
 		local hotspot_content = widget_content[hotspot_name]
 		hotspot_content.is_selected = i == index
 	end
-
-	return 
 end
+
 HeroViewStateLoot._select_grid_item = function (self, item, t)
 	local widgets_by_name = self._widgets_by_name
 	local item_grid = self._item_grid
@@ -1016,9 +1006,8 @@ HeroViewStateLoot._select_grid_item = function (self, item, t)
 	local can_open = self._can_open_chests(self)
 	widgets_by_name.item_cap_warning_text.content.visible = not can_open and item ~= nil
 	widgets_by_name.open_button.content.button_hotspot.disable_button = not can_open or item == nil
-
-	return 
 end
+
 HeroViewStateLoot._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local input_manager = self.input_manager
@@ -1046,7 +1035,7 @@ HeroViewStateLoot._handle_input = function (self, dt, t)
 			self.populate_items(self)
 		end
 
-		return 
+		return
 	end
 
 	if self._chest_presentation_active then
@@ -1187,9 +1176,8 @@ HeroViewStateLoot._handle_input = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroViewStateLoot._update_page_info = function (self)
 	local current_page, total_pages = self._item_grid:get_page_info()
 
@@ -1204,9 +1192,8 @@ HeroViewStateLoot._update_page_info = function (self)
 		widgets_by_name.page_button_next.content.button_hotspot.disable_button = current_page == total_pages
 		widgets_by_name.page_button_previous.content.button_hotspot.disable_button = current_page == 1
 	end
-
-	return 
 end
+
 HeroViewStateLoot.open_reward_option = function (self, index)
 	local reward_options = self._reward_options
 	local reward_option = reward_options[index]
@@ -1230,9 +1217,8 @@ HeroViewStateLoot.open_reward_option = function (self, index)
 
 		self.menu_input_description:set_input_description(generic_input_actions.loot_presented)
 	end
-
-	return 
 end
+
 HeroViewStateLoot._setup_rewards = function (self, rewards)
 	local backend_items = Managers.backend:get_interface("items")
 	local reward_options = self._reward_options
@@ -1377,9 +1363,8 @@ HeroViewStateLoot._setup_rewards = function (self, rewards)
 	self._present_reward_options = true
 
 	self._set_background_blur_progress(self, 1)
-
-	return 
 end
+
 HeroViewStateLoot._apply_color_to_glow_style = function (self, style, color)
 	local style_color = style.color
 	local style_default_color = style.default_color
@@ -1391,16 +1376,14 @@ HeroViewStateLoot._apply_color_to_glow_style = function (self, style, color)
 	style_default_color[2] = color[2]
 	style_default_color[3] = color[3]
 	style_default_color[4] = color[4]
-
-	return 
 end
+
 HeroViewStateLoot._spawn_hero_skin_unit = function (self, world_previewer, hero_name, career_index, optional_skin)
 	local callback = callback(self, "cb_hero_unit_spawned", world_previewer, hero_name, career_index)
 
 	world_previewer.request_spawn_hero_unit(world_previewer, hero_name, career_index, false, callback, 0.01, nil, optional_skin)
-
-	return 
 end
+
 HeroViewStateLoot.cb_hero_unit_spawned = function (self, world_previewer, hero_name, career_index)
 	local profile_index = FindProfileIndex(hero_name)
 	local profile = SPProfiles[profile_index]
@@ -1429,15 +1412,15 @@ HeroViewStateLoot.cb_hero_unit_spawned = function (self, world_previewer, hero_n
 	if preview_idle_animation then
 		world_previewer.play_character_animation(world_previewer, preview_idle_animation)
 	end
-
-	return 
 end
+
 HeroViewStateLoot._create_player_portrait = function (self, scenegraph_id, portrait_frame, portrait_image, player_level_text, optional_scale)
 	local definition = UIWidgets.create_portrait_frame(scenegraph_id, portrait_frame, player_level_text, optional_scale or 1, nil, portrait_image)
 	local widget = UIWidget.init(definition)
 
 	return widget
 end
+
 HeroViewStateLoot._set_background_blur_progress = function (self, progress)
 	local world, viewport = self.get_viewport_world(self)
 	local shading_env = World.get_data(world, "shading_environment")
@@ -1447,14 +1430,12 @@ HeroViewStateLoot._set_background_blur_progress = function (self, progress)
 		ShadingEnvironment.set_scalar(shading_env, "fullscreen_blur_amount", progress * 0.75)
 		ShadingEnvironment.apply(shading_env)
 	end
-
-	return 
 end
+
 HeroViewStateLoot.play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroViewStateLoot._start_transition_animation = function (self, key, animation_name)
 	local params = {
 		wwise_world = self.wwise_world,
@@ -1463,9 +1444,8 @@ HeroViewStateLoot._start_transition_animation = function (self, key, animation_n
 	local widgets = {}
 	local anim_id = self.ui_animator:start_animation(animation_name, widgets, scenegraph_definition, params)
 	self._animations[key] = anim_id
-
-	return 
 end
+
 HeroViewStateLoot._start_animation = function (self, key, animation_name, widget, optional_params)
 	if not optional_params then
 		local params = {
@@ -1478,6 +1458,7 @@ HeroViewStateLoot._start_animation = function (self, key, animation_name, widget
 
 	return animation_id
 end
+
 HeroViewStateLoot._open_chest = function (self, selected_item)
 	local backend_loot = Managers.backend:get_interface("loot")
 	local hero_name = self.hero_name
@@ -1513,14 +1494,13 @@ HeroViewStateLoot._open_chest = function (self, selected_item)
 
 					self.play_sound(self, sound_event)
 
-					return 
+					return
 				end
 			end
 		end
 	end
-
-	return 
 end
+
 HeroViewStateLoot.loot_chest_opened = function (self, loot)
 	local selected_item = self._selected_item
 	local num_loot = loot and #loot
@@ -1533,14 +1513,13 @@ HeroViewStateLoot.loot_chest_opened = function (self, loot)
 	end
 
 	self._start_reward_presentation(self, loot)
-
-	return 
 end
+
 HeroViewStateLoot._start_reward_presentation = function (self, loot)
 	local unit = self._chest_unit
 
 	if not unit then
-		return 
+		return
 	end
 
 	local ui_scenegraph = self.ui_scenegraph
@@ -1556,14 +1535,13 @@ HeroViewStateLoot._start_reward_presentation = function (self, loot)
 	self._selected_item = nil
 
 	self.set_reward_options_height_progress(self, 0)
-
-	return 
 end
+
 HeroViewStateLoot._animate_reward_options_entry = function (self, dt)
 	local reward_options_entry_progress = self._reward_options_entry_progress
 
 	if not reward_options_entry_progress then
-		return 
+		return
 	end
 
 	local progress = math.min(reward_options_entry_progress + dt, 1)
@@ -1577,9 +1555,8 @@ HeroViewStateLoot._animate_reward_options_entry = function (self, dt)
 	else
 		self._reward_options_entry_progress = progress
 	end
-
-	return 
 end
+
 HeroViewStateLoot.set_reward_options_height_progress = function (self, progress)
 	local w, h = UIResolution()
 	local progress_1 = math.min(progress * 1.1, 1)
@@ -1589,9 +1566,8 @@ HeroViewStateLoot.set_reward_options_height_progress = function (self, progress)
 	ui_scenegraph.loot_option_1.local_position[2] = -h * (1 - math.catmullrom(math.easeOutCubic(progress_1), 0, 0, 1, -1.8))
 	ui_scenegraph.loot_option_2.local_position[2] = -h * (1 - math.catmullrom(math.easeOutCubic(progress_2), 0, 0, 1, -1.8))
 	ui_scenegraph.loot_option_3.local_position[2] = -h * (1 - math.catmullrom(math.easeOutCubic(progress_3), 0, 0, 1, -1.8))
-
-	return 
 end
+
 HeroViewStateLoot._spawn_chest_unit = function (self, unit_name, instant_spawn, t)
 	local world = self.get_viewport_world(self)
 
@@ -1620,9 +1596,8 @@ HeroViewStateLoot._spawn_chest_unit = function (self, unit_name, instant_spawn, 
 
 	self._current_chest_unit_name = unit_name
 	self._chest_unit = unit
-
-	return 
 end
+
 HeroViewStateLoot.get_world_link_unit = function (self)
 	local level_name = viewport_widget_definition.style.viewport.level_name
 	local previewer_pass_data = self.viewport_widget.element.pass_data[1]
@@ -1640,9 +1615,8 @@ HeroViewStateLoot.get_world_link_unit = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroViewStateLoot.set_camera_zoom = function (self, progress)
 	local camera_pose = self._camera_pose:unbox()
 	local translation = Matrix4x4.translation(camera_pose)
@@ -1653,9 +1627,8 @@ HeroViewStateLoot.set_camera_zoom = function (self, progress)
 	local position = translation + dir * distance
 
 	self.set_camera_position(self, position)
-
-	return 
 end
+
 HeroViewStateLoot.set_grid_animation_progress = function (self, progress)
 	local ui_scenegraph = self.ui_scenegraph
 	ui_scenegraph.info_root.local_position[1] = 400 * progress
@@ -1663,16 +1636,14 @@ HeroViewStateLoot.set_grid_animation_progress = function (self, progress)
 	ui_scenegraph.open_button.local_position[2] = 30 - 200 * progress
 	ui_scenegraph.close_button.local_position[2] = 30 - 200 * progress
 	self._grid_alpha_multiplier = 1 - progress
-
-	return 
 end
+
 HeroViewStateLoot.set_continue_button_animation_progress = function (self, progress)
 	local ui_scenegraph = self.ui_scenegraph
 	ui_scenegraph.continue_button.local_position[2] = -170 + 200 * progress
 	self._continue_button_alpha_multiplier = progress
-
-	return 
 end
+
 HeroViewStateLoot.set_chest_title_alpha_progress = function (self, progress)
 	local widgets_by_name = self._widgets_by_name
 	local alpha = 255 * progress
@@ -1681,14 +1652,13 @@ HeroViewStateLoot.set_chest_title_alpha_progress = function (self, progress)
 	widgets_by_name.chest_sub_title.style.text.text_color[1] = alpha
 	widgets_by_name.chest_sub_title.style.text_shadow.text_color[1] = alpha
 	self._chest_title_alpha_progress = progress
-
-	return 
 end
+
 HeroViewStateLoot._update_enter_animation_time = function (self, dt, t)
 	local center_animation_duration = self._enter_animation_duration
 
 	if not center_animation_duration then
-		return 
+		return
 	end
 
 	center_animation_duration = center_animation_duration + dt
@@ -1702,14 +1672,13 @@ HeroViewStateLoot._update_enter_animation_time = function (self, dt, t)
 	else
 		self._enter_animation_duration = center_animation_duration
 	end
-
-	return 
 end
+
 HeroViewStateLoot._update_continue_button_animation_time = function (self, dt, t)
 	local continue_button_animation_duration = self._continue_button_animation_duration
 
 	if not continue_button_animation_duration then
-		return 
+		return
 	end
 
 	continue_button_animation_duration = continue_button_animation_duration + dt
@@ -1723,14 +1692,13 @@ HeroViewStateLoot._update_continue_button_animation_time = function (self, dt, t
 	else
 		self._continue_button_animation_duration = continue_button_animation_duration
 	end
-
-	return 
 end
+
 HeroViewStateLoot._update_camera_look_up_time = function (self, dt, t)
 	local camera_look_up_duration = self._camera_look_up_duration
 
 	if not camera_look_up_duration then
-		return 
+		return
 	end
 
 	local previous_progress = math.min(camera_look_up_duration / CHEST_PRESENTATION_LOOK_UP_TIME, 1)
@@ -1758,14 +1726,13 @@ HeroViewStateLoot._update_camera_look_up_time = function (self, dt, t)
 	else
 		self._camera_look_up_duration = camera_look_up_duration
 	end
-
-	return 
 end
+
 HeroViewStateLoot._update_camera_look_down_time = function (self, dt, t)
 	local camera_look_down_duration = self._camera_look_down_duration
 
 	if not camera_look_down_duration then
-		return 
+		return
 	end
 
 	local previous_progress = math.min(camera_look_down_duration / CHEST_PRESENTATION_LOOK_DOWN_TIME, 1)
@@ -1789,14 +1756,13 @@ HeroViewStateLoot._update_camera_look_down_time = function (self, dt, t)
 	else
 		self._camera_look_down_duration = camera_look_down_duration
 	end
-
-	return 
 end
+
 HeroViewStateLoot._update_chest_open_wait_time = function (self, dt, t)
 	local chest_open_wait_duration = self._chest_open_wait_duration
 
 	if not chest_open_wait_duration then
-		return 
+		return
 	end
 
 	chest_open_wait_duration = chest_open_wait_duration + dt
@@ -1813,14 +1779,13 @@ HeroViewStateLoot._update_chest_open_wait_time = function (self, dt, t)
 	else
 		self._chest_open_wait_duration = chest_open_wait_duration
 	end
-
-	return 
 end
+
 HeroViewStateLoot._update_chest_zoom_in_time = function (self, dt, t)
 	local chest_zoom_in_duration = self._chest_zoom_in_duration
 
 	if not chest_zoom_in_duration then
-		return 
+		return
 	end
 
 	chest_zoom_in_duration = chest_zoom_in_duration + dt
@@ -1837,14 +1802,13 @@ HeroViewStateLoot._update_chest_zoom_in_time = function (self, dt, t)
 	else
 		self._chest_zoom_in_duration = chest_zoom_in_duration
 	end
-
-	return 
 end
+
 HeroViewStateLoot._update_chest_zoom_out_time = function (self, dt, t)
 	local chest_zoom_out_duration = self._chest_zoom_out_duration
 
 	if not chest_zoom_out_duration then
-		return 
+		return
 	end
 
 	chest_zoom_out_duration = chest_zoom_out_duration + dt
@@ -1859,14 +1823,13 @@ HeroViewStateLoot._update_chest_zoom_out_time = function (self, dt, t)
 	else
 		self._chest_zoom_out_duration = chest_zoom_out_duration
 	end
-
-	return 
 end
+
 HeroViewStateLoot._update_camera_shake_chest_spawn_time = function (self, dt, t)
 	local camera_shake_chest_spawn_duration = self._camera_shake_chest_spawn_duration
 
 	if not camera_shake_chest_spawn_duration then
-		return 
+		return
 	end
 
 	camera_shake_chest_spawn_duration = camera_shake_chest_spawn_duration + dt
@@ -1879,9 +1842,8 @@ HeroViewStateLoot._update_camera_shake_chest_spawn_time = function (self, dt, t)
 	else
 		self._camera_shake_chest_spawn_duration = camera_shake_chest_spawn_duration
 	end
-
-	return 
 end
+
 HeroViewStateLoot.add_camera_shake = function (self, settings, start_time, scale)
 	local data = {}
 	local settings = settings or camera_default_shake_settings
@@ -1899,9 +1861,8 @@ HeroViewStateLoot.add_camera_shake = function (self, settings, start_time, scale
 	self._active_camera_shakes = {
 		[data] = true
 	}
-
-	return 
 end
+
 HeroViewStateLoot._apply_shake_event = function (self, settings, t)
 	local active_camera_shakes = self._active_camera_shakes
 	local start_time = settings.start_time
@@ -1929,9 +1890,8 @@ HeroViewStateLoot._apply_shake_event = function (self, settings, t)
 	if settings.end_time and settings.end_time <= t then
 		active_camera_shakes[settings] = nil
 	end
-
-	return 
 end
+
 HeroViewStateLoot._calculate_perlin_value = function (self, x, settings)
 	local total = 0
 	local shake_settings = settings.shake_settings
@@ -1950,6 +1910,7 @@ HeroViewStateLoot._calculate_perlin_value = function (self, x, settings)
 
 	return total
 end
+
 HeroViewStateLoot._interpolated_noise = function (self, x, settings)
 	local x_floored = math.floor(x)
 	local remainder = x - x_floored
@@ -1958,15 +1919,18 @@ HeroViewStateLoot._interpolated_noise = function (self, x, settings)
 
 	return math.lerp(v1, v2, remainder)
 end
+
 HeroViewStateLoot._smoothed_noise = function (self, x, settings)
 	return self._noise(self, x, settings) / 2 + self._noise(self, x - 1, settings) / 4 + self._noise(self, x + 1, settings) / 4
 end
+
 HeroViewStateLoot._noise = function (self, x, settings)
 	local next_seed, _ = Math.next_random(x + settings.seed)
 	local _, value = Math.next_random(next_seed)
 
 	return value * 2 - 1
 end
+
 HeroViewStateLoot._get_card_spawn_position = function (self)
 	local camera_position = self.get_camera_position(self)
 	local camera_rotation = self.get_camera_rotation(self)
@@ -1979,6 +1943,7 @@ HeroViewStateLoot._get_card_spawn_position = function (self)
 
 	return world_position
 end
+
 HeroViewStateLoot._create_portrait_frame_widget = function (self, frame_settings_name, portrait_texture, player_level_text)
 	local widget_definition = UIWidgets.create_portrait_frame("info_portrait_root", frame_settings_name, player_level_text, 1, nil, portrait_texture)
 	local widget = UIWidget.init(widget_definition)
@@ -1987,6 +1952,7 @@ HeroViewStateLoot._create_portrait_frame_widget = function (self, frame_settings
 
 	return widget
 end
+
 HeroViewStateLoot._setup_info_window = function (self)
 	local hero_name = self.hero_name
 	local career_index = self.career_index
@@ -2003,8 +1969,6 @@ HeroViewStateLoot._setup_info_window = function (self)
 	local portrait_widget = self._create_portrait_frame_widget(self, portrait_frame, portrait_image, player_level_text)
 	self._portrait_widget = portrait_widget
 	self._widgets_by_name.info_text_title.content.text = Localize(character_name)
-
-	return 
 end
 
-return 
+return

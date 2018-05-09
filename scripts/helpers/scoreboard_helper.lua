@@ -193,8 +193,6 @@ local function get_score(statistics_db, stats_id, stat_type)
 	else
 		return statistics_db.get_stat(statistics_db, stats_id, stat_type)
 	end
-
-	return 
 end
 
 local function get_score_by_name(statistics_db, stats_id, stat_name)
@@ -341,6 +339,7 @@ ScoreboardHelper.get_sorted_topic_statistics = function (statistics_db, profile_
 		player_list
 	}
 end
+
 ScoreboardHelper.get_grouped_topic_statistics = function (statistics_db, profile_synchronizer)
 	assert(statistics_db, "Missing statistics_database reference.")
 	assert(profile_synchronizer, "Missing profile_synchronizer reference.")
@@ -399,6 +398,7 @@ ScoreboardHelper.get_grouped_topic_statistics = function (statistics_db, profile
 
 	return player_list
 end
+
 ScoreboardHelper.debug_get_sorted_topic_statistics = function ()
 	local player_list = {}
 
@@ -462,6 +462,7 @@ ScoreboardHelper.debug_get_sorted_topic_statistics = function ()
 		player_list
 	}
 end
+
 ScoreboardHelper.debug_get_grouped_topic_statistics = function ()
 	local player_list = {}
 
@@ -504,4 +505,4 @@ ScoreboardHelper.debug_get_grouped_topic_statistics = function ()
 	return player_list
 end
 
-return 
+return

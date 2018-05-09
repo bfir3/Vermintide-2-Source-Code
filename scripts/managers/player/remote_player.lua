@@ -1,4 +1,5 @@
 RemotePlayer = class(RemotePlayer)
+
 RemotePlayer.init = function (self, network_manager, peer, player_controlled, is_server, local_player_id, unique_id, clan_tag)
 	self.network_manager = network_manager
 	self.remote = true
@@ -17,37 +18,39 @@ RemotePlayer.init = function (self, network_manager, peer, player_controlled, is
 
 	self.index = self.game_object_id
 	self._cached_name = nil
-
-	return 
 end
+
 RemotePlayer.profile_id = function (self)
 	return self._unique_id
 end
+
 RemotePlayer.ui_id = function (self)
 	return self._unique_id
 end
+
 RemotePlayer.platform_id = function (self)
 	return self.peer_id
 end
+
 RemotePlayer.despawn = function (self)
 	assert(self.is_server)
-
-	return 
 end
+
 RemotePlayer.type = function (self)
 	return "RemotePlayer"
 end
+
 RemotePlayer.profile_index = function (self)
 	local profile_synchronizer = self.network_manager.profile_synchronizer
 	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, self.peer_id, self._local_player_id)
 
 	return profile_index
 end
+
 RemotePlayer.set_profile_index = function (self, index)
 	assert(true, "Why are we trying to set profile index for a remote player?")
-
-	return 
 end
+
 RemotePlayer.character_name = function (self)
 	local profile_synchronizer = self.network_manager.profile_synchronizer
 	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, self.peer_id, self._local_player_id)
@@ -60,9 +63,8 @@ RemotePlayer.character_name = function (self)
 	else
 		return ""
 	end
-
-	return 
 end
+
 RemotePlayer.profile_display_name = function (self)
 	local profile_synchronizer = self.network_manager.profile_synchronizer
 	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, self.peer_id, self._local_player_id)
@@ -75,33 +77,40 @@ RemotePlayer.profile_display_name = function (self)
 	else
 		return ""
 	end
-
-	return 
 end
+
 RemotePlayer.career_index = function (self)
 	return 1
 end
+
 RemotePlayer.stats_id = function (self)
 	return self._unique_id
 end
+
 RemotePlayer.telemetry_id = function (self)
 	return self._unique_id
 end
+
 RemotePlayer.local_player_id = function (self)
 	return self._local_player_id
 end
+
 RemotePlayer.network_id = function (self)
 	return self.peer_id
 end
+
 RemotePlayer.is_player_controlled = function (self)
 	return self._player_controlled
 end
+
 RemotePlayer.create_boon_handler = function (self, world)
-	return 
+	return
 end
+
 RemotePlayer.get_data = function (self, key)
 	return self._player_sync_data:get_data(key)
 end
+
 RemotePlayer.name = function (self)
 	local name = nil
 
@@ -146,6 +155,7 @@ RemotePlayer.name = function (self)
 
 	return name
 end
+
 RemotePlayer.destroy = function (self)
 	if self._player_sync_data then
 		self._player_sync_data:destroy()
@@ -154,9 +164,8 @@ RemotePlayer.destroy = function (self)
 	if self.is_server and self.game_object_id then
 		self.network_manager:destroy_game_object(self.game_object_id)
 	end
-
-	return 
 end
+
 RemotePlayer.create_game_object = function (self)
 	local empty_boon_id = NetworkLookup.boons["n/a"]
 	local game_object_data_table = {
@@ -196,37 +205,32 @@ RemotePlayer.create_game_object = function (self)
 	if script_data.network_debug then
 		print("RemotePlayer:create_game_object( )", self.game_object_id)
 	end
-
-	return 
 end
+
 RemotePlayer.cb_game_session_disconnect = function (self)
 	self.game_object_id = nil
 
 	if self.boon_handler then
 		self.boon_handler = nil
 	end
-
-	return 
 end
+
 RemotePlayer.set_game_object_id = function (self, id)
 	self.game_object_id = id
-
-	return 
 end
+
 RemotePlayer.create_sync_data = function (self)
 	assert(self._player_sync_data == nil)
 
 	self._player_sync_data = PlayerSyncData:new(self, self.network_manager)
-
-	return 
 end
+
 RemotePlayer.set_sync_data_game_object_id = function (self, id)
 	self._player_sync_data:set_game_object_id(id)
-
-	return 
 end
+
 RemotePlayer.sync_data_active = function (self)
 	return self._player_sync_data and self._player_sync_data:active()
 end
 
-return 
+return

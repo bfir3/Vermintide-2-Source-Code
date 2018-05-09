@@ -1,6 +1,7 @@
 SpecialsPacing = class(SpecialsPacing)
 local ai_utils_unit_alive = AiUtils.unit_alive
 local player_and_bot_positions = PLAYER_AND_BOT_POSITIONS
+
 SpecialsPacing.init = function (self, nav_world)
 	self.nav_world = nav_world
 	self._specials_timer = 0
@@ -10,9 +11,8 @@ SpecialsPacing.init = function (self, nav_world)
 	self.method_name = CurrentSpecialsSettings.spawn_method
 
 	self.remove_unwanted_breeds(self)
-
-	return 
 end
+
 SpecialsPacing.remove_unwanted_breeds = function (self)
 	print("SpecialsPacing:remove_unwanted_breeds:")
 
@@ -59,9 +59,8 @@ SpecialsPacing.remove_unwanted_breeds = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 SpecialsPacing.start = function (self)
 	if self.method_name then
 		self.method_data = CurrentSpecialsSettings.methods[self.method_name]
@@ -74,15 +73,14 @@ SpecialsPacing.start = function (self)
 			SpecialsPacing.setup_functions[self.method_name](t, self._specials_slots, self.method_data)
 		end
 	end
-
-	return 
 end
+
 SpecialsPacing.setup_functions = {
 	specials_by_slots = function (t, slots, method_data)
 		local specials_settings = CurrentSpecialsSettings
 
 		if #specials_settings.breeds == 0 then
-			return 
+			return
 		end
 
 		for i = 1, specials_settings.max_specials, 1 do
@@ -94,8 +92,6 @@ SpecialsPacing.setup_functions = {
 				time = time
 			}
 		end
-
-		return 
 	end
 }
 SpecialsPacing.select_breed_functions = {
@@ -103,7 +99,7 @@ SpecialsPacing.select_breed_functions = {
 		local count = FrameTable.alloc_table()
 
 		if #slots == 0 then
-			return 
+			return
 		end
 
 		for i = 1, #slots, 1 do
@@ -151,6 +147,7 @@ SpecialsPacing.select_breed_functions = {
 		return breed
 	end
 }
+
 SpecialsPacing.specials_by_slots = function (self, t, specials_settings, method_data, slots, spawn_queue)
 	local num_slots = #slots
 	local waiting = 0
@@ -218,9 +215,8 @@ SpecialsPacing.specials_by_slots = function (self, t, specials_settings, method_
 	end
 
 	self._specials_timer = t + 1
-
-	return 
 end
+
 SpecialsPacing.specials_by_time_window = function (self, t, specials_settings, method_data, slots, spawn_queue, alive_specials)
 	if self._specials_timer < t then
 		local num_alive = #alive_specials
@@ -298,13 +294,10 @@ SpecialsPacing.specials_by_time_window = function (self, t, specials_settings, m
 
 		self._specials_timer = t + 1
 	end
-
-	return 
 end
+
 SpecialsPacing.enable = function (self, state)
 	self._disabled = not state
-
-	return 
 end
 
 local function cb_special_spawned(unit, breed, optional_data)
@@ -313,23 +306,21 @@ local function cb_special_spawned(unit, breed, optional_data)
 	slot.unit = unit
 	slot.state = "alive"
 	alive_specials[#alive_specials + 1] = unit
-
-	return 
 end
 
 SpecialsPacing.update = function (self, t, alive_specials, specials_population, player_positions)
 	local specials_settings = CurrentSpecialsSettings
 
 	if specials_settings.disabled then
-		return 
+		return
 	end
 
 	if self._disabled then
-		return 
+		return
 	end
 
 	if specials_population < 1 then
-		return 
+		return
 	end
 
 	local specials_spawn_queue = self._specials_spawn_queue
@@ -363,9 +354,8 @@ SpecialsPacing.update = function (self, t, alive_specials, specials_population, 
 			end
 		end
 	end
-
-	return 
 end
+
 SpecialsPacing.delay_spawning = function (self, t, delay, per_unit_delay)
 	self._specials_timer = t + delay
 	local slots = self._specials_slots
@@ -381,9 +371,8 @@ SpecialsPacing.delay_spawning = function (self, t, delay, per_unit_delay)
 	for i = 1, #specials_spawn_queue, 1 do
 		specials_spawn_queue[i] = nil
 	end
-
-	return 
 end
+
 SpecialsPacing.debug_spawn = function (self)
 	local breeds = CurrentSpecialsSettings.breeds
 	local breed_name = breeds[math.random(#breeds)]
@@ -397,9 +386,8 @@ SpecialsPacing.debug_spawn = function (self)
 	else
 		print("debug spawning special could not find spawn position")
 	end
-
-	return 
 end
+
 SpecialsPacing.get_special_spawn_pos = function (self, spawning_rule)
 	local conflict_director = Managers.state.conflict
 	local main_path_info = conflict_director.main_path_info
@@ -468,7 +456,7 @@ SpecialsPacing.get_special_spawn_pos = function (self, spawning_rule)
 	if not pos then
 		print("FAIL: Special spawn no hidden pos found :/ ")
 
-		return 
+		return
 	end
 
 	return pos
@@ -526,8 +514,6 @@ local function cb_rush_intervention_unit_spawned(unit, breed, optional_data)
 	slot.desc = "rush intervention"
 
 	print("rush intervention - spawning ", breed.name)
-
-	return 
 end
 
 SpecialsPacing.request_rushing_intervention = function (self, t, player_unit, main_path_info, main_path_player_info)
@@ -584,8 +570,6 @@ SpecialsPacing.request_rushing_intervention = function (self, t, player_unit, ma
 
 		return true, "rush special"
 	end
-
-	return 
 end
 
 local function cb_outside_navmesh_intervention_unit_spawned(special_unit, breed, optional_data)
@@ -598,8 +582,6 @@ local function cb_outside_navmesh_intervention_unit_spawned(special_unit, breed,
 	slot.time = nil
 	slot.state = "alive"
 	slot.desc = "outside navmesh intervention"
-
-	return 
 end
 
 SpecialsPacing.request_outside_navmesh_intervention = function (self, player_unit)
@@ -651,9 +633,8 @@ SpecialsPacing.request_outside_navmesh_intervention = function (self, player_uni
 
 		return true, breed_name
 	end
-
-	return 
 end
+
 SpecialsPacing.get_relative_main_path_pos = function (self, main_paths, player_info, extra_distance)
 	local path_pos, path_index = MainPathUtils.point_on_mainpath(main_paths, player_info.travel_dist + extra_distance)
 	local epicenter, failed = nil
@@ -667,6 +648,7 @@ SpecialsPacing.get_relative_main_path_pos = function (self, main_paths, player_i
 
 	return epicenter, failed
 end
+
 SpecialsPacing.debug = function (self, t, alive_specials, specials_population, slots)
 	if script_data.debug_ai_pacing then
 		local s = ""
@@ -689,8 +671,6 @@ SpecialsPacing.debug = function (self, t, alive_specials, specials_population, s
 
 		Debug.text("Specials: " .. s)
 	end
-
-	return 
 end
 
-return 
+return

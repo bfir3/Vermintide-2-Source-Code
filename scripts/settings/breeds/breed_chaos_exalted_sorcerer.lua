@@ -300,8 +300,6 @@ local action_data = {
 			table.shuffle(angles)
 
 			blackboard.random_flower_angles = angles
-
-			return 
 		end
 	},
 	spawn_multiple_wave = {
@@ -333,8 +331,6 @@ local action_data = {
 			if hit_pos then
 				return hit_pos
 			end
-
-			return 
 		end
 	},
 	cast_missile = {
@@ -419,8 +415,6 @@ local action_data = {
 		},
 		init_spell_func = function (blackboard)
 			blackboard.current_spell = blackboard.sorcerer_strike_missile_data
-
-			return 
 		end,
 		get_throw_position_func = function (unit, blackboard, target_position)
 			local ai_inventory_ext = ScriptUnit.has_extension(unit, "ai_inventory_system")
@@ -606,8 +600,6 @@ local action_data = {
 		},
 		init_spell_func = function (blackboard)
 			blackboard.current_spell = blackboard.sorcerer_strike_missile_data
-
-			return 
 		end,
 		get_throw_position_func = function (unit, blackboard, target_position)
 			local ai_inventory_ext = ScriptUnit.has_extension(unit, "ai_inventory_system")
@@ -693,8 +685,6 @@ local action_data = {
 		},
 		init_spell_func = function (blackboard)
 			blackboard.current_spell = blackboard.seeking_bomb_missile_data
-
-			return 
 		end
 	},
 	intro_idle = {
@@ -905,4 +895,4 @@ action_data.magic_missile_skulking = copy_action_data("magic_missile_skulking", 
 action_data.seeking_bomb_missile_skulking = copy_action_data("seeking_bomb_missile_skulking", action_data.skulking, "seeking_bomb_missile")
 BreedActions.chaos_exalted_sorcerer = table.create_copy(BreedActions.chaos_exalted_sorcerer, action_data)
 
-return 
+return

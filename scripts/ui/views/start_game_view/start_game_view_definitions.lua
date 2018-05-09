@@ -103,7 +103,7 @@ local settings_by_screen = {
 			0
 		},
 		require_function = function ()
-			return 
+			return
 		end,
 		contains_new_content = function ()
 			return false
@@ -131,7 +131,7 @@ local settings_by_screen = {
 			0
 		},
 		require_function = function ()
-			return 
+			return
 		end,
 		contains_new_content = function ()
 			return false

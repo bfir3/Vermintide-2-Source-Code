@@ -3,11 +3,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 BTTentacleAttackAction = class(BTTentacleAttackAction, BTNode)
 BTTentacleAttackAction.name = "BTTentacleAttackAction"
 local swipe_attack = false
+
 BTTentacleAttackAction.init = function (self, ...)
 	BTTentacleAttackAction.super.init(self, ...)
-
-	return 
 end
+
 BTTentacleAttackAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -22,9 +22,8 @@ BTTentacleAttackAction.enter = function (self, unit, blackboard, t)
 	self.sync_state_to_clients(self, unit, blackboard, "attack", 0, t)
 
 	blackboard.tentacle_satisfied = false
-
-	return 
 end
+
 BTTentacleAttackAction.sync_state_to_clients = function (self, unit, blackboard, template_name, reach_dist, t)
 	local network_manager = Managers.state.network
 	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
@@ -33,15 +32,14 @@ BTTentacleAttackAction.sync_state_to_clients = function (self, unit, blackboard,
 	reach_dist = math.clamp(reach_dist, 0, 31)
 
 	network_manager.network_transmit:send_rpc_clients("rpc_change_tentacle_state", unit_id, target_unit_id, template_id, reach_dist, t)
-
-	return 
 end
+
 BTTentacleAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.tentacle_satisfied = true
-
-	return 
 end
+
 local Unit_alive = Unit.alive
+
 BTTentacleAttackAction.run = function (self, unit, blackboard, t, dt)
 	if self.update_tentacle(self, unit, blackboard, t, dt) then
 		return "running"
@@ -49,7 +47,9 @@ BTTentacleAttackAction.run = function (self, unit, blackboard, t, dt)
 
 	return "done"
 end
+
 local evade_length = 10
+
 BTTentacleAttackAction.update_tentacle = function (self, unit, blackboard, t, dt)
 	local data = blackboard.tentacle_data
 	local target_unit = blackboard.current_target
@@ -242,6 +242,7 @@ BTTentacleAttackAction.update_tentacle = function (self, unit, blackboard, t, dt
 
 	return true
 end
+
 BTTentacleAttackAction.dist_sqr_to_tentacle_tip = function (self, unit, tentacle_data, target_unit)
 	local tip_node = tentacle_data.bone_nodes[tentacle_data.num_bone_nodes]
 	local tentacle_tip_pos = Unit.world_position(unit, tip_node)
@@ -250,23 +251,21 @@ BTTentacleAttackAction.dist_sqr_to_tentacle_tip = function (self, unit, tentacle
 
 	return dist_sqr
 end
+
 BTTentacleAttackAction.target_evade_through_dodge_check = function (self, action, tentacle_data, target_unit, dist_to_tip_sqr)
 	local target_status_extension = ScriptUnit.has_extension(target_unit, "status_system")
 
 	if target_status_extension and target_status_extension.is_dodging and action.dodge_mitigation_radius_squared < dist_to_tip_sqr then
 		return true
 	end
-
-	return 
 end
+
 BTTentacleAttackAction.target_tentacle_status_check = function (self, target_unit, status)
 	local target_status_extension = ScriptUnit.has_extension(target_unit, "status_system")
 
 	if target_status_extension and target_status_extension.grabbed_by_tentacle_status == status then
 		return true
 	end
-
-	return 
 end
 
-return 
+return

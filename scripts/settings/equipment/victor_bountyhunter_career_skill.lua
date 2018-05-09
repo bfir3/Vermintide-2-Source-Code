@@ -132,7 +132,7 @@ weapon_template.actions = {
 			end,
 			allowed_chain_actions = {},
 			enter_function = function (attacker_unit, input_extension)
-				return 
+				return
 			end,
 			condition_func = function (user_unit)
 				return true
@@ -220,4 +220,4 @@ weapon_template.wwise_dep_left_hand = {
 Weapons = Weapons or {}
 Weapons.victor_bountyhunter_career_skill_weapon = table.create_copy(Weapons.victor_bountyhunter_career_skill_weapon, weapon_template)
 
-return 
+return

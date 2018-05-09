@@ -7,13 +7,14 @@ local definitions = dofile("scripts/ui/views/console_cursor_view_definitions")
 local DO_RELOAD = true
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
 ConsoleCursorView = class(ConsoleCursorView)
+
 ConsoleCursorView.init = function (self, world)
 	self._world = world
 	self._ui_renderer = UIRenderer.create(world, "material", "materials/ui/ui_1080p_loading")
@@ -24,9 +25,8 @@ ConsoleCursorView.init = function (self, world)
 	self._create_ui_elements(self)
 
 	DO_RELOAD = false
-
-	return 
 end
+
 ConsoleCursorView._create_ui_elements = function (self)
 	self._ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 	self._widgets = {}
@@ -36,9 +36,8 @@ ConsoleCursorView._create_ui_elements = function (self)
 	end
 
 	UIRenderer.clear_scenegraph_queue(self._ui_renderer)
-
-	return 
 end
+
 ConsoleCursorView.update = function (self, dt)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -47,17 +46,17 @@ ConsoleCursorView.update = function (self, dt)
 	end
 
 	if not Managers.input:is_device_active("gamepad") then
-		return 
+		return
 	end
 
 	self._update_position(self, dt)
 	self._draw(self, dt)
+end
 
-	return 
-end
 ConsoleCursorView._update_position = function (self, dt)
-	return 
+	return
 end
+
 ConsoleCursorView._draw = function (self, dt)
 	local ui_renderer = self._ui_renderer
 	local ui_scenegraph = self._ui_scenegraph
@@ -69,8 +68,6 @@ ConsoleCursorView._draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
 
-return 
+return

@@ -2,6 +2,7 @@ require("scripts/managers/world_interaction/world_interaction_settings")
 
 WorldInteractionManager = class(WorldInteractionManager)
 local ENEMIES = {}
+
 WorldInteractionManager.init = function (self, world)
 	self._world = world
 	self._water_timer = 0
@@ -9,31 +10,27 @@ WorldInteractionManager.init = function (self, world)
 	self._units = {}
 
 	self._setup_gui(self)
-
-	return 
 end
+
 WorldInteractionManager._setup_gui = function (self)
 	self._gui = World.create_screen_gui(self._world, "material", "materials/world_interaction/world_interaction", "immediate")
-
-	return 
 end
+
 WorldInteractionManager.add_world_interaction = function (self, material, unit)
 	self.remove_world_interaction(self, unit, material)
 
 	self._units[material] = self._units[material] or {}
 	self._units[material][unit] = self._units[material][unit] or Managers.time:time("game")
-
-	return 
 end
+
 WorldInteractionManager.remove_world_interaction = function (self, unit, material_to_ignore)
 	for material, units in pairs(self._units) do
 		if not material_to_ignore or material_to_ignore ~= material then
 			units[unit] = nil
 		end
 	end
-
-	return 
 end
+
 WorldInteractionManager._add_water_ripple = function (self, pos, angle, material, random_size_diff, stretch_multiplier, ref_time, size, multiplier)
 	local water_settings = WorldInteractionSettings.water
 	local random_ripple_size_diff = water_settings.random_ripple_size_diff
@@ -48,9 +45,8 @@ WorldInteractionManager._add_water_ripple = function (self, pos, angle, material
 		default_size = size,
 		multiplier = multiplier
 	}
-
-	return 
 end
+
 WorldInteractionManager.add_simple_effect = function (self, material, unit, position)
 	local player_manager = Managers.player
 	local local_player = player_manager.local_player(player_manager)
@@ -66,9 +62,8 @@ WorldInteractionManager.add_simple_effect = function (self, material, unit, posi
 			self["_add_simple_" .. material .. "_effect"](self, unit, position)
 		end
 	end
-
-	return 
 end
+
 WorldInteractionManager._add_simple_water_effect = function (self, unit, position)
 	local water_settings = WorldInteractionSettings.water
 	local water_splash_settings = water_settings.splash
@@ -90,17 +85,15 @@ WorldInteractionManager._add_simple_water_effect = function (self, unit, positio
 			self._add_water_ripple(self, position, 0, material, random_size_diff, stretch_multiplier, timer_ref, start_size, multiplier)
 		end
 	end
-
-	return 
 end
+
 WorldInteractionManager.update = function (self, dt, t)
 	if Managers.state.network:game() then
 		self._update_water(self, dt, t)
 		self._update_foliage(self, dt, t)
 	end
-
-	return 
 end
+
 WorldInteractionManager._update_water = function (self, dt, t)
 	local available_units = self._units.water
 	local local_player = Managers.player:local_player()
@@ -111,10 +104,10 @@ WorldInteractionManager._update_water = function (self, dt, t)
 		self._update_water_data(self, dt, t)
 		self._update_water_ripples(self, dt, t)
 	end
-
-	return 
 end
+
 local UNITS_TO_REMOVE = {}
+
 WorldInteractionManager._cleanup_removed_units = function (self)
 	local spawn_manager = Managers.state.spawn
 	local unit_spawner = spawn_manager.unit_spawner
@@ -135,10 +128,10 @@ WorldInteractionManager._cleanup_removed_units = function (self)
 			units[unit] = nil
 		end
 	end
-
-	return 
 end
+
 local COLLECTED_UNITS = {}
+
 WorldInteractionManager._update_water_data = function (self, dt, t)
 	local water_settings = WorldInteractionSettings.water
 	local window_size = math.clamp(water_settings.window_size, 1, 100)
@@ -225,10 +218,10 @@ WorldInteractionManager._update_water_data = function (self, dt, t)
 	end
 
 	self._water_timer = self._water_timer + dt
-
-	return 
 end
+
 local DATA_TO_REMOVE = {}
+
 WorldInteractionManager._update_water_ripples = function (self, dt, t)
 	table.clear(DATA_TO_REMOVE)
 
@@ -338,9 +331,8 @@ WorldInteractionManager._update_water_ripples = function (self, dt, t)
 
 		table.remove(self._water_ripples, idx)
 	end
-
-	return 
 end
+
 WorldInteractionManager._update_foliage = function (self, dt, t)
 	local local_player = Managers.player:local_player()
 	local local_player_unit = local_player and local_player.player_unit
@@ -349,10 +341,10 @@ WorldInteractionManager._update_foliage = function (self, dt, t)
 		self._update_foliage_players(self, dt, t)
 		self._update_foliage_ai(self, local_player_unit, dt, t)
 	end
-
-	return 
 end
+
 local TEXTURE_SIZE = {}
+
 WorldInteractionManager._update_foliage_players = function (self, dt, t)
 	local foliage_settings = WorldInteractionSettings.foliage
 	local material_name = foliage_settings.default_foliage_material
@@ -413,9 +405,8 @@ WorldInteractionManager._update_foliage_players = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 WorldInteractionManager._update_foliage_ai = function (self, local_player_unit, dt, t)
 	local foliage_settings = WorldInteractionSettings.foliage
 	local material_name = foliage_settings.default_foliage_material
@@ -464,11 +455,10 @@ WorldInteractionManager._update_foliage_ai = function (self, local_player_unit, 
 			end
 		end
 	end
-
-	return 
 end
+
 WorldInteractionManager.destory = function (self)
-	return 
+	return
 end
 
-return 
+return

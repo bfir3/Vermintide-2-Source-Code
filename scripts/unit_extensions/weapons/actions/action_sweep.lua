@@ -7,6 +7,7 @@ end
 
 local unit_get_data = Unit.get_data
 ActionSweep = class(ActionSweep)
+
 ActionSweep.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.world = world
 	self.owner_unit = owner_unit
@@ -33,9 +34,8 @@ ActionSweep.init = function (self, world, item_name, is_server, owner_unit, dama
 		mode = "retained",
 		name = "weapon_system"
 	})
-
-	return 
 end
+
 ActionSweep.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level, action_init_data)
 	self.has_played_rumble_effect = false
 	self.current_action = new_action
@@ -182,9 +182,8 @@ ActionSweep.client_owner_start_action = function (self, new_action, t, chain_act
 	end
 
 	self._drawer:reset()
-
-	return 
 end
+
 local SWEEP_RESULTS = {}
 
 if PhysicsWorld.stop_reusing_sweep_tables then
@@ -235,9 +234,8 @@ ActionSweep.client_owner_post_update = function (self, dt, t, world, _, current_
 			hud_extension.show_critical_indication = false
 		end
 	end
-
-	return 
 end
+
 ActionSweep._is_within_damage_window = function (self, current_time_in_action, action, owner_unit)
 	local damage_window_start = action.damage_window_start
 	local damage_window_end = action.damage_window_end
@@ -255,6 +253,7 @@ ActionSweep._is_within_damage_window = function (self, current_time_in_action, a
 
 	return after_start and before_end
 end
+
 ActionSweep._calculate_hit_mass = function (self, difficulty_rank, target_health_extension, actual_hit_target_index, shield_blocked, current_action, breed, hit_unit_id)
 	local can_damage = false
 	local can_stagger = false
@@ -294,6 +293,7 @@ ActionSweep._calculate_hit_mass = function (self, difficulty_rank, target_health
 
 	return math.ceil(actual_hit_target_index), shield_blocked, can_damage, can_stagger
 end
+
 ActionSweep._calculate_hit_mass_level_object = function (self, unit, target_health_extension, actual_hit_target_index, current_action)
 	local can_damage = false
 	local can_stagger = false
@@ -312,9 +312,8 @@ ActionSweep._calculate_hit_mass_level_object = function (self, unit, target_heal
 		self.amount_of_mass_hit = self.amount_of_mass_hit + hit_mass_total
 		self.number_of_hit_enemies = self.number_of_hit_enemies + 1
 	end
-
-	return 
 end
+
 ActionSweep._do_overlap = function (self, dt, t, unit, owner_unit, current_action, physics_world, can_damage, current_position, current_rotation)
 	local drawer = self._drawer
 	local current_time_in_action = t - self.action_time_started
@@ -323,7 +322,7 @@ ActionSweep._do_overlap = function (self, dt, t, unit, owner_unit, current_actio
 	local weapon_system = self.weapon_system
 
 	if self.attack_aborted then
-		return 
+		return
 	end
 
 	local weapon_up_dir = Quaternion.up(current_rotation)
@@ -337,7 +336,7 @@ ActionSweep._do_overlap = function (self, dt, t, unit, owner_unit, current_actio
 		self.stored_position:store(last_position_current)
 		self.stored_rotation:store(current_rotation)
 
-		return 
+		return
 	end
 
 	final_frame = not can_damage and self.could_damage_last_update
@@ -812,9 +811,8 @@ ActionSweep._do_overlap = function (self, dt, t, unit, owner_unit, current_actio
 	if PhysicsWorld.stop_reusing_sweep_tables then
 		PhysicsWorld.stop_reusing_sweep_tables()
 	end
-
-	return 
 end
+
 ActionSweep._play_environmental_effect = function (self, weapon_rotation, current_action, hit_unit, hit_position, hit_normal, hit_actor)
 	local weapon_fwd = Quaternion.forward(weapon_rotation)
 	local weapon_right = Quaternion.right(weapon_rotation)
@@ -840,9 +838,8 @@ ActionSweep._play_environmental_effect = function (self, weapon_rotation, curren
 		drawer.vector(drawer, hit_position - impact_direction * 0.1, impact_direction * 0.1)
 		drawer.vector(drawer, hit_position - impact_direction * 0.1, weapon_fwd * 0.1)
 	end
-
-	return 
 end
+
 ActionSweep._play_character_impact = function (self, is_server, attacker_unit, hit_unit, breed, hit_position, hit_zone_name, current_action, damage_profile, target_index, power_level, attack_direction, blocking, boost_curve_multiplier, is_critical_strike, backstab_multiplier)
 	local attacker_player = Managers.player:owner(attacker_unit)
 	local husk = attacker_player.bot_player
@@ -923,7 +920,7 @@ ActionSweep._play_character_impact = function (self, is_server, attacker_unit, h
 
 	if sound_event then
 		if not sound_type then
-			return 
+			return
 		end
 
 		EffectHelper.play_melee_hit_effects(sound_event, world, hit_position, sound_type, husk, hit_unit)
@@ -965,7 +962,7 @@ ActionSweep._play_character_impact = function (self, is_server, attacker_unit, h
 	local staggered = nil
 
 	if blocking then
-		return 
+		return
 	end
 
 	if not husk and not target_presumed_dead and breed and not breed.disable_local_hit_reactions and Unit.has_animation_state_machine(hit_unit) then
@@ -998,9 +995,8 @@ ActionSweep._play_character_impact = function (self, is_server, attacker_unit, h
 
 		Unit.animation_event(hit_unit, hit_anim)
 	end
-
-	return 
 end
+
 ActionSweep.hit_level_object = function (self, hit_units, hit_unit, owner_unit, current_action, attack_direction, level_index, is_dummy_unit, hit_actor)
 	hit_units[hit_unit] = true
 	self.has_hit_environment = true
@@ -1044,9 +1040,8 @@ ActionSweep.hit_level_object = function (self, hit_units, hit_unit, owner_unit, 
 
 		Unit.animation_event(first_person_unit, first_person_hit_anim)
 	end
-
-	return 
 end
+
 ActionSweep.finish = function (self, reason, data)
 	if reason == "interacting" then
 		Unit.flow_event(self.weapon_unit, "lua_finish_interacting")
@@ -1071,13 +1066,13 @@ ActionSweep.finish = function (self, reason, data)
 	end
 
 	if not script_data.debug_weapons_always_hit_target then
-		return 
+		return
 	end
 
 	local target_breed_unit = self.target_breed_unit
 
 	if target_breed_unit == nil or self.has_hit_target then
-		return 
+		return
 	end
 
 	weapon_printf("FINISHING OFF MISSED TARGET")
@@ -1101,12 +1096,12 @@ ActionSweep.finish = function (self, reason, data)
 
 	DamageUtils.buff_on_attack(owner_unit, target_breed_unit, charge_value, is_critical_strike, hit_zone_name, self.number_of_hit_enemies + 1, send_to_server)
 	weapon_system.send_rpc_attack_hit(weapon_system, NetworkLookup.damage_sources[self.item_name], attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", hit_target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", melee_boost_curve_multiplier, "is_critical_strike", is_critical_strike)
+end
 
-	return 
-end
 ActionSweep.destroy = function (self)
-	return 
+	return
 end
+
 ActionSweep._play_hit_animations = function (self, owner_unit, current_action, abort_attack, hit_zone_name, armor_type, blocking)
 	local hit_stop_anim = (current_action.dual_hit_stop_anims and self.action_hand and current_action.dual_hit_stop_anims[self.action_hand]) or current_action.hit_stop_anim
 	local first_person_hit_anim = (hit_zone_name ~= "head" and armor_type == 2 and abort_attack and current_action.hit_armor_anim) or (abort_attack and blocking and current_action.hit_shield_stop_anim) or (abort_attack and hit_stop_anim) or current_action.first_person_hit_anim
@@ -1123,8 +1118,6 @@ ActionSweep._play_hit_animations = function (self, owner_unit, current_action, a
 	if third_person_hit_anim then
 		CharacterStateHelper.play_animation_event(owner_unit, third_person_hit_anim)
 	end
-
-	return 
 end
 
-return 
+return

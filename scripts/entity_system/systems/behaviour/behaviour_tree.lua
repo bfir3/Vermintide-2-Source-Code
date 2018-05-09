@@ -193,24 +193,27 @@ end
 
 BehaviorTree = class(BehaviorTree)
 BehaviorTree.types = {}
+
 BehaviorTree.init = function (self, lua_tree_node, name)
 	self._root = nil
 	self._name = name
 	self._action_data = {}
 
 	self.parse_lua_tree(self, lua_tree_node)
-
-	return 
 end
+
 BehaviorTree.action_data = function (self)
 	return self._action_data
 end
+
 BehaviorTree.root = function (self)
 	return self._root
 end
+
 BehaviorTree.name = function (self)
 	return self._name
 end
+
 local CLASS_NAME = 1
 
 local function create_btnode_from_lua_node(lua_node, parent_btnode)
@@ -227,17 +230,14 @@ local function create_btnode_from_lua_node(lua_node, parent_btnode)
 	else
 		return class_type.new(class_type, identifier, parent_btnode, condition_name, enter_hook_name, leave_hook_name, lua_node), action_data
 	end
-
-	return 
 end
 
 BehaviorTree.parse_lua_tree = function (self, lua_root_node)
 	self._root = create_btnode_from_lua_node(lua_root_node)
 
 	self.parse_lua_node(self, lua_root_node, self._root)
-
-	return 
 end
+
 BehaviorTree.parse_lua_node = function (self, lua_node, parent)
 	local num_children = #lua_node
 
@@ -261,8 +261,6 @@ BehaviorTree.parse_lua_node = function (self, lua_node, parent)
 	if parent.ready then
 		parent.ready(parent, lua_node)
 	end
-
-	return 
 end
 
-return 
+return

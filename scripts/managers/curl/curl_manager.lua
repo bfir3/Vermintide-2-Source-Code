@@ -1,11 +1,11 @@
 CurlManager = class(CurlManager)
+
 CurlManager.init = function (self)
 	self._curl = lcurl.stingray_init()
 	self._multi = self._curl.multi()
 	self._requests = {}
-
-	return 
 end
+
 CurlManager.destroy = function (self)
 	local timeout_at = os.time() + 10
 
@@ -22,9 +22,8 @@ CurlManager.destroy = function (self)
 	for handle, request in pairs(self._requests) do
 		handle.close(handle)
 	end
-
-	return 
 end
+
 local Request = {
 	__index = Request,
 	new = function ()
@@ -35,8 +34,6 @@ local Request = {
 	end,
 	OnResponse = function (self, data)
 		self.data = (self.data and self.data .. data) or data
-
-		return 
 	end,
 	OnHeader = function (self, data)
 		local k, v = data.match(data, "([^:]+):%s+([^:]+)")
@@ -44,10 +41,9 @@ local Request = {
 		if k ~= nil then
 			self.headers[k] = string.gsub(v, "\r\n", "")
 		end
-
-		return 
 	end
 }
+
 CurlManager.update = function (self, handle_callbacks)
 	Deadlock.pause()
 
@@ -79,12 +75,12 @@ CurlManager.update = function (self, handle_callbacks)
 
 		handle.close(handle)
 	end
-
-	return 
 end
+
 CurlManager._num_requests = function (self)
 	return table.size(self._requests)
 end
+
 CurlManager.add_request = function (self, request_type, url, body, headers, user_cb, userdata, options)
 	local easy = self._curl.easy()
 
@@ -123,33 +119,26 @@ CurlManager.add_request = function (self, request_type, url, body, headers, user
 	self._multi:add_handle(easy)
 
 	self._requests[easy] = request
-
-	return 
 end
+
 CurlManager.get = function (self, url, headers, request_cb, userdata, options)
 	self.add_request(self, "GET", url, nil, headers, request_cb, userdata, options)
-
-	return 
 end
+
 CurlManager.post = function (self, url, body, headers, request_cb, userdata, options)
 	self.add_request(self, "POST", url, body, headers, request_cb, userdata, options)
-
-	return 
 end
+
 CurlManager.put = function (self, url, body, headers, request_cb, userdata, options)
 	self.add_request(self, "PUT", url, body, headers, request_cb, userdata, options)
-
-	return 
 end
+
 CurlManager.delete = function (self, url, body, headers, request_cb, userdata, options)
 	self.add_request(self, "DELETE", url, body, headers, request_cb, userdata, options)
-
-	return 
 end
+
 CurlManager.patch = function (self, url, body, headers, request_cb, userdata, options)
 	self.add_request(self, "PATCH", url, body, headers, request_cb, userdata, options)
-
-	return 
 end
 
 local function create_read_function(data)
@@ -161,8 +150,6 @@ local function create_read_function(data)
 
 			return data
 		end
-
-		return 
 	end
 end
 
@@ -179,8 +166,6 @@ CurlManager.upload = function (self, url, data, cb)
 	self._multi:add_handle(easy)
 
 	self._requests[easy] = request
-
-	return 
 end
 
-return 
+return

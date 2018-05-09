@@ -6,9 +6,11 @@ NavBotConfiguration = NavClass(NavBotConfiguration)
 local NavHelpers = safe_require("core/gwnav/lua/runtime/navhelpers")
 local Unit = stingray.Unit
 local GwNavTagLayerCostTable = stingray.GwNavTagLayerCostTable
+
 NavBotConfiguration.get_configuration_value = function (self, default, ...)
 	return NavHelpers.unit_script_data(self.unit, default, ...)
 end
+
 NavBotConfiguration.init = function (self, bot_configuration_unit)
 	self.unit = bot_configuration_unit
 	self.config_name = "GwNavBotConfiguration"
@@ -60,9 +62,8 @@ NavBotConfiguration.init = function (self, bot_configuration_unit)
 
 	self.target_group = self.get_configuration_value(self, "default", self.config_name, "target_group")
 	self.is_player = self.get_configuration_value(self, false, self.config_name, "is_player")
-
-	return 
 end
+
 NavBotConfiguration.configure_bot = function (self, bot)
 	bot.set_use_avoidance(bot, self.enable_avoidance)
 	bot.set_use_channel(bot, self.use_channel)
@@ -74,15 +75,12 @@ NavBotConfiguration.configure_bot = function (self, bot)
 	bot.set_propagation_box(bot, self.pathfinder_propagation_box_extent)
 	bot.set_outside_navmesh_distance(bot, self.pathfinder_from_outside_navmesh_distance, self.pathfinder_to_outside_navmesh_distance)
 	bot.set_navtag_layer_cost_table(bot, self.navtag_layer_cost_table)
-
-	return 
 end
+
 NavBotConfiguration.shutdown = function (self)
 	GwNavTagLayerCostTable.destroy(self.navtag_layer_cost_table)
 
 	self.navtag_layer_cost_table = nil
-
-	return 
 end
 
 return NavBotConfiguration

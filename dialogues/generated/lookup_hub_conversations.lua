@@ -73,4 +73,4 @@ DialogueLookup[DialogueLookup_n + 35] = "nfl_hub_banter_kept_alive"
 DialogueLookup[DialogueLookup_n + 36] = "nfl_hub_call_out"
 DialogueLookup_n = DialogueLookup_n + 36
 
-return 
+return

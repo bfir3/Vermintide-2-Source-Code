@@ -1,29 +1,30 @@
 local PING_COOLDOWN = 2
 local PING_RANGE = 50
 ContextAwarePingExtension = class(ContextAwarePingExtension)
+
 ContextAwarePingExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self._world = extension_init_context.world
 	self._physics_world = World.get_data(self._world, "physics_world")
 	self._unit = unit
 	self._player = extension_init_data.player
 	self.ping_timer = 0
-
-	return 
 end
+
 ContextAwarePingExtension.extensions_ready = function (self, world, unit)
 	self.input_extension = ScriptUnit.extension(unit, "input_system")
 	self.first_person_extension = ScriptUnit.extension(unit, "first_person_system")
 	self.status_extension = ScriptUnit.extension(unit, "status_system")
+end
 
-	return 
-end
 ContextAwarePingExtension.destroy = function (self)
-	return 
+	return
 end
+
 local INDEX_POSITION = 1
 local INDEX_DISTANCE = 2
 local INDEX_NORMAL = 3
 local INDEX_ACTOR = 4
+
 ContextAwarePingExtension.update = function (self, unit, input, dt, context, t)
 	local ping = self.input_extension:get("ping")
 
@@ -82,8 +83,6 @@ ContextAwarePingExtension.update = function (self, unit, input, dt, context, t)
 			self.ping_timer = t + PING_COOLDOWN
 		end
 	end
-
-	return 
 end
 
-return 
+return

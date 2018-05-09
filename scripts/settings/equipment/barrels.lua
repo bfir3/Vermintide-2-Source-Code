@@ -127,4 +127,4 @@ Weapons.beer_barrel.actions.action_one.default.projectile_info = {
 	projectile_unit_name = "units/weapons/player/pup_explosive_barrel/pup_explosive_barrel_01"
 }
 
-return 
+return

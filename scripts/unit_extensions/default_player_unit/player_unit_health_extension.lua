@@ -16,8 +16,6 @@ local function _add_player_damaged_telemetry(unit, damage_type, damage_source)
 			Managers.telemetry.events:player_damaged(owner, damage_type, damage_source, position)
 		end
 	end
-
-	return 
 end
 
 PlayerUnitHealthExtension.init = function (self, extension_init_context, unit, extension_init_data)
@@ -41,22 +39,20 @@ PlayerUnitHealthExtension.init = function (self, extension_init_context, unit, e
 	if self.is_server and not is_local_player and not is_bot then
 		self.create_health_game_object(self)
 	end
+end
 
-	return 
-end
 PlayerUnitHealthExtension.hot_join_sync = function (self, sender)
-	return 
+	return
 end
+
 PlayerUnitHealthExtension.cb_game_session_disconnect = function (self)
 	self.health_game_object_id = nil
-
-	return 
 end
+
 PlayerUnitHealthExtension.set_health_game_object_id = function (self, go_id)
 	self.health_game_object_id = go_id
-
-	return 
 end
+
 PlayerUnitHealthExtension.create_health_game_object = function (self)
 	fassert(self.is_server, "Trying to create health game object on a client")
 
@@ -79,9 +75,8 @@ PlayerUnitHealthExtension.create_health_game_object = function (self)
 	self.health_game_object_id = health_game_object_id
 	self.previous_max_health = max_health_alive
 	self.previous_state = self.state
-
-	return 
 end
+
 PlayerUnitHealthExtension.sync_health_state = function (self)
 	local player = self.player
 	local health_state, health_percentage, temporary_health_percentage, melee_ammo, ranged_ammo = Managers.state.spawn:get_status(player)
@@ -101,9 +96,8 @@ PlayerUnitHealthExtension.sync_health_state = function (self)
 			self._knock_down(self, self.unit)
 		end
 	end
-
-	return 
 end
+
 PlayerUnitHealthExtension._get_base_max_health = function (self)
 	local profile_index = self._profile_index
 	local career_index = self._career_index
@@ -113,6 +107,7 @@ PlayerUnitHealthExtension._get_base_max_health = function (self)
 
 	return attributes.max_hp, attributes.max_hp_kd
 end
+
 PlayerUnitHealthExtension._calculate_max_health = function (self)
 	local buff_extension = self.buff_extension
 	local health_state = self.state
@@ -141,6 +136,7 @@ PlayerUnitHealthExtension._calculate_max_health = function (self)
 
 	return max_health
 end
+
 PlayerUnitHealthExtension.extensions_ready = function (self, world, unit)
 	self.status_extension = ScriptUnit.extension(unit, "status_system")
 	self.buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -148,26 +144,23 @@ PlayerUnitHealthExtension.extensions_ready = function (self, world, unit)
 	if self.is_server and not self.is_bot then
 		self.sync_health_state(self)
 	end
-
-	return 
 end
+
 PlayerUnitHealthExtension._knock_down = function (self, unit)
 	self.state = "knocked_down"
 
 	StatusUtils.set_knocked_down_network(unit, true)
 	StatusUtils.set_wounded_network(unit, false, "knocked_down")
-
-	return 
 end
+
 PlayerUnitHealthExtension._revive = function (self, unit, t)
 	self.state = "alive"
 
 	StatusUtils.set_knocked_down_network(unit, false)
 	StatusUtils.set_wounded_network(unit, true, "revived", t)
 	StatusUtils.set_revived_network(unit, false)
-
-	return 
 end
+
 PlayerUnitHealthExtension.update = function (self, dt, context, t)
 	local status_extension = self.status_extension
 	local game_object_id = self.health_game_object_id
@@ -256,13 +249,13 @@ PlayerUnitHealthExtension.update = function (self, dt, context, t)
 		self.previous_state = state
 		self.previous_max_health = max_health
 	end
-
-	return 
 end
+
 local FORCED_PERMANENT_DAMAGE_TYPES = {}
+
 PlayerUnitHealthExtension.add_damage = function (self, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike, added_dot)
 	if DamageUtils.is_in_inn then
-		return 
+		return
 	end
 
 	local breed = Unit.get_data(attacker_unit, "breed")
@@ -370,9 +363,8 @@ PlayerUnitHealthExtension.add_damage = function (self, attacker_unit, damage_amo
 			self.network_transmit:send_rpc_clients("rpc_add_damage", unit_id, false, attacker_unit_id, attacker_is_level_unit, damage_amount, hit_zone_id, damage_type_id, damage_direction, damage_source_id, hit_ragdoll_actor_id, hit_react_type_id, is_dead, is_critical_strike, added_dot)
 		end
 	end
-
-	return 
 end
+
 PlayerUnitHealthExtension.add_heal = function (self, healer_unit, heal_amount, heal_source_name, heal_type)
 	local unit = self.unit
 
@@ -410,12 +402,11 @@ PlayerUnitHealthExtension.add_heal = function (self, healer_unit, heal_amount, h
 			network_transmit.send_rpc_clients(network_transmit, "rpc_heal", unit_id, false, healer_unit_id, healer_is_level_unit, heal_amount, heal_type_id)
 		end
 	end
-
-	return 
 end
+
 PlayerUnitHealthExtension.die = function (self, damage_type)
 	if not self.is_server then
-		return 
+		return
 	end
 
 	damage_type = damage_type or "undefined"
@@ -438,7 +429,7 @@ PlayerUnitHealthExtension.die = function (self, damage_type)
 				ScriptUnit.extension(unit, "ai_navigation_system"):teleport(pos)
 				ScriptUnit.extension(unit, "ai_system"):clear_failed_paths()
 
-				return 
+				return
 			end
 		end
 	end
@@ -448,18 +439,16 @@ PlayerUnitHealthExtension.die = function (self, damage_type)
 	local damage_direction = Vector3.up()
 
 	self.add_damage(self, unit, damage_amount, hit_zone_name, damage_type, damage_direction)
-
-	return 
 end
+
 PlayerUnitHealthExtension.destroy = function (self)
 	if self.is_server and self.health_game_object_id then
 		self.network_manager:destroy_game_object(self.health_game_object_id)
 
 		self.health_game_object_id = nil
 	end
-
-	return 
 end
+
 PlayerUnitHealthExtension.reset = function (self)
 	if self.is_server then
 		self.state = "alive"
@@ -470,9 +459,8 @@ PlayerUnitHealthExtension.reset = function (self)
 		GameSession.set_game_object_field(game, game_object_id, "current_health", max_health)
 		GameSession.set_game_object_field(game, game_object_id, "current_temporary_health", 0)
 	end
-
-	return 
 end
+
 PlayerUnitHealthExtension.is_alive = function (self)
 	local game = self.game
 	local game_object_id = self.health_game_object_id
@@ -486,6 +474,7 @@ PlayerUnitHealthExtension.is_alive = function (self)
 
 	return true
 end
+
 PlayerUnitHealthExtension.current_health_percent = function (self)
 	local game = self.game
 	local game_object_id = self.health_game_object_id
@@ -500,6 +489,7 @@ PlayerUnitHealthExtension.current_health_percent = function (self)
 
 	return 1
 end
+
 PlayerUnitHealthExtension.current_permanent_health_percent = function (self)
 	local game = self.game
 	local game_object_id = self.health_game_object_id
@@ -513,6 +503,7 @@ PlayerUnitHealthExtension.current_permanent_health_percent = function (self)
 
 	return 1
 end
+
 PlayerUnitHealthExtension.current_temporary_health_percent = function (self)
 	local game = self.game
 	local game_object_id = self.health_game_object_id
@@ -526,6 +517,7 @@ PlayerUnitHealthExtension.current_temporary_health_percent = function (self)
 
 	return 1
 end
+
 PlayerUnitHealthExtension.current_health = function (self)
 	local game = self.game
 	local game_object_id = self.health_game_object_id
@@ -539,6 +531,7 @@ PlayerUnitHealthExtension.current_health = function (self)
 
 	return self._calculate_max_health(self)
 end
+
 PlayerUnitHealthExtension.current_permanent_health = function (self)
 	local game = self.game
 	local game_object_id = self.health_game_object_id
@@ -551,6 +544,7 @@ PlayerUnitHealthExtension.current_permanent_health = function (self)
 
 	return self._calculate_max_health(self)
 end
+
 PlayerUnitHealthExtension.current_temporary_health = function (self)
 	local game = self.game
 	local game_object_id = self.health_game_object_id
@@ -563,6 +557,7 @@ PlayerUnitHealthExtension.current_temporary_health = function (self)
 
 	return self._calculate_max_health(self)
 end
+
 PlayerUnitHealthExtension.get_max_health = function (self)
 	local game = self.game
 	local game_object_id = self.health_game_object_id
@@ -575,6 +570,7 @@ PlayerUnitHealthExtension.get_max_health = function (self)
 
 	return self._calculate_max_health(self)
 end
+
 PlayerUnitHealthExtension.get_damage_taken = function (self)
 	local game = self.game
 	local game_object_id = self.health_game_object_id
@@ -589,6 +585,7 @@ PlayerUnitHealthExtension.get_damage_taken = function (self)
 
 	return 0
 end
+
 PlayerUnitHealthExtension.shield = function (self, shield_amount)
 	self._shield_amount = shield_amount
 	self._shield_duration_left = 10
@@ -597,22 +594,22 @@ PlayerUnitHealthExtension.shield = function (self, shield_amount)
 	if script_data.damage_debug then
 		printf("[PlayerUnitHealthExtension] shield %.1f to %s", shield_amount, tostring(self.unit))
 	end
-
-	return 
 end
+
 PlayerUnitHealthExtension.has_assist_shield = function (self)
 	return 0 < self._shield_duration_left and 0 < self._shield_amount, self._shield_amount
 end
+
 PlayerUnitHealthExtension.remove_assist_shield = function (self, end_reason)
 	self._shield_duration_left = 0
 	self._shield_amount = 0
 	self._end_reason = end_reason
-
-	return 
 end
+
 PlayerUnitHealthExtension.previous_shield_end_reason = function (self)
 	return self._end_reason
 end
+
 PlayerUnitHealthExtension.set_dead = function (self)
 	self.state = "dead"
 
@@ -623,14 +620,14 @@ PlayerUnitHealthExtension.set_dead = function (self)
 	local player_profile = ScriptUnit.extension(unit, "dialogue_system").context.player_profile
 
 	SurroundingAwareSystem.add_event(unit, "player_death", death_discover_distance, "target", unit, "target_name", player_profile)
-
-	return 
 end
+
 PlayerUnitHealthExtension.set_max_health = function (self, health, update_unmodfied)
-	return 
-end
-PlayerUnitHealthExtension.set_current_damage = function (self, damage)
-	return 
+	return
 end
 
-return 
+PlayerUnitHealthExtension.set_current_damage = function (self, damage)
+	return
+end
+
+return

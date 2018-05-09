@@ -1,27 +1,26 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTTargetUnreachableAction = class(BTTargetUnreachableAction, BTNode)
+
 BTTargetUnreachableAction.init = function (self, ...)
 	BTTargetUnreachableAction.super.init(self, ...)
-
-	return 
 end
+
 BTTargetUnreachableAction.name = "BTTargetUnreachableAction"
+
 BTTargetUnreachableAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
 	blackboard.unreachable_timer = blackboard.chasing_timer or 0
-
-	return 
 end
+
 BTTargetUnreachableAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 BTTargetUnreachableAction.run = function (self, unit, blackboard, t, dt)
 	local position = POSITION_LOOKUP[unit]
 	local target_unit = blackboard.target_unit
@@ -76,6 +75,7 @@ BTTargetUnreachableAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running", "evaluate"
 end
+
 BTTargetUnreachableAction.move_closer = function (self, unit, blackboard, locomotion_extension, navigation_extension)
 	local unit_position = POSITION_LOOKUP[unit]
 	local distance_sq = navigation_extension.distance_to_destination_sq(navigation_extension, unit_position)
@@ -111,9 +111,8 @@ BTTargetUnreachableAction.move_closer = function (self, unit, blackboard, locomo
 
 		locomotion_extension.set_wanted_rotation(locomotion_extension, rot)
 	end
-
-	return 
 end
+
 BTTargetUnreachableAction._debug_distance_text = function (self, unit, navigation_extension)
 	if script_data.debug_ai_movement then
 		local unit_position = POSITION_LOOKUP[unit]
@@ -124,8 +123,6 @@ BTTargetUnreachableAction._debug_distance_text = function (self, unit, navigatio
 
 		Debug.text("Unreachable distance to target: %.2f Flat: %.2f", distance, flat_distance)
 	end
-
-	return 
 end
 
-return 
+return

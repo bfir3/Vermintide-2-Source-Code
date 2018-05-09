@@ -39,6 +39,7 @@ require("scripts/ui/ui_cleanui")
 
 local definitions = local_require("scripts/ui/views/ingame_hud_definitions")
 IngameHud = class(IngameHud)
+
 IngameHud.init = function (self, ingame_ui_context)
 	self.is_in_inn = ingame_ui_context.is_in_inn
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
@@ -127,9 +128,8 @@ IngameHud.init = function (self, ingame_ui_context)
 		self.tutorial_input_ui = TutorialInputUI:new(ingame_ui_context)
 		self.tutorial_intro_ui = TutorialIntroUI:new(ingame_ui_context)
 	end
-
-	return 
 end
+
 IngameHud.destroy = function (self)
 	if self.unit_frames_handler then
 		self.unit_frames_handler:destroy()
@@ -225,16 +225,14 @@ IngameHud.destroy = function (self)
 	end
 
 	self.gift_popup_ui:destroy()
-
-	return 
 end
+
 IngameHud.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
-
-	return 
 end
+
 IngameHud.set_visible = function (self, visible, draw_playerlist)
 	local ingame_player_list_ui = self.ingame_player_list_ui
 
@@ -321,9 +319,8 @@ IngameHud.set_visible = function (self, visible, draw_playerlist)
 	if self.tutorial_ui then
 		self.tutorial_ui:set_visible(visible)
 	end
-
-	return 
 end
+
 IngameHud.is_own_player_dead = function (self)
 	local peer_id = self.peer_id
 	local my_player = self.player_manager:player_from_peer_id(peer_id)
@@ -336,9 +333,8 @@ IngameHud.is_own_player_dead = function (self)
 
 		return status_extension.is_ready_for_assisted_respawn(status_extension)
 	end
-
-	return 
 end
+
 IngameHud._update_survival_ui = function (self, dt, t)
 	local game_timer_ui = self.game_timer_ui
 
@@ -366,37 +362,36 @@ IngameHud._update_survival_ui = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 IngameHud.is_cutscene_active = function (self)
 	local cutscene_system = self.cutscene_system
 
 	return cutscene_system.active_camera and not cutscene_system.ingame_hud_enabled
 end
+
 IngameHud._update_clean_ui = function (self, dt, t, player, context)
 	local has_tobii = rawget(_G, "Tobii") and Tobii.get_is_connected()
 
 	if not has_tobii then
-		return 
+		return
 	end
 
 	local use_clean_ui = Application.user_setting("tobii_eyetracking") and Application.user_setting("tobii_clean_ui")
 
 	if not use_clean_ui then
-		return 
+		return
 	end
 
 	local cleanui = self.cleanui
 
 	if not self.cleanui then
-		return 
+		return
 	end
 
 	UICleanUI.update(self.cleanui, dt, context)
-
-	return 
 end
+
 IngameHud._update_crosshair_ui = function (self, dt, t, player, context)
 	local player_unit = player.player_unit
 	local crosshair_position_x, crosshair_position_y = self._update_crosshair_position(self, player_unit, dt)
@@ -410,9 +405,8 @@ IngameHud._update_crosshair_ui = function (self, dt, t, player, context)
 		self._crosshair_position_x = crosshair_position_x
 		self._crosshair_position_y = crosshair_position_y
 	end
-
-	return 
 end
+
 IngameHud._draw = function (self, dt, player, t, menu_active)
 	local input_manager = self.input_manager
 	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
@@ -428,9 +422,8 @@ IngameHud._draw = function (self, dt, player, t, menu_active)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 IngameHud.update = function (self, dt, t, menu_active, context)
 	local active_cutscene = self.is_cutscene_active(self)
 	local peer_id = self.peer_id
@@ -460,9 +453,8 @@ IngameHud.update = function (self, dt, t, menu_active, context)
 	end
 
 	self._update_always(self, dt, t, player, context)
-
-	return 
 end
+
 IngameHud._update_always = function (self, dt, t, player, context)
 	self._update_clean_ui(self, dt, t, player, context)
 	self._update_crosshair_ui(self, dt, t, player, context)
@@ -499,9 +491,8 @@ IngameHud._update_always = function (self, dt, t, player, context)
 	if self.twitch_vote_ui then
 		self.twitch_vote_ui:update(dt, t)
 	end
-
-	return 
 end
+
 IngameHud._update_while_alive = function (self, dt, t, player, context)
 	local game_mode = Managers.state.game_mode:game_mode()
 	local game_mode_disable_hud = game_mode.game_mode_hud_disabled and game_mode.game_mode_hud_disabled(game_mode)
@@ -571,9 +562,8 @@ IngameHud._update_while_alive = function (self, dt, t, player, context)
 	if self.contract_log_ui then
 		self.contract_log_ui:update(dt, t)
 	end
-
-	return 
 end
+
 IngameHud._update_while_dead = function (self, dt, t, player, context)
 	local observer_ui = self.observer_ui
 
@@ -600,9 +590,8 @@ IngameHud._update_while_dead = function (self, dt, t, player, context)
 	self.boss_health_ui:update(dt, t)
 	self.positive_reinforcement_ui:update(dt, t)
 	self.area_indicator:update(dt)
-
-	return 
 end
+
 IngameHud.post_update = function (self, dt, t, hud_visible)
 	local is_own_player_dead = self.is_own_player_dead(self)
 
@@ -613,9 +602,8 @@ IngameHud.post_update = function (self, dt, t, hud_visible)
 	local ingame_player_list_ui = self.ingame_player_list_ui
 
 	ingame_player_list_ui.post_update(ingame_player_list_ui, dt)
-
-	return 
 end
+
 IngameHud._update_crosshair_position = function (self, player_unit, dt)
 	local inv_res_scale = RESOLUTION_LOOKUP.inv_scale
 	local position_x = RESOLUTION_LOOKUP.res_w * 0.5 * inv_res_scale
@@ -649,4 +637,4 @@ IngameHud._update_crosshair_position = function (self, player_unit, dt)
 	return position_x, position_y
 end
 
-return 
+return

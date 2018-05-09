@@ -1,4 +1,5 @@
 LiquidAreaDamageHuskExtension = class(LiquidAreaDamageHuskExtension)
+
 LiquidAreaDamageHuskExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	self._unit = unit
@@ -35,9 +36,8 @@ LiquidAreaDamageHuskExtension.init = function (self, extension_init_context, uni
 	if update_function then
 		self._liquid_update_function = LiquidAreaDamageTemplates[update_function]
 	end
-
-	return 
 end
+
 LiquidAreaDamageHuskExtension._get_rotation_from_navmesh = function (self, position)
 	local nav_world = self._nav_world
 	local success, z, vertex_1, vertex_2, vertex_3 = GwNavQueries.triangle_from_position(nav_world, position, 2, 2)
@@ -54,6 +54,7 @@ LiquidAreaDamageHuskExtension._get_rotation_from_navmesh = function (self, posit
 
 	return rotation
 end
+
 LiquidAreaDamageHuskExtension.add_damage_blob = function (self, blob_id, position, is_filled)
 	local fx_id = nil
 	local fx_name_rim = self._fx_name_rim
@@ -72,9 +73,8 @@ LiquidAreaDamageHuskExtension.add_damage_blob = function (self, blob_id, positio
 	if is_filled then
 		self.set_damage_blob_filled(self, blob_id)
 	end
-
-	return 
 end
+
 LiquidAreaDamageHuskExtension.set_damage_blob_filled = function (self, blob_id)
 	local blob = self._blobs[blob_id]
 	local fx_id = blob.fx_id
@@ -95,12 +95,12 @@ LiquidAreaDamageHuskExtension.set_damage_blob_filled = function (self, blob_id)
 	end
 
 	blob.full = true
+end
 
-	return 
-end
 LiquidAreaDamageHuskExtension.remove_damage_blob = function (self, blob_id)
-	return 
+	return
 end
+
 LiquidAreaDamageHuskExtension.update = function (self, unit, input, dt, context, t)
 	local liquid_update_function = self._liquid_update_function
 
@@ -111,9 +111,8 @@ LiquidAreaDamageHuskExtension.update = function (self, unit, input, dt, context,
 			self._liquid_update_function = nil
 		end
 	end
-
-	return 
 end
+
 LiquidAreaDamageHuskExtension.destroy = function (self)
 	local world = self._world
 	local sfx_name_stop = self._sfx_name_stop
@@ -131,8 +130,6 @@ LiquidAreaDamageHuskExtension.destroy = function (self)
 			World.stop_spawning_particles(world, fx_id)
 		end
 	end
-
-	return 
 end
 
-return 
+return

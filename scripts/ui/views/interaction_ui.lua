@@ -398,6 +398,7 @@ local widget_definitions = {
 		}
 	}
 }
+
 InteractionUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.input_manager = ingame_ui_context.input_manager
@@ -415,23 +416,20 @@ InteractionUI.init = function (self, ingame_ui_context)
 		press = Localize("interaction_prefix_press"),
 		to = Localize("interaction_to")
 	}
-
-	return 
 end
+
 InteractionUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self.interaction_widget = UIWidget.init(widget_definitions.tooltip)
 	self.interaction_bar_widget = UIWidget.init(widget_definitions.interaction_bar)
-
-	return 
 end
+
 InteractionUI.destroy = function (self)
 	GarbageLeakDetector.register_object(self, "interaction_gui")
-
-	return 
 end
+
 InteractionUI.button_texture_data_by_input_action = function (self, input_action)
 	local input_manager = self.input_manager
 	local input_service = input_manager.get_service(input_manager, "Player")
@@ -439,23 +437,22 @@ InteractionUI.button_texture_data_by_input_action = function (self, input_action
 
 	return UISettings.get_gamepad_input_texture_data(input_service, input_action, gamepad_active)
 end
+
 InteractionUI._animate_in_progress_bar = function (self)
 	local widget_content = self.interaction_bar_widget.content
 	local widget_style = self.interaction_bar_widget.style
 	local fade_in_time = UISettings.interaction.bar.fade_in
 	self.interaction_animations.interaction_bar_glow_fade = UIAnimation.init(UIAnimation.function_by_time, widget_style.glow.color, 1, 0, 255, 0.3, math.easeInCubic)
 	self.interaction_animations.interaction_bar_fill_fade = UIAnimation.init(UIAnimation.function_by_time, widget_style.bar.color, 1, 0, 255, fade_in_time, math.easeInCubic)
-
-	return 
 end
+
 InteractionUI._animate_out_progress_bar = function (self)
 	local fade_out_time = UISettings.interaction.bar.fade_out
 	local widget_style = self.interaction_bar_widget.style
 	self.interaction_animations.interaction_bar_glow_fade = UIAnimation.init(UIAnimation.function_by_time, widget_style.glow.color, 1, widget_style.glow.color[1], 0, fade_out_time, math.easeInCubic)
 	self.interaction_animations.interaction_bar_fill_fade = UIAnimation.init(UIAnimation.function_by_time, widget_style.bar.color, 1, widget_style.bar.color[1], 0, fade_out_time, math.easeInCubic)
-
-	return 
 end
+
 InteractionUI._handle_interaction_progress = function (self, progress)
 	if progress and progress ~= 0 then
 		local widget_content = self.interaction_bar_widget.content
@@ -475,9 +472,8 @@ InteractionUI._handle_interaction_progress = function (self, progress)
 
 		return true
 	end
-
-	return 
 end
+
 InteractionUI.update = function (self, dt, t, my_player)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -486,7 +482,7 @@ InteractionUI.update = function (self, dt, t, my_player)
 	local player_unit = my_player.player_unit
 
 	if not player_unit then
-		return 
+		return
 	end
 
 	for name, ui_animation in pairs(self.interaction_animations) do
@@ -574,9 +570,8 @@ InteractionUI.update = function (self, dt, t, my_player)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 InteractionUI._get_interaction_text = function (self, player_unit, is_channeling)
 	local interactor_extension = ScriptUnit.extension(player_unit, "interactor_system")
 	local title_text, action_text, interact_action = nil
@@ -607,11 +602,12 @@ InteractionUI._get_interaction_text = function (self, player_unit, is_channeling
 
 	return title_text, action_text, interact_action, failed_reason
 end
+
 InteractionUI._get_wielded_interaction_text = function (self, player_unit)
 	local item_data = self._get_wielded_item_data(self, player_unit)
 
 	if not item_data then
-		return 
+		return
 	end
 
 	local title_text, action_text, interact_action = nil
@@ -663,6 +659,7 @@ InteractionUI._get_wielded_interaction_text = function (self, player_unit)
 
 	return title_text, action_text, interact_action
 end
+
 InteractionUI._get_wielded_item_data = function (self, player_unit)
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
 	local equipment = inventory_extension.equipment(inventory_extension)
@@ -670,6 +667,7 @@ InteractionUI._get_wielded_item_data = function (self, player_unit)
 
 	return item_data
 end
+
 InteractionUI._assign_button_info = function (self, interact_action, failed_reason, channeling)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -723,17 +721,14 @@ InteractionUI._assign_button_info = function (self, interact_action, failed_reas
 	text_color[2] = new_text_color[2]
 	text_color[3] = new_text_color[3]
 	text_color[4] = new_text_color[4]
-
-	return 
 end
+
 InteractionUI.external_interact_ui_description = function (self, player_unit)
 	local overcharge_extension = ScriptUnit.extension(player_unit, "overcharge_system")
 
 	if overcharge_extension.is_above_critical_limit(overcharge_extension) and not overcharge_extension.are_you_exploding(overcharge_extension) then
 		return "interaction_overheat", "interaction_action_vent", "weapon_reload"
 	end
-
-	return 
 end
 
-return 
+return

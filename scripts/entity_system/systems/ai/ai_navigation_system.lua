@@ -6,6 +6,7 @@ local extensions = {
 	"PlayerBotNavigation"
 }
 AINavigationSystem = class(AINavigationSystem, ExtensionSystemBase)
+
 AINavigationSystem.init = function (self, entity_system_creation_context, system_name)
 	AINavigationSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -15,14 +16,12 @@ AINavigationSystem.init = function (self, entity_system_creation_context, system
 	self.navbots_to_release = {}
 	local nav_world = Managers.state.entity:system("ai_system"):nav_world()
 	self.nav_world = nav_world
-
-	return 
 end
+
 AINavigationSystem.destroy = function (self)
 	AINavigationSystem.super.destroy(self)
-
-	return 
 end
+
 AINavigationSystem.on_add_extension = function (self, world, unit, extension_name, extension_init_data)
 	local extension = AINavigationSystem.super.on_add_extension(self, world, unit, extension_name, extension_init_data)
 
@@ -32,12 +31,12 @@ AINavigationSystem.on_add_extension = function (self, world, unit, extension_nam
 
 	return extension
 end
+
 AINavigationSystem.on_remove_extension = function (self, unit, extension_name)
 	self.on_freeze_extension(self, unit, extension_name)
 	AINavigationSystem.super.on_remove_extension(self, unit, extension_name)
-
-	return 
 end
+
 AINavigationSystem.on_freeze_extension = function (self, unit, extension_name)
 	self.unit_extension_data[unit] = nil
 	self.enabled_units[unit] = nil
@@ -47,14 +46,13 @@ AINavigationSystem.on_freeze_extension = function (self, unit, extension_name)
 	end
 
 	self.delayed_units[unit] = nil
-
-	return 
 end
+
 AINavigationSystem.simulate_dummy_target = function (self, t)
 	local local_player_unit = Managers.player:local_player().player_unit
 
 	if not local_player_unit then
-		return 
+		return
 	end
 
 	local player_position = POSITION_LOOKUP[local_player_unit]
@@ -69,9 +67,8 @@ AINavigationSystem.simulate_dummy_target = function (self, t)
 			extension.move_to(extension, dummy_pos_on_mesh)
 		end
 	end
-
-	return 
 end
+
 AINavigationSystem.update = function (self, context, t)
 	local dt = context.dt
 
@@ -85,22 +82,19 @@ AINavigationSystem.update = function (self, context, t)
 	if not script_data.disable_crowd_dispersion then
 		self.update_dispersion(self)
 	end
-
-	return 
 end
+
 AINavigationSystem.post_update = function (self, context, t)
 	local dt = context.dt
 
 	self.update_position(self)
-
-	return 
 end
+
 AINavigationSystem.add_navbot_to_release = function (self, unit)
 	local extension = self.unit_extension_data[unit] or self.delayed_units[unit]
 	self.navbots_to_release[unit] = extension
-
-	return 
 end
+
 AINavigationSystem.update_navbots_to_release = function (self)
 	for unit, extension in pairs(self.navbots_to_release) do
 		extension.release_bot(extension)
@@ -115,9 +109,8 @@ AINavigationSystem.update_navbots_to_release = function (self)
 
 		self.delayed_units[unit] = nil
 	end
-
-	return 
 end
+
 AINavigationSystem.update_enabled = function (self)
 	for unit, extension in pairs(self.unit_extension_data) do
 		local enabled = extension._nav_bot ~= nil and extension._enabled
@@ -128,9 +121,8 @@ AINavigationSystem.update_enabled = function (self)
 		local enabled = extension._nav_bot ~= nil and extension._enabled
 		self.enabled_units[unit] = (enabled and extension) or nil
 	end
-
-	return 
 end
+
 AINavigationSystem.update_destination = function (self, t)
 	local POSITION_LOOKUP = POSITION_LOOKUP
 	local Vec3_dist_sq = Vector3.distance_squared
@@ -259,9 +251,8 @@ AINavigationSystem.update_destination = function (self, t)
 	end
 
 	self.update_delayed_units(self, t)
-
-	return 
 end
+
 AINavigationSystem.update_delayed_units = function (self, t)
 	local delayed_units = self.delayed_units
 	local unit = self.delayed_unit
@@ -278,7 +269,7 @@ AINavigationSystem.update_delayed_units = function (self, t)
 			if nav_bot and GwNavBot.is_following_path(nav_bot) then
 				extension.delayed_max_time = nil
 
-				return 
+				return
 			end
 
 			if extension.delayed_max_time < t then
@@ -305,9 +296,8 @@ AINavigationSystem.update_delayed_units = function (self, t)
 	if self.delayed_unit == unit then
 		self.delayed_unit = next(delayed_units, unit)
 	end
-
-	return 
 end
+
 AINavigationSystem.setup_far_astar = function (self, p1, p2, extension, blackboard, nav_bot)
 	if blackboard.far_path then
 		blackboard.far_path = nil
@@ -336,9 +326,8 @@ AINavigationSystem.setup_far_astar = function (self, p1, p2, extension, blackboa
 
 		return true
 	end
-
-	return 
 end
+
 AINavigationSystem.far_astar = function (self, p1, p2)
 	local navigation_group_manager = Managers.state.conflict.navigation_group_manager
 	local path, total_path_length = navigation_group_manager.a_star_cached_between_positions(navigation_group_manager, p1, p2)
@@ -362,7 +351,9 @@ AINavigationSystem.far_astar = function (self, p1, p2)
 
 	return true, goal_pos, path, num_nodes
 end
+
 local SPEED_EPSILON_SQ = 0.0001
+
 AINavigationSystem.update_desired_velocity = function (self, t, dt)
 	local raycasts_done = 0
 	local nav_world = self.nav_world
@@ -437,9 +428,8 @@ AINavigationSystem.update_desired_velocity = function (self, t, dt)
 
 		locomotion_extension.set_wanted_velocity_flat(locomotion_extension, desired_velocity)
 	end
-
-	return 
 end
+
 AINavigationSystem.update_next_smart_object = function (self, t, dt)
 	for unit, extension in pairs(self.enabled_units) do
 		local data = extension._blackboard.next_smart_object_data
@@ -479,9 +469,8 @@ AINavigationSystem.update_next_smart_object = function (self, t, dt)
 			extension._blackboard.is_in_smartobject_range = dist_sq < 4
 		end
 	end
-
-	return 
 end
+
 AINavigationSystem.update_dispersion = function (self, t, dt)
 	for unit, extension in pairs(self.enabled_units) do
 		local action = GwNavBot.update_logic_for_crowd_dispersion(extension._nav_bot)
@@ -490,9 +479,8 @@ AINavigationSystem.update_dispersion = function (self, t, dt)
 		elseif action == 2 then
 		end
 	end
-
-	return 
 end
+
 AINavigationSystem.update_position = function (self, t, dt)
 	for unit, extension in pairs(self.enabled_units) do
 		if extension._nav_bot then
@@ -501,9 +489,8 @@ AINavigationSystem.update_position = function (self, t, dt)
 			GwNavBot.update_position(extension._nav_bot, position)
 		end
 	end
-
-	return 
 end
+
 AINavigationSystem.update_debug_draw = function (self, t)
 	local drawer = Managers.state.debug:drawer({
 		mode = "immediate",
@@ -562,9 +549,8 @@ AINavigationSystem.update_debug_draw = function (self, t)
 		self._debug_draw_nav_path(self, drawer, navigation_extension)
 		self._debug_draw_far_path(self, drawer, debug_unit, blackboard, navigation_extension)
 	end
-
-	return 
 end
+
 AINavigationSystem._debug_draw_text = function (self, debug_unit, blackboard, navigation_extension, t)
 	Debug.text("AI NAVIGATION DEBUG")
 	Debug.text("  enabled = %s", tostring(self.enabled_units[debug_unit] ~= nil))
@@ -581,20 +567,19 @@ AINavigationSystem._debug_draw_text = function (self, debug_unit, blackboard, na
 	Debug.text("  move_state = %s", tostring(navigation_extension._blackboard.move_state or "nil"))
 	Debug.text("  btnode = %s", tostring(blackboard.btnode_name))
 	Debug.text("  wait_timer = %.1f", math.max(-1, navigation_extension._wait_timer - t))
-
-	return 
 end
+
 AINavigationSystem._debug_draw_nav_path = function (self, drawer, navigation_extension)
 	local nav_bot = navigation_extension._nav_bot
 
 	if nav_bot == nil then
-		return 
+		return
 	end
 
 	local following_path = navigation_extension._is_navbot_following_path
 
 	if not following_path then
-		return 
+		return
 	end
 
 	local node_count = GwNavBot.get_path_nodes_count(nav_bot)
@@ -617,9 +602,8 @@ AINavigationSystem._debug_draw_nav_path = function (self, drawer, navigation_ext
 			previous_node_position = position
 		end
 	end
-
-	return 
 end
+
 AINavigationSystem._debug_draw_far_path = function (self, drawer, debug_unit, blackboard, navigation_extension)
 	local far_path = blackboard.far_path
 
@@ -661,10 +645,10 @@ AINavigationSystem._debug_draw_far_path = function (self, drawer, debug_unit, bl
 		drawer.sphere(drawer, real_destination, 0.2, Colors.get("yellow"))
 		drawer.vector(drawer, position_unit, real_destination - position_unit, Colors.get("yellow"))
 	end
-
-	return 
 end
+
 NAVIGATION_RUNNING_IN_THREAD = false
+
 AINavigationSystem.override_nav_funcs = function (self)
 	local patch_list = {
 		"GwNavWorld",
@@ -693,8 +677,6 @@ AINavigationSystem.override_nav_funcs = function (self)
 			end
 		end
 	end
-
-	return 
 end
 
-return 
+return

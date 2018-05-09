@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTCombatShoutAction = class(BTCombatShoutAction, BTNode)
+
 BTCombatShoutAction.init = function (self, ...)
 	BTCombatShoutAction.super.init(self, ...)
-
-	return 
 end
+
 BTCombatShoutAction.name = "BTCombatShoutAction"
+
 BTCombatShoutAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -38,17 +39,15 @@ BTCombatShoutAction.enter = function (self, unit, blackboard, t)
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "shouting", event_data)
-
-	return 
 end
+
 BTCombatShoutAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.update_timer = 0
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_enabled(navigation_extension, true)
-
-	return 
 end
+
 BTCombatShoutAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion_extension = blackboard.locomotion_extension
 	local rot = LocomotionUtils.rotation_towards_unit_flat(unit, blackboard.target_unit)
@@ -62,4 +61,4 @@ BTCombatShoutAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

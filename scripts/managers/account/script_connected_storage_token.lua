@@ -1,4 +1,5 @@
 ScriptConnectedStorageToken = class(ScriptConnectedStorageToken, ScriptSaveToken)
+
 ScriptConnectedStorageToken.info = function (self)
 	local info = {}
 
@@ -18,7 +19,9 @@ ScriptConnectedStorageToken.info = function (self)
 
 	return info
 end
+
 ScriptConnectedStorageQueryToken = class(ScriptConnectedStorageQueryToken, ScriptSaveToken)
+
 ScriptConnectedStorageQueryToken.info = function (self)
 	local info = {}
 
@@ -34,7 +37,9 @@ ScriptConnectedStorageQueryToken.info = function (self)
 
 	return info
 end
+
 ScriptConnectedStorageDeleteToken = class(ScriptConnectedStorageDeleteToken, ScriptSaveToken)
+
 ScriptConnectedStorageDeleteToken.info = function (self)
 	local info = {}
 
@@ -49,4 +54,4 @@ ScriptConnectedStorageDeleteToken.info = function (self)
 	return info
 end
 
-return 
+return

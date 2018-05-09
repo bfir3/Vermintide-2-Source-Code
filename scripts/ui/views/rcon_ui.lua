@@ -7,6 +7,7 @@ RconUI.META_MSG = 1
 RconUI.OUTPUT_MSG = 1
 local RELOAD_UI = true
 local MAX_CHARS = 512
+
 RconUI.init = function (self, ui_context, callback_object)
 	self._input_manager = ui_context.input_manager
 	self._ui_renderer = ui_context.ui_top_renderer
@@ -19,9 +20,8 @@ RconUI.init = function (self, ui_context, callback_object)
 	self._ui_animations = {}
 
 	self._create_ui_elements(self)
-
-	return 
 end
+
 RconUI.update = function (self, dt, menu_active, menu_input_service, no_unblock)
 	if RELOAD_UI then
 		self._create_ui_elements(self)
@@ -33,14 +33,12 @@ RconUI.update = function (self, dt, menu_active, menu_input_service, no_unblock)
 		self._update_input(self, dt, input_service, menu_active, menu_input_service, no_unblock)
 		self._draw_widgets(self, dt, input_service)
 	end
-
-	return 
 end
+
 RconUI.set_header = function (self, text)
 	self._header = text
-
-	return 
 end
+
 RconUI.set_input_manager = function (self, input_manager)
 	if input_manager then
 		local block_reasons = {
@@ -55,9 +53,8 @@ RconUI.set_input_manager = function (self, input_manager)
 	end
 
 	self._input_manager = input_manager
-
-	return 
 end
+
 RconUI.add_output = function (self, text, text_type)
 	local history_max_size = 500
 	local message_tables = self._output_widget.content.message_tables
@@ -88,9 +85,8 @@ RconUI.add_output = function (self, text, text_type)
 		type = irc_type
 	}
 	message_tables[#message_tables + 1] = new_message_table
-
-	return 
 end
+
 RconUI._create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self._ui_renderer)
 
@@ -101,14 +97,14 @@ RconUI._create_ui_elements = function (self)
 	self._scrollbar_widget = UIWidget.init(definitions.scrollbar_widget)
 	self._ui_animations.caret_pulse = self._animate_element_pulse(self, self._input_widget.style.text.caret_color, 1, 60, 255, 2)
 	RELOAD_UI = false
-
-	return 
 end
+
 RconUI._animate_element_pulse = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.pulse_animation, target, target_index, from, to, time)
 
 	return new_animation
 end
+
 RconUI._update_input = function (self, dt, input_service, menu_active, menu_input_service, no_unblock)
 	local activate_menu_was_pressed = input_service.get(input_service, "activate_menu")
 
@@ -146,12 +142,11 @@ RconUI._update_input = function (self, dt, input_service, menu_active, menu_inpu
 			self._input_message, self._input_index, self._input_mode = KeystrokeHelper.parse_strokes(self._input_message, self._input_index, self._input_mode, keystrokes, ctrl_held)
 		end
 	end
-
-	return 
 end
+
 RconUI._draw_widgets = function (self, dt, input_service)
 	if not self._visible then
-		return 
+		return
 	end
 
 	local ui_scenegraph = self._ui_scenegraph
@@ -173,9 +168,8 @@ RconUI._draw_widgets = function (self, dt, input_service)
 	UIRenderer.draw_widget(ui_renderer, output_widget)
 	UIRenderer.draw_widget(ui_renderer, scrollbar_widget)
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 RconUI._handle_input_service_release = function (self, menu_active, menu_input_service, no_unblock)
 	if menu_active then
 		local input_service_name = menu_input_service.name
@@ -190,9 +184,8 @@ RconUI._handle_input_service_release = function (self, menu_active, menu_input_s
 	else
 		self._unblock_input(self, no_unblock)
 	end
-
-	return 
 end
+
 RconUI._block_input = function (self, input_service_name)
 	local input_manager = self._input_manager
 
@@ -212,9 +205,8 @@ RconUI._block_input = function (self, input_service_name)
 		input_manager.block_device_except_service(input_manager, "rcon_input", "gamepad", 1)
 		Window.set_show_cursor(true)
 	end
-
-	return 
 end
+
 RconUI._unblock_input = function (self, no_unblock)
 	local input_manager = self._input_manager
 
@@ -232,8 +224,6 @@ RconUI._unblock_input = function (self, no_unblock)
 		input_manager.device_unblock_all_services(input_manager, "gamepad", 1)
 		Window.set_show_cursor(false)
 	end
-
-	return 
 end
 
-return 
+return

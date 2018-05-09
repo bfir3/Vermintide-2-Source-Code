@@ -1,4 +1,5 @@
 HeroSpawnerHandler = class(HeroSpawnerHandler)
+
 HeroSpawnerHandler.init = function (self, is_server, profile_synchronizer, network_event_delegate)
 	self.profile_synchronizer = profile_synchronizer
 	self.is_server = is_server
@@ -6,14 +7,12 @@ HeroSpawnerHandler.init = function (self, is_server, profile_synchronizer, netwo
 	self.network_event_delegate = network_event_delegate
 
 	network_event_delegate.register(network_event_delegate, self, "rpc_to_client_spawn_player")
-
-	return 
 end
+
 HeroSpawnerHandler.destroy = function (self)
 	self.network_event_delegate:unregister(self)
-
-	return 
 end
+
 HeroSpawnerHandler.spawn_hero_request = function (self, player, hero_name)
 	if self.pending_profile_request then
 		return false
@@ -32,6 +31,7 @@ HeroSpawnerHandler.spawn_hero_request = function (self, player, hero_name)
 
 	return self.request_id
 end
+
 HeroSpawnerHandler.start = function (self)
 	local player = self.player
 	local player_unit = player.player_unit
@@ -50,9 +50,8 @@ HeroSpawnerHandler.start = function (self)
 	end
 
 	self.pending_profile_request = true
-
-	return 
 end
+
 HeroSpawnerHandler.update = function (self, dt)
 	if self.pending_profile_request then
 		local profile_synchronizer = self.profile_synchronizer
@@ -95,31 +94,28 @@ HeroSpawnerHandler.update = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroSpawnerHandler.save_selected_profile = function (self, index)
 	local save_manager = Managers.save
 	local save_data = SaveData
 	SaveData.wanted_profile_index = index
 
 	save_manager.auto_save(save_manager, SaveFileName, SaveData, nil)
-
-	return 
 end
+
 HeroSpawnerHandler.query_result = function (self, request_id)
 	fassert(request_id == self.request_id, "HeroSpawnerHandler:query_result with invalid request_id")
 
 	return self.result
 end
+
 HeroSpawnerHandler.rpc_to_client_spawn_player = function (self, sender, local_player_id, profile_index, position, rotation, is_initial_spawn)
 	if self.hero_spawner_faded_in then
 		Managers.transition:fade_out(1)
 
 		self.hero_spawner_faded_in = false
 	end
-
-	return 
 end
 
-return 
+return

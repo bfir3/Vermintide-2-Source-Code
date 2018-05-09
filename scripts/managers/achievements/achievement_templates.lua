@@ -490,4 +490,4 @@ end
 
 AchievementTemplates = templates
 
-return 
+return

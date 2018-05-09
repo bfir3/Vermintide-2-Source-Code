@@ -1,5 +1,6 @@
 PlayerProjectileUnitExtension = class(PlayerProjectileUnitExtension)
 local DELETION_GRACE_TIMER = 0.3
+
 PlayerProjectileUnitExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local item_name = extension_init_data.item_name
 	local owner_unit = extension_init_data.owner_unit
@@ -53,15 +54,13 @@ PlayerProjectileUnitExtension.init = function (self, extension_init_context, uni
 	self._is_critical_strike = extension_init_data.is_critical_strike
 
 	self.initialize_projectile(self, projectile_info, impact_data)
-
-	return 
 end
+
 PlayerProjectileUnitExtension.extensions_ready = function (self, world, unit)
 	self.locomotion_extension = ScriptUnit.extension(unit, "projectile_locomotion_system")
 	self.impact_extension = ScriptUnit.extension(unit, "projectile_impact_system")
-
-	return 
 end
+
 PlayerProjectileUnitExtension.initialize_projectile = function (self, projectile_info, impact_data)
 	local unit = self.unit
 
@@ -109,9 +108,8 @@ PlayerProjectileUnitExtension.initialize_projectile = function (self, projectile
 	end
 
 	Unit.flow_event(unit, "lua_trail")
-
-	return 
 end
+
 PlayerProjectileUnitExtension.mark_for_deletion = function (self)
 	if not self.marked_for_deletion then
 		self.locomotion_extension:stop()
@@ -121,9 +119,8 @@ PlayerProjectileUnitExtension.mark_for_deletion = function (self)
 
 		Unit.flow_event(self.unit, "lua_projectile_end")
 	end
-
-	return 
 end
+
 PlayerProjectileUnitExtension.update = function (self, unit, input, _, context, t)
 	if self.marked_for_deletion then
 		if self.deletion_time <= t and not self.delete_done then
@@ -132,7 +129,7 @@ PlayerProjectileUnitExtension.update = function (self, unit, input, _, context, 
 			Managers.state.unit_spawner:mark_for_deletion(self.unit)
 		end
 
-		return 
+		return
 	end
 
 	if self.is_timed then
@@ -147,9 +144,8 @@ PlayerProjectileUnitExtension.update = function (self, unit, input, _, context, 
 			self.handle_impacts(self, recent_impacts, num_impacts)
 		end
 	end
-
-	return 
 end
+
 PlayerProjectileUnitExtension.handle_timed_events = function (self, t)
 	if self.life_time <= t then
 		local unit = self.unit
@@ -164,12 +160,12 @@ PlayerProjectileUnitExtension.handle_timed_events = function (self, t)
 
 		self.stop_impacts = true
 	end
+end
 
-	return 
-end
 PlayerProjectileUnitExtension.destroy = function (self)
-	return 
+	return
 end
+
 PlayerProjectileUnitExtension.validate_position = function (self, position, min, max)
 	for i = 1, 3, 1 do
 		local coord = position[i]
@@ -183,6 +179,7 @@ PlayerProjectileUnitExtension.validate_position = function (self, position, min,
 
 	return true
 end
+
 PlayerProjectileUnitExtension.handle_impacts = function (self, impacts, num_impacts)
 	local unit = self.unit
 	local owner_unit = self.owner_unit
@@ -328,9 +325,8 @@ PlayerProjectileUnitExtension.handle_impacts = function (self, impacts, num_impa
 			end
 		end
 	end
-
-	return 
 end
+
 PlayerProjectileUnitExtension.hit_afro = function (self, breed, hit_actor)
 	local node = Actor.node(hit_actor)
 	local hit_zone = breed.hit_zones_lookup[node]
@@ -338,6 +334,7 @@ PlayerProjectileUnitExtension.hit_afro = function (self, breed, hit_actor)
 
 	return hit_zone_name == "afro", hit_zone_name
 end
+
 PlayerProjectileUnitExtension.hit_enemy = function (self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, breed, has_ranged_boost, ranged_boost_curve_multiplier)
 	local owner_unit = self.owner_unit
 	local shield_blocked = false
@@ -397,9 +394,8 @@ PlayerProjectileUnitExtension.hit_enemy = function (self, impact_data, hit_unit,
 	end
 
 	self._check_projectile_spawn(self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor)
-
-	return 
 end
+
 PlayerProjectileUnitExtension.hit_enemy_damage = function (self, damage_profile, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, breed, has_ranged_boost, ranged_boost_curve_multiplier)
 	local target_settings = damage_profile.default_target
 	local network_manager = Managers.state.network
@@ -540,6 +536,7 @@ PlayerProjectileUnitExtension.hit_enemy_damage = function (self, damage_profile,
 
 	return hit_zone_name ~= "ward", shield_blocked
 end
+
 PlayerProjectileUnitExtension.hit_player = function (self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, has_ranged_boost, ranged_boost_curve_multiplier)
 	local difficulty_settings = Managers.state.difficulty:get_difficulty_settings()
 	local hit = false
@@ -579,9 +576,8 @@ PlayerProjectileUnitExtension.hit_player = function (self, impact_data, hit_unit
 	end
 
 	self._check_projectile_spawn(self, self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor)
-
-	return 
 end
+
 ProjectileSpawners = {
 	flame_wave = function (self, projectile_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor)
 		local owner_unit = self.owner_unit
@@ -598,8 +594,6 @@ ProjectileSpawners = {
 		local initial_forward_speed = projectile_data.initial_forward_speed
 
 		Managers.state.entity:system("projectile_system"):spawn_flame_wave_projectile(owner_unit, scale, item_name, item_template_name, action_name, sub_action_name, position, flat_angle, lateral_speed, initial_forward_speed, 0)
-
-		return 
 	end,
 	split_bounce = function (self, projectile_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor)
 		local owner_unit = self.owner_unit
@@ -628,10 +622,9 @@ ProjectileSpawners = {
 
 			Managers.state.entity:system("projectile_system"):spawn_player_projectile(owner_unit, position, rotation, scale, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name)
 		end
-
-		return 
 	end
 }
+
 PlayerProjectileUnitExtension._check_projectile_spawn = function (self, impact_data, ...)
 	local projectile_data = impact_data.projectile_spawn
 
@@ -640,9 +633,8 @@ PlayerProjectileUnitExtension._check_projectile_spawn = function (self, impact_d
 
 		spawner_function(self, projectile_data, ...)
 	end
-
-	return 
 end
+
 PlayerProjectileUnitExtension.hit_player_damage = function (self, damage_profile, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, has_ranged_boost, ranged_boost_curve_multiplier)
 	local owner_unit = self.owner_unit
 	local network_manager = Managers.state.network
@@ -687,9 +679,8 @@ PlayerProjectileUnitExtension.hit_player_damage = function (self, damage_profile
 	if hit_effect then
 		EffectHelper.play_skinned_surface_material_effects(hit_effect, self.world, hit_unit, hit_position, hit_rotation, hit_normal, is_husk)
 	end
-
-	return 
 end
+
 PlayerProjectileUnitExtension.hit_level_unit = function (self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, level_index, has_ranged_boost, ranged_boost_curve_multiplier)
 	local health_extension = ScriptUnit.has_extension(hit_unit, "health_system")
 	local damage_profile_name = impact_data.damage_profile_prop or impact_data.damage_profile or "default"
@@ -740,7 +731,7 @@ PlayerProjectileUnitExtension.hit_level_unit = function (self, impact_data, hit_
 
 				self.num_bounces = self.num_bounces + 1
 
-				return 
+				return
 			end
 		end
 	end
@@ -760,9 +751,8 @@ PlayerProjectileUnitExtension.hit_level_unit = function (self, impact_data, hit_
 	self.stop_impacts = true
 
 	self._check_projectile_spawn(self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor)
-
-	return 
 end
+
 PlayerProjectileUnitExtension.hit_damagable_prop = function (self, damage_profile, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, level_index, has_ranged_boost, ranged_boost_curve_multiplier)
 	self.amount_of_mass_hit = self.amount_of_mass_hit + 1
 	local target_index = math.ceil(self.amount_of_mass_hit)
@@ -795,9 +785,8 @@ PlayerProjectileUnitExtension.hit_damagable_prop = function (self, damage_profil
 	else
 		DamageUtils.damage_level_unit(hit_unit, owner_unit, hit_zone_name, power_level, ranged_boost_curve_multiplier, is_critical_strike, damage_profile, target_index, hit_direction, damage_source)
 	end
-
-	return 
 end
+
 PlayerProjectileUnitExtension.hit_non_level_unit = function (self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, has_ranged_boost, ranged_boost_curve_multiplier)
 	local damage_profile_name = impact_data.damage_profile_prop or impact_data.damage_profile or "default"
 	local damage_profile = DamageProfileTemplates[damage_profile_name]
@@ -839,9 +828,8 @@ PlayerProjectileUnitExtension.hit_non_level_unit = function (self, impact_data, 
 	end
 
 	self._check_projectile_spawn(self, impact_data, hit_unit, hit_position, hit_direction, hit_normal, hit_actor)
-
-	return 
 end
+
 PlayerProjectileUnitExtension.hit_non_level_damagable_unit = function (self, damage_profile, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, has_ranged_boost, ranged_boost_curve_multiplier)
 	local network_manager = Managers.state.network
 	local target_settings = damage_profile.default_target
@@ -870,9 +858,8 @@ PlayerProjectileUnitExtension.hit_non_level_damagable_unit = function (self, dam
 
 		EffectHelper.play_surface_material_effects(hit_effect, world, hit_unit, hit_position, hit_rotation, hit_normal, nil, is_husk, nil, hit_actor)
 	end
-
-	return 
 end
+
 PlayerProjectileUnitExtension.link_projectile = function (self, hit_unit, hit_position, hit_direction, hit_normal, hit_actor, damage, shield_blocked)
 	local unit_spawner = Managers.state.unit_spawner
 	local projectile_linker_system = self.projectile_linker_system
@@ -949,9 +936,8 @@ PlayerProjectileUnitExtension.link_projectile = function (self, hit_unit, hit_po
 
 		projectile_linker_system.add_linked_projectile_reference(projectile_linker_system, hit_unit, projectile_dummy)
 	end
-
-	return 
 end
+
 PlayerProjectileUnitExtension.do_aoe = function (self, aoe_data, position)
 	local world = self.world
 	local owner_unit = self.owner_unit
@@ -983,9 +969,8 @@ PlayerProjectileUnitExtension.do_aoe = function (self, aoe_data, position)
 			DamageUtils.create_taunt(world, owner_unit, unit, position, aoe_data)
 		end
 	end
-
-	return 
 end
+
 PlayerProjectileUnitExtension.spawn_liquid_area = function (self, unit, pos, dir, data)
 	local start_pos = pos
 	local dir = dir
@@ -1004,8 +989,6 @@ PlayerProjectileUnitExtension.spawn_liquid_area = function (self, unit, pos, dir
 	local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 
 	liquid_area_damage_extension.ready(liquid_area_damage_extension)
-
-	return 
 end
 
-return 
+return

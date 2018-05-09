@@ -15,14 +15,13 @@ local function netpack_consumables(consumables, temp_table)
 	for i, slot_name in ipairs(CONSUMABLE_SLOTS) do
 		temp_table[i] = NetworkLookup.item_names[consumables[slot_name] or "n/a"]
 	end
-
-	return 
 end
 
 local RPCS = {
 	"rpc_to_client_respawn_player",
 	"rpc_respawn_confirmed"
 }
+
 SpawnManager.init = function (self, world, is_server, network_event_delegate, unit_spawner, profile_synchronizer, network_server, checkpoint_data)
 	self.world = world
 	self.spawn_points = {}
@@ -52,9 +51,8 @@ SpawnManager.init = function (self, world, is_server, network_event_delegate, un
 	self._respawns_enabled = true
 	self._despawn_queue = {}
 	self._debug_HON6842 = false
-
-	return 
 end
+
 SpawnManager.disable_spawning = function (self, set, reason, safe_position, safe_rotation)
 	local filter = self._disable_spawning_reason_filter
 
@@ -71,9 +69,8 @@ SpawnManager.disable_spawning = function (self, set, reason, safe_position, safe
 
 		self._force_update_spawn_positions(self, safe_position, safe_rotation)
 	end
-
-	return 
 end
+
 SpawnManager._force_update_spawn_positions = function (self, safe_position, safe_rotation)
 	local statuses = self._player_statuses
 
@@ -83,9 +80,8 @@ SpawnManager._force_update_spawn_positions = function (self, safe_position, safe
 		status.position:store(safe_position)
 		status.rotation:store(safe_rotation)
 	end
-
-	return 
 end
+
 SpawnManager.destroy = function (self)
 	self.respawn_handler:destroy()
 	self.hero_spawner_handler:destroy()
@@ -95,9 +91,8 @@ SpawnManager.destroy = function (self)
 	end
 
 	self._network_event_delegate:unregister(self)
-
-	return 
 end
+
 SpawnManager._default_player_statuses = function (self)
 	local settings = Managers.state.difficulty:get_difficulty_settings()
 	local gamemode_settings = Managers.state.game_mode:settings()
@@ -130,6 +125,7 @@ SpawnManager._default_player_statuses = function (self)
 
 	return statuses
 end
+
 SpawnManager.flow_callback_add_spawn_point = function (self, unit)
 	local pos = Unit.local_position(unit, 0)
 	local rot = Unit.local_rotation(unit, 0)
@@ -150,9 +146,8 @@ SpawnManager.flow_callback_add_spawn_point = function (self, unit)
 			break
 		end
 	end
-
-	return 
 end
+
 SpawnManager._spawn_pos_rot_from_index = function (self, index)
 	local spawn_point = self.spawn_points[index]
 	local position = spawn_point.pos:unbox()
@@ -160,11 +155,12 @@ SpawnManager._spawn_pos_rot_from_index = function (self, index)
 
 	return position, rotation
 end
+
 SpawnManager.flow_callback_set_checkpoint = function (self, no_spawn_volume, safe_zone_volume_name, ...)
 	if not self._is_server then
 		print("calling flow_callback_set_checkpoint on client.")
 
-		return 
+		return
 	end
 
 	local mission_data = Managers.state.entity:system("mission_system"):create_checkpoint_data()
@@ -181,9 +177,8 @@ SpawnManager.flow_callback_set_checkpoint = function (self, no_spawn_volume, saf
 		mission = mission_data,
 		networked_flow_state = networked_flow_state_data
 	}
-
-	return 
 end
+
 SpawnManager.load_checkpoint_data = function (self, data)
 	self._checkpoint_data = data
 	local statuses = self._clone_player_status(self, data.player_statuses)
@@ -205,12 +200,12 @@ SpawnManager.load_checkpoint_data = function (self, data)
 	end
 
 	self._player_statuses = statuses
-
-	return 
 end
+
 SpawnManager.checkpoint_data = function (self)
 	return self._checkpoint_data
 end
+
 SpawnManager._clone_player_status = function (self, t)
 	local clone = {}
 
@@ -228,6 +223,7 @@ SpawnManager._clone_player_status = function (self, t)
 
 	return clone
 end
+
 SpawnManager._pack_spawn_unit_level_indices = function (self, ...)
 	local return_table = {}
 	local level = LevelHelper:current_level(self.world)
@@ -241,6 +237,7 @@ SpawnManager._pack_spawn_unit_level_indices = function (self, ...)
 
 	return return_table
 end
+
 SpawnManager.spawn_unit = function (self, spawn_data, position, rotation)
 	if LEVEL_EDITOR_TEST then
 		local pose = Application.get_data("camera")
@@ -254,14 +251,12 @@ SpawnManager.spawn_unit = function (self, spawn_data, position, rotation)
 
 		return self._spawn_unit_at_pos_rot(self, spawn_data, position, camera_flat_rot)
 	end
-
-	return 
 end
+
 SpawnManager.set_forced_bot_profile_index = function (self, profile_index)
 	self._forced_bot_profile_index = profile_index
-
-	return 
 end
+
 SpawnManager._spawn_unit_at_pos_rot = function (self, spawn_data, pos, rot)
 	local unit_name = spawn_data.unit_name
 	local unit_template_name = spawn_data.unit_template_name
@@ -285,6 +280,7 @@ SpawnManager._spawn_unit_at_pos_rot = function (self, spawn_data, pos, rot)
 
 	return unit
 end
+
 SpawnManager.update = function (self, dt, t)
 	self.hero_spawner_handler:update(dt, t)
 
@@ -313,15 +309,13 @@ SpawnManager.update = function (self, dt, t)
 	if 0 < #self._despawn_queue then
 		self._update_despawns(self)
 	end
-
-	return 
 end
+
 SpawnManager.delayed_despawn = function (self, player)
 	local despawn_queue = self._despawn_queue
 	despawn_queue[#despawn_queue + 1] = player
-
-	return 
 end
+
 SpawnManager._update_despawns = function (self)
 	local despawn_queue = self._despawn_queue
 
@@ -332,9 +326,8 @@ SpawnManager._update_despawns = function (self)
 
 		despawn_queue[i] = nil
 	end
-
-	return 
 end
+
 SpawnManager._update_respawns = function (self, dt, t)
 	local statuses = self._player_statuses
 	local player_manager = Managers.player
@@ -363,12 +356,11 @@ SpawnManager._update_respawns = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 SpawnManager.rpc_to_client_respawn_player = function (self, sender, local_player_id, profile_index, respawn_unit_id, health_kit_id, potion_id, grenade_id)
 	if not Managers.state.network:game() then
-		return 
+		return
 	end
 
 	printf("RespawnSystem:rpc_to_client_respawn_player(%s, %s)", tostring(sender), tostring(profile_index))
@@ -379,9 +371,8 @@ SpawnManager.rpc_to_client_respawn_player = function (self, sender, local_player
 	local player = player_manager.local_player(player_manager, local_player_id)
 
 	self._respawn_player(self, player, profile_index, respawn_unit, NetworkLookup.item_names[health_kit_id], NetworkLookup.item_names[potion_id], NetworkLookup.item_names[grenade_id])
-
-	return 
 end
+
 SpawnManager._respawn_player = function (self, player, profile_index, respawn_unit, health_kit, potion, grenade)
 	player.set_profile_index(player, profile_index)
 
@@ -401,9 +392,8 @@ SpawnManager._respawn_player = function (self, player, profile_index, respawn_un
 
 	network_manager.network_transmit:send_rpc_server("rpc_status_change_bool", NetworkLookup.statuses.ready_for_assisted_respawn, true, unit_id, respawn_unit_id)
 	network_manager.network_transmit:send_rpc_server("rpc_respawn_confirmed", player.local_player_id(player))
-
-	return 
 end
+
 SpawnManager.rpc_respawn_confirmed = function (self, sender, local_player_id)
 	local statuses = self._player_statuses
 
@@ -413,12 +403,11 @@ SpawnManager.rpc_respawn_confirmed = function (self, sender, local_player_id)
 		if status.peer_id == sender and status.local_player_id == local_player_id then
 			status.ready_for_respawn = false
 
-			return 
+			return
 		end
 	end
-
-	return 
 end
+
 SpawnManager._update_player_status = function (self, dt, t)
 	local player_manager = Managers.player
 	local statuses = self._player_statuses
@@ -522,9 +511,8 @@ SpawnManager._update_player_status = function (self, dt, t)
 			Debug.text("")
 		end
 	end
-
-	return 
 end
+
 SpawnManager._free_status_slot = function (self, slot_index)
 	local status = self._player_statuses[slot_index]
 	status.peer_id = nil
@@ -544,9 +532,8 @@ SpawnManager._free_status_slot = function (self, slot_index)
 	else
 		status.spawn_state = "not_spawned"
 	end
-
-	return 
 end
+
 SpawnManager._update_bot_spawns = function (self, dt, t)
 	local player_manager = Managers.player
 	local profile_synchronizer = self._profile_synchronizer
@@ -705,9 +692,8 @@ SpawnManager._update_bot_spawns = function (self, dt, t)
 
 		table.clear(self._spawn_list)
 	end
-
-	return 
 end
+
 SpawnManager.post_unit_destroy_update = function (self)
 	if self._is_server then
 		local synchronizer = self._profile_synchronizer
@@ -719,9 +705,8 @@ SpawnManager.post_unit_destroy_update = function (self)
 
 		table.clear(release_list)
 	end
-
-	return 
 end
+
 SpawnManager.all_humans_dead = function (self)
 	local statuses = self._player_statuses
 	local player_manager = Managers.player
@@ -741,6 +726,7 @@ SpawnManager.all_humans_dead = function (self)
 
 	return true
 end
+
 SpawnManager.all_players_disabled = function (self)
 	local statuses = self._player_statuses
 
@@ -755,6 +741,7 @@ SpawnManager.all_players_disabled = function (self)
 
 	return true
 end
+
 SpawnManager.get_status = function (self, _player)
 	local statuses = self._player_statuses
 	local player_manager = Managers.player
@@ -775,6 +762,7 @@ SpawnManager.get_status = function (self, _player)
 
 	return nil
 end
+
 SpawnManager.teleport_despawned_players = function (self, position)
 	local statuses = self._player_statuses
 	local player_manager = Managers.player
@@ -789,9 +777,8 @@ SpawnManager.teleport_despawned_players = function (self, position)
 			status.position:store(position)
 		end
 	end
-
-	return 
 end
+
 SpawnManager._update_available_profiles = function (self, profile_synchronizer, available_profile_order, available_profiles)
 	local delta = 0
 	local bots = 0
@@ -841,6 +828,7 @@ SpawnManager._update_available_profiles = function (self, profile_synchronizer, 
 
 	return delta, humans, bots
 end
+
 SpawnManager._take_status_slot = function (self, i, peer_id, local_player_id, profile_index)
 	local status = self._player_statuses[i]
 	local old_peer_id = status.peer_id
@@ -858,9 +846,8 @@ SpawnManager._take_status_slot = function (self, i, peer_id, local_player_id, pr
 		status.health_percentage = 0
 		status.temporary_health_percentage = 1
 	end
-
-	return 
 end
+
 SpawnManager._assign_status_slot = function (self, peer_id, local_player_id, profile_index)
 	local latest_slot = nil
 	local latest_time = -math.huge
@@ -926,6 +913,7 @@ SpawnManager._assign_status_slot = function (self, peer_id, local_player_id, pro
 
 	return first_spawn, slot_index
 end
+
 SpawnManager._find_spawn_point = function (self, status)
 	local position, rotation = nil
 	local room_manager = Managers.state.room
@@ -941,6 +929,7 @@ SpawnManager._find_spawn_point = function (self, status)
 
 	return position, rotation
 end
+
 SpawnManager._clear_bots = function (self)
 	local local_peer_id = Network.peer_id()
 	local synchronizer = self._profile_synchronizer
@@ -952,9 +941,8 @@ SpawnManager._clear_bots = function (self)
 		player_manager.remove_player(player_manager, local_peer_id, local_player_id)
 		synchronizer.set_profile_peer_id(synchronizer, profile_index, nil)
 	end
-
-	return 
 end
+
 SpawnManager._update_spawning = function (self, dt, t)
 	if self._spawning then
 		local statuses = self._player_statuses
@@ -968,9 +956,8 @@ SpawnManager._update_spawning = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 SpawnManager._spawn_player = function (self, status)
 	local peer_id = status.peer_id
 	local local_player_id = status.local_player_id
@@ -992,9 +979,8 @@ SpawnManager._spawn_player = function (self, status)
 	table.clear(CONSUMABLES_TEMP)
 
 	status.spawn_state = (is_initial_spawn and "initial_spawning") or "spawning"
-
-	return 
 end
+
 SpawnManager.ready_to_spawn = function (self, peer_id, local_player_id)
 	local spawn_index, position, rotation = nil
 	local profile_index = self._profile_synchronizer:profile_by_peer(peer_id, local_player_id)
@@ -1011,15 +997,12 @@ SpawnManager.ready_to_spawn = function (self, peer_id, local_player_id)
 	else
 		status.spawn_state = (is_initial_spawn and "is_initial_spawn") or "spawn"
 	end
-
-	return 
 end
+
 SpawnManager.set_respawning_enabled = function (self, enabled)
 	fassert(self._respawns_enabled ~= enabled, "Respawns already enabled=%s", tostring(enabled))
 
 	self._respawns_enabled = enabled
-
-	return 
 end
 
-return 
+return

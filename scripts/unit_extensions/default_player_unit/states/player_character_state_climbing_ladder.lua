@@ -1,13 +1,13 @@
 PlayerCharacterStateClimbingLadder = class(PlayerCharacterStateClimbingLadder, PlayerCharacterState)
+
 PlayerCharacterStateClimbingLadder.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "climbing_ladder")
 
 	local context = character_state_init_context
 	self.lerp_target_position = Vector3Box()
 	self.lerp_start_position = Vector3Box()
-
-	return 
 end
+
 PlayerCharacterStateClimbingLadder.on_enter_animation_event = function (self)
 	local unit = self.unit
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
@@ -28,9 +28,8 @@ PlayerCharacterStateClimbingLadder.on_enter_animation_event = function (self)
 	local first_person_extension = self.first_person_extension
 
 	first_person_extension.play_animation_event(first_person_extension, "climb_enter_ladder")
-
-	return 
 end
+
 PlayerCharacterStateClimbingLadder.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	local unit = self.unit
 	local input_extension = self.input_extension
@@ -68,9 +67,8 @@ PlayerCharacterStateClimbingLadder.on_enter = function (self, unit, input, dt, c
 	end
 
 	loc_ext.set_mover_filter_property(loc_ext, "ladder", true)
-
-	return 
 end
+
 PlayerCharacterStateClimbingLadder.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local loc_ext = self.locomotion_extension
 
@@ -103,9 +101,8 @@ PlayerCharacterStateClimbingLadder.on_exit = function (self, unit, input, dt, co
 	end
 
 	loc_ext.set_mover_filter_property(loc_ext, "ladder", false)
-
-	return 
 end
+
 PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -115,7 +112,7 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 	local player = self.player
 
 	if CharacterStateHelper.do_common_state_transitions(status_extension, csm) then
-		return 
+		return
 	end
 
 	local current_velocity = locomotion_extension.current_velocity(locomotion_extension)
@@ -124,7 +121,7 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 	if CharacterStateHelper.is_colliding_down(unit) and current_velocity_z < 0 then
 		csm.change_state(csm, "walking")
 
-		return 
+		return
 	end
 
 	local ladder_shaking = ScriptUnit.extension(self.ladder_unit, "ladder_system"):is_shaking()
@@ -136,7 +133,7 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 
 		csm.change_state(csm, "jumping", params)
 
-		return 
+		return
 	end
 
 	local colliding_with_ladder, ladder_unit = CharacterStateHelper.is_colliding_with_gameplay_collision_box(self.world, unit, "filter_ladder_collision")
@@ -152,7 +149,7 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 
 			csm.change_state(csm, "leaving_ladder_top", params)
 
-			return 
+			return
 		elseif not colliding_with_ladder then
 			if above_climb_off_height and 0 < current_velocity_z then
 				local params = self.temp_params
@@ -163,7 +160,7 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 				csm.change_state(csm, "falling")
 			end
 
-			return 
+			return
 		end
 	end
 
@@ -203,9 +200,8 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 
 		WwiseWorld.trigger_event(wwise_world, "player_footstep_ladder", wwise_source_id)
 	end
-
-	return 
 end
+
 PlayerCharacterStateClimbingLadder._move_on_ladder = function (self, first_person_extension, rotation, input_extension, locomotion_extension, unit, speed, ladder_offset)
 	local movement = CharacterStateHelper.get_square_movement_input(input_extension)
 	local x_input = Vector3.x(movement)
@@ -263,9 +259,8 @@ PlayerCharacterStateClimbingLadder._move_on_ladder = function (self, first_perso
 	local move_direction = Quaternion.rotate(rotation, direction)
 
 	locomotion_extension.set_wanted_velocity(locomotion_extension, move_direction * speed + ladder_offset * Quaternion.forward(rotation) * 4)
-
-	return 
 end
+
 PlayerCharacterStateClimbingLadder.on_ladder_animation = function (self)
 	local unit = self.unit
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
@@ -294,8 +289,6 @@ PlayerCharacterStateClimbingLadder.on_ladder_animation = function (self)
 
 		self.currently_playing_move_animation = true
 	end
-
-	return 
 end
 
-return 
+return

@@ -8,11 +8,11 @@ local DETAILED_PROFILING = true
 if DETAILED_PROFILING then
 else
 	function detailed_profiler_start()
-		return 
+		return
 	end
 
 	function detailed_profiler_stop()
-		return 
+		return
 	end
 end
 
@@ -29,8 +29,6 @@ LocomotionTemplates.AILocomotionExtension = {
 		data.snap_to_navmesh_update_units = {}
 		data.get_to_navmesh_update_units = {}
 		data.mover_constrained_update_units = {}
-
-		return 
 	end,
 	update = function (data, t, dt)
 		LocomotionTemplates.AILocomotionExtension.validate2(data, t, dt)
@@ -42,8 +40,6 @@ LocomotionTemplates.AILocomotionExtension = {
 		LocomotionTemplates.AILocomotionExtension.update_position(data, t, dt)
 		LocomotionTemplates.AILocomotionExtension.update_out_of_range(data, t, dt)
 		LocomotionTemplates.AILocomotionExtension.update_network(data, t, dt)
-
-		return 
 	end,
 	validate2 = function (data, t, dt)
 		local all_update_units = data.all_update_units
@@ -61,8 +57,6 @@ LocomotionTemplates.AILocomotionExtension = {
 				fassert(Vector3.is_valid(wanted_velocity), "Invalid velocity %s", wanted_velocity)
 			end
 		end
-
-		return 
 	end,
 	update_alive = function (data, t, dt)
 		for unit, extension in pairs(data.destroy_units) do
@@ -77,22 +71,16 @@ LocomotionTemplates.AILocomotionExtension = {
 			data.get_to_navmesh_update_units[unit] = nil
 			data.mover_constrained_update_units[unit] = nil
 		end
-
-		return 
 	end,
 	update_velocity = function (data, t, dt)
 		for unit, extension in pairs(data.all_update_units) do
 			extension._wanted_velocity = extension._wanted_velocity or extension._velocity:unbox()
 		end
-
-		return 
 	end,
 	update_gravity = function (data, t, dt)
 		for unit, extension in pairs(data.affected_by_gravity_update_units) do
 			extension._wanted_velocity.z = extension._velocity.z - extension._gravity * dt
 		end
-
-		return 
 	end,
 	update_animation_driven_units = function (data, t, dt)
 		for unit, extension in pairs(data.animation_update_units) do
@@ -121,8 +109,6 @@ LocomotionTemplates.AILocomotionExtension = {
 			wanted_velocity = Vector3.multiply_elements(wanted_velocity, extension._animation_translation_scale:unbox())
 			extension._wanted_velocity = wanted_velocity
 		end
-
-		return 
 	end,
 	update_rotation = function (data, t, dt)
 		local Vector3_length_squared = Vector3.length_squared
@@ -155,8 +141,6 @@ LocomotionTemplates.AILocomotionExtension = {
 				extension._rotation_speed_modifier = math.lerp(extension._rotation_speed_modifier_lerp_start_value, 1, lerp_percentage)
 			end
 		end
-
-		return 
 	end,
 	update_position = function (data, t, dt)
 		local Unit_local_position = Unit.local_position
@@ -295,8 +279,6 @@ LocomotionTemplates.AILocomotionExtension = {
 				Mover_set_position(mover, Unit_local_position(unit, 0))
 			end
 		end
-
-		return 
 	end,
 	update_out_of_range = function (data, t, dt)
 		local conflict_director = Managers.state.conflict
@@ -322,14 +304,12 @@ LocomotionTemplates.AILocomotionExtension = {
 				conflict_director.destroy_unit(conflict_director, unit, blackboard, "out_of_range")
 			end
 		end
-
-		return 
 	end,
 	update_network = function (data, t, dt)
 		local game = Managers.state.network:game()
 
 		if game == nil then
-			return 
+			return
 		end
 
 		local unit_storage = Managers.state.unit_storage
@@ -358,9 +338,7 @@ LocomotionTemplates.AILocomotionExtension = {
 
 			GameSession_set_game_object_field(game, go_id, "velocity", velocity)
 		end
-
-		return 
 	end
 }
 
-return 
+return

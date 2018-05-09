@@ -311,4 +311,4 @@ local quality_settings = {
 Weapons = Weapons or {}
 Weapons.kerillian_waywatcher_career_skill_weapon = table.create_copy(Weapons.kerillian_waywatcher_career_skill_weapon, weapon_template)
 
-return 
+return

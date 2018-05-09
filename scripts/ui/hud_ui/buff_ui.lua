@@ -5,6 +5,7 @@ local MAX_NUMBER_OF_BUFFS = definitions.MAX_NUMBER_OF_BUFFS
 local BUFF_SIZE = definitions.BUFF_SIZE
 local BUFF_SPACING = definitions.BUFF_SPACING
 BuffUI = class(BuffUI)
+
 BuffUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -19,9 +20,8 @@ BuffUI.init = function (self, ingame_ui_context)
 
 	self._create_ui_elements(self)
 	rawset(_G, "buff_ui", self)
-
-	return 
 end
+
 BuffUI._create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local buff_widgets = {}
@@ -48,12 +48,12 @@ BuffUI._create_ui_elements = function (self)
 		local career_index = career_extension.career_index(career_extension)
 		self._current_career_index = career_index
 	end
-
-	return 
 end
+
 local sorted_buffs = {}
 local widgets_to_remove = {}
 local buffs_to_add = {}
+
 BuffUI._sync_buffs = function (self)
 	local debug_buffs = Development.parameter("debug_player_buffs")
 	local t = Managers.time:time("game")
@@ -150,9 +150,8 @@ BuffUI._sync_buffs = function (self)
 			self._align_widgets(self)
 		end
 	end
-
-	return 
 end
+
 BuffUI._add_buff = function (self, buff, infinite, end_time)
 	local buff_template = buff.template
 	local dormant = buff_template.dormant
@@ -243,6 +242,7 @@ BuffUI._add_buff = function (self, buff, infinite, end_time)
 
 	return true
 end
+
 BuffUI._remove_buff = function (self, index)
 	local active_buffs = self._active_buffs
 	local data = table.remove(active_buffs, index)
@@ -251,14 +251,13 @@ BuffUI._remove_buff = function (self, index)
 
 	table.insert(unused_buff_widgets, #unused_buff_widgets + 1, widget)
 	UIRenderer.set_element_visible(self.ui_renderer, widget.element, false)
-
-	return 
 end
+
 BuffUI._update_pivot_alignment = function (self, dt)
 	local alignment_duration = self._alignment_duration
 
 	if not alignment_duration then
-		return 
+		return
 	end
 
 	alignment_duration = math.min(alignment_duration + dt, ALIGNMENT_DURATION_TIME)
@@ -285,9 +284,8 @@ BuffUI._update_pivot_alignment = function (self, dt)
 	end
 
 	self.set_dirty(self)
-
-	return 
 end
+
 BuffUI._align_widgets = function (self)
 	local gamepad_active = self.input_manager:is_device_active("gamepad")
 	local horizontal_spacing = BUFF_SIZE[1] + BUFF_SPACING
@@ -307,9 +305,8 @@ BuffUI._align_widgets = function (self)
 	self.set_dirty(self)
 
 	self._alignment_duration = 0
-
-	return 
 end
+
 BuffUI.set_position = function (self, x, y)
 	local position = self.ui_scenegraph.pivot.local_position
 	position[1] = x
@@ -320,15 +317,13 @@ BuffUI.set_position = function (self, x, y)
 	end
 
 	self.set_dirty(self)
-
-	return 
 end
+
 BuffUI.destroy = function (self)
 	self.set_visible(self, false)
 	rawset(_G, "buff_ui", nil)
-
-	return 
 end
+
 BuffUI.set_visible = function (self, visible)
 	self._is_visible = visible
 	local ui_renderer = self.ui_renderer
@@ -338,9 +333,8 @@ BuffUI.set_visible = function (self, visible)
 	end
 
 	self.set_dirty(self)
-
-	return 
 end
+
 BuffUI.update = function (self, dt, t)
 	local dirty = false
 	local gamepad_active = self.input_manager:is_device_active("gamepad")
@@ -371,32 +365,29 @@ BuffUI.update = function (self, dt, t)
 	self._handle_resolution_modified(self)
 	self._update_buffs(self, dt)
 	self.draw(self, dt)
-
-	return 
 end
+
 BuffUI._handle_resolution_modified = function (self)
 	if RESOLUTION_LOOKUP.modified then
 		self._on_resolution_modified(self)
 	end
-
-	return 
 end
+
 BuffUI._on_resolution_modified = function (self)
 	for _, widget in ipairs(self._buff_widgets) do
 		self._set_widget_dirty(self, widget)
 	end
 
 	self.set_dirty(self)
-
-	return 
 end
+
 BuffUI.draw = function (self, dt)
 	if not self._is_visible then
-		return 
+		return
 	end
 
 	if not self._dirty then
-		return 
+		return
 	end
 
 	local ui_renderer = self.ui_renderer
@@ -414,9 +405,8 @@ BuffUI.draw = function (self, dt)
 	UIRenderer.end_pass(ui_renderer)
 
 	self._dirty = false
-
-	return 
 end
+
 BuffUI._update_buffs = function (self, dt)
 	local dirty = false
 	local t = Managers.time:time("game")
@@ -453,9 +443,8 @@ BuffUI._update_buffs = function (self, dt)
 	if dirty then
 		self.set_dirty(self)
 	end
-
-	return 
 end
+
 BuffUI._handle_career_change = function (self)
 	local player = Managers.player:local_player(1)
 	local player_unit = player.player_unit
@@ -474,11 +463,11 @@ BuffUI._handle_career_change = function (self)
 			self.set_dirty(self)
 		end
 	end
-
-	return 
 end
+
 local floor = math.floor
 local ceil = math.ceil
+
 BuffUI._set_widget_time_progress = function (self, widget, progress, time_left, is_cooldown)
 	local style = widget.style
 	local content = widget.content
@@ -508,29 +497,24 @@ BuffUI._set_widget_time_progress = function (self, widget, progress, time_left, 
 	end
 
 	self._set_widget_dirty(self, widget)
-
-	return 
 end
+
 BuffUI.set_dirty = function (self)
 	self._dirty = true
-
-	return 
 end
+
 BuffUI._set_widget_dirty = function (self, widget)
 	widget.element.dirty = true
-
-	return 
 end
+
 BuffUI.on_gamepad_activated = function (self)
 	self._align_widgets(self)
-
-	return 
 end
+
 BuffUI.on_gamepad_deactivated = function (self)
 	self._align_widgets(self)
-
-	return 
 end
+
 BuffUI.set_panel_alpha = function (self, alpha)
 	if self.render_settings.alpha_multiplier ~= alpha then
 		self.render_settings.alpha_multiplier = alpha
@@ -543,8 +527,6 @@ BuffUI.set_panel_alpha = function (self, alpha)
 			self._set_widget_dirty(self, widget)
 		end
 	end
-
-	return 
 end
 
-return 
+return

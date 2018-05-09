@@ -24,7 +24,7 @@ StatisticsTemplates.multikill = {
 		local kills_total = context.statistics_db:get_stat(extension.statistics_id, "kills_total")
 
 		if kills_total <= kills_total_last then
-			return 
+			return
 		end
 
 		local time_window = StatisticsTemplates.multikill.config.time_window
@@ -54,8 +54,6 @@ StatisticsTemplates.multikill = {
 
 		data.kill_times_n = kill_times_n
 		data.kills_total_last = kills_total
-
-		return 
 	end
 }
 local templates = {}
@@ -68,4 +66,4 @@ for name, cat in pairs(StatisticsTemplateCategories) do
 	assert(StatisticsTemplates[name] == nil, "Statistics templates: Can't have category with the same name as a template")
 end
 
-return 
+return

@@ -4,6 +4,7 @@ local extensions = {
 	"PlayGoTutorialExtension"
 }
 PlayGoTutorialSystem = class(PlayGoTutorialSystem, ExtensionSystemBase)
+
 PlayGoTutorialSystem.init = function (self, entity_system_creation_context, system_name)
 	PlayGoTutorialSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -17,21 +18,21 @@ PlayGoTutorialSystem.init = function (self, entity_system_creation_context, syst
 	self._active = false
 	self._bot_loot_enabled = true
 	self._bot_portraits_enabled = {}
-
-	return 
 end
+
 PlayGoTutorialSystem.destroy = function (self)
 	if self._unit_animation_event then
 		Unit.animation_event = self._unit_animation_event
 		self._unit_animation_event = nil
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem.active = function (self)
 	return self._active
 end
+
 local dummy_input = {}
+
 PlayGoTutorialSystem.on_add_extension = function (self, world, unit, extension_name, ...)
 	fassert(self._tutorial_unit == nil, "Multiple tutorial units spawned on level!")
 
@@ -60,6 +61,7 @@ PlayGoTutorialSystem.on_add_extension = function (self, world, unit, extension_n
 
 	return extension
 end
+
 PlayGoTutorialSystem.trigger_pause_event = function (self, pause_event, look_position)
 	self._current_pause_event = nil
 
@@ -71,22 +73,21 @@ PlayGoTutorialSystem.trigger_pause_event = function (self, pause_event, look_pos
 	pause_event.world = self._world
 
 	self._current_pause_event.on_enter(pause_event, nil, look_position)
-
-	return 
 end
+
 PlayGoTutorialSystem.add_animation_hook = function (self, animation_hook)
 	self._animation_hooks[#self._animation_hooks + 1] = animation_hook
 
 	self._add_next_animation_hook(self)
-
-	return 
 end
+
 PlayGoTutorialSystem._add_next_animation_hook = function (self)
 	self._unit_animation_event = self._unit_animation_event or Unit.animation_event
 	local animation_hook = self._animation_hooks[1]
 
 	if animation_hook then
 		self._current_animation_hook = animation_hook
+
 		Unit.animation_event = function (unit, animation_event)
 			local breed = Unit.get_data(unit, "breed")
 
@@ -105,9 +106,8 @@ PlayGoTutorialSystem._add_next_animation_hook = function (self)
 
 		print("Resetting Unit.animation_event")
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem.on_remove_extension = function (self, unit, extension_name)
 	ScriptUnit.remove_extension(unit, self.NAME)
 	self._unload_profile_packages(self)
@@ -119,25 +119,22 @@ PlayGoTutorialSystem.on_remove_extension = function (self, unit, extension_name)
 	self._active = false
 	self._tutorial_started = false
 	self._tutorial_unit = nil
-
-	return 
 end
+
 PlayGoTutorialSystem.spawn_bot = function (self, profile_index)
 	Managers.state.spawn:set_forced_bot_profile_index(profile_index)
 
 	script_data.ai_bots_disabled = false
 	script_data.cap_num_bots = self._num_bots_active
 	self._num_bots_active = self._num_bots_active + 1
-
-	return 
 end
+
 PlayGoTutorialSystem.set_bot_ready_for_assisted_respawn = function (self, unit, respawn_unit)
 	local status_extension = ScriptUnit.extension(unit, "status_system")
 
 	status_extension.set_ready_for_assisted_respawn(status_extension, true, respawn_unit)
-
-	return 
 end
+
 PlayGoTutorialSystem.remove_player_ammo = function (self)
 	local player = Managers.player:local_player()
 	local inventory_extension = ScriptUnit.extension(player.player_unit, "inventory_system")
@@ -154,9 +151,8 @@ PlayGoTutorialSystem.remove_player_ammo = function (self)
 			ammo_extension.add_ammo_to_reserve(ammo_extension, -(current - 1))
 		end
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem.check_player_ammo = function (self)
 	local player = Managers.player:local_player()
 	local inventory_extension = ScriptUnit.extension(player.player_unit, "inventory_system")
@@ -168,12 +164,13 @@ PlayGoTutorialSystem.check_player_ammo = function (self)
 
 	return false
 end
+
 PlayGoTutorialSystem.enable_player_ammo_refill = function (self)
 	self.player_ammo_refill = true
-
-	return 
 end
+
 local DO_RELOAD = false
+
 PlayGoTutorialSystem.give_player_potion_from_bot = function (self, player_unit, bot_unit)
 	local inventory = ScriptUnit.extension(player_unit, "inventory_system")
 	local item_name = "potion_speed_boost_01"
@@ -187,18 +184,17 @@ PlayGoTutorialSystem.give_player_potion_from_bot = function (self, player_unit, 
 	if interactor_player then
 		Managers.state.event:trigger("give_item_feedback", interactor_player.stats_id(interactor_player) .. item_name, interactor_player, item_name)
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem.update = function (self, context, t)
 	if not self._tutorial_started then
-		return 
+		return
 	end
 
 	local player = Managers.player:local_player()
 
 	if not Unit.alive(player.player_unit) then
-		return 
+		return
 	end
 
 	if DO_RELOAD then
@@ -229,9 +225,8 @@ PlayGoTutorialSystem.update = function (self, context, t)
 	self._update_ai_units(self)
 	self._capture_wield_switch(self, player)
 	self._capture_attacks(self, player)
-
-	return 
 end
+
 PlayGoTutorialSystem._update_animation_hooks = function (self, player, t)
 	if self._current_animation_hook and self._current_animation_hook.activated and self._current_animation_hook.update(self._current_animation_hook, t) then
 		self._current_animation_hook.on_exit(self._current_animation_hook)
@@ -241,18 +236,16 @@ PlayGoTutorialSystem._update_animation_hooks = function (self, player, t)
 
 		self._add_next_animation_hook(self)
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem._update_pause_events = function (self, t)
 	if self._current_pause_event and self._current_pause_event.update(self._current_pause_event, t) then
 		self._current_pause_event.on_exit(self._current_pause_event)
 
 		self._current_pause_event = nil
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem._update_player_health = function (self, player)
 	local player_unit = player.player_unit
 	local health_extension = ScriptUnit.extension(player_unit, "health_system")
@@ -261,9 +254,8 @@ PlayGoTutorialSystem._update_player_health = function (self, player)
 	if hp_percent < 0.2 then
 		health_extension.reset(health_extension)
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem._capture_wield_switch = function (self, player)
 	local player_unit = player.player_unit
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
@@ -273,9 +265,8 @@ PlayGoTutorialSystem._capture_wield_switch = function (self, player)
 
 		Unit.flow_event(self._tutorial_unit, "lua_wield_switch")
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem._capture_attacks = function (self, player)
 	local player_unit = player.player_unit
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
@@ -293,12 +284,11 @@ PlayGoTutorialSystem._capture_attacks = function (self, player)
 			end
 		end
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem._update_player_ammo = function (self, player)
 	if not self.player_ammo_refill then
-		return 
+		return
 	end
 
 	local inventory_extension = ScriptUnit.extension(player.player_unit, "inventory_system")
@@ -317,9 +307,8 @@ PlayGoTutorialSystem._update_player_ammo = function (self, player)
 			end
 		end
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem._update_ai_units = function (self)
 	for i, data in pairs(self._spawned_ai_units) do
 		if Unit.alive(data.ai_unit) and not ScriptUnit.extension(data.ai_unit, "health_system"):is_alive() then
@@ -336,9 +325,8 @@ PlayGoTutorialSystem._update_ai_units = function (self)
 			break
 		end
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem._load_profile_packages = function (self)
 	local profiles_to_load = {
 		3,
@@ -456,9 +444,8 @@ PlayGoTutorialSystem._load_profile_packages = function (self)
 	end
 
 	print("[PlayGoTutorialSystem]:_load_profile_packages()")
-
-	return 
 end
+
 PlayGoTutorialSystem._unload_profile_packages = function (self)
 	local profile_packages = self._profile_packages
 
@@ -469,9 +456,8 @@ PlayGoTutorialSystem._unload_profile_packages = function (self)
 	end
 
 	print("[PlayGoTutorialSystem]:_unload_profile_packages()")
-
-	return 
 end
+
 PlayGoTutorialSystem.register_dodge = function (self, dodge_direction)
 	if self._tutorial_started then
 		local tutorial_unit = self._tutorial_unit
@@ -486,23 +472,20 @@ PlayGoTutorialSystem.register_dodge = function (self, dodge_direction)
 			Unit.flow_event(tutorial_unit, "lua_dodge_left")
 		end
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem.register_push = function (self, hit_unit)
 	if self._tutorial_started and Unit.alive(hit_unit) and ScriptUnit.extension(hit_unit, "health_system"):is_alive() then
 		Unit.flow_event(self._tutorial_unit, "lua_pushed_enemy")
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem.register_block = function (self)
 	if self._tutorial_started then
 		Unit.flow_event(self._tutorial_unit, "lua_blocked_attack")
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem.register_killing_blow = function (self, damage_type, attacker)
 	if self._tutorial_started then
 		local local_player = Managers.player:local_player()
@@ -524,12 +507,11 @@ PlayGoTutorialSystem.register_killing_blow = function (self, damage_type, attack
 			end
 		end
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem.register_unit = function (self, spawner_unit, ai_unit)
 	if not self._tutorial_started then
-		return 
+		return
 	end
 
 	local data = {}
@@ -558,9 +540,8 @@ PlayGoTutorialSystem.register_unit = function (self, spawner_unit, ai_unit)
 	data.ai_unit = ai_unit
 
 	table.insert(self._spawned_ai_units, data)
-
-	return 
 end
+
 PlayGoTutorialSystem.teleport_unit = function (self, unit, position, rotation)
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
@@ -573,26 +554,24 @@ PlayGoTutorialSystem.teleport_unit = function (self, unit, position, rotation)
 
 		navigation_extension.teleport(navigation_extension, position)
 	end
-
-	return 
 end
+
 PlayGoTutorialSystem.enable_bot_loot = function (self, enable)
 	self._bot_loot_enabled = enable
-
-	return 
 end
+
 PlayGoTutorialSystem.bot_loot_enabled = function (self)
 	return self._bot_loot_enabled
 end
+
 PlayGoTutorialSystem.set_bot_portrait_enabled = function (self, bot_display_name)
 	self._bot_portraits_enabled[bot_display_name] = true
-
-	return 
 end
+
 PlayGoTutorialSystem.bot_portrait_enabled = function (self, player)
 	local display_name = player.player_name
 
 	return self._bot_portraits_enabled[display_name]
 end
 
-return 
+return

@@ -16,6 +16,7 @@ local extensions = {
 	"SimpleHuskInventoryExtension",
 	"SimpleInventoryExtension"
 }
+
 InventorySystem.init = function (self, entity_system_creation_context, system_name)
 	InventorySystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -29,8 +30,6 @@ InventorySystem.init = function (self, entity_system_creation_context, system_na
 	self.profile_synchronizer = entity_system_creation_context.profile_synchronizer
 	self.num_grimoires = 0
 	self.num_side_objectives = 0
-
-	return 
 end
 
 local function add_grimoire()
@@ -44,8 +43,6 @@ local function add_grimoire()
 	local group_buff_name_id = NetworkLookup.group_buff_templates.grimoire
 
 	buff_system.rpc_add_group_buff(buff_system, nil, group_buff_name_id, 1)
-
-	return 
 end
 
 local function remove_grimoire()
@@ -58,8 +55,6 @@ local function remove_grimoire()
 	local group_buff_name_id = NetworkLookup.group_buff_templates.grimoire
 
 	buff_system.rpc_remove_group_buff(buff_system, nil, group_buff_name_id, 1)
-
-	return 
 end
 
 local function add_side_objective()
@@ -68,8 +63,6 @@ local function add_side_objective()
 
 	mission_system.request_mission(mission_system, mission_name)
 	mission_system.update_mission(mission_system, mission_name, true, nil, true)
-
-	return 
 end
 
 local function remove_side_objective()
@@ -77,8 +70,6 @@ local function remove_side_objective()
 	local mission_name = "tome_bonus_mission"
 
 	mission_system.update_mission(mission_system, mission_name, false, nil, true)
-
-	return 
 end
 
 InventorySystem.update = function (self, context, t)
@@ -88,9 +79,8 @@ InventorySystem.update = function (self, context, t)
 		self.num_grimoires = self.update_mission_inventory_item(self, "slot_potion", "wpn_grimoire_01", self.num_grimoires, add_grimoire, remove_grimoire)
 		self.num_side_objectives = self.update_mission_inventory_item(self, "slot_healthkit", "wpn_side_objective_tome_01", self.num_side_objectives, add_side_objective, remove_side_objective)
 	end
-
-	return 
 end
+
 InventorySystem.update_mission_inventory_item = function (self, slot_name, item_name, previous_num_items, add_func, remove_func)
 	local player_and_bot_units = PLAYER_AND_BOT_UNITS
 	local num_player_and_bots = #player_and_bot_units
@@ -127,11 +117,11 @@ InventorySystem.update_mission_inventory_item = function (self, slot_name, item_
 
 	return num_items
 end
+
 InventorySystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
-
-	return 
 end
+
 InventorySystem.rpc_show_inventory = function (self, sender, unit_id, show_inventory)
 	local unit = self.unit_storage:unit(unit_id)
 	local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
@@ -141,9 +131,8 @@ InventorySystem.rpc_show_inventory = function (self, sender, unit_id, show_inven
 	if self.is_server then
 		Managers.state.network.network_transmit:send_rpc_clients_except("rpc_show_inventory", sender, unit_id, show_inventory)
 	end
-
-	return 
 end
+
 InventorySystem.rpc_play_simple_particle_with_vector_variable = function (self, sender, effect_id, position, variable_id, variable_value)
 	if self.is_server then
 		self.network_transmit:send_rpc_clients("rpc_play_simple_particle_with_vector_variable", effect_id, position, variable_id, variable_value)
@@ -156,9 +145,8 @@ InventorySystem.rpc_play_simple_particle_with_vector_variable = function (self, 
 	local effect_variable_id = World.find_particles_variable(world, effect_name, variable_name)
 
 	World.set_particles_variable(world, effect_id, effect_variable_id, variable_value)
-
-	return 
 end
+
 InventorySystem.rpc_destroy_slot = function (self, sender, go_id, slot_id)
 	if self.is_server then
 		self.network_transmit:send_rpc_clients_except("rpc_destroy_slot", sender, go_id, slot_id)
@@ -169,9 +157,8 @@ InventorySystem.rpc_destroy_slot = function (self, sender, go_id, slot_id)
 	local inventory = ScriptUnit.extension(unit, "inventory_system")
 
 	inventory.destroy_slot(inventory, slot_name)
-
-	return 
 end
+
 InventorySystem.rpc_give_equipment = function (self, sender, interactor_game_object_id, game_object_id, slot_id, item_name_id, position)
 	local unit = self.unit_storage:unit(game_object_id)
 	local failed = false
@@ -238,9 +225,8 @@ InventorySystem.rpc_give_equipment = function (self, sender, interactor_game_obj
 			self.network_transmit:send_rpc_server("rpc_spawn_pickup_with_physics", pickup_name_id, position, Quaternion.identity(), pickup_spawn_type_id)
 		end
 	end
-
-	return 
 end
+
 InventorySystem.rpc_add_equipment = function (self, sender, go_id, slot_id, item_name_id, weapon_skin_id)
 	if self.is_server then
 		self.network_transmit:send_rpc_clients_except("rpc_add_equipment", sender, go_id, slot_id, item_name_id, weapon_skin_id)
@@ -258,9 +244,8 @@ InventorySystem.rpc_add_equipment = function (self, sender, go_id, slot_id, item
 	local inventory = ScriptUnit.extension(unit, "inventory_system")
 
 	inventory.add_equipment(inventory, slot_name, item_name, skin_name)
-
-	return 
 end
+
 InventorySystem.rpc_add_equipment_buffs = function (self, sender, go_id, slot_id, buff_1_id, buff_data_type_1_id, value_1, buff_2_id, buff_data_type_2_id, value_2, buff_3_id, buff_data_type_3_id, value_3, buff_4_id, buff_data_type_4_id, value_4)
 	fassert(self.is_server, "attempting to add buffs as a client VIA rpc_add_equipment_buffs")
 
@@ -277,9 +262,8 @@ InventorySystem.rpc_add_equipment_buffs = function (self, sender, go_id, slot_id
 	local inventory = ScriptUnit.extension(unit, "inventory_system")
 
 	inventory.add_buffs_to_slot(inventory, slot_name, buff_name_1, buff_data_type_1, value_1, buff_name_2, buff_data_type_2, value_2, buff_name_3, buff_data_type_3, value_3, buff_name_4, buff_data_type_4, value_4)
-
-	return 
 end
+
 InventorySystem.rpc_add_equipment_limited_item = function (self, sender, go_id, slot_id, item_name_id, spawner_unit_id, limited_item_id)
 	if self.is_server then
 		self.network_transmit:send_rpc_clients_except("rpc_add_equipment_limited_item", sender, go_id, slot_id, item_name_id, spawner_unit_id, limited_item_id)
@@ -292,9 +276,8 @@ InventorySystem.rpc_add_equipment_limited_item = function (self, sender, go_id, 
 	local inventory = ScriptUnit.extension(unit, "inventory_system")
 
 	inventory.add_equipment_limited_item(inventory, slot_name, item_name, spawner_unit, limited_item_id)
-
-	return 
 end
+
 InventorySystem.rpc_wield_equipment = function (self, sender, go_id, slot_id)
 	if self.is_server then
 		self.network_transmit:send_rpc_clients_except("rpc_wield_equipment", sender, go_id, slot_id)
@@ -305,8 +288,6 @@ InventorySystem.rpc_wield_equipment = function (self, sender, go_id, slot_id)
 	local inventory = ScriptUnit.extension(unit, "inventory_system")
 
 	inventory.wield(inventory, slot_name)
-
-	return 
 end
 
-return 
+return

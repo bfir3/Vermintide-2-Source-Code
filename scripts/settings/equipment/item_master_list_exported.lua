@@ -16299,4 +16299,4 @@ ItemMasterList.we_spear_skin = {
 	}
 }
 
-return 
+return

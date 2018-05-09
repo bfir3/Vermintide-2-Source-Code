@@ -1,4 +1,5 @@
 GearUtils = {}
+
 GearUtils.create_equipment = function (world, slot_name, item_data, unit_1p, unit_3p, is_bot, unit_template, extra_extension_data, ammo_percent, override_item_template, override_item_units)
 	local right_hand_weapon_unit_3p, right_hand_weapon_unit_1p, left_hand_weapon_unit_3p, left_hand_weapon_unit_1p, right_hand_ammo_unit_3p, right_hand_ammo_unit_1p, left_hand_ammo_unit_3p, left_hand_ammo_unit_1p = nil
 	local item_template = override_item_template or BackendUtils.get_item_template(item_data)
@@ -65,6 +66,7 @@ GearUtils.create_equipment = function (world, slot_name, item_data, unit_1p, uni
 
 	return slot_data
 end
+
 GearUtils.apply_properties_to_item_template = function (template, backend_id)
 	local backend_items = Managers.backend:get_interface("items")
 	local properties = backend_items.get_properties(backend_items, backend_id)
@@ -88,6 +90,7 @@ GearUtils.apply_properties_to_item_template = function (template, backend_id)
 
 	return template
 end
+
 GearUtils.spawn_inventory_unit = function (world, hand, third_person_extension_template, unit_name, node_linking_settings, slot_name, item_data, owner_unit_1p, owner_unit_3p, unit_template, extra_extension_data, ammo_percent)
 	local item_template = BackendUtils.get_item_template(item_data)
 	local ammo_data = item_template.ammo_data
@@ -191,6 +194,7 @@ GearUtils.spawn_inventory_unit = function (world, hand, third_person_extension_t
 
 	return weapon_unit_3p, ammo_unit_3p
 end
+
 GearUtils._attach_ammo_unit = function (world, ammo_unit_name, attachment_node_linking, target_unit)
 	local ammo_unit = Managers.state.unit_spawner:spawn_local_unit(ammo_unit_name)
 	local scene_graph_links = {}
@@ -199,12 +203,12 @@ GearUtils._attach_ammo_unit = function (world, ammo_unit_name, attachment_node_l
 
 	return ammo_unit
 end
+
 GearUtils.link = function (world, attachment_node_linking, scene_graph_links, user_unit, unit)
 	table.clear(scene_graph_links)
 	GearUtils.link_units(world, attachment_node_linking, scene_graph_links, user_unit, unit)
-
-	return 
 end
+
 GearUtils.link_units = function (world, attachment_node_linking, link_table, source, target)
 	for i, attachment_nodes in ipairs(attachment_node_linking) do
 		local source_node = attachment_nodes.source
@@ -220,9 +224,8 @@ GearUtils.link_units = function (world, attachment_node_linking, link_table, sou
 
 		World.link_unit(world, target, target_node_index, source, source_node_index)
 	end
-
-	return 
 end
+
 GearUtils.restore_scene_graph = function (scene_graph_links)
 	if scene_graph_links then
 		for i, link in ipairs(scene_graph_links) do
@@ -232,24 +235,23 @@ GearUtils.restore_scene_graph = function (scene_graph_links)
 			end
 		end
 	end
-
-	return 
 end
+
 GearUtils.destroy_wielded = function (world, wielded_unit)
 	Unit.flow_event(wielded_unit, "lua_unwield")
 
 	local unit_spawner = Managers.state.unit_spawner
 
 	unit_spawner.mark_for_deletion(unit_spawner, wielded_unit)
-
-	return 
 end
+
 GearUtils.get_ammo_extension = function (right_hand_unit, left_hand_unit)
 	local right_hand_ammo_extension = right_hand_unit and ScriptUnit.has_extension(right_hand_unit, "ammo_system")
 	local left_hand_ammo_extension = left_hand_unit and ScriptUnit.has_extension(left_hand_unit, "ammo_system")
 
 	return right_hand_ammo_extension or left_hand_ammo_extension
 end
+
 GearUtils.destroy_equipment = function (world, equipment)
 	local slots = equipment.slots
 	local unit_spawner = Managers.state.unit_spawner
@@ -294,9 +296,8 @@ GearUtils.destroy_equipment = function (world, equipment)
 	equipment.left_hand_ammo_unit_3p = nil
 	equipment.left_hand_wielded_unit = nil
 	equipment.left_hand_ammo_unit_1p = nil
-
-	return 
 end
+
 GearUtils.destroy_slot = function (world, unit, slot_data, equipment, allow_destroy_weapon)
 	local item_data = slot_data.item_data
 	local slot_name = slot_data.id
@@ -350,9 +351,8 @@ GearUtils.destroy_slot = function (world, unit, slot_data, equipment, allow_dest
 	end
 
 	equipment.slots[slot_name] = nil
-
-	return 
 end
+
 GearUtils.hot_join_sync = function (sender, unit, equipment)
 	local slots = equipment.slots
 	local unit_object_id = Managers.state.unit_storage:go_id(unit)
@@ -374,9 +374,8 @@ GearUtils.hot_join_sync = function (sender, unit, equipment)
 	if equipment.wielded then
 		RPC.rpc_wield_equipment(sender, unit_object_id, NetworkLookup.equipment_slots[equipment.wielded_slot])
 	end
-
-	return 
 end
+
 GearUtils._setup_extension_init_data_type_impact = function (item_template, item_name)
 	local explosive_settings = item_template.explosive_settings
 	local area_damage_system = {
@@ -394,6 +393,7 @@ GearUtils._setup_extension_init_data_type_impact = function (item_template, item
 
 	return area_damage_system
 end
+
 GearUtils._setup_extension_init_data_type_dot = function (item_template, item_name)
 	local dot_settings = item_template.dot_settings
 	local area_damage_system = {
@@ -414,6 +414,7 @@ GearUtils._setup_extension_init_data_type_dot = function (item_template, item_na
 
 	return area_damage_system
 end
+
 GearUtils.create_grenade_extension_init_data = function (owner_unit, item_name, current_action, projectile_data, explode_time)
 	local network_position = AiAnimUtils.position_network_scale(projectile_data.position, true)
 	local network_rotation = AiAnimUtils.rotation_network_scale(projectile_data.rotation, true)
@@ -454,6 +455,7 @@ GearUtils.create_grenade_extension_init_data = function (owner_unit, item_name, 
 
 	return extension_init_data
 end
+
 GearUtils.get_property_and_trait_buffs = function (backend_items, backend_id, buffs_table)
 	local properties = backend_items.get_properties(backend_items, backend_id)
 
@@ -490,4 +492,4 @@ GearUtils.get_property_and_trait_buffs = function (backend_items, backend_id, bu
 	return buffs_table
 end
 
-return 
+return

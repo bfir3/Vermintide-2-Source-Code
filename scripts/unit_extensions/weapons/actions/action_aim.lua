@@ -1,4 +1,5 @@
 ActionAim = class(ActionAim)
+
 ActionAim.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.weapon_unit = weapon_unit
@@ -15,9 +16,8 @@ ActionAim.init = function (self, world, item_name, is_server, owner_unit, damage
 	if ScriptUnit.has_extension(weapon_unit, "spread_system") then
 		self.spread_extension = ScriptUnit.extension(weapon_unit, "spread_system")
 	end
-
-	return 
 end
+
 ActionAim.client_owner_start_action = function (self, new_action, t)
 	local owner_unit = self.owner_unit
 	self.current_action = new_action
@@ -66,9 +66,8 @@ ActionAim.client_owner_start_action = function (self, new_action, t)
 	if charge_sound_husk_name then
 		ActionUtils.play_husk_sound_event(charge_sound_husk_name, owner_unit)
 	end
-
-	return 
 end
+
 ActionAim.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local current_action = self.current_action
 	local owner_unit = self.owner_unit
@@ -141,9 +140,8 @@ ActionAim.client_owner_post_update = function (self, dt, t, world, can_damage)
 
 		self.heavy_aim_flow_done = true
 	end
-
-	return 
 end
+
 ActionAim.finish = function (self, reason)
 	local current_action = self.current_action
 	local ammo_extension = self.ammo_extension
@@ -214,8 +212,6 @@ ActionAim.finish = function (self, reason)
 	if charge_sound_husk_stop_event then
 		ActionUtils.play_husk_sound_event(charge_sound_husk_stop_event, owner_unit)
 	end
-
-	return 
 end
 
-return 
+return

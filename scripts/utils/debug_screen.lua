@@ -51,8 +51,6 @@ local function update_option(cs, option_index, dont_save)
 		printf("DebugScreen: script_data.%-35s = %s", cs.title, tostring(cs.options[option_index]))
 		Application.save_user_settings()
 	end
-
-	return 
 end
 
 local function activate_preset(cs)
@@ -73,13 +71,12 @@ local function activate_preset(cs)
 	script_data[cs.title] = nil
 
 	Development.clear_param_cache(cs.title)
-
-	return 
 end
 
 DebugScreen = DebugScreen or {}
 local DebugScreen = DebugScreen
 local script_data_printed = false
+
 DebugScreen.setup = function (world, settings, callbacks)
 	local DebugScreen = DebugScreen
 	DebugScreen.world = world
@@ -242,26 +239,24 @@ DebugScreen.setup = function (world, settings, callbacks)
 	DebugScreen.search_string = ""
 	DebugScreen.filtered_console_settings = DebugScreen.console_settings
 	DebugScreen.allow_to_open = true
-
-	return 
 end
+
 DebugScreen.destroy = function ()
 	World.destroy_gui(DebugScreen.world, DebugScreen.gui)
 
 	DebugScreen.world = nil
 	DebugScreen.gui = nil
-
-	return 
 end
+
 DebugScreen.set_blocked = function (is_blocked)
 	DebugScreen.is_blocked = is_blocked
-
-	return 
 end
+
 local accelerate_factor = 1
+
 DebugScreen.update = function (dt, t, input_service, input_manager)
 	if DebugScreen.is_blocked or not script_data.debug_enabled or not input_service then
-		return 
+		return
 	end
 
 	local gui = DebugScreen.gui
@@ -316,7 +311,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 			Debug.text("Debug Screen: %s = %s", cs.title, tostring(cs.options[cs.selected_id]))
 		end
 
-		return 
+		return
 	end
 
 	DebugScreen.update_search(input_manager, input_service, gui, t, dt)
@@ -852,9 +847,8 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 			i = i + 1
 		end
 	end
-
-	return 
 end
+
 DebugScreen.reset_settings = function ()
 	local all_false = true
 
@@ -886,9 +880,8 @@ DebugScreen.reset_settings = function ()
 	end
 
 	Application.save_user_settings()
-
-	return 
 end
+
 DebugScreen.set_texture_quality = function (value)
 	Application.set_user_setting("texture_settings", "texture_categories/character_df", value)
 	Application.set_user_setting("texture_settings", "texture_categories/character_gsm", value)
@@ -914,9 +907,8 @@ DebugScreen.set_texture_quality = function (value)
 	Application.set_user_setting("texture_settings", "texture_categories/weapon_nm", value)
 	Application.set_user_setting("texture_settings", "texture_categories/weapon_scr", value)
 	Application.save_user_settings()
-
-	return 
 end
+
 DebugScreen.update_search = function (input_manager, input_service, gui, t, dt)
 	local exit_using_backspace = input_service.get(input_service, "console_search_key") and DebugScreen.search_string == ""
 	local exit_due_to_exiting_debugscreen = not DebugScreen.active and DebugScreen.search_active
@@ -960,7 +952,7 @@ DebugScreen.update_search = function (input_manager, input_service, gui, t, dt)
 			Gui.text(gui, "Search (backspace) ", font_mtrl, font_size, font, search_title_pos, Colors.get_color_with_alpha("white", 100 + math.cos(hot_anim_t) * 100))
 		end
 
-		return 
+		return
 	end
 
 	DebugScreen.search_text_box_width = math.min(400, DebugScreen.search_text_box_width + 2000 * dt)
@@ -988,8 +980,6 @@ DebugScreen.update_search = function (input_manager, input_service, gui, t, dt)
 	local width = max.x - min.x
 
 	Gui.rect(gui, search_text_pos + Vector3(width + 1, -2, 0), Vector2(10, 20), Colors.get_color_with_alpha("white", -50 + math.cos(hot_anim_t) * 250))
-
-	return 
 end
 
-return 
+return

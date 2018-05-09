@@ -343,6 +343,7 @@ if not script_data.debug_voip then
 end
 
 local rpcs_logged = false
+
 GameSettingsDevelopment.set_ignored_rpc_logs = function ()
 	local ignored_rpc_logs = GameSettingsDevelopment.ignored_rpc_logs
 
@@ -357,9 +358,8 @@ GameSettingsDevelopment.set_ignored_rpc_logs = function ()
 	end
 
 	rpcs_logged = true
-
-	return 
 end
+
 DefaultDisplayModes = {
 	{
 		640,
@@ -428,4 +428,4 @@ DefaultDisplayModes = {
 	}
 }
 
-return 
+return

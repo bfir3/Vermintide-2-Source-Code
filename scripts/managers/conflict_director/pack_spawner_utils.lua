@@ -11,6 +11,7 @@ local function euler_to_quaternion(pitch, roll, yaw)
 end
 
 local spawn_pack = {}
+
 PackSpawnerUtils.spawn_predefined_pack = function (breed_pack, pos, mesh)
 	local size = 0
 
@@ -46,6 +47,7 @@ PackSpawnerUtils.spawn_predefined_pack = function (breed_pack, pos, mesh)
 
 	return size, spawn_pack
 end
+
 PackSpawnerUtils.spawn_in_circle = function (breed_pack, pack_size, pos)
 	local point_cap = 5
 	local total_points = pack_size
@@ -109,6 +111,7 @@ PackSpawnerUtils.spawn_in_circle = function (breed_pack, pack_size, pos)
 
 	return 0, spawn_pack
 end
+
 PackSpawnerUtils.spawn_random_pack = function (breed_pack, pos, mesh)
 	local pack = breed_pack
 	local unit = pack[1]
@@ -142,6 +145,7 @@ PackSpawnerUtils.spawn_random_pack = function (breed_pack, pos, mesh)
 
 	return #spawn_pack, spawn_pack
 end
+
 PackSpawnerUtils.modify_spawn_position = function (unit_pos, pos)
 	local x = pos[1] + unit_pos[1]
 	local y = pos[2] + unit_pos[2]
@@ -158,6 +162,7 @@ PackSpawnerUtils.modify_spawn_position = function (unit_pos, pos)
 
 	return false
 end
+
 PackSpawnerUtils.check_unit_overlap = function (pos, other_units, units_count)
 	if not next(other_units) then
 		return false
@@ -174,6 +179,7 @@ PackSpawnerUtils.check_unit_overlap = function (pos, other_units, units_count)
 
 	return false
 end
+
 PackSpawnerUtils.random_predefined_pack_index = function ()
 	local index = 1
 	local current_spawn_weight = math.random(0, BreedPacks[index].spawn_weight)
@@ -190,4 +196,4 @@ PackSpawnerUtils.random_predefined_pack_index = function ()
 	return index
 end
 
-return 
+return

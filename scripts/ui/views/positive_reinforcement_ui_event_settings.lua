@@ -6,8 +6,6 @@ return {
 			else
 				return string.format(Localize("positive_reinforcement_player_saved_player"), player_1_name, player_2_name)
 			end
-
-			return 
 		end,
 		sound_function = function ()
 			return script_data.reinforcement_ui_local_sound or "hud_achievement_unlock_02" or (script_data.enable_reinforcement_ui_remote_sound and "hud_info")
@@ -23,8 +21,6 @@ return {
 			else
 				return string.format(Localize("positive_reinforcement_player_revived_player"), player_1_name, player_2_name)
 			end
-
-			return 
 		end,
 		sound_function = function ()
 			return script_data.reinforcement_ui_local_sound or "hud_achievement_unlock_02" or (script_data.enable_reinforcement_ui_remote_sound and "hud_info")
@@ -40,8 +36,6 @@ return {
 			else
 				return string.format(Localize("positive_reinforcement_player_rescued_player"), player_1_name, player_2_name)
 			end
-
-			return 
 		end,
 		sound_function = function ()
 			return script_data.reinforcement_ui_local_sound or "hud_achievement_unlock_02" or (script_data.enable_reinforcement_ui_remote_sound and "hud_info")
@@ -58,8 +52,6 @@ return {
 			else
 				return string.format(Localize("positive_reinforcement_player_killed_special"), player_name, Localize(breed_name))
 			end
-
-			return 
 		end,
 		sound_function = function ()
 			return nil
@@ -75,8 +67,6 @@ return {
 			else
 				return string.format(Localize("positive_reinforcement_player_killed_special"), player_name, Localize(breed_name))
 			end
-
-			return 
 		end,
 		sound_function = function ()
 			return nil
@@ -92,8 +82,6 @@ return {
 			else
 				return string.format(Localize("positive_reinforcement_player_killed_special"), player_name, Localize(breed_name))
 			end
-
-			return 
 		end,
 		sound_function = function ()
 			return nil

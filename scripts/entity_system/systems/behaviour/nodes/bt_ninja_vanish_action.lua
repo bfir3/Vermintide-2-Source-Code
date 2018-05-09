@@ -5,18 +5,15 @@ BTNinjaVanishAction.name = "BTNinjaVanishAction"
 local POSITION_LOOKUP = POSITION_LOOKUP
 local PLAYER_POSITIONS = PLAYER_POSITIONS
 local script_data = script_data
+
 BTNinjaVanishAction.init = function (self, ...)
 	BTNinjaVanishAction.super.init(self, ...)
-
-	return 
 end
 
 local function debug3d(unit, text, color_name)
 	if script_data.debug_ai_movement then
 		Debug.world_sticky_text(POSITION_LOOKUP[unit], text, color_name)
 	end
-
-	return 
 end
 
 BTNinjaVanishAction.enter = function (self, unit, blackboard, t)
@@ -35,9 +32,8 @@ BTNinjaVanishAction.enter = function (self, unit, blackboard, t)
 
 		blackboard.vanish_timer = t + blackboard.action.foff_anim_length
 	end
-
-	return 
 end
+
 BTNinjaVanishAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.vanish_timer = nil
 	blackboard.vanish_pos = nil
@@ -45,9 +41,8 @@ BTNinjaVanishAction.leave = function (self, unit, blackboard, t, reason, destroy
 	blackboard.ninja_vanish = false
 
 	blackboard.navigation_extension:set_enabled(true)
-
-	return 
 end
+
 BTNinjaVanishAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.vanish_timer < t then
 		if blackboard.wait_one_frame then
@@ -63,6 +58,7 @@ BTNinjaVanishAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTNinjaVanishAction.vanish = function (unit, blackboard)
 	local vanish_pos = blackboard.vanish_pos:unbox()
 
@@ -86,9 +82,8 @@ BTNinjaVanishAction.vanish = function (unit, blackboard)
 	local ping_system = Managers.state.entity:system("ping_system")
 
 	ping_system.remove_ping_from_unit(ping_system, unit)
-
-	return 
 end
+
 BTNinjaVanishAction.play_foff = function (unit, blackboard, network_manager, pos, pos2)
 	local effect_name_id = NetworkLookup.effects[blackboard.action.effect_name]
 	local owner_unit_id = network_manager.unit_game_object_id(network_manager, unit)
@@ -97,9 +92,8 @@ BTNinjaVanishAction.play_foff = function (unit, blackboard, network_manager, pos
 
 	network_manager.rpc_play_particle_effect(network_manager, nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, pos, rotation_offset, false)
 	network_manager.rpc_play_particle_effect(network_manager, nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, pos2, rotation_offset, false)
-
-	return 
 end
+
 BTNinjaVanishAction.find_escape_position = function (unit, blackboard)
 	local center_position = nil
 
@@ -141,8 +135,6 @@ BTNinjaVanishAction.find_escape_position = function (unit, blackboard)
 			return pos
 		end
 	end
-
-	return 
 end
 
-return 
+return

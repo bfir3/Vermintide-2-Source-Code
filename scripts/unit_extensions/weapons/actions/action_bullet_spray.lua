@@ -9,6 +9,7 @@ local NODES = {
 	"j_rightshoulder",
 	"j_spine1"
 }
+
 ActionBulletSpray.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.owner_unit_first_person = first_person_unit
@@ -24,9 +25,8 @@ ActionBulletSpray.init = function (self, world, item_name, is_server, owner_unit
 	self.targets = {}
 	self.overcharge_extension = ScriptUnit.extension(owner_unit, "overcharge_system")
 	self._is_critical_strike = false
-
-	return 
 end
+
 ActionBulletSpray.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level)
 	local weapon_unit = self.weapon_unit
 	local owner_unit = self.owner_unit
@@ -65,9 +65,8 @@ ActionBulletSpray.client_owner_start_action = function (self, new_action, t, cha
 	end
 
 	self._is_critical_strike = is_critical_strike
-
-	return 
 end
+
 ActionBulletSpray.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local current_action = self.current_action
 	local owner_unit_1p = self.owner_unit_first_person
@@ -151,9 +150,8 @@ ActionBulletSpray.client_owner_post_update = function (self, dt, t, world, can_d
 	end
 
 	self._target_index = target_index + 1
-
-	return 
 end
+
 ActionBulletSpray.finish = function (self, reason)
 	self._clear_targets(self)
 
@@ -170,17 +168,16 @@ ActionBulletSpray.finish = function (self, reason)
 	if hud_extension then
 		hud_extension.show_critical_indication = false
 	end
-
-	return 
 end
+
 ActionBulletSpray._clear_targets = function (self)
 	table.clear(self.targets)
-
-	return 
 end
+
 local actor_unit = Actor.unit
 local vector3_distance = Vector3.distance
 local unit_local_position = Unit.local_position
+
 ActionBulletSpray._select_targets = function (self, world, show_outline)
 	local physics_world = World.get_data(world, "physics_world")
 	local owner_unit_1p = self.owner_unit_first_person
@@ -257,9 +254,8 @@ ActionBulletSpray._select_targets = function (self, world, show_outline)
 	end
 
 	self.shot = true
-
-	return 
 end
+
 ActionBulletSpray._check_within_cone = function (self, player_position, player_direction, target, player)
 	local CONE_COS_ALPHA = self.CONE_COS_ALPHA
 
@@ -278,6 +274,7 @@ ActionBulletSpray._check_within_cone = function (self, player_position, player_d
 
 	return false
 end
+
 ActionBulletSpray._is_infront_player = function (self, player_position, player_direction, hit_position)
 	local player_to_hit_unit_dir = Vector3.normalize(hit_position - player_position)
 	local dot = Vector3.dot(player_to_hit_unit_dir, player_direction)
@@ -285,9 +282,8 @@ ActionBulletSpray._is_infront_player = function (self, player_position, player_d
 	if 0 < dot then
 		return true
 	end
-
-	return 
 end
+
 ActionBulletSpray.raycast_to_target = function (self, world, from_position, direction, target)
 	local physics_world = World.get_data(world, "physics_world")
 	local collision_filter = "filter_player_ray_projectile"
@@ -296,4 +292,4 @@ ActionBulletSpray.raycast_to_target = function (self, world, from_position, dire
 	return result
 end
 
-return 
+return

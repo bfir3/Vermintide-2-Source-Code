@@ -1,12 +1,13 @@
 PlayerCharacterStateJumping = class(PlayerCharacterStateJumping, PlayerCharacterState)
+
 PlayerCharacterStateJumping.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "jumping")
 
 	local context = character_state_init_context
-
-	return 
 end
+
 local position_lookup = POSITION_LOOKUP
+
 PlayerCharacterStateJumping.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	table.clear(self.temp_params)
 
@@ -81,9 +82,8 @@ PlayerCharacterStateJumping.on_enter = function (self, unit, input, dt, context,
 
 	status_extension.set_falling_height(status_extension, start_jump_height)
 	Unit.flow_event(unit, "sfx_player_jump")
-
-	return 
 end
+
 PlayerCharacterStateJumping.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local input_extension = self.input_extension
 
@@ -99,9 +99,8 @@ PlayerCharacterStateJumping.on_exit = function (self, unit, input, dt, context, 
 		CharacterStateHelper.play_animation_event(unit, "land_still")
 		CharacterStateHelper.play_animation_event(unit, "to_onground")
 	end
-
-	return 
 end
+
 PlayerCharacterStateJumping.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
@@ -111,13 +110,13 @@ PlayerCharacterStateJumping.update = function (self, unit, input, dt, context, t
 	local locomotion_extension = self.locomotion_extension
 
 	if CharacterStateHelper.do_common_state_transitions(status_extension, csm) then
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_overcharge_exploding(status_extension) then
 		csm.change_state(csm, "overcharge_exploding")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_pushed(status_extension) then
@@ -129,7 +128,7 @@ PlayerCharacterStateJumping.update = function (self, unit, input, dt, context, t
 
 		csm.change_state(csm, "stunned", params)
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_block_broken(status_extension) then
@@ -140,21 +139,21 @@ PlayerCharacterStateJumping.update = function (self, unit, input, dt, context, t
 
 		csm.change_state(csm, "stunned", params)
 
-		return 
+		return
 	end
 
 	if locomotion_extension.is_on_ground(locomotion_extension) then
 		csm.change_state(csm, "walking")
 		first_person_extension.change_state(first_person_extension, "walking")
 
-		return 
+		return
 	end
 
 	if not csm.state_next and locomotion_extension.current_velocity(locomotion_extension).z <= 0 then
 		csm.change_state(csm, "falling", self.temp_params)
 		first_person_extension.change_state(first_person_extension, "falling")
 
-		return 
+		return
 	end
 
 	local inventory_extension = self.inventory_extension
@@ -185,7 +184,7 @@ PlayerCharacterStateJumping.update = function (self, unit, input, dt, context, t
 			csm.change_state(csm, "interacting", params)
 		end
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_interacting(interactor_extension) then
@@ -200,10 +199,8 @@ PlayerCharacterStateJumping.update = function (self, unit, input, dt, context, t
 			csm.change_state(csm, "interacting", params)
 		end
 
-		return 
+		return
 	end
-
-	return 
 end
 
-return 
+return

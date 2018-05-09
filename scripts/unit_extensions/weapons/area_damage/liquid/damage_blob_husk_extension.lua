@@ -1,4 +1,5 @@
 DamageBlobHuskExtension = class(DamageBlobHuskExtension)
+
 DamageBlobHuskExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	self.world = world
@@ -40,9 +41,8 @@ DamageBlobHuskExtension.init = function (self, extension_init_context, unit, ext
 	if sfx_name_start then
 		WwiseUtils.trigger_unit_event(world, sfx_name_start, unit, 0)
 	end
-
-	return 
 end
+
 DamageBlobHuskExtension.destroy = function (self)
 	local world = self.world
 	local fx_list = self.fx_list
@@ -77,9 +77,8 @@ DamageBlobHuskExtension.destroy = function (self)
 	end
 
 	self.aborted = true
-
-	return 
 end
+
 DamageBlobHuskExtension.update = function (self, unit, input, dt, context, t)
 	local game = self.game
 	local go_id = self.go_id
@@ -101,9 +100,8 @@ DamageBlobHuskExtension.update = function (self, unit, input, dt, context, t)
 			self._blob_update_function = nil
 		end
 	end
-
-	return 
 end
+
 DamageBlobHuskExtension.update_blobs_fx_and_sfx = function (self, t, dt)
 	local world = self.world
 	local fx_name_filled = self.fx_name_filled
@@ -148,9 +146,8 @@ DamageBlobHuskExtension.update_blobs_fx_and_sfx = function (self, t, dt)
 			WwiseWorld.trigger_event(wwise_world, sfx_name_stop_remains, sfx_source)
 		end
 	end
-
-	return 
 end
+
 DamageBlobHuskExtension.add_damage_blob_fx = function (self, position, life_time_percentage)
 	local unit = self.unit
 	local world = self.world
@@ -186,9 +183,8 @@ DamageBlobHuskExtension.add_damage_blob_fx = function (self, position, life_time
 		source = source,
 		time = blob_death_time
 	}
-
-	return 
 end
+
 DamageBlobHuskExtension.abort = function (self)
 	local unit = self.unit
 	local sfx_name_stop = self._sfx_name_stop
@@ -198,8 +194,6 @@ DamageBlobHuskExtension.abort = function (self)
 	end
 
 	self.aborted = true
-
-	return 
 end
 
-return 
+return

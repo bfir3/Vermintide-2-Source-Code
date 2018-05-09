@@ -2953,8 +2953,6 @@ go_type_table = {
 		end,
 		sync_unit = function (game_session, go_id, owner_id, unit, gameobject_functor_context)
 			assert(false)
-
-			return 
 		end
 	},
 	unit_from_gameobject_creator_func = function (unit_spawner, game_session, go_id, go_template)
@@ -3010,6 +3008,7 @@ go_type_table = {
 	end
 }
 local initializers = go_type_table.initializers
+
 initializers.ai_true_flight_killable_projectile_unit = function (unit, unit_name, unit_template, gameobject_functor_context)
 	local data_table = initializers.ai_true_flight_projectile_unit(unit, unit_name, unit_template, gameobject_functor_context)
 	local health_extension = ScriptUnit.has_extension(unit, "health_system")
@@ -3018,7 +3017,9 @@ initializers.ai_true_flight_killable_projectile_unit = function (unit, unit_name
 
 	return data_table
 end
+
 local extractors = go_type_table.extractors
+
 extractors.ai_true_flight_killable_projectile_unit = function (game_session, go_id, owner_id, unit, gameobject_functor_context)
 	local _, extension_init_data, true_flight_template_name = extractors.ai_true_flight_projectile_unit(game_session, go_id, owner_id, unit, gameobject_functor_context)
 	local template = TrueFlightTemplates[true_flight_template_name]

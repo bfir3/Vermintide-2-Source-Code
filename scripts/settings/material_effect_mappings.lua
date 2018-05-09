@@ -12867,4 +12867,4 @@ for context_name, context_materials in pairs(MaterialEffectSettings.material_con
 	end
 end
 
-return 
+return

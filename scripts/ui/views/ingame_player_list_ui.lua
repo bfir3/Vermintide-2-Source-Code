@@ -26,6 +26,7 @@ local mission_settings = {
 	}
 }
 IngamePlayerListUI = class(IngamePlayerListUI)
+
 IngamePlayerListUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.ui_top_renderer = ingame_ui_context.ui_top_renderer
@@ -82,9 +83,8 @@ IngamePlayerListUI.init = function (self, ingame_ui_context)
 	self.host_peer_id = server_peer_id or network_transmit.peer_id
 
 	rawset(_G, "ingame_player_list", self)
-
-	return 
 end
+
 IngamePlayerListUI.create_ui_elements = function (self)
 	local scenegraph_definition = definitions.scenegraph_definition
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
@@ -130,14 +130,13 @@ IngamePlayerListUI.create_ui_elements = function (self)
 	self.player_list_widgets = player_list_widgets
 	self.popup_list = UIWidget.init(definitions.popup_widget_definition)
 	self._console_cursor = UIWidget.init(console_cursor_definition)
-
-	return 
 end
+
 IngamePlayerListUI._setup_mission_data = function (self, level_settings)
 	local loot_objectives = level_settings.loot_objectives
 
 	if not loot_objectives then
-		return 
+		return
 	end
 
 	local create_loot_widget = definitions.create_loot_widget
@@ -179,14 +178,13 @@ IngamePlayerListUI._setup_mission_data = function (self, level_settings)
 
 		self._sync_missions(self)
 	end
-
-	return 
 end
+
 IngamePlayerListUI._sync_missions = function (self)
 	local mission_settings_data = self._mission_settings_data
 
 	if not mission_settings_data then
-		return 
+		return
 	end
 
 	for _, data in pairs(mission_settings_data) do
@@ -204,9 +202,8 @@ IngamePlayerListUI._sync_missions = function (self)
 			style.icon_textures.draw_count = amount
 		end
 	end
-
-	return 
 end
+
 IngamePlayerListUI._get_item_amount_by_mission_name = function (self, mission_name)
 	local mission_system = self._mission_system
 	local data = mission_system.get_level_end_mission_data(mission_system, mission_name)
@@ -214,13 +211,13 @@ IngamePlayerListUI._get_item_amount_by_mission_name = function (self, mission_na
 
 	return current_amount
 end
+
 IngamePlayerListUI._create_player_portrait = function (self, portrait_frame, portrait_image, player_level_text)
 	local definition = UIWidgets.create_portrait_frame("player_portrait", portrait_frame, player_level_text, 1, nil, portrait_image)
 	local widget = UIWidget.init(definition)
 	self._player_portrait_widget = widget
-
-	return 
 end
+
 IngamePlayerListUI.destroy = function (self)
 	if self.cursor_active then
 		ShowCursorStack.pop()
@@ -236,31 +233,26 @@ IngamePlayerListUI.destroy = function (self)
 
 	rawset(_G, "ingame_player_list", nil)
 	print("[IngamePlayerListUI] - Destroy")
-
-	return 
 end
+
 IngamePlayerListUI.set_level_name = function (self, name)
 	self._set_widget_text(self, "game_level", name)
-
-	return 
 end
+
 IngamePlayerListUI.set_difficulty_name = function (self, name)
 	self._set_widget_text(self, "game_difficulty", name)
-
-	return 
 end
+
 IngamePlayerListUI._set_widget_text = function (self, widget_name, text)
 	local widget = self._widgets_by_name[widget_name]
 	widget.content.text = text
-
-	return 
 end
+
 IngamePlayerListUI._set_simple_widget_texture = function (self, widget_name, texture)
 	local widget = self._widgets_by_name[widget_name]
 	widget.content.texture_id = texture
-
-	return 
 end
+
 IngamePlayerListUI.add_player = function (self, player)
 	local ingame_ui_context = self.ingame_ui_context
 	local is_local_player = player.local_player
@@ -285,9 +277,8 @@ IngamePlayerListUI.add_player = function (self, player)
 	}
 	self.num_players = self.num_players + 1
 	self.players[self.num_players] = player_data
-
-	return 
 end
+
 IngamePlayerListUI.select_player = function (self, player_index)
 	self.selected_player_index = player_index
 	local players = self.players
@@ -296,9 +287,8 @@ IngamePlayerListUI.select_player = function (self, player_index)
 	for i = 1, num_players, 1 do
 		players[i].widget.content.button_hotspot.is_selected = i == player_index
 	end
-
-	return 
 end
+
 IngamePlayerListUI.deselect_player = function (self)
 	self.selected_player_index = nil
 	local players = self.players
@@ -310,9 +300,8 @@ IngamePlayerListUI.deselect_player = function (self)
 		button_hotspot.is_hover = nil
 		button_hotspot.is_clicked = nil
 	end
-
-	return 
 end
+
 IngamePlayerListUI.update_widgets = function (self)
 	local players = self.players
 	local num_players = self.num_players
@@ -372,18 +361,18 @@ IngamePlayerListUI.update_widgets = function (self)
 		player_data.player_name = (PLAYER_NAME_MAX_LENGTH < UTF8Utils.string_length(name) and UIRenderer.crop_text_width(self.ui_top_renderer, name, 370, widget.style.name)) or name
 		player_data.widget = widget
 	end
-
-	return 
 end
+
 local slot_to_block_by_wield_slot = {
 	slot_ranged = "slot_melee",
 	slot_melee = "slot_ranged"
 }
+
 IngamePlayerListUI._populate_hero_unit_equipment = function (self, player, hero_previewer, hero_name, career_index, current_items)
 	local player_unit = player.player_unit
 
 	if not Unit.alive(player_unit) then
-		return 
+		return
 	end
 
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
@@ -424,6 +413,7 @@ IngamePlayerListUI._populate_hero_unit_equipment = function (self, player, hero_
 
 	return items_changed
 end
+
 IngamePlayerListUI.update_player_information = function (self)
 	local profiles = SPProfiles
 	local profile_synchronizer = self.profile_synchronizer
@@ -531,9 +521,8 @@ IngamePlayerListUI.update_player_information = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 IngamePlayerListUI._create_portrait_frame_widget = function (self, frame_settings_name, portrait_texture, player_level_text)
 	local widget_definition = UIWidgets.create_portrait_frame("player_list_portrait", frame_settings_name, player_level_text, 1, nil, portrait_texture)
 	local widget = UIWidget.init(widget_definition)
@@ -542,6 +531,7 @@ IngamePlayerListUI._create_portrait_frame_widget = function (self, frame_setting
 
 	return widget
 end
+
 IngamePlayerListUI.update_player_ping_list = function (self, dt)
 	local delay_time = self.time_to_next_ping_update
 
@@ -554,15 +544,14 @@ IngamePlayerListUI.update_player_ping_list = function (self, dt)
 
 		self.time_to_next_ping_update = new_time
 
-		return 
+		return
 	end
 
 	local matchmaking_manager = Managers.matchmaking
 	self.pings_by_peer_id = matchmaking_manager.get_players_ping(matchmaking_manager)
 	self.time_to_next_ping_update = 2.5
-
-	return 
 end
+
 IngamePlayerListUI.get_ping_by_peer_id = function (self, peer_id)
 	local pings_by_peer_id = self.pings_by_peer_id
 
@@ -585,6 +574,7 @@ IngamePlayerListUI.get_ping_by_peer_id = function (self, peer_id)
 
 	return 255
 end
+
 IngamePlayerListUI.get_ping_texture_by_ping_value = function (self, ping_value)
 	if ping_value <= 100 then
 		return "ping_icon_01"
@@ -593,28 +583,26 @@ IngamePlayerListUI.get_ping_texture_by_ping_value = function (self, ping_value)
 	elseif 150 < ping_value then
 		return "ping_icon_03"
 	end
-
-	return 
 end
+
 IngamePlayerListUI.ignoring_chat_peer_id = function (self, peer_id)
 	local chat_gui = Managers.chat.chat_gui
 
 	return chat_gui.ignoring_peer_id(chat_gui, peer_id)
 end
+
 IngamePlayerListUI.ignore_chat_message_from_peer_id = function (self, peer_id)
 	local chat_gui = Managers.chat.chat_gui
 
 	chat_gui.ignore_peer_id(chat_gui, peer_id)
-
-	return 
 end
+
 IngamePlayerListUI.remove_ignore_chat_message_from_peer_id = function (self, peer_id)
 	local chat_gui = Managers.chat.chat_gui
 
 	chat_gui.remove_ignore_peer_id(chat_gui, peer_id)
-
-	return 
 end
+
 IngamePlayerListUI.muted_peer_id = function (self, peer_id)
 	if PLATFORM == "xb1" then
 		if Managers.voice_chat then
@@ -625,9 +613,8 @@ IngamePlayerListUI.muted_peer_id = function (self, peer_id)
 	else
 		return self.voip:peer_muted(peer_id)
 	end
-
-	return 
 end
+
 IngamePlayerListUI.ignore_voice_message_from_peer_id = function (self, peer_id)
 	if PLATFORM == "xb1" then
 		if Managers.voice_chat then
@@ -636,9 +623,8 @@ IngamePlayerListUI.ignore_voice_message_from_peer_id = function (self, peer_id)
 	else
 		self.voip:mute_member(peer_id)
 	end
-
-	return 
 end
+
 IngamePlayerListUI.remove_ignore_voice_message_from_peer_id = function (self, peer_id)
 	if PLATFORM == "xb1" then
 		if Managers.voice_chat then
@@ -647,12 +633,12 @@ IngamePlayerListUI.remove_ignore_voice_message_from_peer_id = function (self, pe
 	else
 		self.voip:unmute_member(peer_id)
 	end
+end
 
-	return 
-end
 IngamePlayerListUI.post_update = function (self, dt)
-	return 
+	return
 end
+
 IngamePlayerListUI.update = function (self, dt)
 	local input_manager = self.input_manager
 	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
@@ -727,9 +713,8 @@ IngamePlayerListUI.update = function (self, dt)
 		self._sync_missions(self)
 		self.draw(self, dt)
 	end
-
-	return 
 end
+
 IngamePlayerListUI.set_privacy_enabled = function (self, enabled, animate)
 	local text = (enabled and "map_screen_private_button") or "map_public_setting"
 	local widget = self.private_checkbox_widget
@@ -739,9 +724,8 @@ IngamePlayerListUI.set_privacy_enabled = function (self, enabled, animate)
 	if animate then
 		self._private_timer = 0
 	end
-
-	return 
 end
+
 IngamePlayerListUI._update_gamepad_private_text_animation_timer = function (self, dt)
 	local timer = self._private_timer
 
@@ -751,7 +735,7 @@ IngamePlayerListUI._update_gamepad_private_text_animation_timer = function (self
 		if timer == total_time then
 			self._private_timer = nil
 
-			return 
+			return
 		else
 			timer = math.min(timer + dt, total_time)
 			self._private_timer = timer
@@ -759,38 +743,38 @@ IngamePlayerListUI._update_gamepad_private_text_animation_timer = function (self
 			return timer / total_time
 		end
 	end
-
-	return 
 end
+
 IngamePlayerListUI._update_gamepad_private_text_animation = function (self, dt, instant)
 	local progress = self._update_gamepad_private_text_animation_timer(self, dt)
 
 	if not progress then
-		return 
+		return
 	end
 
 	local anim_progress = math.ease_pulse(progress)
 	local text_style = self.private_text_gamepad_widget.style.text
 	text_style.font_size = 22 + 10 * anim_progress
-
-	return 
 end
+
 IngamePlayerListUI.on_save_ended_callback = function (self)
 	print("[IngamePlayerWiew] - settings saved")
-
-	return 
 end
+
 IngamePlayerListUI.is_active = function (self)
 	return self.active
 end
+
 IngamePlayerListUI.is_focused = function (self)
 	return self.active and self.cursor_active
 end
+
 IngamePlayerListUI.input_service = function (self)
 	local input_manager = self.input_manager
 
 	return input_manager.get_service(input_manager, "player_list_input")
 end
+
 IngamePlayerListUI.set_active = function (self, active)
 	local chat_gui = Managers.chat.chat_gui
 
@@ -838,14 +822,13 @@ IngamePlayerListUI.set_active = function (self, active)
 
 		self.cursor_active = false
 	end
-
-	return 
 end
+
 IngamePlayerListUI._update_fade_in_duration = function (self, dt)
 	local fade_in_duration = self._fade_in_duration
 
 	if not fade_in_duration then
-		return 
+		return
 	end
 
 	fade_in_duration = fade_in_duration + dt
@@ -862,9 +845,8 @@ IngamePlayerListUI._update_fade_in_duration = function (self, dt)
 	else
 		self._fade_in_duration = fade_in_duration
 	end
-
-	return 
 end
+
 IngamePlayerListUI.get_background_world = function (self)
 	local previewer_pass_data = self.viewport_widget.element.pass_data[1]
 	local viewport = previewer_pass_data.viewport
@@ -872,6 +854,7 @@ IngamePlayerListUI.get_background_world = function (self)
 
 	return world, viewport
 end
+
 local debug_players = {
 	[999] = {
 		peer_id = 999,
@@ -903,6 +886,7 @@ local debug_players = {
 	}
 }
 local temp_players = {}
+
 IngamePlayerListUI.update_player_list = function (self, dt)
 	local player_manager = self.player_manager
 
@@ -1001,9 +985,8 @@ IngamePlayerListUI.update_player_list = function (self, dt)
 	end
 
 	self.update_player_information(self)
-
-	return 
 end
+
 IngamePlayerListUI.update_difficulty = function (self)
 	local difficulty_settings = Managers.state.difficulty:get_difficulty_settings()
 	local difficulty_name = difficulty_settings.display_name
@@ -1013,9 +996,8 @@ IngamePlayerListUI.update_difficulty = function (self)
 
 		self.current_difficulty_name = difficulty_name
 	end
-
-	return 
 end
+
 IngamePlayerListUI.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -1085,12 +1067,12 @@ IngamePlayerListUI.draw = function (self, dt)
 	UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt, nil, render_settings)
 	UIRenderer.draw_widget(ui_renderer, self.background)
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 IngamePlayerListUI.can_host_solo_kick = function (self)
 	return self.is_server and Managers.player:num_human_players() == 2
 end
+
 IngamePlayerListUI.kick_player = function (self, player)
 	local kick_peer_id = player.peer_id
 
@@ -1104,9 +1086,8 @@ IngamePlayerListUI.kick_player = function (self, player)
 		Managers.state.voting:request_vote("kick_player", vote_data, Network.peer_id())
 		self.set_active(self, false)
 	end
-
-	return 
 end
+
 IngamePlayerListUI.kick_player_available = function (self, player)
 	local peer_id = player.peer_id
 
@@ -1122,6 +1103,7 @@ IngamePlayerListUI.kick_player_available = function (self, player)
 
 	return true
 end
+
 IngamePlayerListUI.show_profile_by_peer_id = function (self, peer_id)
 	local platform = self.platform
 
@@ -1141,8 +1123,6 @@ IngamePlayerListUI.show_profile_by_peer_id = function (self, peer_id)
 
 		Managers.account:show_player_profile_with_np_id(np_id)
 	end
-
-	return 
 end
 
-return 
+return

@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTVortexFlyAction = class(BTVortexFlyAction, BTNode)
+
 BTVortexFlyAction.init = function (self, ...)
 	BTVortexFlyAction.super.init(self, ...)
-
-	return 
 end
+
 BTVortexFlyAction.name = "BTVortexFlyAction"
+
 BTVortexFlyAction.enter = function (self, unit, blackboard, t)
 	local next_smart_object_data = blackboard.next_smart_object_data
 	local entrance_pos = next_smart_object_data.entrance_pos:unbox()
@@ -21,9 +22,8 @@ BTVortexFlyAction.enter = function (self, unit, blackboard, t)
 	end
 
 	blackboard.fly_state = "moving_to_within_smartobject_range"
-
-	return 
 end
+
 BTVortexFlyAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.fly_entrance_pos = nil
 	blackboard.fly_middle_pos = nil
@@ -40,9 +40,8 @@ BTVortexFlyAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	navigation_extension.set_enabled(navigation_extension, true)
 
 	slot8 = navigation_extension.is_using_smart_object(navigation_extension) and navigation_extension.use_smart_object(navigation_extension, false)
-
-	return 
 end
+
 BTVortexFlyAction._move_to_destination = function (self, current_position, destination, locomotion_extension, dt, max_speed)
 	local destination_vector = destination - current_position
 	local destination_distance = Vector3.length(destination_vector)
@@ -65,9 +64,8 @@ BTVortexFlyAction._move_to_destination = function (self, current_position, desti
 
 		return true
 	end
-
-	return 
 end
+
 BTVortexFlyAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion_extension = blackboard.locomotion_extension
 	local max_speed = blackboard.breed.run_speed
@@ -126,8 +124,6 @@ BTVortexFlyAction.run = function (self, unit, blackboard, t, dt)
 	else
 		return "running"
 	end
-
-	return 
 end
 
-return 
+return

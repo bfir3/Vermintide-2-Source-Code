@@ -1,4 +1,5 @@
 ProjectileTrueFlightLocomotionExtension = class(ProjectileTrueFlightLocomotionExtension)
+
 ProjectileTrueFlightLocomotionExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	local gravity_settings = extension_init_data.gravity_settings or "default"
@@ -75,8 +76,6 @@ ProjectileTrueFlightLocomotionExtension.init = function (self, extension_init_co
 	Unit.set_local_position(unit, 0, initial_position)
 
 	self.hit_units = {}
-
-	return 
 end
 
 local function get_target_head_node_position(unit, node_name)
@@ -88,8 +87,6 @@ local function get_target_head_node_position(unit, node_name)
 	else
 		return Unit.world_position(unit, Unit.node(unit, node_name))
 	end
-
-	return 
 end
 
 local function valid_position(position)
@@ -118,23 +115,21 @@ ProjectileTrueFlightLocomotionExtension._do_forced_impact = function (self, unit
 	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
 
 	network_manager.network_transmit:send_rpc_clients("rpc_generic_impact_projectile_force_impact", unit_id, current_position)
-
-	return 
 end
+
 ProjectileTrueFlightLocomotionExtension.bounce = function (self, hit_normal)
 	local current_direction = self.current_direction:unbox()
 	local bounce_dir = Vector3.normalize(current_direction - 2 * Vector3.dot(current_direction, hit_normal) * hit_normal)
 	self.bounce_dir = Vector3Box(bounce_dir)
 	self.bounced = true
-
-	return 
 end
+
 ProjectileTrueFlightLocomotionExtension.update = function (self, unit, input, dt, context, t)
 	self.dt = t - self.t
 	self.moved = false
 
 	if self.stopped then
-		return 
+		return
 	end
 
 	if self.is_husk then
@@ -149,7 +144,7 @@ ProjectileTrueFlightLocomotionExtension.update = function (self, unit, input, dt
 			Unit.set_local_rotation(unit, 0, rotation)
 		end
 
-		return 
+		return
 	end
 
 	self.on_target_time = self.on_target_time + dt
@@ -214,13 +209,13 @@ ProjectileTrueFlightLocomotionExtension.update = function (self, unit, input, dt
 		self.stop(self)
 		Managers.state.unit_spawner:mark_for_deletion(self.unit)
 
-		return 
+		return
 	end
 
 	local length = Vector3.length(direction)
 
 	if length <= 0.001 then
-		return 
+		return
 	end
 
 	if script_data.debug_projectiles then
@@ -251,9 +246,8 @@ ProjectileTrueFlightLocomotionExtension.update = function (self, unit, input, dt
 
 	self.angle = math.degrees_to_radians(ActionUtils.pitch_from_rotation(rotation))
 	self.moved = true
-
-	return 
 end
+
 ProjectileTrueFlightLocomotionExtension.set_projectile_state = function (self, state_id)
 	if state_id ~= self.projectile_state_id then
 		local is_server = not self.is_husk
@@ -273,9 +267,8 @@ ProjectileTrueFlightLocomotionExtension.set_projectile_state = function (self, s
 	else
 		print("WARNING: projectile trying to be put in the same state multiple times", self.unit, state_id)
 	end
-
-	return 
 end
+
 ProjectileTrueFlightLocomotionExtension.update_towards_slow_bomb_target = function (self, position, t, dt)
 	local target_unit = self.target_unit
 	local unit = self.unit
@@ -316,6 +309,7 @@ ProjectileTrueFlightLocomotionExtension.update_towards_slow_bomb_target = functi
 
 	return new_position
 end
+
 ProjectileTrueFlightLocomotionExtension.update_towards_strike_missile_target = function (self, position, t, dt)
 	local target_unit = self.target_unit
 	local current_direction = self.current_direction:unbox()
@@ -385,6 +379,7 @@ ProjectileTrueFlightLocomotionExtension.update_towards_strike_missile_target = f
 
 	return new_position
 end
+
 ProjectileTrueFlightLocomotionExtension.update_towards_position_target = function (self, position, t, dt)
 	local current_direction = self.current_direction:unbox()
 	local template = TrueFlightTemplates[self.true_flight_template_name]
@@ -406,6 +401,7 @@ ProjectileTrueFlightLocomotionExtension.update_towards_position_target = functio
 
 	return new_position
 end
+
 ProjectileTrueFlightLocomotionExtension.update_towards_target = function (self, position, t, dt)
 	local target_unit = self.target_unit
 	local current_direction = self.current_direction:unbox()
@@ -433,6 +429,7 @@ ProjectileTrueFlightLocomotionExtension.update_towards_target = function (self, 
 
 	return new_position
 end
+
 ProjectileTrueFlightLocomotionExtension.update_towards_target_ability = function (self, position, t, dt)
 	local target_unit = self.target_unit
 	local current_direction = self.current_direction:unbox()
@@ -475,6 +472,7 @@ ProjectileTrueFlightLocomotionExtension.update_towards_target_ability = function
 
 	return new_position
 end
+
 ProjectileTrueFlightLocomotionExtension.update_seeking_target = function (self, position, dt, t, seeking)
 	local true_flight_template = TrueFlightTemplates[self.true_flight_template_name]
 	local speed_multiplier = true_flight_template.speed_multiplier
@@ -492,6 +490,7 @@ ProjectileTrueFlightLocomotionExtension.update_seeking_target = function (self, 
 
 	return new_position, target
 end
+
 ProjectileTrueFlightLocomotionExtension.find_new_target = function (self, position, true_flight_template, t, dt)
 	if self.raycast_timer < t then
 		local time_between_raycasts = true_flight_template.time_between_raycasts
@@ -501,10 +500,10 @@ ProjectileTrueFlightLocomotionExtension.find_new_target = function (self, positi
 
 		return target
 	end
-
-	return 
 end
+
 local player_targets = {}
+
 ProjectileTrueFlightLocomotionExtension.find_player_target = function (self, position)
 	local player_units = PLAYER_UNITS
 	local players_n = #player_units
@@ -525,10 +524,10 @@ ProjectileTrueFlightLocomotionExtension.find_player_target = function (self, pos
 			end
 		end
 	end
-
-	return 
 end
+
 local ai_units = {}
+
 ProjectileTrueFlightLocomotionExtension.find_broadphase_target = function (self, position)
 	local broadphase_radius = TrueFlightTemplates[self.true_flight_template_name].broadphase_radius
 
@@ -569,6 +568,7 @@ ProjectileTrueFlightLocomotionExtension.find_broadphase_target = function (self,
 
 	return nil
 end
+
 ProjectileTrueFlightLocomotionExtension.find_closest_highest_value_target = function (self, position)
 	local template = TrueFlightTemplates[self.true_flight_template_name]
 	local broadphase_radius = template.broadphase_radius
@@ -613,9 +613,11 @@ ProjectileTrueFlightLocomotionExtension.find_closest_highest_value_target = func
 
 	return nil
 end
+
 ProjectileTrueFlightLocomotionExtension.legitimate_always = function (self, unit, position)
 	return true
 end
+
 ProjectileTrueFlightLocomotionExtension.legitimate_only_dot_check = function (self, unit, position)
 	local target_position = Unit.world_position(unit, Unit.node(unit, "c_spine"))
 	local current_direction = self.current_direction:unbox()
@@ -628,9 +630,8 @@ ProjectileTrueFlightLocomotionExtension.legitimate_only_dot_check = function (se
 	else
 		self.target_unit = nil
 	end
-
-	return 
 end
+
 ProjectileTrueFlightLocomotionExtension.legitimate_target = function (self, unit, position)
 	local target_position = get_target_head_node_position(unit, "c_head")
 	local current_direction = self.current_direction:unbox()
@@ -678,6 +679,7 @@ ProjectileTrueFlightLocomotionExtension.legitimate_target = function (self, unit
 
 	return false
 end
+
 ProjectileTrueFlightLocomotionExtension.legitimate_player_target = function (self, unit, position)
 	local target_position = Unit.world_position(unit, Unit.node(unit, "c_spine"))
 	local current_direction = self.current_direction:unbox()
@@ -719,12 +721,15 @@ ProjectileTrueFlightLocomotionExtension.legitimate_player_target = function (sel
 
 	return false
 end
+
 ProjectileTrueFlightLocomotionExtension.moved_this_frame = function (self)
 	return self.moved
 end
+
 ProjectileTrueFlightLocomotionExtension.current_velocity = function (self)
 	return self.velocity:unbox()
 end
+
 ProjectileTrueFlightLocomotionExtension.destroy = function (self)
 	local target = self.target_unit
 
@@ -745,14 +750,12 @@ ProjectileTrueFlightLocomotionExtension.destroy = function (self)
 	end
 
 	self.hit_units = nil
-
-	return 
 end
+
 ProjectileTrueFlightLocomotionExtension.notify_hit_enemy = function (self, hit_unit)
 	self.hit_units[hit_unit] = true
-
-	return 
 end
+
 ProjectileTrueFlightLocomotionExtension.update_bot_threat = function (self, target_unit, distance)
 	local template = self.true_flight_template
 
@@ -764,12 +767,11 @@ ProjectileTrueFlightLocomotionExtension.update_bot_threat = function (self, targ
 			blackboard.created_missile_bot_threat = true
 		end
 	end
-
-	return 
 end
+
 ProjectileTrueFlightLocomotionExtension.stop = function (self)
 	if self.true_flight_template.update_after_impact then
-		return 
+		return
 	end
 
 	self.stopped = true
@@ -780,8 +782,6 @@ ProjectileTrueFlightLocomotionExtension.stop = function (self)
 
 		target_outline_extension.set_method("never")
 	end
-
-	return 
 end
 
-return 
+return

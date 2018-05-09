@@ -2,6 +2,7 @@ require("scripts/settings/keep_decoration_settings")
 require("scripts/settings/paintings")
 
 KeepDecorationPaintingExtension = class(KeepDecorationPaintingExtension)
+
 KeepDecorationPaintingExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	local level = LevelHelper:current_level(world)
@@ -10,9 +11,8 @@ KeepDecorationPaintingExtension.init = function (self, extension_init_context, u
 	self._level_unit_index = Level.unit_index(level, unit)
 	self._is_leader = Managers.party:is_leader(Network.peer_id())
 	self._paintings_lookup = NetworkLookup.keep_decoration_paintings
-
-	return 
 end
+
 KeepDecorationPaintingExtension.setup = function (self, settings, owned_paintings)
 	if self._is_leader then
 		self._backend_key = settings.backend_key
@@ -39,29 +39,27 @@ KeepDecorationPaintingExtension.setup = function (self, settings, owned_painting
 			else
 				self._waiting_for_game_session = true
 			end
-
-			return 
 		end
 
 		self._load_painting_material(self, selected_painting, on_material_loaded)
 	end
-
-	return 
 end
+
 KeepDecorationPaintingExtension.destroy = function (self)
 	self._unit = nil
 	self._world = nil
 	self._paintings = nil
 	self._go_id = nil
+end
 
-	return 
-end
 KeepDecorationPaintingExtension.extensions_ready = function (self)
-	return 
+	return
 end
+
 KeepDecorationPaintingExtension.can_interact = function (self)
 	return self._is_leader and self._go_id and 1 < #self._paintings
 end
+
 KeepDecorationPaintingExtension.interacted_with = function (self)
 	local paintings = self._paintings
 	local current_painting = self._get_selected_painting(self)
@@ -84,17 +82,15 @@ KeepDecorationPaintingExtension.interacted_with = function (self)
 
 			GameSession.set_game_object_field(game, go_id, "painting_index", self._paintings_lookup[next_painting])
 		end
-
-		return 
 	end
 
 	self._load_painting_material(self, next_painting, on_material_loaded)
+end
 
-	return 
-end
 KeepDecorationPaintingExtension.hot_join_sync = function (self, sender)
-	return 
+	return
 end
+
 KeepDecorationPaintingExtension.distributed_update = function (self)
 	if self._is_leader then
 		if self._waiting_for_game_session and Managers.state.network:in_game_session() then
@@ -119,9 +115,8 @@ KeepDecorationPaintingExtension.distributed_update = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 KeepDecorationPaintingExtension._get_selected_painting = function (self)
 	local backend_key = self._backend_key
 	local backend_interface = Managers.backend:get_interface("keep_decorations")
@@ -134,6 +129,7 @@ KeepDecorationPaintingExtension._get_selected_painting = function (self)
 
 	return selected_painting
 end
+
 KeepDecorationPaintingExtension._set_selected_painting = function (self, painting)
 	local backend_key = self._backend_key
 	local backend_manager = Managers.backend
@@ -141,9 +137,8 @@ KeepDecorationPaintingExtension._set_selected_painting = function (self, paintin
 
 	backend_interface.set(backend_interface, backend_key, painting)
 	backend_manager.commit(backend_manager)
-
-	return 
 end
+
 KeepDecorationPaintingExtension._load_painting_material = function (self, name, cb_done)
 	local subpath = "keep_painting_" .. name
 
@@ -157,8 +152,6 @@ KeepDecorationPaintingExtension._load_painting_material = function (self, name, 
 		if cb_done then
 			cb_done()
 		end
-
-		return 
 	end
 
 	if string.find(name, "_none") ~= nil then
@@ -169,9 +162,8 @@ KeepDecorationPaintingExtension._load_painting_material = function (self, name, 
 
 		Managers.package:load(package_name, reference_name, cb_package_loaded, true)
 	end
-
-	return 
 end
+
 KeepDecorationPaintingExtension._create_game_object = function (self, painting)
 	local go_data_table = {
 		go_type = NetworkLookup.go_types.keep_decoration_painting,
@@ -180,14 +172,12 @@ KeepDecorationPaintingExtension._create_game_object = function (self, painting)
 	}
 	local callback = callback(self, "cb_game_session_disconnect")
 	self._go_id = Managers.state.network:create_game_object("keep_decoration_painting", go_data_table, callback)
-
-	return 
 end
+
 KeepDecorationPaintingExtension.cb_game_session_disconnect = function (self)
 	self._go_id = nil
-
-	return 
 end
+
 KeepDecorationPaintingExtension.on_game_object_created = function (self, go_id)
 	local game = Managers.state.network:game()
 	local painting_index = GameSession.game_object_field(game, go_id, "painting_index")
@@ -197,13 +187,10 @@ KeepDecorationPaintingExtension.on_game_object_created = function (self, go_id)
 
 	self._go_painting_index = painting_index
 	self._go_id = go_id
-
-	return 
 end
+
 KeepDecorationPaintingExtension.on_game_object_destroyed = function (self)
 	self._go_id = nil
-
-	return 
 end
 
-return 
+return

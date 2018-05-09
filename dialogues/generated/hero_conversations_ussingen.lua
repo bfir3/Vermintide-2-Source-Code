@@ -4531,6 +4531,4 @@ return function ()
 			}
 		}
 	})
-
-	return 
 end

@@ -46,6 +46,7 @@ local subtitle_widget_definition = {
 	}
 }
 SubtitleGui = class(SubtitleGui)
+
 SubtitleGui.init = function (self, ingame_ui_context)
 	self.dialogue_system = ingame_ui_context.dialogue_system
 	self.ui_renderer = ingame_ui_context.ui_renderer
@@ -67,22 +68,19 @@ SubtitleGui.init = function (self, ingame_ui_context)
 	if use_subtitles ~= nil then
 		UISettings.use_subtitles = use_subtitles
 	end
-
-	return 
 end
+
 SubtitleGui.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self.subtitle_widget = UIWidget.init(subtitle_widget_definition)
-
-	return 
 end
+
 SubtitleGui.destroy = function (self)
 	self.playing_dialogues = nil
 
 	GarbageLeakDetector.register_object(self, "subtitle_gui")
-
-	return 
 end
+
 SubtitleGui._add_subtitle = function (self, unit, speaker, text)
 	local new_entry = {
 		unit = unit,
@@ -90,9 +88,8 @@ SubtitleGui._add_subtitle = function (self, unit, speaker, text)
 		text = text
 	}
 	self.subtitle_list[#self.subtitle_list + 1] = new_entry
-
-	return 
 end
+
 SubtitleGui._remove_subtitle = function (self, unit)
 	local subtitle_list = self.subtitle_list
 	local num_subtitles = #self.subtitle_list
@@ -104,9 +101,8 @@ SubtitleGui._remove_subtitle = function (self, unit)
 			break
 		end
 	end
-
-	return 
 end
+
 SubtitleGui._has_subtitle_for_unit = function (self, unit)
 	local subtitle_list = self.subtitle_list
 	local num_subtitles = #self.subtitle_list
@@ -116,12 +112,11 @@ SubtitleGui._has_subtitle_for_unit = function (self, unit)
 			return true
 		end
 	end
-
-	return 
 end
+
 SubtitleGui.update = function (self, dt)
 	if not UISettings.use_subtitles then
-		return 
+		return
 	end
 
 	local remake_text = false
@@ -221,20 +216,16 @@ SubtitleGui.update = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 SubtitleGui.start_subtitle = function (self, speaker_name, subtitle)
 	self.subtitles_to_display[speaker_name] = subtitle
 	self._force_text_remake = true
-
-	return 
 end
+
 SubtitleGui.stop_subtitle = function (self, speaker_name)
 	self.subtitles_to_display[speaker_name] = nil
 	self._force_text_remake = true
-
-	return 
 end
 
-return 
+return

@@ -61,6 +61,7 @@ local page_settings = {
 }
 HeroWindowCrafting = class(HeroWindowCrafting)
 HeroWindowCrafting.NAME = "HeroWindowCrafting"
+
 HeroWindowCrafting.on_enter = function (self, params, offset)
 	print("[HeroViewWindow] Enter Substate HeroWindowCrafting")
 
@@ -100,9 +101,8 @@ HeroWindowCrafting.on_enter = function (self, params, offset)
 	self.unblocked_services_n = 0
 
 	self._change_recipe_page(self, 1)
-
-	return 
 end
+
 HeroWindowCrafting.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -133,9 +133,8 @@ HeroWindowCrafting.create_ui_elements = function (self, params, offset)
 	end
 
 	self._widgets_by_name.crafting_fg_glow.style.texture_id.color[1] = 0
-
-	return 
 end
+
 HeroWindowCrafting.on_exit = function (self, params)
 	print("[HeroViewWindow] Exit Substate HeroWindowCrafting")
 
@@ -146,18 +145,16 @@ HeroWindowCrafting.on_exit = function (self, params)
 
 		self._active_page:on_exit(params)
 	end
-
-	return 
 end
+
 HeroWindowCrafting.set_input_description = function (self, input_desc_name)
 	if not input_desc_name or input_actions[input_desc_name] then
 		self._menu_input_description:set_input_description(input_desc_name and input_actions[input_desc_name])
 	else
 		Application.warning("[HeroWindowCrafting:set_input_description] Could not set input desc: " .. tostring(input_desc_name))
 	end
-
-	return 
 end
+
 HeroWindowCrafting.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -192,16 +189,14 @@ HeroWindowCrafting.update = function (self, dt, t)
 	self._update_animations(self, dt)
 	self._handle_input(self, dt, t)
 	self.draw(self, dt)
-
-	return 
 end
+
 HeroWindowCrafting.post_update = function (self, dt, t)
 	if self._active_page and self._active_page.post_update then
 		self._active_page:post_update(dt, t)
 	end
-
-	return 
 end
+
 HeroWindowCrafting._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -217,9 +212,8 @@ HeroWindowCrafting._update_animations = function (self, dt)
 	end
 
 	local widgets_by_name = self._widgets_by_name
-
-	return 
 end
+
 HeroWindowCrafting._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -229,9 +223,8 @@ HeroWindowCrafting._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroWindowCrafting._is_button_hovered = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -239,9 +232,8 @@ HeroWindowCrafting._is_button_hovered = function (self, widget)
 	if hotspot.on_hover_enter then
 		return true
 	end
-
-	return 
 end
+
 HeroWindowCrafting._is_button_held = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -249,9 +241,8 @@ HeroWindowCrafting._is_button_held = function (self, widget)
 	if hotspot.is_clicked then
 		return hotspot.is_clicked
 	end
-
-	return 
 end
+
 HeroWindowCrafting._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local page_button_next = widgets_by_name.page_button_next
@@ -294,15 +285,13 @@ HeroWindowCrafting._handle_input = function (self, dt, t)
 			end
 		end
 	end
-
-	return 
 end
+
 HeroWindowCrafting._exit = function (self, selected_level)
 	self.exit = true
 	self.exit_level_id = selected_level
-
-	return 
 end
+
 HeroWindowCrafting.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -329,14 +318,12 @@ HeroWindowCrafting.draw = function (self, dt)
 	if gamepad_active then
 		self._menu_input_description:draw(ui_top_renderer, dt)
 	end
-
-	return 
 end
+
 HeroWindowCrafting._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroWindowCrafting._change_recipe_page = function (self, current_page)
 	local total_pages = #page_settings
 	local current_page_settings = page_settings[current_page]
@@ -362,12 +349,12 @@ HeroWindowCrafting._change_recipe_page = function (self, current_page)
 	end
 
 	self._selected_page_index = current_page
+end
 
-	return 
-end
 HeroWindowCrafting.window_input_service = function (self)
-	return 
+	return
 end
+
 HeroWindowCrafting._set_page_index = function (self, page_index)
 	local active_page = self._active_page
 	local params = self._page_params
@@ -377,7 +364,7 @@ HeroWindowCrafting._set_page_index = function (self, page_index)
 
 	if active_page then
 		if active_page.NAME == page_class_name then
-			return 
+			return
 		end
 
 		if active_page.on_exit then
@@ -395,14 +382,13 @@ HeroWindowCrafting._set_page_index = function (self, page_index)
 	end
 
 	self._active_page = page
-
-	return 
 end
+
 HeroWindowCrafting._update_craft_start_time = function (self, dt, t)
 	local craft_start_duration = self._craft_start_duration
 
 	if not craft_start_duration then
-		return 
+		return
 	end
 
 	craft_start_duration = craft_start_duration + dt
@@ -419,14 +405,13 @@ HeroWindowCrafting._update_craft_start_time = function (self, dt, t)
 	else
 		self._craft_start_duration = craft_start_duration
 	end
-
-	return 
 end
+
 HeroWindowCrafting._update_craft_glow_in_time = function (self, dt, t)
 	local craft_glow_in_duration = self._craft_glow_in_duration
 
 	if not craft_glow_in_duration then
-		return 
+		return
 	end
 
 	craft_glow_in_duration = craft_glow_in_duration + dt
@@ -441,14 +426,13 @@ HeroWindowCrafting._update_craft_glow_in_time = function (self, dt, t)
 	else
 		self._craft_glow_in_duration = craft_glow_in_duration
 	end
-
-	return 
 end
+
 HeroWindowCrafting._update_craft_glow_wait_time = function (self, dt, t)
 	local craft_glow_wait_duration = self._craft_glow_wait_duration
 
 	if not craft_glow_wait_duration then
-		return 
+		return
 	end
 
 	craft_glow_wait_duration = craft_glow_wait_duration + dt
@@ -460,14 +444,13 @@ HeroWindowCrafting._update_craft_glow_wait_time = function (self, dt, t)
 	else
 		self._craft_glow_wait_duration = craft_glow_wait_duration
 	end
-
-	return 
 end
+
 HeroWindowCrafting._update_craft_glow_out_time = function (self, dt, t)
 	local craft_glow_out_duration = self._craft_glow_out_duration
 
 	if not craft_glow_out_duration or self._craft_glow_in_duration or self._craft_start_duration or self._craft_glow_wait_duration then
-		return 
+		return
 	end
 
 	craft_glow_out_duration = craft_glow_out_duration + dt
@@ -488,9 +471,8 @@ HeroWindowCrafting._update_craft_glow_out_time = function (self, dt, t)
 
 		self._craft_glow_out_duration = craft_glow_out_duration
 	end
-
-	return 
 end
+
 HeroWindowCrafting._set_crafting_fg_progress = function (self, progress)
 	local widgets_by_name = self._widgets_by_name
 	local crafting_fg = widgets_by_name.crafting_fg
@@ -502,14 +484,13 @@ HeroWindowCrafting._set_crafting_fg_progress = function (self, progress)
 	current_size[2] = default_size[2] * progress
 	uvs[1][2] = 1 - progress
 	uvs[2][2] = 1
-
-	return 
 end
+
 HeroWindowCrafting._update_craft_end_time = function (self, dt, t)
 	local craft_end_duration = self._craft_end_duration
 
 	if not craft_end_duration then
-		return 
+		return
 	end
 
 	craft_end_duration = craft_end_duration + dt
@@ -529,9 +510,8 @@ HeroWindowCrafting._update_craft_end_time = function (self, dt, t)
 	else
 		self._craft_end_duration = craft_end_duration
 	end
-
-	return 
 end
+
 HeroWindowCrafting.craft = function (self, items, recipe_override)
 	local craft_id = self.crafting_manager:craft(items, recipe_override)
 
@@ -548,6 +528,7 @@ HeroWindowCrafting.craft = function (self, items, recipe_override)
 
 	return false
 end
+
 HeroWindowCrafting.craft_complete = function (self, result)
 	self._waiting_for_craft = false
 	self._craft_glow_out_duration = 0
@@ -555,12 +536,12 @@ HeroWindowCrafting.craft_complete = function (self, result)
 	if self._active_page then
 		self._active_page:craft_result(result)
 	end
-
-	return 
 end
+
 HeroWindowCrafting.waiting_for_craft = function (self)
 	return self._waiting_for_craft
 end
+
 HeroWindowCrafting.lock_input = function (self)
 	local input_manager = self.input_manager
 
@@ -571,9 +552,8 @@ HeroWindowCrafting.lock_input = function (self)
 	input_manager.device_block_services(input_manager, "keyboard", 1, self.unblocked_services, self.unblocked_services_n, "crafting")
 	input_manager.device_block_services(input_manager, "gamepad", 1, self.unblocked_services, self.unblocked_services_n, "crafting")
 	input_manager.device_block_services(input_manager, "mouse", 1, self.unblocked_services, self.unblocked_services_n, "crafting")
-
-	return 
 end
+
 HeroWindowCrafting.unlock_input = function (self)
 	local input_manager = self.input_manager
 
@@ -583,8 +563,6 @@ HeroWindowCrafting.unlock_input = function (self)
 	table.clear(self.unblocked_services)
 
 	self.unblocked_services_n = 0
-
-	return 
 end
 
-return 
+return

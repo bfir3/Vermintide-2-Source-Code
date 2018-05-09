@@ -56,8 +56,6 @@ DamageBlobTemplates = {
 			self._firing_time_deadline = t + firing_time
 			self._particle_life_time = Vector3Box(1, 0, 0)
 		end
-
-		return 
 	end,
 	warpfire_thrower_fire_update = function (self, t, dt, target_unit)
 		local warpfire_gun_unit = self._warpfire_gun_unit
@@ -101,9 +99,7 @@ DamageBlobTemplates = {
 
 			return false
 		end
-
-		return 
 	end
 }
 
-return 
+return

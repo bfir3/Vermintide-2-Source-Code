@@ -5,6 +5,7 @@ local HEALING_MAX_LIFE_TIME = 0.5
 local HEALING_EFFECT_LIFE_TIME = 2
 local breed_textures = UISettings.breed_textures
 BossHealthUI = class(BossHealthUI)
+
 BossHealthUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.input_manager = ingame_ui_context.input_manager
@@ -25,18 +26,16 @@ BossHealthUI.init = function (self, ingame_ui_context)
 
 	self._proximity_update_time = 0
 	self._look_at_boss_unit_timer = 0
-
-	return 
 end
+
 BossHealthUI.destroy = function (self)
 	GarbageLeakDetector.register_object(self, "boss_health_ui")
 
 	local event_manager = Managers.state.event
 
 	event_manager.unregister(event_manager, "show_boss_health_bar", self)
-
-	return 
 end
+
 BossHealthUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
@@ -52,17 +51,15 @@ BossHealthUI.create_ui_elements = function (self)
 
 	self._widgets = widgets
 	self._widgets_by_name = widgets_by_name
-
-	return 
 end
+
 BossHealthUI._set_portrait_by_breed = function (self, breed_name)
 	local portrait_texture = breed_textures[breed_name] or "icons_placeholder"
 	local bar_widget = self._widgets_by_name.bar
 	bar_widget.content.title_text = Localize(breed_name)
 	bar_widget.content.portrait = portrait_texture
-
-	return 
 end
+
 BossHealthUI.update = function (self, dt, t)
 	self._sync_boss_health(self, dt, t)
 	self._update_targeted_boss(self, dt, t)
@@ -71,20 +68,19 @@ BossHealthUI.update = function (self, dt, t)
 		self._update_animations(self, dt, t)
 		self._draw(self, dt, t)
 	end
-
-	return 
 end
+
 BossHealthUI._update_targeted_boss = function (self, dt, t)
 	local local_player = self.player_manager:local_player()
 
 	if not local_player then
-		return 
+		return
 	end
 
 	local player_unit = local_player.player_unit
 
 	if not player_unit then
-		return 
+		return
 	end
 
 	local proximity_system = Managers.state.entity:system("proximity_system")
@@ -93,9 +89,8 @@ BossHealthUI._update_targeted_boss = function (self, dt, t)
 	if proximity_boss_unit and self._boss_unit ~= proximity_boss_unit then
 		self.event_show_boss_health_bar(self, proximity_boss_unit)
 	end
-
-	return 
 end
+
 BossHealthUI._update_animations = function (self, dt, t)
 	local animations = self._animations
 
@@ -106,9 +101,8 @@ BossHealthUI._update_animations = function (self, dt, t)
 			animations[name] = nil
 		end
 	end
-
-	return 
 end
+
 BossHealthUI._draw = function (self, dt, t)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -125,9 +119,8 @@ BossHealthUI._draw = function (self, dt, t)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 BossHealthUI.event_show_boss_health_bar = function (self, unit)
 	if unit and AiUtils.unit_alive(unit) then
 		local breed = Unit.get_data(unit, "breed")
@@ -162,9 +155,8 @@ BossHealthUI.event_show_boss_health_bar = function (self, unit)
 			self._next_update_is_instant = true
 		end
 	end
-
-	return 
 end
+
 BossHealthUI._reset = function (self)
 	self._boss_unit = nil
 	self._current_progress = nil
@@ -173,20 +165,19 @@ BossHealthUI._reset = function (self)
 	self._healing_start_progress = nil
 	self._healing_life_time = nil
 	self._healing_effect_life_time = nil
-
-	return 
 end
+
 BossHealthUI._sync_boss_health = function (self, dt, t)
 	local unit = self._boss_unit
 
 	if not unit then
-		return 
+		return
 	end
 
 	if not AiUtils.unit_alive(unit) then
 		self._reset(self)
 
-		return 
+		return
 	end
 
 	local progress, max_health_fraction = nil
@@ -223,9 +214,8 @@ BossHealthUI._sync_boss_health = function (self, dt, t)
 	if not progress or self._current_progress == 0 then
 		self._reset(self)
 	end
-
-	return 
 end
+
 BossHealthUI._set_bar_progress = function (self, progress, max_health_fraction, instant, dt, t)
 	progress = progress or 0
 	local current_health_percent = self._current_progress or 1
@@ -284,9 +274,8 @@ BossHealthUI._set_bar_progress = function (self, progress, max_health_fraction, 
 	self._current_raw_progress = progress
 	self._current_max_health_fraction = max_health_anim_fraction
 	self._next_update_is_instant = nil
-
-	return 
 end
+
 BossHealthUI._set_healing_amount = function (self, start_progress, end_progress, time)
 	local widget = self._widgets_by_name.bar
 	local content = widget.content
@@ -308,15 +297,14 @@ BossHealthUI._set_healing_amount = function (self, start_progress, end_progress,
 		self._healing_life_time = time + HEALING_MAX_LIFE_TIME
 		self._healing_effect_life_time = time + HEALING_EFFECT_LIFE_TIME
 	end
-
-	return 
 end
+
 BossHealthUI._update_healing_bar = function (self, dt, t, freeze_healing)
 	local healing_end_progress = self._current_raw_progress
 	local healing_start_progress = self._healing_start_progress
 
 	if not healing_start_progress or not healing_end_progress then
-		return 
+		return
 	end
 
 	local new_healing_start_progress = healing_start_progress
@@ -344,9 +332,8 @@ BossHealthUI._update_healing_bar = function (self, dt, t, freeze_healing)
 		self._healing_start_progress = nil
 		self._healing_life_time = nil
 	end
-
-	return 
 end
+
 BossHealthUI._set_health_edge_texture_position_progress = function (self, progress)
 	local widget = self._widgets_by_name.bar
 	local content = widget.content
@@ -356,9 +343,8 @@ BossHealthUI._set_health_edge_texture_position_progress = function (self, progre
 	local bar_edge_default_width_offset = bar_edge_style.default_width_offset
 	bar_edge_offset[1] = bar_length * progress - bar_edge_default_width_offset
 	content.bar_edge_fraction = progress
-
-	return 
 end
+
 BossHealthUI._update_healing_effect = function (self, dt, t)
 	if self._healing_effect_life_time then
 		local time_progress = math.max(self._healing_effect_life_time - t, 0) / HEALING_EFFECT_LIFE_TIME
@@ -371,9 +357,8 @@ BossHealthUI._update_healing_effect = function (self, dt, t)
 			self._healing_effect_life_time = nil
 		end
 	end
-
-	return 
 end
+
 BossHealthUI._set_health_effect_alpha = function (self, alpha)
 	local widget = self._widgets_by_name.bar
 	local content = widget.content
@@ -381,8 +366,6 @@ BossHealthUI._set_health_effect_alpha = function (self, alpha)
 	local portrait_healing_style = style.portrait_healing
 	local portrait_healing_color = portrait_healing_style.color
 	portrait_healing_color[1] = alpha
-
-	return 
 end
 
-return 
+return

@@ -2,11 +2,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTInterestPointApproachAction = class(BTInterestPointApproachAction, BTNode)
 BTInterestPointApproachAction.name = "BTInterestPointApproachAction"
+
 BTInterestPointApproachAction.init = function (self, ...)
 	BTInterestPointApproachAction.super.init(self, ...)
-
-	return 
 end
+
 BTInterestPointApproachAction.enter = function (self, unit, blackboard, t)
 	local interest_point_system_api = blackboard.system_api.ai_interest_point_system
 	local request = interest_point_system_api.get_claim(blackboard.ip_request_id)
@@ -33,9 +33,8 @@ BTInterestPointApproachAction.enter = function (self, unit, blackboard, t)
 	Managers.state.network:anim_event(unit, "move_fwd")
 
 	blackboard.move_state = "moving"
-
-	return 
 end
+
 BTInterestPointApproachAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.ip_state = nil
 	blackboard.ip_target_position = nil
@@ -65,9 +64,8 @@ BTInterestPointApproachAction.leave = function (self, unit, blackboard, t, reaso
 
 	local group_blackboard = blackboard.group_blackboard
 	group_blackboard.rats_currently_moving_to_ip = group_blackboard.rats_currently_moving_to_ip - 1
-
-	return 
 end
+
 BTInterestPointApproachAction.run = function (self, unit, blackboard, t, dt)
 	if script_data.ai_interest_point_debug then
 		Debug.text("BTInterestPointApproachAction state = %s", blackboard.ip_state)
@@ -104,4 +102,4 @@ BTInterestPointApproachAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

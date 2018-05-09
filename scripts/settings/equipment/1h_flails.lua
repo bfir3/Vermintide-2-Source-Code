@@ -1078,4 +1078,4 @@ Weapons.one_handed_flail_template_1_t3_un = table.create_copy(Weapons.one_handed
 Weapons.one_handed_flail_template_1_t3_un.actions.action_inspect.default.anim_event = "inspect_start_2"
 Weapons.one_handed_flail_template_1_t3_un.actions.action_inspect.default.anim_end_event = "inspect_end_2"
 
-return 
+return

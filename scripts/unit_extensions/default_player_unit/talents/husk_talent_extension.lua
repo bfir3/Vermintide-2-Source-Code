@@ -1,4 +1,5 @@
 HuskTalentExtension = class(HuskTalentExtension)
+
 HuskTalentExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self._unit = unit
 	self.world = extension_init_context.world
@@ -13,9 +14,8 @@ HuskTalentExtension.init = function (self, extension_init_context, unit, extensi
 		0,
 		0
 	}
-
-	return 
 end
+
 HuskTalentExtension.extensions_ready = function (self, world, unit)
 	local career_extension = ScriptUnit.extension(unit, "career_system")
 	self.buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -26,15 +26,14 @@ HuskTalentExtension.extensions_ready = function (self, world, unit)
 	local career_name = career_extension.career_name(career_extension)
 	self._hero_name = hero_name
 	self._career_name = career_name
-
-	return 
 end
+
 HuskTalentExtension.set_talent_ids = function (self, talent_ids)
 	self._talent_ids = talent_ids
-
-	return 
 end
+
 local params = {}
+
 HuskTalentExtension.apply_buffs_from_talents = function (self)
 	local talent_ids = self._talent_ids
 	local hero_name = self._hero_name
@@ -66,9 +65,8 @@ HuskTalentExtension.apply_buffs_from_talents = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 HuskTalentExtension._clear_buffs_from_talents = function (self)
 	local buff_extension = self.buff_extension
 	local talent_buff_ids = self._talent_buff_ids
@@ -81,9 +79,8 @@ HuskTalentExtension._clear_buffs_from_talents = function (self)
 	end
 
 	table.clear(self._talent_buff_ids)
-
-	return 
 end
+
 HuskTalentExtension.has_talent = function (self, talent_name)
 	local talent_ids = self._talent_ids
 	local wanted_talent_id = TalentIDLookup[talent_name]
@@ -98,6 +95,7 @@ HuskTalentExtension.has_talent = function (self, talent_name)
 
 	return false
 end
+
 HuskTalentExtension.get_talent_names = function (self)
 	local talent_ids = self._talent_ids
 	local talent_names = {}
@@ -114,8 +112,9 @@ HuskTalentExtension.get_talent_names = function (self)
 
 	return talent_names
 end
+
 HuskTalentExtension.destroy = function (self)
-	return 
+	return
 end
 
-return 
+return

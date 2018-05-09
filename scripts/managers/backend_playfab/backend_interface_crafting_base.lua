@@ -6,22 +6,25 @@ require("scripts/settings/crafting/crafting_data")
 
 BackendInterfaceCraftingBase = class(BackendInterfaceCraftingBase)
 local crafting_recipes, crafting_recipes_by_name, crafting_recipes_lookup = dofile("scripts/settings/crafting/crafting_recipes")
+
 BackendInterfaceCraftingBase.init = function (self)
 	self._crafting_recipes = crafting_recipes
 	self._crafting_recipes_by_name = crafting_recipes_by_name
 	self._crafting_recipes_lookup = crafting_recipes_lookup
-
-	return 
 end
+
 BackendInterfaceCraftingBase.get_recipes = function (self)
 	return self._crafting_recipes
 end
+
 BackendInterfaceCraftingBase.get_recipe_by_name = function (self, name)
 	return self._crafting_recipes_by_name[name]
 end
+
 BackendInterfaceCraftingBase.get_recipes_lookup = function (self)
 	return self._crafting_recipes_lookup
 end
+
 BackendInterfaceCraftingBase._get_valid_recipe = function (self, item_backend_ids, recipe_override)
 	local crafting_recipes = self._crafting_recipes
 
@@ -34,7 +37,7 @@ BackendInterfaceCraftingBase._get_valid_recipe = function (self, item_backend_id
 			return recipe, item_backend_ids_and_amounts
 		end
 
-		return 
+		return
 	end
 
 	for i = 1, #crafting_recipes, 1 do
@@ -46,10 +49,10 @@ BackendInterfaceCraftingBase._get_valid_recipe = function (self, item_backend_id
 			return recipe, item_backend_ids_and_amounts
 		end
 	end
-
-	return 
 end
+
 local valid_item_ids = {}
+
 BackendInterfaceCraftingBase.salvage_validation_func = function (self, recipe, item_backend_ids)
 	local backend_items = Managers.backend:get_interface("items")
 	local salvagable_slot_types = recipe.salvagable_slot_types
@@ -77,6 +80,7 @@ BackendInterfaceCraftingBase.salvage_validation_func = function (self, recipe, i
 
 	return true, valid_item_ids
 end
+
 BackendInterfaceCraftingBase.craft_validation_func = function (self, recipe, item_backend_ids)
 	local ingredients = recipe.ingredients
 	local cloned_backend_ids = table.clone(item_backend_ids)
@@ -109,7 +113,9 @@ BackendInterfaceCraftingBase.craft_validation_func = function (self, recipe, ite
 
 	return true, valid_item_ids
 end
+
 local ingredient_ids = {}
+
 BackendInterfaceCraftingBase._validate_ingredient = function (self, ingredient, item_backend_ids)
 	local backend_items = Managers.backend:get_interface("items")
 	local ingredient_name = ingredient.name
@@ -139,6 +145,7 @@ BackendInterfaceCraftingBase._validate_ingredient = function (self, ingredient, 
 
 	return false
 end
+
 BackendInterfaceCraftingBase.weapon_skin_application_validation_func = function (self, recipe, item_backend_ids)
 	local ingredients = recipe.ingredients
 	local backend_items = Managers.backend:get_interface("items")
@@ -185,6 +192,7 @@ BackendInterfaceCraftingBase.weapon_skin_application_validation_func = function 
 
 	return true, valid_item_ids
 end
+
 BackendInterfaceCraftingBase.check_same_item_func = function (self, item_backend_ids)
 	local backend_items = Managers.backend:get_interface("items")
 	local name = nil
@@ -202,6 +210,7 @@ BackendInterfaceCraftingBase.check_same_item_func = function (self, item_backend
 
 	return true
 end
+
 BackendInterfaceCraftingBase.check_has_skin = function (self, item_backend_ids)
 	local backend_items = Managers.backend:get_interface("items")
 	local data = item_backend_ids[1]
@@ -215,4 +224,4 @@ BackendInterfaceCraftingBase.check_has_skin = function (self, item_backend_ids)
 	return false
 end
 
-return 
+return

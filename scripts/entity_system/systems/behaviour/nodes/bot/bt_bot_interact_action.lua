@@ -1,13 +1,14 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTBotInteractAction = class(BTBotInteractAction, BTNode)
+
 BTBotInteractAction.init = function (self, ...)
 	BTBotInteractAction.super.init(self, ...)
-
-	return 
 end
+
 BTBotInteractAction.name = "BTBotInteractAction"
 local unit_alive = Unit.alive
+
 BTBotInteractAction.enter = function (self, unit, blackboard, t)
 	local interaction_unit = blackboard.interaction_unit
 	blackboard.current_interaction_unit = interaction_unit
@@ -23,9 +24,8 @@ BTBotInteractAction.enter = function (self, unit, blackboard, t)
 	local soft_aiming = true
 
 	input_ext.set_aiming(input_ext, true, soft_aiming)
-
-	return 
 end
+
 BTBotInteractAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.interact = false
 	local interaction_ext = blackboard.interaction_extension
@@ -37,9 +37,8 @@ BTBotInteractAction.leave = function (self, unit, blackboard, t, reason, destroy
 	input_ext.set_aiming(input_ext, false)
 
 	blackboard.current_interaction_unit = nil
-
-	return 
 end
+
 BTBotInteractAction.run = function (self, unit, blackboard, t, dt)
 	local interaction_unit = blackboard.current_interaction_unit
 
@@ -90,4 +89,4 @@ BTBotInteractAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

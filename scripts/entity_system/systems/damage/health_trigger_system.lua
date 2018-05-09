@@ -4,20 +4,19 @@ HealthTriggerSystem = class(HealthTriggerSystem, ExtensionSystemBase)
 local extensions = {
 	"HealthTriggerExtension"
 }
+
 HealthTriggerSystem.init = function (self, entity_system_creation_context, system_name)
 	HealthTriggerSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
 	self.unit_extensions = {}
-
-	return 
 end
+
 HealthTriggerSystem.destroy = function (self)
 	assert(not next(self.unit_extensions), "Found at least one unit that hasn't been unregistered for health trigger system.")
 
 	self.unit_extensions = nil
-
-	return 
 end
+
 HealthTriggerSystem.on_add_extension = function (self, world, unit, extension_name, ...)
 	local extension = {}
 
@@ -37,16 +36,17 @@ HealthTriggerSystem.on_add_extension = function (self, world, unit, extension_na
 
 	return extension
 end
+
 HealthTriggerSystem.on_remove_extension = function (self, unit, extension_name)
 	assert(ScriptUnit.has_extension(unit, "health_trigger_system"), "Trying to remove non-existing extension %q from unit %s", extension_name, unit)
 	ScriptUnit.remove_extension(unit, "health_trigger_system")
 
 	self.unit_extensions[unit] = nil
-
-	return 
 end
+
 local health_trigger_levels = HealthTriggerSettings.levels
 local rapid_health_loss = HealthTriggerSettings.rapid_health_loss
+
 HealthTriggerSystem.update = function (self, context, t)
 	for unit, extension in pairs(self.unit_extensions) do
 		local last_health_percent = extension.last_health_percent
@@ -105,8 +105,6 @@ HealthTriggerSystem.update = function (self, context, t)
 			end
 		end
 	end
-
-	return 
 end
 
-return 
+return

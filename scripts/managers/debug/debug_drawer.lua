@@ -1,32 +1,30 @@
 DebugDrawer = class(DebugDrawer)
+
 DebugDrawer.init = function (self, line_object, mode)
 	self._line_object = line_object
 	self._mode = mode
-
-	return 
 end
+
 DebugDrawer.reset = function (self)
 	LineObject.reset(self._line_object)
-
-	return 
 end
+
 DebugDrawer.line_object = function (self)
 	return self._line_object
 end
+
 DebugDrawer.line = function (self, from, to, color)
 	color = color or Color(255, 255, 255)
 
 	LineObject.add_line(self._line_object, color, from, to)
-
-	return 
 end
+
 DebugDrawer.sphere = function (self, center, radius, color, segments, parts)
 	color = color or Color(255, 255, 255)
 
 	LineObject.add_sphere(self._line_object, color, center, radius, segments or 20, parts or 2)
-
-	return 
 end
+
 DebugDrawer.capsule_overlap = function (self, position, size, rotation, color)
 	fassert(size.x == size.z, "Passing diffent x and y size doesn't do anything, capsules overlaps are always sphere swept, not spheroid shaped.")
 
@@ -37,16 +35,14 @@ DebugDrawer.capsule_overlap = function (self, position, size, rotation, color)
 	local to = position + offset_y
 
 	self.capsule(self, from, to, radius, color)
-
-	return 
 end
+
 DebugDrawer.oobb_overlap = function (self, position, size, rotation, color)
 	local pose = Matrix4x4.from_quaternion_position(rotation, position)
 
 	self.box(self, pose, size, color)
-
-	return 
 end
+
 DebugDrawer.box_sweep = function (self, pose, extents, movement_vector, color1, color2)
 	color1 = color1 or Color(255, 255, 255)
 	color2 = color2 or Color(255, 0, 0)
@@ -83,44 +79,38 @@ DebugDrawer.box_sweep = function (self, pose, extents, movement_vector, color1, 
 	self.line(self, box1corner6, box1corner6 + movement_vector, color2)
 	self.line(self, box1corner7, box1corner7 + movement_vector, color2)
 	self.line(self, box1corner8, box1corner8 + movement_vector, color2)
-
-	return 
 end
+
 DebugDrawer.capsule = function (self, from, to, radius, color)
 	color = color or Color(255, 255, 255)
 
 	LineObject.add_capsule(self._line_object, color, from, to, radius)
-
-	return 
 end
+
 DebugDrawer.actor = function (self, actor, color, camera_pose)
 	color = color or Color(255, 255, 255)
 
 	Actor.debug_draw(actor, self._line_object, color, camera_pose)
-
-	return 
 end
+
 DebugDrawer.box = function (self, pose, extents, color)
 	color = color or Color(255, 255, 255)
 
 	LineObject.add_box(self._line_object, color, pose, extents)
-
-	return 
 end
+
 DebugDrawer.cone = function (self, from, to, radius, color, segements, bars)
 	color = color or Color(255, 255, 255)
 
 	LineObject.add_cone(self._line_object, color, from, to, radius, segements, bars)
-
-	return 
 end
+
 DebugDrawer.circle = function (self, center, radius, normal, color, segments)
 	color = color or Color(255, 255, 255)
 
 	LineObject.add_circle(self._line_object, color, center, radius, normal, segments or 20)
-
-	return 
 end
+
 DebugDrawer.arrow_2d = function (self, from, to, color)
 	self.line(self, from, to, color)
 
@@ -130,9 +120,8 @@ DebugDrawer.arrow_2d = function (self, from, to, color)
 
 	self.line(self, to, to - 0.2 * vector + base_axis * length * 0.2, color)
 	self.line(self, to, to - 0.2 * vector - base_axis * length * 0.2, color)
-
-	return 
 end
+
 DebugDrawer.cylinder = function (self, pos1, pos2, radius, color, segments)
 	color = color or Color(255, 255, 255)
 	segments = segments or 5
@@ -147,9 +136,8 @@ DebugDrawer.cylinder = function (self, pos1, pos2, radius, color, segments)
 
 		LineObject.add_circle(self._line_object, color, pos, radius, normal, 20)
 	end
-
-	return 
 end
+
 DebugDrawer.vector = function (self, position, vector, color)
 	color = color or Color(255, 255, 255)
 	local length = Vector3.length(vector)
@@ -166,18 +154,16 @@ DebugDrawer.vector = function (self, position, vector, color)
 	self.line(self, tip, aux + x * tip_width, color)
 	self.line(self, tip, aux - y * tip_width, color)
 	self.line(self, tip, aux + y * tip_width, color)
-
-	return 
 end
+
 DebugDrawer.quaternion = function (self, position, quaternion, scale)
 	scale = scale or 1
 
 	self.vector(self, position, scale * Quaternion.right(quaternion), Color(255, 0, 0))
 	self.vector(self, position, scale * Quaternion.forward(quaternion), Color(0, 255, 0))
 	self.vector(self, position, scale * Quaternion.up(quaternion), Color(0, 0, 255))
-
-	return 
 end
+
 DebugDrawer.matrix4x4 = function (self, matrix, scale)
 	scale = scale or 1
 	local position = Matrix4x4.translation(matrix)
@@ -187,9 +173,8 @@ DebugDrawer.matrix4x4 = function (self, matrix, scale)
 	local rotation = Matrix4x4.rotation(matrix)
 
 	self.quaternion(self, position, rotation, scale)
-
-	return 
 end
+
 DebugDrawer.unit = function (self, unit, color)
 	color = color or Color(255, 255, 255)
 	local box_pose, box_extents = Unit.box(unit)
@@ -201,19 +186,17 @@ DebugDrawer.unit = function (self, unit, color)
 	local rotation = Unit.world_rotation(unit, 0)
 
 	self.quaternion(self, position, rotation)
-
-	return 
 end
+
 DebugDrawer.navigation_mesh_search = function (self, mesh)
 	NavigationMesh.visualize_last_search(mesh, self._line_object)
-
-	return 
 end
+
 DebugDrawer.update = function (self, world)
 	if script_data and script_data.disable_debug_draw then
 		self.reset(self)
 
-		return 
+		return
 	end
 
 	LineObject.dispatch(world, self._line_object)
@@ -221,8 +204,6 @@ DebugDrawer.update = function (self, world)
 	if self._mode == "immediate" then
 		self.reset(self)
 	end
-
-	return 
 end
 
-return 
+return

@@ -7,6 +7,7 @@ local STARTING_DIFFICULTY_INDEX = 1
 local DEBUG_NUM_VISIBLE_DIFFICULTIES = nil
 StartGameWindowDifficulty = class(StartGameWindowDifficulty)
 StartGameWindowDifficulty.NAME = "StartGameWindowDifficulty"
+
 StartGameWindowDifficulty.on_enter = function (self, params, offset)
 	print("[StartGameWindow] Enter Substate StartGameWindowDifficulty")
 
@@ -33,9 +34,8 @@ StartGameWindowDifficulty.on_enter = function (self, params, offset)
 
 	self._update_selected_difficulty_option(self, difficulty_key)
 	self.parent.parent:set_input_description("select_difficulty")
-
-	return 
 end
+
 StartGameWindowDifficulty.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -60,9 +60,8 @@ StartGameWindowDifficulty.create_ui_elements = function (self, params, offset)
 		window_position[2] = window_position[2] + offset[2]
 		window_position[3] = window_position[3] + offset[3]
 	end
-
-	return 
 end
+
 StartGameWindowDifficulty._setup_difficulties = function (self)
 	local difficulties = self._get_difficulty_options(self)
 	local widgets_by_name = self._widgets_by_name
@@ -87,12 +86,12 @@ StartGameWindowDifficulty._setup_difficulties = function (self)
 
 		widget_index_counter = widget_index_counter + 1
 	end
-
-	return 
 end
+
 StartGameWindowDifficulty._get_difficulty_options = function (self)
 	return Managers.state.difficulty:get_level_difficulties()
 end
+
 StartGameWindowDifficulty.on_exit = function (self, params)
 	print("[StartGameWindow] Exit Substate StartGameWindowDifficulty")
 
@@ -101,9 +100,8 @@ StartGameWindowDifficulty.on_exit = function (self, params)
 	self.parent.parent:set_input_description(nil)
 
 	self._has_exited = true
-
-	return 
 end
+
 StartGameWindowDifficulty.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -115,12 +113,12 @@ StartGameWindowDifficulty.update = function (self, dt, t)
 	self._handle_input(self, dt, t)
 	self._update_difficulty_lock(self)
 	self.draw(self, dt)
+end
 
-	return 
-end
 StartGameWindowDifficulty.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 StartGameWindowDifficulty._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -141,9 +139,8 @@ StartGameWindowDifficulty._update_animations = function (self, dt)
 	self._animate_difficulty_option_button(self, widgets_by_name.difficulty_option_2, dt)
 	self._animate_difficulty_option_button(self, widgets_by_name.difficulty_option_3, dt)
 	self._animate_difficulty_option_button(self, widgets_by_name.difficulty_option_4, dt)
-
-	return 
 end
+
 StartGameWindowDifficulty._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -153,9 +150,8 @@ StartGameWindowDifficulty._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartGameWindowDifficulty._is_button_released = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -165,15 +161,15 @@ StartGameWindowDifficulty._is_button_released = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartGameWindowDifficulty._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter and not hotspot.is_selected
 end
+
 StartGameWindowDifficulty._is_stepper_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot_left = content.button_hotspot_left
@@ -188,15 +184,15 @@ StartGameWindowDifficulty._is_stepper_button_pressed = function (self, widget)
 
 		return true, 1
 	end
-
-	return 
 end
+
 local difficulties_select_sounds = {
 	"play_gui_lobby_button_01_difficulty_select_normal",
 	"play_gui_lobby_button_01_difficulty_select_hard",
 	"play_gui_lobby_button_01_difficulty_select_nightmare",
 	"play_gui_lobby_button_01_difficulty_select_cataclysm"
 }
+
 StartGameWindowDifficulty._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local widget_prefix = "difficulty_option_"
@@ -244,9 +240,8 @@ StartGameWindowDifficulty._handle_input = function (self, dt, t)
 
 		parent.set_layout(parent, previous_game_mode_index)
 	end
-
-	return 
 end
+
 StartGameWindowDifficulty._set_selected_difficulty_option = function (self, new_difficulty_key)
 	local difficulties = self._get_difficulty_options(self)
 	local widgets_by_name = self._widgets_by_name
@@ -261,9 +256,8 @@ StartGameWindowDifficulty._set_selected_difficulty_option = function (self, new_
 		content.button_hotspot.is_selected = difficulty_key == new_difficulty_key
 		widget_index_counter = widget_index_counter + 1
 	end
-
-	return 
 end
+
 StartGameWindowDifficulty._set_info_window = function (self, difficulty_key)
 	local widgets_by_name = self._widgets_by_name
 	local difficulty_settings = DifficultySettings[difficulty_key]
@@ -277,9 +271,8 @@ StartGameWindowDifficulty._set_info_window = function (self, difficulty_key)
 	widgets_by_name.description_text.content.text = Localize(description)
 	widgets_by_name.difficulty_chest_info.content.text = Localize("difficulty_chest_max_powerlevel") .. ": " .. tostring(chest_max_powerlevel)
 	widgets_by_name.xp_multiplier.content.text = Localize("difficulty_xp_multiplier") .. ": " .. tostring(xp_multiplier_number * 100) .. "%"
-
-	return 
 end
+
 StartGameWindowDifficulty._update_difficulty_lock = function (self)
 	local difficulties = self._get_difficulty_options(self)
 	local widgets_by_name = self._widgets_by_name
@@ -316,9 +309,8 @@ StartGameWindowDifficulty._update_difficulty_lock = function (self)
 			self.parent.parent:set_input_description(nil)
 		end
 	end
-
-	return 
 end
+
 StartGameWindowDifficulty._set_blocking_peers = function (self, players_below_power_level)
 	local ui_renderer = self.ui_renderer
 	local blocking_peers = self._widgets_by_name.blocking_peers
@@ -343,9 +335,8 @@ StartGameWindowDifficulty._set_blocking_peers = function (self, players_below_po
 	if num_players_below_power_level == 0 then
 		text = ""
 	end
-
-	return 
 end
+
 StartGameWindowDifficulty._update_selected_difficulty_option = function (self, difficulty_key)
 	local parent = self.parent
 	local difficulty_key = difficulty_key or Managers.state.difficulty:get_difficulty()
@@ -357,9 +348,8 @@ StartGameWindowDifficulty._update_selected_difficulty_option = function (self, d
 
 		self._set_info_window(self, difficulty_key)
 	end
-
-	return 
 end
+
 StartGameWindowDifficulty.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -380,14 +370,12 @@ StartGameWindowDifficulty.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 StartGameWindowDifficulty._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 StartGameWindowDifficulty._animate_difficulty_option_button = function (self, widget, dt)
 	local ui_renderer = self.ui_renderer
 	local scenegraph_id = widget.scenegraph_id
@@ -472,9 +460,8 @@ StartGameWindowDifficulty._animate_difficulty_option_button = function (self, wi
 	icon_glow_color[2] = combined_progress * 255
 	icon_glow_color[3] = combined_progress * 255
 	icon_glow_color[4] = combined_progress * 255
-
-	return 
 end
+
 StartGameWindowDifficulty._get_text_height = function (self, ui_renderer, size, ui_style, text, ui_style_global)
 	local widget_scale = nil
 
@@ -515,4 +502,4 @@ StartGameWindowDifficulty._get_text_height = function (self, ui_renderer, size, 
 	return full_font_height
 end
 
-return 
+return

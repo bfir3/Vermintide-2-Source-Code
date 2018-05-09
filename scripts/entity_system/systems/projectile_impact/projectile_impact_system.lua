@@ -9,6 +9,7 @@ local extensions = {
 	"ProjectileRaycastImpactUnitExtension",
 	"PlayerProjectileImpactUnitExtension"
 }
+
 ProjectileImpactSystem.init = function (self, entity_system_creation_context, system_name)
 	ProjectileImpactSystem.super.init(self, entity_system_creation_context, system_name, extensions)
 
@@ -18,16 +19,13 @@ ProjectileImpactSystem.init = function (self, entity_system_creation_context, sy
 	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
 
 	self.network_transmit = Managers.state.network.network_transmit
-
-	return 
 end
+
 ProjectileImpactSystem.destroy = function (self)
 	self.network_event_delegate:unregister(self)
 
 	self.network_event_delegate = nil
 	self.network_transmit = nil
-
-	return 
 end
 
-return 
+return

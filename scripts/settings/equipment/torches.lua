@@ -99,4 +99,4 @@ Weapons.torch = weapon_template
 Weapons.torch = Weapons.torch or table.clone(weapon_template)
 Weapons.torch.right_hand_unit = "units/weapons/player/wpn_torch/wpn_torch"
 
-return 
+return

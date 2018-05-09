@@ -1,6 +1,7 @@
 ScriptApplication = ScriptApplication or {}
 local string_format = string.format
 ScriptApplication.num_crashify_prints = ScriptApplication.num_crashify_prints or {}
+
 ScriptApplication.send_to_crashify = function (system, message, ...)
 	local print_key = system .. message
 	local print_count = ScriptApplication.num_crashify_prints[print_key] or 0
@@ -23,14 +24,12 @@ ScriptApplication.send_to_crashify = function (system, message, ...)
 	end
 
 	ScriptApplication.num_crashify_prints[print_key] = print_count
-
-	return 
 end
+
 ScriptApplication.set_crashify_tag = function (tag, data)
 	printf("[CrashifyCustomTag] %s, %s", tag, data)
-
-	return 
 end
+
 ScriptApplication.is_bundled = function ()
 	local args = {
 		Application.argv()
@@ -47,4 +46,4 @@ ScriptApplication.is_bundled = function ()
 	return false
 end
 
-return 
+return

@@ -7,6 +7,7 @@ local placeholder_icon_textures = {
 	hat = "icons_placeholder_hat_01",
 	trinket = "icons_placeholder_trinket_01"
 }
+
 BackendUtils.get_loadout_item = function (career_name, slot)
 	local backend_items = Managers.backend:get_interface("items")
 	local backend_id = backend_items.get_loadout_item_id(backend_items, career_name, slot)
@@ -14,6 +15,7 @@ BackendUtils.get_loadout_item = function (career_name, slot)
 
 	return item
 end
+
 BackendUtils.get_item_from_masterlist = function (backend_id)
 	local backend_items = Managers.backend:get_interface("items")
 	local item_master_list_data = backend_items.get_item_masterlist_data(backend_items, backend_id)
@@ -22,6 +24,7 @@ BackendUtils.get_item_from_masterlist = function (backend_id)
 
 	return item_data
 end
+
 BackendUtils.get_hero_power_level_from_level = function (profile_name)
 	local settings = PowerLevelFromLevelSettings
 	local experience = ExperienceSettings.get_experience(profile_name)
@@ -29,6 +32,7 @@ BackendUtils.get_hero_power_level_from_level = function (profile_name)
 
 	return settings.power_level_per_level * level
 end
+
 BackendUtils.get_hero_power_level = function (profile_name)
 	local settings = PowerLevelFromLevelSettings
 	local experience = ExperienceSettings.get_experience(profile_name)
@@ -36,6 +40,7 @@ BackendUtils.get_hero_power_level = function (profile_name)
 
 	return settings.power_level_per_level * level + settings.starting_power_level
 end
+
 BackendUtils.get_average_item_power_level = function (career_name)
 	local backend_items = Managers.backend:get_interface("items")
 	local slots = InventorySettings.slots_by_slot_index
@@ -58,6 +63,7 @@ BackendUtils.get_average_item_power_level = function (career_name)
 
 	return total_item_power_level / num_slots
 end
+
 BackendUtils.get_total_power_level = function (profile_name, career_name)
 	if script_data.power_level_override then
 		return script_data.power_level_override
@@ -68,6 +74,7 @@ BackendUtils.get_total_power_level = function (profile_name, career_name)
 
 	return hero_power_level + average_item_power_level
 end
+
 BackendUtils.get_item_template = function (item_data, backend_id)
 	local backend_items = Managers.backend:get_interface("items")
 	local backend_id = item_data.backend_id or backend_id
@@ -75,6 +82,7 @@ BackendUtils.get_item_template = function (item_data, backend_id)
 
 	return template
 end
+
 BackendUtils.get_item_units = function (item_data, backend_id, skin)
 	local left_hand_unit = item_data.left_hand_unit
 	local right_hand_unit = item_data.right_hand_unit
@@ -113,9 +121,8 @@ BackendUtils.get_item_units = function (item_data, backend_id, skin)
 	end
 
 	fassert(false, "no left hand or right hand unit defined for : " .. item_data.backend_id)
-
-	return 
 end
+
 BackendUtils.format_profile_hash = function (hash, num_chars, block_length, block_divider)
 	if not hash then
 		return "n/a"
@@ -135,6 +142,7 @@ BackendUtils.format_profile_hash = function (hash, num_chars, block_length, bloc
 
 	return str
 end
+
 BackendUtils.has_loot_chest = function ()
 	local backend_items = Managers.backend:get_interface("items")
 	local item_filter = "slot_type == " .. ItemType.LOOT_CHEST
@@ -144,4 +152,4 @@ BackendUtils.has_loot_chest = function ()
 	return has_chest
 end
 
-return 
+return

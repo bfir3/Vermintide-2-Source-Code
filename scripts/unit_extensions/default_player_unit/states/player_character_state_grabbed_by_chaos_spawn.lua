@@ -1,11 +1,11 @@
 PlayerCharacterStateGrabbedByChaosSpawn = class(PlayerCharacterStateGrabbedByChaosSpawn, PlayerCharacterState)
 local position_lookup = POSITION_LOOKUP
 local anim_event = CharacterStateHelper.play_animation_event
+
 PlayerCharacterStateGrabbedByChaosSpawn.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "grabbed_by_chaos_spawn")
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByChaosSpawn.on_enter = function (self, unit, input, dt, context, t, previous_state)
 	local inventory_extension = self.inventory_extension
 
@@ -53,9 +53,8 @@ PlayerCharacterStateGrabbedByChaosSpawn.on_enter = function (self, unit, input, 
 	if not self.is_bot then
 		Wwise.set_state("spawn_catch_player", "true")
 	end
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByChaosSpawn.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local status_extension = self.status_extension
 	local pos = nil
@@ -111,47 +110,40 @@ PlayerCharacterStateGrabbedByChaosSpawn.on_exit = function (self, unit, input, d
 	if not self.is_bot then
 		Wwise.set_state("spawn_catch_player", "false")
 	end
-
-	return 
 end
+
 PlayerCharacterStateGrabbedByChaosSpawn.states = {
 	grabbed = {
 		enter = function (parent, unit, t)
 			anim_event(unit, "attack_grab_player")
-
-			return 
 		end,
 		run = function (parent, unit, t, dt)
-			return 
+			return
 		end,
 		leave = function (parent, unit)
-			return 
+			return
 		end
 	},
 	beating_with = {
 		enter = function (parent, unit, t)
 			anim_event(unit, "attack_grabbed_smash")
-
-			return 
 		end,
 		run = function (parent, unit, t, dt)
-			return 
+			return
 		end,
 		leave = function (parent, unit)
-			return 
+			return
 		end
 	},
 	thrown_away = {
 		enter = function (parent, unit, t)
 			anim_event(unit, "attack_grabbed_throw")
-
-			return 
 		end,
 		run = function (parent, unit, t, dt)
-			return 
+			return
 		end,
 		leave = function (parent, unit)
-			return 
+			return
 		end
 	},
 	chewed_on = {
@@ -159,15 +151,11 @@ PlayerCharacterStateGrabbedByChaosSpawn.states = {
 			anim_event(unit, "attack_grabbed_eat_start")
 
 			parent.roar_screen_space_particle_timer = t + 1.1
-
-			return 
 		end,
 		run = function (parent, unit, t, dt)
 			if not parent.roar_screen_space_particle_1 and parent.roar_screen_space_particle_timer < t then
 				parent.roar_screen_space_particle_1 = parent.first_person_extension:create_screen_particles("fx/screenspace_chaos_spawn_tentacles_01")
 			end
-
-			return 
 		end,
 		leave = function (parent, unit)
 			if parent.roar_screen_space_particle_1 then
@@ -175,24 +163,21 @@ PlayerCharacterStateGrabbedByChaosSpawn.states = {
 
 				parent.roar_screen_space_particle_1 = nil
 			end
-
-			return 
 		end
 	},
 	idle = {
 		enter = function (parent, unit, t)
 			anim_event(unit, "idle_grabbed")
-
-			return 
 		end,
 		run = function (parent, unit, t, dt)
-			return 
+			return
 		end,
 		leave = function (parent, unit)
-			return 
+			return
 		end
 	}
 }
+
 PlayerCharacterStateGrabbedByChaosSpawn.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local input_extension = self.input_extension
@@ -208,7 +193,7 @@ PlayerCharacterStateGrabbedByChaosSpawn.update = function (self, unit, input, dt
 
 		csm.change_state(csm, "catapulted", params)
 
-		return 
+		return
 	end
 
 	if not status_extension.grabbed_by_chaos_spawn or not AiUtils.unit_alive(chaos_spawn_unit) then
@@ -218,7 +203,7 @@ PlayerCharacterStateGrabbedByChaosSpawn.update = function (self, unit, input, dt
 			csm.change_state(csm, "standing")
 		end
 
-		return 
+		return
 	end
 
 	local grabbed_by_chaos_spawn_status, status_count = CharacterStateHelper.grabbed_by_chaos_spawn_status(status_extension)
@@ -242,11 +227,11 @@ PlayerCharacterStateGrabbedByChaosSpawn.update = function (self, unit, input, dt
 	if CharacterStateHelper.is_knocked_down(status_extension) then
 		csm.change_state(csm, "knocked_down")
 
-		return 
+		return
 	elseif CharacterStateHelper.is_dead(status_extension) then
 		csm.change_state(csm, "dead")
 
-		return 
+		return
 	end
 
 	states[grabbed_by_chaos_spawn_status].run(self, unit, t, dt)
@@ -258,8 +243,6 @@ PlayerCharacterStateGrabbedByChaosSpawn.update = function (self, unit, input, dt
 	local player = self.player
 
 	CharacterStateHelper.look(input_extension, player.viewport_name, self.first_person_extension, status_extension, self.inventory_extension)
-
-	return 
 end
 
-return 
+return

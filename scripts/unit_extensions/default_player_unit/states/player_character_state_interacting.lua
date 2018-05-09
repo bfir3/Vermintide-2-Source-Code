@@ -1,9 +1,9 @@
 PlayerCharacterStateInteracting = class(PlayerCharacterStateInteracting, PlayerCharacterState)
+
 PlayerCharacterStateInteracting.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "interacting")
-
-	return 
 end
+
 PlayerCharacterStateInteracting.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	self.has_started_interacting = false
 	self.swap_to_3p = params.swap_to_3p
@@ -50,9 +50,8 @@ PlayerCharacterStateInteracting.on_enter = function (self, unit, input, dt, cont
 
 		status_extension.set_blocking(status_extension, true)
 	end
-
-	return 
 end
+
 PlayerCharacterStateInteracting.on_exit = function (self, unit, input, dt, context, t, next_state)
 	if self.swap_to_3p then
 		CharacterStateHelper.change_camera_state(self.player, "follow")
@@ -82,9 +81,8 @@ PlayerCharacterStateInteracting.on_exit = function (self, unit, input, dt, conte
 
 		status_extension.set_blocking(status_extension, false)
 	end
-
-	return 
 end
+
 PlayerCharacterStateInteracting.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local input_extension = self.input_extension
@@ -93,25 +91,25 @@ PlayerCharacterStateInteracting.update = function (self, unit, input, dt, contex
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 
 	if CharacterStateHelper.do_common_state_transitions(status_extension, csm) then
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_using_transport(status_extension) then
 		csm.change_state(csm, "using_transport")
 
-		return 
+		return
 	end
 
 	if not csm.state_next and status_extension.do_leap then
 		csm.change_state(csm, "leaping")
 
-		return 
+		return
 	end
 
 	if not CharacterStateHelper.is_interacting(interactor_extension) then
 		csm.change_state(csm, "standing")
 
-		return 
+		return
 	end
 
 	if not CharacterStateHelper.is_waiting_for_interaction_approval(interactor_extension) then
@@ -122,7 +120,7 @@ PlayerCharacterStateInteracting.update = function (self, unit, input, dt, contex
 		if not CharacterStateHelper.interact(input_extension, interactor_extension) then
 			csm.change_state(csm, "standing")
 
-			return 
+			return
 		end
 	end
 
@@ -136,7 +134,7 @@ PlayerCharacterStateInteracting.update = function (self, unit, input, dt, contex
 		csm.change_state(csm, "stunned", params)
 		interactor_extension.abort_interaction(interactor_extension)
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_block_broken(status_extension) then
@@ -148,13 +146,11 @@ PlayerCharacterStateInteracting.update = function (self, unit, input, dt, contex
 		csm.change_state(csm, "stunned", params)
 		interactor_extension.abort_interaction(interactor_extension)
 
-		return 
+		return
 	end
 
 	self.locomotion_extension:set_disable_rotation_update()
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, self.first_person_extension, status_extension, self.inventory_extension)
-
-	return 
 end
 
-return 
+return

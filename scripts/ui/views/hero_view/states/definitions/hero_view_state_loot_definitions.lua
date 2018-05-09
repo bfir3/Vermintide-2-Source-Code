@@ -2016,8 +2016,6 @@ local animation_definitions = {
 				local wwise_world = params.wwise_world
 
 				WwiseWorld.trigger_event(wwise_world, "play_gui_chest_reward_rumble")
-
-				return 
 			end,
 			update = function (ui_scenegraph, scenegraph_definition, widget, progress, params)
 				local anim_progress = math.easeOutCubic(progress)
@@ -2030,11 +2028,9 @@ local animation_definitions = {
 				local definition_size = definition.size
 				offset[1] = 5 - 5 * math.catmullrom(bounce_anim_progress, 10, 1, 1, -1)
 				offset[2] = 5 - 5 * math.catmullrom(bounce_anim_progress, -1, 1, 1, 10)
-
-				return 
 			end,
 			on_complete = function (ui_scenegraph, scenegraph_definition, widget, params)
-				return 
+				return
 			end
 		},
 		{
@@ -2042,7 +2038,7 @@ local animation_definitions = {
 			start_progress = 0,
 			end_progress = 0.3,
 			init = function (ui_scenegraph, scenegraph_definition, widget, params)
-				return 
+				return
 			end,
 			update = function (ui_scenegraph, scenegraph_definition, widget, progress, params)
 				local anim_progress = math.easeOutCubic(progress)
@@ -2053,11 +2049,9 @@ local animation_definitions = {
 				style.lock_glow.color[1] = math.min(style.lock_glow.color[1], style.lock_glow.default_color[1] * (1 - anim_progress))
 				style.lock_glow_1.color[1] = math.min(style.lock_glow_1.color[1], style.lock_glow_1.default_color[1] * (1 - anim_progress))
 				style.lock_glow_2.color[1] = math.min(style.lock_glow_2.color[1], style.lock_glow_2.default_color[1] * (1 - anim_progress))
-
-				return 
 			end,
 			on_complete = function (ui_scenegraph, scenegraph_definition, widget, params)
-				return 
+				return
 			end
 		},
 		{
@@ -2065,7 +2059,7 @@ local animation_definitions = {
 			start_progress = 0.3,
 			end_progress = 0.6,
 			init = function (ui_scenegraph, scenegraph_definition, widget, params)
-				return 
+				return
 			end,
 			update = function (ui_scenegraph, scenegraph_definition, widget, progress, params)
 				if not params.played_open_sound then
@@ -2101,8 +2095,6 @@ local animation_definitions = {
 				local frame_style = style.frame
 				frame_style.size[2] = new_height + 20
 				frame_style.offset[2] = -10
-
-				return 
 			end,
 			on_complete = function (ui_scenegraph, scenegraph_definition, widget, params)
 				local presentation_complete = true
@@ -2130,8 +2122,6 @@ local animation_definitions = {
 
 					params.played_opened_sound = true
 				end
-
-				return 
 			end
 		},
 		{
@@ -2139,7 +2129,7 @@ local animation_definitions = {
 			start_progress = 0.6,
 			end_progress = 0.8,
 			init = function (ui_scenegraph, scenegraph_definition, widget, params)
-				return 
+				return
 			end,
 			update = function (ui_scenegraph, scenegraph_definition, widget, progress, params)
 				local anim_progress = math.easeOutCubic(progress)
@@ -2148,11 +2138,9 @@ local animation_definitions = {
 				style.final_glow.color[1] = math.max(style.final_glow.color[1], style.final_glow.default_color[1] * anim_progress)
 				style.final_glow_1.color[1] = math.max(style.final_glow_1.color[1], style.final_glow_1.default_color[1] * anim_progress)
 				style.final_glow_2.color[1] = math.max(style.final_glow_2.color[1], style.final_glow_2.default_color[1] * anim_progress)
-
-				return 
 			end,
 			on_complete = function (ui_scenegraph, scenegraph_definition, widget, params)
-				return 
+				return
 			end
 		},
 		{
@@ -2160,7 +2148,7 @@ local animation_definitions = {
 			start_progress = 0.8,
 			end_progress = 1.2,
 			init = function (ui_scenegraph, scenegraph_definition, widget, params)
-				return 
+				return
 			end,
 			update = function (ui_scenegraph, scenegraph_definition, widget, progress, params)
 				local anim_progress = math.easeOutCubic(progress)
@@ -2171,11 +2159,9 @@ local animation_definitions = {
 				style.item_name_shadow.text_color[1] = alpha
 				style.item_type.text_color[1] = alpha
 				style.item_type_shadow.text_color[1] = alpha
-
-				return 
 			end,
 			on_complete = function (ui_scenegraph, scenegraph_definition, widget, params)
-				return 
+				return
 			end
 		}
 	},
@@ -2186,17 +2172,13 @@ local animation_definitions = {
 			end_progress = 0.3,
 			init = function (ui_scenegraph, scenegraph_definition, widgets, params)
 				params.render_settings.alpha_multiplier = 0
-
-				return 
 			end,
 			update = function (ui_scenegraph, scenegraph_definition, widgets, progress, params)
 				local anim_progress = math.easeOutCubic(progress)
 				params.render_settings.alpha_multiplier = anim_progress
-
-				return 
 			end,
 			on_complete = function (ui_scenegraph, scenegraph_definition, widgets, params)
-				return 
+				return
 			end
 		}
 	},
@@ -2207,17 +2189,13 @@ local animation_definitions = {
 			end_progress = 0.3,
 			init = function (ui_scenegraph, scenegraph_definition, widgets, params)
 				params.render_settings.alpha_multiplier = 1
-
-				return 
 			end,
 			update = function (ui_scenegraph, scenegraph_definition, widgets, progress, params)
 				local anim_progress = math.easeOutCubic(progress)
 				params.render_settings.alpha_multiplier = 1 - anim_progress
-
-				return 
 			end,
 			on_complete = function (ui_scenegraph, scenegraph_definition, widgets, params)
-				return 
+				return
 			end
 		}
 	}

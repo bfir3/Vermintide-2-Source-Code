@@ -16,6 +16,7 @@ local private_settings = {
 }
 StartGameWindowTwitchGameSettings = class(StartGameWindowTwitchGameSettings)
 StartGameWindowTwitchGameSettings.NAME = "StartGameWindowTwitchGameSettings"
+
 StartGameWindowTwitchGameSettings.on_enter = function (self, params, offset)
 	print("[StartGameWindow] Enter Substate StartGameWindowTwitchGameSettings")
 
@@ -42,9 +43,8 @@ StartGameWindowTwitchGameSettings.on_enter = function (self, params, offset)
 	self._twitch_active = nil
 
 	self._update_difficulty_option(self)
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -94,9 +94,8 @@ StartGameWindowTwitchGameSettings.create_ui_elements = function (self, params, o
 	local anim = self._animate_pulse(self, game_option_2.style.glow_frame.color, 1, 255, 100, 2)
 
 	UIWidget.animate(game_option_2, anim)
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._set_additional_options_enabled_state = function (self, enabled)
 	local widgets_by_name = self._widgets_by_name
 	widgets_by_name.additional_option.content.button_hotspot.disable_button = not enabled
@@ -107,16 +106,14 @@ StartGameWindowTwitchGameSettings._set_additional_options_enabled_state = functi
 	local strict_matchmaking_button = widgets_by_name.strict_matchmaking_button
 	strict_matchmaking_button.content.button_hotspot.disable_button = not enabled
 	self._additional_option_enabled = enabled
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings.on_exit = function (self, params)
 	print("[StartGameWindow] Exit Substate StartGameWindowTwitchGameSettings")
 
 	self.ui_animator = nil
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -134,12 +131,12 @@ StartGameWindowTwitchGameSettings.update = function (self, dt, t)
 	self._update_animations(self, dt)
 	self._handle_input(self, dt, t)
 	self.draw(self, dt)
+end
 
-	return 
-end
 StartGameWindowTwitchGameSettings.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 StartGameWindowTwitchGameSettings._update_animations = function (self, dt)
 	self._update_game_options_hover_effect(self)
 
@@ -166,9 +163,8 @@ StartGameWindowTwitchGameSettings._update_animations = function (self, dt)
 	end
 
 	local widgets_by_name = self._widgets_by_name
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -178,9 +174,8 @@ StartGameWindowTwitchGameSettings._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._is_button_released = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -190,9 +185,8 @@ StartGameWindowTwitchGameSettings._is_button_released = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._is_stepper_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot_left = content.button_hotspot_left
@@ -207,9 +201,8 @@ StartGameWindowTwitchGameSettings._is_stepper_button_pressed = function (self, w
 
 		return true, 1
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._is_tab_pressed = function (self, widget)
 	local widget_content = widget.content
 	local amount = widget_content.amount
@@ -223,9 +216,8 @@ StartGameWindowTwitchGameSettings._is_tab_pressed = function (self, widget)
 			return i
 		end
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._select_tab_by_index = function (self, widget, index)
 	local widget_content = widget.content
 	local amount = widget_content.amount
@@ -236,27 +228,29 @@ StartGameWindowTwitchGameSettings._select_tab_by_index = function (self, widget,
 		local hotspot_content = widget_content[hotspot_name]
 		hotspot_content.is_selected = i == index
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter
 end
+
 StartGameWindowTwitchGameSettings._is_button_hover_exit = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_exit
 end
+
 StartGameWindowTwitchGameSettings._is_button_selected = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.is_selected
 end
+
 StartGameWindowTwitchGameSettings._is_other_option_button_selected = function (self, widget, current_option)
 	if self._is_button_released(self, widget) then
 		local is_selected = not current_option
@@ -272,6 +266,7 @@ StartGameWindowTwitchGameSettings._is_other_option_button_selected = function (s
 
 	return nil
 end
+
 StartGameWindowTwitchGameSettings._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local widgets_by_name = self._widgets_by_name
@@ -323,14 +318,12 @@ StartGameWindowTwitchGameSettings._handle_input = function (self, dt, t)
 	if self._is_button_released(self, widgets_by_name.play_button) or play_pressed then
 		parent.play(parent, t)
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._update_game_options_hover_effect = function (self)
 	local widgets_by_name = self._widgets_by_name
 	local widget_prefix = "game_option_"
@@ -345,9 +338,8 @@ StartGameWindowTwitchGameSettings._update_game_options_hover_effect = function (
 			self._on_option_button_hover_exit(self, i)
 		end
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._on_option_button_hover_enter = function (self, index, instant)
 	local widgets_by_name = self._widgets_by_name
 	local widget_name = "game_option_" .. index
@@ -356,9 +348,8 @@ StartGameWindowTwitchGameSettings._on_option_button_hover_enter = function (self
 	self._create_style_animation_enter(self, widget, 255, "glow", index, instant)
 	self._create_style_animation_enter(self, widget, 255, "icon_glow", index, instant)
 	self._create_style_animation_exit(self, widget, 0, "button_hover_rect", index, instant)
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._on_option_button_hover_exit = function (self, index, instant)
 	local widgets_by_name = self._widgets_by_name
 	local widget_name = "game_option_" .. index
@@ -367,9 +358,8 @@ StartGameWindowTwitchGameSettings._on_option_button_hover_exit = function (self,
 	self._create_style_animation_exit(self, widget, 0, "glow", index, instant)
 	self._create_style_animation_exit(self, widget, 0, "icon_glow", index, instant)
 	self._create_style_animation_enter(self, widget, 30, "button_hover_rect", index, instant)
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._update_additional_options = function (self, force_update)
 	local parent = self.parent
 	local private_enabled = true
@@ -403,9 +393,8 @@ StartGameWindowTwitchGameSettings._update_additional_options = function (self, f
 		self._twitch_active = twitch_active
 		self._is_alone = is_alone
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._update_difficulty_option = function (self)
 	local parent = self.parent
 	local difficulty_key = parent.get_difficulty_option(parent)
@@ -427,9 +416,8 @@ StartGameWindowTwitchGameSettings._update_difficulty_option = function (self)
 			self.parent.parent:set_input_description(nil)
 		end
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._set_difficulty_option = function (self, difficulty_key)
 	local widgets_by_name = self._widgets_by_name
 	local difficulty_settings = DifficultySettings[difficulty_key]
@@ -437,9 +425,8 @@ StartGameWindowTwitchGameSettings._set_difficulty_option = function (self, diffi
 	local display_image = difficulty_settings and difficulty_settings.display_image
 	widgets_by_name.game_option_2.content.option_text = (display_name and Localize(display_name)) or ""
 	widgets_by_name.game_option_2.content.icon = display_image or nil
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._update_mission_selection = function (self)
 	local parent = self.parent
 	local selected_level_id = parent.get_selected_level_id(parent)
@@ -451,9 +438,8 @@ StartGameWindowTwitchGameSettings._update_mission_selection = function (self)
 		local widgets_by_name = self._widgets_by_name
 		widgets_by_name.game_option_2.content.button_hotspot.disable_button = selected_level_id == nil
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._set_selected_level = function (self, level_id)
 	local widget = self._widgets_by_name.game_option_1
 	local text = "n/a"
@@ -474,9 +460,8 @@ StartGameWindowTwitchGameSettings._set_selected_level = function (self, level_id
 	end
 
 	widget.content.option_text = text
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._get_selection_frame_by_difficulty_index = function (self, difficulty_index)
 	local completed_frame_texture = "map_frame_00"
 
@@ -489,12 +474,12 @@ StartGameWindowTwitchGameSettings._get_selection_frame_by_difficulty_index = fun
 
 	return completed_frame_texture
 end
+
 StartGameWindowTwitchGameSettings._exit = function (self, selected_level)
 	self.exit = true
 	self.exit_level_id = selected_level
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -519,14 +504,12 @@ StartGameWindowTwitchGameSettings.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._create_style_animation_enter = function (self, widget, target_value, style_id, widget_index, instant)
 	local ui_animations = self._ui_animations
 	local animation_name = "game_option_" .. style_id
@@ -534,7 +517,7 @@ StartGameWindowTwitchGameSettings._create_style_animation_enter = function (self
 	local pass_style = widget_style[style_id]
 
 	if not pass_style then
-		return 
+		return
 	end
 
 	local current_color_value = pass_style.color[1]
@@ -547,9 +530,8 @@ StartGameWindowTwitchGameSettings._create_style_animation_enter = function (self
 	else
 		pass_style.color[1] = target_color_value
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._create_style_animation_exit = function (self, widget, target_value, style_id, widget_index, instant)
 	local ui_animations = self._ui_animations
 	local animation_name = "game_option_" .. style_id
@@ -557,7 +539,7 @@ StartGameWindowTwitchGameSettings._create_style_animation_exit = function (self,
 	local pass_style = widget_style[style_id]
 
 	if not pass_style then
-		return 
+		return
 	end
 
 	local current_color_value = pass_style.color[1]
@@ -570,23 +552,24 @@ StartGameWindowTwitchGameSettings._create_style_animation_exit = function (self,
 	else
 		pass_style.color[1] = target_color_value
 	end
-
-	return 
 end
+
 StartGameWindowTwitchGameSettings._animate_pulse = function (self, target, target_index, from, to, speed)
 	local new_animation = UIAnimation.init(UIAnimation.pulse_animation, target, target_index, from, to, speed)
 
 	return new_animation
 end
+
 StartGameWindowTwitchGameSettings._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 StartGameWindowTwitchGameSettings._animate_element_by_catmullrom = function (self, target, target_index, target_value, p0, p1, p2, p3, time)
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
 end
 
-return 
+return

@@ -2,6 +2,7 @@ Pacing = class(Pacing)
 script_data.debug_ai_pacing = script_data.debug_ai_pacing or Development.parameter("debug_ai_pacing")
 script_data.debug_player_intensity = script_data.debug_player_intensity or Development.parameter("debug_player_intensity")
 local CurrentPacing = CurrentPacing or nil
+
 Pacing.init = function (self, world)
 	self.world = world
 	self.pacing_state = "pacing_build_up"
@@ -12,80 +13,80 @@ Pacing.init = function (self, world)
 	self.total_intensity = 0
 	self.player_intensity = {}
 	CurrentPacing = _G.CurrentPacing
-
-	return 
 end
+
 Pacing.disable = function (self)
 	self._threat_population = 1
 	self._specials_population = 0
 	self._horde_population = 0
 	self.pacing_state = "pacing_frozen"
-
-	return 
 end
+
 Pacing.enable = function (self)
 	self._threat_population = 1
 	self._specials_population = 1
 	self._horde_population = 1
 	self.pacing_state = "pacing_build_up"
+end
 
-	return 
-end
 Pacing.pacing_frozen = function (self, t)
-	return 
+	return
 end
+
 Pacing.pacing_build_up = function (self, t)
 	if CurrentPacing.peak_intensity_threshold < self.total_intensity then
 		self.advance_pacing(self, t)
 	end
-
-	return 
 end
+
 Pacing.pacing_sustain_peak = function (self, t)
 	if self._end_pacing_time < t then
 		self.advance_pacing(self, t)
 	end
-
-	return 
 end
+
 Pacing.pacing_peak_fade = function (self, t)
 	if self.total_intensity < CurrentPacing.peak_fade_threshold then
 		self.advance_pacing(self, t)
 	end
-
-	return 
 end
+
 Pacing.pacing_relax = function (self, t)
 	if CurrentPacing.leave_relax_if_zero_intensity and self.total_intensity <= 0 then
 		self.advance_pacing(self, t)
 
-		return 
+		return
 	end
 
 	if self._end_pacing_time < t then
 		self.advance_pacing(self, t)
 	end
-
-	return 
 end
+
 Pacing.get_pacing_data = function (self)
 	return self.pacing_state, self._state_start_time, self._threat_population, self._specials_population, self._horde_population, self._end_pacing_time
 end
+
 Pacing.ignore_intensity_decay_delay = function (self)
 	return self.pacing_state == "pacing_relax"
 end
+
 Pacing.get_state = function (self)
 	return self.pacing_state
 end
+
 Pacing.threat_population = function (self)
 	return self._threat_population
 end
+
 Pacing.horde_population = function (self)
 	return self._horde_population
 end
+
 Pacing.specials_population = function (self)
 	return self._specials_population
 end
+
 Pacing.enemy_killed = function (self, killed_unit, player_units)
 	for i = 1, #player_units, 1 do
 		local player_unit = player_units[i]
@@ -104,9 +105,8 @@ Pacing.enemy_killed = function (self, killed_unit, player_units)
 
 		status_ext.add_intensity(status_ext, amount)
 	end
-
-	return 
 end
+
 Pacing.advance_pacing = function (self, t, reason)
 	local pacing = self.pacing_state
 	next_pacing, self._end_pacing_time = nil
@@ -156,14 +156,13 @@ Pacing.advance_pacing = function (self, t, reason)
 
 	self.pacing_state = next_pacing
 	self._state_start_time = t
-
-	return 
 end
+
 Pacing.update = function (self, t, dt, alive_player_units)
 	local num_alive_player_units = #alive_player_units
 
 	if num_alive_player_units == 0 then
-		return 
+		return
 	end
 
 	local pacing_state = self.pacing_state
@@ -181,16 +180,14 @@ Pacing.update = function (self, t, dt, alive_player_units)
 	end
 
 	self.total_intensity = sum_intensity / num_alive_player_units
-
-	return 
 end
+
 Pacing.toggle_graph = function (self)
 	if self.graph then
 		self.graph:set_active(not self.graph.active)
 	end
-
-	return 
 end
+
 Pacing.show_debug = function (self, show)
 	if not self.graph then
 		return false
@@ -204,6 +201,7 @@ Pacing.show_debug = function (self, show)
 
 	return true
 end
+
 Pacing.debug_add_intensity = function (self, player_units, value)
 	for k = 1, #player_units, 1 do
 		local unit = player_units[k]
@@ -211,9 +209,8 @@ Pacing.debug_add_intensity = function (self, player_units, value)
 
 		status_ext.add_intensity(status_ext, value)
 	end
-
-	return 
 end
+
 local time_width = 120
 local player_names = {
 	"player1",
@@ -221,6 +218,7 @@ local player_names = {
 	"player3",
 	"player4"
 }
+
 Pacing.intensity_graphs = function (self, t, dt, alive_player_units)
 	if script_data.debug_player_intensity then
 		local g = self.graph
@@ -259,13 +257,13 @@ Pacing.intensity_graphs = function (self, t, dt, alive_player_units)
 
 		self.graph = nil
 	end
-
-	return 
 end
+
 local annotate_pos = 70
+
 Pacing.annotate_graph = function (self, text, color)
 	if not self.graph then
-		return 
+		return
 	end
 
 	annotate_pos = annotate_pos - 6
@@ -283,14 +281,14 @@ Pacing.annotate_graph = function (self, text, color)
 		text = text,
 		color = color or "orange"
 	})
-
-	return 
 end
+
 Pacing.get_intensity = function (self)
 	return self.total_intensity, self.player_intensity
 end
+
 Pacing.get_roaming_density = function (self)
 	return 0.5
 end
 
-return 
+return

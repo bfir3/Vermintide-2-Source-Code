@@ -2499,8 +2499,6 @@ UITooltipPasses = {
 			else
 				return 0
 			end
-
-			return 
 		end
 	},
 	skin_applied = {
@@ -2580,8 +2578,6 @@ UITooltipPasses = {
 			else
 				return 0
 			end
-
-			return 
 		end
 	},
 	item_description = {
@@ -4490,8 +4486,6 @@ UITooltipPasses = {
 			else
 				return 0
 			end
-
-			return 
 		end
 	},
 	keywords = {
@@ -7071,4 +7065,4 @@ UITooltipPasses = {
 	}
 }
 
-return 
+return

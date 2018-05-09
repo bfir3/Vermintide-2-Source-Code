@@ -6,14 +6,15 @@ local animation_definitions = definitions.animation_definitions
 local DO_RELOAD = false
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
 EndViewStateSummary = class(EndViewStateSummary)
 EndViewStateSummary.NAME = "EndViewStateSummary"
+
 EndViewStateSummary.on_enter = function (self, params)
 	print("[EndViewState] Enter Substate EndViewStateSummary")
 
@@ -61,20 +62,19 @@ EndViewStateSummary.on_enter = function (self, params)
 	self._experience_presentation_completed = nil
 
 	self._play_sound(self, "play_gui_mission_summary_appear")
-
-	return 
 end
+
 EndViewStateSummary.exit = function (self, direction)
 	self._exit_started = true
 
 	self._start_transition_animation(self, "on_enter", "transition_exit")
 	self._play_sound(self, "play_gui_mission_summary_end")
-
-	return 
 end
+
 EndViewStateSummary.exit_done = function (self)
 	return self._exit_started and self._animations.on_enter == nil
 end
+
 EndViewStateSummary.create_ui_elements = function (self, params)
 	DO_RELOAD = false
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
@@ -104,29 +104,27 @@ EndViewStateSummary.create_ui_elements = function (self, params)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
-
-	return 
 end
+
 EndViewStateSummary._wanted_state = function (self)
 	local new_state = self.parent:wanted_menu_state()
 
 	return new_state
 end
+
 EndViewStateSummary.set_input_manager = function (self, input_manager)
 	self.input_manager = input_manager
-
-	return 
 end
+
 EndViewStateSummary.on_exit = function (self, params)
 	print("[EndViewState] Exit Substate EndViewStateSummary")
 
 	self.ui_animator = nil
-
-	return 
 end
+
 EndViewStateSummary._update_transition_timer = function (self, dt)
 	if not self._transition_timer then
-		return 
+		return
 	end
 
 	if self._transition_timer == 0 then
@@ -134,9 +132,8 @@ EndViewStateSummary._update_transition_timer = function (self, dt)
 	else
 		self._transition_timer = math.max(self._transition_timer - dt, 0)
 	end
-
-	return 
 end
+
 EndViewStateSummary.update = function (self, dt, t)
 	local input_manager = self.input_manager
 	local input_service = input_manager.get_service(input_manager, "end_of_level")
@@ -175,12 +172,12 @@ EndViewStateSummary.update = function (self, dt, t)
 	if not transitioning and not self._transition_timer then
 		self._handle_input(self, dt, t)
 	end
+end
 
-	return 
-end
 EndViewStateSummary.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 EndViewStateSummary._update_animations = function (self, dt)
 	for name, animation in pairs(self._ui_animations) do
 		UIAnimation.update(animation, dt)
@@ -208,14 +205,12 @@ EndViewStateSummary._update_animations = function (self, dt)
 
 		self.parent:present_level_up(self._hero_name, self._current_level + (self._extra_levels or 0))
 	end
-
-	return 
 end
+
 EndViewStateSummary._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
-
-	return 
 end
+
 EndViewStateSummary.draw = function (self, input_service, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -240,9 +235,8 @@ EndViewStateSummary.draw = function (self, input_service, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 EndViewStateSummary._start_transition_animation = function (self, key, animation_name)
 	local params = {
 		wwise_world = self.wwise_world,
@@ -251,9 +245,8 @@ EndViewStateSummary._start_transition_animation = function (self, key, animation
 	local widgets = {}
 	local anim_id = self.ui_animator:start_animation(animation_name, widgets, scenegraph_definition, params)
 	self._animations[key] = anim_id
-
-	return 
 end
+
 EndViewStateSummary._start_animation = function (self, key, animation_name)
 	local params = {
 		wwise_world = self.wwise_world,
@@ -262,25 +255,25 @@ EndViewStateSummary._start_animation = function (self, key, animation_name)
 	local widgets = self._widgets_by_name
 	local anim_id = self.ui_animator:start_animation(animation_name, widgets, scenegraph_definition, params)
 	self._animations[key] = anim_id
-
-	return 
 end
+
 EndViewStateSummary._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 EndViewStateSummary._animate_element_by_catmullrom = function (self, target, target_index, target_value, p0, p1, p2, p3, time)
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
 end
+
 EndViewStateSummary._initialize_entries = function (self)
 	local summary_entries, experience_gained = self._get_summary_entries(self, self.game_won, self.game_mode_key)
 	self._summary_entries = summary_entries
-
-	return 
 end
+
 EndViewStateSummary._get_summary_entries = function (self, game_won, game_mode_key)
 	local mission_rewards = self._context.rewards.mission_results
 	local entry_widgets = self._entry_widgets
@@ -321,6 +314,7 @@ EndViewStateSummary._get_summary_entries = function (self, game_won, game_mode_k
 
 	return entries, total_experience_gained
 end
+
 EndViewStateSummary._animate_summary_entries = function (self, dt)
 	local summary_entries = self._summary_entries
 
@@ -331,7 +325,7 @@ EndViewStateSummary._animate_summary_entries = function (self, dt)
 			self.parent:present_additional_rewards()
 		end
 
-		return 
+		return
 	end
 
 	local ui_animator = self.ui_animator
@@ -366,9 +360,8 @@ EndViewStateSummary._animate_summary_entries = function (self, dt)
 
 	if animations_completed then
 	end
-
-	return 
 end
+
 EndViewStateSummary._get_experience_earned = function (self, game_won, game_mode_key)
 	local mission_rewards = self._context.rewards.mission_results
 	local total_experience_gained = 0
@@ -380,6 +373,7 @@ EndViewStateSummary._get_experience_earned = function (self, game_won, game_mode
 
 	return total_experience_gained
 end
+
 EndViewStateSummary._get_total_experience_progress_data = function (self, current_experience, experience_gained)
 	local min_time = 4
 	local max_time = 7
@@ -402,11 +396,12 @@ EndViewStateSummary._get_total_experience_progress_data = function (self, curren
 		total_time = time
 	}
 end
+
 EndViewStateSummary._animate_experience_bar = function (self, dt, displaying_reward_presentation)
 	local progress_data = self._progress_data
 
 	if not progress_data or progress_data.complete or displaying_reward_presentation or self.level_up_anim_id or self._experience_presentation_completed then
-		return 
+		return
 	end
 
 	if not self._experience_bar_started then
@@ -445,9 +440,8 @@ EndViewStateSummary._animate_experience_bar = function (self, dt, displaying_rew
 		self._play_sound(self, "play_gui_mission_summary_experience_bar_end")
 		self.parent:present_additional_rewards()
 	end
-
-	return 
 end
+
 EndViewStateSummary._set_current_experience = function (self, current_experience, initialize)
 	local level, progress, experience_into_level, extra_levels = ExperienceSettings.get_level(current_experience)
 	local next_level = math.clamp(level + 1, 0, ExperienceSettings.max_level)
@@ -479,13 +473,13 @@ EndViewStateSummary._set_current_experience = function (self, current_experience
 
 	return level, extra_levels
 end
+
 EndViewStateSummary.done = function (self)
 	return self._experience_presentation_completed and self._summary_entries.complete
 end
+
 EndViewStateSummary._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
 
-return 
+return

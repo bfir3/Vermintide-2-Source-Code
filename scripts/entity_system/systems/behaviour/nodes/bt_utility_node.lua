@@ -1,40 +1,37 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTUtilityNode = class(BTUtilityNode, BTNode)
+
 BTUtilityNode.init = function (self, ...)
 	BTUtilityNode.super.init(self, ...)
 
 	self._children = {}
 	self.fail_cooldown_name = self._identifier .. "_fail_cooldown"
-
-	return 
 end
+
 BTUtilityNode.name = "BTUtilityNode"
+
 BTUtilityNode.ready = function (self, lua_node)
 	for name, child in pairs(self._children) do
 		self._action_list = self._action_list or {}
 		self._action_list[#self._action_list + 1] = child._tree_node.action_data
 	end
+end
 
-	return 
-end
 BTUtilityNode.enter = function (self, unit, blackboard, t)
-	return 
+	return
 end
+
 BTUtilityNode.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.running_attack_action = nil
 
 	self.set_running_child(self, unit, blackboard, t, nil, reason)
-
-	return 
 end
 
 local function swap(t, i, j)
 	local temp = t[i]
 	t[i] = t[j]
 	t[j] = temp
-
-	return 
 end
 
 local function randomize_actions(unit, actions, blackboard, t)
@@ -164,10 +161,9 @@ BTUtilityNode.run = function (self, unit, blackboard, t, dt)
 
 	return result
 end
+
 BTUtilityNode.add_child = function (self, node)
 	self._children[node._identifier] = node
-
-	return 
 end
 
-return 
+return

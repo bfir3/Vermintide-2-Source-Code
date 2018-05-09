@@ -3,11 +3,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 BTBotTeleportToAllyAction = class(BTBotTeleportToAllyAction, BTNode)
 BTBotTeleportToAllyAction.name = "BTBotTeleportToAllyAction"
 local MAX_ALLOWED_TELEPORT_DISTANCE = 10
+
 BTBotTeleportToAllyAction.init = function (self, ...)
 	BTBotTeleportToAllyAction.super.init(self, ...)
-
-	return 
 end
+
 BTBotTeleportToAllyAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local a_star = blackboard.teleport.a_star
 	blackboard.teleport = nil
@@ -17,18 +17,16 @@ BTBotTeleportToAllyAction.leave = function (self, unit, blackboard, t, reason, d
 	end
 
 	GwNavAStar.destroy(a_star)
-
-	return 
 end
+
 BTBotTeleportToAllyAction.enter = function (self, unit, blackboard, t)
 	blackboard.teleport = {
 		state = "init",
 		position = Vector3Box(Vector3.invalid_vector()),
 		a_star = GwNavAStar.create()
 	}
-
-	return 
 end
+
 BTBotTeleportToAllyAction.run = function (self, unit, blackboard, t, dt)
 	local target_ally_unit = blackboard.target_ally_unit
 	local tp_bb = blackboard.teleport
@@ -71,4 +69,4 @@ BTBotTeleportToAllyAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

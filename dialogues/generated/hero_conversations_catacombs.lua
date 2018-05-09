@@ -3370,6 +3370,4 @@ return function ()
 			}
 		}
 	})
-
-	return 
 end

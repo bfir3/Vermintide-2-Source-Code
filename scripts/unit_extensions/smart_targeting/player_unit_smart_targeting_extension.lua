@@ -8,6 +8,7 @@ local CLICK_TIME = 0.1
 local REACTION_FRAMES = 8
 local OPTIMIZED_AIM_ASSIST = true
 PlayerUnitSmartTargetingExtension = class(PlayerUnitSmartTargetingExtension)
+
 PlayerUnitSmartTargetingExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.world = extension_init_context.world
@@ -21,24 +22,23 @@ PlayerUnitSmartTargetingExtension.init = function (self, extension_init_context,
 	self.use_score_modifiers_1 = true
 	self.score_modifiers_1 = {}
 	self.score_modifiers_2 = {}
-
-	return 
 end
+
 PlayerUnitSmartTargetingExtension.extensions_ready = function (self)
 	local unit = self.unit
 	self.first_person_extension = ScriptUnit.extension(unit, "first_person_system")
 	self.status_extension = ScriptUnit.extension(unit, "status_system")
 	self.inventory_extension = ScriptUnit.extension(unit, "inventory_system")
 	self.input_extension = ScriptUnit.extension(unit, "input_system")
-
-	return 
 end
+
 local nearby_ai_units = {}
 local nearby_ai_positions = {}
 local nearby_ai_distances = {}
+
 PlayerUnitSmartTargetingExtension.update_opt2 = function (self, unit, input, dt, context, t)
 	if DISABLED then
-		return 
+		return
 	end
 
 	table.clear(self.targeting_data)
@@ -82,7 +82,7 @@ PlayerUnitSmartTargetingExtension.update_opt2 = function (self, unit, input, dt,
 	local auto_aim_disabled = not Application.user_setting("gamepad_auto_aim_enabled")
 
 	if not aim_assist_settings or (gamepad_active and auto_aim_disabled) then
-		return 
+		return
 	end
 
 	local max_range = aim_assist_settings.max_range
@@ -176,18 +176,17 @@ PlayerUnitSmartTargetingExtension.update_opt2 = function (self, unit, input, dt,
 	end
 
 	targeting_data.targets_within_range = targets_within_range
-
-	return 
 end
+
 PlayerUnitSmartTargetingExtension.update = function (self, unit, input, dt, context, t)
 	if OPTIMIZED_AIM_ASSIST then
 		self.update_opt2(self, unit, input, dt, context, t)
 
-		return 
+		return
 	end
 
 	if DISABLED then
-		return 
+		return
 	end
 
 	table.clear(self.targeting_data)
@@ -234,7 +233,7 @@ PlayerUnitSmartTargetingExtension.update = function (self, unit, input, dt, cont
 	local auto_aim_disabled = not Application.user_setting("gamepad_auto_aim_enabled")
 
 	if not aim_assist_settings or (gamepad_active and auto_aim_disabled) then
-		return 
+		return
 	end
 
 	local max_range = aim_assist_settings.max_range
@@ -313,9 +312,8 @@ PlayerUnitSmartTargetingExtension.update = function (self, unit, input, dt, cont
 	targeting_data.aim_score = aim_score
 	targeting_data.target_position = target_position
 	targeting_data.targets_within_range = targets_within_range
-
-	return 
 end
+
 PlayerUnitSmartTargetingExtension._get_player_camera = function (self)
 	local player = self.player
 	local viewport_name = player.viewport_name
@@ -324,6 +322,7 @@ PlayerUnitSmartTargetingExtension._get_player_camera = function (self)
 
 	return camera
 end
+
 PlayerUnitSmartTargetingExtension.get_target_visibility_and_aim_position = function (self, target_unit, own_position, aim_assist_settings)
 	local target_node_name = aim_assist_settings.target_node or "j_spine1"
 	local target_node = Unit.node(target_unit, target_node_name)
@@ -347,8 +346,9 @@ PlayerUnitSmartTargetingExtension.get_target_visibility_and_aim_position = funct
 
 	return visible_target, target_position
 end
+
 PlayerUnitSmartTargetingExtension.get_targeting_data = function (self)
 	return self.targeting_data
 end
 
-return 
+return

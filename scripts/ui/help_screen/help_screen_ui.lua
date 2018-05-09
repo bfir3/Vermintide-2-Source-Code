@@ -3,6 +3,7 @@ local definitions = dofile("scripts/ui/help_screen/help_screen_definitions")
 require("scripts/ui/help_screen/help_screen_settings")
 
 HelpScreenUI = class(HelpScreenUI)
+
 HelpScreenUI.init = function (self, ingame_ui_context)
 	self._world = ingame_ui_context.world
 	self._ui_renderer = ingame_ui_context.ui_renderer
@@ -26,22 +27,21 @@ HelpScreenUI.init = function (self, ingame_ui_context)
 	}
 	self._current_view = nil
 	self._current_index = 1
-
-	return 
 end
+
 HelpScreenUI._create_ui_elements = function (self)
 	self._ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 
 	self._set_page(self, self._current_index)
 
 	DO_RELOAD = false
-
-	return 
 end
+
 DO_RELOAD = true
+
 HelpScreenUI.update = function (self, dt)
 	if not self._current_view then
-		return 
+		return
 	end
 
 	if DO_RELOAD then
@@ -50,9 +50,8 @@ HelpScreenUI.update = function (self, dt)
 
 	self._update_input(self, dt)
 	self._draw(self, dt)
-
-	return 
 end
+
 HelpScreenUI.show_help = function (self, help_screen_name, input_service_name, on_init)
 	if on_init then
 	end
@@ -78,14 +77,12 @@ HelpScreenUI.show_help = function (self, help_screen_name, input_service_name, o
 	else
 		Application.warning(string.format("HelpScreenUI] Help screen not available (%s)", help_screen_name))
 	end
-
-	return 
 end
+
 HelpScreenUI.hide_help = function (self)
 	self._close_help(self)
-
-	return 
 end
+
 HelpScreenUI._set_page = function (self, index)
 	local current_view_settings = HelpScreens[self._current_view]
 	local page_settings = current_view_settings[index]
@@ -94,9 +91,8 @@ HelpScreenUI._set_page = function (self, index)
 	for setting_name, setting in pairs(page_settings) do
 		self._help_screen_widget.content[setting_name] = setting
 	end
-
-	return 
 end
+
 HelpScreenUI._draw = function (self, dt)
 	local ui_renderer = self._ui_renderer
 	local ui_top_renderer = self._ui_top_renderer
@@ -107,9 +103,8 @@ HelpScreenUI._draw = function (self, dt)
 	UIRenderer.begin_pass(ui_top_renderer, ui_scenegraph, input_service, dt, nil, render_settings)
 	UIRenderer.draw_widget(ui_top_renderer, self._help_screen_widget)
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 HelpScreenUI._update_input = function (self, dt)
 	if self._input_service:get("move_left", true) then
 		self._current_index = math.max(self._current_index - 1, 1)
@@ -126,9 +121,8 @@ HelpScreenUI._update_input = function (self, dt)
 	elseif self._input_service:get("back", true) or self._input_service:get("show_gamercard", true) then
 		self._close_help(self)
 	end
-
-	return 
 end
+
 HelpScreenUI._close_help = function (self)
 	if self._disabled_input_service_name then
 		Managers.input:device_unblock_service("gamepad", 1, self._disabled_input_service_name)
@@ -139,11 +133,10 @@ HelpScreenUI._close_help = function (self)
 	self._current_view = nil
 	self._current_index = 1
 	self._disabled_input_service_name = nil
-
-	return 
 end
+
 HelpScreenUI.destroy = function (self)
-	return 
+	return
 end
 
-return 
+return

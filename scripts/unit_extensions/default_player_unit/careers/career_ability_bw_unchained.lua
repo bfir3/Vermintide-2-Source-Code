@@ -1,4 +1,5 @@
 CareerAbilityBWUnchained = class(CareerAbilityBWUnchained)
+
 CareerAbilityBWUnchained.init = function (self, extension_init_context, unit, extension_init_data)
 	self._owner_unit = unit
 	self._world = extension_init_context.world
@@ -12,9 +13,8 @@ CareerAbilityBWUnchained.init = function (self, extension_init_context, unit, ex
 	self._input_manager = Managers.input
 	self._priming_fx_id = nil
 	self._priming_fx_name = "fx/chr_unchained_aoe_decal"
-
-	return 
 end
+
 CareerAbilityBWUnchained.extensions_ready = function (self, world, unit)
 	self._first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
 	self._status_extension = ScriptUnit.extension(unit, "status_system")
@@ -25,21 +25,21 @@ CareerAbilityBWUnchained.extensions_ready = function (self, world, unit)
 	if self._first_person_extension then
 		self._first_person_unit = self._first_person_extension:get_first_person_unit()
 	end
+end
 
-	return 
-end
 CareerAbilityBWUnchained.destroy = function (self)
-	return 
+	return
 end
+
 CareerAbilityBWUnchained.update = function (self, unit, input, dt, context, t)
 	if not self._ability_available(self) then
-		return 
+		return
 	end
 
 	local input_extension = self._input_extension
 
 	if not input_extension then
-		return 
+		return
 	end
 
 	if not self._is_priming then
@@ -52,22 +52,22 @@ CareerAbilityBWUnchained.update = function (self, unit, input, dt, context, t)
 		if input_extension.get(input_extension, "action_two") then
 			self._stop_priming(self)
 
-			return 
+			return
 		end
 
 		if input_extension.get(input_extension, "action_career_release") then
 			self._run_ability(self)
 		end
 	end
-
-	return 
 end
+
 CareerAbilityBWUnchained._ability_available = function (self)
 	local career_extension = self._career_extension
 	local status_extension = self._status_extension
 
 	return career_extension.can_use_activated_ability(career_extension) and not status_extension.is_disabled(status_extension)
 end
+
 CareerAbilityBWUnchained._start_priming = function (self)
 	if self._local_player then
 		local world = self._world
@@ -82,9 +82,8 @@ CareerAbilityBWUnchained._start_priming = function (self)
 	end
 
 	self._is_priming = true
-
-	return 
 end
+
 CareerAbilityBWUnchained._update_priming = function (self, dt)
 	local effect_id = self._priming_fx_id
 
@@ -95,9 +94,8 @@ CareerAbilityBWUnchained._update_priming = function (self, dt)
 
 		World.move_particles(world, effect_id, owner_unit_position)
 	end
-
-	return 
 end
+
 CareerAbilityBWUnchained._stop_priming = function (self)
 	local world = self._world
 	local effect_id = self._priming_fx_id
@@ -109,9 +107,8 @@ CareerAbilityBWUnchained._stop_priming = function (self)
 	end
 
 	self._is_priming = false
-
-	return 
 end
+
 CareerAbilityBWUnchained._run_ability = function (self, new_initial_speed)
 	self._stop_priming(self)
 
@@ -164,17 +161,14 @@ CareerAbilityBWUnchained._run_ability = function (self, new_initial_speed)
 	end
 
 	self._play_vo(self)
-
-	return 
 end
+
 CareerAbilityBWUnchained._play_vo = function (self)
 	local owner_unit = self._owner_unit
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
-
-	return 
 end
 
-return 
+return

@@ -7,8 +7,6 @@ ActionAssertFuncs = {
 
 		fassert(damage_profile, "No damage profile set for [\"%s.%s\"] in weapon [\"%s\"]", action_name, sub_action_name, weapon_name)
 		fassert(DamageProfileTemplates[damage_profile], "Damage profile [\"%s\"] does not exist", damage_profile)
-
-		return 
 	end,
 	sweep = function (weapon_name, action_name, sub_action_name, action)
 		if action.weapon_action_hand == "both" then
@@ -27,8 +25,6 @@ ActionAssertFuncs = {
 			fassert(damage_profile, "No damage profile set for [\"%s.%s\"] in weapon [\"%s\"]", action_name, sub_action_name, weapon_name)
 			fassert(DamageProfileTemplates[damage_profile], "Damage profile [\"%s\"] does not exist", damage_profile)
 		end
-
-		return 
 	end,
 	push_stagger = function (weapon_name, action_name, sub_action_name, action)
 		local damage_profile_inner = action.damage_profile_inner
@@ -40,8 +36,6 @@ ActionAssertFuncs = {
 
 		fassert(damage_profile_outer, "No outer damage profile set for [\"%s.%s\"] in weapon [\"%s\"]", action_name, sub_action_name, weapon_name)
 		fassert(DamageProfileTemplates[damage_profile_outer], "Damage profile [\"%s\"] does not exist", damage_profile_outer)
-
-		return 
 	end,
 	shield_slam = function (weapon_name, action_name, sub_action_name, action)
 		local damage_profile = action.damage_profile
@@ -53,56 +47,42 @@ ActionAssertFuncs = {
 
 		fassert(damage_profile_aoe, "No aoe damage profile set for [\"%s.%s\"] in weapon [\"%s\"]", action_name, sub_action_name, weapon_name)
 		fassert(DamageProfileTemplates[damage_profile_aoe], "Damage profile [\"%s\"] does not exist", damage_profile_aoe)
-
-		return 
 	end,
 	shotgun = function (weapon_name, action_name, sub_action_name, action)
 		local damage_profile = action.damage_profile
 
 		fassert(damage_profile, "No damage profile set for [\"%s.%s\"] in weapon [\"%s\"]", action_name, sub_action_name, weapon_name)
 		fassert(DamageProfileTemplates[damage_profile], "Damage profile [\"%s\"] does not exist", damage_profile)
-
-		return 
 	end,
 	geiser = function (weapon_name, action_name, sub_action_name, action)
 		local damage_profile = action.damage_profile
 
 		fassert(damage_profile, "No damage profile set for [\"%s.%s\"] in weapon [\"%s\"]", action_name, sub_action_name, weapon_name)
 		fassert(DamageProfileTemplates[damage_profile], "Damage profile [\"%s\"] does not exist", damage_profile)
-
-		return 
 	end,
 	beam = function (weapon_name, action_name, sub_action_name, action)
 		local damage_profile = action.damage_profile
 
 		fassert(damage_profile, "No damage profile set for [\"%s.%s\"] in weapon [\"%s\"]", action_name, sub_action_name, weapon_name)
 		fassert(DamageProfileTemplates[damage_profile], "Damage profile [\"%s\"] does not exist", damage_profile)
-
-		return 
 	end,
 	flamethrower = function (weapon_name, action_name, sub_action_name, action)
 		local damage_profile = action.damage_profile
 
 		fassert(damage_profile, "No damage profile set for [\"%s.%s\"] in weapon [\"%s\"]", action_name, sub_action_name, weapon_name)
 		fassert(DamageProfileTemplates[damage_profile], "Damage profile [\"%s\"] does not exist", damage_profile)
-
-		return 
 	end,
 	handgun_lock = function (weapon_name, action_name, sub_action_name, action)
 		local damage_profile = action.damage_profile
 
 		fassert(damage_profile, "No damage profile set for [\"%s.%s\"] in weapon [\"%s\"]", action_name, sub_action_name, weapon_name)
 		fassert(DamageProfileTemplates[damage_profile], "Damage profile [\"%s\"] does not exist", damage_profile)
-
-		return 
 	end,
 	charge = function (weapon_name, action_name, sub_action_name, action)
 		local charge_time = action.charge_time
 
 		fassert(charge_time, "No charge time set")
-
-		return 
 	end
 }
 
-return 
+return

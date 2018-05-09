@@ -7,6 +7,7 @@ local ObjectiveSocketUnitExtensionSettings = {
 		0.1
 	}
 }
+
 ObjectiveSocketUnitExtension.init = function (self, extension_init_context, unit, extension_init_data, is_server)
 	self.world = extension_init_context.world
 	self.unit = unit
@@ -22,9 +23,8 @@ ObjectiveSocketUnitExtension.init = function (self, extension_init_context, unit
 	POSITION_LOOKUP[unit] = Unit.world_position(unit, 0)
 
 	self._handle_optional_slots(self, unit)
-
-	return 
 end
+
 ObjectiveSocketUnitExtension._handle_optional_slots = function (self, unit)
 	if Unit.get_data(unit, "optional") then
 		script_data.socket_unit = unit
@@ -46,14 +46,12 @@ ObjectiveSocketUnitExtension._handle_optional_slots = function (self, unit)
 			i = i + 1
 		end
 	end
-
-	return 
 end
+
 ObjectiveSocketUnitExtension.destroy = function (self)
 	POSITION_LOOKUP[self.unit] = nil
-
-	return 
 end
+
 ObjectiveSocketUnitExtension.setup_sockets = function (self, unit)
 	local sockets = self.sockets
 	local base = "socket_"
@@ -74,9 +72,8 @@ ObjectiveSocketUnitExtension.setup_sockets = function (self, unit)
 	fassert(0 < i - 1, "No socket nodes in unit %q", unit)
 
 	self.num_sockets = i - 1
-
-	return 
 end
+
 ObjectiveSocketUnitExtension.pick_socket_ordered = function (self, sockets)
 	local num_sockets = self.num_sockets
 
@@ -89,9 +86,8 @@ ObjectiveSocketUnitExtension.pick_socket_ordered = function (self, sockets)
 	end
 
 	print("[ObjectiveSocketUnitExtension]: No sockets open")
-
-	return 
 end
+
 ObjectiveSocketUnitExtension.pick_socket_closest = function (self, sockets, unit)
 	local position = POSITION_LOOKUP[unit]
 	local socket_unit = self.unit
@@ -120,6 +116,7 @@ ObjectiveSocketUnitExtension.pick_socket_closest = function (self, sockets, unit
 
 	return closest_socket, closest_id
 end
+
 ObjectiveSocketUnitExtension.pick_socket = function (self, unit)
 	local socket, i = nil
 	local pick_config = self.pick_config
@@ -134,9 +131,11 @@ ObjectiveSocketUnitExtension.pick_socket = function (self, unit)
 
 	return socket, i
 end
+
 ObjectiveSocketUnitExtension.socket_from_id = function (self, socket_id)
 	return self.sockets[socket_id]
 end
+
 ObjectiveSocketUnitExtension.update = function (self, unit, input, dt, context, t)
 	if script_data.debug_objective_socket then
 		local sockets = self.sockets
@@ -156,8 +155,6 @@ ObjectiveSocketUnitExtension.update = function (self, unit, input, dt, context, 
 			end
 		end
 	end
-
-	return 
 end
 
-return 
+return

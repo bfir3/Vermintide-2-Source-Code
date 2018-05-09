@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTCirclePreyAction = class(BTCirclePreyAction, BTNode)
+
 BTCirclePreyAction.init = function (self, ...)
 	BTCirclePreyAction.super.init(self, ...)
-
-	return 
 end
+
 BTCirclePreyAction.name = "BTCirclePreyAction"
+
 BTCirclePreyAction.enter = function (self, unit, blackboard, t)
 	LocomotionUtils.set_animation_driven_movement(unit, false)
 
@@ -41,9 +42,8 @@ BTCirclePreyAction.enter = function (self, unit, blackboard, t)
 
 		self.stop(self, unit, blackboard)
 	end
-
-	return 
 end
+
 BTCirclePreyAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if reason == "aborted" then
 		blackboard.need_to_recalculate_skulk_pos = true
@@ -53,9 +53,8 @@ BTCirclePreyAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
-
-	return 
 end
+
 BTCirclePreyAction.run = function (self, unit, blackboard, t, dt)
 	local navigation_extension = blackboard.navigation_extension
 
@@ -77,6 +76,7 @@ BTCirclePreyAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTCirclePreyAction.get_new_goal = function (self, unit, blackboard)
 	local target_unit = blackboard.secondary_target or blackboard.target_unit
 
@@ -88,9 +88,8 @@ BTCirclePreyAction.get_new_goal = function (self, unit, blackboard)
 			return goal_position
 		end
 	end
-
-	return 
 end
+
 BTCirclePreyAction.move_to_goal = function (self, unit, blackboard, goal_position)
 	if blackboard.move_state ~= "moving" then
 		Managers.state.network:anim_event(unit, "move_fwd")
@@ -105,9 +104,8 @@ BTCirclePreyAction.move_to_goal = function (self, unit, blackboard, goal_positio
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.move_to(navigation_extension, goal_position)
-
-	return 
 end
+
 BTCirclePreyAction.stop = function (self, unit, blackboard)
 	if blackboard.move_state ~= "idle" then
 		Managers.state.network:anim_event(unit, "idle")
@@ -120,8 +118,6 @@ BTCirclePreyAction.stop = function (self, unit, blackboard)
 	if navigation_extension.is_following_path(navigation_extension) then
 		navigation_extension.stop(navigation_extension)
 	end
-
-	return 
 end
 
-return 
+return

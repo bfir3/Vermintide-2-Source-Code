@@ -3,11 +3,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 BTChaosPlagueWaveSpawnerSummoningAction = class(BTChaosPlagueWaveSpawnerSummoningAction, BTNode)
 BTChaosPlagueWaveSpawnerSummoningAction.name = "BTChaosPlagueWaveSpawnerSummoningAction"
 local BTChaosPlagueWaveSpawnerSummoningAction = BTChaosPlagueWaveSpawnerSummoningAction
+
 BTChaosPlagueWaveSpawnerSummoningAction.init = function (self, ...)
 	BTChaosPlagueWaveSpawnerSummoningAction.super.init(self, ...)
-
-	return 
 end
+
 BTChaosPlagueWaveSpawnerSummoningAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local breed = blackboard.breed
@@ -23,14 +23,12 @@ BTChaosPlagueWaveSpawnerSummoningAction.enter = function (self, unit, blackboard
 			plague_wave_rot = QuaternionBox()
 		}
 	end
-
-	return 
 end
+
 BTChaosPlagueWaveSpawnerSummoningAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.action = nil
-
-	return 
 end
+
 BTChaosPlagueWaveSpawnerSummoningAction.run = function (self, unit, blackboard, t, dt)
 	local action = blackboard.action
 	local plague_wave_data = blackboard.plague_wave_data
@@ -47,7 +45,7 @@ BTChaosPlagueWaveSpawnerSummoningAction.run = function (self, unit, blackboard, 
 	if external_event_value and 100 <= external_event_value then
 		Managers.state.conflict:destroy_unit(unit, blackboard, "plague_wave_spawner")
 
-		return 
+		return
 	end
 
 	local anticipation_fx = action.anticipation_fx
@@ -80,4 +78,4 @@ BTChaosPlagueWaveSpawnerSummoningAction.run = function (self, unit, blackboard, 
 	return "running"
 end
 
-return 
+return

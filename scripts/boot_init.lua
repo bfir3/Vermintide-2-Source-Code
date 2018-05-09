@@ -10,8 +10,6 @@ local function import(lib)
 	for k, v in pairs(lib) do
 		_G[k] = v
 	end
-
-	return 
 end
 
 if s3d then
@@ -48,13 +46,10 @@ end
 
 Application.build = function ()
 	error("Trying to use BUILD, use global variable BUILD instead.")
-
-	return 
 end
+
 Application.platform = function ()
 	error("Trying to use Application.platform(), use global variable PLATFORM instead.")
-
-	return 
 end
 
 if not PROFILER_SCOPES_INITED then
@@ -140,4 +135,4 @@ else
 	}
 end
 
-return 
+return

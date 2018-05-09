@@ -11,16 +11,12 @@ local resolution_lookup = RESOLUTION_LOOKUP
 
 function CLEAR_POSITION_LOOKUP()
 	table.clear(position_lookup)
-
-	return 
 end
 
 local world_position = Unit.world_position
 
 function UPDATE_POSITION_LOOKUP()
 	EngineOptimized.update_position_lookup(position_lookup)
-
-	return 
 end
 
 function UPDATE_RESOLUTION_LOOKUP(force_update)
@@ -38,8 +34,6 @@ function UPDATE_RESOLUTION_LOOKUP(force_update)
 	end
 
 	resolution_lookup.modified = resolution_modified
-
-	return 
 end
 
 PLAYER_UNITS = PLAYER_UNITS or {}
@@ -143,8 +137,6 @@ function UPDATE_PLAYER_LISTS()
 		ai_target_units[j] = nil
 		j = j + 1
 	end
-
-	return 
 end
 
 function REMOVE_PLAYER_UNIT_FROM_LISTS(player_unit)
@@ -184,8 +176,6 @@ function REMOVE_PLAYER_UNIT_FROM_LISTS(player_unit)
 			break
 		end
 	end
-
-	return 
 end
 
 function REMOVE_AGGRO_UNITS(aggro_unit)
@@ -200,8 +190,6 @@ function REMOVE_AGGRO_UNITS(aggro_unit)
 			break
 		end
 	end
-
-	return 
 end
 
 function CLEAR_ALL_PLAYER_LISTS()
@@ -223,8 +211,6 @@ function CLEAR_ALL_PLAYER_LISTS()
 	table.clear(BLACKBOARDS)
 	assert(next(BLACKBOARDS) == nil)
 	CLEAR_POSITION_LOOKUP()
-
-	return 
 end
 
-return 
+return

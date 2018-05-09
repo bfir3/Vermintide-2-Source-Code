@@ -1,4 +1,5 @@
 ActionHandgunLock = class(ActionHandgunLock)
+
 ActionHandgunLock.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.owner_unit_first_person = first_person_unit
@@ -16,9 +17,8 @@ ActionHandgunLock.init = function (self, world, item_name, is_server, owner_unit
 
 	self.spread_extension = ScriptUnit.extension(weapon_unit, "spread_system")
 	self._is_critical_strike = false
-
-	return 
 end
+
 ActionHandgunLock.client_owner_start_action = function (self, new_action, t, chain_action_data)
 	local weapon_unit = self.weapon_unit
 	local owner_unit = self.owner_unit
@@ -47,9 +47,8 @@ ActionHandgunLock.client_owner_start_action = function (self, new_action, t, cha
 	end
 
 	self._is_critical_strike = is_critical_strike
-
-	return 
 end
+
 ActionHandgunLock.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local current_action = self.current_action
 	local target_count = self.target_count
@@ -61,7 +60,7 @@ ActionHandgunLock.client_owner_post_update = function (self, dt, t, world, can_d
 			weapon_extension.stop_action(weapon_extension, "action_abort")
 		end
 
-		return 
+		return
 	end
 
 	if self.shots_fired == 0 then
@@ -142,9 +141,8 @@ ActionHandgunLock.client_owner_post_update = function (self, dt, t, world, can_d
 			Unit.flow_event(weapon_unit, "lua_bullet_trail_set")
 		end
 	end
-
-	return 
 end
+
 ActionHandgunLock.raycast_to_target = function (self, world, from_position, direction, target)
 	local physics_world = World.get_data(world, "physics_world")
 	local return_result = nil
@@ -156,14 +154,13 @@ ActionHandgunLock.raycast_to_target = function (self, world, from_position, dire
 
 	return result
 end
+
 ActionHandgunLock.finish = function (self, reason)
 	local hud_extension = ScriptUnit.has_extension(self.owner_unit, "hud_system")
 
 	if hud_extension then
 		hud_extension.show_critical_indication = false
 	end
-
-	return 
 end
 
-return 
+return

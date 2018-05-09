@@ -13,8 +13,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_set_wounded", go_id, wounded, reason_id)
 		end
-
-		return 
 	end,
 	set_knocked_down_network = function (knocked_down_unit, knocked_down)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -29,8 +27,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", NetworkLookup.statuses.knocked_down, knocked_down, go_id, 0)
 		end
-
-		return 
 	end,
 	set_revived_network = function (revived_unit, revived, reviver_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST, "Only the server is allowed to decide who is revived and who isn't since it owns damage and interactions.")
@@ -46,8 +42,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", NetworkLookup.statuses.revived, revived, go_id, reviver_go_id)
 		end
-
-		return 
 	end,
 	set_respawned_network = function (respawned_unit, respawned, helper_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -73,8 +67,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc("rpc_status_change_bool", network_id, NetworkLookup.statuses.assisted_respawning, respawned, go_id, helper_go_id)
 		end
-
-		return 
 	end,
 	set_pulled_up_network = function (pulled_up_unit, pulled_up, helper_unit)
 		local status_extension = ScriptUnit.extension(pulled_up_unit, "status_system")
@@ -92,14 +84,12 @@ StatusUtils = {
 				network_manager.network_transmit:send_rpc_server("rpc_status_change_bool", NetworkLookup.statuses.pulled_up, pulled_up, go_id, helper_go_id)
 			end
 		end
-
-		return 
 	end,
 	set_grabbed_by_pack_master_network = function (status_name, grabbed_unit, is_grabbed, grabber_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
 
 		if not Managers.state.network:game() then
-			return 
+			return
 		end
 
 		local status_extension = ScriptUnit.extension(grabbed_unit, "status_system")
@@ -114,14 +104,12 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", status_id, is_grabbed, grabbed_go_id, grabber_go_id)
 		end
-
-		return 
 	end,
 	set_grabbed_by_corruptor_network = function (status_name, grabbed_unit, is_grabbed, grabber_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
 
 		if not Managers.state.network:game() then
-			return 
+			return
 		end
 
 		local status_extension = ScriptUnit.extension(grabbed_unit, "status_system")
@@ -136,8 +124,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", status_id, is_grabbed, grabbed_go_id, grabber_go_id)
 		end
-
-		return 
 	end,
 	set_pushed_network = function (pushed_unit, pushed)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -153,8 +139,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", NetworkLookup.statuses.pushed, pushed, go_id, 0)
 		end
-
-		return 
 	end,
 	set_catapulted_network = function (unit, catapulted, velocity)
 		local player_manager = Managers.player
@@ -171,8 +155,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc("rpc_set_catapulted", peer_id, go_id, catapulted, velocity or Vector.zero())
 		end
-
-		return 
 	end,
 	set_grabbed_by_tentacle_network = function (grabbed_unit, is_grabbed, tentacle_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -188,8 +170,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", NetworkLookup.statuses.grabbed_by_tentacle, is_grabbed, go_id, grabber_go_id)
 		end
-
-		return 
 	end,
 	set_grabbed_by_tentacle_status_network = function (grabbed_unit, substatus)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -205,8 +185,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_int", NetworkLookup.statuses.grabbed_by_tentacle, substatus_id, go_id)
 		end
-
-		return 
 	end,
 	set_grabbed_by_chaos_spawn_network = function (grabbed_unit, is_grabbed, chaos_spawn_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -222,8 +200,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", NetworkLookup.statuses.grabbed_by_chaos_spawn, is_grabbed, go_id, grabber_go_id)
 		end
-
-		return 
 	end,
 	set_grabbed_by_chaos_spawn_status_network = function (grabbed_unit, substatus)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -239,8 +215,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_int", NetworkLookup.statuses.grabbed_by_chaos_spawn, substatus_id, go_id)
 		end
-
-		return 
 	end,
 	set_in_vortex_network = function (affected_unit, in_vortex, vortex_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -256,8 +230,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", NetworkLookup.statuses.in_vortex, in_vortex, go_id, vortex_go_id)
 		end
-
-		return 
 	end,
 	set_near_vortex_network = function (affected_unit, near_vortex, vortex_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -273,8 +245,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", NetworkLookup.statuses.near_vortex, near_vortex, go_id, vortex_go_id)
 		end
-
-		return 
 	end,
 	set_in_liquid_network = function (affected_unit, in_liquid, in_liquid_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -290,8 +260,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_bool", NetworkLookup.statuses.in_liquid, in_liquid, go_id, liquid_go_id)
 		end
-
-		return 
 	end,
 	set_overpowered_network = function (affected_unit, overpowered, overpowered_template_name, attacking_unit)
 		fassert(Managers.player.is_server or LEVEL_EDITOR_TEST)
@@ -308,8 +276,6 @@ StatusUtils = {
 
 			network_manager.network_transmit:send_rpc_clients("rpc_status_change_int_and_unit", NetworkLookup.statuses.overpowered, status_int, go_id, other_go_id)
 		end
-
-		return 
 	end,
 	set_overcharge_exploding = function (unit, exploding)
 		local status_extension = ScriptUnit.extension(unit, "status_system")
@@ -326,8 +292,6 @@ StatusUtils = {
 				network_manager.network_transmit:send_rpc_server("rpc_status_change_bool", NetworkLookup.statuses.overcharge_exploding, exploding, go_id, 0)
 			end
 		end
-
-		return 
 	end,
 	use_soft_collision = function (unit)
 		local status_extension = ScriptUnit.extension(unit, "status_system")
@@ -350,9 +314,7 @@ StatusUtils = {
 				end
 			end
 		end
-
-		return 
 	end
 }
 
-return 
+return

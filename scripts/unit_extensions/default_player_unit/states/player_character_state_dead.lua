@@ -1,9 +1,9 @@
 PlayerCharacterStateDead = class(PlayerCharacterStateDead, PlayerCharacterState)
+
 PlayerCharacterStateDead.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "dead")
-
-	return 
 end
+
 PlayerCharacterStateDead.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	self.despawn_time_start = t
 	self.despawned = false
@@ -33,15 +33,13 @@ PlayerCharacterStateDead.on_enter = function (self, unit, input, dt, context, t,
 	local override_item_drop_direction = (params and params.override_item_drop_direction) or nil
 	self.override_item_drop_position = (override_item_drop_position and Vector3Box(override_item_drop_position)) or nil
 	self.override_item_drop_direction = (override_item_drop_direction and Vector3Box(override_item_drop_direction)) or nil
-
-	return 
 end
+
 PlayerCharacterStateDead.on_exit = function (self, unit, input, dt, context, t, next_state)
 	self.override_item_drop_position = nil
 	self.override_item_drop_direction = nil
-
-	return 
 end
+
 PlayerCharacterStateDead.update = function (self, unit, input, dt, context, t)
 	local time_since_death = t - self.despawn_time_start
 
@@ -71,8 +69,6 @@ PlayerCharacterStateDead.update = function (self, unit, input, dt, context, t)
 		MOOD_BLACKBOARD.wounded = false
 		MOOD_BLACKBOARD.bleeding_out = false
 	end
-
-	return 
 end
 
-return 
+return

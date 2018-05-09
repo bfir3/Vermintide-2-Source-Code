@@ -1,4 +1,5 @@
 ActionChargedProjectile = class(ActionChargedProjectile)
+
 ActionChargedProjectile.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.world = world
 	self.owner_unit = owner_unit
@@ -20,9 +21,8 @@ ActionChargedProjectile.init = function (self, world, item_name, is_server, owne
 	end
 
 	self._is_critical_strike = false
-
-	return 
 end
+
 ActionChargedProjectile.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level)
 	local weapon_unit = self.weapon_unit
 	local owner_unit = self.owner_unit
@@ -72,9 +72,8 @@ ActionChargedProjectile.client_owner_start_action = function (self, new_action, 
 	end
 
 	self._is_critical_strike = is_critical_strike
-
-	return 
 end
+
 ActionChargedProjectile.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local current_action = self.current_action
 	local owner_unit = self.owner_unit
@@ -243,9 +242,8 @@ ActionChargedProjectile.client_owner_post_update = function (self, dt, t, world,
 			dialogue_input.trigger_networked_dialogue_event(dialogue_input, "throwing_item", event_data)
 		end
 	end
-
-	return 
 end
+
 ActionChargedProjectile.finish = function (self, reason)
 	local owner_unit = self.owner_unit
 	local inventory_extension = ScriptUnit.extension(owner_unit, "inventory_system")
@@ -261,8 +259,6 @@ ActionChargedProjectile.finish = function (self, reason)
 	if hud_extension then
 		hud_extension.show_critical_indication = false
 	end
-
-	return 
 end
 
-return 
+return

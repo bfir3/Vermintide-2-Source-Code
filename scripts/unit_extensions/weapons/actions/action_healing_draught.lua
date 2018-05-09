@@ -1,4 +1,5 @@
 ActionHealingDraught = class(ActionHealingDraught)
+
 ActionHealingDraught.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.weapon_unit = weapon_unit
@@ -8,17 +9,16 @@ ActionHealingDraught.init = function (self, world, item_name, is_server, owner_u
 	if ScriptUnit.has_extension(weapon_unit, "ammo_system") then
 		self.ammo_extension = ScriptUnit.extension(weapon_unit, "ammo_system")
 	end
-
-	return 
 end
+
 ActionHealingDraught.client_owner_start_action = function (self, new_action, t)
 	self.current_action = new_action
+end
 
-	return 
-end
 ActionHealingDraught.client_owner_post_update = function (self, dt, t, world, can_damage)
-	return 
+	return
 end
+
 ActionHealingDraught.finish = function (self, reason)
 	local current_action = self.current_action
 	local owner_unit = self.owner_unit
@@ -27,7 +27,7 @@ ActionHealingDraught.finish = function (self, reason)
 	local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 
 	if reason ~= "action_complete" or buff_extension.has_buff_type(buff_extension, "trait_necklace_no_healing_health_regen") then
-		return 
+		return
 	end
 
 	if current_action.dialogue_event then
@@ -67,8 +67,6 @@ ActionHealingDraught.finish = function (self, reason)
 	local position = POSITION_LOOKUP[owner_unit]
 
 	Managers.telemetry.events:player_used_item(player, self.item_name, position)
-
-	return 
 end
 
-return 
+return

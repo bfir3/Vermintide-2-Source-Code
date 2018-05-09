@@ -73,6 +73,7 @@ local LOG_LEVELS = {
 	verbose = 2,
 	normal = 1
 }
+
 ScriptBackend.init = function (self)
 	local title_id = GameSettingsDevelopment.backend_settings.title_id
 	local environment = GameSettingsDevelopment.backend_settings.environment
@@ -91,8 +92,6 @@ ScriptBackend.init = function (self)
 	self._commit_current_id = nil
 	self._commit_queue_id = nil
 	self._last_id = 0
-
-	return 
 end
 
 local function print_result(result, action)
@@ -106,8 +105,6 @@ local function print_result(result, action)
 			details = result.details
 		}
 	end
-
-	return 
 end
 
 ScriptBackend.update = function (self)
@@ -119,6 +116,7 @@ ScriptBackend.update = function (self)
 
 	return result
 end
+
 ScriptBackend._update_state = function (self)
 	local state = Backend.state()
 	local allowed_changes = STATE_CHANGES[self._state]
@@ -161,9 +159,11 @@ ScriptBackend._update_state = function (self)
 
 	return result
 end
+
 ScriptBackend.update_state = function (self)
 	return self._update_state(self)
 end
+
 ScriptBackend.update_signin = function (self)
 	local error_data = self._update_state(self)
 
@@ -190,9 +190,11 @@ ScriptBackend.update_signin = function (self)
 
 	return result
 end
+
 ScriptBackend.authenticated = function (self)
 	return Backend.state() == Backend.CONNECTION_ENTITIES_LOADED
 end
+
 ScriptBackend._refresh_stats = function (self)
 	if self._dirty_stats or not self._stats then
 		local stats = BackendStats.get_stats(self._backend)
@@ -206,14 +208,14 @@ ScriptBackend._refresh_stats = function (self)
 		self._nice_stats = nice_stats
 		self._dirty_stats = false
 	end
-
-	return 
 end
+
 ScriptBackend.get_stats = function (self)
 	self._refresh_stats(self)
 
 	return self._nice_stats
 end
+
 ScriptBackend.set_stats = function (self, nice_stats)
 	self._refresh_stats(self)
 
@@ -240,9 +242,8 @@ ScriptBackend.set_stats = function (self, nice_stats)
 	self.commit(self)
 
 	self._dirty_stats = true
-
-	return 
 end
+
 ScriptBackend.check_for_errors = function (self)
 	local backend_error = Backend.get_error()
 	local session_error = BackendSession.get_error()
@@ -257,11 +258,13 @@ ScriptBackend.check_for_errors = function (self)
 
 	return backend_error or session_error or commit_error
 end
+
 ScriptBackend._new_id = function (self)
 	self._last_id = self._last_id + 1
 
 	return self._last_id
 end
+
 ScriptBackend._check_current_commit = function (self)
 	local status = self.commit_status(self, self._commit_current_id)
 
@@ -281,9 +284,8 @@ ScriptBackend._check_current_commit = function (self)
 			self._commit_queue_id = nil
 		end
 	end
-
-	return 
 end
+
 ScriptBackend._commit_internal = function (self, queued_id)
 	local commit_id, result = Backend.commit()
 	local new_id = queued_id or self._new_id(self)
@@ -299,6 +301,7 @@ ScriptBackend._commit_internal = function (self, queued_id)
 
 	return new_id
 end
+
 ScriptBackend._queue_commit = function (self)
 	if not self._commit_queue_id then
 		self._commit_queue_id = self._new_id(self)
@@ -306,6 +309,7 @@ ScriptBackend._queue_commit = function (self)
 
 	return self._commit_queue_id
 end
+
 ScriptBackend.commit = function (self, internal)
 	print("Trying to commit", internal, self._commit_current_id, self._commit_queue_id)
 
@@ -319,9 +323,8 @@ ScriptBackend.commit = function (self, internal)
 
 		return new_id
 	end
-
-	return 
 end
+
 ScriptBackend.commit_status = function (self, commit_id)
 	fassert(commit_id, "Querying status for commit_id %s", tostring(commit_id))
 
@@ -360,28 +363,26 @@ ScriptBackend.commit_status = function (self, commit_id)
 	else
 		return Backend.COMMIT_WAITING
 	end
-
-	return 
 end
+
 ScriptBackend.destroy = function (self)
 	print("[Backend] ScriptBackend destroy")
 	Backend.destroy()
-
-	return 
 end
+
 ScriptBackend.backend_object = function (self)
 	error("no backend object in lua anymore")
 
 	return self._backend
 end
+
 ScriptBackend.refresh_log_level = function (self)
 	local log_index = script_data.backend_logging_level or "verbose"
 	local log_level = LOG_LEVELS[log_index]
 
 	Backend.set_log_level(log_level)
-
-	return 
 end
+
 ScriptBackend.wait_for_shutdown = function (self, timeout)
 	local timeout_at = os.time() + timeout
 
@@ -395,7 +396,7 @@ ScriptBackend.wait_for_shutdown = function (self, timeout)
 				print("wait for shutdown has timed out", Backend.active_requests(), self._commit_queue_id)
 			end
 
-			return 
+			return
 		end
 	end
 
@@ -408,8 +409,6 @@ ScriptBackend.wait_for_shutdown = function (self, timeout)
 	if timeout_at < os.time() then
 		print("backend disconnect has timed out")
 	end
-
-	return 
 end
 
-return 
+return

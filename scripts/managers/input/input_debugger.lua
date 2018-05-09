@@ -5,6 +5,7 @@ local serialize = require("scripts/utils/serialize")
 script_data.input_debug_device_state = script_data.input_debug_device_state or Development.parameter("input_debug_device_state")
 script_data.input_debug_filters = script_data.input_debug_filters or Development.parameter("input_debug_filters")
 InputDebugger = InputDebugger or {}
+
 InputDebugger.setup = function (self, world, input_manager)
 	self.input_device_data = {}
 	self.gui = World.create_screen_gui(world, "material", "materials/fonts/gw_fonts", "immediate")
@@ -15,30 +16,28 @@ InputDebugger.setup = function (self, world, input_manager)
 	self.debug_edit_keymap = false
 	self.enabled = true
 	self.world = world
-
-	return 
 end
+
 InputDebugger.clear = function (self)
 	self.world = nil
 	self.gui = nil
 	self.input_manager = nil
-
-	return 
 end
+
 InputDebugger.pre_update_device = function (self, input_device, device_data, dt)
 	if script_data.input_debug_device_state then
 	end
-
-	return 
 end
+
 local x_spacing = 100
+
 InputDebugger.post_update_device = function (self, input_device, device_data, dt)
 	if not self.input_manager then
-		return 
+		return
 	end
 
 	if not script_data.debug_enabled then
-		return 
+		return
 	end
 
 	if script_data.input_debug_device_state then
@@ -115,14 +114,10 @@ InputDebugger.post_update_device = function (self, input_device, device_data, dt
 
 		self.num_updated_devices = self.num_updated_devices + 1
 	end
-
-	return 
 end
 
 local function render_text(text, position, color)
 	Gui.text(InputDebugger.gui, text, font_mtrl, font_size, font, position, color)
-
-	return 
 end
 
 InputDebugger.debug_input_filters = function (self)
@@ -148,9 +143,8 @@ InputDebugger.debug_input_filters = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 InputDebugger.update_input_service_data = function (self, input_service, t)
 	local selected_color = Color(128, 128, 192)
 	local normal_color = Color(255, 255, 255)
@@ -172,7 +166,7 @@ InputDebugger.update_input_service_data = function (self, input_service, t)
 
 			self.current_selection = 1
 
-			return 
+			return
 		end
 	end
 
@@ -246,6 +240,7 @@ InputDebugger.update_input_service_data = function (self, input_service, t)
 
 	return current_input_service_data, x_pos
 end
+
 InputDebugger.update_selected_device = function (self, input_service, x_pos, top, t)
 	local selected_color = Color(128, 128, 192)
 	local normal_color = Color(255, 255, 255)
@@ -310,9 +305,8 @@ InputDebugger.update_selected_device = function (self, input_service, x_pos, top
 		end
 	elseif selected_map_type == "axis" then
 	end
-
-	return 
 end
+
 InputDebugger.update_input_modify_type = function (self, input_service, t, x_pos)
 	local selected_color = Color(128, 128, 192)
 	local normal_color = Color(255, 255, 255)
@@ -359,6 +353,7 @@ InputDebugger.update_input_modify_type = function (self, input_service, t, x_pos
 
 	return x_pos
 end
+
 InputDebugger.update_selected_keymap_edit = function (self, input_service, dt, t, x_pos, current_input_service_data)
 	local selected_color = Color(128, 128, 192)
 	local normal_color = Color(255, 255, 255)
@@ -392,7 +387,7 @@ InputDebugger.update_selected_keymap_edit = function (self, input_service, dt, t
 			self.added_keymap = nil
 			self.current_selection = 1
 
-			return 
+			return
 		end
 
 		top = top - font_size
@@ -427,7 +422,7 @@ InputDebugger.update_selected_keymap_edit = function (self, input_service, dt, t
 				self.key_selected_wait = nil
 				self.last_pressed = nil
 
-				return 
+				return
 			end
 		end
 
@@ -488,7 +483,7 @@ InputDebugger.update_selected_keymap_edit = function (self, input_service, dt, t
 			self.update_selected_device(self, input_service, x_pos, top, t)
 		end
 
-		return 
+		return
 	end
 
 	local max_keymaps = 40
@@ -529,14 +524,14 @@ InputDebugger.update_selected_keymap_edit = function (self, input_service, dt, t
 	end
 
 	if not current_keymap_data then
-		return 
+		return
 	end
 
 	if input_service.get(input_service, "esc") then
 		self.selected_input_type = nil
 		self.current_selection = 1
 
-		return 
+		return
 	end
 
 	x_pos = x_pos + 120
@@ -589,7 +584,7 @@ InputDebugger.update_selected_keymap_edit = function (self, input_service, dt, t
 	end
 
 	if not current_keymap then
-		return 
+		return
 	end
 
 	render_text("Please press new key (escape to cancel).", Vector3(s_w / 2, s_h / 2, 900), normal_color)
@@ -615,9 +610,8 @@ InputDebugger.update_selected_keymap_edit = function (self, input_service, dt, t
 			self.last_pressed = nil
 		end
 	end
-
-	return 
 end
+
 InputDebugger.update_selected_filter_edit = function (self, input_service, dt, t, x_pos, current_input_service_data)
 	local selected_color = Color(128, 128, 192)
 	local normal_color = Color(255, 255, 255)
@@ -661,7 +655,7 @@ InputDebugger.update_selected_filter_edit = function (self, input_service, dt, t
 	end
 
 	if not selected_input_filter then
-		return 
+		return
 	end
 
 	x_pos = x_pos + 120
@@ -707,7 +701,7 @@ InputDebugger.update_selected_filter_edit = function (self, input_service, dt, t
 	end
 
 	if not selected_edit_type_index then
-		return 
+		return
 	end
 
 	top = s_h - 20 - font_size
@@ -838,16 +832,15 @@ InputDebugger.update_selected_filter_edit = function (self, input_service, dt, t
 			end
 		end
 	end
-
-	return 
 end
+
 InputDebugger.finalize_update = function (self, input_services, dt, t)
 	if not self.input_manager then
-		return 
+		return
 	end
 
 	if not script_data.debug_enabled then
-		return 
+		return
 	end
 
 	self.num_updated_devices = 0
@@ -869,14 +862,14 @@ InputDebugger.finalize_update = function (self, input_services, dt, t)
 		local current_input_service_data, x_pos = self.update_input_service_data(self, input_service, t)
 
 		if not current_input_service_data then
-			return 
+			return
 		end
 
 		local selected_input_type = self.selected_input_type
 		x_pos = self.update_input_modify_type(self, input_service, t, x_pos)
 
 		if not selected_input_type then
-			return 
+			return
 		end
 
 		if selected_input_type == "keymap" then
@@ -890,9 +883,8 @@ InputDebugger.finalize_update = function (self, input_services, dt, t)
 		self.input_manager:block_device_except_service("Debug", "keyboard")
 		self.input_manager:block_device_except_service("Debug", "mouse")
 	end
-
-	return 
 end
+
 InputDebugger.handle_edit_debug_keys = function (self, input_service, current_choice_name, choice_store, back_clear, max_nr_choices, t)
 	local current_selection = self.current_selection
 
@@ -909,8 +901,6 @@ InputDebugger.handle_edit_debug_keys = function (self, input_service, current_ch
 		self[back_clear] = nil
 		self.current_selection = 1
 	end
-
-	return 
 end
 
-return 
+return

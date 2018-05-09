@@ -63,8 +63,6 @@ weapon_template.actions = {
 			},
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end,
 			cleave_distribution = {
 				attack = 0.15,
@@ -153,8 +151,6 @@ weapon_template.actions = {
 			},
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end,
 			cleave_distribution = {
 				attack = 0.15,
@@ -255,8 +251,6 @@ weapon_template.actions = {
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.reset_release_input(input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end,
 			projectile_info = Projectiles.spear,
 			impact_data = {
@@ -343,8 +337,6 @@ weapon_template.actions = {
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.reset_release_input(input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end,
 			cleave_distribution = {
 				attack = 0.25,
@@ -434,8 +426,6 @@ weapon_template.actions = {
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.reset_release_input(input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end,
 			projectile_info = Projectiles.spear,
 			impact_data = {
@@ -558,8 +548,6 @@ weapon_template.actions = {
 			enter_function = function (attacker_unit, input_extension)
 				input_extension.reset_release_input(input_extension)
 				input_extension.clear_input_buffer(input_extension)
-
-				return 
 			end,
 			buff_data = {
 				{
@@ -708,4 +696,4 @@ weapon_template.tooltip_detail = {
 Weapons = Weapons or {}
 Weapons.staff_spark_spear_template_1 = table.clone(weapon_template)
 
-return 
+return

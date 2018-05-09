@@ -16,7 +16,7 @@ local function look_at_target_unit(unit, data, dt, target_unit, target_distance,
 	if not target_unit or not Unit.alive(target_unit) then
 		AiUtils.set_default_anim_constraint(unit, head_constraint_target)
 
-		return 
+		return
 	end
 
 	local look_target = nil
@@ -58,8 +58,6 @@ local function look_at_target_unit(unit, data, dt, target_unit, target_distance,
 
 	data.previous_look_target:store(look_target)
 	Unit.animation_set_constraint_target(unit, head_constraint_target, look_target)
-
-	return 
 end
 
 AimTemplates.player = {
@@ -71,8 +69,6 @@ AimTemplates.player = {
 			data.aim_direction_pitch_var = Unit.animation_find_variable(unit, "aim_direction_pitch")
 			data.locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 			data.status_extension = ScriptUnit.extension(unit, "status_system")
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local aim_direction = nil
@@ -121,11 +117,9 @@ AimTemplates.player = {
 				GameSession.set_game_object_field(game, go_id, "aim_direction", aim_direction)
 				GameSession.set_game_object_field(game, go_id, "aim_position", network_aim_position)
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	},
 	husk = {
@@ -136,15 +130,13 @@ AimTemplates.player = {
 			data.packmaster_claw_aim_constraint = Unit.animation_find_constraint_target(unit, "packmaster_claw_target")
 			data.camera_attach_node = Unit.node(unit, "camera_attach")
 			data.status_extension = ScriptUnit.extension(unit, "status_system")
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local game = Managers.state.network:game()
 			local go_id = Managers.state.unit_storage:go_id(unit)
 
 			if not game or not go_id then
-				return 
+				return
 			end
 
 			local aim_direction = GameSession.game_object_field(game, go_id, "aim_direction")
@@ -195,11 +187,9 @@ AimTemplates.player = {
 
 				Unit.animation_set_constraint_target(unit, data.packmaster_claw_aim_constraint, node_position)
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	}
 }
@@ -207,14 +197,12 @@ AimTemplates.packmaster_claw = {
 	owner = {
 		init = function (unit, data)
 			data.aim_constraint_anim_var = Unit.animation_find_constraint_target(unit, "aim_constraint_target")
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
-			return 
+			return
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	}
 }
@@ -224,8 +212,6 @@ AimTemplates.ratling_gunner = {
 			local blackboard = BLACKBOARDS[unit]
 			data.blackboard = blackboard
 			data.constraint_target = Unit.animation_find_constraint_target(unit, "aim_target")
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local unit_position = POSITION_LOOKUP[unit]
@@ -248,18 +234,14 @@ AimTemplates.ratling_gunner = {
 			if game and go_id then
 				GameSession.set_game_object_field(game, go_id, "aim_target", aim_target)
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	},
 	husk = {
 		init = function (unit, data)
 			data.constraint_target = Unit.animation_find_constraint_target(unit, "aim_target")
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local game = Managers.state.network:game()
@@ -275,11 +257,9 @@ AimTemplates.ratling_gunner = {
 
 				Unit.animation_set_constraint_target(unit, data.constraint_target, aim_target)
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	}
 }
@@ -289,8 +269,6 @@ AimTemplates.warpfire_thrower = {
 			local blackboard = BLACKBOARDS[unit]
 			data.blackboard = blackboard
 			data.constraint_target = Unit.animation_find_constraint_target(unit, "aim_target")
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local unit_position = POSITION_LOOKUP[unit]
@@ -332,18 +310,14 @@ AimTemplates.warpfire_thrower = {
 					GameSession.set_game_object_field(game, go_id, "target_unit_id", target_go_id)
 				end
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	},
 	husk = {
 		init = function (unit, data)
 			data.constraint_target = Unit.animation_find_constraint_target(unit, "aim_target")
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local game = Managers.state.network:game()
@@ -359,11 +333,9 @@ AimTemplates.warpfire_thrower = {
 
 				Unit.animation_set_constraint_target(unit, data.constraint_target, aim_target)
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	}
 }
@@ -374,12 +346,10 @@ AimTemplates.chaos_warrior = {
 			data.blackboard = blackboard
 			data.constraint_target = Unit.animation_find_constraint_target(unit, "aim_target")
 			data.previous_look_target = Vector3Box()
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			if not Unit.has_animation_state_machine(unit) then
-				return 
+				return
 			end
 
 			local blackboard = data.blackboard
@@ -390,7 +360,7 @@ AimTemplates.chaos_warrior = {
 			if not target_unit or not Unit.alive(target_unit) then
 				AiUtils.set_default_anim_constraint(unit, constraint_target)
 
-				return 
+				return
 			end
 
 			local aim_target = nil
@@ -427,23 +397,19 @@ AimTemplates.chaos_warrior = {
 					GameSession.set_game_object_field(game, go_id, "target_unit_id", target_go_id)
 				end
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	},
 	husk = {
 		init = function (unit, data)
 			data.constraint_target = Unit.animation_find_constraint_target(unit, "aim_target")
 			data.previous_look_target = Vector3Box()
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			if not Unit.has_animation_state_machine(unit) then
-				return 
+				return
 			end
 
 			local game = Managers.state.network:game()
@@ -457,7 +423,7 @@ AimTemplates.chaos_warrior = {
 				if not target_unit or not Unit.alive(target_unit) or target_unit_id <= 0 then
 					AiUtils.set_default_anim_constraint(unit, constraint_target)
 
-					return 
+					return
 				end
 
 				local aim_target = nil
@@ -487,11 +453,9 @@ AimTemplates.chaos_warrior = {
 			else
 				AiUtils.set_default_anim_constraint(unit, constraint_target)
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	}
 }
@@ -503,8 +467,6 @@ AimTemplates.chaos_marauder = {
 			data.ai_extension = ScriptUnit.extension(unit, "ai_system")
 			data.head_constraint_target = Unit.animation_find_constraint_target(unit, "head_aim_target")
 			data.previous_look_target = Vector3Box()
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local blackboard = data.blackboard
@@ -551,8 +513,6 @@ AimTemplates.chaos_marauder = {
 
 				Unit.animation_event(unit, "look_at_off")
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
 			if data.is_using_head_constraint then
@@ -560,16 +520,12 @@ AimTemplates.chaos_marauder = {
 
 				Unit.animation_event(unit, "look_at_off")
 			end
-
-			return 
 		end
 	},
 	husk = {
 		init = function (unit, data)
 			data.head_constraint_target = Unit.animation_find_constraint_target(unit, "head_aim_target")
 			data.previous_look_target = Vector3Box()
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local game = Managers.state.network:game()
@@ -602,8 +558,6 @@ AimTemplates.chaos_marauder = {
 					Unit.animation_event(unit, "look_at_off")
 				end
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
 			if data.is_using_head_constraint then
@@ -611,8 +565,6 @@ AimTemplates.chaos_marauder = {
 
 				Unit.animation_event(unit, "look_at_off")
 			end
-
-			return 
 		end
 	}
 }
@@ -624,8 +576,6 @@ AimTemplates.stormfiend = {
 			data.ai_extension = ScriptUnit.extension(unit, "ai_system")
 			data.head_constraint_target = Unit.animation_find_constraint_target(unit, "head_aim_target")
 			data.previous_look_target = Vector3Box()
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local blackboard = data.blackboard
@@ -701,8 +651,6 @@ AimTemplates.stormfiend = {
 
 				Unit.animation_event(unit, "look_at_off")
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
 			if data.is_using_head_constraint then
@@ -710,8 +658,6 @@ AimTemplates.stormfiend = {
 
 				Unit.animation_event(unit, "look_at_off")
 			end
-
-			return 
 		end
 	},
 	husk = {
@@ -719,8 +665,6 @@ AimTemplates.stormfiend = {
 			data.shoot_constraint_targets = BreedActions.skaven_stormfiend.shoot.aim_constraint_target
 			data.head_constraint_target = Unit.animation_find_constraint_target(unit, "head_aim_target")
 			data.previous_look_target = Vector3Box()
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local game = Managers.state.network:game()
@@ -781,8 +725,6 @@ AimTemplates.stormfiend = {
 					Unit.animation_event(unit, "look_at_off")
 				end
 			end
-
-			return 
 		end,
 		leave = function (unit, data)
 			if data.is_using_head_constraint then
@@ -790,8 +732,6 @@ AimTemplates.stormfiend = {
 
 				Unit.animation_event(unit, "look_at_off")
 			end
-
-			return 
 		end
 	}
 }
@@ -803,8 +743,6 @@ AimTemplates.innkeeper = {
 			data.interpolation_origin_position = Vector3Box()
 			data.last_position = Vector3Box()
 			data.interpolation_time = -math.huge
-
-			return 
 		end,
 		update = function (unit, t, dt, data)
 			local inn_keeper_position = Unit.local_position(unit, 0)
@@ -865,13 +803,11 @@ AimTemplates.innkeeper = {
 			end
 
 			data.current_target = best_player
-
-			return 
 		end,
 		leave = function (unit, data)
-			return 
+			return
 		end
 	}
 }
 
-return 
+return

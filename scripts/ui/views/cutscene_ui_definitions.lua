@@ -145,7 +145,7 @@ local widget_definitions = {
 					pass_type = "rect",
 					content_check_function = function (content, style_data)
 						if not content or not style_data then
-							return 
+							return
 						end
 
 						local alpha = content.fx_fade_alpha * 255
@@ -181,7 +181,7 @@ local widget_definitions = {
 					text_id = "text",
 					content_check_function = function (content, style_data)
 						if not content or not style_data then
-							return 
+							return
 						end
 
 						local alpha = content.fx_text_popup_alpha * 255

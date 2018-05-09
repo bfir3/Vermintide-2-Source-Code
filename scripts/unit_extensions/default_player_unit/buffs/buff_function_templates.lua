@@ -19,8 +19,6 @@ local function get_variable(path_to_movement_setting_to_modify, unit)
 	else
 		assert(orginal_variable_exists, "variable does not exist in PlayerUnitMovementSettings")
 	end
-
-	return 
 end
 
 local function set_variable(path_to_movement_setting_to_modify, unit, value)
@@ -41,8 +39,6 @@ local function set_variable(path_to_movement_setting_to_modify, unit, value)
 
 		index = index + 1
 	end
-
-	return 
 end
 
 local params = {}
@@ -53,8 +49,6 @@ local function dprintf(text, ...)
 	if script_data.buff_debug then
 		printf(text, ...)
 	end
-
-	return 
 end
 
 local function is_local(unit)
@@ -92,8 +86,6 @@ BuffFunctionTemplates.functions = {
 		if multiplier then
 			buff.current_lerped_multiplier = 1
 		end
-
-		return 
 	end,
 	update_action_lerp_movement_buff = function (unit, buff, params)
 		local bonus = params.bonus
@@ -142,8 +134,6 @@ BuffFunctionTemplates.functions = {
 
 			BuffFunctionTemplates.functions.apply_movement_buff(unit, buff, buff_extension_function_params)
 		end
-
-		return 
 	end,
 	remove_action_lerp_movement_buff = function (unit, buff, params)
 		local buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -155,8 +145,6 @@ BuffFunctionTemplates.functions = {
 		clearable_params.external_optional_multiplier = buff.current_lerped_multiplier
 
 		buff_extension.add_buff(buff_extension, buff.template.remove_buff_name, clearable_params)
-
-		return 
 	end,
 	apply_action_lerp_remove_movement_buff = function (unit, buff, params)
 		local bonus = params.bonus
@@ -171,8 +159,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.last_frame_percentage = 1
-
-		return 
 	end,
 	update_action_lerp_remove_movement_buff = function (unit, buff, params)
 		local bonus = params.bonus
@@ -181,7 +167,7 @@ BuffFunctionTemplates.functions = {
 		local value_to_update_movement_setting, old_value_to_update_movement_setting, old_multiplier_to_update_movement_setting, multiplier_to_update_movement_setting = nil
 
 		if buff.last_frame_percentage == 0 then
-			return 
+			return
 		end
 
 		local percentage_in_lerp = math.min(1, time_into_buff / buff.template.lerp_time)
@@ -215,8 +201,6 @@ BuffFunctionTemplates.functions = {
 				BuffFunctionTemplates.functions.apply_movement_buff(unit, buff, buff_extension_function_params)
 			end
 		end
-
-		return 
 	end,
 	apply_movement_buff = function (unit, buff, params)
 		local bonus = params.bonus
@@ -233,8 +217,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		set_variable(path_to_movement_setting_to_modify, unit, movement_setting_value)
-
-		return 
 	end,
 	remove_movement_buff = function (unit, buff, params)
 		local bonus = params.bonus
@@ -251,13 +233,9 @@ BuffFunctionTemplates.functions = {
 		end
 
 		set_variable(path_to_movement_setting_to_modify, unit, movement_setting_value)
-
-		return 
 	end,
 	knock_down_bleed_start = function (unit, buff, params)
 		buff.next_damage_time = params.t + buff.template.time_between_damage
-
-		return 
 	end,
 	knock_down_bleed_update = function (unit, buff, params)
 		if buff.next_damage_time < params.t then
@@ -268,13 +246,9 @@ BuffFunctionTemplates.functions = {
 
 			DamageUtils.add_damage_network(unit, unit, damage, "full", damage_type, Vector3(1, 0, 0), "knockdown_bleed")
 		end
-
-		return 
 	end,
 	temporary_health_degen_start = function (unit, buff, params)
 		buff.next_damage_time = params.t + buff.template.time_between_damage
-
-		return 
 	end,
 	temporary_health_degen_update = function (unit, buff, params)
 		if buff.next_damage_time < params.t then
@@ -285,13 +259,9 @@ BuffFunctionTemplates.functions = {
 
 			DamageUtils.add_damage_network(unit, unit, damage, "full", damage_type, Vector3(1, 0, 0), "temporary_health_degen")
 		end
-
-		return 
 	end,
 	health_degen_start = function (unit, buff, params)
 		buff.next_damage_time = params.t + buff.template.time_between_damage
-
-		return 
 	end,
 	health_degen_update = function (unit, buff, params)
 		if buff.next_damage_time < params.t then
@@ -302,15 +272,11 @@ BuffFunctionTemplates.functions = {
 
 			DamageUtils.add_damage_network(unit, unit, damage, "full", damage_type, Vector3(1, 0, 0), "health_degen")
 		end
-
-		return 
 	end,
 	health_regen_start = function (unit, buff, params)
 		if Managers.state.network.is_server then
 			buff.next_heal_time = params.t + buff.template.time_between_heal
 		end
-
-		return 
 	end,
 	health_regen_update = function (unit, buff, params)
 		if Managers.state.network.is_server and buff.next_heal_time < params.t then
@@ -324,8 +290,6 @@ BuffFunctionTemplates.functions = {
 				DamageUtils.heal_network(player_and_bot_units[i], unit, heal_amount, heal_type)
 			end
 		end
-
-		return 
 	end,
 	start_dot_damage = function (unit, buff, params)
 		local random_mod_next_dot_time = 0.75 * buff.template.time_between_dot_damages + math.random() * 0.5 * buff.template.time_between_dot_damages
@@ -351,8 +315,6 @@ BuffFunctionTemplates.functions = {
 				target_buff_extension.add_buff(target_buff_extension, "increase_damage_recieved_while_burning", clearable_params)
 			end
 		end
-
-		return 
 	end,
 	reapply_dot_damage = function (unit, buff, params)
 		if buff.template.damage_type == "burninating" then
@@ -371,12 +333,10 @@ BuffFunctionTemplates.functions = {
 				target_buff_extension.add_buff(target_buff_extension, "increase_damage_recieved_while_burning", clearable_params)
 			end
 		end
-
-		return 
 	end,
 	apply_dot_damage = function (unit, buff, params)
 		if not Managers.state.network.is_server then
-			return 
+			return
 		end
 
 		local t = params.t
@@ -412,8 +372,6 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	remove_dot_damage = function (unit, buff, params)
 		local end_flow_event = buff.template.end_flow_event
@@ -429,26 +387,20 @@ BuffFunctionTemplates.functions = {
 				Unit.flow_event(unit, death_flow_event)
 			end
 		end
-
-		return 
 	end,
 	start_dot_damage_globadier_gas = function (unit, buff, params, world)
 		buff.next_poison_damage_time = params.t + buff.template.time_between_dot_damages
 		local status_extension = ScriptUnit.extension(unit, "status_system")
 
 		status_extension.modify_poison(status_extension, true, params.attacker_unit)
-
-		return 
 	end,
 	remove_dot_damage_globadier_gas = function (unit, buff, params, world)
 		local status_extension = ScriptUnit.extension(unit, "status_system")
 
 		status_extension.modify_poison(status_extension, false)
-
-		return 
 	end,
 	apply_dot_damage_globadier_gas = function (unit, buff, params, world)
-		return 
+		return
 	end,
 	apply_moving_through_vomit = function (unit, buff, params, world)
 		local difficulty_name = Managers.state.difficulty:get_difficulty()
@@ -476,8 +428,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.vomit_next_t = params.t + 0
-
-		return 
 	end,
 	update_moving_through_vomit = function (unit, buff, params, world)
 		local t = params.t
@@ -521,8 +471,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.vomit_next_t = t + buff_template.time_between_dot_damages
 		end
-
-		return 
 	end,
 	remove_moving_through_vomit = function (unit, buff, params, world)
 		local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
@@ -530,13 +478,9 @@ BuffFunctionTemplates.functions = {
 		if first_person_extension then
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.vomit_particle_id)
 		end
-
-		return 
 	end,
 	apply_catacombs_corpse_pit = function (unit, buff, params, world)
 		buff.next_tick = params.t + 0
-
-		return 
 	end,
 	update_catacombs_corpse_pit = function (unit, buff, params, world)
 		local t = params.t
@@ -566,26 +510,20 @@ BuffFunctionTemplates.functions = {
 
 			buff.next_tick = t + buff_template.time_between_ticks
 		end
-
-		return 
 	end,
 	remove_catacombs_corpse_pit = function (unit, buff, params, world)
-		return 
+		return
 	end,
 	apply_ai_movement_debuff = function (unit, buff, params, world)
 		local ext = ScriptUnit.extension(unit, "ai_navigation_system")
 		local modifier = buff.template.multiplier
 		local id = ext.add_movement_modifier(ext, modifier)
 		buff.movement_modifier_id = id
-
-		return 
 	end,
 	remove_ai_movement_debuff = function (unit, buff, params, world)
 		local ext = ScriptUnit.extension(unit, "ai_navigation_system")
 
 		ext.remove_movement_modifier(ext, buff.movement_modifier_id)
-
-		return 
 	end,
 	apply_chaos_zombie_explosion_in_face = function (unit, buff, params, world)
 		local buff_template = buff.template
@@ -595,11 +533,9 @@ BuffFunctionTemplates.functions = {
 			buff.nurgle_particle_id_01 = first_person_extension.create_screen_particles(first_person_extension, "fx/screenspace_nurgle_explosion_01")
 			buff.nurgle_particle_id_02 = first_person_extension.create_screen_particles(first_person_extension, "fx/screenspace_nurgle_explosion_02")
 		end
-
-		return 
 	end,
 	update_chaos_zombie_explosion_in_face = function (unit, buff, params, world)
-		return 
+		return
 	end,
 	remove_chaos_zombie_explosion_in_face = function (unit, buff, params, world)
 		local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
@@ -608,8 +544,6 @@ BuffFunctionTemplates.functions = {
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.nurgle_particle_id_01)
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.nurgle_particle_id_02)
 		end
-
-		return 
 	end,
 	apply_plague_wave_in_face = function (unit, buff, params, world)
 		local difficulty_name = Managers.state.difficulty:get_difficulty()
@@ -655,8 +589,6 @@ BuffFunctionTemplates.functions = {
 		locomotion_extension.add_external_velocity(locomotion_extension, pushed_velocity)
 
 		buff.vomit_next_t = params.t
-
-		return 
 	end,
 	remove_plague_wave_in_face = function (unit, buff, params, world)
 		local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
@@ -665,8 +597,6 @@ BuffFunctionTemplates.functions = {
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.plague_wave_particle_id)
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.plague_wave_opaque_particle_id)
 		end
-
-		return 
 	end,
 	apply_vermintide_in_face = function (unit, buff, params, world)
 		local difficulty_name = Managers.state.difficulty:get_difficulty()
@@ -696,8 +626,6 @@ BuffFunctionTemplates.functions = {
 		locomotion_extension.add_external_velocity(locomotion_extension, pushed_velocity)
 
 		buff.vomit_next_t = params.t
-
-		return 
 	end,
 	update_vermintide_in_face = function (unit, buff, params, world)
 		local t = params.t
@@ -735,11 +663,9 @@ BuffFunctionTemplates.functions = {
 
 			buff.vomit_next_t = t + buff_template.time_between_dot_damages
 		end
-
-		return 
 	end,
 	remove_vermintide_in_face = function (unit, buff, params, world)
-		return 
+		return
 	end,
 	apply_vomit_in_face = function (unit, buff, params, world)
 		local difficulty_name = Managers.state.difficulty:get_difficulty()
@@ -785,8 +711,6 @@ BuffFunctionTemplates.functions = {
 		locomotion_extension.add_external_velocity(locomotion_extension, pushed_velocity)
 
 		buff.vomit_next_t = params.t
-
-		return 
 	end,
 	update_vomit_in_face = function (unit, buff, params, world)
 		local t = params.t
@@ -830,8 +754,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.vomit_next_t = t + buff_template.time_between_dot_damages
 		end
-
-		return 
 	end,
 	remove_vomit_in_face = function (unit, buff, params, world)
 		local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
@@ -840,8 +762,6 @@ BuffFunctionTemplates.functions = {
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.vomit_particle_id)
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.vomit_opaque_particle_id)
 		end
-
-		return 
 	end,
 	apply_vortex = function (unit, buff, params, world)
 		local difficulty_name = Managers.state.difficulty:get_difficulty()
@@ -857,8 +777,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.vortex_next_t = params.t
-
-		return 
 	end,
 	update_vortex = function (unit, buff, params, world)
 		local t = params.t
@@ -902,8 +820,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.vortex_next_t = t + buff_template.time_between_dot_damages
 		end
-
-		return 
 	end,
 	remove_vortex = function (unit, buff, params, world)
 		local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
@@ -911,8 +827,6 @@ BuffFunctionTemplates.functions = {
 		if first_person_extension then
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.vortex_particle_id)
 		end
-
-		return 
 	end,
 	apply_moving_through_warpfire = function (unit, buff, params, world)
 		local difficulty_name = Managers.state.difficulty:get_difficulty()
@@ -937,8 +851,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.warpfire_next_t = params.t + buff_template.time_between_dot_damages
-
-		return 
 	end,
 	update_moving_through_warpfire = function (unit, buff, params, world)
 		local t = params.t
@@ -969,8 +881,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.warpfire_next_t = t + buff_template.time_between_dot_damages
 		end
-
-		return 
 	end,
 	update_heal_ticks = function (unit, buff, params, world)
 		local t = params.t
@@ -979,7 +889,7 @@ BuffFunctionTemplates.functions = {
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
 		if health_extension.current_health_percent(health_extension) == 1 then
-			return 
+			return
 		end
 
 		if next_heal_tick < t then
@@ -993,8 +903,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.next_heal_tick = t + buff_template.time_between_heals
 		end
-
-		return 
 	end,
 	markus_huntsman_update_heal_ticks = function (unit, buff, params, world)
 		local t = params.t
@@ -1003,7 +911,7 @@ BuffFunctionTemplates.functions = {
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
 		if health_extension.current_health_percent(health_extension) == 1 then
-			return 
+			return
 		end
 
 		if next_heal_tick < t then
@@ -1017,8 +925,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.next_heal_tick = t + buff_template.time_between_heals
 		end
-
-		return 
 	end,
 	update_kerillian_waywatcher_regen = function (unit, buff, params, world)
 		local t = params.t
@@ -1082,8 +988,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.next_heal_tick = t + buff_template.time_between_heals
 		end
-
-		return 
 	end,
 	remove_moving_through_warpfire = function (unit, buff, params, world)
 		local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
@@ -1091,8 +995,6 @@ BuffFunctionTemplates.functions = {
 		if first_person_extension then
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.warpfire_particle_id)
 		end
-
-		return 
 	end,
 	apply_warpfirethrower_in_face = function (unit, buff, params, world)
 		local difficulty_name = Managers.state.difficulty:get_difficulty()
@@ -1140,8 +1042,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.warpfire_next_t = params.t
-
-		return 
 	end,
 	update_warpfirethrower_in_face = function (unit, buff, params, world)
 		local t = params.t
@@ -1166,8 +1066,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.warpfire_next_t = t + buff_template.time_between_dot_damages
 		end
-
-		return 
 	end,
 	remove_warpfirethrower_in_face = function (unit, buff, params, world)
 		local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
@@ -1177,8 +1075,6 @@ BuffFunctionTemplates.functions = {
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.warpfire_particle_id_2)
 			first_person_extension.play_hud_sound_event(first_person_extension, "Stop_player_hit_warpfire_thrower")
 		end
-
-		return 
 	end,
 	apply_warpfire_in_face = function (unit, buff, params, world)
 		local difficulty_name = Managers.state.difficulty:get_difficulty()
@@ -1230,8 +1126,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.warpfire_next_t = params.t
-
-		return 
 	end,
 	update_warpfire_in_face = function (unit, buff, params, world)
 		local t = params.t
@@ -1262,8 +1156,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.warpfire_next_t = t + buff_template.time_between_dot_damages
 		end
-
-		return 
 	end,
 	remove_warpfire_in_face = function (unit, buff, params, world)
 		local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
@@ -1272,8 +1164,6 @@ BuffFunctionTemplates.functions = {
 			first_person_extension.stop_spawning_screen_particles(first_person_extension, buff.warpfire_particle_id)
 			first_person_extension.play_hud_sound_event(first_person_extension, "Stop_player_hit_warpfire_thrower")
 		end
-
-		return 
 	end,
 	start_aoe_buff = function (unit, buff, params)
 		local buff_template = buff.template
@@ -1303,8 +1193,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.reapply_t = params.t + buff_template.reapply_rate
-
-		return 
 	end,
 	reapply_aoe_buff = function (unit, buff, params)
 		if buff.reapply_t <= params.t then
@@ -1336,11 +1224,9 @@ BuffFunctionTemplates.functions = {
 
 			buff.reapply_t = params.t + buff_template.reapply_rate
 		end
-
-		return 
 	end,
 	remove_aoe_buff = function (unit, buff, params)
-		return 
+		return
 	end,
 	update_multiplier_based_on_enemy_proximity = function (unit, buff, params)
 		local ai_system = Managers.state.entity:system("ai_system")
@@ -1385,8 +1271,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	update_bonus_based_on_enemy_proximity = function (unit, buff, params)
 		local ai_system = Managers.state.entity:system("ai_system")
@@ -1431,8 +1315,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_bonus = bonus
-
-		return 
 	end,
 	activate_buff_stacks_based_on_enemy_proximity = function (unit, buff, params)
 		local ai_system = Managers.state.entity:system("ai_system")
@@ -1485,8 +1367,6 @@ BuffFunctionTemplates.functions = {
 				buff_extension.remove_buff(buff_extension, buff_id)
 			end
 		end
-
-		return 
 	end,
 	activate_buff_stacks_based_on_overcharge_chunks = function (unit, buff, params)
 		if is_local(unit) then
@@ -1524,8 +1404,6 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	activate_buff_stacks_based_on_health_chunks = function (unit, buff, params)
 		local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -1563,12 +1441,10 @@ BuffFunctionTemplates.functions = {
 				buff_extension.remove_buff(buff_extension, buff_id)
 			end
 		end
-
-		return 
 	end,
 	activate_buff_on_distance = function (unit, buff, params)
 		if not Managers.state.network.is_server then
-			return 
+			return
 		end
 
 		local owner_unit = unit
@@ -1611,12 +1487,10 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	activate_buff_on_closest = function (unit, buff, params)
 		if not Managers.state.network.is_server then
-			return 
+			return
 		end
 
 		local owner_unit = unit
@@ -1660,12 +1534,10 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	markus_knight_proximity_buff_update = function (unit, buff, params)
 		if not Managers.state.network.is_server then
-			return 
+			return
 		end
 
 		local owner_unit = unit
@@ -1718,12 +1590,10 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	kerillian_maidenguard_proximity_buff_update = function (unit, buff, params)
 		if not Managers.state.network.is_server then
-			return 
+			return
 		end
 
 		local owner_unit = unit
@@ -1766,8 +1636,6 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	activate_buff_on_other_buff = function (unit, buff, params)
 		local template = buff.template
@@ -1786,8 +1654,6 @@ BuffFunctionTemplates.functions = {
 		elseif applied_buff then
 			buff_extension.remove_buff(buff_extension, applied_buff.id)
 		end
-
-		return 
 	end,
 	activate_bonus_on_last_standing = function (unit, buff, params)
 		local template = buff.template
@@ -1811,7 +1677,7 @@ BuffFunctionTemplates.functions = {
 			local is_disabled = status_extension.is_disabled(status_extension)
 
 			if is_disabled and unit == owner_unit then
-				return 
+				return
 			elseif is_disabled and unit ~= owner_unit then
 				disabled_allies[#disabled_allies + 1] = unit
 			end
@@ -1834,8 +1700,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_bonus = bonus
-
-		return 
 	end,
 	activate_multiplier_on_last_standing = function (unit, buff, params)
 		local template = buff.template
@@ -1861,7 +1725,7 @@ BuffFunctionTemplates.functions = {
 				local is_disabled = status_extension.is_disabled(status_extension)
 
 				if is_disabled and unit == owner_unit then
-					return 
+					return
 				elseif is_disabled and unit ~= owner_unit then
 					disabled_allies[#disabled_allies + 1] = unit
 				end
@@ -1885,8 +1749,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	activate_buff_on_last_standing = function (unit, buff, params)
 		local template = buff.template
@@ -1913,7 +1775,7 @@ BuffFunctionTemplates.functions = {
 				local is_disabled = status_extension.is_disabled(status_extension)
 
 				if is_disabled and unit == owner_unit then
-					return 
+					return
 				elseif is_disabled and unit ~= owner_unit then
 					disabled_allies[#disabled_allies + 1] = unit
 				end
@@ -1949,8 +1811,6 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	activate_buff_on_health_percent = function (unit, buff, params)
 		local template = buff.template
@@ -1992,8 +1852,6 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	activate_buff_on_disabled = function (unit, buff, params)
 		local template = buff.template
@@ -2032,8 +1890,6 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	activate_buff_on_no_ammo = function (unit, buff, params)
 		local template = buff.template
@@ -2122,8 +1978,6 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	activate_multiplier_on_disabled = function (unit, buff, params)
 		local template = buff.template
@@ -2148,8 +2002,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	activate_multiplier_on_wounded = function (unit, buff, params)
 		local template = buff.template
@@ -2174,8 +2026,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	activate_bonus_on_wounded = function (unit, buff, params)
 		local template = buff.template
@@ -2200,8 +2050,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_bonus = bonus
-
-		return 
 	end,
 	bardin_slayer_passive_update = function (unit, buff, params)
 		local ai_system = Managers.state.entity:system("ai_system")
@@ -2252,8 +2100,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_bonus = bonus
-
-		return 
 	end,
 	activate_on_single_enemy = function (unit, buff, params)
 		local ai_system = Managers.state.entity:system("ai_system")
@@ -2295,8 +2141,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	activate_bonus_on_health_percent = function (unit, buff, params)
 		local template = buff.template
@@ -2323,8 +2167,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_bonus = bonus
-
-		return 
 	end,
 	activate_multiplier_on_health_percent = function (unit, buff, params)
 		local template = buff.template
@@ -2351,8 +2193,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	activate_bonus_on_ammo_percent = function (unit, buff, params)
 		local template = buff.template
@@ -2386,8 +2226,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_bonus = bonus
-
-		return 
 	end,
 	activate_multiplier_on_ammo_percent = function (unit, buff, params)
 		local template = buff.template
@@ -2421,8 +2259,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	activate_multiplier_on_grimoire_picked_up = function (unit, buff, params)
 		local buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -2445,8 +2281,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	activate_bonus_on_grimoire_picked_up = function (unit, buff, params)
 		local buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -2469,8 +2303,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_bonus = bonus
-
-		return 
 	end,
 	update_multiplier_based_on_missing_health = function (unit, buff, params)
 		local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -2490,8 +2322,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	enter_sienna_unchained_activated_ability = function (unit, buff, params)
 		if Managers.state.network.is_server then
@@ -2501,7 +2331,7 @@ BuffFunctionTemplates.functions = {
 			local game = network_manager.game(network_manager)
 
 			if not go_id then
-				return 
+				return
 			end
 
 			local aim_direction = GameSession.game_object_field(game, go_id, "aim_direction")
@@ -2524,8 +2354,6 @@ BuffFunctionTemplates.functions = {
 
 			first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_sienna_unchained", nil, true)
 		end
-
-		return 
 	end,
 	end_sienna_adept_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
@@ -2536,8 +2364,6 @@ BuffFunctionTemplates.functions = {
 			status_extension.set_noclip(status_extension, false)
 			career_extension.set_state(career_extension, "default")
 		end
-
-		return 
 	end,
 	end_sienna_unchained_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
@@ -2545,15 +2371,11 @@ BuffFunctionTemplates.functions = {
 
 			career_extension.set_state(career_extension, "default")
 		end
-
-		return 
 	end,
 	apply_shade_activated_ability = function (unit, buff, params, world)
 		if is_husk(unit) or (is_server() and is_bot(unit)) then
 			Unit.flow_event(unit, "vfx_career_ability_start")
 		end
-
-		return 
 	end,
 	end_shade_activated_ability = function (unit, buff, params, world)
 		if is_local(unit) then
@@ -2595,8 +2417,6 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	apply_huntsman_activated_ability = function (unit, buff, params)
 		if is_local(unit) and not is_bot(unit) then
@@ -2609,8 +2429,6 @@ BuffFunctionTemplates.functions = {
 		if is_husk(unit) or (is_server() and is_bot(unit)) then
 			Unit.flow_event(unit, "vfx_career_ability_start")
 		end
-
-		return 
 	end,
 	end_huntsman_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
@@ -2664,8 +2482,6 @@ BuffFunctionTemplates.functions = {
 				end
 			end
 		end
-
-		return 
 	end,
 	end_slayer_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
@@ -2680,8 +2496,6 @@ BuffFunctionTemplates.functions = {
 
 			MOOD_BLACKBOARD.skill_slayer = false
 		end
-
-		return 
 	end,
 	add_victor_zealot_invulnerability_cooldown = function (unit, buff, params)
 		local player_unit = unit
@@ -2690,8 +2504,6 @@ BuffFunctionTemplates.functions = {
 		if Unit.alive(player_unit) then
 			buff_extension.add_buff(buff_extension, "victor_zealot_invulnerability_cooldown")
 		end
-
-		return 
 	end,
 	end_zealot_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
@@ -2706,8 +2518,6 @@ BuffFunctionTemplates.functions = {
 
 			MOOD_BLACKBOARD.skill_zealot = false
 		end
-
-		return 
 	end,
 	update_bardin_ironbreaker_activated_ability = function (unit, buff, params)
 		local time_between_vo = 3
@@ -2723,16 +2533,12 @@ BuffFunctionTemplates.functions = {
 				dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability_taunt", event_data)
 			end
 		end
-
-		return 
 	end,
 	end_bardin_ironbreaker_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
 			params.next_vo_time = nil
 			slot3 = ScriptUnit.extension(unit, "career_system")
 		end
-
-		return 
 	end,
 	end_ranger_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
@@ -2759,8 +2565,6 @@ BuffFunctionTemplates.functions = {
 
 			MOOD_BLACKBOARD.skill_ranger = false
 		end
-
-		return 
 	end,
 	start_maidenguard_activated_ability = function (unit, buff, params)
 		if is_local(unit) and not is_bot(unit) then
@@ -2769,8 +2573,6 @@ BuffFunctionTemplates.functions = {
 
 			Managers.state.camera:set_additional_fov_multiplier_with_lerp_time(fov_multiplier, lerp_time)
 		end
-
-		return 
 	end,
 	end_maidenguard_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
@@ -2790,8 +2592,6 @@ BuffFunctionTemplates.functions = {
 
 			career_extension.set_state(career_extension, "default")
 		end
-
-		return 
 	end,
 	end_knight_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
@@ -2799,8 +2599,6 @@ BuffFunctionTemplates.functions = {
 
 			status_extension.set_noclip(status_extension, false)
 		end
-
-		return 
 	end,
 	start_activated_ability_cooldown = function (unit, buff, params)
 		if is_local(unit) and buff.attacker_unit == unit then
@@ -2808,8 +2606,6 @@ BuffFunctionTemplates.functions = {
 
 			career_extension.start_activated_ability_cooldown(career_extension)
 		end
-
-		return 
 	end,
 	update_bonus_based_on_missing_health_chunks = function (unit, buff, params)
 		local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -2837,8 +2633,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_bonus = bonus
-
-		return 
 	end,
 	update_multiplier_based_on_missing_health_chunks = function (unit, buff, params)
 		local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -2866,8 +2660,6 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	update_bonus_based_on_overcharge_chunks = function (unit, buff, params)
 		if is_local(unit) then
@@ -2897,8 +2689,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.previous_bonus = bonus
 		end
-
-		return 
 	end,
 	update_multiplier_based_on_overcharge_chunks = function (unit, buff, params)
 		if is_local(unit) then
@@ -2923,8 +2713,6 @@ BuffFunctionTemplates.functions = {
 
 			buff.previous_multiplier = multiplier
 		end
-
-		return 
 	end,
 	apply_grenade_slow = function (unit, buff, params)
 		if Managers.state.network.is_server then
@@ -2932,8 +2720,6 @@ BuffFunctionTemplates.functions = {
 			local id = ext.add_movement_modifier(ext, 0.2)
 			buff.movement_modifier_id = id
 		end
-
-		return 
 	end,
 	remove_grenade_slow = function (unit, buff, params)
 		if Managers.state.network.is_server then
@@ -2941,8 +2727,6 @@ BuffFunctionTemplates.functions = {
 
 			ext.remove_movement_modifier(ext, buff.movement_modifier_id)
 		end
-
-		return 
 	end,
 	activate_bonus_based_on_low_health = function (unit, buff, params)
 		local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -2967,13 +2751,9 @@ BuffFunctionTemplates.functions = {
 		end
 
 		buff.previous_multiplier = multiplier
-
-		return 
 	end,
 	apply_volume_dot_damage = function (unit, buff, params)
 		buff.next_damage_time = params.t + params.bonus.time_between_damage
-
-		return 
 	end,
 	update_volume_dot_damage = function (unit, buff, params)
 		if buff.next_damage_time < params.t then
@@ -2986,22 +2766,17 @@ BuffFunctionTemplates.functions = {
 				DamageUtils.add_damage_network(unit, params.attacker_unit, damage, "full", buff.template.damage_type, Vector3(1, 0, 0))
 			end
 		end
-
-		return 
 	end,
 	apply_volume_movement_buff = function (unit, buff, params)
 		local movement_settings = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 		movement_settings.move_speed = movement_settings.move_speed * params.multiplier
-
-		return 
 	end,
 	remove_volume_movement_buff = function (unit, buff, params)
 		local movement_settings = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 		movement_settings.move_speed = movement_settings.move_speed / params.multiplier
-
-		return 
 	end
 }
+
 BuffFunctionTemplates.functions.update_charging_action_lerp_movement_buff = function (unit, buff, params)
 	local multiplier = params.multiplier
 	local time_into_buff = params.time_into_buff
@@ -3046,8 +2821,6 @@ BuffFunctionTemplates.functions.update_charging_action_lerp_movement_buff = func
 
 		BuffFunctionTemplates.functions.apply_movement_buff(unit, buff, buff_extension_function_params)
 	end
-
-	return 
 end
 
-return 
+return

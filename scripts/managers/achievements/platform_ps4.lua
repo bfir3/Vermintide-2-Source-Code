@@ -1,6 +1,6 @@
 local platform_functions = {
 	init = function (achievement_manager)
-		return 
+		return
 	end,
 	check_version_number = function ()
 		return true
@@ -34,13 +34,9 @@ local platform_functions = {
 		elseif result == Trophies.UNKNOWN then
 			return true, "unknown"
 		end
-
-		return 
 	end,
 	reset = function ()
 		errorf("Tried to reset Trophies, not implemented!")
-
-		return 
 	end
 }
 

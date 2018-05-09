@@ -1,6 +1,6 @@
 local platform_functions = {
 	init = function (achievement_manager)
-		return 
+		return
 	end,
 	check_version_number = function ()
 		local token = Application.time_since_launch() + 1 + math.random() * 2
@@ -28,7 +28,7 @@ local platform_functions = {
 		return token < time
 	end,
 	reset = function ()
-		return 
+		return
 	end
 }
 

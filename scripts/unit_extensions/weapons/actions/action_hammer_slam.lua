@@ -6,6 +6,7 @@ local MIN_CHARGE_TIME = 2
 local SLAM_TIME = 1
 local SLAM_HIT_TIME = 0.4
 local FORWARD_OFFSET = 0.5
+
 ActionHammerSlam.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.owner_unit_first_person = first_person_unit
@@ -13,9 +14,8 @@ ActionHammerSlam.init = function (self, world, item_name, is_server, owner_unit,
 	self.is_server = is_server
 	self.world = world
 	self.item_name = item_name
-
-	return 
 end
+
 ActionHammerSlam.client_owner_start_action = function (self, new_action, t)
 	self.current_action = new_action
 	self.minimum_charge_time = t + MIN_CHARGE_TIME
@@ -24,14 +24,12 @@ ActionHammerSlam.client_owner_start_action = function (self, new_action, t)
 	self.dealt_damage = false
 	self.started_hammer_slam = false
 	self.targeting_decal = World.spawn_unit(self.world, "units/decals/decal_special_slam")
-
-	return 
 end
+
 ActionHammerSlam.client_owner_post_update = function (self, dt, t, world, can_damage)
 	self._draw_targeting_decal(self, world)
-
-	return 
 end
+
 ActionHammerSlam.update_is_finished = function (self, dt, t, world, reason)
 	local owner_unit = self.owner_unit
 
@@ -93,10 +91,13 @@ ActionHammerSlam.update_is_finished = function (self, dt, t, world, reason)
 
 	return false
 end
+
 ActionHammerSlam.finish = function (self, reason)
-	return 
+	return
 end
+
 local hit_units = {}
+
 ActionHammerSlam.slam_overlap_callback = function (self, actors)
 	local num_actors = #actors
 
@@ -135,9 +136,8 @@ ActionHammerSlam.slam_overlap_callback = function (self, actors)
 	end
 
 	table.clear(hit_units)
-
-	return 
 end
+
 ActionHammerSlam._draw_targeting_decal = function (self, world)
 	local player_position = POSITION_LOOKUP[self.owner_unit]
 	local player_rotation = Unit.world_rotation(self.owner_unit_first_person, 0)
@@ -157,9 +157,8 @@ ActionHammerSlam._draw_targeting_decal = function (self, world)
 	Unit.set_local_position(targeting_decal, 0, push_circle_pos)
 	Unit.set_local_rotation(targeting_decal, 0, flat_rotation)
 	Unit.set_local_scale(targeting_decal, 0, Vector3(scale, scale, 1))
-
-	return 
 end
+
 ActionHammerSlam._play_slamming_animation = function (self, current_action)
 	local event = current_action.slam_anim
 	local go_id = Managers.state.unit_storage:go_id(self.owner_unit)
@@ -175,8 +174,6 @@ ActionHammerSlam._play_slamming_animation = function (self, current_action)
 
 	Unit.animation_event(self.owner_unit_first_person, event)
 	Unit.animation_event(self.owner_unit, event)
-
-	return 
 end
 
-return 
+return

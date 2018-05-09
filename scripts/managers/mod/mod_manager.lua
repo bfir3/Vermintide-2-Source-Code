@@ -25,6 +25,7 @@ local LOG_LEVELS = {
 		error = true
 	}
 }
+
 ModManager.print = function (self, level, str, ...)
 	if LOG_LEVELS[self._settings.log_level][level] then
 		local concat_str = sprintf("[MOD MANAGER] [" .. level .. "] " .. str, ...)
@@ -37,9 +38,8 @@ ModManager.print = function (self, level, str, ...)
 			self._print_cache[#self._print_cache + 1] = concat_str
 		end
 	end
-
-	return 
 end
+
 ModManager.init = function (self)
 	self._mods = {}
 	self._num_mods = nil
@@ -57,14 +57,13 @@ ModManager.init = function (self)
 		self._state = "done"
 		self._num_mods = 0
 	end
-
-	return 
 end
+
 ModManager._has_enabled_mods = function (self)
 	local mod_settings = Application.user_setting("mods")
 
 	if not mod_settings then
-		return 
+		return
 	end
 
 	for i, mod_data in ipairs(mod_settings) do
@@ -75,9 +74,11 @@ ModManager._has_enabled_mods = function (self)
 
 	return false
 end
+
 ModManager.state = function (self)
 	return self._state
 end
+
 ModManager.update = function (self, dt)
 	local print_cache = self._print_cache
 	local num_delayed_prints = #print_cache
@@ -160,26 +161,24 @@ ModManager.update = function (self, dt)
 	if old_state ~= self._state then
 		self.print(self, "info", "%s -> %s", old_state, self._state)
 	end
-
-	return 
 end
+
 ModManager.all_mods_loaded = function (self)
 	return self._state == "done"
 end
+
 ModManager.destroy = function (self)
 	self.unload_all_mods(self)
-
-	return 
 end
+
 ModManager._start_scan = function (self)
 	Mod.start_scan()
 
 	self._state = "scanning"
 
 	self.print(self, "info", "scanning")
-
-	return 
 end
+
 ModManager._load_mod = function (self, index)
 	local mods = self._mods
 	local mod = mods[index]
@@ -219,9 +218,8 @@ ModManager._load_mod = function (self, index)
 	else
 		return "done"
 	end
-
-	return 
 end
+
 ModManager._build_mod_table = function (self, mod_handles)
 	fassert(table.is_empty(self._mods), "Trying to add mods to non-empty mod table")
 
@@ -239,8 +237,6 @@ ModManager._build_mod_table = function (self, mod_handles)
 			enabled = enabled,
 			loaded_packages = {}
 		}
-
-		return 
 	end
 
 	local mod_settings = Application.user_setting("mods") or {}
@@ -285,9 +281,8 @@ ModManager._build_mod_table = function (self, mod_handles)
 
 	Application.set_user_setting("mods", new_settings_table)
 	Application.save_user_settings()
-
-	return 
 end
+
 ModManager._load_package = function (self, mod, index)
 	mod.package_index = index
 	local package_name = mod.data.packages[index]
@@ -300,9 +295,8 @@ ModManager._load_package = function (self, mod, index)
 	ResourcePackage.load(resource_handle)
 
 	mod.loaded_packages[#mod.loaded_packages + 1] = resource_handle
-
-	return 
 end
+
 ModManager.unload_all_mods = function (self)
 	if self._state == "done" then
 		self.print(self, "info", "Unload all mod packages")
@@ -323,9 +317,8 @@ ModManager.unload_all_mods = function (self)
 	else
 		self.print(self, "error", "Mods can't be unloaded, mod state is not \"done\". current: %q", self._state)
 	end
-
-	return 
 end
+
 ModManager.unload_mod = function (self, index)
 	local mod = self._mods[index]
 
@@ -347,9 +340,8 @@ ModManager.unload_mod = function (self, index)
 	else
 		self.print(self, "error", "Mod index %i can't be unloaded, has not been loaded", index)
 	end
-
-	return 
 end
+
 ModManager._reload_mods = function (self)
 	self.print(self, "info", "reloading mods")
 
@@ -372,9 +364,8 @@ ModManager._reload_mods = function (self)
 	self._start_scan(self)
 
 	self._reload_requested = false
-
-	return 
 end
+
 ModManager.on_game_state_changed = function (self, status, state)
 	if self._state == "done" then
 		for i = 1, self._num_mods, 1 do
@@ -392,8 +383,6 @@ ModManager.on_game_state_changed = function (self, status, state)
 	else
 		self.print(self, "warning", "Ignored on_game_state_changed call due to being in state %q", self._state)
 	end
-
-	return 
 end
 
-return 
+return

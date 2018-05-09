@@ -5,18 +5,15 @@ BTPrepareForCrazyJumpAction.name = "BTPrepareForCrazyJumpAction"
 local position_lookup = POSITION_LOOKUP
 local AiUtils = AiUtils
 local unit_alive = Unit.alive
+
 BTPrepareForCrazyJumpAction.init = function (self, ...)
 	BTPrepareForCrazyJumpAction.super.init(self, ...)
-
-	return 
 end
 
 local function debug3d(unit, text, color_name)
 	if script_data.debug_ai_movement then
 		Debug.world_sticky_text(position_lookup[unit], text, color_name)
 	end
-
-	return 
 end
 
 BTPrepareForCrazyJumpAction.enter = function (self, unit, blackboard, t)
@@ -46,9 +43,8 @@ BTPrepareForCrazyJumpAction.enter = function (self, unit, blackboard, t)
 
 		network_manager.network_transmit:send_rpc_all("rpc_tutorial_message", template_id, message_id)
 	end
-
-	return 
 end
+
 BTPrepareForCrazyJumpAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	aiprint("LEAVE BTPrepareForCrazyJumpAction")
 
@@ -63,9 +59,8 @@ BTPrepareForCrazyJumpAction.leave = function (self, unit, blackboard, t, reason,
 
 		blackboard.jump_data = nil
 	end
-
-	return 
 end
+
 BTPrepareForCrazyJumpAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion = ScriptUnit.extension(unit, "locomotion_system")
 	local breed = blackboard.breed
@@ -163,6 +158,7 @@ BTPrepareForCrazyJumpAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTPrepareForCrazyJumpAction.start_crawling = function (unit, blackboard, t, data)
 	local action = blackboard.action
 
@@ -175,9 +171,8 @@ BTPrepareForCrazyJumpAction.start_crawling = function (unit, blackboard, t, data
 	local prepare_jump_time = action.difficulty_prepare_jump_time[Managers.state.difficulty:get_difficulty_rank()]
 	data.crouching = true
 	data.ready_crouch_time = t + (prepare_jump_time or 0.5)
-
-	return 
 end
+
 BTPrepareForCrazyJumpAction.ready_to_jump = function (unit, blackboard, data, set_data)
 	local enemy_spine_node = Unit.node(blackboard.target_unit, "j_neck")
 	local p1 = position_lookup[unit]
@@ -210,6 +205,7 @@ BTPrepareForCrazyJumpAction.ready_to_jump = function (unit, blackboard, data, se
 
 	return in_los, velocity, time_of_flight
 end
+
 BTPrepareForCrazyJumpAction.test_trajectory = function (blackboard, p1, p2, segment_list, multiple_raycasts)
 	local physics_world = World.get_data(blackboard.world, "physics_world")
 	local gravity = blackboard.breed.jump_gravity
@@ -236,38 +232,39 @@ BTPrepareForCrazyJumpAction.test_trajectory = function (blackboard, p1, p2, segm
 	end
 
 	if not jump_angle and not jump_speed then
-		return 
+		return
 	end
 
 	local in_los, velocity, time_of_flight = WeaponHelper.test_angled_trajectory(physics_world, p1 + wedge, p2 + wedge, -gravity, jump_speed, jump_angle, segment_list)
 
 	if multiple_raycasts then
 		if not in_los then
-			return 
+			return
 		end
 
 		in_los = WeaponHelper.ray_segmented_test(physics_world, segment_list, Vector3(0, 0, 1.6))
 
 		if not in_los then
-			return 
+			return
 		end
 
 		local right = Vector3.cross(Vector3.normalize(p2 - p1), Vector3.up()) * 0.4
 		in_los = WeaponHelper.ray_segmented_test(physics_world, segment_list, Vector3(0, 0, 0.7) + right)
 
 		if not in_los then
-			return 
+			return
 		end
 
 		in_los = WeaponHelper.ray_segmented_test(physics_world, segment_list, Vector3(0, 0, 0.7) - right)
 
 		if not in_los then
-			return 
+			return
 		end
 	end
 
 	return in_los, velocity, time_of_flight
 end
+
 BTPrepareForCrazyJumpAction.test_simple_jump = function (to_target, jump_speed)
 	local angle = WeaponHelper:wanted_projectile_angle(to_target, 9.82, jump_speed)
 
@@ -279,8 +276,6 @@ BTPrepareForCrazyJumpAction.test_simple_jump = function (to_target, jump_speed)
 
 		return velocity
 	end
-
-	return 
 end
 
-return 
+return

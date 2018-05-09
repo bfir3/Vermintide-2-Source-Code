@@ -59,9 +59,8 @@ SubtitleTimedGui.init = function (self, subtitle_timing_name, target_widgets)
 	self.subtitle_timing_name = subtitle_timing_name
 	self.target_widgets = target_widgets
 	reload = false
-
-	return 
 end
+
 SubtitleTimedGui.update = function (self, dt)
 	local target_widgets = self.target_widgets
 
@@ -109,8 +108,6 @@ SubtitleTimedGui.update = function (self, dt)
 
 	if script_data.subtitle_debug then
 	end
-
-	return 
 end
 
-return 
+return

@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTCorruptorGrabAction = class(BTCorruptorGrabAction, BTNode)
+
 BTCorruptorGrabAction.init = function (self, ...)
 	BTCorruptorGrabAction.super.init(self, ...)
-
-	return 
 end
+
 BTCorruptorGrabAction.name = "BTCorruptorGrabAction"
+
 BTCorruptorGrabAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -25,9 +26,8 @@ BTCorruptorGrabAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.navigation_extension:set_enabled(false)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
-
-	return 
 end
+
 BTCorruptorGrabAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local sound_event = blackboard.action.grabbed_sound_event_2d_stop
 	blackboard.move_state = nil
@@ -66,9 +66,8 @@ BTCorruptorGrabAction.leave = function (self, unit, blackboard, t, reason, destr
 	blackboard.corruptor_target = nil
 	blackboard.grabbed_unit = nil
 	blackboard.vanish_countdown = t
-
-	return 
 end
+
 BTCorruptorGrabAction.run = function (self, unit, blackboard, t, dt)
 	local action = blackboard.action
 	local corruptor_target = blackboard.corruptor_target
@@ -131,6 +130,7 @@ BTCorruptorGrabAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTCorruptorGrabAction.attack = function (self, unit, t, dt, blackboard)
 	local action = blackboard.action
 	local locomotion_extension = blackboard.locomotion_extension
@@ -159,6 +159,7 @@ BTCorruptorGrabAction.attack = function (self, unit, t, dt, blackboard)
 
 	return false
 end
+
 BTCorruptorGrabAction.drain_life = function (self, unit, blackboard)
 	local corruptor_target = blackboard.corruptor_target
 	local action = blackboard.action
@@ -172,19 +173,17 @@ BTCorruptorGrabAction.drain_life = function (self, unit, blackboard)
 	local health_extension = ScriptUnit.extension(unit, "health_system")
 
 	health_extension.add_heal(health_extension, unit, heal_amount, nil, heal_type)
-
-	return 
 end
+
 BTCorruptorGrabAction.anim_cb_damage = function (self, unit, blackboard)
 	if blackboard.active_node and blackboard.active_node == BTCorruptorGrabAction then
 		self.set_beam_state(self, unit, blackboard, "projectile")
 	end
-
-	return 
 end
+
 BTCorruptorGrabAction.overlap_players = function (self, unit, t, dt, blackboard)
 	if not blackboard.projectile_target_position then
-		return 
+		return
 	end
 
 	local target_unit = blackboard.corruptor_target
@@ -199,9 +198,8 @@ BTCorruptorGrabAction.overlap_players = function (self, unit, t, dt, blackboard)
 	if dist < radius then
 		self.grab_player(self, unit, blackboard)
 	end
-
-	return 
 end
+
 BTCorruptorGrabAction.grab_player = function (self, unit, blackboard)
 	local target_unit = blackboard.corruptor_target
 	local self_pos = POSITION_LOOKUP[unit]
@@ -244,9 +242,8 @@ BTCorruptorGrabAction.grab_player = function (self, unit, blackboard)
 	else
 		blackboard.attack_aborted = true
 	end
-
-	return 
 end
+
 BTCorruptorGrabAction.set_beam_state = function (self, unit, blackboard, state)
 	local network_manager = Managers.state.network
 	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
@@ -255,8 +252,6 @@ BTCorruptorGrabAction.set_beam_state = function (self, unit, blackboard, state)
 	if unit_id then
 		Managers.state.network.network_transmit:send_rpc_all("rpc_set_corruptor_beam_state", unit_id, state, target_unit_id or unit_id)
 	end
-
-	return 
 end
 
-return 
+return

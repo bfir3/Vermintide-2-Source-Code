@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTThrowRockAction = class(BTThrowRockAction, BTNode)
+
 BTThrowRockAction.init = function (self, ...)
 	BTThrowRockAction.super.init(self, ...)
-
-	return 
 end
+
 BTThrowRockAction.name = "BTThrowRockAction"
+
 BTThrowRockAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 
@@ -14,16 +15,14 @@ BTThrowRockAction.enter = function (self, unit, blackboard, t)
 	Managers.state.network:anim_event(unit, action.attack_anim)
 
 	blackboard.attack_cooldown = t + action.cooldown
-
-	return 
 end
+
 BTThrowRockAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	print("BTThrowRockAction LEAVE")
 
 	blackboard.running_attack_action = nil
-
-	return 
 end
+
 BTThrowRockAction.run = function (self, unit, blackboard, t, dt)
 	local rot = LocomotionUtils.rotation_towards_unit(unit, blackboard.target_unit)
 	local locomotion = blackboard.locomotion_extension
@@ -33,8 +32,6 @@ BTThrowRockAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.attack_cooldown < t then
 		blackboard.running_attack_action = nil
 	end
-
-	return 
 end
 
-return 
+return

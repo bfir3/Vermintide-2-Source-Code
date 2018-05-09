@@ -269,4 +269,4 @@ weapon_template.tooltip_detail = {
 Weapons = Weapons or {}
 Weapons.repeating_handgun_template_1 = table.clone(weapon_template)
 
-return 
+return

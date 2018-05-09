@@ -3,6 +3,7 @@ require("scripts/unit_extensions/default_player_unit/charge/overcharge_data")
 PlayerUnitOverchargeExtension = class(PlayerUnitOverchargeExtension)
 script_data.overcharge_debug = script_data.overcharge_debug or Development.parameter("overcharge_debug")
 script_data.disable_overcharge = script_data.disable_overcharge or Development.parameter("disable_overcharge")
+
 PlayerUnitOverchargeExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.world = extension_init_context.world
 	self.unit = unit
@@ -43,9 +44,8 @@ PlayerUnitOverchargeExtension.init = function (self, extension_init_context, uni
 	self._overcharge_rumble_effect_id = nil
 	self._overcharge_rumble_critical_effect_id = nil
 	self._overcharge_rumble_overcharged_effect_id = nil
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.extensions_ready = function (self, world, unit)
 	local buff_extension = ScriptUnit.extension(self.unit, "buff_system")
 	self.buff_extension = buff_extension
@@ -56,14 +56,12 @@ PlayerUnitOverchargeExtension.extensions_ready = function (self, world, unit)
 	self.overcharge_value = (ammo_percent and (1 - ammo_percent) * max_value) or 0
 	self.overcharge_limit = max_value * 0.65
 	self.overcharge_critical_limit = max_value * 0.8
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.set_screen_particle_opacity_modifier = function (self, value)
 	self._screen_particle_opacity_modifier = value / 100
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.reset = function (self)
 	local buff_extension = self.buff_extension
 	local has_buff_extension = ScriptUnit.has_extension(self.unit, "buff_system")
@@ -90,9 +88,8 @@ PlayerUnitOverchargeExtension.reset = function (self)
 
 	StatusUtils.set_overcharge_exploding(self.unit, false)
 	self.set_animation_variable(self)
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.destroy = function (self)
 	if self.onscreen_particles_id then
 		World.destroy_particles(self.world, self.onscreen_particles_id)
@@ -117,18 +114,16 @@ PlayerUnitOverchargeExtension.destroy = function (self)
 			self.overcharged_buff_id = nil
 		end
 	end
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.set_animation_variable = function (self)
 	local first_person_unit = self.first_person_unit
 	local overcharge_blend_id = self.overcharge_blend_id
 	local anim_blend_overcharge = self.get_anim_blend_overcharge(self)
 
 	Unit.animation_set_variable(first_person_unit, overcharge_blend_id, anim_blend_overcharge)
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context, t)
 	local world = self.world
 
@@ -293,18 +288,17 @@ PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context,
 			World.set_particles_material_scalar(world, critical_onscreen_particles_id, charge_effect_material_name, charge_effect_material_variable_name, 0)
 		end
 	end
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.add_charge = function (self, overcharge_amount, charge_level)
 	if script_data.disable_overcharge then
-		return 
+		return
 	end
 
 	local buff_extension = self.buff_extension
 
 	if buff_extension.has_buff_type(buff_extension, "twitch_no_overcharge_no_ammo_reloads") then
-		return 
+		return
 	end
 
 	local threshold = self.overcharge_threshold
@@ -444,43 +438,48 @@ PlayerUnitOverchargeExtension.add_charge = function (self, overcharge_amount, ch
 
 	self.time_when_overcharge_start_decreasing = Managers.time:time("game") + self.time_until_overcharge_decreases
 	self.overcharge_value = current_overcharge_value
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.remove_charge = function (self, amount)
 	self.overcharge_value = math.max(self.overcharge_value - amount, 0)
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.hud_sound = function (self, event, fp_extension)
 	fp_extension.play_hud_sound_event(fp_extension, event)
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.get_overcharge_value = function (self)
 	return self.overcharge_value
 end
+
 PlayerUnitOverchargeExtension.is_above_critical_limit = function (self)
 	return self.overcharge_critical_limit <= self.overcharge_value
 end
+
 PlayerUnitOverchargeExtension.get_max_value = function (self)
 	return self.max_value
 end
+
 PlayerUnitOverchargeExtension.get_overcharge_threshold = function (self)
 	return self.overcharge_threshold
 end
+
 PlayerUnitOverchargeExtension.above_overcharge_threshold = function (self)
 	return self.overcharge_threshold <= self.overcharge_value
 end
+
 PlayerUnitOverchargeExtension.are_you_exploding = function (self)
 	return self.is_exploding
 end
+
 PlayerUnitOverchargeExtension.overcharge_fraction = function (self)
 	return self.overcharge_value / self.max_value
 end
+
 PlayerUnitOverchargeExtension.threshold_fraction = function (self)
 	return self.overcharge_threshold / self.max_value
 end
+
 PlayerUnitOverchargeExtension.current_overcharge_status = function (self)
 	local value = self.get_overcharge_value(self)
 	local threshold = self.get_overcharge_threshold(self)
@@ -488,6 +487,7 @@ PlayerUnitOverchargeExtension.current_overcharge_status = function (self)
 
 	return value, threshold, max_value
 end
+
 PlayerUnitOverchargeExtension.vent_overcharge = function (self)
 	self.venting_overcharge = true
 
@@ -498,15 +498,13 @@ PlayerUnitOverchargeExtension.vent_overcharge = function (self)
 	end
 
 	self.venting_anim = "cooldown_start"
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.vent_overcharge_done = function (self)
 	self.venting_overcharge = false
 	self.venting_anim = "cooldown_end"
-
-	return 
 end
+
 PlayerUnitOverchargeExtension.get_anim_blend_overcharge = function (self)
 	local overcharge_value = self.overcharge_value
 	local overcharge_threshold = self.overcharge_threshold
@@ -516,4 +514,4 @@ PlayerUnitOverchargeExtension.get_anim_blend_overcharge = function (self)
 	return anim_blend_value
 end
 
-return 
+return

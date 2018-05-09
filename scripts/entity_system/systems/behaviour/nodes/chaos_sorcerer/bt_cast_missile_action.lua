@@ -2,11 +2,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTCastMissileAction = class(BTCastMissileAction, BTNode)
 BTCastMissileAction.name = "BTCastMissileAction"
+
 BTCastMissileAction.init = function (self, ...)
 	BTCastMissileAction.super.init(self, ...)
-
-	return 
 end
+
 BTCastMissileAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -29,17 +29,15 @@ BTCastMissileAction.enter = function (self, unit, blackboard, t)
 	if action.init_spell_func then
 		action.init_spell_func(blackboard)
 	end
-
-	return 
 end
+
 BTCastMissileAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.active_node = nil
 	blackboard.cast_time_done = nil
 	blackboard.summoning = nil
 	blackboard.ready_to_summon = false
-
-	return 
 end
+
 BTCastMissileAction.run = function (self, unit, blackboard, t, dt)
 	local action = blackboard.action
 	local cast_target_unit = blackboard.cast_target_unit
@@ -116,6 +114,7 @@ BTCastMissileAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTCastMissileAction.launch_projectile = function (self, blackboard, action, initial_position, target_dir, angle, speed, owner_unit, target_unit)
 	local difficulty_rank = Managers.state.difficulty:get_difficulty_rank()
 	local aoe_dot_damage_table = action.aoe_dot_damage[difficulty_rank]
@@ -165,9 +164,8 @@ BTCastMissileAction.launch_projectile = function (self, blackboard, action, init
 	}
 	local projectile_unit_name = "units/hub_elements/empty"
 	local projectile_unit = Managers.state.unit_spawner:spawn_network_unit(projectile_unit_name, "aoe_projectile_unit", extension_init_data, initial_position)
-
-	return 
 end
+
 BTCastMissileAction.launch_magic_missile = function (self, blackboard, action, position, target_dir, angle, speed, owner_unit, target_unit, position_target, missile_data)
 	local scale = 1
 	local radius_min = 0.2
@@ -241,8 +239,6 @@ BTCastMissileAction.launch_magic_missile = function (self, blackboard, action, p
 	end
 
 	Unit.set_unit_visibility(projectile_unit, true)
-
-	return 
 end
 
-return 
+return

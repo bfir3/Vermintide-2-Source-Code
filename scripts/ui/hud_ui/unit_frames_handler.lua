@@ -15,6 +15,7 @@ local MAX_HEALTH_DIVIDERS = 10
 local NUM_TEAM_MEMBERS = 3
 UnitFramesHandler = class(UnitFramesHandler)
 local DO_RELOAD = true
+
 UnitFramesHandler.init = function (self, ingame_ui_context)
 	self.ingame_ui_context = ingame_ui_context
 	self.ingame_ui = ingame_ui_context.ingame_ui
@@ -38,9 +39,8 @@ UnitFramesHandler.init = function (self, ingame_ui_context)
 	rawset(_G, "unit_frames_handler", self)
 
 	self._current_frame_index = 1
-
-	return 
 end
+
 UnitFramesHandler.get_unit_widget = function (self, index)
 	return self._unit_frames[index].widget
 end
@@ -71,9 +71,8 @@ UnitFramesHandler._create_player_unit_frame = function (self)
 	unit_frame.sync = true
 	self._unit_frames[1] = unit_frame
 	self.unit_frame_index_by_ui_id[player_ui_id] = 1
-
-	return 
 end
+
 UnitFramesHandler._create_team_members_unit_frames = function (self)
 	local player_manager = self.player_manager
 	local players = self.player_manager:human_and_bot_players()
@@ -85,9 +84,8 @@ UnitFramesHandler._create_team_members_unit_frames = function (self)
 	end
 
 	self._align_team_member_frames(self)
-
-	return 
 end
+
 UnitFramesHandler._create_unit_frame_by_type = function (self, frame_type, frame_index)
 	local ingame_ui_context = self.ingame_ui_context
 	local unit_frame = {}
@@ -113,6 +111,7 @@ UnitFramesHandler._create_unit_frame_by_type = function (self, frame_type, frame
 
 	return unit_frame
 end
+
 UnitFramesHandler._get_unused_unit_frame = function (self)
 	for index, unit_frame in ipairs(self._unit_frames) do
 		local player_data = unit_frame.player_data
@@ -121,18 +120,16 @@ UnitFramesHandler._get_unused_unit_frame = function (self)
 			return unit_frame, index
 		end
 	end
-
-	return 
 end
+
 UnitFramesHandler._get_unit_frame_by_connecting_peer_id = function (self, peer_id)
 	for index, unit_frame in ipairs(self._unit_frames) do
 		if unit_frame.player_data.connecting_peer_id == peer_id then
 			return unit_frame, index
 		end
 	end
-
-	return 
 end
+
 UnitFramesHandler._reset_unit_frame = function (self, unit_frame)
 	local widget = unit_frame.widget
 
@@ -141,12 +138,12 @@ UnitFramesHandler._reset_unit_frame = function (self, unit_frame)
 	table.clear(unit_frame.data)
 
 	unit_frame.sync = false
-
-	return 
 end
+
 local temp_active_ui_ids = {}
 local temp_active_peer_ids = {}
 local temp_connecting_peer_ids = {}
+
 UnitFramesHandler._handle_unit_frame_assigning = function (self)
 	local player_manager = self.player_manager
 	local players = self.player_manager:human_and_bot_players()
@@ -222,9 +219,8 @@ UnitFramesHandler._handle_unit_frame_assigning = function (self)
 	if frames_changed then
 		self._align_team_member_frames(self)
 	end
-
-	return 
 end
+
 UnitFramesHandler._handle_connecting_peers = function (self, active_peer_ids, num_unit_frames_used)
 	local added_connection = false
 
@@ -266,6 +262,7 @@ UnitFramesHandler._handle_connecting_peers = function (self, active_peer_ids, nu
 
 	return added_connection
 end
+
 UnitFramesHandler._cleanup_unused_unit_frames = function (self, active_ui_ids, connecting_peer_ids)
 	local frames_cleared = false
 
@@ -289,6 +286,7 @@ UnitFramesHandler._cleanup_unused_unit_frames = function (self, active_ui_ids, c
 
 	return frames_cleared
 end
+
 UnitFramesHandler._align_team_member_frames = function (self)
 	local start_offset_y = -100
 	local start_offset_x = 80
@@ -317,15 +315,13 @@ UnitFramesHandler._align_team_member_frames = function (self)
 			end
 		end
 	end
-
-	return 
 end
 
 local function get_ammunition_count(left_hand_wielded_unit, right_hand_wielded_unit, item_template)
 	local ammo_extension = nil
 
 	if not item_template.ammo_data then
-		return 
+		return
 	end
 
 	local ammo_unit_hand = item_template.ammo_data.ammo_hand
@@ -335,7 +331,7 @@ local function get_ammunition_count(left_hand_wielded_unit, right_hand_wielded_u
 	elseif ammo_unit_hand == "left" then
 		ammo_extension = ScriptUnit.extension(left_hand_wielded_unit, "ammo_system")
 	else
-		return 
+		return
 	end
 
 	local ammo_count = ammo_extension.ammo_count(ammo_extension)
@@ -366,13 +362,13 @@ UnitFramesHandler._set_player_extensions = function (self, player_data, player_u
 	}
 	player_data.extensions = extensions
 	player_data.player_unit = player_unit
-
-	return 
 end
+
 local empty_features_list = {}
+
 UnitFramesHandler._sync_player_stats = function (self, unit_frame)
 	if not unit_frame.sync then
-		return 
+		return
 	end
 
 	local features_list = unit_frame.features_list or empty_features_list
@@ -382,7 +378,7 @@ UnitFramesHandler._sync_player_stats = function (self, unit_frame)
 	local player = player_data.player
 
 	if not player then
-		return 
+		return
 	end
 
 	local peer_id = player_data.peer_id
@@ -402,7 +398,7 @@ UnitFramesHandler._sync_player_stats = function (self, unit_frame)
 	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, peer_id, local_player_id)
 
 	if not profile_index then
-		return 
+		return
 	end
 
 	local health_percent, shield_percent, total_health_percent, active_percentage, is_dead, is_knocked_down, needs_help, is_wounded, is_ready_for_assisted_respawn = nil
@@ -762,17 +758,15 @@ UnitFramesHandler._sync_player_stats = function (self, unit_frame)
 	end
 
 	self.gamepad_was_active = gamepad_active
-
-	return 
 end
+
 UnitFramesHandler.destroy = function (self)
 	self.ui_animator = nil
 
 	self.set_visible(self, false)
 	rawset(_G, "unit_frames_handler", nil)
-
-	return 
 end
+
 UnitFramesHandler.set_visible = function (self, visible, ignore_own_player)
 	self._is_visible = visible
 
@@ -789,9 +783,8 @@ UnitFramesHandler.set_visible = function (self, visible, ignore_own_player)
 			unit_frame.widget:set_visible(false)
 		end
 	end
-
-	return 
 end
+
 UnitFramesHandler.on_gamepad_activated = function (self)
 	local my_unit_frame = self._unit_frames[1]
 
@@ -803,9 +796,8 @@ UnitFramesHandler.on_gamepad_activated = function (self)
 		new_unit_frame.sync = true
 		self._unit_frames[1] = new_unit_frame
 	end
-
-	return 
 end
+
 UnitFramesHandler.on_gamepad_deactivated = function (self)
 	local my_unit_frame = self._unit_frames[1]
 
@@ -817,12 +809,11 @@ UnitFramesHandler.on_gamepad_deactivated = function (self)
 		new_unit_frame.sync = true
 		self._unit_frames[1] = new_unit_frame
 	end
-
-	return 
 end
+
 UnitFramesHandler.update = function (self, dt, t, ignore_own_player)
 	if not self._is_visible then
-		return 
+		return
 	end
 
 	local gamepad_active = self.input_manager:is_device_active("gamepad")
@@ -848,12 +839,11 @@ UnitFramesHandler.update = function (self, dt, t, ignore_own_player)
 			table.clear(unit_frame.data)
 		end
 	end
-
-	return 
 end
+
 UnitFramesHandler._handle_resolution_modified = function (self)
 	if not self._is_visible then
-		return 
+		return
 	end
 
 	if RESOLUTION_LOOKUP.modified then
@@ -861,19 +851,16 @@ UnitFramesHandler._handle_resolution_modified = function (self)
 			unit_frame.widget:on_resolution_modified()
 		end
 	end
-
-	return 
 end
+
 UnitFramesHandler._draw = function (self, dt)
 	if not self._is_visible then
-		return 
+		return
 	end
 
 	for index, unit_frame in ipairs(self._unit_frames) do
 		unit_frame.widget:draw(dt)
 	end
-
-	return 
 end
 
-return 
+return

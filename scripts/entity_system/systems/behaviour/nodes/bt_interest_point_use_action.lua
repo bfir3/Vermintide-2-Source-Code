@@ -1,12 +1,13 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTInterestPointUseAction = class(BTInterestPointUseAction, BTNode)
+
 BTInterestPointUseAction.init = function (self, ...)
 	BTInterestPointUseAction.super.init(self, ...)
-
-	return 
 end
+
 BTInterestPointUseAction.name = "BTInterestPointUseAction"
+
 BTInterestPointUseAction.enter = function (self, unit, blackboard, t)
 	local interest_point_system_api = blackboard.system_api.ai_interest_point_system
 	local request = interest_point_system_api.get_claim(blackboard.ip_request_id)
@@ -31,9 +32,8 @@ BTInterestPointUseAction.enter = function (self, unit, blackboard, t)
 	local navigation_extension = blackboard.navigation_extension
 
 	navigation_extension.set_enabled(navigation_extension, false)
-
-	return 
 end
+
 BTInterestPointUseAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local interest_point_system_api = blackboard.system_api.ai_interest_point_system
 
@@ -60,9 +60,8 @@ BTInterestPointUseAction.leave = function (self, unit, blackboard, t, reason, de
 
 		blackboard.ip_next_request_id = nil
 	end
-
-	return 
 end
+
 BTInterestPointUseAction.run = function (self, unit, blackboard, t, dt)
 	if script_data.ai_interest_point_debug then
 		Debug.text("BTInterestPointApproachAction state = %s", blackboard.ip_state)
@@ -105,4 +104,4 @@ BTInterestPointUseAction.run = function (self, unit, blackboard, t, dt)
 	return "running"
 end
 
-return 
+return

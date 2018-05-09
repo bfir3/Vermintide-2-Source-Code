@@ -32,12 +32,11 @@ local function item_sort_func(item_1, item_2)
 	else
 		return item_1_rarity_order < item_2_rarity_order
 	end
-
-	return 
 end
 
 HeroWindowCosmeticsInventory = class(HeroWindowCosmeticsInventory)
 HeroWindowCosmeticsInventory.NAME = "HeroWindowCosmeticsInventory"
+
 HeroWindowCosmeticsInventory.on_enter = function (self, params, offset)
 	print("[HeroViewWindow] Enter Substate HeroWindowCosmeticsInventory")
 
@@ -70,9 +69,8 @@ HeroWindowCosmeticsInventory.on_enter = function (self, params, offset)
 	item_grid.disable_locked_items(item_grid, true)
 	item_grid.disable_item_drag(item_grid)
 	item_grid.apply_item_sorting_function(item_grid, item_sort_func)
-
-	return 
 end
+
 HeroWindowCosmeticsInventory.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -103,9 +101,8 @@ HeroWindowCosmeticsInventory.create_ui_elements = function (self, params, offset
 	end
 
 	self._assign_tab_icons(self)
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._assign_tab_icons = function (self)
 	local widget = self._widgets_by_name.item_tabs
 	local widget_content = widget.content
@@ -120,9 +117,8 @@ HeroWindowCosmeticsInventory._assign_tab_icons = function (self)
 		local icon = category.icon
 		hotspot_content[icon_name] = icon
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory.on_exit = function (self, params)
 	print("[HeroViewWindow] Exit Substate HeroWindowCosmeticsInventory")
 
@@ -131,9 +127,8 @@ HeroWindowCosmeticsInventory.on_exit = function (self, params)
 	self._item_grid:destroy()
 
 	self._item_grid = nil
-
-	return 
 end
+
 HeroWindowCosmeticsInventory.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -148,12 +143,12 @@ HeroWindowCosmeticsInventory.update = function (self, dt, t)
 	self._update_loadout_sync(self)
 	self._update_page_info(self)
 	self.draw(self, dt)
+end
 
-	return 
-end
 HeroWindowCosmeticsInventory.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 HeroWindowCosmeticsInventory._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -169,9 +164,8 @@ HeroWindowCosmeticsInventory._update_animations = function (self, dt)
 	end
 
 	local widgets_by_name = self._widgets_by_name
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -181,9 +175,8 @@ HeroWindowCosmeticsInventory._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._is_button_hovered = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -191,9 +184,8 @@ HeroWindowCosmeticsInventory._is_button_hovered = function (self, widget)
 	if hotspot.on_hover_enter then
 		return true
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._is_inventory_tab_hovered = function (self)
 	local widget = self._widgets_by_name.item_tabs
 	local widget_content = widget.content
@@ -208,9 +200,8 @@ HeroWindowCosmeticsInventory._is_inventory_tab_hovered = function (self)
 			return i
 		end
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._is_inventory_tab_pressed = function (self)
 	local widget = self._widgets_by_name.item_tabs
 	local widget_content = widget.content
@@ -225,9 +216,8 @@ HeroWindowCosmeticsInventory._is_inventory_tab_pressed = function (self)
 			return i
 		end
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._select_tab_by_category_index = function (self, index)
 	local widget = self._widgets_by_name.item_tabs
 	local widget_content = widget.content
@@ -239,9 +229,8 @@ HeroWindowCosmeticsInventory._select_tab_by_category_index = function (self, ind
 		local hotspot_content = widget_content[hotspot_name]
 		hotspot_content.is_selected = i == index
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local parent = self.parent
@@ -317,9 +306,8 @@ HeroWindowCosmeticsInventory._handle_input = function (self, dt, t)
 		item_grid.set_item_page(item_grid, next_page_index)
 		self._play_sound(self, "play_gui_cosmetics_inventory_next_click")
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._update_page_info = function (self)
 	local current_page, total_pages = self._item_grid:get_page_info()
 
@@ -334,9 +322,8 @@ HeroWindowCosmeticsInventory._update_page_info = function (self)
 		widgets_by_name.page_button_next.content.button_hotspot.disable_button = current_page == total_pages
 		widgets_by_name.page_button_previous.content.button_hotspot.disable_button = current_page == 1
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._update_selected_cosmetic_slot_index = function (self)
 	local index = self.parent:get_selected_cosmetic_slot_index()
 
@@ -345,9 +332,8 @@ HeroWindowCosmeticsInventory._update_selected_cosmetic_slot_index = function (se
 
 		self._change_category_by_index(self, index)
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._update_loadout_sync = function (self)
 	local item_grid = self._item_grid
 	local parent = self.parent
@@ -358,15 +344,13 @@ HeroWindowCosmeticsInventory._update_loadout_sync = function (self)
 
 		item_grid.update_items_status(item_grid)
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._exit = function (self, selected_level)
 	self.exit = true
 	self.exit_level_id = selected_level
-
-	return 
 end
+
 HeroWindowCosmeticsInventory.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -393,14 +377,12 @@ HeroWindowCosmeticsInventory.draw = function (self, dt)
 	if gamepad_active then
 		self._menu_input_description:draw(ui_top_renderer, dt)
 	end
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroWindowCosmeticsInventory._change_category_by_index = function (self, index, force_update)
 	self._select_tab_by_category_index(self, index)
 
@@ -409,7 +391,7 @@ HeroWindowCosmeticsInventory._change_category_by_index = function (self, index, 
 	end
 
 	if self._current_category_index == index then
-		return 
+		return
 	end
 
 	self._current_category_index = index
@@ -424,4 +406,4 @@ HeroWindowCosmeticsInventory._change_category_by_index = function (self, index, 
 	return true
 end
 
-return 
+return

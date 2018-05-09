@@ -1,4 +1,5 @@
 UIWidgetUtils = UIWidgetUtils or {}
+
 UIWidgetUtils.animate_default_button = function (widget, dt)
 	local content = widget.content
 	local style = widget.style
@@ -61,9 +62,8 @@ UIWidgetUtils.animate_default_button = function (widget, dt)
 	hotspot.hover_progress = hover_progress
 	hotspot.input_progress = input_progress
 	hotspot.selection_progress = selection_progress
-
-	return 
 end
+
 UIWidgetUtils.animate_default_icon_tabs = function (widget, dt)
 	local content = widget.content
 	local style = widget.style
@@ -129,9 +129,8 @@ UIWidgetUtils.animate_default_icon_tabs = function (widget, dt)
 		hotspot.input_progress = input_progress
 		hotspot.selection_progress = selection_progress
 	end
-
-	return 
 end
+
 UIWidgetUtils.animate_default_checkbox_button = function (widget, dt)
 	local content = widget.content
 	local style = widget.style
@@ -199,9 +198,8 @@ UIWidgetUtils.animate_default_checkbox_button = function (widget, dt)
 	hotspot.hover_progress = hover_progress
 	hotspot.input_progress = input_progress
 	hotspot.selection_progress = selection_progress
-
-	return 
 end
+
 UIWidgetUtils.animate_default_text_tabs = function (widget, dt)
 	local content = widget.content
 	local style = widget.style
@@ -274,9 +272,8 @@ UIWidgetUtils.animate_default_text_tabs = function (widget, dt)
 		hotspot.input_progress = input_progress
 		hotspot.selection_progress = selection_progress
 	end
-
-	return 
 end
+
 UIWidgetUtils.animate_option_button = function (widget, dt)
 	local content = widget.content
 	local style = widget.style
@@ -353,8 +350,6 @@ UIWidgetUtils.animate_option_button = function (widget, dt)
 	hotspot.hover_progress = hover_progress
 	hotspot.input_progress = input_progress
 	hotspot.selection_progress = selection_progress
-
-	return 
 end
 
-return 
+return

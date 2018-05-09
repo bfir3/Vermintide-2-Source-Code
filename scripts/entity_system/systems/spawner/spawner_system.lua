@@ -4,8 +4,6 @@ local function D(...)
 	if script_data.debug_hordes then
 		printf(...)
 	end
-
-	return 
 end
 
 SpawnerSystem = class(SpawnerSystem, ExtensionSystemBase)
@@ -14,6 +12,7 @@ local extensions = {
 }
 local player_positions = PLAYER_POSITIONS
 local script_data = script_data
+
 SpawnerSystem.init = function (self, context, system_name)
 	SpawnerSystem.super.init(self, context, system_name, extensions)
 
@@ -32,9 +31,8 @@ SpawnerSystem.init = function (self, context, system_name)
 
 	self.hidden_spawners_broadphase = Broadphase(40, 512)
 	self._breed_limits = {}
-
-	return 
 end
+
 local spawn_list = {
 	"skaven_slave",
 	"skaven_clan_rat",
@@ -47,6 +45,7 @@ local spawn_list = {
 	"skaven_slave",
 	"skaven_clan_rat"
 }
+
 SpawnerSystem.update_test_all_spawners = function (self, t)
 	local spawner_units = self._enabled_spawners
 	local index = self._test_data.index
@@ -83,9 +82,8 @@ SpawnerSystem.update_test_all_spawners = function (self, t)
 	else
 		self._test_data.index = index
 	end
-
-	return 
 end
+
 SpawnerSystem.test_all_spawners = function (self)
 	self.tests_running = 0
 
@@ -95,18 +93,20 @@ SpawnerSystem.test_all_spawners = function (self)
 	self._test_data = {
 		index = 1
 	}
-
-	return 
 end
+
 SpawnerSystem.running_spawners = function (self)
 	return self._active_spawners
 end
+
 SpawnerSystem.enabled_spawners = function (self)
 	return self._enabled_spawners
 end
+
 SpawnerSystem.hidden_spawners_lookup = function (self)
 	return self._hidden_spawners
 end
+
 SpawnerSystem.register_enabled_spawner = function (self, spawner, terror_event_id, hidden)
 	self._enabled_spawners[#self._enabled_spawners + 1] = spawner
 
@@ -129,9 +129,8 @@ SpawnerSystem.register_enabled_spawner = function (self, spawner, terror_event_i
 		self._num_hidden_spawners = self._num_hidden_spawners + 1
 		self._hidden_spawners[spawner] = true
 	end
-
-	return 
 end
+
 SpawnerSystem.hibernate_spawner = function (self, spawner, hibernate)
 	local enabled_spawners = self._enabled_spawners
 	local num_enabled_spawners = #enabled_spawners
@@ -158,9 +157,8 @@ SpawnerSystem.hibernate_spawner = function (self, spawner, hibernate)
 	else
 		print("Can't wake up spawner, it wasn't hibernating")
 	end
-
-	return 
 end
+
 SpawnerSystem.register_raw_spawner = function (self, spawner, terror_event_id)
 	if terror_event_id then
 		local lookup = self._raw_id_lookup[terror_event_id]
@@ -172,12 +170,12 @@ SpawnerSystem.register_raw_spawner = function (self, spawner, terror_event_id)
 
 		lookup[#lookup + 1] = spawner
 	end
-
-	return 
 end
+
 local spawn_list = {}
 local spawn_list_hidden = {}
 local copy_list = {}
+
 SpawnerSystem.spawn_horde = function (self, spawner, amount, breeds, breed_list, group_template)
 	local extension = ScriptUnit.extension(spawner, "spawner_system")
 	self._active_spawners[spawner] = extension
@@ -218,15 +216,12 @@ local function copy_array(source, index_a, index_b, dest)
 		dest[j] = source[i]
 		j = j + 1
 	end
-
-	return 
 end
 
 SpawnerSystem.set_breed_event_horde_spawn_limit = function (self, breed_name, limit)
 	self._breed_limits[breed_name] = limit
-
-	return 
 end
+
 local temp_spawn_list_per_breed = {}
 local exchange_order = {}
 local i = 1
@@ -297,6 +292,7 @@ SpawnerSystem._try_spawn_breed = function (self, breed_name, spawn_list_per_bree
 
 	return active_enemies
 end
+
 SpawnerSystem._fill_spawners = function (self, spawn_list, spawners, limit_spawners)
 	local num_spawners_to_use = #spawners
 
@@ -329,6 +325,7 @@ SpawnerSystem._fill_spawners = function (self, spawn_list, spawners, limit_spawn
 
 	return #spawn_list
 end
+
 SpawnerSystem.spawn_horde_from_terror_event_id_composition = function (self, event_id, composition_type, limit_spawners, group_template, strictly_not_close_to_players)
 	local composition = CurrentHordeSettings.compositions[composition_type]
 	local index = LoadedDice.roll_easy(composition.loaded_probs)
@@ -338,13 +335,13 @@ SpawnerSystem.spawn_horde_from_terror_event_id_composition = function (self, eve
 	local variant = composition[index]
 
 	self.spawn_horde_from_terror_event_id(self, event_id, variant, limit_spawners, group_template, strictly_not_close_to_players, composition_type)
-
-	return 
 end
+
 local ok_spawner_breeds = {
 	skaven_clan_rat = true,
 	skaven_slave = true
 }
+
 SpawnerSystem.spawn_horde_from_terror_event_id = function (self, event_id, variant, limit_spawners, group_template, strictly_not_close_to_players, optional_composition_type)
 	local ConflictUtils = ConflictUtils
 	local must_use_hidden_spawners = variant.must_use_hidden_spawners
@@ -357,7 +354,7 @@ SpawnerSystem.spawn_horde_from_terror_event_id = function (self, event_id, varia
 		if not source_spawners then
 			assert("No horde spawners found with terror_id ", event_id)
 
-			return 
+			return
 		end
 
 		spawners = {}
@@ -388,19 +385,19 @@ SpawnerSystem.spawn_horde_from_terror_event_id = function (self, event_id, varia
 			if #hidden_spawners == 0 then
 				print("Can't find any hidden spawners for this breed")
 
-				return 
+				return
 			end
 		end
 
 		if not next(spawners) then
-			return 
+			return
 		end
 	end
 
 	local num_spawners = #spawners
 
 	if num_spawners == 0 then
-		return 
+		return
 	end
 
 	local difficulty = Managers.state.difficulty.difficulty
@@ -461,15 +458,14 @@ SpawnerSystem.spawn_horde_from_terror_event_id = function (self, event_id, varia
 	if 0 < count then
 		return "success", count
 	end
-
-	return 
 end
+
 SpawnerSystem.change_spawner_id = function (self, unit, spawner_id, new_spawner_id)
 	if unit then
 		local old_id = Unit.get_data(unit, "terror_event_id")
 
 		if old_id ~= "" and old_id == new_spawner_id then
-			return 
+			return
 		end
 
 		local old_spawners = self._id_lookup[old_id]
@@ -498,7 +494,7 @@ SpawnerSystem.change_spawner_id = function (self, unit, spawner_id, new_spawner_
 
 		Unit.set_data(unit, "terror_event_id", new_spawner_id)
 
-		return 
+		return
 	end
 
 	local spawners = self._id_lookup[spawner_id]
@@ -523,9 +519,8 @@ SpawnerSystem.change_spawner_id = function (self, unit, spawner_id, new_spawner_
 	else
 		print("Can't find spawners called: ", spawner_id, " so cannot rename any")
 	end
-
-	return 
 end
+
 SpawnerSystem.get_raw_spawner_unit = function (self, terror_id)
 	local spawners = self._raw_id_lookup[terror_id]
 
@@ -535,14 +530,12 @@ SpawnerSystem.get_raw_spawner_unit = function (self, terror_id)
 
 		return spawner_unit, idle_animation
 	end
-
-	return 
 end
+
 SpawnerSystem.deactivate_spawner = function (self, spawner)
 	self._active_spawners[spawner] = nil
-
-	return 
 end
+
 SpawnerSystem.debug_show_spawners = function (self, t, spawners)
 	local h = 70
 	local add_height = Vector3(0, 0, h)
@@ -559,20 +552,18 @@ SpawnerSystem.debug_show_spawners = function (self, t, spawners)
 		QuickDrawer:sphere(pos + Vector3(0, 0, (d + 10) % h), 0.5, color)
 		QuickDrawer:sphere(pos + Vector3(0, 0, (d + 20) % h), 0.5, color)
 	end
-
-	return 
 end
+
 SpawnerSystem.set_spawn_list = function (self, list)
 	self._spawn_list = list
-
-	return 
 end
+
 SpawnerSystem.pop_pawn_list = function (self)
 	local spawn_list = self._spawn_list
 	local size = #spawn_list
 
 	if size <= 0 then
-		return 
+		return
 	end
 
 	local breed = spawn_list[size]
@@ -580,23 +571,24 @@ SpawnerSystem.pop_pawn_list = function (self)
 
 	return breed
 end
+
 SpawnerSystem.add_waiting_to_spawn = function (self, amount)
 	self._waiting_to_spawn = self._waiting_to_spawn + amount
-
-	return 
 end
+
 SpawnerSystem.waiting_to_spawn = function (self)
 	return self._waiting_to_spawn
 end
+
 local dummy_input = {}
 local found_hidden_spawners = {}
+
 SpawnerSystem.update = function (self, context, t, dt)
 	for unit, extension in pairs(self._active_spawners) do
 		extension.update(extension, unit, dummy_input, dt, context, t)
 	end
-
-	return 
 end
+
 SpawnerSystem.show_hidden_spawners = function (self, t)
 	local unit_local_position = Unit.local_position
 	local center_pos = PLAYER_POSITIONS[1]
@@ -651,8 +643,6 @@ SpawnerSystem.show_hidden_spawners = function (self, t)
 			QuickDrawer:circle(center_pos + Vector3(0, 0, 20), radius, Vector3.up(), fail_color)
 		end
 	end
-
-	return 
 end
 
-return 
+return

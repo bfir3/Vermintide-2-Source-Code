@@ -20,6 +20,7 @@ end
 DamageDataIndex.STRIDE = #data_fields
 data_fields = nil
 GenericHealthExtension = class(GenericHealthExtension)
+
 GenericHealthExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.is_server = Managers.player.is_server
@@ -45,21 +46,20 @@ GenericHealthExtension.init = function (self, extension_init_context, unit, exte
 	self._recent_hit_react_type = nil
 
 	self.set_max_health(self, health, true)
+end
 
-	return 
-end
 GenericHealthExtension.destroy = function (self)
-	return 
+	return
 end
+
 GenericHealthExtension.reset = function (self)
 	self.damage = 0
 	self.state = "alive"
 
 	pdArray.set_empty(self.damage_buffers[1])
 	pdArray.set_empty(self.damage_buffers[2])
-
-	return 
 end
+
 GenericHealthExtension.hot_join_sync = function (self, sender)
 	local unit = self.unit
 	local network_manager = Managers.state.network
@@ -88,32 +88,36 @@ GenericHealthExtension.hot_join_sync = function (self, sender)
 			network_transmit.send_rpc(network_transmit, "rpc_add_damage", sender, go_id, is_level_unit, go_id, is_level_unit, damage_amount, hit_zone_id, damage_type_id, damage_direction, damage_source_id, hit_ragdoll_actor_id, hit_react_type_id, is_dead, is_critical_strike, added_dot)
 		end
 	end
-
-	return 
 end
+
 GenericHealthExtension.is_alive = function (self)
 	return not self.dead
 end
+
 GenericHealthExtension.current_health_percent = function (self)
 	return 1 - self.damage / self.health
 end
+
 GenericHealthExtension.current_health = function (self)
 	return self.health - self.damage
 end
+
 GenericHealthExtension.get_damage_taken = function (self)
 	return self.damage
 end
+
 GenericHealthExtension.set_current_damage = function (self, damage)
 	self.damage = damage
-
-	return 
 end
+
 GenericHealthExtension.get_max_health = function (self)
 	return self.health
 end
+
 GenericHealthExtension.current_max_health_percent = function (self)
 	return 1
 end
+
 GenericHealthExtension.set_max_health = function (self, health, update_unmodfied)
 	local health_constant = NetworkConstants.health
 	local network_health = math.clamp(health, health_constant.min, health_constant.max)
@@ -134,9 +138,8 @@ GenericHealthExtension.set_max_health = function (self, health, update_unmodfied
 
 		self.network_transmit:send_rpc_clients("rpc_sync_damage_taken", go_id, is_level_unit, true, network_health, state)
 	end
-
-	return 
 end
+
 GenericHealthExtension._add_to_damage_history_buffer = function (self, unit, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike)
 	local damage_direction_table = (damage_direction and {
 		damage_direction.x,
@@ -163,9 +166,11 @@ GenericHealthExtension._add_to_damage_history_buffer = function (self, unit, att
 
 	return temp_table
 end
+
 GenericHealthExtension._should_die = function (self)
 	return self.health <= self.damage
 end
+
 GenericHealthExtension.add_damage = function (self, attacker_unit, damage_amount, hit_zone_name, damage_type, damage_direction, damage_source_name, hit_ragdoll_actor, damaging_unit, hit_react_type, is_critical_strike, added_dot)
 	local unit = self.unit
 	local network_manager = Managers.state.network
@@ -206,9 +211,8 @@ GenericHealthExtension.add_damage = function (self, attacker_unit, damage_amount
 
 		network_transmit.send_rpc_clients(network_transmit, "rpc_add_damage", unit_id, is_level_unit, attacker_unit_id, attacker_is_level_unit, damage_amount, hit_zone_id, damage_type_id, damage_direction, damage_source_id, hit_ragdoll_actor_id, hit_react_type_id, is_dead, is_critical_strike, added_dot)
 	end
-
-	return 
 end
+
 GenericHealthExtension.add_heal = function (self, healer_unit, heal_amount, heal_source_name, heal_type)
 	local unit = self.unit
 
@@ -227,9 +231,8 @@ GenericHealthExtension.add_heal = function (self, healer_unit, heal_amount, heal
 			network_transmit.send_rpc_clients(network_transmit, "rpc_heal", unit_id, is_level_unit, healer_unit_id, healer_is_level_unit, heal_amount, heal_type_id)
 		end
 	end
-
-	return 
 end
+
 GenericHealthExtension.die = function (self, damage_type)
 	if self.is_server then
 		local unit = self.unit
@@ -240,26 +243,26 @@ GenericHealthExtension.die = function (self, damage_type)
 			AiUtils.kill_unit(unit, nil, nil, damage_type, nil)
 		end
 	end
-
-	return 
 end
+
 GenericHealthExtension.set_dead = function (self)
 	self.damage = self.health
 	self.dead = true
-
-	return 
 end
+
 GenericHealthExtension.has_assist_shield = function (self)
 	return false
 end
+
 GenericHealthExtension.recent_damages = function (self)
 	local previous_buffer_index = 3 - self.system_data.active_damage_buffer_index
 	local damage_queue = self.damage_buffers[previous_buffer_index]
 
 	return pdArray.data(damage_queue)
 end
+
 GenericHealthExtension.recently_damaged = function (self)
 	return self._recent_damage_type, self._recent_hit_react_type
 end
 
-return 
+return

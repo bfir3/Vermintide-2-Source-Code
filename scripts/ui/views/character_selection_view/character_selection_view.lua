@@ -11,8 +11,6 @@ local flow_events = definitions.flow_events
 
 local function dprint(...)
 	print("[CharacterSelectionView]", ...)
-
-	return 
 end
 
 local DO_RELOAD = true
@@ -21,12 +19,13 @@ local debug_menu = true
 CharacterSelectionView = class(CharacterSelectionView)
 local fake_input_service = {
 	get = function ()
-		return 
+		return
 	end,
 	has = function ()
-		return 
+		return
 	end
 }
+
 CharacterSelectionView.init = function (self, ingame_ui_context)
 	self.world = ingame_ui_context.world
 	self.player_manager = ingame_ui_context.player_manager
@@ -68,12 +67,12 @@ CharacterSelectionView.init = function (self, ingame_ui_context)
 	DO_RELOAD = false
 
 	self.show_hero_panel(self)
-
-	return 
 end
+
 CharacterSelectionView.initial_profile_view = function (self)
 	return self.ingame_ui.initial_profile_view
 end
+
 CharacterSelectionView._setup_state_machine = function (self, state_machine_params, optional_start_state, optional_start_sub_state)
 	if self._machine then
 		self._machine:destroy()
@@ -86,33 +85,32 @@ CharacterSelectionView._setup_state_machine = function (self, state_machine_para
 	state_machine_params.start_state = optional_start_sub_state
 	self._machine = GameStateMachine:new(self, start_state, state_machine_params, profiling_debugging_enabled)
 	self._state_machine_params = state_machine_params
-
-	return 
 end
+
 CharacterSelectionView.wanted_state = function (self)
 	return self._wanted_state
 end
+
 CharacterSelectionView.clear_wanted_state = function (self)
 	self._wanted_state = nil
-
-	return 
 end
+
 CharacterSelectionView.input_service = function (self)
 	return (self._input_blocked and fake_input_service) or self.input_manager:get_service("character_selection_view")
 end
+
 CharacterSelectionView.set_input_blocked = function (self, blocked)
 	self._input_blocked = blocked
-
-	return 
 end
+
 CharacterSelectionView.input_blocked = function (self)
 	return self._input_blocked
 end
+
 CharacterSelectionView.play_sound = function (self, event)
 	WwiseWorld.trigger_event(self.wwise_world, event)
-
-	return 
 end
+
 CharacterSelectionView.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self._static_widgets = {}
@@ -127,9 +125,8 @@ CharacterSelectionView.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_top_renderer)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, definitions.animations)
-
-	return 
 end
+
 CharacterSelectionView.get_background_world = function (self)
 	local previewer_pass_data = self.viewport_widget.element.pass_data[1]
 	local viewport = previewer_pass_data.viewport
@@ -137,6 +134,7 @@ CharacterSelectionView.get_background_world = function (self)
 
 	return world, viewport
 end
+
 CharacterSelectionView.show_hero_world = function (self)
 	if not self._draw_menu_world then
 		self._draw_menu_world = true
@@ -146,9 +144,8 @@ CharacterSelectionView.show_hero_world = function (self)
 
 		ScriptWorld.deactivate_viewport(world, viewport)
 	end
-
-	return 
 end
+
 CharacterSelectionView.hide_hero_world = function (self)
 	if self._draw_menu_world then
 		self._draw_menu_world = false
@@ -158,23 +155,20 @@ CharacterSelectionView.hide_hero_world = function (self)
 
 		ScriptWorld.activate_viewport(world, viewport)
 	end
-
-	return 
 end
+
 CharacterSelectionView.show_hero_panel = function (self)
 	self._draw_menu_panel = true
 
 	self.set_input_blocked(self, false)
-
-	return 
 end
+
 CharacterSelectionView.hide_hero_panel = function (self)
 	self._draw_menu_panel = false
 
 	self.set_input_blocked(self, true)
-
-	return 
 end
+
 CharacterSelectionView.draw = function (self, dt, input_service)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -205,18 +199,16 @@ CharacterSelectionView.draw = function (self, dt, input_service)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 CharacterSelectionView.post_update = function (self, dt, t)
 	self._machine:post_update(dt, t)
 	self.world_previewer:post_update(dt, t)
-
-	return 
 end
+
 CharacterSelectionView.update = function (self, dt, t)
 	if self.suspended or self.waiting_for_post_update_enter then
-		return 
+		return
 	end
 
 	local requested_screen_change_data = self._requested_screen_change_data
@@ -256,9 +248,8 @@ CharacterSelectionView.update = function (self, dt, t)
 
 	self._machine:update(dt, t)
 	self.draw(self, dt, input_service)
-
-	return 
 end
+
 CharacterSelectionView.on_enter = function (self, menu_state_name, menu_sub_state_name)
 	ShowCursorStack.push()
 
@@ -303,9 +294,8 @@ CharacterSelectionView.on_enter = function (self, menu_state_name, menu_sub_stat
 			inventory_extension.check_and_drop_pickups(inventory_extension, "enter_inventory")
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionView.set_current_hero = function (self, profile_index)
 	local profile_settings = SPProfiles[profile_index]
 	local display_name = profile_settings.display_name
@@ -319,9 +309,8 @@ CharacterSelectionView.set_current_hero = function (self, profile_index)
 	local prestige = hero_attributes.get(hero_attributes, display_name, "prestige")
 
 	self.set_prestige_level(self, prestige)
-
-	return 
 end
+
 CharacterSelectionView._get_sorted_players = function (self)
 	local human_players = self.player_manager:human_players()
 	local player_order = {}
@@ -336,18 +325,19 @@ CharacterSelectionView._get_sorted_players = function (self)
 
 	return player_order
 end
+
 CharacterSelectionView.set_prestige_level = function (self, prestige)
 	if 0 < prestige then
 		self._hero_prestige_level_text_widget.content.text = "Prestige level: " .. prestige
 	else
 		self._hero_prestige_level_text_widget.content.text = ""
 	end
+end
 
-	return 
-end
 CharacterSelectionView._handle_mouse_input = function (self, dt, t, input_service)
-	return 
+	return
 end
+
 CharacterSelectionView._is_selection_widget_pressed = function (self, widget)
 	local content = widget.content
 	local steps = content.steps
@@ -360,9 +350,8 @@ CharacterSelectionView._is_selection_widget_pressed = function (self, widget)
 			return true, i
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionView.hotkey_allowed = function (self, input, mapping_data)
 	if self.input_blocked(self) then
 		return false
@@ -395,23 +384,22 @@ CharacterSelectionView.hotkey_allowed = function (self, input, mapping_data)
 
 	return false
 end
+
 CharacterSelectionView._get_screen_settings_by_state_name = function (self, state_name)
 	for index, screen_settings in ipairs(settings_by_screen) do
 		if screen_settings.state_name == state_name then
 			return screen_settings
 		end
 	end
-
-	return 
 end
+
 CharacterSelectionView.requested_screen_change_by_name = function (self, screen_name, sub_screen_name)
 	self._requested_screen_change_data = {
 		screen_name = screen_name,
 		sub_screen_name = sub_screen_name
 	}
-
-	return 
 end
+
 CharacterSelectionView._change_screen_by_name = function (self, screen_name, sub_screen_name)
 	local settings, settings_index = nil
 
@@ -458,17 +446,15 @@ CharacterSelectionView._change_screen_by_name = function (self, screen_name, sub
 		self.world_previewer:set_camera_rotation_axis_offset("y", camera_rotation[2], 0.5, math.easeOutCubic)
 		self.world_previewer:set_camera_rotation_axis_offset("z", camera_rotation[3], 0.5, math.easeOutCubic)
 	end
-
-	return 
 end
+
 CharacterSelectionView._change_screen_by_index = function (self, index)
 	local screen_settings = settings_by_screen[index]
 	local settings_name = screen_settings.name
 
 	self._change_screen_by_name(self, settings_name)
-
-	return 
 end
+
 CharacterSelectionView.post_update_on_enter = function (self)
 	assert(self.viewport_widget == nil)
 
@@ -486,9 +472,8 @@ CharacterSelectionView.post_update_on_enter = function (self)
 	else
 		self._change_screen_by_index(self, 1)
 	end
-
-	return 
 end
+
 CharacterSelectionView.post_update_on_exit = function (self)
 	self.world_previewer:prepare_exit()
 	self.world_previewer:on_exit()
@@ -498,9 +483,8 @@ CharacterSelectionView.post_update_on_exit = function (self)
 
 		self.viewport_widget = nil
 	end
-
-	return 
 end
+
 CharacterSelectionView.on_exit = function (self)
 	self.input_manager:device_unblock_all_services("keyboard", 1)
 	self.input_manager:device_unblock_all_services("mouse", 1)
@@ -518,9 +502,8 @@ CharacterSelectionView.on_exit = function (self)
 	self.hide_hero_world(self)
 	self.play_sound(self, "hud_in_inventory_state_off")
 	self.play_sound(self, "play_gui_amb_hero_screen_loop_end")
-
-	return 
 end
+
 CharacterSelectionView.exit = function (self, return_to_game)
 	local exit_transition = (self.initial_profile_view(self) and "exit_initial_character_selection") or (return_to_game and "exit_menu") or "ingame_menu"
 
@@ -528,18 +511,16 @@ CharacterSelectionView.exit = function (self, return_to_game)
 	self.play_sound(self, "Play_hud_button_close")
 
 	self.exiting = true
-
-	return 
 end
+
 CharacterSelectionView.transitioning = function (self)
 	if self.exiting then
 		return true
 	else
 		return false
 	end
-
-	return 
 end
+
 CharacterSelectionView.suspend = function (self)
 	self.input_manager:device_unblock_all_services("keyboard", 1)
 	self.input_manager:device_unblock_all_services("mouse", 1)
@@ -557,9 +538,8 @@ CharacterSelectionView.suspend = function (self)
 	local world = previewer_pass_data.world
 
 	ScriptWorld.deactivate_viewport(world, viewport)
-
-	return 
 end
+
 CharacterSelectionView.unsuspend = function (self)
 	self.input_manager:block_device_except_service("character_selection_view", "keyboard", 1)
 	self.input_manager:block_device_except_service("character_selection_view", "mouse", 1)
@@ -580,9 +560,8 @@ CharacterSelectionView.unsuspend = function (self)
 
 		ScriptWorld.activate_viewport(world, viewport)
 	end
-
-	return 
 end
+
 CharacterSelectionView._handle_exit = function (self, dt, input_service)
 	local exit_button_widget = self._exit_button_widget
 
@@ -596,16 +575,14 @@ CharacterSelectionView._handle_exit = function (self, dt, input_service)
 		self.play_sound(self, "play_gui_start_menu_button_click")
 		self.close_menu(self, not self.exit_to_game)
 	end
-
-	return 
 end
+
 CharacterSelectionView.close_menu = function (self, return_to_main_screen)
 	local return_to_game = not return_to_main_screen
 
 	self.exit(self, return_to_game)
-
-	return 
 end
+
 CharacterSelectionView.destroy = function (self)
 	if self.viewport_widget then
 		UIWidget.destroy(self.ui_top_renderer, self.viewport_widget)
@@ -626,9 +603,8 @@ CharacterSelectionView.destroy = function (self)
 
 		self._machine = nil
 	end
-
-	return 
 end
+
 CharacterSelectionView._is_button_pressed = function (self, widget)
 	local button_hotspot = widget.content.button_hotspot
 
@@ -637,8 +613,6 @@ CharacterSelectionView._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
 
-return 
+return

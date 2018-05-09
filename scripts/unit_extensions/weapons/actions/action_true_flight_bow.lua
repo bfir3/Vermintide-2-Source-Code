@@ -1,6 +1,7 @@
 require("scripts/unit_extensions/weapons/projectiles/true_flight_templates")
 
 ActionTrueFlightBow = class(ActionTrueFlightBow)
+
 ActionTrueFlightBow.init = function (self, world, item_name, is_server, owner_unit, damage_unit, first_person_unit, weapon_unit, weapon_system)
 	self.owner_unit = owner_unit
 	self.first_person_unit = first_person_unit
@@ -17,9 +18,8 @@ ActionTrueFlightBow.init = function (self, world, item_name, is_server, owner_un
 	self.overcharge_extension = ScriptUnit.extension(owner_unit, "overcharge_system")
 	self.first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
 	self._is_critical_strike = false
-
-	return 
 end
+
 ActionTrueFlightBow.client_owner_start_action = function (self, new_action, t, chain_action_data, power_level, action_init_data)
 	self.current_action = new_action
 	self.true_flight_template_id = TrueFlightTemplates[new_action.true_flight_template].lookup_id
@@ -72,9 +72,8 @@ ActionTrueFlightBow.client_owner_start_action = function (self, new_action, t, c
 	end
 
 	self._is_critical_strike = is_critical_strike
-
-	return 
 end
+
 ActionTrueFlightBow.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local current_action = self.current_action
 	local owner_unit = self.owner_unit
@@ -118,9 +117,8 @@ ActionTrueFlightBow.client_owner_post_update = function (self, dt, t, world, can
 			WwiseUtils.trigger_position_event(self.world, self.current_action.extra_fire_sound_event, position)
 		end
 	end
-
-	return 
 end
+
 ActionTrueFlightBow.finish = function (self, reason, data)
 	local owner_unit_status = ScriptUnit.extension(self.owner_unit, "status_system")
 	local current_action = self.current_action
@@ -128,9 +126,8 @@ ActionTrueFlightBow.finish = function (self, reason, data)
 	if not data or data.new_action ~= "action_two" or data.new_sub_action ~= "default" then
 		owner_unit_status.set_zooming(owner_unit_status, false)
 	end
-
-	return 
 end
+
 ActionTrueFlightBow.fire = function (self, current_action, add_spread)
 	local owner_unit = self.owner_unit
 	local speed = current_action.speed
@@ -197,8 +194,6 @@ ActionTrueFlightBow.fire = function (self, current_action, add_spread)
 			Managers.state.entity:system("ai_system"):alert_enemies_within_range(owner_unit, POSITION_LOOKUP[owner_unit], current_action.alert_sound_range_fire)
 		end
 	end
-
-	return 
 end
 
-return 
+return

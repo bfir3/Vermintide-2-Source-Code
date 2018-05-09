@@ -1,4 +1,5 @@
 LobbyMembers = class(LobbyMembers)
+
 LobbyMembers.init = function (self, lobby)
 	self.lobby = lobby
 	self.members_joined = {}
@@ -13,12 +14,12 @@ LobbyMembers.init = function (self, lobby)
 
 	self.members = my_members
 	self._members_changed = true
+end
 
-	return 
-end
 LobbyMembers.clear = function (self)
-	return 
+	return
 end
+
 LobbyMembers.update = function (self)
 	local members_joined = self.members_joined
 	local members_left = self.members_left
@@ -63,18 +64,20 @@ LobbyMembers.update = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 LobbyMembers.get_members_left = function (self)
 	return self.members_left
 end
+
 LobbyMembers.get_members_joined = function (self)
 	return self.members_joined
 end
+
 LobbyMembers.get_members = function (self)
 	return self.lobby:members()
 end
+
 LobbyMembers.members_map = function (self)
 	return self.members
 end
@@ -88,4 +91,4 @@ if PLATFORM == "xb1" then
 	end
 end
 
-return 
+return

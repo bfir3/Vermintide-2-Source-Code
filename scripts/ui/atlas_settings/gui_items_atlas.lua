@@ -9451,4 +9451,4 @@ items_atlas = {
 	}
 }
 
-return 
+return

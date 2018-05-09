@@ -3094,6 +3094,7 @@ PatrolFormationSettings.prologue_marauder = {
 		}
 	}
 }
+
 PatrolFormationSettings.random_roaming_formation = function (breed_pack)
 	local members = breed_pack.members
 	local num_members = #members
@@ -3151,4 +3152,4 @@ PatrolFormationSettings.random_roaming_formation = function (breed_pack)
 	return formation
 end
 
-return 
+return

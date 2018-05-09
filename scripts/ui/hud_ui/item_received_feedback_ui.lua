@@ -10,8 +10,6 @@ local event_settings = {
 			else
 				return string.format(Localize("positive_reinforcement_player_gave_item_player"), player_1_name, player_2_name)
 			end
-
-			return 
 		end,
 		sound_function = function ()
 			return script_data.reinforcement_ui_local_sound or "hud_achievement_unlock_02" or (script_data.enable_reinforcement_ui_remote_sound and "hud_info")
@@ -39,6 +37,7 @@ local item_icons = {
 	healthkit_first_aid_kit_01 = "reinforcement_heal"
 }
 ItemReceivedFeedbackUI = class(ItemReceivedFeedbackUI)
+
 ItemReceivedFeedbackUI.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.input_manager = ingame_ui_context.input_manager
@@ -58,18 +57,16 @@ ItemReceivedFeedbackUI.init = function (self, ingame_ui_context)
 	local event_manager = Managers.state.event
 
 	event_manager.register(event_manager, self, "give_item_feedback", "event_give_item_feedback")
-
-	return 
 end
+
 ItemReceivedFeedbackUI.destroy = function (self)
 	GarbageLeakDetector.register_object(self, "item_received_feedback_ui")
 
 	local event_manager = Managers.state.event
 
 	event_manager.unregister(event_manager, "give_item_feedback", self)
-
-	return 
 end
+
 ItemReceivedFeedbackUI.create_ui_elements = function (self)
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
 
@@ -81,18 +78,16 @@ ItemReceivedFeedbackUI.create_ui_elements = function (self)
 	end
 
 	self._unused_widgets = table.clone(self.message_widgets)
-
-	return 
 end
+
 ItemReceivedFeedbackUI.remove_event = function (self, index)
 	local events = self._received_events
 	local event = table.remove(events, index)
 	local widget = event.widget
 	local unused_widgets = self._unused_widgets
 	unused_widgets[#unused_widgets + 1] = widget
-
-	return 
 end
+
 ItemReceivedFeedbackUI.add_event = function (self, hash, color_from, event_type, ...)
 	if not script_data.disable_reinforcement_ui then
 		local events = self._received_events
@@ -149,13 +144,13 @@ ItemReceivedFeedbackUI.add_event = function (self, hash, color_from, event_type,
 			WwiseWorld.trigger_event(wwise_world, sound_event)
 		end
 	end
-
-	return 
 end
+
 local temp_portrait_size = {
 	96,
 	112
 }
+
 ItemReceivedFeedbackUI._assign_portrait_texture = function (self, widget, pass_name, texture)
 	widget.content[pass_name].texture_id = texture
 	local portrait_size = table.clone(temp_portrait_size)
@@ -172,9 +167,8 @@ ItemReceivedFeedbackUI._assign_portrait_texture = function (self, widget, pass_n
 	offset[1] = portrait_offset[1] - portrait_size[1] / 2
 	offset[2] = portrait_offset[2] - portrait_size[2] / 2
 	style.size = portrait_size
-
-	return 
 end
+
 ItemReceivedFeedbackUI.event_give_item_feedback = function (self, hash, giver_player, item_name)
 	local player_1_name = (giver_player and giver_player.name(giver_player)) or nil
 	local player_unit = giver_player and giver_player.player_unit
@@ -185,9 +179,8 @@ ItemReceivedFeedbackUI.event_give_item_feedback = function (self, hash, giver_pl
 	local item_icon = item_icons[item_name] or "icons_placeholder"
 
 	self.add_event(self, hash, event_colors.default, "give_item", player_1_profile_image, item_icon)
-
-	return 
 end
+
 ItemReceivedFeedbackUI._get_hero_portrait = function (self, profile_index, career_index)
 	local scale = RESOLUTION_LOOKUP.scale
 	local profile_data = SPProfiles[profile_index]
@@ -198,6 +191,7 @@ ItemReceivedFeedbackUI._get_hero_portrait = function (self, profile_index, caree
 
 	return "small_" .. character_portrait
 end
+
 ItemReceivedFeedbackUI.update = function (self, dt, t)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -274,8 +268,6 @@ ItemReceivedFeedbackUI.update = function (self, dt, t)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
 
-return 
+return

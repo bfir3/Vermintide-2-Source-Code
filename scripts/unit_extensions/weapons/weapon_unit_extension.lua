@@ -45,8 +45,6 @@ function weapon_printf(...)
 	if script_data.debug_weapons then
 		printf(...)
 	end
-
-	return 
 end
 
 if Development.parameter("debug_weapons") then
@@ -143,6 +141,7 @@ local function is_within_a_chain_window(current_time_in_action, action, owner_un
 end
 
 WeaponUnitExtension = class(WeaponUnitExtension)
+
 WeaponUnitExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.weapon_system = extension_init_data.weapon_system
 	local world = extension_init_context.world
@@ -189,16 +188,14 @@ WeaponUnitExtension.init = function (self, extension_init_context, unit, extensi
 			request = {}
 		}
 	end
-
-	return 
 end
+
 WeaponUnitExtension.extensions_ready = function (self, world, unit)
 	if ScriptUnit.has_extension(unit, "ammo_system") then
 		self.ammo_extension = ScriptUnit.extension(unit, "ammo_system")
 	end
-
-	return 
 end
+
 WeaponUnitExtension.destroy = function (self)
 	if self.current_action_settings then
 		local action_kind = self.current_action_settings.kind
@@ -208,16 +205,17 @@ WeaponUnitExtension.destroy = function (self)
 			attack_prev.destroy(attack_prev)
 		end
 	end
-
-	return 
 end
+
 WeaponUnitExtension.get_action = function (self, action_name, sub_action_name, actions)
 	local sub_actions = actions[action_name]
 	local action = sub_actions[sub_action_name]
 
 	return action
 end
+
 local interupting_action_data = {}
+
 WeaponUnitExtension.start_action = function (self, action_name, sub_action_name, actions, t, power_level, action_init_data)
 	local buff_extension = ScriptUnit.extension(self.owner_unit, "buff_system")
 	local first_person_extension = ScriptUnit.extension(self.owner_unit, "first_person_system")
@@ -433,16 +431,14 @@ WeaponUnitExtension.start_action = function (self, action_name, sub_action_name,
 			end
 		end
 	end
-
-	return 
 end
+
 WeaponUnitExtension.stop_action = function (self, reason, data)
 	if self.has_current_action(self) then
 		self._finish_action(self, reason, data)
 	end
-
-	return 
 end
+
 WeaponUnitExtension._finish_action = function (self, reason, data)
 	local current_action_settings = self.current_action_settings
 	local action_kind = current_action_settings.kind
@@ -481,15 +477,15 @@ WeaponUnitExtension._finish_action = function (self, reason, data)
 
 	return chain_action_data
 end
+
 WeaponUnitExtension._handle_proc_events = function (self, current_action_settings, reason)
 	local buff_extension = ScriptUnit.extension(self.owner_unit, "buff_system")
 
 	if current_action_settings.is_spell then
 		buff_extension.trigger_procs(buff_extension, "on_spell_used", current_action_settings)
 	end
-
-	return 
 end
+
 WeaponUnitExtension.anim_end_event = function (self, reason, current_action_settings)
 	local go_id = Managers.state.unit_storage:go_id(self.owner_unit)
 	local event = current_action_settings.anim_end_event
@@ -512,9 +508,8 @@ WeaponUnitExtension.anim_end_event = function (self, reason, current_action_sett
 
 		self._looping_anim_event_started = nil
 	end
-
-	return 
 end
+
 WeaponUnitExtension.update = function (self, unit, input, dt, context, t)
 	local current_action_settings = self.current_action_settings
 
@@ -560,9 +555,8 @@ WeaponUnitExtension.update = function (self, unit, input, dt, context, t)
 			end
 		end
 	end
-
-	return 
 end
+
 WeaponUnitExtension.is_streak_action_available = function (self, streak_action, t, time_offset)
 	local current_action_settings = self.current_action_settings or self.temporary_action_settings
 	local action = self.actions[current_action_settings.kind]
@@ -574,6 +568,7 @@ WeaponUnitExtension.is_streak_action_available = function (self, streak_action, 
 
 	return false
 end
+
 WeaponUnitExtension.is_chain_action_available = function (self, next_chain_action, t, time_offset)
 	local current_action_settings = self.current_action_settings or self.temporary_action_settings
 	local current_time_in_action = t - self.action_time_started
@@ -589,9 +584,8 @@ WeaponUnitExtension.is_chain_action_available = function (self, next_chain_actio
 
 		return next_chain_action.start_time / attack_speed_modifier + time_offset <= current_time_in_action and current_time_in_action <= end_time
 	end
-
-	return 
 end
+
 WeaponUnitExtension.time_to_next_chain_action = function (self, next_chain_action, t, time_offset, action_settings)
 	action_settings = action_settings or self.current_action_settings or self.temporary_action_settings
 	local current_time_in_action = (self.has_current_action(self) and t - self.action_time_started) or 0
@@ -603,6 +597,7 @@ WeaponUnitExtension.time_to_next_chain_action = function (self, next_chain_actio
 
 	return start_time - current_time_in_action
 end
+
 WeaponUnitExtension.can_stop_hold_action = function (self, t)
 	local current_time_in_action = t - self.action_time_started
 	local current_action_settings = self.current_action_settings
@@ -620,24 +615,27 @@ WeaponUnitExtension.can_stop_hold_action = function (self, t)
 
 	return minimum_hold_time < current_time_in_action
 end
+
 WeaponUnitExtension.get_current_action = function (self)
 	return self.actions[self.current_action_settings.kind]
 end
+
 WeaponUnitExtension.has_current_action = function (self)
 	return self.current_action_settings ~= nil
 end
+
 WeaponUnitExtension.get_current_action_settings = function (self)
 	return self.current_action_settings
 end
+
 WeaponUnitExtension.bot_should_stop_attack_on_leave = function (self)
 	local current_action_settings = self.current_action_settings
 
 	if current_action_settings then
 		return current_action_settings.stop_action_on_leave_for_bot
 	end
-
-	return 
 end
+
 WeaponUnitExtension._is_before_end_time = function (self, next_chain_action, t)
 	local current_action_settings = self.current_action_settings or self.temporary_action_settings
 	local current_time_in_action = t - self.action_time_started
@@ -648,6 +646,7 @@ WeaponUnitExtension._is_before_end_time = function (self, next_chain_action, t)
 
 	return current_time_in_action < end_time
 end
+
 WeaponUnitExtension._find_chain_action = function (self, actions, allowed_chain_actions, t, wanted_input, wanted_occurrence_number)
 	local current_occurrence_number = 0
 	local num_chain_actions = #allowed_chain_actions
@@ -680,6 +679,7 @@ WeaponUnitExtension._find_chain_action = function (self, actions, allowed_chain_
 
 	return found_chain_info, found_action_settings
 end
+
 WeaponUnitExtension._get_attack_chain_data = function (self, actions, attack_chain, t)
 	local found_chain_action, found_action_settings, action_settings = nil
 	local bot_wait_input = "hold_attack"
@@ -719,6 +719,7 @@ WeaponUnitExtension._get_attack_chain_data = function (self, actions, attack_cha
 
 	return found_chain_action, found_action_settings, action_settings, bot_wait_input, bot_wanted_input
 end
+
 WeaponUnitExtension._process_bot_attack_request = function (self, attack_type, actions, weapon_name, t, attack_chain)
 	if attack_chain then
 		return self._get_attack_chain_data(self, actions, attack_chain, t)
@@ -748,6 +749,7 @@ WeaponUnitExtension._process_bot_attack_request = function (self, attack_type, a
 
 	return found_chain_action, found_action_settings, action_settings, bot_wait_input, bot_wanted_input
 end
+
 WeaponUnitExtension.update_bot_attack_request = function (self, t)
 	local bot_attack_data = self.bot_attack_data
 	local request = bot_attack_data.request
@@ -769,7 +771,7 @@ WeaponUnitExtension.update_bot_attack_request = function (self, t)
 	local chain_action = bot_attack_data.chain_action
 
 	if chain_action == nil then
-		return 
+		return
 	end
 
 	local input = nil
@@ -788,9 +790,8 @@ WeaponUnitExtension.update_bot_attack_request = function (self, t)
 
 		input_extension[input](input_extension)
 	end
-
-	return 
 end
+
 WeaponUnitExtension.request_bot_attack_action = function (self, attack_type, actions, weapon_name, attack_chain)
 	local bot_attack_data = self.bot_attack_data
 	local attack_request = bot_attack_data.request
@@ -805,9 +806,8 @@ WeaponUnitExtension.request_bot_attack_action = function (self, attack_type, act
 
 		return true
 	end
-
-	return 
 end
+
 WeaponUnitExtension.clear_bot_attack_request = function (self)
 	local bot_attack_data = self.bot_attack_data
 	local attack_request = bot_attack_data.request
@@ -816,14 +816,14 @@ WeaponUnitExtension.clear_bot_attack_request = function (self)
 	table.clear(bot_attack_data)
 
 	bot_attack_data.request = attack_request
-
-	return 
 end
+
 WeaponUnitExtension.is_starting_attack = function (self)
 	local current_action_settings = self.current_action_settings
 
 	return current_action_settings and current_action_settings.kind == "melee_start"
 end
+
 WeaponUnitExtension.time_to_next_attack = function (self, wanted_attack_type, current_actions, current_weapon_name, t, attack_chain)
 	local bot_attack_data = self.bot_attack_data
 	local chain_action, chain_action_settings, action_settings = nil
@@ -848,8 +848,6 @@ WeaponUnitExtension.time_to_next_attack = function (self, wanted_attack_type, cu
 	else
 		return nil
 	end
-
-	return 
 end
 
-return 
+return

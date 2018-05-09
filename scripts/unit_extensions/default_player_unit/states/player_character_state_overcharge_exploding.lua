@@ -1,4 +1,5 @@
 PlayerCharacterStateOverchargeExploding = class(PlayerCharacterStateOverchargeExploding, PlayerCharacterState)
+
 PlayerCharacterStateOverchargeExploding.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "overcharge_exploding")
 
@@ -6,9 +7,8 @@ PlayerCharacterStateOverchargeExploding.init = function (self, character_state_i
 	self.movement_speed_limit = 1
 	self.last_input_direction = Vector3Box(0, 0, 0)
 	self.inside_inn = global_is_inside_inn
-
-	return 
 end
+
 PlayerCharacterStateOverchargeExploding.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	CharacterStateHelper.stop_weapon_actions(self.inventory_extension, "exploding")
 
@@ -35,12 +35,11 @@ PlayerCharacterStateOverchargeExploding.on_enter = function (self, unit, input, 
 	self.explosion_template = overcharge_extension.explosion_template
 	self.walking = false
 	self.falling = false
-
-	return 
 end
+
 PlayerCharacterStateOverchargeExploding.on_exit = function (self, unit, input, dt, context, t, next_state)
 	if not Managers.state.network:game() or not next_state then
-		return 
+		return
 	end
 
 	CharacterStateHelper.play_animation_event(unit, "cooldown_end")
@@ -56,9 +55,8 @@ PlayerCharacterStateOverchargeExploding.on_exit = function (self, unit, input, d
 	if self.falling and next_state ~= "falling" then
 		ScriptUnit.extension(unit, "whereabouts_system"):set_no_landing()
 	end
-
-	return 
 end
+
 PlayerCharacterStateOverchargeExploding.explode = function (self)
 	self.has_exploded = true
 	local unit = self.unit
@@ -86,9 +84,8 @@ PlayerCharacterStateOverchargeExploding.explode = function (self)
 	local scale = 1
 
 	Managers.state.entity:system("area_damage_system"):create_explosion(unit, position, rotation, explosion_template, scale, "overcharge")
-
-	return 
 end
+
 PlayerCharacterStateOverchargeExploding.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local world = self.world
@@ -115,7 +112,7 @@ PlayerCharacterStateOverchargeExploding.update = function (self, unit, input, dt
 	end
 
 	if CharacterStateHelper.do_common_state_transitions(status_extension, csm) then
-		return 
+		return
 	end
 
 	local params = self.temp_params
@@ -123,7 +120,7 @@ PlayerCharacterStateOverchargeExploding.update = function (self, unit, input, dt
 	if CharacterStateHelper.is_ledge_hanging(world, unit, params) then
 		csm.change_state(csm, "ledge_hanging", params)
 
-		return 
+		return
 	end
 
 	if (self.explosion_time <= t and not self.has_exploded) or not status_extension.is_overcharge_exploding(status_extension) then
@@ -146,7 +143,7 @@ PlayerCharacterStateOverchargeExploding.update = function (self, unit, input, dt
 			first_person_extension.change_state(first_person_extension, "falling")
 		end
 
-		return 
+		return
 	end
 
 	if self.damage_timer < t then
@@ -234,8 +231,6 @@ PlayerCharacterStateOverchargeExploding.update = function (self, unit, input, dt
 	end
 
 	self.walking = walking
-
-	return 
 end
 
-return 
+return

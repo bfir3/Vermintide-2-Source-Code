@@ -1,8 +1,6 @@
 local destroyed_mt = {
 	__index = function ()
 		error("This object has been destroyed")
-
-		return 
 	end
 }
 local special_functions = {
@@ -40,8 +38,6 @@ function class(class_table, ...)
 				end
 
 				setmetatable(self, destroyed_mt)
-
-				return 
 			end
 		}
 	end
@@ -57,4 +53,4 @@ function class(class_table, ...)
 	return class_table
 end
 
-return 
+return

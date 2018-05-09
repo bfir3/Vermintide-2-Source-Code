@@ -2,11 +2,11 @@ require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTSkulkApproachAction = class(BTSkulkApproachAction, BTNode)
 BTSkulkApproachAction.name = "BTSkulkApproachAction"
+
 BTSkulkApproachAction.init = function (self, ...)
 	BTSkulkApproachAction.super.init(self, ...)
-
-	return 
 end
+
 BTSkulkApproachAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	local target_dist = blackboard.target_dist
@@ -44,9 +44,8 @@ BTSkulkApproachAction.enter = function (self, unit, blackboard, t)
 
 		network_manager.network_transmit:send_rpc_all("rpc_tutorial_message", template_id, message_id)
 	end
-
-	return 
 end
+
 BTSkulkApproachAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local skulk_data = blackboard.skulk_data
 	skulk_data.animation_state = nil
@@ -63,10 +62,10 @@ BTSkulkApproachAction.leave = function (self, unit, blackboard, t, reason, destr
 			self.start_move_animation(self, unit, blackboard)
 		end
 	end
-
-	return 
 end
+
 local RADIUS_DECRESE_PER_TEST = 0.5
+
 BTSkulkApproachAction.run = function (self, unit, blackboard, t, dt)
 	self.update_skulk_data(self, unit, blackboard, dt)
 
@@ -118,6 +117,7 @@ BTSkulkApproachAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTSkulkApproachAction.update_skulk_data = function (self, unit, blackboard, dt)
 	local action = blackboard.action
 	local start_radius = action.skulk_init_distance
@@ -135,10 +135,10 @@ BTSkulkApproachAction.update_skulk_data = function (self, unit, blackboard, dt)
 	radius = math.clamp(radius, 0, start_radius)
 	skulk_data.radius = radius
 	skulk_data.skulk_around_time = skulk_data.skulk_around_time + dt
-
-	return 
 end
+
 local MINIMUM_SKULK_RADIUS = 5
+
 BTSkulkApproachAction.commit_to_target = function (self, unit, blackboard, dt)
 	local action = blackboard.action
 	local has_been_attacked = blackboard.previous_attacker
@@ -149,6 +149,7 @@ BTSkulkApproachAction.commit_to_target = function (self, unit, blackboard, dt)
 
 	return commit_to_target
 end
+
 BTSkulkApproachAction.at_goal = function (self, unit, blackboard)
 	local skulk_data = blackboard.skulk_data
 	local position_boxed = blackboard.move_pos
@@ -163,9 +164,8 @@ BTSkulkApproachAction.at_goal = function (self, unit, blackboard)
 	if distance < 0.25 then
 		return true
 	end
-
-	return 
 end
+
 BTSkulkApproachAction.move_to = function (self, position, unit, blackboard)
 	local skulk_data = blackboard.skulk_data
 	local ai_navigation = blackboard.navigation_extension
@@ -173,25 +173,22 @@ BTSkulkApproachAction.move_to = function (self, position, unit, blackboard)
 	ai_navigation.move_to(ai_navigation, position)
 
 	blackboard.move_pos = Vector3Box(position)
-
-	return 
 end
+
 BTSkulkApproachAction.idle = function (self, unit, blackboard)
 	Managers.state.network:anim_event(unit, "to_passive")
 	self.anim_event(self, unit, blackboard, "idle")
 
 	blackboard.move_state = "idle"
-
-	return 
 end
+
 BTSkulkApproachAction.start_move_animation = function (self, unit, blackboard)
 	Managers.state.network:anim_event(unit, "to_combat")
 	self.anim_event(self, unit, blackboard, "move_fwd_run")
 
 	blackboard.move_state = "moving"
-
-	return 
 end
+
 BTSkulkApproachAction.anim_event = function (self, unit, blackboard, anim)
 	local skulk_data = blackboard.skulk_data
 
@@ -200,10 +197,10 @@ BTSkulkApproachAction.anim_event = function (self, unit, blackboard, anim)
 
 		skulk_data.animation_state = anim
 	end
-
-	return 
 end
+
 local TRIES = 15
+
 BTSkulkApproachAction.get_random_goal_on_circle = function (self, unit, blackboard)
 	local skulk_data = blackboard.skulk_data
 	local radius = skulk_data.radius
@@ -252,6 +249,7 @@ BTSkulkApproachAction.get_random_goal_on_circle = function (self, unit, blackboa
 
 	return false
 end
+
 BTSkulkApproachAction.debug_show_skulk_circle = function (self, unit, blackboard)
 	local action = blackboard.action
 	local skulk_start_radius = action.skulk_init_distance
@@ -263,8 +261,6 @@ BTSkulkApproachAction.debug_show_skulk_circle = function (self, unit, blackboard
 
 	QuickDrawer:circle(target_position + offset, radius, Vector3.up(), Colors.get("light_green"))
 	QuickDrawer:circle(target_position + offset, skulk_start_radius, Vector3.up(), Colors.get("light_green"))
-
-	return 
 end
 
-return 
+return

@@ -634,8 +634,6 @@ UIElements = {
 				click_check_content_id = "scrollbar_down_hotspot",
 				click_function = function (ui_scenegraph, ui_style, ui_content, input_service)
 					ui_content.internal_scroll_value = math.max(0, ui_content.internal_scroll_value - ui_content.scroll_step_size)
-
-					return 
 				end
 			},
 			{
@@ -643,8 +641,6 @@ UIElements = {
 				click_check_content_id = "scrollbar_up_hotspot",
 				click_function = function (ui_scenegraph, ui_style, ui_content, input_service)
 					ui_content.internal_scroll_value = math.min(1, ui_content.internal_scroll_value + ui_content.scroll_step_size)
-
-					return 
 				end
 			},
 			{
@@ -659,8 +655,6 @@ UIElements = {
 					local y_pos = math.min(min + (max - min) * ui_content.internal_scroll_value, max - bar_height)
 					local_position[2] = y_pos
 					ui_content.scroll_value = (y_pos - min) / (max - bar_height - min)
-
-					return 
 				end
 			},
 			{
@@ -691,8 +685,6 @@ UIElements = {
 					local current_position = math.clamp(current_offset_center_bar, 0, size[2])
 					local delta_value = math.min(current_position / size[2], 1)
 					ui_content.internal_scroll_value = delta_value
-
-					return 
 				end
 			}
 		}
@@ -977,4 +969,4 @@ UIElements = {
 	end
 }
 
-return 
+return

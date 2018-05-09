@@ -140,4 +140,4 @@ local num_breeds = #NetworkLookup.breeds
 
 fassert(num_breeds <= num_bitmasks_bits, "Need to update enemy_package_loader_bitmask_array so that it enough 32-bit elements to contain number of breeds (%i).", num_breeds)
 
-return 
+return

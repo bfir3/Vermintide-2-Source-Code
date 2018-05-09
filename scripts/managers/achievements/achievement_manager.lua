@@ -39,7 +39,7 @@ local platform_functions = {
 			return token < time
 		end,
 		reset = function ()
-			return 
+			return
 		end
 	},
 	steam = {
@@ -53,8 +53,6 @@ local platform_functions = {
 			if result.done then
 				return true, result.error
 			end
-
-			return 
 		end,
 		is_unlocked = function (template)
 			local unlocked, error_msg = Achievement.unlocked(template.id)
@@ -72,13 +70,9 @@ local platform_functions = {
 			if result.done then
 				return true, result.error
 			end
-
-			return 
 		end,
 		reset = function ()
 			Achievement.reset()
-
-			return 
 		end
 	},
 	ps4 = {
@@ -115,13 +109,9 @@ local platform_functions = {
 			elseif result == Trophies.UNKNOWN then
 				return true, "unknown"
 			end
-
-			return 
 		end,
 		reset = function ()
 			errorf("Tried to reset Trophies, not implemented!")
-
-			return 
 		end
 	},
 	xb1 = {
@@ -143,11 +133,11 @@ local platform_functions = {
 			fassert(achievement_id, "[AchievementManager] No Achievement ID specified for achievement %q", template_id)
 
 			if not rawget(_G, "XB1Achievements") then
-				return 
+				return
 			end
 
 			if Achievements2017.is_refreshing(XB1Achievements) or Achievements2017.progress_task_status(XB1Achievements) == PROGRESS_TASK_STARTED then
-				return 
+				return
 			end
 
 			local current_progress = Achievements2017.progress(XB1Achievements, achievement_id)
@@ -161,11 +151,11 @@ local platform_functions = {
 			if current_progress == 100 then
 				Managers.account:set_achievement_unlocked(template_id)
 
-				return 
+				return
 			end
 
 			if new_progress <= current_progress then
-				return 
+				return
 			end
 
 			local error_msg = Achievements2017.set_progress(XB1Achievements, achievement_id, new_progress)
@@ -192,18 +182,15 @@ local platform_functions = {
 
 				return true, "error"
 			end
-
-			return 
 		end,
 		reset = function ()
 			errorf("Tried to reset Achievements2017, not implemented!")
-
-			return 
 		end
 	}
 }
 AchievementManager = class(AchievementManager)
 local ACHIEVEMENTS_PER_FRAME = 1
+
 AchievementManager.init = function (self, world, statistics_db, is_in_inn)
 	self.world = world
 	self.statistics_db = statistics_db
@@ -270,20 +257,17 @@ AchievementManager.init = function (self, world, statistics_db, is_in_inn)
 
 	Managers.state.event:register(self, "event_enable_achievements", "event_enable_achievements")
 	Managers.state.event:register(self, "event_set_loadout_items", "event_set_loadout_items")
-
-	return 
 end
+
 AchievementManager.event_enable_achievements = function (self, enable)
 	self._enabled = enable
-
-	return 
 end
+
 AchievementManager.event_set_loadout_items = function (self)
 	self.context_set_loadout = true
 	self.next_achievement_to_process_index = 0
-
-	return 
 end
+
 AchievementManager._initialize_xbox_achivements = function (self)
 	local setup_data = require("scripts/settings/events_xb1")
 
@@ -292,9 +276,8 @@ AchievementManager._initialize_xbox_achivements = function (self)
 	Achievements2017.refresh(XB1Achievements)
 
 	self._xbox_achievements_initialized = true
-
-	return 
 end
+
 AchievementManager.destroy = function (self)
 	Managers.state.event:unregister("event_enable_achievements", self)
 	Managers.state.event:unregister("event_set_loadout_items", self)
@@ -304,9 +287,8 @@ AchievementManager.destroy = function (self)
 
 		self.gui = nil
 	end
-
-	return 
 end
+
 AchievementManager.update = function (self, dt)
 	if self.error_timeout then
 		self.error_timeout = self.error_timeout - dt
@@ -315,7 +297,7 @@ AchievementManager.update = function (self, dt)
 			self.error_timeout = nil
 		end
 
-		return 
+		return
 	end
 
 	local platform = self.platform
@@ -327,11 +309,11 @@ AchievementManager.update = function (self, dt)
 			self._sent_warning = true
 		end
 
-		return 
+		return
 	end
 
 	if not self._enabled then
-		return 
+		return
 	end
 
 	if platform == "xb1" and not self._xbox_achievements_initialized then
@@ -339,7 +321,7 @@ AchievementManager.update = function (self, dt)
 			self._initialize_xbox_achivements(self)
 		end
 
-		return 
+		return
 	end
 
 	local player_manager = Managers.player
@@ -366,7 +348,7 @@ AchievementManager.update = function (self, dt)
 				else
 					self.version_token = token
 
-					return 
+					return
 				end
 			else
 				local done, error_msg = platform_functions.version_result(self.version_token)
@@ -377,12 +359,12 @@ AchievementManager.update = function (self, dt)
 					if error_msg then
 						print("[AchievementManager] Couldn't update achievement version number stat")
 
-						return 
+						return
 					else
 						self.checked_version_number = true
 					end
 				else
-					return 
+					return
 				end
 			end
 		end
@@ -493,9 +475,8 @@ AchievementManager.update = function (self, dt)
 			end
 		end
 	end
-
-	return 
 end
+
 AchievementManager._test = function (self)
 	if not self._achievements then
 		self._achievements = Achievements2017(Managers.account:user_id())
@@ -512,9 +493,8 @@ AchievementManager._test = function (self)
 	end
 
 	slot1 = self._info and 0
-
-	return 
 end
+
 AchievementManager.reset = function (self)
 	local platform = self.platform
 	local platform_functions = platform_functions[platform]
@@ -526,12 +506,12 @@ AchievementManager.reset = function (self)
 	end
 
 	self.unlock_tasks = {}
-
-	return 
 end
+
 local font_size = 16
 local font = "gw_arial_16"
 local font_mtrl = "materials/fonts/" .. font
+
 AchievementManager.debug_draw = function (self)
 	if script_data.achievement_debug then
 		if self.gui == nil then
@@ -574,8 +554,6 @@ AchievementManager.debug_draw = function (self)
 	end
 
 	self.statistics_db:debug_draw()
-
-	return 
 end
 
-return 
+return

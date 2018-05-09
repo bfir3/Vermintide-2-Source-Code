@@ -2,23 +2,20 @@ SystemDialogManager = class(SystemDialogManager)
 
 local function dprint(...)
 	print("[SystemDialogManager]", ...)
-
-	return 
 end
 
 SystemDialogManager.init = function (self)
 	self._dialogs = {}
+end
 
-	return 
-end
 SystemDialogManager.destroy = function (self)
-	return 
+	return
 end
+
 SystemDialogManager.update = function (self, dt)
 	self._handle_dialogs(self)
-
-	return 
 end
+
 SystemDialogManager.check_status = function (self, dialog_instance)
 	local data = nil
 
@@ -34,33 +31,37 @@ SystemDialogManager.check_status = function (self, dialog_instance)
 
 	return status
 end
+
 SystemDialogManager._get_status = function (self, dialog_instance)
 	local status = dialog_instance.update()
 
 	return status
 end
+
 SystemDialogManager._initialize = function (self, dialog_instance)
 	local result = dialog_instance.initialize()
 
 	if result ~= PS4.SCE_OK then
 		dprint("Failed to initialize " .. dialog_instance._name)
 
-		return 
+		return
 	end
 
 	return true
 end
+
 SystemDialogManager._terminate = function (self, dialog_instance)
 	local result = dialog_instance.terminate()
 
 	if result ~= PS4.SCE_OK then
 		dprint("Failed to terminate " .. dialog_instance._name)
 
-		return 
+		return
 	end
 
 	return true
 end
+
 SystemDialogManager._handle_dialogs = function (self)
 	local data = nil
 
@@ -95,9 +96,8 @@ SystemDialogManager._handle_dialogs = function (self)
 			end
 		end
 	end
-
-	return 
 end
+
 SystemDialogManager.open_system_dialog = function (self, message, user_id)
 	local function open(data)
 		local dialog_instance = data.dialog_instance
@@ -116,9 +116,8 @@ SystemDialogManager.open_system_dialog = function (self, message, user_id)
 		params = params,
 		open = open
 	}
-
-	return 
 end
+
 SystemDialogManager.open_save_dialog = function (self, required_blocks)
 	local function open(data)
 		local dialog_instance = data.dialog_instance
@@ -133,9 +132,8 @@ SystemDialogManager.open_save_dialog = function (self, required_blocks)
 		required_blocks = required_blocks,
 		open = open
 	}
-
-	return 
 end
+
 SystemDialogManager.open_commerce_dialog = function (self, mode, user_id, targets)
 	local function open(data)
 		local dialog_instance = data.dialog_instance
@@ -153,9 +151,8 @@ SystemDialogManager.open_commerce_dialog = function (self, mode, user_id, target
 		targets = targets,
 		open = open
 	}
-
-	return 
 end
+
 SystemDialogManager.open_error_dialog = function (self, error_code, callback)
 	local function open(data)
 		local dialog_instance = data.dialog_instance
@@ -171,8 +168,6 @@ SystemDialogManager.open_error_dialog = function (self, error_code, callback)
 		open = open,
 		callback = callback
 	}
-
-	return 
 end
 
-return 
+return

@@ -1,13 +1,13 @@
 require("scripts/unit_extensions/generic/generic_volume_templates")
 
 GenericVolumeExtension = class(GenericVolumeExtension)
+
 GenericVolumeExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	self.unit = unit
 	self.volume_data = {}
 	self.active_updates_n = 0
-
-	return 
 end
+
 GenericVolumeExtension.destroy = function (self)
 	local unit = self.unit
 
@@ -23,9 +23,8 @@ GenericVolumeExtension.destroy = function (self)
 
 	self.unit = nil
 	self.volume_data = nil
-
-	return 
 end
+
 GenericVolumeExtension.on_volume_enter = function (self, dt, t, volume)
 	local volume_data = self.volume_data
 	local templates = GenericVolumeTemplates.functions
@@ -55,9 +54,8 @@ GenericVolumeExtension.on_volume_enter = function (self, dt, t, volume)
 	if data.update_func then
 		self.set_update_active(self, data, true)
 	end
-
-	return 
 end
+
 GenericVolumeExtension.on_volume_exit = function (self, volume)
 	local data = self.volume_data[volume.volume_name]
 	data.is_inside = false
@@ -69,14 +67,12 @@ GenericVolumeExtension.on_volume_exit = function (self, volume)
 	if data.update_func then
 		self.set_update_active(self, data, false)
 	end
-
-	return 
 end
+
 GenericVolumeExtension.on_volume_unregistered = function (self, volume)
 	self.volume_data[volume.volume_name] = nil
-
-	return 
 end
+
 GenericVolumeExtension.update = function (self, dt, t, context)
 	local unit = self.unit
 
@@ -85,18 +81,17 @@ GenericVolumeExtension.update = function (self, dt, t, context)
 			data.update_func(unit, dt, t, context, data)
 		end
 	end
-
-	return 
 end
+
 GenericVolumeExtension.set_update_active = function (self, data, active)
 	self.active_updates_n = self.active_updates_n + ((active and 1) or -1)
 	data.update_active = active
-
-	return 
 end
+
 GenericVolumeExtension.do_update = function (self)
 	return 0 < self.active_updates_n
 end
+
 GenericVolumeExtension.is_inside_volume = function (self, volume_name)
 	local volume_data = self.volume_data
 	local data = volume_data and volume_data[volume_name]
@@ -105,4 +100,4 @@ GenericVolumeExtension.is_inside_volume = function (self, volume_name)
 	return is_inside
 end
 
-return 
+return

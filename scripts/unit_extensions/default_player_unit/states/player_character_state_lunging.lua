@@ -1,13 +1,13 @@
 local POSITION_LOOKUP = POSITION_LOOKUP
 PlayerCharacterStateLunging = class(PlayerCharacterStateLunging, PlayerCharacterState)
+
 PlayerCharacterStateLunging.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "lunging")
 
 	self._direction = Vector3Box()
 	self._last_position = Vector3Box()
-
-	return 
 end
+
 PlayerCharacterStateLunging._on_enter_animation = function (self, unit, anim_event, variable_name, variable_value, first_person_anim_event)
 	if variable_name then
 		CharacterStateHelper.play_animation_event_with_variable_float(unit, anim_event, variable_name, variable_value)
@@ -18,9 +18,8 @@ PlayerCharacterStateLunging._on_enter_animation = function (self, unit, anim_eve
 	local first_person_extension = self.first_person_extension
 
 	CharacterStateHelper.play_animation_event_first_person(first_person_extension, first_person_anim_event or anim_event)
-
-	return 
 end
+
 PlayerCharacterStateLunging.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	local unit = self.unit
 	local input_extension = self.input_extension
@@ -80,9 +79,8 @@ PlayerCharacterStateLunging.on_enter = function (self, unit, input, dt, context,
 		self.max_targets_impact = max_targets_impact
 		self.max_targets = (max_targets_impact < max_targets_attack and max_targets_attack) or max_targets_impact
 	end
-
-	return 
 end
+
 PlayerCharacterStateLunging.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local data = self._lunge_data
 	local hit = self._hit
@@ -125,9 +123,8 @@ PlayerCharacterStateLunging.on_exit = function (self, unit, input, dt, context, 
 	self._hit = nil
 
 	self.first_person_extension:enable_rig_movement()
-
-	return 
 end
+
 PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -176,19 +173,19 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 	end
 
 	if CharacterStateHelper.do_common_state_transitions(status_extension, csm) then
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_using_transport(status_extension) then
 		csm.change_state(csm, "using_transport")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_overcharge_exploding(status_extension) then
 		csm.change_state(csm, "overcharge_exploding")
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_pushed(status_extension) then
@@ -200,7 +197,7 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 
 		csm.change_state(csm, "stunned", params)
 
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_block_broken(status_extension) then
@@ -211,7 +208,7 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 
 		csm.change_state(csm, "stunned", params)
 
-		return 
+		return
 	end
 
 	if not stop then
@@ -250,7 +247,7 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 
 			first_person_extension.change_state(first_person_extension, "falling")
 
-			return 
+			return
 		else
 			csm.change_state(csm, "walking", self.temp_params)
 
@@ -258,16 +255,15 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 
 			first_person_extension.change_state(first_person_extension, "walking")
 
-			return 
+			return
 		end
 	end
 
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, first_person_extension, status_extension, self.inventory_extension, 0.5)
 	CharacterStateHelper.update_weapon_actions(t, unit, input_extension, self.inventory_extension, self.health_extension)
 	CharacterStateHelper.reload(input_extension, self.inventory_extension, status_extension)
-
-	return 
 end
+
 PlayerCharacterStateLunging._update_movement = function (self, unit, dt, t, lunge_data)
 	if self._falling then
 		return self._move_in_air(self, unit, dt, t, lunge_data)
@@ -275,6 +271,7 @@ PlayerCharacterStateLunging._update_movement = function (self, unit, dt, t, lung
 
 	return self._move_on_ground(self, unit, dt, t, lunge_data)
 end
+
 PlayerCharacterStateLunging._move_on_ground = function (self, unit, dt, t, lunge_data)
 	local locomotion_extension = self.locomotion_extension
 	local first_person_extension = self.first_person_extension
@@ -310,6 +307,7 @@ PlayerCharacterStateLunging._move_on_ground = function (self, unit, dt, t, lunge
 
 	return lunge_time < duration
 end
+
 PlayerCharacterStateLunging._move_in_air = function (self, unit, dt, t, lunge_data)
 	local locomotion_extension = self.locomotion_extension
 	local first_person_extension = self.first_person_extension
@@ -344,6 +342,7 @@ PlayerCharacterStateLunging._move_in_air = function (self, unit, dt, t, lunge_da
 
 	return lunge_time < duration
 end
+
 PlayerCharacterStateLunging._parse_attack_data = function (self, damage_settings)
 	local career_power_level = self.career_extension:get_career_power_level()
 	local power_level_multiplier = damage_settings.power_level_multiplier
@@ -355,6 +354,7 @@ PlayerCharacterStateLunging._parse_attack_data = function (self, damage_settings
 
 	return damage_profile_id, power_level, hit_zone_id, damage_settings.ignore_shield, damage_settings.allow_backstab
 end
+
 PlayerCharacterStateLunging._calculate_hit_mass = function (self, shield_blocked, current_action, hit_unit, breed)
 	if breed and AiUtils.unit_alive(hit_unit) then
 		local difficulty_rank = Managers.state.difficulty:get_difficulty_rank()
@@ -373,6 +373,7 @@ PlayerCharacterStateLunging._calculate_hit_mass = function (self, shield_blocked
 
 	return shield_blocked
 end
+
 PlayerCharacterStateLunging._update_damage = function (self, unit, dt, t, damage_data)
 	local padding = damage_data.depth_padding
 	local half_width = 0.5 * damage_data.width
@@ -484,7 +485,9 @@ PlayerCharacterStateLunging._update_damage = function (self, unit, dt, t, damage
 
 	return false
 end
+
 local hit_units = {}
+
 PlayerCharacterStateLunging._do_blast = function (self, new_pos, forward_direction)
 	self._hit = true
 	local lunge_data = self._lunge_data
@@ -531,8 +534,6 @@ PlayerCharacterStateLunging._do_blast = function (self, new_pos, forward_directi
 			end
 		end
 	end
-
-	return 
 end
 
-return 
+return

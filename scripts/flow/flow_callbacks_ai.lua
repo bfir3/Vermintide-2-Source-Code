@@ -2,16 +2,12 @@ function flow_callback_activate_ai_spawner(params)
 	local spawner_unit = params.spawner_unit
 
 	Managers.state.event:trigger("activate_ai_spawner", spawner_unit)
-
-	return 
 end
 
 function flow_callback_deactivate_ai_spawner(params)
 	local spawner_unit = params.spawner_unit
 
 	Managers.state.event:trigger("deactivate_ai_spawner", spawner_unit)
-
-	return 
 end
 
 function flow_callback_hibernate_spawner(params)
@@ -20,20 +16,14 @@ function flow_callback_hibernate_spawner(params)
 	local spawner_system = Managers.state.entity:system("spawner_system")
 
 	spawner_system.hibernate_spawner(spawner_system, spawner_unit, hibernate)
-
-	return 
 end
 
 function flow_callback_ai_move_group_command(params)
 	Managers.state.event:trigger("ai_move_group", params.player_name, params.group_name, params.target_unit, params.on_arrived_event_name)
-
-	return 
 end
 
 function flow_callback_ai_move_single_command(params)
 	Managers.state.event:trigger("ai_move_single", params.move_unit, params.target_unit)
-
-	return 
 end
 
 function flow_callback_ai_despawn(params)
@@ -41,8 +31,6 @@ function flow_callback_ai_despawn(params)
 	local spawner = ScriptUnit.extension(spawner_unit, "spawner_system")
 
 	spawner.despawn(spawner)
-
-	return 
 end
 
 function flow_callback_ai_kill(params)
@@ -50,7 +38,7 @@ function flow_callback_ai_kill(params)
 	local breed = Unit.get_data(hit_unit, "breed")
 
 	if not breed then
-		return 
+		return
 	end
 
 	local hit_actor = params.hit_actor
@@ -61,8 +49,6 @@ function flow_callback_ai_kill(params)
 	local attack_direction = -params.hit_normal
 
 	AiUtils.kill_unit(hit_unit, hit_unit, hit_zone_name, damage_type, attack_direction)
-
-	return 
 end
 
 function trigger_ai_equipment_flow_event(params)
@@ -77,8 +63,6 @@ function trigger_ai_equipment_flow_event(params)
 			unit_flow(inventory_item_units[i], params.event)
 		end
 	end
-
-	return 
 end
 
 function flow_callback_ai_follow_path(params)
@@ -103,8 +87,6 @@ function flow_callback_ai_follow_path(params)
 			finish_event = finish_event
 		}
 	end
-
-	return 
 end
 
 function flow_callback_ai_patrol_path(params)
@@ -126,8 +108,6 @@ function flow_callback_ai_patrol_path(params)
 			name = "patrol"
 		}
 	end
-
-	return 
 end
 
 function flow_callback_ai_move_to_command(params)
@@ -152,8 +132,6 @@ function flow_callback_ai_move_to_command(params)
 			finish_event = finish_event
 		}
 	end
-
-	return 
 end
 
 function flow_callback_ai_detect_player(params)
@@ -171,8 +149,6 @@ function flow_callback_ai_detect_player(params)
 		local ai_base = ScriptUnit.extension(ai_entity, "ai_system")
 		ai_base.blackboard(ai_base).players[player_unit] = true
 	end
-
-	return 
 end
 
 function flow_callback_ai_hold_position(params)
@@ -201,8 +177,6 @@ function flow_callback_ai_hold_position(params)
 		brain.change_behaviour(brain, "avoidance", "nil_tree")
 		brain.change_behaviour(brain, "pathing", "nil_tree")
 	end
-
-	return 
 end
 
 function flow_callback_set_ai_properties(params)
@@ -222,8 +196,6 @@ function flow_callback_set_ai_properties(params)
 
 		ai_base.set_properties(ai_base, params)
 	end
-
-	return 
 end
 
 function flow_callback_set_ai_perception(params)
@@ -242,8 +214,6 @@ function flow_callback_set_ai_perception(params)
 
 		ai_base.perception(ai_base):set_config(params)
 	end
-
-	return 
 end
 
 function flow_callback_ai_set_waypoint(params)
@@ -253,50 +223,36 @@ function flow_callback_ai_set_waypoint(params)
 	local level = LevelHelper:current_level(world)
 
 	Level.set_flow_variable(level, waypoint_name, waypoint_unit)
-
-	return 
 end
 
 function flow_callback_ai_set_areas(params)
 	flow_callback_set_ai_properties(params)
-
-	return 
 end
 
 function flow_callback_set_ai_spawner_mode(params)
 	Managers.state.entity:system("spawner_system"):set_deterministic(params.deterministic)
-
-	return 
 end
 
 function flow_callback_force_terror_event(params)
 	if Managers.player.is_server or LEVEL_EDITOR_TEST then
 		Managers.state.conflict:start_terror_event(params.event_type)
 	end
-
-	return 
 end
 
 function flow_callback_override_player_respawning(params)
 	if Managers.player.is_server or LEVEL_EDITOR_TEST then
 		Managers.state.spawn.respawn_handler:set_override_respawn_group(params.respawn_group_name, params.active)
 	end
-
-	return 
 end
 
 function flow_callback_pick_crossroad_path(params)
 	if Managers.player.is_server or LEVEL_EDITOR_TEST then
 		Managers.state.conflict.level_analysis:pick_crossroad_path(params.crossroad_id, params.path_id)
 	end
-
-	return 
 end
 
 function flow_callback_change_spawner_id(params)
 	Managers.state.entity:system("spawner_system"):change_spawner_id(params.unit, params.spawner_id, params.new_spawner_id)
-
-	return 
 end
 
 function flow_callback_stop_terror_event(params)
@@ -305,16 +261,12 @@ function flow_callback_stop_terror_event(params)
 
 		TerrorEventMixer.stop_event(event_name)
 	end
-
-	return 
 end
 
 function flow_callback_force_random_terror_event(params)
 	if Managers.player.is_server or LEVEL_EDITOR_TEST then
 		TerrorEventMixer.start_random_event(params.event_chunk)
 	end
-
-	return 
 end
 
 function flow_callback_bot_nav_transition_entered(params)
@@ -330,8 +282,6 @@ function flow_callback_bot_nav_transition_entered(params)
 	else
 		Application.warning(string.format("[flow_callback_bot_nav_transition_left] Unit: %s missing extension \"ai_navigation_system\"", tostring(bot_unit)))
 	end
-
-	return 
 end
 
 function flow_callback_bot_nav_transition_left(params)
@@ -347,13 +297,11 @@ function flow_callback_bot_nav_transition_left(params)
 	else
 		Application.warning(string.format("[flow_callback_bot_nav_transition_left] Unit: %s missing extension \"ai_navigation_system\"", tostring(bot_unit)))
 	end
-
-	return 
 end
 
 function flow_callback_player_bot_hold_position(params)
 	if not Managers.player.is_server then
-		return 
+		return
 	end
 
 	local player_unit = params.player_unit
@@ -384,13 +332,11 @@ function flow_callback_player_bot_hold_position(params)
 	else
 		Application.warning(string.format("[flow_callback_player_bot_hold_position] Unit: %s is missing ai_bot_group_extension", tostring(player_unit)))
 	end
-
-	return 
 end
 
 function flow_callback_overcharge_explode_player_bot(params)
 	if not Managers.player.is_server then
-		return 
+		return
 	end
 
 	local player_unit = params.player_unit
@@ -404,13 +350,11 @@ function flow_callback_overcharge_explode_player_bot(params)
 
 		overcharge_extension.add_charge(overcharge_extension, max_overcharge)
 	end
-
-	return 
 end
 
 function flow_callback_broadphase_ai_set_goal_destination(params)
 	if not Managers.player.is_server then
-		return 
+		return
 	end
 
 	local goal_unit = params.goal_unit
@@ -455,8 +399,6 @@ function flow_callback_broadphase_ai_set_goal_destination(params)
 	else
 		Application.warning(string.format("[flow_callback_broadphase_ai_set_goal_destination] Couldn't find nearby navmesh for Goal Unit: %s", tostring(goal_unit)))
 	end
-
-	return 
 end
 
-return 
+return

@@ -703,8 +703,6 @@ local function check_event_overrides(override_data, override_table_name, level_n
 			end
 		end
 	end
-
-	return 
 end
 
 for level_key, level_data in pairs(LevelSettings) do
@@ -726,6 +724,7 @@ for level_key, level_data in pairs(LevelSettings) do
 end
 
 LevelSettingsMeta = LevelSettingsMeta or {}
+
 LevelSettingsMeta.__index = function (table, key)
 	Application.error(string.format("LevelSettings has no level %q\n", tostring(key)))
 	Application.error("Maybe you were looking for one of these:")
@@ -735,11 +734,9 @@ LevelSettingsMeta.__index = function (table, key)
 	end
 
 	error("")
-
-	return 
 end
 
 setmetatable(LevelSettings, LevelSettingsMeta)
 dofile("scripts/settings/level_unlock_settings")
 
-return 
+return

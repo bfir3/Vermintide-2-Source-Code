@@ -2,8 +2,6 @@ local function debug_print(message, ...)
 	if DEBUG_TWITCH then
 		print("[Twitch] " .. string.format(message, ...))
 	end
-
-	return 
 end
 
 local function default_validation_func(vote_data)
@@ -51,8 +49,6 @@ local function default_validation_func(vote_data)
 			vote_data.validation_data = nil
 		end
 	end
-
-	return 
 end
 
 local function add_item(is_server, player_unit, pickup_type)
@@ -119,8 +115,6 @@ local function add_item(is_server, player_unit, pickup_type)
 			end
 		end
 	end
-
-	return 
 end
 
 TwitchVoteTemplates = TwitchVoteTemplates or {}
@@ -155,8 +149,6 @@ TwitchVoteTemplates.twitch_give_first_aid_kit = {
 				break
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_give_healing_draught = {
@@ -190,8 +182,6 @@ TwitchVoteTemplates.twitch_give_healing_draught = {
 				break
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_give_damage_boost_potion = {
@@ -225,8 +215,6 @@ TwitchVoteTemplates.twitch_give_damage_boost_potion = {
 				break
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_give_speed_boost_potion = {
@@ -260,8 +248,6 @@ TwitchVoteTemplates.twitch_give_speed_boost_potion = {
 				break
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_give_cooldown_reduction_potion = {
@@ -295,8 +281,6 @@ TwitchVoteTemplates.twitch_give_cooldown_reduction_potion = {
 				break
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_give_frag_grenade_t1 = {
@@ -330,8 +314,6 @@ TwitchVoteTemplates.twitch_give_frag_grenade_t1 = {
 				break
 			end
 		end
-
-		return 
 	end
 }
 TwitchVoteTemplates.twitch_give_fire_grenade_t1 = {
@@ -365,9 +347,7 @@ TwitchVoteTemplates.twitch_give_fire_grenade_t1 = {
 				break
 			end
 		end
-
-		return 
 	end
 }
 
-return 
+return

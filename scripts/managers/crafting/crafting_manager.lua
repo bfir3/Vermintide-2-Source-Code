@@ -1,29 +1,34 @@
 CraftingManager = class(CraftingManager)
 CraftingManager.NAME = "CraftingManager"
+
 CraftingManager.init = function (self)
 	local crafting_interface = Managers.backend:get_interface("crafting")
 	self._crafting_interface = crafting_interface
+end
 
-	return 
-end
 CraftingManager.update = function (self, dt)
-	return 
+	return
 end
+
 CraftingManager.get_recipes = function (self)
 	return self._crafting_interface:get_recipes()
 end
+
 CraftingManager.get_recipes_lookup = function (self)
 	return self._crafting_interface:get_recipes_lookup()
 end
+
 CraftingManager.are_recipes_dirty = function (self)
 	local crafting_interface = self._crafting_interface
 	local dirty_reason = crafting_interface.are_recipes_dirty(crafting_interface)
 
 	return dirty_reason
 end
+
 CraftingManager.destroy = function (self)
-	return 
+	return
 end
+
 CraftingManager.craft = function (self, items, recipe_override)
 	local crafting_interface = self._crafting_interface
 	local item_backend_ids = {}
@@ -60,6 +65,7 @@ CraftingManager.craft = function (self, items, recipe_override)
 
 	return craft_id
 end
+
 CraftingManager.debug_set_crafted_items_stat = function (self, value)
 	local player_manager = Managers.player
 	local player = player_manager.local_player(player_manager)
@@ -69,9 +75,8 @@ CraftingManager.debug_set_crafted_items_stat = function (self, value)
 	statistics_db.set_stat(statistics_db, stats_id, "crafted_items", value)
 	Managers.backend:commit()
 	print("Number of crafted items set to", value)
-
-	return 
 end
+
 CraftingManager.debug_set_salvaged_items_stat = function (self, value)
 	local player_manager = Managers.player
 	local player = player_manager.local_player(player_manager)
@@ -81,8 +86,6 @@ CraftingManager.debug_set_salvaged_items_stat = function (self, value)
 	statistics_db.set_stat(statistics_db, stats_id, "salvaged_items", value)
 	Managers.backend:commit()
 	print("Number of salvaged items set to", value)
-
-	return 
 end
 
-return 
+return

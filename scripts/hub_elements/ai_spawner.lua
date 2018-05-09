@@ -2,6 +2,7 @@ require("scripts/settings/breeds")
 
 AISpawner = class(AISpawner)
 AI_TEST_COUNTER = 0
+
 AISpawner.init = function (self, world, unit)
 	self._spawner_system = Managers.state.entity:system("spawner_system")
 	self._config = {}
@@ -63,9 +64,8 @@ AISpawner.init = function (self, world, unit)
 
 		self._spawner_system:register_raw_spawner(self._unit, terror_event_id)
 	end
-
-	return 
 end
+
 AISpawner.check_for_enabled = function (self)
 	local i = 1
 	local name = "spawner"
@@ -80,18 +80,16 @@ AISpawner.check_for_enabled = function (self)
 	end
 
 	i = i + 1
-
-	return 
 end
+
 AISpawner.add_breeds = function (self, breed_list)
 	self._breed_list = self._breed_list or {}
 
 	table.append(self._breed_list, breed_list)
 
 	self._max_amount = #self._breed_list
-
-	return 
 end
+
 AISpawner.on_activate = function (self, amount, breeds, breed_list)
 	if breed_list then
 		self.add_breeds(self, breed_list)
@@ -100,17 +98,15 @@ AISpawner.on_activate = function (self, amount, breeds, breed_list)
 		self._breeds = breeds
 		self._max_amount = self._max_amount + amount
 	end
-
-	return 
 end
+
 AISpawner.on_deactivate = function (self)
 	self._max_amount = 0
 	self._spawned_units = 0
 
 	self._spawner_system:deactivate_spawner(self._unit)
-
-	return 
 end
+
 AISpawner.update = function (self, unit, input, dt, context, t)
 	if self._next_spawn < t then
 		if self._spawned_units < self._max_amount then
@@ -121,12 +117,12 @@ AISpawner.update = function (self, unit, input, dt, context, t)
 			self.on_deactivate(self)
 		end
 	end
-
-	return 
 end
+
 AISpawner.spawn_rate = function (self)
 	return self._config.spawn_rate
 end
+
 AISpawner.spawn_unit = function (self)
 	local breed, group_template, breed_name = nil
 
@@ -177,24 +173,26 @@ AISpawner.spawn_unit = function (self)
 	self._spawned_units = self._spawned_units + 1
 
 	self._spawner_system:add_waiting_to_spawn(-1)
-
-	return 
 end
+
 AISpawner.spawn_rotation = function (self)
 	local unit = self._unit
 
 	return Unit.world_rotation(unit, Unit.node(unit, self._config.node))
 end
+
 AISpawner.spawn_position = function (self)
 	local unit = self._unit
 
 	return Unit.world_position(unit, Unit.node(unit, self._config.node))
 end
+
 AISpawner.get_spawner_name = function (self)
 	return self._config.name
 end
+
 AISpawner.destroy = function (self)
-	return 
+	return
 end
 
-return 
+return

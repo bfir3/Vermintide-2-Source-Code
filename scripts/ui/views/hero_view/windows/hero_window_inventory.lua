@@ -6,6 +6,7 @@ local animation_definitions = definitions.animation_definitions
 local DO_RELOAD = false
 HeroWindowInventory = class(HeroWindowInventory)
 HeroWindowInventory.NAME = "HeroWindowInventory"
+
 HeroWindowInventory.on_enter = function (self, params, offset)
 	print("[HeroViewWindow] Enter Substate HeroWindowInventory")
 
@@ -40,9 +41,8 @@ HeroWindowInventory.on_enter = function (self, params, offset)
 
 	local inventory_sync_id = self.parent.inventory_sync_id
 	self._inventory_sync_id = inventory_sync_id
-
-	return 
 end
+
 HeroWindowInventory.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -67,9 +67,8 @@ HeroWindowInventory.create_ui_elements = function (self, params, offset)
 		window_position[2] = window_position[2] + offset[2]
 		window_position[3] = window_position[3] + offset[3]
 	end
-
-	return 
 end
+
 HeroWindowInventory.on_exit = function (self, params)
 	print("[HeroViewWindow] Exit Substate HeroWindowInventory")
 
@@ -78,9 +77,8 @@ HeroWindowInventory.on_exit = function (self, params)
 	self._item_grid:destroy()
 
 	self._item_grid = nil
-
-	return 
 end
+
 HeroWindowInventory.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -95,12 +93,12 @@ HeroWindowInventory.update = function (self, dt, t)
 	self._update_disabled_backend_ids(self)
 	self._update_page_info(self)
 	self.draw(self, dt)
+end
 
-	return 
-end
 HeroWindowInventory.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 HeroWindowInventory._update_animations = function (self, dt)
 	self.ui_animator:update(dt)
 
@@ -116,9 +114,8 @@ HeroWindowInventory._update_animations = function (self, dt)
 	end
 
 	local widgets_by_name = self._widgets_by_name
-
-	return 
 end
+
 HeroWindowInventory._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -128,9 +125,8 @@ HeroWindowInventory._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 HeroWindowInventory._is_button_hovered = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -138,9 +134,8 @@ HeroWindowInventory._is_button_hovered = function (self, widget)
 	if hotspot.on_hover_enter then
 		return true
 	end
-
-	return 
 end
+
 HeroWindowInventory._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local parent = self.parent
@@ -197,9 +192,8 @@ HeroWindowInventory._handle_input = function (self, dt, t)
 		item_grid.set_item_page(item_grid, next_page_index)
 		self._play_sound(self, "play_gui_craft_inventory_next_click")
 	end
-
-	return 
 end
+
 HeroWindowInventory._update_page_info = function (self)
 	local current_page, total_pages = self._item_grid:get_page_info()
 
@@ -214,9 +208,8 @@ HeroWindowInventory._update_page_info = function (self)
 		widgets_by_name.page_button_next.content.button_hotspot.disable_button = current_page == total_pages
 		widgets_by_name.page_button_previous.content.button_hotspot.disable_button = current_page == 1
 	end
-
-	return 
 end
+
 HeroWindowInventory._update_crafting_material_panel = function (self)
 	local backend_items = Managers.backend:get_interface("items")
 	local material_textures = UISettings.crafting_material_icons_small
@@ -250,9 +243,8 @@ HeroWindowInventory._update_crafting_material_panel = function (self)
 			}
 		end
 	end
-
-	return 
 end
+
 HeroWindowInventory._update_inventory_items = function (self)
 	local item_grid = self._item_grid
 	local parent = self.parent
@@ -275,9 +267,8 @@ HeroWindowInventory._update_inventory_items = function (self)
 
 		self._update_crafting_material_panel(self)
 	end
-
-	return 
 end
+
 HeroWindowInventory._update_disabled_backend_ids = function (self)
 	local item_grid = self._item_grid
 	local parent = self.parent
@@ -296,15 +287,13 @@ HeroWindowInventory._update_disabled_backend_ids = function (self)
 
 		item_grid.update_items_status(item_grid)
 	end
-
-	return 
 end
+
 HeroWindowInventory._exit = function (self, selected_level)
 	self.exit = true
 	self.exit_level_id = selected_level
-
-	return 
 end
+
 HeroWindowInventory.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_top_renderer = self.ui_top_renderer
@@ -318,14 +307,12 @@ HeroWindowInventory.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_top_renderer)
-
-	return 
 end
+
 HeroWindowInventory._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 HeroWindowInventory._change_category_by_name = function (self, name)
 	for i, recipe in ipairs(crafting_recipes) do
 		if recipe.name == name then
@@ -334,16 +321,15 @@ HeroWindowInventory._change_category_by_name = function (self, name)
 			break
 		end
 	end
-
-	return 
 end
+
 HeroWindowInventory._change_category_by_index = function (self, index, force_update)
 	if force_update then
 		index = self._current_category_index or 1
 	end
 
 	if self._current_category_index == index and not force_update then
-		return 
+		return
 	end
 
 	self._current_category_index = index
@@ -359,12 +345,11 @@ HeroWindowInventory._change_category_by_index = function (self, index, force_upd
 
 	return true
 end
+
 HeroWindowInventory.change_item_filter = function (self, item_filter, change_page)
 	change_page = change_page or change_page == nil
 
 	self._item_grid:change_item_filter(item_filter, change_page)
-
-	return 
 end
 
-return 
+return

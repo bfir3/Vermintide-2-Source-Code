@@ -1,6 +1,7 @@
 require("scripts/managers/camera/cameras/base_camera")
 
 BlendCamera = class(BlendCamera, BaseCamera)
+
 BlendCamera.init = function (self, root_node)
 	BlendCamera.super.init(self, root_node)
 
@@ -22,16 +23,14 @@ BlendCamera.init = function (self, root_node)
 			return 1 - math.min(math.abs(blend - match), 1)
 		end
 	}
-
-	return 
 end
+
 BlendCamera.parse_parameters = function (self, camera_settings, parent_node)
 	BlendCamera.super.parse_parameters(self, camera_settings, parent_node)
 
 	self._child_node_definitions = camera_settings.child_node_blend_definitions
-
-	return 
 end
+
 BlendCamera.add_child_node = function (self, node)
 	BlendCamera.super.add_child_node(self, node)
 
@@ -42,14 +41,13 @@ BlendCamera.add_child_node = function (self, node)
 		weight_function = self._blend_functions[def.blend_function],
 		definition = def
 	}
-
-	return 
 end
+
 BlendCamera.update = function (self, dt, position, rotation, data)
 	if 0 < self._active_children then
 		BlendCamera.super.update(self, dt, position, rotation, data)
 
-		return 
+		return
 	end
 
 	local total_weight = 0
@@ -74,8 +72,6 @@ BlendCamera.update = function (self, dt, position, rotation, data)
 	local new_position = position + total_offset / total_weight
 
 	BlendCamera.super.update(self, dt, new_position, rotation, data)
-
-	return 
 end
 
-return 
+return

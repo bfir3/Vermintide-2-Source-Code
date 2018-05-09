@@ -4,23 +4,22 @@ local unit_alive = Unit.alive
 local Profiler = Profiler
 
 local function nop()
-	return 
+	return
 end
 
 BTSelector_skaven_ratling_gunner = class(BTSelector_skaven_ratling_gunner, BTNode)
 BTSelector_skaven_ratling_gunner.name = "BTSelector_skaven_ratling_gunner"
+
 BTSelector_skaven_ratling_gunner.init = function (self, ...)
 	BTSelector_skaven_ratling_gunner.super.init(self, ...)
 
 	self._children = {}
-
-	return 
 end
+
 BTSelector_skaven_ratling_gunner.leave = function (self, unit, blackboard, t, reason)
 	self.set_running_child(self, unit, blackboard, t, nil, reason)
-
-	return 
 end
+
 BTSelector_skaven_ratling_gunner.run = function (self, unit, blackboard, t, dt)
 	local child_running = self.current_running_child(self, blackboard)
 	local children = self._children
@@ -173,13 +172,10 @@ BTSelector_skaven_ratling_gunner.run = function (self, unit, blackboard, t, dt)
 	if result ~= "failed" then
 		return result, evaluate
 	end
-
-	return 
 end
+
 BTSelector_skaven_ratling_gunner.add_child = function (self, node)
 	self._children[#self._children + 1] = node
-
-	return 
 end
 
-return 
+return

@@ -6,6 +6,7 @@ local RESOLUTION_LOOKUP = rawget(_G, "RESOLUTION_LOOKUP")
 local Color = rawget(_G, "Color")
 local Gui = rawget(_G, "Gui")
 AchievementManager = class(AchievementManager)
+
 AchievementManager.init = function (self, world, statistics_db)
 	self.initialized = false
 	self.world = world
@@ -53,9 +54,8 @@ AchievementManager.init = function (self, world, statistics_db)
 	Managers.state.event:register(self, "event_enable_achievements", "event_enable_achievements")
 
 	self.initialized = true
-
-	return 
 end
+
 AchievementManager.destroy = function (self)
 	Managers.state.event:unregister("event_enable_achievements", self)
 
@@ -64,19 +64,17 @@ AchievementManager.destroy = function (self)
 
 		self.gui = nil
 	end
-
-	return 
 end
+
 AchievementManager.event_enable_achievements = function (self, enable)
 	self._enabled = enable
-
-	return 
 end
+
 AchievementManager.update = function (self, dt, t)
 	self.debug_draw(self)
 
 	if not self._enabled or not self._check_version_number(self) or not self._check_initialized_achievements(self) then
-		return 
+		return
 	end
 
 	if self._error_timeout then
@@ -86,7 +84,7 @@ AchievementManager.update = function (self, dt, t)
 			self._error_timeout = nil
 		end
 
-		return 
+		return
 	end
 
 	local template = self._templates[self._curr_template_idx]
@@ -94,7 +92,7 @@ AchievementManager.update = function (self, dt, t)
 	local player = player_manager.local_player(player_manager)
 
 	if not player then
-		return 
+		return
 	end
 
 	local should_process = not self._unlocked_achievements[template.id] and not self._unlock_tasks[template.id]
@@ -136,17 +134,15 @@ AchievementManager.update = function (self, dt, t)
 	end
 
 	self._update_reward_polling(self, dt, t)
-
-	return 
 end
+
 AchievementManager.reset = function (self)
 	self._platform_functions.reset()
 
 	self._unlocked_achievements = {}
 	self._unlock_tasks = {}
-
-	return 
 end
+
 AchievementManager.outline = function (self)
 	if not self.initialized then
 		return nil, "AchievementManager not initialized"
@@ -154,6 +150,7 @@ AchievementManager.outline = function (self)
 
 	return outline
 end
+
 AchievementManager.get_data_by_id = function (self, achievement_id)
 	local achievement_data = self._achievement_data[achievement_id]
 
@@ -161,6 +158,7 @@ AchievementManager.get_data_by_id = function (self, achievement_id)
 
 	return achievement_data
 end
+
 AchievementManager.setup_achievement_data = function (self)
 	if not self.initialized then
 		return nil, "AchievementManager not initialized"
@@ -176,21 +174,17 @@ AchievementManager.setup_achievement_data = function (self)
 				achievement_manager.setup_achievement_data_from_list(achievement_manager, category.entries)
 			end
 		end
-
-		return 
 	end
 
 	setup_achievement_data_from_categories(self, outline.categories)
-
-	return 
 end
+
 AchievementManager.setup_achievement_data_from_list = function (self, achievement_ids)
 	for i, achievement_id in ipairs(achievement_ids) do
 		self._setup_achievement_data(self, achievement_id)
 	end
-
-	return 
 end
+
 AchievementManager.can_claim_achievement_rewards = function (self, achievement_id)
 	if not self.initialized then
 		return nil, "AchievementManager not initialized"
@@ -209,6 +203,7 @@ AchievementManager.can_claim_achievement_rewards = function (self, achievement_i
 
 	return true
 end
+
 AchievementManager.claim_reward = function (self, achievement_id)
 	local backend_interface_loot = self._backend_interface_loot
 	local reward_poll_id = backend_interface_loot.claim_achievement_rewards(backend_interface_loot, achievement_id)
@@ -216,9 +211,11 @@ AchievementManager.claim_reward = function (self, achievement_id)
 
 	return reward_poll_id
 end
+
 AchievementManager.polling_reward = function (self)
 	return (self._reward_poll_id and true) or false
 end
+
 AchievementManager.has_any_unclaimed_achievement = function (self)
 	for achievement_id, data in pairs(self._achievement_data) do
 		if data.completed and not data.claimed then
@@ -228,6 +225,7 @@ AchievementManager.has_any_unclaimed_achievement = function (self)
 
 	return false
 end
+
 AchievementManager._update_reward_polling = function (self)
 	local reward_poll_id = self._reward_poll_id
 
@@ -239,9 +237,8 @@ AchievementManager._update_reward_polling = function (self)
 			self._reward_poll_id = nil
 		end
 	end
-
-	return 
 end
+
 AchievementManager._check_version_number = function (self)
 	if not self._checked_version_number then
 		if not self._version_token then
@@ -269,6 +266,7 @@ AchievementManager._check_version_number = function (self)
 
 	return self._checked_version_number
 end
+
 AchievementManager._check_initialized_achievements = function (self)
 	if not self._initialized_achievements then
 		self._initialized_achievements = true
@@ -290,6 +288,7 @@ AchievementManager._check_initialized_achievements = function (self)
 
 	return self._initialized_achievements
 end
+
 AchievementManager._setup_achievement_data = function (self, achievement_id)
 	local achievement_data = achievement_templates.achievements[achievement_id]
 
@@ -383,15 +382,15 @@ AchievementManager._setup_achievement_data = function (self, achievement_id)
 		claimed = claimed
 	}
 	self._achievement_data[achievement_id] = achievement_data
-
-	return 
 end
+
 local font_size = 16
 local font = "gw_arial_16"
 local font_mtrl = "materials/fonts/" .. font
+
 AchievementManager.debug_draw = function (self)
 	if not script_data.achievement_debug then
-		return 
+		return
 	end
 
 	if not self.gui then
@@ -428,8 +427,6 @@ AchievementManager.debug_draw = function (self)
 	end
 
 	Gui.rect(gui, Vector3(start_pos.x - 20, pos.y - 20, 100), Vector2(300, start_pos.y - pos.y + 40), bg_color)
-
-	return 
 end
 
-return 
+return

@@ -1,11 +1,11 @@
 FunctionCommandQueue = class(FunctionCommandQueue)
+
 FunctionCommandQueue.init = function (self, max_num_args)
 	self.command_queue = {}
 	self.command_index = 0
 	self.command_stride = max_num_args + 1
-
-	return 
 end
+
 FunctionCommandQueue.run_commands = function (self)
 	local command_queue = self.command_queue
 	local stride = self.command_stride
@@ -22,9 +22,8 @@ FunctionCommandQueue.run_commands = function (self)
 	end
 
 	self.command_index = 0
-
-	return 
 end
+
 FunctionCommandQueue.cleanup_destroyed_unit = function (self, unit)
 	local command_queue = self.command_queue
 	local stride = self.command_stride
@@ -58,9 +57,8 @@ FunctionCommandQueue.cleanup_destroyed_unit = function (self, unit)
 	end
 
 	self.command_index = list_size
-
-	return 
 end
+
 FunctionCommandQueue.queue_function_command = function (self, function_call, ...)
 	local index = self.command_index
 	local command_queue = self.command_queue
@@ -76,8 +74,6 @@ FunctionCommandQueue.queue_function_command = function (self, function_call, ...
 	end
 
 	self.command_index = index + 1
-
-	return 
 end
 
-return 
+return

@@ -1,13 +1,14 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTWarpfireThrowerShootAction = class(BTWarpfireThrowerShootAction, BTNode)
+
 BTWarpfireThrowerShootAction.init = function (self, ...)
 	BTWarpfireThrowerShootAction.super.init(self, ...)
-
-	return 
 end
+
 BTWarpfireThrowerShootAction.name = "BTWarpfireThrowerShootAction"
 local hit_ai_units = {}
+
 BTWarpfireThrowerShootAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -47,9 +48,8 @@ BTWarpfireThrowerShootAction.enter = function (self, unit, blackboard, t)
 	data.is_firing = false
 
 	Managers.state.entity:system("ai_bot_group_system"):ranged_attack_started(unit, target_unit, "warpfire_thrower_fire")
-
-	return 
 end
+
 BTWarpfireThrowerShootAction._init_attack = function (self, unit, target_unit, blackboard, action)
 	local target_position = POSITION_LOOKUP[target_unit]
 	local attack_is_ok = nil
@@ -65,13 +65,13 @@ BTWarpfireThrowerShootAction._init_attack = function (self, unit, target_unit, b
 
 	return attack_is_ok
 end
+
 BTWarpfireThrowerShootAction._abort_shooting = function (self, t, warpfire_data)
 	warpfire_data.blob_extension:stop_placing_blobs(t)
 
 	warpfire_data.is_firing = false
-
-	return 
 end
+
 BTWarpfireThrowerShootAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local warpfire_data = blackboard.warpfire_data
 
@@ -93,9 +93,8 @@ BTWarpfireThrowerShootAction.leave = function (self, unit, blackboard, t, reason
 	for unit, _ in pairs(hit_ai_units) do
 		hit_ai_units[unit] = nil
 	end
-
-	return 
 end
+
 BTWarpfireThrowerShootAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.attack_aborted then
 		return "failed"
@@ -187,6 +186,7 @@ BTWarpfireThrowerShootAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTWarpfireThrowerShootAction._move_warpfire_blob = function (self, unit, warpfire_data, blackboard, action, dt)
 	local blob_unit = warpfire_data.blob_unit
 	local blob_position = POSITION_LOOKUP[blob_unit]
@@ -213,9 +213,8 @@ BTWarpfireThrowerShootAction._move_warpfire_blob = function (self, unit, warpfir
 
 		Unit.set_local_position(blob_unit, 0, new_blob_position)
 	end
-
-	return 
 end
+
 BTWarpfireThrowerShootAction._end_align_towards_target = function (self, unit, warpfire_data, attack_pattern_data, blackboard, t)
 	attack_pattern_data.state = "ready"
 	attack_pattern_data.shoot_direction_start = nil
@@ -226,9 +225,8 @@ BTWarpfireThrowerShootAction._end_align_towards_target = function (self, unit, w
 	Managers.state.network:anim_event(unit, "attack_shoot_start")
 
 	blackboard.close_attack_cooldown = 0
-
-	return 
 end
+
 BTWarpfireThrowerShootAction._start_align_towards_target = function (self, unit, blackboard, data, target_unit)
 	data.state = "align"
 	data.align_speed = 0
@@ -243,15 +241,15 @@ BTWarpfireThrowerShootAction._start_align_towards_target = function (self, unit,
 	local turn_animation = self._calculate_align_animation(self, right_vector, forward_vector, flat_wanted_direction, action.attack_anims, unit_position)
 
 	Managers.state.network:anim_event(unit, turn_animation)
-
-	return 
 end
+
 local PI = math.pi
 local TWO_PI = PI * 2
 local ACCELERATION = PI * 24
 local DECELERATION = PI * 6
 local STOP_ANGLE = PI / 32
 local AIM_PIVOT_HEIGHT = 0.7
+
 BTWarpfireThrowerShootAction._remaining_angle = function (self, from, to)
 	local from_forward = Quaternion.forward(from)
 	local to_forward = Quaternion.forward(to)
@@ -264,15 +262,15 @@ BTWarpfireThrowerShootAction._remaining_angle = function (self, from, to)
 
 	return normalized_angle_diff
 end
+
 BTWarpfireThrowerShootAction._angle_to_speed = function (self, speed, angle_left)
 	if 0 < angle_left then
 		return speed
 	else
 		return -speed
 	end
-
-	return 
 end
+
 BTWarpfireThrowerShootAction._update_align_towards_target = function (self, unit, blackboard, attack_pattern_data, target_unit, dt)
 	local _, wanted_rotation, _ = self._calculate_wanted_target_position(self, unit, target_unit)
 	local action = blackboard.action
@@ -309,11 +307,13 @@ BTWarpfireThrowerShootAction._update_align_towards_target = function (self, unit
 
 	return math.abs(angle_left) < STOP_ANGLE
 end
+
 BTWarpfireThrowerShootAction._close_range_attack_check = function (self, blackboard, action, t)
 	local target_distance = blackboard.target_dist
 
 	return target_distance < action.close_attack_range and blackboard.close_attack_cooldown < t
 end
+
 BTWarpfireThrowerShootAction._close_range_attack = function (self, unit, attack_pattern_data, blackboard, action, t)
 	local node_name = action.muzzle_node
 	local warpfire_unit = attack_pattern_data.warpfire_gun_unit
@@ -389,9 +389,8 @@ BTWarpfireThrowerShootAction._close_range_attack = function (self, unit, attack_
 	end
 
 	blackboard.close_attack_cooldown = t + action.close_attack_cooldown
-
-	return 
 end
+
 BTWarpfireThrowerShootAction._aim_at_target = function (self, unit, target_unit, attack_pattern_data, blackboard, action, t, dt)
 	local aim_pos, wanted_rotation, _, target_position = self._calculate_wanted_target_position(self, unit, target_unit)
 	local target_status_extension = ScriptUnit.has_extension(blackboard.target_unit, "status_system")
@@ -448,6 +447,7 @@ BTWarpfireThrowerShootAction._aim_at_target = function (self, unit, target_unit,
 
 	return realign, new_target_unit
 end
+
 BTWarpfireThrowerShootAction._rotate_from_to = function (self, from, to, max_angle_speed, dt)
 	local inner_product = Quaternion.dot(to, from)
 	local angle_difference = 2 * math.acos(math.clamp(inner_product, -1, 1))
@@ -457,6 +457,7 @@ BTWarpfireThrowerShootAction._rotate_from_to = function (self, from, to, max_ang
 
 	return Quaternion.lerp(from, to, lerp_t), math.max(normalized_angle_diff - max_delta, 0)
 end
+
 BTWarpfireThrowerShootAction._calculate_wanted_target_position = function (self, unit, target_unit)
 	local unit_position = Unit.world_position(unit, Unit.node(unit, "c_spine"))
 	local target_position = POSITION_LOOKUP[target_unit] + Vector3.up()
@@ -473,6 +474,7 @@ BTWarpfireThrowerShootAction._calculate_wanted_target_position = function (self,
 
 	return mid_pos, look_at_rotation, unit_position, target_position
 end
+
 BTWarpfireThrowerShootAction._calculate_align_animation = function (self, right_vector, forward_vector, dir, attack_anims)
 	local right_dot = Vector3.dot(right_vector, dir)
 	local fwd_dot = Vector3.dot(forward_vector, dir)
@@ -493,13 +495,13 @@ BTWarpfireThrowerShootAction._calculate_align_animation = function (self, right_
 
 	return anim
 end
+
 BTWarpfireThrowerShootAction._attack_fire = function (self, unit, warpfire_data, action, blackboard, t)
 	self._create_warpfire_blob(self, unit, warpfire_data, action, blackboard, t)
 
 	warpfire_data.is_firing = true
-
-	return 
 end
+
 BTWarpfireThrowerShootAction._create_warpfire_blob = function (self, unit, data, action, blackboard, t)
 	local attack_pattern_data = blackboard.attack_pattern_data
 	local warpfire_data = blackboard.warpfire_data
@@ -522,9 +524,8 @@ BTWarpfireThrowerShootAction._create_warpfire_blob = function (self, unit, data,
 	local wait_time = length / 10
 
 	damage_blob_extension.start_placing_blobs(damage_blob_extension, wait_time, t)
-
-	return 
 end
+
 BTWarpfireThrowerShootAction._calculate_cylinder_collision = function (self, action, self_pos, self_rot)
 	local radius = action.bot_threat_radius
 	local height = action.bot_threat_height
@@ -538,6 +539,7 @@ BTWarpfireThrowerShootAction._calculate_cylinder_collision = function (self, act
 
 	return cylinder_center, size
 end
+
 BTWarpfireThrowerShootAction._create_bot_aoe_threat = function (self, unit, action)
 	local unit_position = POSITION_LOOKUP[unit]
 	local unit_rotation = Unit.local_rotation(unit, 0)
@@ -546,8 +548,6 @@ BTWarpfireThrowerShootAction._create_bot_aoe_threat = function (self, unit, acti
 	local obstacle_position, obstacle_size = self._calculate_cylinder_collision(self, action, unit_position, unit_rotation)
 
 	ai_bot_group_system.aoe_threat_created(ai_bot_group_system, obstacle_position, "cylinder", obstacle_size, nil, bot_threat_duration)
-
-	return 
 end
 
-return 
+return

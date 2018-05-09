@@ -1161,8 +1161,6 @@ local action_data = {
 							blackboard.hit_warrior_challenge_completed = true
 						end
 					end
-
-					return 
 				end
 			}
 		},
@@ -1347,4 +1345,4 @@ BreedActions.chaos_exalted_champion.angry_charge.considerations = UtilityConside
 BreedActions.chaos_exalted_champion.norsca_charge = table.create_copy(BreedActions.chaos_exalted_champion.norsca_charge, BreedActions.chaos_exalted_champion.charge)
 BreedActions.chaos_exalted_champion.norsca_charge.attacks[1].hit_ai_func = nil
 
-return 
+return

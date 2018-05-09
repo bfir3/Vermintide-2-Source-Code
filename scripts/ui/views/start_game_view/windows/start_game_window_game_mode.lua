@@ -6,6 +6,7 @@ local animation_definitions = definitions.animation_definitions
 local DO_RELOAD = false
 StartGameWindowGameMode = class(StartGameWindowGameMode)
 StartGameWindowGameMode.NAME = "StartGameWindowGameMode"
+
 StartGameWindowGameMode.on_enter = function (self, params, offset)
 	print("[StartGameWindow] Enter Substate StartGameWindowGameMode")
 
@@ -26,9 +27,8 @@ StartGameWindowGameMode.on_enter = function (self, params, offset)
 	self._ui_animations = {}
 
 	self.create_ui_elements(self, params, offset)
-
-	return 
 end
+
 StartGameWindowGameMode.create_ui_elements = function (self, params, offset)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	local widgets = {}
@@ -61,16 +61,14 @@ StartGameWindowGameMode.create_ui_elements = function (self, params, offset)
 		window_position[2] = window_position[2] + offset[2]
 		window_position[3] = window_position[3] + offset[3]
 	end
-
-	return 
 end
+
 StartGameWindowGameMode.on_exit = function (self, params)
 	print("[StartGameWindow] Exit Substate StartGameWindowGameMode")
 
 	self.ui_animator = nil
-
-	return 
 end
+
 StartGameWindowGameMode.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
@@ -82,12 +80,12 @@ StartGameWindowGameMode.update = function (self, dt, t)
 	self._update_animations(self, dt)
 	self._handle_input(self, dt, t)
 	self.draw(self, dt)
+end
 
-	return 
-end
 StartGameWindowGameMode.post_update = function (self, dt, t)
-	return 
+	return
 end
+
 StartGameWindowGameMode._update_animations = function (self, dt)
 	self._update_game_options_hover_effect(self, dt)
 
@@ -112,9 +110,8 @@ StartGameWindowGameMode._update_animations = function (self, dt)
 			animations[animation_name] = nil
 		end
 	end
-
-	return 
 end
+
 StartGameWindowGameMode._is_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
@@ -124,9 +121,8 @@ StartGameWindowGameMode._is_button_pressed = function (self, widget)
 
 		return true
 	end
-
-	return 
 end
+
 StartGameWindowGameMode._is_stepper_button_pressed = function (self, widget)
 	local content = widget.content
 	local hotspot_left = content.button_hotspot_left
@@ -141,27 +137,29 @@ StartGameWindowGameMode._is_stepper_button_pressed = function (self, widget)
 
 		return true, 1
 	end
-
-	return 
 end
+
 StartGameWindowGameMode._is_button_hover_enter = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_enter
 end
+
 StartGameWindowGameMode._is_button_hover_exit = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.on_hover_exit
 end
+
 StartGameWindowGameMode._is_button_selected = function (self, widget)
 	local content = widget.content
 	local hotspot = content.button_hotspot
 
 	return hotspot.is_selected
 end
+
 local layout_indices = {
 	win32 = {
 		1,
@@ -180,6 +178,7 @@ local layout_indices = {
 		3
 	}
 }
+
 StartGameWindowGameMode._handle_input = function (self, dt, t)
 	local gamepad_active = Managers.input:is_device_active("gamepad")
 	local widgets_by_name = self._widgets_by_name
@@ -221,9 +220,8 @@ StartGameWindowGameMode._handle_input = function (self, dt, t)
 			self.parent:set_layout(index)
 		end
 	end
-
-	return 
 end
+
 StartGameWindowGameMode._update_game_options_hover_effect = function (self, dt)
 	local widgets_by_name = self._widgets_by_name
 	local widget_prefix = "game_option_"
@@ -246,9 +244,8 @@ StartGameWindowGameMode._update_game_options_hover_effect = function (self, dt)
 	if widgets_by_name.game_option_5 then
 		UIWidgetUtils.animate_default_button(widgets_by_name.game_option_5, dt)
 	end
-
-	return 
 end
+
 StartGameWindowGameMode._set_selected_option = function (self, index)
 	local widgets_by_name = self._widgets_by_name
 	local widget_prefix = "game_option_"
@@ -258,9 +255,8 @@ StartGameWindowGameMode._set_selected_option = function (self, index)
 		local widget = widgets_by_name[widget_name]
 		widget.content.button_hotspot.is_selected = index == i
 	end
-
-	return 
 end
+
 StartGameWindowGameMode._update_selected_option = function (self)
 	local parent = self.parent
 	local selected_index = parent.get_selected_game_mode_index(parent)
@@ -270,9 +266,8 @@ StartGameWindowGameMode._update_selected_option = function (self)
 
 		self._selected_index = selected_index
 	end
-
-	return 
 end
+
 StartGameWindowGameMode.draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -295,14 +290,12 @@ StartGameWindowGameMode.draw = function (self, dt)
 	end
 
 	UIRenderer.end_pass(ui_renderer)
-
-	return 
 end
+
 StartGameWindowGameMode._play_sound = function (self, event)
 	self.parent:play_sound(event)
-
-	return 
 end
+
 StartGameWindowGameMode._create_style_animation_enter = function (self, widget, target_value, style_id, widget_index, instant)
 	local ui_animations = self._ui_animations
 	local animation_name = "game_option_" .. style_id
@@ -310,7 +303,7 @@ StartGameWindowGameMode._create_style_animation_enter = function (self, widget, 
 	local pass_style = widget_style[style_id]
 
 	if not pass_style then
-		return 
+		return
 	end
 
 	local current_color_value = pass_style.color[1]
@@ -323,9 +316,8 @@ StartGameWindowGameMode._create_style_animation_enter = function (self, widget, 
 	else
 		pass_style.color[1] = target_color_value
 	end
-
-	return 
 end
+
 StartGameWindowGameMode._create_style_animation_exit = function (self, widget, target_value, style_id, widget_index, instant)
 	local ui_animations = self._ui_animations
 	local animation_name = "game_option_" .. style_id
@@ -333,7 +325,7 @@ StartGameWindowGameMode._create_style_animation_exit = function (self, widget, t
 	local pass_style = widget_style[style_id]
 
 	if not pass_style then
-		return 
+		return
 	end
 
 	local current_color_value = pass_style.color[1]
@@ -346,18 +338,18 @@ StartGameWindowGameMode._create_style_animation_exit = function (self, widget, t
 	else
 		pass_style.color[1] = target_color_value
 	end
-
-	return 
 end
+
 StartGameWindowGameMode._animate_element_by_time = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.function_by_time, target, target_index, from, to, time, math.ease_out_quad)
 
 	return new_animation
 end
+
 StartGameWindowGameMode._animate_element_by_catmullrom = function (self, target, target_index, target_value, p0, p1, p2, p3, time)
 	local new_animation = UIAnimation.init(UIAnimation.catmullrom, target, target_index, target_value, p0, p1, p2, p3, time)
 
 	return new_animation
 end
 
-return 
+return

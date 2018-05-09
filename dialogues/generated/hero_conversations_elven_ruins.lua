@@ -3577,6 +3577,4 @@ return function ()
 			}
 		}
 	})
-
-	return 
 end

@@ -1,9 +1,9 @@
 PlayerCharacterStateInHangingCage = class(PlayerCharacterStateInHangingCage, PlayerCharacterState)
+
 PlayerCharacterStateInHangingCage.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "in_hanging_cage")
-
-	return 
 end
+
 PlayerCharacterStateInHangingCage.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	CharacterStateHelper.stop_weapon_actions(self.inventory_extension, "in_hanging_cage")
 
@@ -24,16 +24,14 @@ PlayerCharacterStateInHangingCage.on_enter = function (self, unit, input, dt, co
 	self.falling_animation = animations.falling
 	self.landing_animation = animations.landing
 	self.state = "hanging"
-
-	return 
 end
+
 PlayerCharacterStateInHangingCage.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local status_extension = self.status_extension
 
 	status_extension.set_in_hanging_cage(status_extension, false)
-
-	return 
 end
+
 PlayerCharacterStateInHangingCage.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local status_extension = self.status_extension
@@ -70,8 +68,6 @@ PlayerCharacterStateInHangingCage.update = function (self, unit, input, dt, cont
 
 		self.state = new_state
 	end
-
-	return 
 end
 
-return 
+return

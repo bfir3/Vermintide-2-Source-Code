@@ -1,11 +1,11 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTChampionAttackAction = class(BTChampionAttackAction, BTNode)
+
 BTChampionAttackAction.init = function (self, ...)
 	BTChampionAttackAction.super.init(self, ...)
-
-	return 
 end
+
 BTChampionAttackAction.name = "BTChampionAttackAction"
 
 local function randomize(event)
@@ -14,8 +14,6 @@ local function randomize(event)
 	else
 		return event
 	end
-
-	return 
 end
 
 BTChampionAttackAction.enter = function (self, unit, blackboard, t)
@@ -42,8 +40,6 @@ BTChampionAttackAction.enter = function (self, unit, blackboard, t)
 	blackboard.spawn_to_running = nil
 
 	AiUtils.stormvermin_champion_hack_check_ward(unit, blackboard)
-
-	return 
 end
 
 local function NEVER()
@@ -53,6 +49,7 @@ end
 local PARTICLES_TEMP = {}
 local POSITIONS_TEMP = {}
 local SOUNDS_TEMP = {}
+
 BTChampionAttackAction._init_attack = function (self, unit, blackboard, action, t)
 	blackboard.move_state = "attacking"
 	local world = blackboard.world
@@ -193,9 +190,8 @@ BTChampionAttackAction._init_attack = function (self, unit, blackboard, action, 
 			Managers.state.entity:system("ai_bot_group_system"):aoe_threat_created(pos, "oobb", size, rot, bot_threat_duration)
 		end
 	end
-
-	return 
 end
+
 BTChampionAttackAction._attack_threat_over = function (self, unit, blackboard, action)
 	local target_unit = blackboard.special_attacking_target
 	local target_alive = Unit.alive(target_unit)
@@ -208,9 +204,8 @@ BTChampionAttackAction._attack_threat_over = function (self, unit, blackboard, a
 	end
 
 	blackboard.special_attacking_target = nil
-
-	return 
 end
+
 BTChampionAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local action = blackboard.action
 	local catapulted_players = blackboard.catapulted_players
@@ -280,9 +275,8 @@ BTChampionAttackAction.leave = function (self, unit, blackboard, t, reason, dest
 	if flow_event then
 		Unit.flow_event(unit, flow_event)
 	end
-
-	return 
 end
+
 BTChampionAttackAction.run = function (self, unit, blackboard, t, dt)
 	local target_unit = blackboard.special_attacking_target
 
@@ -333,6 +327,7 @@ BTChampionAttackAction.run = function (self, unit, blackboard, t, dt)
 
 	return "running"
 end
+
 BTChampionAttackAction._next_in_sequence = function (self, blackboard, t, sequence_data, sequence_index)
 	local current = sequence_data[sequence_index]
 	local anim = current.attack_anim
@@ -355,6 +350,7 @@ BTChampionAttackAction._next_in_sequence = function (self, blackboard, t, sequen
 
 	return anim, scale or 1
 end
+
 BTChampionAttackAction._update_rotation = function (self, unit, t, dt, blackboard)
 	local target_status_ext = blackboard.target_unit_status_extension
 	local has_dodged = blackboard.target_dodged or (target_status_ext and (target_status_ext.get_is_dodging(target_status_ext) or target_status_ext.is_invisible(target_status_ext)))
@@ -380,13 +376,13 @@ BTChampionAttackAction._update_rotation = function (self, unit, t, dt, blackboar
 	local locomotion_extension = blackboard.locomotion_extension
 
 	locomotion_extension.set_wanted_rotation(locomotion_extension, rotation)
-
-	return 
 end
+
 local debug_drawer_info = {
 	mode = "retained",
 	name = "BTChampionAttackAction"
 }
+
 BTChampionAttackAction._update_overlap = function (self, unit, blackboard, action, dt, t)
 	local start_t = blackboard.overlap_start_time
 	local end_t = blackboard.overlap_end_time
@@ -485,10 +481,10 @@ BTChampionAttackAction._update_overlap = function (self, unit, blackboard, actio
 	blackboard.last_attack_overlap_position:store(new_pos)
 
 	blackboard.last_attack_overlap_position_time = t
-
-	return 
 end
+
 local HITS_TEMP = {}
+
 BTChampionAttackAction._update_nav_mesh_wave = function (self, unit, blackboard, action, dt, t)
 	local world = blackboard.world
 	local start_t = blackboard.overlap_start_time
@@ -497,9 +493,9 @@ BTChampionAttackAction._update_nav_mesh_wave = function (self, unit, blackboard,
 	if end_t < t and blackboard.special_attacking_target then
 		self._attack_threat_over(self, unit, blackboard, action)
 
-		return 
+		return
 	elseif t < start_t or end_t < t then
-		return 
+		return
 	end
 
 	local speed = action.wave_speed
@@ -569,9 +565,8 @@ BTChampionAttackAction._update_nav_mesh_wave = function (self, unit, blackboard,
 	self._deal_damage(self, unit, blackboard, action, from, HITS_TEMP, num_hits, true)
 
 	blackboard.last_overlap_index = new_index
-
-	return 
 end
+
 BTChampionAttackAction.anim_cb_damage = function (self, unit, blackboard)
 	local action = blackboard.action
 	local mode = action.mode
@@ -579,7 +574,7 @@ BTChampionAttackAction.anim_cb_damage = function (self, unit, blackboard)
 	if mode then
 		printf("BTChampionAttackAction anim_cb_damage in mode %q", mode)
 
-		return 
+		return
 	end
 
 	local self_pos = Unit.local_position(unit, 0)
@@ -622,16 +617,15 @@ BTChampionAttackAction.anim_cb_damage = function (self, unit, blackboard)
 	end
 
 	self._attack_threat_over(self, unit, blackboard, action)
-
-	return 
 end
+
 BTChampionAttackAction._update_radial_cylinder = function (self, unit, blackboard, action, dt, t)
 	if blackboard.overlap_end_time < t and blackboard.special_attacking_target then
 		self._attack_threat_over(self, unit, blackboard, action)
 
-		return 
+		return
 	elseif t < blackboard.overlap_start_time or blackboard.overlap_end_time < t then
-		return 
+		return
 	end
 
 	local attack_t = t - blackboard.overlap_start_time
@@ -701,9 +695,8 @@ BTChampionAttackAction._update_radial_cylinder = function (self, unit, blackboar
 	self._deal_damage(self, unit, blackboard, action, self_pos, hit_list, num_hit, false)
 
 	blackboard.overlap_last_angle = new_angle
-
-	return 
 end
+
 BTChampionAttackAction._calculate_cylinder_collision = function (self, action, self_pos, self_rot)
 	local radius = action.radius
 	local height = action.height
@@ -720,6 +713,7 @@ BTChampionAttackAction._calculate_cylinder_collision = function (self, action, s
 
 	return cylinder_center, size, rotation
 end
+
 BTChampionAttackAction._calculate_oobb_collision = function (self, action, self_pos, self_rot)
 	local range = action.range
 	local height = action.height
@@ -735,6 +729,7 @@ BTChampionAttackAction._calculate_oobb_collision = function (self, action, self_
 
 	return oobb_pos, self_rot, size
 end
+
 BTChampionAttackAction._deal_damage = function (self, unit, blackboard, action, self_pos, hit_actors, actor_count, is_animation_callback)
 	local hit_players = blackboard.hit_players
 	local Unit_alive = Unit.alive
@@ -802,7 +797,7 @@ BTChampionAttackAction._deal_damage = function (self, unit, blackboard, action, 
 				end
 
 				if not action.ignore_abort_on_blocked_attack then
-					return 
+					return
 				end
 			else
 				AiUtils_damage_target(target_unit, unit, action, action.damage)
@@ -815,9 +810,8 @@ BTChampionAttackAction._deal_damage = function (self, unit, blackboard, action, 
 			end
 		end
 	end
-
-	return 
 end
+
 BTChampionAttackAction._catapult_players = function (self, unit, blackboard, action, catapulted_players)
 	local shove_speed = action.shove_speed
 	local shove_z_speed = action.shove_z_speed
@@ -833,9 +827,8 @@ BTChampionAttackAction._catapult_players = function (self, unit, blackboard, act
 	end
 
 	table.clear(catapulted_players)
-
-	return 
 end
+
 BTChampionAttackAction._catapult_player = function (self, unit, shove_speed, shove_z_speed, target_unit, blocked, direction)
 	local target_status_extension = ScriptUnit.extension(target_unit, "status_system")
 
@@ -845,8 +838,6 @@ BTChampionAttackAction._catapult_player = function (self, unit, shove_speed, sho
 		Vector3.set_z(push_velocity, shove_z_speed)
 		StatusUtils.set_catapulted_network(target_unit, true, push_velocity)
 	end
-
-	return 
 end
 
-return 
+return

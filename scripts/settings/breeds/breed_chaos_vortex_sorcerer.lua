@@ -239,4 +239,4 @@ local action_data = {
 }
 BreedActions.chaos_vortex_sorcerer = table.create_copy(BreedActions.chaos_vortex_sorcerer, action_data)
 
-return 
+return

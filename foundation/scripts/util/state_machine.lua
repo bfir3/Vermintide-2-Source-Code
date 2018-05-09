@@ -28,8 +28,6 @@ local function debug_print(format, ...)
 	if script_data.network_debug or StateMachine.DEBUG then
 		printf("[StateMachine] " .. format, ...)
 	end
-
-	return 
 end
 
 StateMachine.init = function (self, parent, start_state, params, profiling_debugging_enabled)
@@ -38,9 +36,8 @@ StateMachine.init = function (self, parent, start_state, params, profiling_debug
 	self._profiling_debugging_enabled = profiling_debugging_enabled
 
 	self._change_state(self, start_state, params)
-
-	return 
 end
+
 StateMachine._change_state = function (self, new_state, params)
 	if self._state then
 		if self._state.on_exit and self._profiling_debugging_enabled then
@@ -68,27 +65,24 @@ StateMachine._change_state = function (self, new_state, params)
 	elseif self._state.on_enter then
 		self._state:on_enter(params)
 	end
-
-	return 
 end
+
 StateMachine.state = function (self)
 	return self._state
 end
+
 StateMachine.update = function (self, dt, t)
 	local new_state = self._state:update(dt, t)
 
 	if new_state then
 		self._change_state(self, new_state, self._params)
 	end
-
-	return 
 end
+
 StateMachine.destroy = function (self, ...)
 	if self._state and self._state.on_exit then
 		self._state:on_exit(...)
 	end
-
-	return 
 end
 
-return 
+return

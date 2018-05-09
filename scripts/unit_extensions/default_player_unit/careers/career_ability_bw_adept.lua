@@ -5,8 +5,6 @@ local function dprint(...)
 	if DEBUG then
 		printf(...)
 	end
-
-	return 
 end
 
 CareerAbilityBWAdept._ballistic_raycast = function (self, physics_world, max_steps, max_time, position, velocity, gravity, collision_filter)
@@ -62,9 +60,8 @@ CareerAbilityBWAdept.init = function (self, extension_init_context, unit, extens
 	self.input_manager = Managers.input
 	self.effect_id = nil
 	self.effect_name = "fx/wpnfx_staff_geiser_charge"
-
-	return 
 end
+
 CareerAbilityBWAdept.extensions_ready = function (self, world, unit)
 	self.first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
 	self.status_extension = ScriptUnit.extension(unit, "status_system")
@@ -76,21 +73,21 @@ CareerAbilityBWAdept.extensions_ready = function (self, world, unit)
 	if self.first_person_extension then
 		self.first_person_unit = self.first_person_extension:get_first_person_unit()
 	end
+end
 
-	return 
-end
 CareerAbilityBWAdept.destroy = function (self)
-	return 
+	return
 end
+
 CareerAbilityBWAdept.update = function (self, unit, input, dt, context, t)
 	if not self._ability_available(self) then
-		return 
+		return
 	end
 
 	local input_extension = self._input_extension
 
 	if not input_extension then
-		return 
+		return
 	end
 
 	if not self.is_priming then
@@ -103,22 +100,22 @@ CareerAbilityBWAdept.update = function (self, unit, input, dt, context, t)
 		if input_extension.get(input_extension, "action_two") or input_extension.get(input_extension, "jump") or input_extension.get(input_extension, "jump_only") then
 			self._stop_priming(self)
 
-			return 
+			return
 		end
 
 		if input_extension.get(input_extension, "action_career_release") then
 			self._run_ability(self, end_position)
 		end
 	end
-
-	return 
 end
+
 CareerAbilityBWAdept._ability_available = function (self)
 	local career_extension = self.career_extension
 	local status_extension = self.status_extension
 
 	return career_extension.can_use_activated_ability(career_extension) and not status_extension.is_disabled(status_extension)
 end
+
 CareerAbilityBWAdept._start_priming = function (self)
 	if self.local_player then
 		local world = self.world
@@ -128,9 +125,8 @@ CareerAbilityBWAdept._start_priming = function (self)
 
 	self._last_valid_position = nil
 	self.is_priming = true
-
-	return 
 end
+
 CareerAbilityBWAdept._landing_postion_valid = function (self, start_pos, end_pos, data, t)
 	local valid_pos = false
 	local astar = data.astar
@@ -174,6 +170,7 @@ CareerAbilityBWAdept._landing_postion_valid = function (self, start_pos, end_pos
 
 	return valid_pos
 end
+
 CareerAbilityBWAdept._update_priming = function (self, dt, t)
 	local effect_id = self.effect_id
 	local owner_unit = self.owner_unit
@@ -237,9 +234,8 @@ CareerAbilityBWAdept._update_priming = function (self, dt, t)
 			self._last_valid_position = Vector3Box(hit_position)
 		end
 	end
-
-	return 
 end
+
 CareerAbilityBWAdept._stop_priming = function (self)
 	if self.effect_id then
 		World.destroy_particles(self.world, self.effect_id)
@@ -268,9 +264,8 @@ CareerAbilityBWAdept._stop_priming = function (self)
 	end
 
 	self.is_priming = false
-
-	return 
 end
+
 CareerAbilityBWAdept._run_ability = function (self)
 	dprint("_run_ability")
 	self._stop_priming(self)
@@ -280,7 +275,7 @@ CareerAbilityBWAdept._run_ability = function (self)
 	if not end_position then
 		dprint("no end_position")
 
-		return 
+		return
 	end
 
 	local world = self.world
@@ -347,17 +342,14 @@ CareerAbilityBWAdept._run_ability = function (self)
 
 	career_extension.start_activated_ability_cooldown(career_extension)
 	self._play_vo(self)
-
-	return 
 end
+
 CareerAbilityBWAdept._play_vo = function (self)
 	local owner_unit = self.owner_unit
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
 	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
-
-	return 
 end
 
-return 
+return

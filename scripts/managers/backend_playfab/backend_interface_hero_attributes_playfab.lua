@@ -20,6 +20,7 @@ local DEFAULT_ATTRIBUTES = {
 	empire_soldier_experience = 0,
 	empire_soldier_tutorial_experience = 0
 }
+
 BackendInterfaceHeroAttributesPlayFab.init = function (self, backend_mirror)
 	self._attributes = {}
 	self._attributes_to_save = {}
@@ -28,14 +29,12 @@ BackendInterfaceHeroAttributesPlayFab.init = function (self, backend_mirror)
 	self._refresh(self)
 
 	self._initialized = true
-
-	return 
 end
+
 BackendInterfaceHeroAttributesPlayFab.make_dirty = function (self)
 	self._dirty = true
-
-	return 
 end
+
 BackendInterfaceHeroAttributesPlayFab._refresh = function (self)
 	table.clear(self._attributes)
 
@@ -46,15 +45,16 @@ BackendInterfaceHeroAttributesPlayFab._refresh = function (self)
 		local backend_value = read_only_data[attribute_name]
 		self._attributes[attribute_name] = backend_value or default_value
 	end
-
-	return 
 end
+
 BackendInterfaceHeroAttributesPlayFab.ready = function (self)
 	return self._initialized
 end
+
 BackendInterfaceHeroAttributesPlayFab.update = function (self, dt)
-	return 
+	return
 end
+
 BackendInterfaceHeroAttributesPlayFab.get = function (self, hero, attribute)
 	if self._dirty then
 		self._refresh(self)
@@ -64,6 +64,7 @@ BackendInterfaceHeroAttributesPlayFab.get = function (self, hero, attribute)
 
 	return self._attributes[key]
 end
+
 BackendInterfaceHeroAttributesPlayFab.set = function (self, hero, attribute, value)
 	fassert(value ~= nil, "Trying to set a hero attribute to nil, don't do this")
 
@@ -73,8 +74,6 @@ BackendInterfaceHeroAttributesPlayFab.set = function (self, hero, attribute, val
 	mirror.set_read_only_data(mirror, key, value, false)
 
 	self._dirty = true
-
-	return 
 end
 
-return 
+return

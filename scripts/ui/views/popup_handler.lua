@@ -726,8 +726,6 @@ local function create_password_window(scenegraph_id, size)
 						parent_style.input_shadow.replacing_character = "*"
 					end
 				end
-
-				return 
 			end
 		},
 		{
@@ -1348,6 +1346,7 @@ local function create_gamepad_button(input_action, scenegraph_id)
 end
 
 PopupHandler = class(PopupHandler)
+
 PopupHandler.init = function (self, context, from_manager)
 	fassert(from_manager, "Not created by the popoup manager")
 
@@ -1371,9 +1370,8 @@ PopupHandler.init = function (self, context, from_manager)
 	self.unblocked_services = {}
 	self.unblocked_services_n = 0
 	self.mock_input_manager = MockInputManager:new()
-
-	return 
 end
+
 PopupHandler.set_input_manager = function (self, input_manager)
 	self.input_manager = input_manager
 
@@ -1385,12 +1383,12 @@ PopupHandler.set_input_manager = function (self, input_manager)
 	if self.has_popup(self) then
 		self.acquire_input(self)
 	end
-
-	return 
 end
+
 PopupHandler.get_input_manager = function (self)
 	return self.input_manager
 end
+
 PopupHandler.remove_input_manager = function (self, application_shutdown)
 	if self.has_popup(self) then
 		self.release_input(self)
@@ -1403,9 +1401,8 @@ PopupHandler.remove_input_manager = function (self, application_shutdown)
 	end
 
 	self.input_manager = nil
-
-	return 
 end
+
 PopupHandler.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 	self._popup_widgets_by_name = {
@@ -1438,9 +1435,8 @@ PopupHandler.create_ui_elements = function (self)
 	gamepad_button_widgets[3][3] = UIWidget.init(create_gamepad_button("refresh", "button_3_3"))
 	self.button_widgets = button_widgets
 	self.gamepad_button_widgets = gamepad_button_widgets
-
-	return 
 end
+
 PopupHandler.acquire_input = function (self, ignore_cursor_stack)
 	local input_manager = self.input_manager
 
@@ -1458,9 +1454,8 @@ PopupHandler.acquire_input = function (self, ignore_cursor_stack)
 	if not ignore_cursor_stack then
 		ShowCursorStack.push()
 	end
-
-	return 
 end
+
 PopupHandler.release_input = function (self, ignore_cursor_stack)
 	local input_manager = self.input_manager
 
@@ -1477,9 +1472,8 @@ PopupHandler.release_input = function (self, ignore_cursor_stack)
 	if not ignore_cursor_stack then
 		ShowCursorStack.pop()
 	end
-
-	return 
 end
+
 PopupHandler.update = function (self, dt, from_manager)
 	fassert(from_manager, "Update does not come from the popup manager")
 
@@ -1637,9 +1631,8 @@ PopupHandler.update = function (self, dt, from_manager)
 
 		UIRenderer.end_pass(ui_renderer)
 	end
-
-	return 
 end
+
 PopupHandler.get_gamepad_input_texture_data = function (self, input_service, input_action, ignore_keybinding)
 	local platform = PLATFORM
 
@@ -1652,9 +1645,8 @@ PopupHandler.get_gamepad_input_texture_data = function (self, input_service, inp
 	else
 		return UISettings.get_gamepad_input_texture_data(input_service, input_action, true)
 	end
-
-	return 
 end
+
 PopupHandler.set_button_enabled = function (self, popup_id, button_index, enabled)
 	local popup = nil
 
@@ -1667,18 +1659,16 @@ PopupHandler.set_button_enabled = function (self, popup_id, button_index, enable
 	end
 
 	popup.button_enabled_state[button_index] = enabled
-
-	return 
 end
+
 PopupHandler.active_popup = function (self)
 	local popup = self.popups[self.n_popups]
 
 	if popup then
 		return popup.popup_id, popup
 	end
-
-	return 
 end
+
 PopupHandler.queue_popup = function (self, popup_type, text, topic, ...)
 	local n_popups = self.n_popups
 	local popups = self.popups
@@ -1732,6 +1722,7 @@ PopupHandler.queue_popup = function (self, popup_type, text, topic, ...)
 
 	return popup_id
 end
+
 PopupHandler._initialize_popup = function (self, popup)
 	local popup_type = popup.type
 
@@ -1740,9 +1731,8 @@ PopupHandler._initialize_popup = function (self, popup)
 	end
 
 	popup.initialized = true
-
-	return 
 end
+
 PopupHandler._initialize_password_popup = function (self, popup)
 	local widget = popup.widget
 	local content = widget.content
@@ -1770,14 +1760,13 @@ PopupHandler._initialize_password_popup = function (self, popup)
 	}
 	popup.result_param_ids = result_param_ids
 	popup.initialized = true
-
-	return 
 end
+
 PopupHandler.set_popup_verifying_password = function (self, popup_id, is_verifying, status_message, error_message)
 	local active_popup_id, popup = self.active_popup(self)
 
 	if active_popup_id ~= popup_id then
-		return 
+		return
 	end
 
 	local widget = popup.widget
@@ -1817,14 +1806,14 @@ PopupHandler.set_popup_verifying_password = function (self, popup_id, is_verifyi
 	for i = 1, n_args, 1 do
 		self.set_button_enabled(self, popup_id, i, not is_verifying)
 	end
-
-	return 
 end
+
 PopupHandler._animate_element_pulse = function (self, target, target_index, from, to, time)
 	local new_animation = UIAnimation.init(UIAnimation.pulse_animation, target, target_index, from, to, time)
 
 	return new_animation
 end
+
 PopupHandler.activate_timer = function (self, popup_id, time, default_result, alignment, blink, optional_timer_format_func, optional_font_size)
 	local n_popups = self.n_popups
 	local popups = self.popups
@@ -1863,12 +1852,12 @@ PopupHandler.activate_timer = function (self, popup_id, time, default_result, al
 	popup.timer_blink = (blink == nil and true) or blink
 	popup.timer_format_func = optional_timer_format_func
 	popup.timer_font_size = optional_font_size
-
-	return 
 end
+
 PopupHandler.has_popup = function (self)
 	return 0 < self.n_popups
 end
+
 PopupHandler.has_popup_with_id = function (self, popup_id)
 	for _, popup in pairs(self.popups) do
 		if popup.popup_id == popup_id then
@@ -1878,13 +1867,13 @@ PopupHandler.has_popup_with_id = function (self, popup_id)
 
 	return false
 end
+
 PopupHandler._reset_popup_initialized = function (self)
 	for _, popup in pairs(self.popups) do
 		popup.initialized = false
 	end
-
-	return 
 end
+
 PopupHandler.cancel_popup = function (self, popup_id)
 	local n_popups = self.n_popups
 	local popups = self.popups
@@ -1902,12 +1891,11 @@ PopupHandler.cancel_popup = function (self, popup_id)
 				self.release_input(self)
 			end
 
-			return 
+			return
 		end
 	end
-
-	return 
 end
+
 PopupHandler.cancel_all_popups = function (self)
 	local n_popups = self.n_popups
 	local popups = self.popups
@@ -1921,9 +1909,8 @@ PopupHandler.cancel_all_popups = function (self)
 	end
 
 	self.n_popups = 0
-
-	return 
 end
+
 PopupHandler.query_result = function (self, popup_id)
 	local result = self.popup_results[popup_id]
 	self.popup_results[popup_id] = nil
@@ -1931,19 +1918,18 @@ PopupHandler.query_result = function (self, popup_id)
 	if result then
 		return unpack(result)
 	end
-
-	return 
 end
+
 PopupHandler.play_sound = function (self, event)
 	WwiseWorld.trigger_event(self.wwise_world, event)
-
-	return 
 end
+
 PopupHandler.fit_text_width_to_popup = function (self, text)
 	local widget = self._popup_widgets_by_name.default
 
 	return UIRenderer.crop_text_width(self.ui_renderer, text, 500, widget.style.text)
 end
+
 PopupHandler.get_number_of_rows = function (self, localized_text, text_style, text_area_width)
 	local font, scaled_font_size = UIFontByResolution(text_style)
 	local lines = UIRenderer.word_wrap(self.ui_renderer, localized_text, font[1], scaled_font_size, text_area_width)
@@ -1951,4 +1937,4 @@ PopupHandler.get_number_of_rows = function (self, localized_text, text_style, te
 	return #lines
 end
 
-return 
+return

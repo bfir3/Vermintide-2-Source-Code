@@ -1,13 +1,14 @@
 require("scripts/entity_system/systems/behaviour/nodes/bt_node")
 
 BTThrowWeaponAction = class(BTThrowWeaponAction, BTNode)
+
 BTThrowWeaponAction.init = function (self, ...)
 	BTThrowWeaponAction.super.init(self, ...)
-
-	return 
 end
+
 BTThrowWeaponAction.name = "BTThrowWeaponAction"
 local player_and_bot_units = PLAYER_AND_BOT_UNITS
+
 BTThrowWeaponAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
@@ -33,9 +34,8 @@ BTThrowWeaponAction.enter = function (self, unit, blackboard, t)
 	if action.close_attack_time then
 		blackboard.close_attack_timer = t + action.close_attack_time
 	end
-
-	return 
 end
+
 BTThrowWeaponAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local locomotion_extension = blackboard.locomotion_extension
 
@@ -66,9 +66,8 @@ BTThrowWeaponAction.leave = function (self, unit, blackboard, t, reason, destroy
 	blackboard.ignore_thrown_weapon_overlap = nil
 
 	Managers.state.network:anim_event(unit, "move_fwd")
-
-	return 
 end
+
 BTThrowWeaponAction.anim_cb_throw_weapon = function (self, unit, blackboard)
 	local action = blackboard.action
 	local rotation = Unit.local_rotation(unit, 0)
@@ -105,14 +104,12 @@ BTThrowWeaponAction.anim_cb_throw_weapon = function (self, unit, blackboard)
 	else
 		blackboard.throw_finished = true
 	end
-
-	return 
 end
+
 BTThrowWeaponAction.anim_cb_throw_finished = function (self, unit, blackboard)
 	blackboard.throw_finished = true
-
-	return 
 end
+
 BTThrowWeaponAction.catch_weapon = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
 	local owner_go_id = network_manager.unit_game_object_id(network_manager, unit)
@@ -137,9 +134,8 @@ BTThrowWeaponAction.catch_weapon = function (self, unit, blackboard)
 	blackboard.thrown_weapon_direction = nil
 	blackboard.catched_weapon = true
 	blackboard.close_attack_target = nil
-
-	return 
 end
+
 BTThrowWeaponAction.run = function (self, unit, blackboard, t, dt)
 	if t < blackboard.rotation_timer then
 		local target_unit = blackboard.target_unit
@@ -174,14 +170,13 @@ BTThrowWeaponAction.run = function (self, unit, blackboard, t, dt)
 
 		return "running"
 	end
-
-	return 
 end
+
 BTThrowWeaponAction.update_thrown_weapon = function (self, unit, blackboard, dt, t)
 	local thrown_unit = blackboard.thrown_unit
 
 	if not thrown_unit or not Unit.alive(thrown_unit) then
-		return 
+		return
 	end
 
 	local thrown_state = blackboard.thrown_state
@@ -271,6 +266,7 @@ BTThrowWeaponAction.update_thrown_weapon = function (self, unit, blackboard, dt,
 
 	return false
 end
+
 BTThrowWeaponAction.check_overlap = function (self, action, thrown_unit, unit, blackboard, target_unit)
 	local radius = action.radius
 	local push_speed = action.push_speed
@@ -313,9 +309,8 @@ BTThrowWeaponAction.check_overlap = function (self, action, thrown_unit, unit, b
 			end
 		end
 	end
-
-	return 
 end
+
 BTThrowWeaponAction.attack_close_units = function (self, action, unit, blackboard, target_unit, t)
 	local attack_range = action.attack_close_range
 	local pos = POSITION_LOOKUP[target_unit]
@@ -329,12 +324,11 @@ BTThrowWeaponAction.attack_close_units = function (self, action, unit, blackboar
 		blackboard.close_attack_timer = t + 3
 		blackboard.close_attack_target = target_unit
 	end
-
-	return 
 end
+
 BTThrowWeaponAction.anim_cb_damage = function (self, unit, blackboard)
 	if not Unit.alive(blackboard.close_attack_target) then
-		return 
+		return
 	end
 
 	local pos = POSITION_LOOKUP[blackboard.close_attack_target]
@@ -345,8 +339,6 @@ BTThrowWeaponAction.anim_cb_damage = function (self, unit, blackboard)
 
 	locomotion_extension.add_external_velocity(locomotion_extension, velocity)
 	AiUtils.damage_target(blackboard.close_attack_target, unit, blackboard.action, blackboard.action.close_attack_damage)
-
-	return 
 end
 
-return 
+return

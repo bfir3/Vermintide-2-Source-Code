@@ -1475,4 +1475,4 @@ local action_data = {
 }
 BreedActions.chaos_fanatic = table.create_copy(BreedActions.chaos_fanatic, action_data)
 
-return 
+return

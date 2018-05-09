@@ -1,4 +1,5 @@
 PlayerCharacterStateStunned = class(PlayerCharacterStateStunned, PlayerCharacterState)
+
 PlayerCharacterStateStunned.init = function (self, character_state_init_context)
 	PlayerCharacterState.init(self, character_state_init_context, "stunned")
 
@@ -15,9 +16,8 @@ PlayerCharacterStateStunned.init = function (self, character_state_init_context)
 	self.movement_speed_limit = 1
 	self.last_input_direction = Vector3Box(0, 0, 0)
 	self.look_override = Vector3Box(0, 0, 0)
-
-	return 
 end
+
 PlayerCharacterStateStunned.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	CharacterStateHelper.stop_weapon_actions(self.inventory_extension, "stunned")
 	CharacterStateHelper.play_animation_event_first_person(self.first_person_extension, params.first_person_anim_name)
@@ -62,9 +62,8 @@ PlayerCharacterStateStunned.on_enter = function (self, unit, input, dt, context,
 	self.next_pulse = 0
 	self.current_stagger_speed = 1
 	self.last_stagger = Vector3Box(0, 0, 0)
-
-	return 
 end
+
 PlayerCharacterStateStunned.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local input_extension = self.input_extension
 
@@ -77,9 +76,8 @@ PlayerCharacterStateStunned.on_exit = function (self, unit, input, dt, context, 
 	if first_person_extension and self.onscreen_particle_id then
 		first_person_extension.stop_spawning_screen_particles(first_person_extension, self.onscreen_particle_id)
 	end
-
-	return 
 end
+
 PlayerCharacterStateStunned.update = function (self, unit, input, dt, context, t)
 	local csm = self.csm
 	local unit = self.unit
@@ -93,19 +91,19 @@ PlayerCharacterStateStunned.update = function (self, unit, input, dt, context, t
 	self.time_in_state = self.time_in_state + dt
 
 	if CharacterStateHelper.do_common_state_transitions(status_extension, csm, "stunned") then
-		return 
+		return
 	end
 
 	if CharacterStateHelper.is_ledge_hanging(world, unit, self.temp_params) then
 		csm.change_state(csm, "ledge_hanging", self.temp_params)
 
-		return 
+		return
 	end
 
 	if self.end_time < t then
 		csm.change_state(csm, "standing")
 
-		return 
+		return
 	end
 
 	self.queue_input(self, input, input_extension, inventory_extension)
@@ -192,7 +190,7 @@ PlayerCharacterStateStunned.update = function (self, unit, input, dt, context, t
 	if not csm.state_next and not locomotion_extension.is_on_ground(locomotion_extension) then
 		csm.change_state(csm, "falling")
 
-		return 
+		return
 	end
 
 	local look_override = nil
@@ -206,9 +204,8 @@ PlayerCharacterStateStunned.update = function (self, unit, input, dt, context, t
 
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, self.first_person_extension, status_extension, self.inventory_extension, look_sense_override, look_override)
 	self.look_override:store(0, 0, 0)
-
-	return 
 end
+
 PlayerCharacterStateStunned.queue_input = function (self, input, input_extension, inventory_extension)
 	local wield_input = CharacterStateHelper.wield_input(input_extension, inventory_extension, "action_wield")
 
@@ -227,8 +224,6 @@ PlayerCharacterStateStunned.queue_input = function (self, input, input_extension
 			break
 		end
 	end
-
-	return 
 end
 
-return 
+return

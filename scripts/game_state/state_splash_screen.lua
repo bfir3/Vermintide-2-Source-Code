@@ -15,6 +15,7 @@ StateSplashScreen.packages_to_load = {
 	"resource_packages/menu_assets",
 	"resource_packages/loading_screens/loading_screen_default"
 }
+
 StateSplashScreen.on_enter = function (self)
 	if PLATFORM == "win32" then
 		Application.set_time_step_policy("no_smoothing", "clear_history", "throttle", 60)
@@ -95,9 +96,8 @@ StateSplashScreen.on_enter = function (self)
 	end
 
 	self.parent.loading_context.show_profile_on_startup = true
-
-	return 
 end
+
 StateSplashScreen._is_in_esrb_terratory = function (self)
 	local esrb_regions = {
 		CA = true,
@@ -109,6 +109,7 @@ StateSplashScreen._is_in_esrb_terratory = function (self)
 
 	return esrb_regions[iso2]
 end
+
 StateSplashScreen.setup_esrb_logo = function (self)
 	self.gui = World.create_screen_gui(self.world, "material", "materials/ui/esrb_console_logo", "immediate")
 
@@ -116,9 +117,8 @@ StateSplashScreen.setup_esrb_logo = function (self)
 
 	self.showing_esrb = true
 	self.esrb_timer = 0
-
-	return 
 end
+
 StateSplashScreen.update_esrb_logo = function (self, dt, t)
 	local total_time = 5
 	local timer = self.esrb_timer
@@ -147,25 +147,21 @@ StateSplashScreen.update_esrb_logo = function (self, dt, t)
 		self.setup_splash_screen_view(self)
 		Managers.transition:force_fade_in()
 	end
-
-	return 
 end
+
 StateSplashScreen.cb_splashes_loaded = function (self)
 	self.splashes_loaded = true
 
 	if not self.showing_esrb then
 		self.setup_splash_screen_view(self)
 	end
-
-	return 
 end
+
 StateSplashScreen.setup_world = function (self)
 	self._world_name = "splash_ui"
 	self._viewport_name = "splash_view_viewport"
 	self.world = Managers.world:create_world(self._world_name, GameSettingsDevelopment.default_environment, nil, 980, Application.DISABLE_PHYSICS, Application.DISABLE_APEX_CLOTH)
 	self.viewport = ScriptWorld.create_viewport(self.world, self._viewport_name, "overlay", 1)
-
-	return 
 end
 
 if PLATFORM == "win32" then
@@ -176,8 +172,6 @@ if PLATFORM == "win32" then
 		self.input_manager:initialize_device("keyboard", 1)
 		self.input_manager:initialize_device("mouse", 1)
 		self.input_manager:initialize_device("gamepad")
-
-		return 
 	end
 end
 
@@ -199,9 +193,8 @@ StateSplashScreen.setup_splash_screen_view = function (self)
 	else
 		self.splash_view:set_index(4)
 	end
-
-	return 
 end
+
 StateSplashScreen.update = function (self, dt, t)
 	if PLATFORM ~= "xb1" and PLATFORM ~= "ps4" then
 		Debug.update(t, dt)
@@ -223,16 +216,16 @@ StateSplashScreen.update = function (self, dt, t)
 
 	return state
 end
+
 StateSplashScreen.render = function (self)
 	if self.splash_view then
 		self.splash_view:render()
 	end
-
-	return 
 end
+
 StateSplashScreen.next_state = function (self)
 	if not self.packages_loaded(self) or not self.wanted_state then
-		return 
+		return
 	end
 
 	if PLATFORM == "win32" and not self.debug_setup then
@@ -243,6 +236,7 @@ StateSplashScreen.next_state = function (self)
 
 	return self.wanted_state
 end
+
 StateSplashScreen.unload_packages = function (self)
 	local package_manager = Managers.package
 
@@ -259,9 +253,8 @@ StateSplashScreen.unload_packages = function (self)
 			package_manager.unload(package_manager, name, "global")
 		end
 	end
-
-	return 
 end
+
 StateSplashScreen.load_packages = function (self)
 	local package_manager = Managers.package
 
@@ -270,9 +263,8 @@ StateSplashScreen.load_packages = function (self)
 			package_manager.load(package_manager, name, "state_splash_screen", nil, true)
 		end
 	end
-
-	return 
 end
+
 StateSplashScreen.packages_loaded = function (self)
 	local package_manager = Managers.package
 
@@ -298,11 +290,11 @@ StateSplashScreen.packages_loaded = function (self)
 
 	return true
 end
+
 StateSplashScreen.cb_fade_in_done = function (self)
 	self.wanted_state = StateTitleScreen
-
-	return 
 end
+
 StateSplashScreen.on_exit = function (self, application_shutdown)
 	if PLATFORM == "win32" then
 		local max_fps = Application.user_setting("max_fps")
@@ -342,8 +334,6 @@ StateSplashScreen.on_exit = function (self, application_shutdown)
 
 		VisualAssertLog.cleanup()
 	end
-
-	return 
 end
 
-return 
+return

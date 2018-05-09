@@ -2,6 +2,7 @@ DoorExtension = class(DoorExtension)
 local SIMPLE_ANIMATION_FPS = 30
 local NAVMESH_UPDATE_DELAY = 3
 local unit_alive = Unit.alive
+
 DoorExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	self.unit = unit
@@ -30,21 +31,18 @@ DoorExtension.init = function (self, extension_init_context, unit, extension_ini
 	self.breeds_failed_leaving_smart_object = {}
 	self.frames_since_obstacle_update = nil
 	self.num_attackers = 0
-
-	return 
 end
+
 DoorExtension.extensions_ready = function (self)
 	self.health_extension = ScriptUnit.extension(self.unit, "health_system")
-
-	return 
 end
+
 DoorExtension.animation_played = function (self, frames, speed)
 	local animation_length = frames / SIMPLE_ANIMATION_FPS / speed
 	local t = Managers.time:time("game")
 	self.animation_stop_time = t + animation_length
-
-	return 
 end
+
 DoorExtension.update_nav_obstacles = function (self)
 	local current_state = self.current_state
 	local obstacles = self.state_to_nav_obstacle_map
@@ -67,9 +65,8 @@ DoorExtension.update_nav_obstacles = function (self)
 	end
 
 	self.frames_since_obstacle_update = 0
-
-	return 
 end
+
 DoorExtension.interacted_with = function (self, interacting_unit)
 	local unit = self.unit
 	local current_state = self.current_state
@@ -96,14 +93,13 @@ DoorExtension.interacted_with = function (self, interacting_unit)
 	end
 
 	self.set_door_state(self, new_state)
-
-	return 
 end
+
 DoorExtension.set_door_state = function (self, new_state)
 	local current_state = self.current_state
 
 	if current_state == new_state then
-		return 
+		return
 	end
 
 	local unit = self.unit
@@ -118,12 +114,12 @@ DoorExtension.set_door_state = function (self, new_state)
 	end
 
 	self.current_state = new_state
-
-	return 
 end
+
 DoorExtension.get_current_state = function (self)
 	return self.current_state
 end
+
 DoorExtension._get_animation_flow_event = function (self, current_state, new_state)
 	local event = self.animation_flow_events[current_state][new_state]
 
@@ -131,6 +127,7 @@ DoorExtension._get_animation_flow_event = function (self, current_state, new_sta
 
 	return event
 end
+
 DoorExtension.update = function (self, unit, input, dt, context, t)
 	local frames_since_obstacle_update = self.frames_since_obstacle_update
 
@@ -147,7 +144,7 @@ DoorExtension.update = function (self, unit, input, dt, context, t)
 	end
 
 	if self.dead then
-		return 
+		return
 	end
 
 	local animation_stop_time = self.animation_stop_time
@@ -168,21 +165,19 @@ DoorExtension.update = function (self, unit, input, dt, context, t)
 
 		self.destroy_box_obstacles(self)
 	end
-
-	return 
 end
+
 DoorExtension.register_breed_failed_leaving_smart_object = function (self, unit)
 	if self.breeds_failed_leaving_smart_object == nil then
-		return 
+		return
 	end
 
 	self.breeds_failed_leaving_smart_object[unit] = true
-
-	return 
 end
+
 DoorExtension.handle_breeds_failed_leaving_smart_object = function (self)
 	if self.breeds_failed_leaving_smart_object == nil then
-		return 
+		return
 	end
 
 	for unit, _ in pairs(self.breeds_failed_leaving_smart_object) do
@@ -196,9 +191,8 @@ DoorExtension.handle_breeds_failed_leaving_smart_object = function (self)
 	end
 
 	self.breeds_failed_leaving_smart_object = {}
-
-	return 
 end
+
 DoorExtension.hot_join_sync = function (self, sender)
 	local level = LevelHelper:current_level(self.world)
 	local level_index = Level.unit_index(level, self.unit)
@@ -206,9 +200,8 @@ DoorExtension.hot_join_sync = function (self, sender)
 	local door_state_id = NetworkLookup.door_states[door_state]
 
 	RPC.rpc_sync_door_state(sender, level_index, door_state_id)
-
-	return 
 end
+
 DoorExtension.destroy = function (self)
 	self.destroy_box_obstacles(self)
 
@@ -216,9 +209,8 @@ DoorExtension.destroy = function (self)
 	self.world = nil
 	self.health_extension = nil
 	self.breeds_failed_leaving_smart_object = nil
-
-	return 
 end
+
 DoorExtension.destroy_box_obstacles = function (self)
 	if self.state_to_nav_obstacle_map then
 		for _, obstacle in pairs(self.state_to_nav_obstacle_map) do
@@ -229,14 +221,14 @@ DoorExtension.destroy_box_obstacles = function (self)
 	end
 
 	self.frames_since_obstacle_update = 0
-
-	return 
 end
+
 DoorExtension.is_open = function (self)
 	return self.current_state ~= "closed"
 end
+
 DoorExtension.is_opening = function (self)
 	return self.current_state ~= "closed" and (self.animation_stop_time or self.frames_since_obstacle_update)
 end
 
-return 
+return

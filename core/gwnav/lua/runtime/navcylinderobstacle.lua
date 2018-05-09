@@ -13,9 +13,11 @@ local Unit = stingray.Unit
 local GwNavWorld = stingray.GwNavWorld
 local GwNavCylinderObstacle = stingray.GwNavCylinderObstacle
 local _navcylinderobstacles = {}
+
 NavCylinderObstacle.get_navcylinderostacle = function (unit)
 	return _navcylinderobstacles[unit]
 end
+
 NavCylinderObstacle.init = function (self, navworld, unit)
 	self.unit = unit
 	self.navworld = navworld
@@ -30,20 +32,17 @@ NavCylinderObstacle.init = function (self, navworld, unit)
 	self.set_does_trigger_tagvolume(self, self.does_trigger_tag_volume)
 
 	_navcylinderobstacles[self.unit] = self
-
-	return 
 end
+
 NavCylinderObstacle.set_does_trigger_tagvolume = function (self, does_trigger_tag_volume)
 	GwNavCylinderObstacle.set_does_trigger_tagvolume(self.nav_cylinderobstacle, does_trigger_tag_volume)
-
-	return 
 end
+
 NavCylinderObstacle.set_next_update_config = function (self, position, velocity)
 	GwNavCylinderObstacle.set_position(self.nav_cylinderobstacle, position)
 	GwNavCylinderObstacle.set_velocity(self.nav_cylinderobstacle, velocity)
-
-	return 
 end
+
 NavCylinderObstacle.update = function (self, dt)
 	local pos = Unit.world_position(self.unit, 1)
 	local velocity = (pos - self.lastpos:unbox()) / dt
@@ -51,27 +50,22 @@ NavCylinderObstacle.update = function (self, dt)
 	self.set_does_trigger_tagvolume(self, does_trigger_tag_volume and Vector3.length(velocity) == 0)
 	self.set_next_update_config(self, pos, velocity)
 	self.lastpos:store(pos)
-
-	return 
 end
+
 NavCylinderObstacle.shutdown = function (self)
 	self.navworld:remove_cylinderobstacle(self.unit)
 	GwNavCylinderObstacle.destroy(self.nav_cylinderobstacle)
 
 	self.nav_cylinderobstacle = nil
 	_navcylinderobstacles[self.unit] = nil
-
-	return 
 end
+
 NavCylinderObstacle.add_to_world = function (self)
 	GwNavCylinderObstacle.add_to_world(self.nav_cylinderobstacle)
-
-	return 
 end
+
 NavCylinderObstacle.remove_from_world = function (self)
 	GwNavCylinderObstacle.remove_from_world(self.nav_cylinderobstacle)
-
-	return 
 end
 
 return NavCylinderObstacle

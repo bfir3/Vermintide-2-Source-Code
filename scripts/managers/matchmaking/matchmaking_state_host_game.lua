@@ -1,5 +1,6 @@
 MatchmakingStateHostGame = class(MatchmakingStateHostGame)
 MatchmakingStateHostGame.NAME = "MatchmakingStateHostGame"
+
 MatchmakingStateHostGame.init = function (self, params)
 	self._lobby = params.lobby
 	self._network_transmit = params.network_transmit
@@ -7,12 +8,12 @@ MatchmakingStateHostGame.init = function (self, params)
 	self._matchmaking_manager = params.matchmaking_manager
 	self._handshaker_host = params.handshaker_host
 	self._wwise_world = params.wwise_world
+end
 
-	return 
-end
 MatchmakingStateHostGame.destroy = function (self)
-	return 
+	return
 end
+
 MatchmakingStateHostGame.on_enter = function (self, state_context)
 	self.state_context = state_context
 	self.search_config = state_context.search_config
@@ -32,9 +33,8 @@ MatchmakingStateHostGame.on_enter = function (self, state_context)
 
 		self.state_context.started_hosting_t = Managers.time:time("main")
 	end
-
-	return 
 end
+
 MatchmakingStateHostGame.set_debug_info = function (self)
 	local search_config = self.search_config
 	local level = search_config.level_key
@@ -48,15 +48,16 @@ MatchmakingStateHostGame.set_debug_info = function (self)
 	Managers.matchmaking.debug.level = level
 	Managers.matchmaking.debug.difficulty = difficulty
 	Managers.matchmaking.debug.hero = profile_name
+end
 
-	return 
-end
 MatchmakingStateHostGame.on_exit = function (self)
-	return 
+	return
 end
+
 MatchmakingStateHostGame.update = function (self, dt, t)
 	return MatchmakingStateWaitForCountdown, self.state_context
 end
+
 MatchmakingStateHostGame._start_hosting_game = function (self)
 	local state_context = self.state_context
 	local search_config = self.search_config
@@ -102,8 +103,6 @@ MatchmakingStateHostGame._start_hosting_game = function (self)
 	self._game_created = true
 
 	self._matchmaking_manager:activate_waystone_portal(true)
-
-	return 
 end
 
-return 
+return
