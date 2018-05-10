@@ -664,7 +664,8 @@ DiceRoller._create_success_table = function (self, success_list)
 			}
 			success_table[#success_table + 1] = data
 
-			if success and not (success_count + 1) then
+			if success then
+				success_count = success_count + 1
 			end
 		end
 	end

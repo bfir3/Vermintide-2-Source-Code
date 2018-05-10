@@ -859,10 +859,12 @@ TutorialUI.distance_between_screen_positions = function (self, position_a, posit
 	local width = position_a[1] - position_b[1]
 	local height = position_a[2] - position_b[2]
 
-	if width < 0 and not (-1 * width) then
+	if width < 0 then
+		width = -1 * width
 	end
 
-	if height < 0 and not (-1 * height) then
+	if height < 0 then
+		height = -1 * height
 	end
 
 	return {

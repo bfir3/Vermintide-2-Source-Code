@@ -189,12 +189,12 @@ StartGameWindowMissionSelection._present_act_levels = function (self, act)
 			for level_index, level_data in ipairs(levels) do
 				if is_end_act then
 					level_position_x = level_width_spacing * 4
-				elseif act_index == 1 and not is_end_act then
-					if level_index == 1 then
-						if not (level_position_x + level_width_spacing / 2) then
-						end
+				elseif act_index == 1 and not is_end_act and level_index == 1 then
+					level_position_x = level_position_x + level_width_spacing / 2
+
+					if act_index ~= 2 and level_index == 1 then
+						level_position_x = level_position_x + level_width_spacing / 2
 					end
-				elseif act_index ~= 2 and level_index == 1 and not (level_position_x + level_width_spacing / 2) then
 				end
 
 				local index = #assigned_widgets + 1
