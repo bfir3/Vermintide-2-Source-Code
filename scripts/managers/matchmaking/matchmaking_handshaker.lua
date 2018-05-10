@@ -72,7 +72,7 @@ MatchmakingHandshakerHost.update = function (self, t)
 		self.ping_time_write_index = (previous_ping_time_write_index + 1) % 6
 		self.next_ping_time = math.floor(t) + 2
 
-		self.send_rpc_to_clients(self, "rpc_ping", self.pings_by_peer_id)
+		self:send_rpc_to_clients("rpc_ping", self.pings_by_peer_id)
 	end
 end
 
@@ -99,7 +99,7 @@ MatchmakingHandshakerHost.rpc_matchmaking_handshake_complete = function (self, s
 end
 
 MatchmakingHandshakerHost.rpc_pong = function (self, sender, client_cookie, host_cookie)
-	if not self.validate_cookies(self, sender, client_cookie, host_cookie) then
+	if not self:validate_cookies(sender, client_cookie, host_cookie) then
 		return
 	end
 
@@ -234,7 +234,7 @@ MatchmakingHandshakerClient.rpc_matchmaking_handshake_reply = function (self, se
 end
 
 MatchmakingHandshakerClient.rpc_ping = function (self, sender, client_cookie, host_cookie, pings_by_peer_id)
-	if not self.validate_cookies(self, client_cookie, host_cookie) then
+	if not self:validate_cookies(client_cookie, host_cookie) then
 		return
 	end
 

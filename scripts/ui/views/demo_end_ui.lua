@@ -23,7 +23,7 @@ DemoEndUI.init = function (self, world)
 	self.input_manager:map_device_to_service("demo", "gamepad")
 	self.input_manager:map_device_to_service("demo", "keyboard")
 	self.input_manager:map_device_to_service("demo", "mouse")
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 end
 
 DemoEndUI._create_ui_elements = function (self)
@@ -43,7 +43,7 @@ DemoEndUI._create_ui_elements = function (self)
 end
 
 DemoEndUI.update = function (self, dt, t)
-	self._draw(self, dt, t)
+	self:_draw(dt, t)
 end
 
 DemoEndUI._draw = function (self, dt, t)

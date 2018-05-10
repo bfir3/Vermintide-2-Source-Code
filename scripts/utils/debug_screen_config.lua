@@ -66,7 +66,7 @@ local settings = {
 					local world = Managers.world:world("level_world")
 
 					LevelHelper:flow_event(world, "teleport_" .. options[index])
-					locomotion.teleport_to(locomotion, pos, rot)
+					locomotion:teleport_to(pos, rot)
 				end
 			end
 
@@ -395,14 +395,14 @@ local settings = {
 		category = "Player mechanics recommended",
 		func = function ()
 			local player_manager = Managers.player
-			local local_player = player_manager.local_player(player_manager)
+			local local_player = player_manager:local_player()
 			local player_unit = local_player and local_player.player_unit
 
 			if Unit.alive(player_unit) then
 				local status_extension = ScriptUnit.extension(player_unit, "status_system")
-				local invisibility = not status_extension.is_invisible(status_extension)
+				local invisibility = not status_extension:is_invisible()
 
-				status_extension.set_invisible(status_extension, invisibility)
+				status_extension:set_invisible(invisibility)
 
 				local debug_text = (invisibility and "Local player is now invisible") or "Local player is now visible"
 
@@ -5884,14 +5884,14 @@ Features that make player mechanics nicer to work with.
 		setting_name = "1000 Experience",
 		func = function ()
 			local player_manager = Managers.player
-			local player = player_manager.local_player(player_manager, 1)
-			local profile_index = player.profile_index(player)
+			local player = player_manager:local_player(1)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local hero_attributes = Managers.backend:get_interface("hero_attributes")
-			local experience = hero_attributes.get(hero_attributes, profile.display_name, "experience")
+			local experience = hero_attributes:get(profile.display_name, "experience")
 			local end_experience = math.min(experience + 1000, ExperienceSettings.max_experience)
 
-			hero_attributes.set(hero_attributes, profile.display_name, "experience", end_experience)
+			hero_attributes:set(profile.display_name, "experience", end_experience)
 		end
 	},
 	{
@@ -5900,12 +5900,12 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Reset Level",
 		func = function ()
 			local player_manager = Managers.player
-			local player = player_manager.local_player(player_manager, 1)
-			local profile_index = player.profile_index(player)
+			local player = player_manager:local_player(1)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local hero_attributes = Managers.backend:get_interface("hero_attributes")
 
-			hero_attributes.set(hero_attributes, profile.display_name, "experience", 0)
+			hero_attributes:set(profile.display_name, "experience", 0)
 		end
 	},
 	{
@@ -5914,12 +5914,12 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Level up above prestige level requirements",
 		func = function ()
 			local player_manager = Managers.player
-			local player = player_manager.local_player(player_manager, 1)
-			local profile_index = player.profile_index(player)
+			local player = player_manager:local_player(1)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local hero_attributes = Managers.backend:get_interface("hero_attributes")
 
-			hero_attributes.set(hero_attributes, profile.display_name, "experience", 1000000)
+			hero_attributes:set(profile.display_name, "experience", 1000000)
 			debug.load_level("inn_level")
 		end
 	},
@@ -5929,12 +5929,12 @@ Features that make player mechanics nicer to work with.
 		setting_name = "Reset prestige level",
 		func = function ()
 			local player_manager = Managers.player
-			local player = player_manager.local_player(player_manager, 1)
-			local profile_index = player.profile_index(player)
+			local player = player_manager:local_player(1)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local hero_attributes = Managers.backend:get_interface("hero_attributes")
 
-			hero_attributes.set(hero_attributes, profile.display_name, "prestige", 0)
+			hero_attributes:set(profile.display_name, "prestige", 0)
 			debug.load_level("inn_level")
 		end
 	},
@@ -6173,7 +6173,7 @@ Features that make player mechanics nicer to work with.
 					properties_serialized = properties_serialized .. property.rune_slot .. ":" .. property.property .. "," .. property.rune_value .. ","
 				end
 
-				loot_interface.generate_weapon_with_properties(loot_interface, item_key, properties_serialized)
+				loot_interface:generate_weapon_with_properties(item_key, properties_serialized)
 			end
 		end
 	},
@@ -6184,11 +6184,11 @@ Features that make player mechanics nicer to work with.
 		func = function ()
 			local item_interface = Managers.backend:get_interface("items")
 
-			item_interface.award_item(item_interface, "skin_color_tint_red")
-			item_interface.award_item(item_interface, "skin_color_tint_green")
-			item_interface.award_item(item_interface, "skin_color_tint_blue")
-			item_interface.award_item(item_interface, "dr_slayer_hair_0001")
-			item_interface.award_item(item_interface, "dr_slayer_hair_0002")
+			item_interface:award_item("skin_color_tint_red")
+			item_interface:award_item("skin_color_tint_green")
+			item_interface:award_item("skin_color_tint_blue")
+			item_interface:award_item("dr_slayer_hair_0001")
+			item_interface:award_item("dr_slayer_hair_0002")
 		end
 	},
 	{
@@ -6198,12 +6198,12 @@ Features that make player mechanics nicer to work with.
 		func = function ()
 			local item_interface = Managers.backend:get_interface("items")
 
-			item_interface.award_item(item_interface, "frame_0001")
-			item_interface.award_item(item_interface, "frame_0002")
-			item_interface.award_item(item_interface, "frame_0003")
-			item_interface.award_item(item_interface, "frame_0004")
-			item_interface.award_item(item_interface, "frame_0005")
-			item_interface.award_item(item_interface, "frame_0006")
+			item_interface:award_item("frame_0001")
+			item_interface:award_item("frame_0002")
+			item_interface:award_item("frame_0003")
+			item_interface:award_item("frame_0004")
+			item_interface:award_item("frame_0005")
+			item_interface:award_item("frame_0006")
 		end
 	},
 	{
@@ -6213,15 +6213,15 @@ Features that make player mechanics nicer to work with.
 		func = function ()
 			local item_interface = Managers.backend:get_interface("items")
 
-			item_interface.award_item(item_interface, "ring_attackspeed_0001")
-			item_interface.award_item(item_interface, "ring_attackspeed_0002")
-			item_interface.award_item(item_interface, "ring_attackspeed_0003")
-			item_interface.award_item(item_interface, "necklace_health_0001")
-			item_interface.award_item(item_interface, "necklace_health_0002")
-			item_interface.award_item(item_interface, "necklace_health_0003")
-			item_interface.award_item(item_interface, "necklace_stamina_0001")
-			item_interface.award_item(item_interface, "necklace_stamina_0002")
-			item_interface.award_item(item_interface, "necklace_stamina_0003")
+			item_interface:award_item("ring_attackspeed_0001")
+			item_interface:award_item("ring_attackspeed_0002")
+			item_interface:award_item("ring_attackspeed_0003")
+			item_interface:award_item("necklace_health_0001")
+			item_interface:award_item("necklace_health_0002")
+			item_interface:award_item("necklace_health_0003")
+			item_interface:award_item("necklace_stamina_0001")
+			item_interface:award_item("necklace_stamina_0002")
+			item_interface:award_item("necklace_stamina_0003")
 		end
 	},
 	{
@@ -6408,18 +6408,18 @@ Features that make player mechanics nicer to work with.
 			local item_master_list = ItemMasterList
 			local item_interface = Managers.backend:get_interface("items")
 			local player_manager = Managers.player
-			local player = player_manager.local_player(player_manager, 1)
-			local profile_index = player.profile_index(player)
+			local player = player_manager:local_player(1)
+			local profile_index = player:profile_index()
 			local profile_settings = SPProfiles[profile_index]
 			local profile_name = profile_settings.display_name
-			local career_index = hero_attributes.get(hero_attributes, profile_name, "career")
+			local career_index = hero_attributes:get(profile_name, "career")
 			local careers = profile_settings.careers
 			local career_settings = careers[career_index]
 			local name = career_settings.name
 
 			for key, item in pairs(item_master_list) do
-				if item.slot_type == "melee" and table.contains(item.can_wield, name) and not item_interface.has_item(item_interface, key) then
-					item_interface.award_item(item_interface, key)
+				if item.slot_type == "melee" and table.contains(item.can_wield, name) and not item_interface:has_item(key) then
+					item_interface:award_item(key)
 				end
 			end
 		end
@@ -6433,18 +6433,18 @@ Features that make player mechanics nicer to work with.
 			local item_master_list = ItemMasterList
 			local item_interface = Managers.backend:get_interface("items")
 			local player_manager = Managers.player
-			local player = player_manager.local_player(player_manager, 1)
-			local profile_index = player.profile_index(player)
+			local player = player_manager:local_player(1)
+			local profile_index = player:profile_index()
 			local profile_settings = SPProfiles[profile_index]
 			local profile_name = profile_settings.display_name
-			local career_index = hero_attributes.get(hero_attributes, profile_name, "career")
+			local career_index = hero_attributes:get(profile_name, "career")
 			local careers = profile_settings.careers
 			local career_settings = careers[career_index]
 			local name = career_settings.name
 
 			for key, item in pairs(item_master_list) do
-				if item.slot_type == "ranged" and table.contains(item.can_wield, name) and not item_interface.has_item(item_interface, key) then
-					item_interface.award_item(item_interface, key)
+				if item.slot_type == "ranged" and table.contains(item.can_wield, name) and not item_interface:has_item(key) then
+					item_interface:award_item(key)
 				end
 			end
 		end
@@ -6472,7 +6472,7 @@ Features that make player mechanics nicer to work with.
 			local item = options[index]
 
 			if item then
-				item_interface.award_item(item_interface, item)
+				item_interface:award_item(item)
 			end
 		end
 	},
@@ -6499,7 +6499,7 @@ Features that make player mechanics nicer to work with.
 			local item = options[index]
 
 			if item then
-				item_interface.award_item(item_interface, item)
+				item_interface:award_item(item)
 			end
 		end
 	},
@@ -6526,7 +6526,7 @@ Features that make player mechanics nicer to work with.
 			local item = options[index]
 
 			if item then
-				item_interface.award_item(item_interface, item)
+				item_interface:award_item(item)
 			end
 		end
 	},
@@ -6554,7 +6554,7 @@ Features that make player mechanics nicer to work with.
 			local item = options[index]
 
 			if item then
-				item_interface.award_item(item_interface, item)
+				item_interface:award_item(item)
 			end
 		end
 	},
@@ -6581,7 +6581,7 @@ Features that make player mechanics nicer to work with.
 			local item = options[index]
 
 			if item then
-				item_interface.award_item(item_interface, item)
+				item_interface:award_item(item)
 			end
 		end
 	},
@@ -6608,7 +6608,7 @@ Features that make player mechanics nicer to work with.
 			local item = options[index]
 
 			if item then
-				item_interface.award_item(item_interface, item)
+				item_interface:award_item(item)
 			end
 		end
 	},
@@ -6635,7 +6635,7 @@ Features that make player mechanics nicer to work with.
 			local item = options[index]
 
 			if item then
-				item_interface.award_item(item_interface, item)
+				item_interface:award_item(item)
 			end
 		end
 	},
@@ -6662,7 +6662,7 @@ Features that make player mechanics nicer to work with.
 			local item = options[index]
 
 			if item then
-				item_interface.award_item(item_interface, item)
+				item_interface:award_item(item)
 			end
 		end
 	},
@@ -6689,7 +6689,7 @@ Features that make player mechanics nicer to work with.
 			local item = options[index]
 
 			if item then
-				item_interface.award_item(item_interface, item)
+				item_interface:award_item(item)
 			end
 		end
 	},
@@ -6742,23 +6742,23 @@ if platform == "ps4" or platform == "xb1" then
 					if selected_value == "Switch Breed" then
 						local t = Managers.time:time("main")
 
-						conflict_director.debug_spawn_switch_breed(conflict_director, t)
+						conflict_director:debug_spawn_switch_breed(t)
 					elseif selected_value == "Spawn Breed" then
 						local t = Managers.time:time("main")
 
-						conflict_director.debug_spawn_breed(conflict_director, t)
+						conflict_director:debug_spawn_breed(t)
 					elseif selected_value == "Spawn Group" then
 						local t = Managers.time:time("main")
 
-						conflict_director.debug_spawn_group(conflict_director, t)
+						conflict_director:debug_spawn_group(t)
 					elseif selected_value == "Spawn Horde" then
-						conflict_director.debug_spawn_horde(conflict_director)
+						conflict_director:debug_spawn_horde()
 					elseif selected_value == "Unspawn All Breed" then
-						conflict_director.destroy_all_units(conflict_director)
+						conflict_director:destroy_all_units()
 					elseif selected_value == "Unspawn Nearby Breed" then
-						conflict_director.destroy_close_units(conflict_director, nil, 144)
+						conflict_director:destroy_close_units(nil, 144)
 					elseif selected_value == "Unspawn Specials" then
-						conflict_director.destroy_specials(conflict_director)
+						conflict_director:destroy_specials()
 					end
 				end
 			end
@@ -6784,7 +6784,7 @@ if platform == "ps4" or platform == "xb1" then
 					local time_scale_index = table.find(debug_manager.time_scale_list, time_scale_value)
 
 					assert(time_scale_index, "[DebugScreen] Selected time scale not found in Managers.state.debug.time_scale_list")
-					debug_manager.set_time_scale(debug_manager, time_scale_index)
+					debug_manager:set_time_scale(time_scale_index)
 				end
 			end
 		}

@@ -20,14 +20,14 @@ BTAlliedAvoidCombatAction.enter = function (self, unit, blackboard, t)
 	blackboard.wanted_flee_pos = Vector3Box(final_pos)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, blackboard.breed.run_speed)
+	navigation_extension:set_max_speed(blackboard.breed.run_speed)
 end
 
 BTAlliedAvoidCombatAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 
 	blackboard.wanted_flee_pos = nil
 end
@@ -35,7 +35,7 @@ end
 BTAlliedAvoidCombatAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion_extension = blackboard.locomotion_extension
 
-	self.flee(self, unit, t, dt, blackboard, locomotion_extension)
+	self:flee(unit, t, dt, blackboard, locomotion_extension)
 
 	return "running", "evaluate"
 end
@@ -51,7 +51,7 @@ BTAlliedAvoidCombatAction._go_idle = function (self, unit, blackboard, locomotio
 	if target_unit then
 		local rot = LocomotionUtils.rotation_towards_unit_flat(unit, target_unit)
 
-		locomotion_extension.set_wanted_rotation(locomotion_extension, rot)
+		locomotion_extension:set_wanted_rotation(rot)
 	end
 end
 
@@ -65,20 +65,20 @@ BTAlliedAvoidCombatAction.flee = function (self, unit, t, dt, blackboard, locomo
 	local action = blackboard.action
 	local navigation_extension = blackboard.navigation_extension
 
-	self._move_to_flee_location(self, unit, blackboard, t, dt)
+	self:_move_to_flee_location(unit, blackboard, t, dt)
 
-	local destination = navigation_extension.destination(navigation_extension)
+	local destination = navigation_extension:destination()
 	local to_vec = destination - POSITION_LOOKUP[unit]
 
 	Vector3.set_z(to_vec, 0)
 
 	local distance_sq = Vector3.length_squared(to_vec)
-	local is_following_path = navigation_extension.is_following_path(navigation_extension)
+	local is_following_path = navigation_extension:is_following_path()
 
 	if blackboard.move_state ~= "moving" and is_following_path and 0.25 < distance_sq then
-		self._go_moving(self, unit, blackboard, action)
+		self:_go_moving(unit, blackboard, action)
 	elseif blackboard.move_state ~= "idle" and (not is_following_path or distance_sq < 0.04000000000000001) then
-		self._go_idle(self, unit, blackboard, locomotion_extension)
+		self:_go_idle(unit, blackboard, locomotion_extension)
 	end
 
 	local target_intensity = blackboard.target_status_extension and blackboard.target_status_extension:get_intensity()
@@ -90,7 +90,7 @@ BTAlliedAvoidCombatAction._move_to_flee_location = function (self, unit, blackbo
 	local navigation_extension = blackboard.navigation_extension
 	local wanted_position = blackboard.wanted_flee_pos:unbox()
 
-	navigation_extension.move_to(navigation_extension, wanted_position)
+	navigation_extension:move_to(wanted_position)
 end
 
 return

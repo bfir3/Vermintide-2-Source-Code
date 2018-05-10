@@ -35,7 +35,7 @@ LocalizationManager.lookup = function (self, text_id)
 
 	local str = Localizer.lookup(self._localizer, text_id) or "<" .. tostring(text_id) .. ">"
 
-	return self.apply_macro(self, str)
+	return self:apply_macro(str)
 end
 
 LocalizationManager.apply_macro = function (self, str)

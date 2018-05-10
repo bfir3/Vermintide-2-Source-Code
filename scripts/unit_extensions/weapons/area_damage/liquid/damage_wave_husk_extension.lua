@@ -7,11 +7,11 @@ DamageWaveHuskExtension.init = function (self, extension_init_context, unit, ext
 	self.world = world
 	self.game = Managers.state.network:game()
 	self.unit = unit
-	self.nav_world = entity_manager.system(entity_manager, "ai_system"):nav_world()
+	self.nav_world = entity_manager:system("ai_system"):nav_world()
 	local unit_storage = Managers.state.unit_storage
-	self.go_id = unit_storage.go_id(unit_storage, unit)
+	self.go_id = unit_storage:go_id(unit)
 	self.fx_list = {}
-	local buff_system = entity_manager.system(entity_manager, "buff_system")
+	local buff_system = entity_manager:system("buff_system")
 	self.buff_system = buff_system
 	self.source_unit = extension_init_data.source_unit
 	local template_name = extension_init_data.damage_wave_template_name
@@ -102,7 +102,7 @@ DamageWaveHuskExtension.hide_wave = function (self, unit)
 end
 
 DamageWaveHuskExtension.set_wave_arrived = function (self, unit)
-	self.hide_wave(self, unit)
+	self:hide_wave(unit)
 
 	local world = self.world
 	local wwise_world = Managers.world:wwise_world(world)

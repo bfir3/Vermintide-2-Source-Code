@@ -22,7 +22,7 @@ TwitchIconView.init = function (self, world)
 		snap_pixel_positions = true
 	}
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 
 	DO_RELOAD = false
 end
@@ -39,11 +39,11 @@ TwitchIconView.update = function (self, dt)
 		DO_RELOAD = false
 
 		print("Reloading Twitch Icon")
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 	end
 
 	if Managers.twitch and (Managers.twitch:is_connected() or Managers.twitch:is_activated()) then
-		self._draw(self, dt)
+		self:_draw(dt)
 	end
 end
 

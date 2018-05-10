@@ -14,7 +14,7 @@ TutorialInputUI.init = function (self, ingame_ui_context)
 		mouse = "mouse"
 	}
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 	Managers.state.event:register(self, "event_add_tutorial_input", "event_add_tutorial_input")
 	Managers.state.event:register(self, "event_update_tutorial_input", "event_update_tutorial_input")
 	Managers.state.event:register(self, "event_remove_tutorial_input", "event_remove_tutorial_input")
@@ -86,7 +86,7 @@ end
 
 TutorialInputUI._button_texture_data_by_input_action = function (self, input_action, alt_button_name, active_template)
 	local input_manager = self._input_manager
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 	local platform = PLATFORM
 
 	if platform == "win32" and gamepad_active then
@@ -98,11 +98,11 @@ TutorialInputUI._button_texture_data_by_input_action = function (self, input_act
 
 		return button_texture_data
 	else
-		local input_service = input_manager.get_service(input_manager, "Player")
+		local input_service = input_manager:get_service("Player")
 		local alternate_input_action = nil
 
 		if active_template.input_service_fallback then
-			alternate_input_action = input_manager.get_service(input_manager, active_template.input_service_fallback)
+			alternate_input_action = input_manager:get_service(active_template.input_service_fallback)
 		end
 
 		return UISettings.get_gamepad_input_texture_data(input_service, input_action, gamepad_active, alternate_input_action)
@@ -111,14 +111,14 @@ end
 
 TutorialInputUI.update = function (self, dt, t)
 	if DO_RELOAD then
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 	end
 
 	script_data.tutorial_input = self
 
-	self._update_animations(self, dt, t)
-	self._update_tooltip(self, dt, t)
-	self._draw(self, dt, t)
+	self:_update_animations(dt, t)
+	self:_update_tooltip(dt, t)
+	self:_draw(dt, t)
 end
 
 TutorialInputUI._update_animations = function (self, dt, t)
@@ -136,7 +136,7 @@ TutorialInputUI._update_tooltip = function (self, dt, t)
 
 	if not active_template then
 		if self._active_tooltip_name then
-			self.hide(self)
+			self:hide()
 		end
 
 		return
@@ -157,7 +157,7 @@ TutorialInputUI._update_tooltip = function (self, dt, t)
 	local inputs = (gamepad_active and active_template.tooltip_gamepad_inputs) or active_template.tooltip_inputs
 
 	if not active_tooltip_name then
-		self.fade_in(self)
+		self:fade_in()
 	end
 
 	local input_widgets = self._tutorial_tooltip_input_widgets
@@ -191,10 +191,10 @@ TutorialInputUI._update_tooltip = function (self, dt, t)
 			local widget_style = widget.style
 			local input = inputs[i]
 			local input_action = input.action
-			local button_texture_data, button_text, keymap_binding, unassigned = self._button_texture_data_by_input_action(self, input_action, nil, active_template)
+			local button_texture_data, button_text, keymap_binding, unassigned = self:_button_texture_data_by_input_action(input_action, nil, active_template)
 
 			if not button_texture_data and active_template.alt_action_icons then
-				button_texture_data, button_text = self._button_texture_data_by_input_action(self, input_action, active_template.alt_action_icons[input_action], active_template)
+				button_texture_data, button_text = self:_button_texture_data_by_input_action(input_action, active_template.alt_action_icons[input_action], active_template)
 			end
 
 			parent_widget_content.unassigned = parent_widget_content.unassigned or unassigned
@@ -310,17 +310,17 @@ end
 TutorialInputUI.hide = function (self)
 	self._active_tooltip_name = nil
 
-	self.fade_out(self)
+	self:fade_out()
 end
 
 local FADE_TIME = 0.25
 
 TutorialInputUI.fade_in = function (self)
-	self._fade(self, 0, 255, FADE_TIME, false)
+	self:_fade(0, 255, FADE_TIME, false)
 end
 
 TutorialInputUI.fade_out = function (self)
-	self._fade(self, 255, 0, FADE_TIME, true)
+	self:_fade(255, 0, FADE_TIME, true)
 end
 
 TutorialInputUI._fade = function (self, from_alpha, to_alpha, duration, completed)

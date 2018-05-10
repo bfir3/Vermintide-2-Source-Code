@@ -2103,13 +2103,13 @@ local animation_definitions = {
 				local reward_key = reward_option.reward_key
 
 				if item_previewer and reward_key then
-					item_previewer.present_item(item_previewer, reward_key)
+					item_previewer:present_item(reward_key)
 				end
 
 				local character_previewer = reward_option.character_previewer
 
 				if character_previewer then
-					character_previewer.force_unhide_character(character_previewer)
+					character_previewer:force_unhide_character()
 				end
 
 				reward_option.presentation_complete = presentation_complete

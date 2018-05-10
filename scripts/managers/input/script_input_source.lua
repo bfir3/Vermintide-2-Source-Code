@@ -40,7 +40,7 @@ end
 
 ScriptInputSource.update = function (self, dt, t)
 	if self._active then
-		self._update_input(self, dt, t)
+		self:_update_input(dt, t)
 	end
 end
 
@@ -73,7 +73,7 @@ ScriptInputSource._update_input = function (self, dt, t)
 	self._active_time = self._active_time + dt
 
 	if #self._input_settings_copy == 0 and self._loop then
-		self.start(self, self._input_settings, true)
+		self:start(self._input_settings, true)
 	end
 end
 

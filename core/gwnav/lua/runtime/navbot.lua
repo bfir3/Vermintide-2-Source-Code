@@ -51,14 +51,14 @@ NavBot.init = function (self, navworld, unit, config)
 	self.gwnavbot = GwNavBot.create(navworld.gwnavworld, self.config.height, self.config.radius, self.config.speed, p)
 	self.interval = GwNavSmartObjectInterval.create(self.navworld.gwnavworld)
 
-	config.configure_bot(config, self)
+	config:configure_bot(self)
 
 	self.destination = Vector3Box(p)
 	self.has_destination = false
 	self.target_route_vertex = 1
 	self.moving = false
 
-	navworld.add_bot(navworld, self)
+	navworld:add_bot(self)
 end
 
 NavBot.set_use_avoidance = function (self, use_avoidance)
@@ -79,9 +79,9 @@ end
 
 NavBot.set_destination = function (self, destination)
 	if destination == self.destination:unbox() then
-		self.on_recompute_path_to_similar_destination_for_crowd_dispersion(self)
+		self:on_recompute_path_to_similar_destination_for_crowd_dispersion()
 	else
-		self.on_compute_path_to_brand_new_destination_for_crowd_dispersion(self)
+		self:on_compute_path_to_brand_new_destination_for_crowd_dispersion()
 	end
 
 	self.destination:store(destination)
@@ -99,7 +99,7 @@ NavBot.velocity = function (self)
 end
 
 NavBot.output_velocity = function (self)
-	if not self.has_arrived(self) then
+	if not self:has_arrived() then
 		return GwNavBot.output_velocity(self.gwnavbot)
 	else
 		return Vector3(0, 0, 0)
@@ -131,12 +131,12 @@ NavBot.forbid_layer = function (self, layer)
 end
 
 NavBot.repath = function (self)
-	self.set_destination(self, self.route[self.target_route_vertex + 1]:unbox())
+	self:set_destination(self.route[self.target_route_vertex + 1]:unbox())
 end
 
 NavBot.force_repath = function (self)
 	if self.has_destination == true and self.is_smartobject_driven == false then
-		self.repath(self)
+		self:repath()
 	end
 end
 
@@ -193,8 +193,8 @@ NavBot.update_crowd_dispersion = function (self)
 
 	if crowd_dispersion_action == 1 then
 		if not GwNavBot.is_computing_path(self.gwnavbot) then
-			self.next_route_index(self)
-			self.set_destination(self, self.route[self.target_route_vertex]:unbox())
+			self:next_route_index()
+			self:set_destination(self.route[self.target_route_vertex]:unbox())
 		end
 	elseif crowd_dispersion_action == 2 and GwNavBot.is_computing_path(self.gwnavbot) then
 		print("self:cancel()")
@@ -221,42 +221,42 @@ NavBot.update_route = function (self)
 	end
 
 	if not GwNavBot.is_computing_new_path(self.gwnavbot) and GwNavBot.is_path_recomputation_needed(self.gwnavbot) then
-		self.set_destination(self, self.route[self.target_route_vertex]:unbox())
+		self:set_destination(self.route[self.target_route_vertex]:unbox())
 	end
 
 	if self.has_destination == false then
-		self.next_route_index(self)
-		self.set_destination(self, self.route[self.target_route_vertex]:unbox())
+		self:next_route_index()
+		self:set_destination(self.route[self.target_route_vertex]:unbox())
 	end
 
-	if self.has_arrived(self) then
+	if self:has_arrived() then
 		if route_point_count == 1 then
 			self.has_destination = false
 			self.route = {}
 		else
-			self.next_route_index(self)
-			self.set_destination(self, self.route[self.target_route_vertex]:unbox())
+			self:next_route_index()
+			self:set_destination(self.route[self.target_route_vertex]:unbox())
 		end
 	end
 end
 
 NavBot.has_arrived = function (self)
-	return Vector3.distance(self.get_position(self), self.destination:unbox()) < self.arrival_distance
+	return Vector3.distance(self:get_position(), self.destination:unbox()) < self.arrival_distance
 end
 
 NavBot.visual_debug_next_smartobject = function (self, entrance_pos, entrance_is_at_bot_progress_on_path, exit_pos, exit_is_at_the_end_of_path)
-	self.visual_debug_draw_line(self, "next_smart_object", "stingray", entrance_pos, exit_pos, Color(0, 255, 0, 0), true)
+	self:visual_debug_draw_line("next_smart_object", "stingray", entrance_pos, exit_pos, Color(0, 255, 0, 0), true)
 
 	if entrance_is_at_bot_progress_on_path == true then
-		self.visual_debug_draw_line(self, "next_smart_object", "stingray", entrance_pos, entrance_pos + Vector3(0, 0, 3), Color(255, 100, 20, 0), true)
+		self:visual_debug_draw_line("next_smart_object", "stingray", entrance_pos, entrance_pos + Vector3(0, 0, 3), Color(255, 100, 20, 0), true)
 	else
-		self.visual_debug_draw_line(self, "next_smart_object", "stingray", entrance_pos, entrance_pos + Vector3(0, 0, 3), Color(0, 255, 0, 0), true)
+		self:visual_debug_draw_line("next_smart_object", "stingray", entrance_pos, entrance_pos + Vector3(0, 0, 3), Color(0, 255, 0, 0), true)
 	end
 
 	if exit_is_at_the_end_of_path == true then
-		self.visual_debug_draw_line(self, "next_smart_object", "stingray", exit_pos, exit_pos + Vector3(0, 0, 3), Color(255, 100, 20, 0), true)
+		self:visual_debug_draw_line("next_smart_object", "stingray", exit_pos, exit_pos + Vector3(0, 0, 3), Color(255, 100, 20, 0), true)
 	else
-		self.visual_debug_draw_line(self, "next_smart_object", "stingray", exit_pos, exit_pos + Vector3(0, 0, 3), Color(0, 255, 0, 0), true)
+		self:visual_debug_draw_line("next_smart_object", "stingray", exit_pos, exit_pos + Vector3(0, 0, 3), Color(0, 255, 0, 0), true)
 	end
 end
 
@@ -268,8 +268,8 @@ NavBot.update_next_smartobject = function (self)
 	local entrance_pos, entrance_is_at_bot_progress_on_path = GwNavSmartObjectInterval.entrance_position(self.interval)
 	local exit_pos, exit_is_at_the_end_of_path = GwNavSmartObjectInterval.exit_position(self.interval)
 
-	self.visual_debug_next_smartobject(self, entrance_pos, entrance_is_at_bot_progress_on_path, exit_pos, exit_is_at_the_end_of_path)
-	self.follower:handle_next_smartobject(self.get_position(self), self.interval, entrance_pos, entrance_is_at_bot_progress_on_path, exit_pos, exit_is_at_the_end_of_path)
+	self:visual_debug_next_smartobject(entrance_pos, entrance_is_at_bot_progress_on_path, exit_pos, exit_is_at_the_end_of_path)
+	self.follower:handle_next_smartobject(self:get_position(), self.interval, entrance_pos, entrance_is_at_bot_progress_on_path, exit_pos, exit_is_at_the_end_of_path)
 end
 
 NavBot.verbose_smartobject_management = function (self, botpos, next_smartobject_interval, entrance_is_at_bot_progress_on_path, exit_is_at_the_end_of_path, entrance_pos, approachingDistance)
@@ -293,23 +293,23 @@ NavBot.verbose_smartobject_management = function (self, botpos, next_smartobject
 end
 
 NavBot.update = function (self, dt)
-	self.update_next_smartobject(self)
-	self.update_crowd_dispersion(self)
-	self.update_route(self)
+	self:update_next_smartobject()
+	self:update_crowd_dispersion()
+	self:update_route()
 
 	if self.is_smartobject_driven == true then
 		self.follower:update_follow(dt)
 	end
 
 	if self.custom_update then
-		self.custom_update(self, dt)
+		self:custom_update(dt)
 	end
 
 	if not GwNavBot.is_computing_new_path(self.gwnavbot) and GwNavBot.is_path_recomputation_needed(self.gwnavbot) then
-		self.set_destination(self, self.destination:unbox())
+		self:set_destination(self.destination:unbox())
 	end
 
-	GwNavBot.update_position(self.gwnavbot, self.get_position(self), dt)
+	GwNavBot.update_position(self.gwnavbot, self:get_position(), dt)
 end
 
 NavBot.get_position = function (self)
@@ -355,12 +355,12 @@ NavBot.move_unit = function (self, dt)
 	if self.is_smartobject_driven == false then
 		local output_velocity = GwNavBot.output_velocity(self.gwnavbot)
 
-		self.update_pose(self, Vector3.normalize(output_velocity), GwNavBot.compute_move_on_navmesh(self.gwnavbot, dt, output_velocity))
+		self:update_pose(Vector3.normalize(output_velocity), GwNavBot.compute_move_on_navmesh(self.gwnavbot, dt, output_velocity))
 	else
 		self.follower:move_unit(dt)
 	end
 
-	GwNavBot.update_position(self.gwnavbot, self.get_position(self), dt)
+	GwNavBot.update_position(self.gwnavbot, self:get_position(), dt)
 end
 
 NavBot.animation_wanted_delta = function (self)
@@ -384,12 +384,12 @@ NavBot.move_unit_with_mover = function (self, dt, gravity)
 		v.z = v.z - dt * gravity
 
 		Mover.move(mover, v, dt)
-		self.update_pose(self, Vector3.normalize(output_velocity), Mover.position(mover))
+		self:update_pose(Vector3.normalize(output_velocity), Mover.position(mover))
 	else
 		self.follower:move_unit_with_mover(dt, mover)
 	end
 
-	GwNavBot.update_position(self.gwnavbot, self.get_position(self), dt)
+	GwNavBot.update_position(self.gwnavbot, self:get_position(), dt)
 end
 
 return NavBot

@@ -25,12 +25,12 @@ BTBotShootAction.enter = function (self, unit, blackboard, t)
 	local input_ext = blackboard.input_extension
 	local soft_aiming = false
 
-	input_ext.set_aiming(input_ext, true, soft_aiming, true)
+	input_ext:set_aiming(true, soft_aiming, true)
 
 	local action_data = self._tree_node.action_data
 	local inventory_extension = blackboard.inventory_extension
-	local wielded_slot_name = action_data.slot_name or inventory_extension.get_wielded_slot_name(inventory_extension)
-	local slot_data = inventory_extension.get_slot_data(inventory_extension, wielded_slot_name)
+	local wielded_slot_name = action_data.slot_name or inventory_extension:get_wielded_slot_name()
+	local slot_data = inventory_extension:get_slot_data(wielded_slot_name)
 	local item_data = slot_data.item_data
 	local item_template = BackendUtils.get_item_template(item_data)
 	local attack_meta_data = item_template.attack_meta_data or {}
@@ -76,13 +76,13 @@ BTBotShootAction.enter = function (self, unit, blackboard, t)
 	}
 	blackboard.ranged_obstruction_by_static = nil
 
-	self._set_new_aim_target(self, unit, t, blackboard.shoot, blackboard.target_unit, blackboard.first_person_extension)
+	self:_set_new_aim_target(unit, t, blackboard.shoot, blackboard.target_unit, blackboard.first_person_extension)
 end
 
 BTBotShootAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local input_ext = blackboard.input_extension
 
-	input_ext.set_aiming(input_ext, false)
+	input_ext:set_aiming(false)
 
 	local action_data = self._tree_node.action_data
 	local shoot_blackboard = blackboard.shoot
@@ -96,7 +96,7 @@ end
 
 BTBotShootAction.run = function (self, unit, blackboard, t, dt)
 	THIS_UNIT = unit
-	local done, evaluate = self._aim(self, unit, blackboard, dt, t)
+	local done, evaluate = self:_aim(unit, blackboard, dt, t)
 
 	if done then
 		return "done", "evaluate"
@@ -106,8 +106,8 @@ BTBotShootAction.run = function (self, unit, blackboard, t, dt)
 end
 
 BTBotShootAction._set_new_aim_target = function (self, self_unit, t, shoot_blackboard, target_unit, first_person_ext)
-	local camera_position = first_person_ext.current_position(first_person_ext)
-	local camera_rotation = first_person_ext.current_rotation(first_person_ext)
+	local camera_position = first_person_ext:current_position()
+	local camera_rotation = first_person_ext:current_rotation()
 	local projectile_info, projectile_speed, aim_at_node = nil
 	local breed = Unit.get_data(target_unit, "breed")
 
@@ -121,7 +121,7 @@ BTBotShootAction._set_new_aim_target = function (self, self_unit, t, shoot_black
 		aim_at_node = breed.override_bot_target_node or shoot_blackboard.aim_at_node
 	end
 
-	local wanted_aim_rotation = self._wanted_aim_rotation(self, self_unit, target_unit, camera_position, projectile_info, projectile_speed, aim_at_node)
+	local wanted_aim_rotation = self:_wanted_aim_rotation(self_unit, target_unit, camera_position, projectile_info, projectile_speed, aim_at_node)
 	local diff_rotation = Quaternion.multiply(Quaternion.inverse(camera_rotation), wanted_aim_rotation)
 	local angle = Quaternion.angle(diff_rotation)
 	shoot_blackboard.target_unit = target_unit
@@ -151,7 +151,7 @@ BTBotShootAction._wanted_aim_rotation = function (self, self_unit, target_unit, 
 	local target_node = Unit.node(target_unit, aim_at_node)
 	local target_pos = Unit.world_position(target_unit, target_node)
 	local target_locomotion_extension = ScriptUnit.has_extension(target_unit, "locomotion_system")
-	local target_current_velocity = (target_locomotion_extension and target_locomotion_extension.current_velocity(target_locomotion_extension)) or Vector3.zero()
+	local target_current_velocity = (target_locomotion_extension and target_locomotion_extension:current_velocity()) or Vector3.zero()
 	local target_rotation, target_position = nil
 	local prediction_function = projectile_info and ProjectileTemplates.trajectory_templates[projectile_info.trajectory_template_name].prediction_function
 
@@ -190,12 +190,12 @@ BTBotShootAction._aim_position = function (self, dt, t, self_unit, current_posit
 		aim_at_node = shoot_blackboard.target_breed.override_bot_target_node or shoot_blackboard.aim_at_node
 	end
 
-	local wanted_rotation, aim_position = self._wanted_aim_rotation(self, self_unit, target_unit, current_position, projectile_info, projectile_speed, aim_at_node)
+	local wanted_rotation, aim_position = self:_wanted_aim_rotation(self_unit, target_unit, current_position, projectile_info, projectile_speed, aim_at_node)
 	local current_yaw = Quaternion.yaw(current_rotation)
 	local current_pitch = Quaternion.pitch(current_rotation)
 	local wanted_yaw = Quaternion.yaw(wanted_rotation)
 	local wanted_pitch = Quaternion.pitch(wanted_rotation)
-	local yaw_speed, pitch_speed = self._calculate_aim_speed(self, self_unit, dt, current_yaw, current_pitch, wanted_yaw, wanted_pitch, shoot_blackboard.aim_speed_yaw, shoot_blackboard.aim_speed_pitch)
+	local yaw_speed, pitch_speed = self:_calculate_aim_speed(self_unit, dt, current_yaw, current_pitch, wanted_yaw, wanted_pitch, shoot_blackboard.aim_speed_yaw, shoot_blackboard.aim_speed_pitch)
 	shoot_blackboard.aim_speed_yaw = yaw_speed
 	shoot_blackboard.aim_speed_pitch = pitch_speed
 	local new_yaw = current_yaw + yaw_speed * dt
@@ -250,7 +250,7 @@ BTBotShootAction._may_attack = function (self, enemy_unit, shoot_blackboard, ran
 		return false
 	end
 
-	local bb = ai_extension.blackboard(ai_extension)
+	local bb = ai_extension:blackboard()
 	local charging = shoot_blackboard.charging_shot
 	local sufficiently_charged = not shoot_blackboard.minimum_charge_time or (not shoot_blackboard.always_charge_before_firing and not charging) or (charging and shoot_blackboard.minimum_charge_time <= t - shoot_blackboard.charge_start_time)
 	local max_range_squared = (charging and shoot_blackboard.max_range_squared_charged) or shoot_blackboard.max_range_squared
@@ -268,18 +268,18 @@ BTBotShootAction._aim = function (self, unit, blackboard, dt, t)
 
 	local shoot_bb = blackboard.shoot
 	local first_person_ext = blackboard.first_person_extension
-	local camera_position = first_person_ext.current_position(first_person_ext)
-	local camera_rotation = first_person_ext.current_rotation(first_person_ext)
+	local camera_position = first_person_ext:current_position()
+	local camera_rotation = first_person_ext:current_rotation()
 
 	if target_unit ~= shoot_bb.target_unit then
-		self._set_new_aim_target(self, unit, t, shoot_bb, target_unit, first_person_ext)
+		self:_set_new_aim_target(unit, t, shoot_bb, target_unit, first_person_ext)
 	end
 
 	local action_data = self._tree_node.action_data
-	local yaw_offset, pitch_offset, wanted_aim_rotation, actual_aim_rotation, actual_aim_position = self._aim_position(self, dt, t, unit, camera_position, camera_rotation, target_unit, shoot_bb)
+	local yaw_offset, pitch_offset, wanted_aim_rotation, actual_aim_rotation, actual_aim_position = self:_aim_position(dt, t, unit, camera_position, camera_rotation, target_unit, shoot_bb)
 
 	if shoot_bb.reevaluate_obstruction_time <= t then
-		if self._reevaluate_obstruction(self, unit, shoot_bb, action_data, t, World.get_data(blackboard.world, "physics_world"), camera_position, wanted_aim_rotation, unit, target_unit, actual_aim_position) then
+		if self:_reevaluate_obstruction(unit, shoot_bb, action_data, t, World.get_data(blackboard.world, "physics_world"), camera_position, wanted_aim_rotation, unit, target_unit, actual_aim_position) then
 			if not blackboard.ranged_obstruction_by_static then
 				local obstructed_by_static = {
 					timer = t
@@ -296,14 +296,14 @@ BTBotShootAction._aim = function (self, unit, blackboard, dt, t)
 	local input_ext = blackboard.input_extension
 	local range_squared = Vector3.distance_squared(camera_position, actual_aim_position)
 
-	if self._should_charge(self, shoot_bb, range_squared, target_unit, t) then
-		self._charge_shot(self, shoot_bb, action_data, input_ext, t)
+	if self:_should_charge(shoot_bb, range_squared, target_unit, t) then
+		self:_charge_shot(shoot_bb, action_data, input_ext, t)
 	end
 
-	input_ext.set_aim_rotation(input_ext, actual_aim_rotation)
+	input_ext:set_aim_rotation(actual_aim_rotation)
 
-	if self._aim_good_enough(self, dt, t, shoot_bb, yaw_offset, pitch_offset) and self._may_attack(self, target_unit, shoot_bb, range_squared, t) then
-		self._fire_shot(self, shoot_bb, action_data, input_ext, t)
+	if self:_aim_good_enough(dt, t, shoot_bb, yaw_offset, pitch_offset) and self:_may_attack(target_unit, shoot_bb, range_squared, t) then
+		self:_fire_shot(shoot_bb, action_data, input_ext, t)
 	end
 
 	local evaluate = (shoot_bb.fired and shoot_bb.next_evaluate < t) or shoot_bb.next_evaluate_without_firing < t
@@ -420,7 +420,7 @@ BTBotShootAction._reevaluate_obstruction = function (self, unit, shoot_blackboar
 	local min = action_data.minimum_obstruction_reevaluation_time
 	local max = action_data.maximum_obstruction_reevaluation_time
 	local collision_filter = (shoot_blackboard.charging_shot and shoot_blackboard.collision_filter_charged) or shoot_blackboard.collision_filter
-	local obstructed, distance_from_target, obstructed_by_static = self._is_shot_obstructed(self, physics_world, ray_from, direction, unit, target_unit, actual_aim_position, collision_filter)
+	local obstructed, distance_from_target, obstructed_by_static = self:_is_shot_obstructed(physics_world, ray_from, direction, unit, target_unit, actual_aim_position, collision_filter)
 	local fuzzyness = nil
 
 	if obstructed then

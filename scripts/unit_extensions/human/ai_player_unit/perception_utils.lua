@@ -199,13 +199,13 @@ PerceptionUtils.special_opportunity = function (unit, blackboard)
 		local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
 		if VALID_TARGETS_PLAYERS_AND_BOTS[player_unit] and not status_extension.using_transport then
-			if status_extension.is_knocked_down(status_extension) then
+			if status_extension:is_knocked_down() then
 				urgency_to_engage = 10
-			elseif status_extension.is_grabbed_by_pack_master(status_extension) then
+			elseif status_extension:is_grabbed_by_pack_master() then
 				urgency_to_engage = 10
-			elseif status_extension.get_is_ledge_hanging(status_extension) then
+			elseif status_extension:get_is_ledge_hanging() then
 				urgency_to_engage = 10
-			elseif status_extension.is_pounced_down(status_extension) then
+			elseif status_extension:is_pounced_down() then
 				urgency_to_engage = 10
 			elseif status_extension.under_ratling_gunner_attack then
 				urgency_to_engage = 10
@@ -282,7 +282,7 @@ PerceptionUtils.pick_ninja_approach_target = function (unit, blackboard, breed)
 		local player_unit = PLAYER_AND_BOT_UNITS[i]
 		local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-		if VALID_TARGETS_PLAYERS_AND_BOTS[player_unit] and not status_extension.is_disabled(status_extension) then
+		if VALID_TARGETS_PLAYERS_AND_BOTS[player_unit] and not status_extension:is_disabled() then
 			local player_pos = PLAYER_AND_BOT_POSITIONS[i]
 			local dist = Vector3.distance(pos, player_pos)
 
@@ -317,7 +317,7 @@ PerceptionUtils.pick_solitary_target = function (unit, blackboard, breed)
 
 	if unit_alive(target_unit) then
 		local status_extension = ScriptUnit.extension(target_unit, "status_system")
-		local is_pounced_by_me = status_extension.is_pounced_down(status_extension) and status_extension.get_pouncer_unit(status_extension) == unit
+		local is_pounced_by_me = status_extension:is_pounced_down() and status_extension:get_pouncer_unit() == unit
 
 		if is_pounced_by_me then
 			return target_unit, blackboard.target_dist, 100
@@ -400,12 +400,12 @@ local function _calculate_horde_pick_closest_target_with_spillover_score(target_
 		end
 
 		local ai_slot_system = Managers.state.entity:system("ai_slot_system")
-		local total_slots_count = ai_slot_system.total_slots_count(ai_slot_system, target_unit)
-		dogpile_count = ai_slot_system.slots_count(ai_slot_system, target_unit)
-		disabled_slots_count = ai_slot_system.disabled_slots_count(ai_slot_system, target_unit)
+		local total_slots_count = ai_slot_system:total_slots_count(target_unit)
+		dogpile_count = ai_slot_system:slots_count(target_unit)
+		disabled_slots_count = ai_slot_system:disabled_slots_count(target_unit)
 		all_slots_disabled = disabled_slots_count == total_slots_count
 		local status_ext = ScriptUnit.has_extension(target_unit, "status_system")
-		local on_ladder = status_ext and status_ext.get_is_on_ladder(status_ext)
+		local on_ladder = status_ext and status_ext:get_is_on_ladder()
 
 		if on_ladder then
 			local max_allowed = (is_previous_attacker and total_slots_count) or total_slots_count - 1
@@ -552,12 +552,12 @@ local function _calculate_closest_target_with_spillover_score(target_unit, targe
 		end
 
 		local ai_slot_system = Managers.state.entity:system("ai_slot_system")
-		local total_slots_count = ai_slot_system.total_slots_count(ai_slot_system, target_unit)
-		dogpile_count = ai_slot_system.slots_count(ai_slot_system, target_unit)
-		disabled_slots_count = ai_slot_system.disabled_slots_count(ai_slot_system, target_unit)
+		local total_slots_count = ai_slot_system:total_slots_count(target_unit)
+		dogpile_count = ai_slot_system:slots_count(target_unit)
+		disabled_slots_count = ai_slot_system:disabled_slots_count(target_unit)
 		all_slots_disabled = disabled_slots_count == total_slots_count
 		local status_ext = ScriptUnit.has_extension(target_unit, "status_system")
-		local on_ladder = status_ext and status_ext.get_is_on_ladder(status_ext)
+		local on_ladder = status_ext and status_ext:get_is_on_ladder()
 
 		if on_ladder then
 			local max_allowed = (is_previous_attacker and total_slots_count) or total_slots_count - 1
@@ -567,7 +567,7 @@ local function _calculate_closest_target_with_spillover_score(target_unit, targe
 			end
 		end
 
-		target_of_combo_score = status_ext.get_combo_target_count(status_ext) * COMBO_TARGET_SCORE
+		target_of_combo_score = status_ext:get_combo_target_count() * COMBO_TARGET_SCORE
 	end
 
 	local aggro_extension = ScriptUnit.extension(target_unit, "aggro_system")
@@ -715,7 +715,7 @@ PerceptionUtils.patrol_passive_target_selection = function (ai_unit, blackboard,
 
 				if distance_sq < detection_radius_sqr then
 					local anchor_direction = blackboard.anchor_direction
-					local ai_unit_rotation = (anchor_direction and anchor_direction.unbox(anchor_direction)) or Quaternion.forward(Unit.world_rotation(ai_unit, 0))
+					local ai_unit_rotation = (anchor_direction and anchor_direction:unbox()) or Quaternion.forward(Unit.world_rotation(ai_unit, 0))
 					local ai_unit_direction = Vector3.normalize(ai_unit_rotation)
 					local ai_unit_to_target_dir = Vector3.normalize(target_unit_position - ai_unit_position)
 					local dot = Vector3.dot(ai_unit_to_target_dir, ai_unit_direction)
@@ -874,7 +874,7 @@ PerceptionUtils.pick_rat_ogre_target_idle = function (unit, blackboard, breed, t
 				if los then
 					local ai_simple = ScriptUnit_extension(unit, "ai_system")
 
-					ai_simple.set_perception(ai_simple, breed.perception, breed.target_selection_angry)
+					ai_simple:set_perception(breed.perception, breed.target_selection_angry)
 					Managers.state.conflict:add_angry_boss(1)
 
 					blackboard.is_angry = true
@@ -907,7 +907,7 @@ PerceptionUtils.pick_rat_ogre_target_idle = function (unit, blackboard, breed, t
 		if attacker or blackboard.is_angry then
 			local ai_simple = ScriptUnit_extension(unit, "ai_system")
 
-			ai_simple.set_perception(ai_simple, breed.perception, breed.target_selection_angry)
+			ai_simple:set_perception(breed.perception, breed.target_selection_angry)
 			Managers.state.conflict:add_angry_boss(1)
 
 			blackboard.is_angry = true
@@ -966,7 +966,7 @@ PerceptionUtils.pick_rat_ogre_target_with_weights = function (unit, blackboard, 
 
 			if not breed.ignore_targets_outside_detection_radius or blackboard.target_unit or distance_valid_target then
 				local aggro = blackboard.aggro_list[enemy_unit] or 0
-				local enemy_disabled = status_extension.is_disabled(status_extension)
+				local enemy_disabled = status_extension:is_disabled()
 
 				if enemy_disabled then
 					aggro = aggro * weights.target_disabled_aggro_mul
@@ -1056,7 +1056,7 @@ PerceptionUtils.pick_chaos_troll_target_with_weights = function (unit, blackboar
 
 				score = score + aggro
 
-				if buff_extension.has_buff_type(buff_extension, "troll_bile_face") then
+				if buff_extension:has_buff_type("troll_bile_face") then
 					score = score * weights.target_is_in_vomit_multiplier
 				end
 
@@ -1107,7 +1107,7 @@ PerceptionUtils.debug_ai_perception = function (unit, ai_ext, blackboard, t, gui
 
 	if unit_alive(target_unit) then
 		local target_player = Managers.player:owner(target_unit)
-		local profile_index = target_player.profile_index(target_player)
+		local profile_index = target_player:profile_index()
 		local profile = SPProfiles[profile_index]
 		unit_name = (profile and profile.unit_name) or "client"
 	end
@@ -1156,7 +1156,7 @@ PerceptionUtils.debug_rat_ogre_perception = function (gui, t, x1, y1, blackboard
 	for unit, player_scores in pairs(score_table) do
 		if Unit.alive(unit) then
 			local target_player = Managers.player:owner(unit)
-			local profile_index = target_player.profile_index(target_player)
+			local profile_index = target_player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local unit_name = (profile and profile.unit_name) or "client"
 			local text = nil
@@ -1290,7 +1290,7 @@ end
 local function target_allowed_for_ratling(unit)
 	local status_ext = ScriptUnit.extension(unit, "status_system")
 
-	return not status_ext.is_knocked_down(status_ext) and not status_ext.get_is_ledge_hanging(status_ext) and not status_ext.is_ready_for_assisted_respawn(status_ext) and not status_ext.is_hanging_from_hook(status_ext)
+	return not status_ext:is_knocked_down() and not status_ext:get_is_ledge_hanging() and not status_ext:is_ready_for_assisted_respawn() and not status_ext:is_hanging_from_hook()
 end
 
 PerceptionUtils.pick_ratling_gun_target = function (unit, blackboard, old_target, view_cone_dot_product, forward_direction)
@@ -1533,7 +1533,7 @@ PerceptionUtils.debug_draw_pick_area_target = function (circles, target, radius,
 	})
 	local z_offset = Vector3.up() * 0.3
 
-	drawer.reset(drawer)
+	drawer:reset()
 
 	for i = 1, #circles, 2 do
 		local circle_1 = circles[i]
@@ -1542,25 +1542,25 @@ PerceptionUtils.debug_draw_pick_area_target = function (circles, target, radius,
 		local color2 = math.random(255)
 		local color3 = math.random(255)
 
-		drawer.circle(drawer, circle_1.pos + z_offset, radius, Vector3.up(), Color(255, color1, color2, color3), 100)
-		drawer.circle(drawer, circle_2.pos + z_offset, radius, Vector3.up(), Color(255, color1, color2, color3), 100)
+		drawer:circle(circle_1.pos + z_offset, radius, Vector3.up(), Color(255, color1, color2, color3), 100)
+		drawer:circle(circle_2.pos + z_offset, radius, Vector3.up(), Color(255, color1, color2, color3), 100)
 
 		for i = 1, circle_1.targets, 1 do
-			drawer.circle(drawer, circle_1.pos + z_offset, 0.5 + i * 0.1, Vector3.up(), Color(255, color1, color2, color3), 100)
+			drawer:circle(circle_1.pos + z_offset, 0.5 + i * 0.1, Vector3.up(), Color(255, color1, color2, color3), 100)
 		end
 
 		for i = 1, circle_2.targets, 1 do
-			drawer.circle(drawer, circle_2.pos + z_offset, 0.5 + i * 0.1, Vector3.up(), Color(255, color1, color2, color3), 100)
+			drawer:circle(circle_2.pos + z_offset, 0.5 + i * 0.1, Vector3.up(), Color(255, color1, color2, color3), 100)
 		end
 	end
 
 	for _, p in pairs(positions) do
-		drawer.sphere(drawer, p + z_offset, 0.1, Color(255, 230, 83, 230))
+		drawer:sphere(p + z_offset, 0.1, Color(255, 230, 83, 230))
 	end
 
 	if target then
-		drawer.sphere(drawer, target + z_offset, 0.2, Color(255, 255, 0, 0))
-		drawer.circle(drawer, target + z_offset, radius, Vector3.up(), Color(255, 255, 0, 0), 20)
+		drawer:sphere(target + z_offset, 0.2, Color(255, 255, 0, 0))
+		drawer:circle(target + z_offset, radius, Vector3.up(), Color(255, 255, 0, 0), 20)
 	end
 end
 
@@ -1571,7 +1571,7 @@ PerceptionUtils.debug_draw_throw_trajectory = function (points)
 	})
 
 	for i = 1, #points, 1 do
-		drawer.sphere(drawer, points[i], 0.05, Color(255, 255, 255, 255))
+		drawer:sphere(points[i], 0.05, Color(255, 255, 255, 255))
 	end
 end
 
@@ -1723,7 +1723,7 @@ PerceptionUtils.perception_rat_ogre = function (unit, blackboard, breed, pick_ta
 		local z = offset.z
 		blackboard.target_flat_distance = math.sqrt(x * x + y * y)
 		blackboard.target_height_distance = z
-		local is_on_ladder, ladder_unit = status_extension.get_is_on_ladder(status_extension)
+		local is_on_ladder, ladder_unit = status_extension:get_is_on_ladder()
 
 		if is_on_ladder then
 			local foot, top = ScriptUnit.extension(ladder_unit, "ladder_system"):ladder_extents()
@@ -1757,19 +1757,19 @@ PerceptionUtils.perception_rat_ogre = function (unit, blackboard, breed, pick_ta
 				event_data.attack_tag = breed.dialogue_target_switch_attack_tag or "rat_ogre_change_target"
 				event_data.target_name = ScriptUnit.extension(target_unit, "dialogue_system").context.player_profile
 
-				dialogue_input.trigger_networked_dialogue_event(dialogue_input, breed.dialogue_target_switch_event or "enemy_attack", event_data)
+				dialogue_input:trigger_networked_dialogue_event(breed.dialogue_target_switch_event or "enemy_attack", event_data)
 			end
 
 			if ScriptUnit.has_extension(target_unit, "sound_effect_system") then
 				local sound_effect_extension = ScriptUnit.extension(target_unit, "sound_effect_system")
 
-				sound_effect_extension.aggro_unit_changed(sound_effect_extension, unit, true)
+				sound_effect_extension:aggro_unit_changed(unit, true)
 			end
 
 			if ScriptUnit.has_extension(target_unit_old, "sound_effect_system") then
 				local sound_effect_extension = ScriptUnit.extension(target_unit_old, "sound_effect_system")
 
-				sound_effect_extension.aggro_unit_changed(sound_effect_extension, unit, false)
+				sound_effect_extension:aggro_unit_changed(unit, false)
 			end
 		end
 	end
@@ -1854,7 +1854,7 @@ PerceptionUtils.perception_regular = function (unit, blackboard, breed, pick_tar
 		if ScriptUnit.has_extension(blackboard.target_unit, "sound_effect_system") then
 			local sound_effect_extension = ScriptUnit.extension(blackboard.target_unit, "sound_effect_system")
 
-			sound_effect_extension.aggro_unit_changed(sound_effect_extension, unit, true)
+			sound_effect_extension:aggro_unit_changed(unit, true)
 		end
 
 		if breed.trigger_dialogue_on_target_switch then
@@ -1863,7 +1863,7 @@ PerceptionUtils.perception_regular = function (unit, blackboard, breed, pick_tar
 			event_data.attack_tag = "enemy_target_changed"
 			event_data.target_name = ScriptUnit.extension(blackboard.target_unit, "dialogue_system").context.player_profile
 
-			dialogue_input.trigger_networked_dialogue_event(dialogue_input, "enemy_target_changed", event_data)
+			dialogue_input:trigger_networked_dialogue_event("enemy_target_changed", event_data)
 		end
 	end
 
@@ -1888,7 +1888,7 @@ PerceptionUtils.perception_regular_update_aggro = function (unit, blackboard, br
 	if ScriptUnit.has_extension(previous_target_unit, "sound_effect_system") then
 		local sound_effect_extension = ScriptUnit.extension(previous_target_unit, "sound_effect_system")
 
-		sound_effect_extension.aggro_unit_changed(sound_effect_extension, unit, false)
+		sound_effect_extension:aggro_unit_changed(unit, false)
 	end
 
 	local aggro_list = blackboard.aggro_list
@@ -1921,7 +1921,7 @@ PerceptionUtils.alert_enemies_within_range = function (___world, player_unit, is
 			name = "sound_alert"
 		})
 
-		drawer.sphere(drawer, alert_position, alert_radius, Colors.get("red"))
+		drawer:sphere(alert_position, alert_radius, Colors.get("red"))
 	end
 end
 

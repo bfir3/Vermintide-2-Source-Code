@@ -21,7 +21,7 @@ MatchmakingStateSearchGame.on_enter = function (self, state_context)
 	self.state_context = state_context
 	self.search_config = state_context.search_config
 
-	self._start_searching_for_games(self)
+	self:_start_searching_for_games()
 end
 
 MatchmakingStateSearchGame._start_searching_for_games = function (self)
@@ -134,7 +134,7 @@ MatchmakingStateSearchGame.update = function (self, dt, t)
 		return
 	end
 
-	local new_lobby = self._search_for_game(self, dt)
+	local new_lobby = self:_search_for_game(dt)
 	local found_new_lobby = new_lobby ~= nil
 	local search_again = false
 
@@ -183,13 +183,13 @@ MatchmakingStateSearchGame.update = function (self, dt, t)
 end
 
 MatchmakingStateSearchGame._search_for_game = function (self, dt)
-	local lobbies = self._get_server_lobbies(self)
+	local lobbies = self:_get_server_lobbies()
 	local active_lobby, wanted_profile_index = nil
 	local player = Managers.player:player_from_peer_id(self._peer_id)
-	local profile_index = player.profile_index(player)
+	local profile_index = player:profile_index()
 	local wanted_profile = profile_index
 	local search_config = self.search_config
-	active_lobby = self._find_suitable_lobby(self, lobbies, search_config, wanted_profile)
+	active_lobby = self:_find_suitable_lobby(lobbies, search_config, wanted_profile)
 
 	return active_lobby
 end
@@ -197,8 +197,8 @@ end
 local server_lobbies = {}
 
 MatchmakingStateSearchGame._get_server_lobbies = function (self)
-	local lobbies = self._get_lobbies(self)
-	local servers = self._get_servers(self)
+	local lobbies = self:_get_lobbies()
+	local servers = self:_get_servers()
 
 	table.clear(server_lobbies)
 	table.merge(server_lobbies, servers)
@@ -221,7 +221,7 @@ MatchmakingStateSearchGame._times_party_completed_level = function (self, level_
 	local players = Managers.player:human_players()
 
 	for _, player in pairs(players) do
-		times_completed = times_completed + statistics_db.get_persistent_stat(statistics_db, player.stats_id(player), "completed_levels", level_key)
+		times_completed = times_completed + statistics_db:get_persistent_stat(player:stats_id(), "completed_levels", level_key)
 	end
 
 	return times_completed
@@ -238,8 +238,8 @@ MatchmakingStateSearchGame._compare_first_prio_lobbies = function (self, current
 	local new_level_key = new_lobby.selected_level_key
 
 	if quick_game and current_level_key and current_level_key ~= "inn_level" and new_level_key and new_level_key ~= "inn_level" then
-		local current_times_completed = self._times_party_completed_level(self, current_level_key)
-		local new_times_completed = self._times_party_completed_level(self, new_level_key)
+		local current_times_completed = self:_times_party_completed_level(current_level_key)
+		local new_times_completed = self:_times_party_completed_level(new_level_key)
 
 		if new_times_completed < current_times_completed then
 			return new_lobby
@@ -261,9 +261,9 @@ MatchmakingStateSearchGame._compare_secondary_prio_lobbies = function (self, cur
 
 	if quick_game and current_level_key and current_level_key ~= "inn_level" and new_level_key and new_level_key ~= "inn_level" then
 		local current_level_key = current_lobby.selected_level_key
-		local current_times_completed = self._times_party_completed_level(self, current_level_key)
+		local current_times_completed = self:_times_party_completed_level(current_level_key)
 		local new_level_key = current_lobby.selected_level_key
-		local new_times_completed = self._times_party_completed_level(self, new_level_key)
+		local new_times_completed = self:_times_party_completed_level(new_level_key)
 
 		if new_times_completed < current_times_completed then
 			return new_lobby
@@ -286,7 +286,7 @@ MatchmakingStateSearchGame._find_suitable_lobby = function (self, lobbies, searc
 
 	for _, lobby_data in ipairs(lobbies) do
 		local host_name = lobby_data.unique_server_name or lobby_data.host
-		local lobby_match, reason = matchmaking_manager.lobby_match(matchmaking_manager, lobby_data, act_key, level_key, difficulty, game_mode, self._peer_id)
+		local lobby_match, reason = matchmaking_manager:lobby_match(lobby_data, act_key, level_key, difficulty, game_mode, self._peer_id)
 
 		if lobby_match then
 			local discard = false
@@ -294,17 +294,17 @@ MatchmakingStateSearchGame._find_suitable_lobby = function (self, lobbies, searc
 			local secondary_option = false
 			local level_key = lobby_data.selected_level_key or lobby_data.level_key
 
-			if not discard and not matchmaking_manager.party_has_level_unlocked(matchmaking_manager, level_key) then
+			if not discard and not matchmaking_manager:party_has_level_unlocked(level_key) then
 				discard = true
 				discard_reason = string.format("level(%s) is not unlocked by party", level_key)
 			end
 
-			if not discard and not matchmaking_manager.hero_available_in_lobby_data(matchmaking_manager, wanted_profile_id, lobby_data) then
+			if not discard and not matchmaking_manager:hero_available_in_lobby_data(wanted_profile_id, lobby_data) then
 				local any_allowed_hero_available = false
 
 				for i = 1, 5, 1 do
 					if MatchmakingSettings.hero_search_filter[i] == true then
-						local hero_available = matchmaking_manager.hero_available_in_lobby_data(matchmaking_manager, i, lobby_data)
+						local hero_available = matchmaking_manager:hero_available_in_lobby_data(i, lobby_data)
 
 						if hero_available then
 							any_allowed_hero_available = true
@@ -342,9 +342,9 @@ MatchmakingStateSearchGame._find_suitable_lobby = function (self, lobbies, searc
 
 			if not discard then
 				if not secondary_option then
-					current_first_prio_lobby = self._compare_first_prio_lobbies(self, current_first_prio_lobby, lobby_data)
+					current_first_prio_lobby = self:_compare_first_prio_lobbies(current_first_prio_lobby, lobby_data)
 				else
-					current_secondary_prio_lobby = self._compare_secondary_prio_lobbies(self, current_secondary_prio_lobby, lobby_data)
+					current_secondary_prio_lobby = self:_compare_secondary_prio_lobbies(current_secondary_prio_lobby, lobby_data)
 				end
 			else
 				mm_printf("Lobby hosted by %s discarded due to '%s'", host_name, discard_reason or "unknown")

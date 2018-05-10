@@ -72,7 +72,7 @@ Debug.update = function (t, dt)
 		local instance_text_color = data.color
 		local text_pos = Vector3(130, pos, 700)
 
-		Gui.text(gui, text, font_mtrl, font_size, font, text_pos, (instance_text_color and instance_text_color.unbox(instance_text_color)) or text_color)
+		Gui.text(gui, text, font_mtrl, font_size, font, text_pos, (instance_text_color and instance_text_color:unbox()) or text_color)
 
 		if show_debug_text_background then
 			local text_min, text_max = Gui.text_extents(gui, text, font_mtrl, font_size)
@@ -307,7 +307,7 @@ end
 
 debug.animation_log_specific_profile = function (profile, enable)
 	local player_manager = Managers.player
-	local players = player_manager.players(player_manager)
+	local players = player_manager:players()
 
 	for _, player in pairs(players) do
 		local units = player.owned_units
@@ -336,15 +336,15 @@ debug.spawn_hero = function (hero_name)
 	local peer_id = Network:peer_id()
 	local player = Managers.player:player_from_peer_id(peer_id)
 
-	hero_spawner_handler.spawn_hero_request(hero_spawner_handler, player, hero_name)
+	hero_spawner_handler:spawn_hero_request(player, hero_name)
 end
 
 debug.load_level = function (level_name)
 	local game_mode_manager = Managers.state.game_mode
 	local level_transition_handler = game_mode_manager.level_transition_handler
 
-	level_transition_handler.set_next_level(level_transition_handler, level_name)
-	level_transition_handler.level_completed(level_transition_handler)
+	level_transition_handler:set_next_level(level_name)
+	level_transition_handler:level_completed()
 end
 
 debug.level_loaded = function (level_name)
@@ -361,7 +361,7 @@ debug.level_loaded = function (level_name)
 		return false
 	end
 
-	local packages_loaded = level_transition_handler.all_packages_loaded(level_transition_handler)
+	local packages_loaded = level_transition_handler:all_packages_loaded()
 
 	if not packages_loaded then
 		return false
@@ -402,7 +402,7 @@ end
 
 Debug.aim_position = function ()
 	local player_manager = Managers.player
-	local player = player_manager.local_player(player_manager, 1)
+	local player = player_manager:local_player(1)
 	local player_unit = player.player_unit
 	local camera_position = Managers.state.camera:camera_position(player.viewport_name)
 	local camera_rotation = Managers.state.camera:camera_rotation(player.viewport_name)

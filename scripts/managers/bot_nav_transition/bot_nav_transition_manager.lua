@@ -33,7 +33,7 @@ BotNavTransitionManager.NAV_COST_MAP_LAYERS = {
 BotNavTransitionManager.init = function (self, world, is_server, network_event_delegate)
 	self._world = world
 	local ai_system = Managers.state.entity:system("ai_system")
-	local nav_world = ai_system.nav_world(ai_system)
+	local nav_world = ai_system:nav_world()
 	self._nav_world = nav_world
 	self._index_offset = 471100
 	self._current_index = self._index_offset + 1
@@ -60,7 +60,7 @@ BotNavTransitionManager.init = function (self, world, is_server, network_event_d
 	self._is_server = is_server
 	self._network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, "rpc_create_bot_nav_transition")
+	network_event_delegate:register(self, "rpc_create_bot_nav_transition")
 end
 
 BotNavTransitionManager.traverse_logic = function (self)
@@ -84,10 +84,10 @@ BotNavTransitionManager.update = function (self, dt, t)
 		local g = 50 + math.cos(math.pi * 0.5 * (t % 2 - 1)) * 200
 		local color = Color(50, g, 50)
 
-		drawer.line(drawer, from, waypoint, color)
-		drawer.line(drawer, waypoint, to, color)
-		drawer.sphere(drawer, from, 0.3, color)
-		drawer.cone(drawer, to - Vector3.normalize(from - to) * 0.25, to, 0.3, color, 9, 9)
+		drawer:line(from, waypoint, color)
+		drawer:line(waypoint, to, color)
+		drawer:sphere(from, 0.3, color)
+		drawer:cone(to - Vector3.normalize(from - to) * 0.25, to, 0.3, color, 9, 9)
 	end
 
 	for _, transition in pairs(self._ladder_transitions) do
@@ -95,13 +95,13 @@ BotNavTransitionManager.update = function (self, dt, t)
 		local to = transition.to:unbox()
 		local color = (transition.failed and Color(0, 0, 0)) or Color(255, 125, 0)
 
-		drawer.line(drawer, from, to, color)
-		drawer.sphere(drawer, from, 0.3, color)
-		drawer.cone(drawer, to - Vector3.normalize(from - to) * 0.25, to, 0.3, color, 9, 9)
+		drawer:line(from, to, color)
+		drawer:sphere(from, 0.3, color)
+		drawer:cone(to - Vector3.normalize(from - to) * 0.25, to, 0.3, color, 9, 9)
 	end
 
 	if Keyboard.pressed(Keyboard.button_index("l")) and 0 < Keyboard.button(Keyboard.button_index("left ctrl")) then
-		self.debug_refresh_ladders(self)
+		self:debug_refresh_ladders()
 	end
 end
 
@@ -109,7 +109,7 @@ BotNavTransitionManager.clear_transitions = function (self)
 	local transitions = self._bot_nav_transitions
 
 	for i, _ in pairs(transitions) do
-		self._destroy_transition(self, transitions, i)
+		self:_destroy_transition(transitions, i)
 	end
 end
 
@@ -165,7 +165,7 @@ BotNavTransitionManager._destroy_transition = function (self, transitions, index
 end
 
 BotNavTransitionManager.rpc_create_bot_nav_transition = function (self, sender, from, via, to, player_jumped)
-	self.create_transition(self, from, via, to, player_jumped)
+	self:create_transition(from, via, to, player_jumped)
 end
 
 BotNavTransitionManager.create_transition = function (self, from, via, wanted_to, player_jumped, make_permanent)
@@ -217,7 +217,7 @@ BotNavTransitionManager.create_transition = function (self, from, via, wanted_to
 		return false
 	end
 
-	local layer_name = self._find_matching_layer(self, from, to, player_jumped)
+	local layer_name = self:_find_matching_layer(from, to, player_jumped)
 
 	if not layer_name then
 		debug_print("fail, no layer")
@@ -229,7 +229,7 @@ BotNavTransitionManager.create_transition = function (self, from, via, wanted_to
 	local transitions = self._bot_nav_transitions
 
 	if transitions[index] then
-		self._destroy_transition(self, transitions, index)
+		self:_destroy_transition(transitions, index)
 	end
 
 	local layer_id = LAYER_ID_MAPPING[layer_name]
@@ -297,7 +297,7 @@ BotNavTransitionManager.unregister_transition = function (self, unit)
 	local index = self._bot_nav_transition_lookup[unit]
 
 	fassert(index, "No transition index found for unit %s.", unit)
-	self._destroy_transition(self, self._bot_nav_transitions, index)
+	self:_destroy_transition(self._bot_nav_transitions, index)
 end
 
 BotNavTransitionManager.transition_data = function (self, unit)
@@ -341,8 +341,8 @@ BotNavTransitionManager.register_ladder = function (self, unit)
 		})
 		local color = (hit and Color(0, 255, 0)) or Color(125, 0, 0)
 
-		drawer.line(drawer, ray_from, ray_to, color)
-		drawer.cone(drawer, ray_to - down * 0.25, ray_to, 0.3, color, 9, 9)
+		drawer:line(ray_from, ray_to, color)
+		drawer:cone(ray_to - down * 0.25, ray_to, 0.3, color, 9, 9)
 	end
 
 	if not hit then
@@ -376,7 +376,7 @@ BotNavTransitionManager.register_ladder = function (self, unit)
 					name = "BotNavTransitionManager_retained"
 				})
 
-				drawer.sphere(drawer, check_pos, 0.2, Color(255, 0, 0))
+				drawer:sphere(check_pos, 0.2, Color(255, 0, 0))
 			end
 
 			found_nav_mesh, z = GwNavQueries.triangle_from_position(nav_world, check_pos, 0.3, 0.5, self._layerless_traverse_logic)
@@ -418,7 +418,7 @@ BotNavTransitionManager.register_ladder = function (self, unit)
 					name = "BotNavTransitionManager_retained"
 				})
 
-				drawer.sphere(drawer, check_pos, 0.2, Color(255, 0, 0))
+				drawer:sphere(check_pos, 0.2, Color(255, 0, 0))
 			end
 
 			found_nav_mesh, z = GwNavQueries.triangle_from_position(nav_world, check_pos, 0.3, 0.5, self._layerless_traverse_logic)
@@ -481,7 +481,7 @@ BotNavTransitionManager.debug_refresh_ladders = function (self)
 	local temp_unit_table = {}
 
 	for unit, data in pairs(self._ladder_transitions) do
-		self.unregister_ladder(self, unit)
+		self:unregister_ladder(unit)
 
 		temp_unit_table[#temp_unit_table + 1] = unit
 	end
@@ -491,7 +491,7 @@ BotNavTransitionManager.debug_refresh_ladders = function (self)
 	fassert(self._debug_ladder_smart_objects_created == 0, "Failed to clean up all ladder smart objects during refresh, %i left.", self._debug_ladder_smart_objects_created)
 
 	for _, unit in ipairs(temp_unit_table) do
-		self.register_ladder(self, unit)
+		self:register_ladder(unit)
 	end
 end
 

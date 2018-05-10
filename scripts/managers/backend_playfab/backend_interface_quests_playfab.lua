@@ -8,13 +8,13 @@ BackendInterfaceQuestsPlayfab.init = function (self, backend_mirror)
 	self._refresh_requests = {}
 	self._quest_reward_requests = {}
 
-	self._refresh(self)
+	self:_refresh()
 end
 
 BackendInterfaceQuestsPlayfab._refresh = function (self)
 	local talents = self._talents
 	local backend_mirror = self._backend_mirror
-	local quest_data = backend_mirror.get_quest_data(backend_mirror)
+	local quest_data = backend_mirror:get_quest_data()
 	self._quests = quest_data.current_quests
 	self._refresh_available = quest_data.refresh_available
 	self._daily_quest_update_time = quest_data.daily_quest_update_time
@@ -45,7 +45,7 @@ end
 
 BackendInterfaceQuestsPlayfab.get_quests = function (self)
 	if self._dirty then
-		self._refresh(self)
+		self:_refresh()
 	end
 
 	return self._quests
@@ -53,7 +53,7 @@ end
 
 BackendInterfaceQuestsPlayfab.get_daily_quest_update_time = function (self)
 	if self._dirty then
-		self._refresh(self)
+		self:_refresh()
 	end
 
 	return self._daily_quest_update_time
@@ -61,14 +61,14 @@ end
 
 BackendInterfaceQuestsPlayfab.can_refresh_quest = function (self)
 	if self._dirty then
-		self._refresh(self)
+		self:_refresh()
 	end
 
 	return self._refresh_available
 end
 
 BackendInterfaceQuestsPlayfab.refresh_quest = function (self, key)
-	local id = self._new_id(self)
+	local id = self:_new_id()
 	local request = {
 		FunctionName = "refreshQuest",
 		FunctionParameter = {
@@ -102,7 +102,7 @@ BackendInterfaceQuestsPlayfab.refresh_quest_cb = function (self, id, key, result
 		local daily_quest_refresh_available = function_result.daily_quest_refresh_available
 		local daily_quest_update_time = function_result.daily_quest_update_time
 
-		backend_mirror.set_quest_data(backend_mirror, current_quests, daily_quest_refresh_available, daily_quest_update_time)
+		backend_mirror:set_quest_data(current_quests, daily_quest_refresh_available, daily_quest_update_time)
 
 		self._refresh_requests[id] = {
 			quest_key = key
@@ -133,7 +133,7 @@ BackendInterfaceQuestsPlayfab.can_claim_quest_rewards = function (self, key)
 end
 
 BackendInterfaceQuestsPlayfab.claim_quest_rewards = function (self, key)
-	local id = self._new_id(self)
+	local id = self:_new_id()
 	local data = {
 		quest_key = key,
 		id = id
@@ -158,18 +158,18 @@ BackendInterfaceQuestsPlayfab.claim_quest_rewards_challenge_request_cb = functio
 		local eac_response, response = nil
 
 		if challenge then
-			eac_response, response = self._get_eac_response(self, challenge)
+			eac_response, response = self:_get_eac_response(challenge)
 		end
 
 		if not challenge then
 			print("EAC disabled on backend")
-			self._claim_quest_rewards(self, data)
+			self:_claim_quest_rewards(data)
 		elseif not eac_response then
 			print("EAC disabled on client")
 			Managers.backend:playfab_eac_error()
 		else
 			print("EAC Enabled!")
-			self._claim_quest_rewards(self, data, response)
+			self:_claim_quest_rewards(data, response)
 		end
 	end
 end
@@ -221,7 +221,7 @@ BackendInterfaceQuestsPlayfab.quest_rewards_request_cb = function (self, data, r
 				local backend_id = item.ItemInstanceId
 				local amount = item.UsesIncrementedBy or 1
 
-				backend_mirror.add_item(backend_mirror, backend_id, item)
+				backend_mirror:add_item(backend_id, item)
 
 				loot[i] = {
 					backend_id,
@@ -230,7 +230,7 @@ BackendInterfaceQuestsPlayfab.quest_rewards_request_cb = function (self, data, r
 			end
 		end
 
-		backend_mirror.set_quest_data(backend_mirror, current_quests, daily_quest_refresh_available, daily_quest_update_time)
+		backend_mirror:set_quest_data(current_quests, daily_quest_refresh_available, daily_quest_update_time)
 
 		self._quest_reward_requests[id] = rewards
 		self._dirty = true

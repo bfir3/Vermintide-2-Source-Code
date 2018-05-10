@@ -121,7 +121,7 @@ EntityManager2.add_unit_extensions = function (self, world, unit, unit_template_
 
 			assert(system ~= nil, "Adding extension %q with no system is registered.", extension_name)
 
-			local extension = system.on_add_extension(system, world, unit, extension_name, extension_init_data)
+			local extension = system:on_add_extension(world, unit, extension_name, extension_init_data)
 
 			assert(extension, "System (%s) must return the created extension (%s)", extension_system_name, extension_name)
 
@@ -143,14 +143,14 @@ EntityManager2.add_unit_extensions = function (self, world, unit, unit_template_
 			local extension = extensions[extension_name]
 
 			if extension.extensions_ready ~= nil then
-				extension.extensions_ready(extension, world, unit)
+				extension:extensions_ready(world, unit)
 			end
 
 			local extension_system_name = extension_to_system_map[extension_name]
 			local system = self_systems[extension_system_name]
 
 			if system.extensions_ready ~= nil then
-				system.extensions_ready(system, world, unit, extension_name)
+				system:extensions_ready(world, unit, extension_name)
 			end
 		end
 	end
@@ -166,7 +166,7 @@ EntityManager2.sync_unit_extensions = function (self, unit, go_id)
 	if extensions then
 		for extension_name, extension in pairs(extensions) do
 			if extension.game_object_initialized ~= nil then
-				extension.game_object_initialized(extension, unit, go_id)
+				extension:game_object_initialized(unit, go_id)
 			end
 		end
 	end
@@ -181,7 +181,7 @@ EntityManager2.hot_join_sync = function (self, unit)
 
 	for system_name, extension in pairs(unit_extensions) do
 		if extension.hot_join_sync then
-			extension.hot_join_sync(extension, Managers.state.network:game_session_host())
+			extension:hot_join_sync(Managers.state.network:game_session_host())
 		end
 	end
 end
@@ -200,10 +200,10 @@ EntityManager2.register_unit = function (self, world, unit, maybe_init_data, ...
 		}
 	end
 
-	if self.add_unit_extensions(self, world, unit, nil, extension_init_data) then
+	if self:add_unit_extensions(world, unit, nil, extension_init_data) then
 		TEMP_TABLE[1] = unit
 
-		self.register_units_extensions(self, TEMP_TABLE, 1)
+		self:register_units_extensions(TEMP_TABLE, 1)
 	end
 end
 
@@ -216,14 +216,14 @@ EntityManager2.add_and_register_units = function (self, world, unit_list, num_un
 		local unit = unit_list[i]
 		local unit_template = Unit.get_data(unit, "unit_template")
 
-		if self.add_unit_extensions(self, world, unit, unit_template) then
+		if self:add_unit_extensions(world, unit, unit_template) then
 			num_added = num_added + 1
 			added_list[num_added] = unit
 		end
 	end
 
 	if 0 < num_added then
-		self.register_units_extensions(self, added_list, num_added)
+		self:register_units_extensions(added_list, num_added)
 	end
 end
 
@@ -260,16 +260,16 @@ EntityManager2.remove_extensions_from_unit = function (self, unit, extensions_to
 	local num_ext = #extensions_list
 
 	for _, extension_name in ipairs(extensions_to_remove) do
-		local system = self.system_by_extension(self, extension_name)
+		local system = self:system_by_extension(extension_name)
 		local system_name = system.NAME
 
 		ScriptUnit_destroy_extension(unit, system_name)
 	end
 
 	for _, extension_name in ipairs(extensions_to_remove) do
-		local system = self.system_by_extension(self, extension_name)
+		local system = self:system_by_extension(extension_name)
 
-		system.on_remove_extension(system, unit, extension_name)
+		system:on_remove_extension(unit, extension_name)
 		assert(not ScriptUnit.has_extension(unit, system.NAME), "Extension was not properly destroyed for extension %s", extension_name)
 
 		self_extensions[extension_name][unit] = nil
@@ -279,10 +279,10 @@ end
 EntityManager2.freeze_extensions = function (self, unit, extensions_to_freeze)
 	for i = 1, #extensions_to_freeze, 1 do
 		local extension_name = extensions_to_freeze[i]
-		local system = self.system_by_extension(self, extension_name)
+		local system = self:system_by_extension(extension_name)
 
 		if system.on_freeze_extension then
-			system.on_freeze_extension(system, unit, extension_name)
+			system:on_freeze_extension(unit, extension_name)
 		end
 	end
 end
@@ -318,7 +318,7 @@ EntityManager2.unregister_units = function (self, units, num_units)
 						local extension_name = system_to_extension_map[system_name]
 						local system = self._systems[system_name]
 
-						system.on_remove_extension(system, unit, extension_name)
+						system:on_remove_extension(unit, extension_name)
 						assert(not ScriptUnit.has_extension(unit, system.NAME), "Extension was not properly destroyed for extension %s", extension_name)
 
 						self_extensions[extension_name][unit] = nil
@@ -328,9 +328,9 @@ EntityManager2.unregister_units = function (self, units, num_units)
 						local extension_name = extensions_list[i]
 
 						if not ignore_extensions_list[extension_name] then
-							local system = self.system_by_extension(self, extension_name)
+							local system = self:system_by_extension(extension_name)
 
-							system.on_remove_extension(system, unit, extension_name)
+							system:on_remove_extension(unit, extension_name)
 							assert(not ScriptUnit.has_extension(unit, system.NAME), "Extension was not properly destroyed for extension %s", extension_name)
 
 							self_extensions[extension_name][unit] = nil
@@ -361,7 +361,7 @@ EntityManager2.game_object_unit_destroyed = function (self, unit)
 		local extension = ScriptUnit.extension(unit, system_name)
 
 		if extension.game_object_unit_destroyed then
-			extension.game_object_unit_destroyed(extension)
+			extension:game_object_unit_destroyed()
 		end
 	end
 end
@@ -383,7 +383,7 @@ local TEMP_UNIT_TABLE = {}
 EntityManager2.unregister_unit = function (self, unit)
 	TEMP_UNIT_TABLE[1] = unit
 
-	self.unregister_units(self, TEMP_UNIT_TABLE, 1)
+	self:unregister_units(TEMP_UNIT_TABLE, 1)
 end
 
 return

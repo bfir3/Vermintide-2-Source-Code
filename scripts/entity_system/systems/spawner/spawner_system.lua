@@ -27,7 +27,7 @@ SpawnerSystem.init = function (self, context, system_name)
 	self._hidden_spawners = {}
 	local event_manager = Managers.state.event
 
-	event_manager.register(event_manager, self, "spawn_horde", "spawn_horde")
+	event_manager:register(self, "spawn_horde", "spawn_horde")
 
 	self.hidden_spawners_broadphase = Broadphase(40, 512)
 	self._breed_limits = {}
@@ -68,7 +68,7 @@ SpawnerSystem.update_test_all_spawners = function (self, t)
 		QuickDrawerStay:sphere(pos, 0.66, Color(60, 200, 0))
 		Debug.world_sticky_text(pos, group_template.id, "green")
 		print("START TEST for ", group_template.id)
-		self.spawn_horde(self, spawner_unit, 10, breeds, spawn_list, group_template)
+		self:spawn_horde(spawner_unit, 10, breeds, spawn_list, group_template)
 
 		index = index + 1
 		j = j + 1
@@ -195,16 +195,16 @@ SpawnerSystem.spawn_horde = function (self, spawner, amount, breeds, breed_list,
 				spawn_list[i] = breed_data
 			end
 
-			extension.on_activate(extension, amount, breeds, spawn_list)
+			extension:on_activate(amount, breeds, spawn_list)
 		else
-			extension.on_activate(extension, amount, breeds, breed_list)
+			extension:on_activate(amount, breeds, breed_list)
 		end
 	else
-		extension.on_activate(extension, amount, breeds)
+		extension:on_activate(amount, breeds)
 	end
 
 	self._waiting_to_spawn = self._waiting_to_spawn + amount
-	local spawn_rate = extension.spawn_rate(extension)
+	local spawn_rate = extension:spawn_rate()
 
 	return spawn_rate
 end
@@ -261,11 +261,11 @@ SpawnerSystem._try_spawn_breed = function (self, breed_name, spawn_list_per_bree
 					end
 
 					for i = 1, num_breeds, 1 do
-						active_enemies = active_enemies + self._try_spawn_breed(self, exchange_breed[i], spawn_list_per_breed, spawn_list, breed_limits, active_enemies, group_template)
+						active_enemies = active_enemies + self:_try_spawn_breed(exchange_breed[i], spawn_list_per_breed, spawn_list, breed_limits, active_enemies, group_template)
 					end
 				else
 					spawn_list_per_breed[exchange_breed] = (spawn_list_per_breed[exchange_breed] or 0) + exchanged_amount
-					active_enemies = active_enemies + self._try_spawn_breed(self, exchange_breed, spawn_list_per_breed, spawn_list, breed_limits, active_enemies, group_template)
+					active_enemies = active_enemies + self:_try_spawn_breed(exchange_breed, spawn_list_per_breed, spawn_list, breed_limits, active_enemies, group_template)
 				end
 			end
 		end
@@ -318,7 +318,7 @@ SpawnerSystem._fill_spawners = function (self, spawn_list, spawners, limit_spawn
 
 		table.clear_array(copy_list, #copy_list)
 		copy_array(spawn_list, start_index, (start_index + to_spawn) - 1, copy_list)
-		extension.on_activate(extension, to_spawn, nil, copy_list)
+		extension:on_activate(to_spawn, nil, copy_list)
 
 		start_index = start_index + to_spawn
 	end
@@ -334,7 +334,7 @@ SpawnerSystem.spawn_horde_from_terror_event_id_composition = function (self, eve
 	local breed_list = (difficulty_breeds and difficulty_breeds[difficulty]) or variant.breeds
 	local variant = composition[index]
 
-	self.spawn_horde_from_terror_event_id(self, event_id, variant, limit_spawners, group_template, strictly_not_close_to_players, composition_type)
+	self:spawn_horde_from_terror_event_id(event_id, variant, limit_spawners, group_template, strictly_not_close_to_players, composition_type)
 end
 
 local ok_spawner_breeds = {
@@ -434,9 +434,9 @@ SpawnerSystem.spawn_horde_from_terror_event_id = function (self, event_id, varia
 		local breed_name = exchange_order[i]
 
 		if event_spawn or ok_spawner_breeds[breed_name] then
-			self._try_spawn_breed(self, breed_name, temp_spawn_list_per_breed, spawn_list, breed_limits, active_enemies, group_template)
+			self:_try_spawn_breed(breed_name, temp_spawn_list_per_breed, spawn_list, breed_limits, active_enemies, group_template)
 		else
-			self._try_spawn_breed(self, breed_name, temp_spawn_list_per_breed, spawn_list_hidden, breed_limits, active_enemies, group_template)
+			self:_try_spawn_breed(breed_name, temp_spawn_list_per_breed, spawn_list_hidden, breed_limits, active_enemies, group_template)
 		end
 	end
 
@@ -445,10 +445,10 @@ SpawnerSystem.spawn_horde_from_terror_event_id = function (self, event_id, varia
 
 	local count = 0
 	local hidden_count = 0
-	count = self._fill_spawners(self, spawn_list, spawners, limit_spawners)
+	count = self:_fill_spawners(spawn_list, spawners, limit_spawners)
 
 	if not event_spawn and must_use_hidden_spawners then
-		hidden_count = self._fill_spawners(self, spawn_list_hidden, hidden_spawners, limit_spawners)
+		hidden_count = self:_fill_spawners(spawn_list_hidden, hidden_spawners, limit_spawners)
 
 		if 0 < hidden_count then
 			return "success", count + hidden_count
@@ -585,7 +585,7 @@ local found_hidden_spawners = {}
 
 SpawnerSystem.update = function (self, context, t, dt)
 	for unit, extension in pairs(self._active_spawners) do
-		extension.update(extension, unit, dummy_input, dt, context, t)
+		extension:update(unit, dummy_input, dt, context, t)
 	end
 end
 
@@ -593,10 +593,10 @@ SpawnerSystem.show_hidden_spawners = function (self, t)
 	local unit_local_position = Unit.local_position
 	local center_pos = PLAYER_POSITIONS[1]
 	local free_flight_manager = Managers.free_flight
-	local in_free_flight = free_flight_manager.active(free_flight_manager, "global")
+	local in_free_flight = free_flight_manager:active("global")
 
 	if in_free_flight then
-		center_pos = free_flight_manager.camera_position_rotation(free_flight_manager)
+		center_pos = free_flight_manager:camera_position_rotation()
 	end
 
 	local s = math.sin(t * 10)

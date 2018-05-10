@@ -9,7 +9,7 @@ end
 SmartMatchCleaner = class(SmartMatchCleaner)
 
 SmartMatchCleaner.init = function (self)
-	self.reset(self)
+	self:reset()
 end
 
 SmartMatchCleaner.reset = function (self)
@@ -27,8 +27,8 @@ end
 local ENTRIES_TO_REMOVE = ENTRIES_TO_REMOVE or {}
 
 SmartMatchCleaner.update = function (self, dt)
-	self._update_cleanup(self, dt)
-	self._update_remove(self, dt)
+	self:_update_cleanup(dt)
+	self:_update_remove(dt)
 end
 
 SmartMatchCleaner._update_cleanup = function (self, dt)
@@ -99,10 +99,10 @@ SmartMatchCleaner._cleanup_ticket = function (self, dt, index, session_data)
 	end
 
 	if destroy_session then
-		self._change_state(self, session_data, "_cleanup_session")
+		self:_change_state(session_data, "_cleanup_session")
 	else
 		cleanup_print("KEEP SESSION ALIVE --> session_id: %s - session_name: %s", session_id, session_name)
-		self._change_state(self, session_data, "_do_remove")
+		self:_change_state(session_data, "_do_remove")
 	end
 end
 
@@ -116,9 +116,9 @@ SmartMatchCleaner._cleanup_session = function (self, dt, index, session_data)
 	if status == MultiplayerSession.READY or status == MultiplayerSession.BROKEN then
 		cleanup_print("Leaving session --> session_id: %s - session_name: %s", session_id, session_name)
 		MultiplayerSession.leave(session_id)
-		self._change_state(self, session_data, "_free_session")
+		self:_change_state(session_data, "_free_session")
 	elseif status == MultiplayerSession.SHUTDOWN then
-		self._change_state(self, session_data, "_free_session")
+		self:_change_state(session_data, "_free_session")
 	end
 end
 
@@ -130,7 +130,7 @@ SmartMatchCleaner._free_session = function (self, dt, index, session_data)
 	if status == MultiplayerSession.SHUTDOWN then
 		cleanup_print("Freeing session --> session_id: %s - session_name: %s", session_id, session_name)
 		Network.free_multiplayer_session(session_id)
-		self._change_state(self, session_data, "_do_remove")
+		self:_change_state(session_data, "_do_remove")
 	end
 end
 

@@ -13,12 +13,12 @@ SimplePopup.update = function (self, dt)
 	local manager = Managers.popup
 	local first = self._tracked_popups[1]
 
-	if first and not manager.has_popup_with_id(manager, first) then
+	if first and not manager:has_popup_with_id(first) then
 		table.remove(self._tracked_popups, 1)
 	end
 
 	for i, v in ipairs(self._tracked_popups) do
-		local result = manager.query_result(manager, v)
+		local result = manager:query_result(v)
 
 		if result ~= nil then
 			table.remove(self._tracked_popups, i)

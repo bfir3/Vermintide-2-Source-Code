@@ -25,8 +25,8 @@ CraftPageSalvage.on_enter = function (self, params, settings)
 	}
 	self.crafting_manager = Managers.state.crafting
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self.hero_name = params.hero_name
@@ -36,7 +36,7 @@ CraftPageSalvage.on_enter = function (self, params, settings)
 	self.settings = settings
 	self._animations = {}
 
-	self.create_ui_elements(self, params)
+	self:create_ui_elements(params)
 
 	self._craft_items = {}
 	self._item_grid = ItemGridUI:new(category_settings, self._widgets_by_name.item_grid, self.hero_name, self.career_index)
@@ -67,8 +67,8 @@ CraftPageSalvage.create_ui_elements = function (self, params)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
 
-	self._set_craft_button_disabled(self, true)
-	self._handle_craft_input_progress(self, 0)
+	self:_set_craft_button_disabled(true)
+	self:_handle_craft_input_progress(0)
 end
 
 CraftPageSalvage.on_exit = function (self, params)
@@ -77,7 +77,7 @@ CraftPageSalvage.on_exit = function (self, params)
 	self.ui_animator = nil
 
 	if self._craft_input_time then
-		self._play_sound(self, "play_gui_craft_forge_button_aborted")
+		self:_play_sound("play_gui_craft_forge_button_aborted")
 	end
 end
 
@@ -85,13 +85,13 @@ CraftPageSalvage.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self._handle_input(self, dt, t)
-	self._update_animations(self, dt)
-	self._update_craft_items(self)
-	self.draw(self, dt)
+	self:_handle_input(dt, t)
+	self:_update_animations(dt)
+	self:_update_craft_items()
+	self:draw(dt)
 end
 
 CraftPageSalvage.post_update = function (self, dt, t)
@@ -105,8 +105,8 @@ CraftPageSalvage._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -149,7 +149,7 @@ end
 CraftPageSalvage._handle_input = function (self, dt, t)
 	local parent = self.parent
 
-	if parent.waiting_for_craft(parent) or self._craft_result then
+	if parent:waiting_for_craft() or self._craft_result then
 		return
 	end
 
@@ -159,47 +159,47 @@ CraftPageSalvage._handle_input = function (self, dt, t)
 	local input_service = self.super_parent:window_input_service()
 	local widget = widgets_by_name.craft_button
 	local is_button_enabled = not widget.content.button_hotspot.disable_button
-	local craft_input = self._is_button_held(self, widgets_by_name.craft_button)
-	local craft_input_gamepad = is_button_enabled and gamepad_active and input_service.get(input_service, "refresh_hold")
+	local craft_input = self:_is_button_held(widgets_by_name.craft_button)
+	local craft_input_gamepad = is_button_enabled and gamepad_active and input_service:get("refresh_hold")
 	local craft_input_accepted = false
 
 	if craft_input == 0 or craft_input_gamepad then
 		if not self._craft_input_time then
 			self._craft_input_time = 0
 
-			self._play_sound(self, "play_gui_craft_forge_button_begin")
+			self:_play_sound("play_gui_craft_forge_button_begin")
 		else
 			self._craft_input_time = self._craft_input_time + dt
 		end
 
 		local max_time = 2
 		local progress = math.min(self._craft_input_time / max_time, 1)
-		craft_input_accepted = self._handle_craft_input_progress(self, progress)
+		craft_input_accepted = self:_handle_craft_input_progress(progress)
 
 		WwiseWorld.set_global_parameter(self.wwise_world, "craft_forge_button_progress", progress)
 	elseif self._craft_input_time then
 		self._craft_input_time = nil
 
-		self._handle_craft_input_progress(self, 0)
-		self._play_sound(self, "play_gui_craft_forge_button_aborted")
+		self:_handle_craft_input_progress(0)
+		self:_play_sound("play_gui_craft_forge_button_aborted")
 	end
 
 	if craft_input_accepted then
 		local items = self._craft_items
-		local recipe_available = parent.craft(parent, items)
+		local recipe_available = parent:craft(items)
 
 		if recipe_available then
-			self._set_craft_button_disabled(self, true)
+			self:_set_craft_button_disabled(true)
 
 			local item_grid = self._item_grid
 
 			for _, backend_id in pairs(items) do
-				item_grid.lock_item_by_id(item_grid, backend_id, true)
+				item_grid:lock_item_by_id(backend_id, true)
 			end
 
-			item_grid.update_items_status(item_grid)
-			self._play_sound(self, "play_gui_craft_forge_button_completed")
-			self._play_sound(self, "play_gui_craft_forge_begin")
+			item_grid:update_items_status()
+			self:_play_sound("play_gui_craft_forge_button_completed")
+			self:_play_sound("play_gui_craft_forge_begin")
 		end
 	end
 end
@@ -223,8 +223,8 @@ end
 CraftPageSalvage.reset = function (self)
 	local item_grid = self._item_grid
 
-	item_grid.clear_locked_items(item_grid)
-	item_grid.update_items_status(item_grid)
+	item_grid:clear_locked_items()
+	item_grid:update_items_status()
 end
 
 CraftPageSalvage.on_craft_completed = function (self)
@@ -237,7 +237,7 @@ CraftPageSalvage.on_craft_completed = function (self)
 		self._craft_items[i] = nil
 	end
 
-	item_grid.clear_item_grid(item_grid)
+	item_grid:clear_item_grid()
 	self.super_parent:clear_disabled_backend_ids()
 	self.super_parent:update_inventory_items()
 
@@ -254,23 +254,23 @@ CraftPageSalvage.on_craft_completed = function (self)
 		local amount = data[3]
 
 		if num_reward_items == 1 then
-			self._add_craft_item(self, backend_id, 5, ignore_sound, amount)
+			self:_add_craft_item(backend_id, 5, ignore_sound, amount)
 		else
-			self._add_craft_item(self, backend_id, index, ignore_sound, amount)
+			self:_add_craft_item(backend_id, index, ignore_sound, amount)
 		end
 	end
 
-	item_grid.clear_locked_items(item_grid)
+	item_grid:clear_locked_items()
 
 	for _, backend_id in pairs(self._craft_items) do
-		item_grid.lock_item_by_id(item_grid, backend_id, true)
+		item_grid:lock_item_by_id(backend_id, true)
 	end
 
-	item_grid.update_items_status(item_grid)
+	item_grid:update_items_status()
 
 	self._num_craft_items = 0
 
-	self._set_craft_button_disabled(self, true)
+	self:_set_craft_button_disabled(true)
 
 	self._craft_result = nil
 end
@@ -278,29 +278,29 @@ end
 CraftPageSalvage._update_craft_items = function (self)
 	local super_parent = self.super_parent
 	local item_grid = self._item_grid
-	local is_dragging_craft_item = item_grid.is_dragging_item(item_grid) or item_grid.is_item_dragged(item_grid) ~= nil
-	local pressed_backend_id, is_drag_item = super_parent.get_pressed_item_backend_id(super_parent)
+	local is_dragging_craft_item = item_grid:is_dragging_item() or item_grid:is_item_dragged() ~= nil
+	local pressed_backend_id, is_drag_item = super_parent:get_pressed_item_backend_id()
 
 	if pressed_backend_id then
 		if is_drag_item then
 			if not is_dragging_craft_item then
-				local slot_index = item_grid.is_slot_hovered(item_grid)
+				local slot_index = item_grid:is_slot_hovered()
 
 				if slot_index then
-					self._add_craft_item(self, pressed_backend_id, slot_index)
+					self:_add_craft_item(pressed_backend_id, slot_index)
 				end
 			end
 		else
-			self._add_craft_item(self, pressed_backend_id)
+			self:_add_craft_item(pressed_backend_id)
 		end
 	end
 
-	local grid_item_pressed = item_grid.is_item_pressed(item_grid)
+	local grid_item_pressed = item_grid:is_item_pressed()
 
 	if grid_item_pressed then
 		local backend_id = grid_item_pressed.backend_id
 
-		self._remove_craft_item(self, backend_id)
+		self:_remove_craft_item(backend_id)
 	end
 end
 
@@ -329,10 +329,10 @@ CraftPageSalvage._remove_craft_item = function (self, backend_id, slot_index)
 		self._num_craft_items = math.max((self._num_craft_items or 0) - 1, 0)
 
 		if self._num_craft_items == 0 then
-			self._set_craft_button_disabled(self, true)
+			self:_set_craft_button_disabled(true)
 		end
 
-		self._play_sound(self, "play_gui_craft_item_drag")
+		self:_play_sound("play_gui_craft_item_drag")
 	end
 end
 
@@ -357,7 +357,7 @@ CraftPageSalvage._add_craft_item = function (self, backend_id, slot_index, ignor
 	if slot_index then
 		craft_items[slot_index] = backend_id
 		local item_interface = Managers.backend:get_interface("items")
-		local item = backend_id and item_interface.get_item_from_id(item_interface, backend_id)
+		local item = backend_id and item_interface:get_item_from_id(backend_id)
 
 		self._item_grid:add_item_to_slot_index(slot_index, item, specific_amount)
 		self.super_parent:set_disabled_backend_id(backend_id, true)
@@ -365,11 +365,11 @@ CraftPageSalvage._add_craft_item = function (self, backend_id, slot_index, ignor
 		self._num_craft_items = math.min((self._num_craft_items or 0) + 1, 9)
 
 		if 0 < self._num_craft_items then
-			self._set_craft_button_disabled(self, false)
+			self:_set_craft_button_disabled(false)
 		end
 
 		if backend_id and not ignore_sound then
-			self._play_sound(self, "play_gui_craft_item_drop")
+			self:_play_sound("play_gui_craft_item_drop")
 		end
 	end
 end

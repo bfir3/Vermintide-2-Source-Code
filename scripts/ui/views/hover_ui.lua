@@ -100,7 +100,7 @@ HoverUI.init = function (self, ingame_ui_context, input_service)
 	self.input_service = input_service
 	self.ui_animations = {}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 end
 
 HoverUI.create_ui_elements = function (self)
@@ -130,8 +130,8 @@ HoverUI.update = function (self, dt)
 	local input_service = self.input_service or fake_input_service
 	local ui_scenegraph = self.ui_scenegraph
 
-	self.update_widget_pivot_position(self, ui_scenegraph, input_service)
-	self.draw(self, dt, ui_scenegraph, input_service)
+	self:update_widget_pivot_position(ui_scenegraph, input_service)
+	self:draw(dt, ui_scenegraph, input_service)
 end
 
 HoverUI.draw = function (self, dt, ui_scenegraph, input_service)
@@ -163,7 +163,7 @@ HoverUI.update_objects = function (self)
 				local content = data.content
 				local style = data.style
 
-				self.display_object(self, tooltip_name, tooltip_type, content, style)
+				self:display_object(tooltip_name, tooltip_type, content, style)
 			end
 		end
 	end
@@ -238,7 +238,7 @@ HoverUI.update_widget_pivot_position = function (self, ui_scenegraph, input_serv
 		hover_position[2] = cursor_position.y
 		local text_style = active_widget.style.text
 		local text = active_widget.content.text
-		local text_width, text_height = self.get_text_size(self, text, text_style)
+		local text_width, text_height = self:get_text_size(text, text_style)
 		local widget_scenegraph_definition = ui_scenegraph.default_hover_widget
 		widget_scenegraph_definition.size[1] = text_width * TEXT_SIZE_MULTIPLIER
 		widget_scenegraph_definition.size[2] = text_height * TEXT_SIZE_MULTIPLIER

@@ -8,7 +8,7 @@ InviteManager.init = function (self)
 end
 
 InviteManager.update = function (self, dt)
-	self._poll_invite(self)
+	self:_poll_invite()
 end
 
 InviteManager._poll_invite = function (self)
@@ -42,7 +42,7 @@ end
 
 InviteManager.has_invitation = function (self)
 	if self.lobby_data == nil then
-		self._poll_invite(self)
+		self:_poll_invite()
 	end
 
 	return self.lobby_data ~= nil

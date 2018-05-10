@@ -19,7 +19,7 @@ BackendInterfaceQuests.init = function (self, boons_interface)
 end
 
 BackendInterfaceQuests.setup = function (self, data_server_queue)
-	self._register_executors(self, data_server_queue)
+	self:_register_executors(data_server_queue)
 
 	self._queue = data_server_queue
 	local param_config = {
@@ -35,17 +35,17 @@ BackendInterfaceQuests.initiated = function (self)
 end
 
 BackendInterfaceQuests._register_executors = function (self, queue)
-	queue.register_executor(queue, "quests", callback(self, "_command_quests"))
-	queue.register_executor(queue, "contracts", callback(self, "_command_contracts"))
-	queue.register_executor(queue, "contract_update", callback(self, "_command_contract_update"))
-	queue.register_executor(queue, "contract_delete", callback(self, "_command_contract_delete"))
-	queue.register_executor(queue, "quest_update", callback(self, "_command_quest_update"))
-	queue.register_executor(queue, "quest_delete", callback(self, "_command_quest_delete"))
-	queue.register_executor(queue, "rewarded", callback(self, "_command_rewarded"))
-	queue.register_executor(queue, "expire_times", callback(self, "_command_expire_times"))
-	queue.register_executor(queue, "status", callback(self, "_command_status"))
-	queue.register_executor(queue, "boons", callback(self, "_command_boons"))
-	queue.register_executor(queue, "boons_add", callback(self, "_command_boons_add"))
+	queue:register_executor("quests", callback(self, "_command_quests"))
+	queue:register_executor("contracts", callback(self, "_command_contracts"))
+	queue:register_executor("contract_update", callback(self, "_command_contract_update"))
+	queue:register_executor("contract_delete", callback(self, "_command_contract_delete"))
+	queue:register_executor("quest_update", callback(self, "_command_quest_update"))
+	queue:register_executor("quest_delete", callback(self, "_command_quest_delete"))
+	queue:register_executor("rewarded", callback(self, "_command_rewarded"))
+	queue:register_executor("expire_times", callback(self, "_command_expire_times"))
+	queue:register_executor("status", callback(self, "_command_status"))
+	queue:register_executor("boons", callback(self, "_command_boons"))
+	queue:register_executor("boons_add", callback(self, "_command_boons_add"))
 end
 
 BackendInterfaceQuests._command_quests = function (self, quests)

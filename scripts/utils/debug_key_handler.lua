@@ -75,10 +75,10 @@ DebugKeyHandler.key_pressed = function (key, description, category, key_modifier
 			DebugKeyHandler.keys[category] = category_keys
 		end
 
-		local key_string = (input_service.has(input_service, key) and key) or cached_fail(key)
+		local key_string = (input_service:has(key) and key) or cached_fail(key)
 
 		if key_modifier then
-			key_string = (input_service.has(input_service, key) and cached_key_mod(key, key_modifier)) or cached_key_mod(key, key_modifier, true)
+			key_string = (input_service:has(key) and cached_key_mod(key, key_modifier)) or cached_key_mod(key, key_modifier, true)
 		end
 
 		category_keys[key_string] = description
@@ -87,10 +87,10 @@ DebugKeyHandler.key_pressed = function (key, description, category, key_modifier
 	local modifier_pressed = true
 
 	if key_modifier then
-		modifier_pressed = input_service.get(input_service, key_modifier)
+		modifier_pressed = input_service:get(key_modifier)
 	else
 		for i, blocking_key in ipairs(blocking_modifiers) do
-			if blocking_key ~= key and input_service.get(input_service, blocking_key) then
+			if blocking_key ~= key and input_service:get(blocking_key) then
 				modifier_pressed = false
 
 				break
@@ -98,7 +98,7 @@ DebugKeyHandler.key_pressed = function (key, description, category, key_modifier
 		end
 	end
 
-	local key_pressed = input_service.get(input_service, key)
+	local key_pressed = input_service:get(key)
 
 	return modifier_pressed and key_pressed
 end

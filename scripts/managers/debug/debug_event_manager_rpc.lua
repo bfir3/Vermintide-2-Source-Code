@@ -10,7 +10,7 @@ DebugEventManagerRPC.rpc_event_manager_event = function (self, peer_id, ...)
 	local event_manager = Managers.state.event
 
 	if event_manager then
-		event_manager.trigger(event_manager, ...)
+		event_manager:trigger(...)
 	end
 end
 

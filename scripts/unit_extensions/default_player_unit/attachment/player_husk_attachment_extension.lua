@@ -44,7 +44,7 @@ PlayerHuskAttachmentExtension.create_attachment = function (self, slot_name, ite
 	local old_slot_data = attachments.slots[slot_name]
 
 	if old_slot_data then
-		self.remove_attachment(self, slot_name)
+		self:remove_attachment(slot_name)
 	end
 
 	local slot_data = AttachmentUtils.create_attachment(self._world, self._unit, attachments, slot_name, item_data, true)
@@ -55,12 +55,12 @@ PlayerHuskAttachmentExtension.create_attachment = function (self, slot_name, ite
 		Unit.flow_event(self._unit, show_attachments_event)
 	end
 
-	self._show_attachment(self, slot_name, slot_data, true)
+	self:_show_attachment(slot_name, slot_data, true)
 
 	attachments.slots[slot_name] = slot_data
 	local outline_extension = ScriptUnit.extension(self._unit, "outline_system")
 
-	outline_extension.reapply_outline(outline_extension)
+	outline_extension:reapply_outline()
 end
 
 PlayerHuskAttachmentExtension.remove_attachment = function (self, slot_name)
@@ -69,7 +69,7 @@ PlayerHuskAttachmentExtension.remove_attachment = function (self, slot_name)
 	AttachmentUtils.destroy_attachment(self._world, self._unit, slot_data)
 
 	if self.current_item_buffs[slot_name] then
-		self._remove_buffs(self, slot_name)
+		self:_remove_buffs(slot_name)
 	end
 
 	self._attachments.slots[slot_name] = nil
@@ -90,7 +90,7 @@ PlayerHuskAttachmentExtension.show_attachments = function (self, show)
 	local slots = self._attachments.slots
 
 	for slot_name, slot_data in pairs(slots) do
-		self._show_attachment(self, slot_name, slot_data, show)
+		self:_show_attachment(slot_name, slot_data, show)
 	end
 end
 
@@ -129,7 +129,7 @@ PlayerHuskAttachmentExtension._apply_buffs = function (self, buffs, slot_name)
 			params[data_type] = data_value
 		end
 
-		current_item_buffs[index] = buff_extension.add_buff(buff_extension, buff_name, params)
+		current_item_buffs[index] = buff_extension:add_buff(buff_name, params)
 		index = index + 1
 	end
 
@@ -143,7 +143,7 @@ PlayerHuskAttachmentExtension._remove_buffs = function (self, slot_name)
 	for i = 1, #current_item_buffs, 1 do
 		local buff_id = current_item_buffs[i]
 
-		buff_extension.remove_buff(buff_extension, buff_id)
+		buff_extension:remove_buff(buff_id)
 	end
 
 	table.clear(current_item_buffs)
@@ -179,7 +179,7 @@ PlayerHuskAttachmentExtension.add_buffs_to_slot = function (self, slot_name, buf
 	self._slot_buffs[slot_name] = slot_buffs
 
 	if Managers.player.is_server then
-		self._apply_buffs(self, slot_buffs, slot_name)
+		self:_apply_buffs(slot_buffs, slot_name)
 	end
 end
 

@@ -64,8 +64,8 @@ StartGameWindowLobbyBrowser.on_enter = function (self, params, offset)
 	}
 	self.difficulty_manager = Managers.state.difficulty
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self._animations = {}
@@ -85,7 +85,7 @@ StartGameWindowLobbyBrowser.on_enter = function (self, params, offset)
 	self.game_server_finder = game_server_finder
 	definitions.game_mode_data = definitions.setup_game_mode_data(self.statistics_db, self._stats_id)
 
-	self.create_ui_elements(self, params, offset)
+	self:create_ui_elements(params, offset)
 
 	self._current_lobby_type = "lobbies"
 	local input_service = self.parent:window_input_service()
@@ -105,7 +105,7 @@ StartGameWindowLobbyBrowser.on_enter = function (self, params, offset)
 	self._current_server_name = ""
 
 	Managers.matchmaking:set_active_lobby_browser(self)
-	self._populate_lobby_list(self)
+	self:_populate_lobby_list()
 end
 
 StartGameWindowLobbyBrowser.create_ui_elements = function (self, params, offset)
@@ -188,8 +188,8 @@ StartGameWindowLobbyBrowser.create_ui_elements = function (self, params, offset)
 		window_position[3] = window_position[3] + offset[3]
 	end
 
-	self._assign_hero_portraits(self)
-	self._reset_filters(self)
+	self:_assign_hero_portraits()
+	self:_reset_filters()
 end
 
 StartGameWindowLobbyBrowser._assign_hero_portraits = function (self)
@@ -222,7 +222,7 @@ StartGameWindowLobbyBrowser.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	local input_service = self.parent:window_input_service()
@@ -231,33 +231,33 @@ StartGameWindowLobbyBrowser.update = function (self, dt, t)
 	self.lobby_finder:update(dt)
 	self.game_server_finder:update(dt)
 
-	local is_refreshing = self._is_refreshing(self)
+	local is_refreshing = self:_is_refreshing()
 
 	if self._searching and not is_refreshing then
 		self._searching = false
 
-		self._populate_lobby_list(self)
+		self:_populate_lobby_list()
 	end
 
-	self._update_animations(self, dt)
-	self._handle_input(self, dt, t)
-	self.draw(self, dt)
-	self._update_auto_refresh(self, dt)
+	self:_update_animations(dt)
+	self:_handle_input(dt, t)
+	self:draw(dt)
+	self:_update_auto_refresh(dt)
 
 	local loading = self._searching
 	local lobby_list = self.lobby_list
 
-	lobby_list.update(lobby_list, dt, loading)
-	lobby_list.draw(lobby_list, dt)
+	lobby_list:update(dt, loading)
+	lobby_list:draw(dt)
 
 	local lobby_index_selected = lobby_list.lobby_list_index_changed
 
 	if lobby_index_selected then
-		lobby_list.on_lobby_selected(lobby_list, lobby_index_selected)
+		lobby_list:on_lobby_selected(lobby_index_selected)
 
-		local lobby_data = lobby_list.selected_lobby(lobby_list)
+		local lobby_data = lobby_list:selected_lobby()
 
-		self._setup_lobby_info_box(self, lobby_data)
+		self:_setup_lobby_info_box(lobby_data)
 	end
 
 	local widgets_by_name = self._base_widgets_by_name
@@ -265,43 +265,43 @@ StartGameWindowLobbyBrowser.update = function (self, dt, t)
 	local search_button_hotspot = widgets_by_name.search_button.content.button_hotspot
 	local reset_button_hotspot = widgets_by_name.reset_button.content.button_hotspot
 	local lobby_type_button_hotspot = widgets_by_name.lobby_type_button.content.button_hotspot
-	local lobby_data = lobby_list.selected_lobby(lobby_list)
+	local lobby_data = lobby_list:selected_lobby()
 
-	self._update_join_button(self, lobby_data)
+	self:_update_join_button(lobby_data)
 
 	if self._draw_invalid_checkbox then
 		local checkbox_content = self._base_widgets_by_name.invalid_checkbox.content
 		local checkbox_hotspot = checkbox_content.button_hotspot
 
 		if checkbox_hotspot.on_hover_enter then
-			self._play_sound(self, "Play_hud_hover")
+			self:_play_sound("Play_hud_hover")
 		end
 
 		if checkbox_hotspot.on_release then
 			checkbox_content.checked = not checkbox_content.checked
 			self.search_timer = input_delay_before_start_new_search
 
-			self._play_sound(self, "Play_hud_select")
+			self:_play_sound("Play_hud_select")
 		end
 	end
 
 	if search_button_hotspot.on_hover_enter or join_button_hotspot.on_hover_enter or reset_button_hotspot.on_hover_enter or lobby_type_button_hotspot.on_hover_enter then
-		self._play_sound(self, "Play_hud_hover")
+		self:_play_sound("Play_hud_hover")
 	end
 
 	local join_lobby_data_id = self.join_lobby_data_id
 
 	if not join_button_hotspot.disable_button and join_button_hotspot.on_release and not self.join_lobby_data_id then
-		local lobby_data = lobby_list.selected_lobby(lobby_list)
+		local lobby_data = lobby_list:selected_lobby()
 
 		if lobby_data then
-			self._play_sound(self, "Play_hud_select")
-			self._join(self, lobby_data)
+			self:_play_sound("Play_hud_select")
+			self:_join(lobby_data)
 		end
 	end
 
 	if lobby_type_button_hotspot.on_release then
-		self._play_sound(self, "Play_hud_select")
+		self:_play_sound("Play_hud_select")
 
 		lobby_type_button_hotspot.on_release = nil
 		local current_lobby_type = self._current_lobby_type
@@ -311,30 +311,30 @@ StartGameWindowLobbyBrowser.update = function (self, dt, t)
 			new_lobby_type = "servers"
 		end
 
-		self._switch_lobby_type(self, new_lobby_type)
+		self:_switch_lobby_type(new_lobby_type)
 	end
 
 	if search_button_hotspot.on_release then
-		self._play_sound(self, "Play_hud_select")
+		self:_play_sound("Play_hud_select")
 
 		search_button_hotspot.on_release = nil
 
-		self._search(self)
+		self:_search()
 	end
 
 	if reset_button_hotspot.on_release then
-		self._play_sound(self, "Play_hud_select")
+		self:_play_sound("Play_hud_select")
 
 		reset_button_hotspot.on_release = nil
 
-		self._reset_filters(self)
+		self:_reset_filters()
 	end
 
 	if self.search_timer then
 		self.search_timer = self.search_timer - dt
 
 		if self.search_timer < 0 then
-			self._search(self)
+			self:_search()
 
 			self.search_timer = nil
 		end
@@ -440,8 +440,8 @@ StartGameWindowLobbyBrowser._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -509,16 +509,16 @@ end
 StartGameWindowLobbyBrowser._handle_input = function (self, dt, t)
 	local lobbies_widgets_by_name = self._lobbies_widgets_by_name
 
-	self._handle_stepper_input(self, "level_stepper", lobbies_widgets_by_name.level_stepper, callback(self, "_on_level_stepper_input"))
-	self._handle_stepper_input(self, "difficulty_stepper", lobbies_widgets_by_name.difficulty_stepper, callback(self, "_on_difficulty_stepper_input"))
-	self._handle_stepper_input(self, "show_lobbies_stepper", lobbies_widgets_by_name.show_lobbies_stepper, callback(self, "_on_show_lobbies_stepper_input"))
-	self._handle_stepper_input(self, "distance_stepper", lobbies_widgets_by_name.distance_stepper, callback(self, "_on_distance_stepper_input"))
+	self:_handle_stepper_input("level_stepper", lobbies_widgets_by_name.level_stepper, callback(self, "_on_level_stepper_input"))
+	self:_handle_stepper_input("difficulty_stepper", lobbies_widgets_by_name.difficulty_stepper, callback(self, "_on_difficulty_stepper_input"))
+	self:_handle_stepper_input("show_lobbies_stepper", lobbies_widgets_by_name.show_lobbies_stepper, callback(self, "_on_show_lobbies_stepper_input"))
+	self:_handle_stepper_input("distance_stepper", lobbies_widgets_by_name.distance_stepper, callback(self, "_on_distance_stepper_input"))
 
 	local server_widgets_by_name = self._server_widgets_by_name
 
-	self._handle_stepper_input(self, "search_type_stepper", server_widgets_by_name.search_type_stepper, callback(self, "_on_search_type_stepper_input"))
-	self._handle_name_input_box(self, dt, t)
-	self._handle_selected_lobby_input(self)
+	self:_handle_stepper_input("search_type_stepper", server_widgets_by_name.search_type_stepper, callback(self, "_on_search_type_stepper_input"))
+	self:_handle_name_input_box(dt, t)
+	self:_handle_selected_lobby_input()
 end
 
 StartGameWindowLobbyBrowser._handle_name_input_box = function (self, dt, t)
@@ -527,7 +527,7 @@ StartGameWindowLobbyBrowser._handle_name_input_box = function (self, dt, t)
 
 	if name_input_box_content.on_release then
 		name_input_box_content.active = true
-	elseif input_service.get(input_service, "left_release") then
+	elseif input_service:get("left_release") then
 		name_input_box_content.active = false
 	end
 
@@ -536,7 +536,7 @@ StartGameWindowLobbyBrowser._handle_name_input_box = function (self, dt, t)
 	if new_server_name ~= self._current_server_name then
 		self._current_server_name = new_server_name
 
-		self._populate_lobby_list(self)
+		self:_populate_lobby_list()
 	end
 end
 
@@ -555,9 +555,9 @@ StartGameWindowLobbyBrowser._handle_selected_lobby_input = function (self)
 			local server_info = lobby_data.server_info
 
 			if server_info.favorite then
-				self._remove_server_from_favorites(self, lobby_data)
+				self:_remove_server_from_favorites(lobby_data)
 			else
-				self._add_server_to_favorites(self, lobby_data)
+				self:_add_server_to_favorites(lobby_data)
 			end
 		end
 	end
@@ -660,7 +660,7 @@ local dummy_server_info = {}
 
 StartGameWindowLobbyBrowser._populate_lobby_list = function (self, auto_update)
 	local selected_lobby_data = self.lobby_list:selected_lobby()
-	local lobbies = self._get_lobbies(self)
+	local lobbies = self:_get_lobbies()
 	local ignore_scroll_reset = true
 	local show_lobbies_index = self.selected_show_lobbies_index
 	local show_all_lobbies = (show_lobbies_index == 2 and true) or false
@@ -668,7 +668,7 @@ StartGameWindowLobbyBrowser._populate_lobby_list = function (self, auto_update)
 	local lobby_count = 0
 
 	for lobby_id, lobby_data in pairs(lobbies) do
-		if show_all_lobbies or self._valid_lobby(self, lobby_data) then
+		if show_all_lobbies or self:_valid_lobby(lobby_data) then
 			lobby_count = lobby_count + 1
 			lobbies_to_present[lobby_count] = lobby_data
 		end
@@ -697,11 +697,11 @@ StartGameWindowLobbyBrowser._get_lobbies = function (self)
 	if current_lobby_type == "lobbies" then
 		local lobby_finder = self.lobby_finder
 
-		return lobby_finder.lobbies(lobby_finder) or empty_lobby_list
+		return lobby_finder:lobbies() or empty_lobby_list
 	elseif current_lobby_type == "servers" then
 		local game_server_finder = self.game_server_finder
 
-		return game_server_finder.servers(game_server_finder) or empty_lobby_list
+		return game_server_finder:servers() or empty_lobby_list
 	else
 		ferror("Unknown lobby type (%s)", current_lobby_type)
 	end
@@ -727,17 +727,17 @@ StartGameWindowLobbyBrowser._valid_lobby = function (self, lobby_data)
 		end
 
 		local player_manager = Managers.player
-		local player = player_manager.local_player(player_manager)
-		local statistics_db = player_manager.statistics_db(player_manager)
-		local player_stats_id = player.stats_id(player)
+		local player = player_manager:local_player()
+		local statistics_db = player_manager:statistics_db()
+		local player_stats_id = player:stats_id()
 		local level_unlocked = LevelUnlockUtils.level_unlocked(statistics_db, player_stats_id, level_key)
 
 		if not level_unlocked then
 			return false
 		end
 
-		local profile_name = player.profile_display_name(player)
-		local career_name = player.career_name(player)
+		local profile_name = player:profile_display_name()
+		local career_name = player:career_name()
 		local has_required_power_level = Managers.matchmaking:has_required_power_level(lobby_data, profile_name, career_name)
 
 		if not has_required_power_level then
@@ -771,7 +771,7 @@ StartGameWindowLobbyBrowser._update_auto_refresh = function (self, dt)
 		lobby_list_update_timer = lobby_list_update_timer - dt
 
 		if lobby_list_update_timer < 0 then
-			self._populate_lobby_list(self, true)
+			self:_populate_lobby_list(true)
 		else
 			self.lobby_list_update_timer = lobby_list_update_timer
 		end
@@ -782,11 +782,11 @@ StartGameWindowLobbyBrowser._update_join_button = function (self, lobby_data)
 	local menu_input_description_ui = self.menu_input_description_ui
 	local active_menu_input_description = self.active_menu_input_description
 	local matchmaking_manager = Managers.matchmaking
-	local is_matchmaking = matchmaking_manager.is_game_matchmaking(matchmaking_manager)
+	local is_matchmaking = matchmaking_manager:is_game_matchmaking()
 	local widget = self._base_widgets_by_name.join_button
 
 	if lobby_data and not is_matchmaking then
-		local valid_lobby = self._valid_lobby(self, lobby_data)
+		local valid_lobby = self:_valid_lobby(lobby_data)
 
 		if valid_lobby then
 			widget.content.button_hotspot.disable_button = false
@@ -799,17 +799,17 @@ StartGameWindowLobbyBrowser._update_join_button = function (self, lobby_data)
 end
 
 StartGameWindowLobbyBrowser._reset_filters = function (self)
-	local levels_table = self._get_levels(self)
+	local levels_table = self:_get_levels()
 	local any_level_index = #levels_table
 
-	self._on_level_stepper_input(self, 0, any_level_index)
+	self:_on_level_stepper_input(0, any_level_index)
 
-	local difficulties_table = self._get_difficulties(self)
+	local difficulties_table = self:_get_difficulties()
 	local any_difficulty_index = #difficulties_table
 
-	self._on_difficulty_stepper_input(self, 0, any_difficulty_index)
-	self._on_show_lobbies_stepper_input(self, 0, 1)
-	self._on_distance_stepper_input(self, 0, 2)
+	self:_on_difficulty_stepper_input(0, any_difficulty_index)
+	self:_on_show_lobbies_stepper_input(0, 1)
+	self:_on_distance_stepper_input(0, 2)
 end
 
 StartGameWindowLobbyBrowser._switch_lobby_type = function (self, new_lobby_type)
@@ -819,21 +819,21 @@ StartGameWindowLobbyBrowser._switch_lobby_type = function (self, new_lobby_type)
 
 	if new_lobby_type == "lobbies" then
 	elseif new_lobby_type == "servers" then
-		self._on_search_type_stepper_input(self, 0, 1)
+		self:_on_search_type_stepper_input(0, 1)
 	else
 		ferror("Unknown lobby type (%s)", new_lobby_type)
 	end
 
-	self._search(self)
+	self:_search()
 end
 
 StartGameWindowLobbyBrowser._create_filter_requirements = function (self)
 	local lobby_finder = self.lobby_finder
 	local level_index = self.selected_level_index
-	local levels_table = self._get_levels(self)
+	local levels_table = self:_get_levels()
 	local level_key = levels_table[level_index]
 	local difficulty_index = self.selected_difficulty_index
-	local difficulty_table = self._get_difficulties(self)
+	local difficulty_table = self:_get_difficulties()
 	local difficulty_key = difficulty_table[difficulty_index]
 	local only_show_valid_lobbies = not self._base_widgets_by_name.invalid_checkbox.content.checked
 	local distance_index = self.selected_distance_index
@@ -843,9 +843,9 @@ StartGameWindowLobbyBrowser._create_filter_requirements = function (self)
 	local matchmaking = not show_all_lobbies
 	local free_slots = 1
 	local player_manager = Managers.player
-	local player = player_manager.local_player(player_manager)
-	local statistics_db = player_manager.statistics_db(player_manager)
-	local player_stats_id = player.stats_id(player)
+	local player = player_manager:local_player()
+	local statistics_db = player_manager:statistics_db()
+	local player_stats_id = player:stats_id()
 	local requirements = {
 		free_slots = free_slots,
 		distance_filter = platform ~= "ps4" and distance_filter,
@@ -892,7 +892,7 @@ StartGameWindowLobbyBrowser._create_filter_requirements = function (self)
 
 	if only_show_valid_lobbies then
 		requirements.filters.network_hash = {
-			value = lobby_finder.network_hash(lobby_finder),
+			value = lobby_finder:network_hash(),
 			comparison = LobbyComparison.EQUAL
 		}
 	end
@@ -914,7 +914,7 @@ StartGameWindowLobbyBrowser._join = function (self, lobby_data, join_params)
 end
 
 StartGameWindowLobbyBrowser._search = function (self)
-	local requirements = self._create_filter_requirements(self)
+	local requirements = self:_create_filter_requirements()
 
 	if self._current_lobby_type == "lobbies" then
 		LobbyInternal.clear_filter_requirements()
@@ -922,7 +922,7 @@ StartGameWindowLobbyBrowser._search = function (self)
 		local force_refresh = true
 		local lobby_finder = self.lobby_finder
 
-		lobby_finder.add_filter_requirements(lobby_finder, requirements, force_refresh)
+		lobby_finder:add_filter_requirements(requirements, force_refresh)
 	elseif self._current_lobby_type == "servers" then
 		local server_finder = self.game_server_finder
 		local game_server_requirements = {
@@ -935,15 +935,15 @@ StartGameWindowLobbyBrowser._search = function (self)
 		}
 		local skip_verify_lobby_data = true
 
-		server_finder.add_filter_requirements(server_finder, game_server_requirements, skip_verify_lobby_data)
-		server_finder.refresh(server_finder)
+		server_finder:add_filter_requirements(game_server_requirements, skip_verify_lobby_data)
+		server_finder:refresh()
 	else
 		ferror("Unknown lobby type (%s)", self._current_lobby_type)
 	end
 
 	self._searching = true
 
-	self._populate_lobby_list(self)
+	self:_populate_lobby_list()
 end
 
 StartGameWindowLobbyBrowser._get_levels = function (self)
@@ -968,28 +968,28 @@ StartGameWindowLobbyBrowser._on_game_mode_stepper_input = function (self, index_
 	local stepper = self._base_widgets_by_name.game_mode_stepper
 	local game_mode_display_table = definitions.game_mode_data
 	local current_index = self.selected_game_mode_index or 1
-	local new_index = self._on_stepper_input(self, stepper, game_mode_display_table, current_index, index_change, specific_index)
+	local new_index = self:_on_stepper_input(stepper, game_mode_display_table, current_index, index_change, specific_index)
 	local data = game_mode_display_table[new_index]
 	local game_mode_text = data.game_mode_display_name
 	stepper.content.setting_text = Localize(game_mode_text)
 	self.selected_game_mode_index = new_index
 	self.search_timer = input_delay_before_start_new_search
-	local levels_table = self._get_levels(self)
+	local levels_table = self:_get_levels()
 	local any_level_index = #levels_table
 
-	self._on_level_stepper_input(self, 0, any_level_index)
+	self:_on_level_stepper_input(0, any_level_index)
 
-	local difficulties_table = self._get_difficulties(self)
+	local difficulties_table = self:_get_difficulties()
 	local any_difficulty_index = #difficulties_table
 
-	self._on_difficulty_stepper_input(self, 0, any_difficulty_index)
+	self:_on_difficulty_stepper_input(0, any_difficulty_index)
 end
 
 StartGameWindowLobbyBrowser._on_level_stepper_input = function (self, index_change, specific_index)
 	local stepper = self._lobbies_widgets_by_name.level_stepper
-	local levels_table = self._get_levels(self)
+	local levels_table = self:_get_levels()
 	local current_index = self.selected_level_index or 1
-	local new_index = self._on_stepper_input(self, stepper, levels_table, current_index, index_change, specific_index)
+	local new_index = self:_on_stepper_input(stepper, levels_table, current_index, index_change, specific_index)
 	local level_display_name = "lobby_browser_mission"
 	local level = levels_table[new_index]
 
@@ -1005,9 +1005,9 @@ end
 
 StartGameWindowLobbyBrowser._on_difficulty_stepper_input = function (self, index_change, specific_index)
 	local stepper = self._lobbies_widgets_by_name.difficulty_stepper
-	local difficulties_table = self._get_difficulties(self)
+	local difficulties_table = self:_get_difficulties()
 	local current_index = self.selected_difficulty_index or 1
-	local new_index = self._on_stepper_input(self, stepper, difficulties_table, current_index, index_change, specific_index)
+	local new_index = self:_on_stepper_input(stepper, difficulties_table, current_index, index_change, specific_index)
 	local difficulty_display_name = "lobby_browser_difficulty"
 	local difficulty = difficulties_table[new_index]
 
@@ -1025,7 +1025,7 @@ StartGameWindowLobbyBrowser._on_show_lobbies_stepper_input = function (self, ind
 	local stepper = self._lobbies_widgets_by_name.show_lobbies_stepper
 	local show_lobbies_table = definitions.show_lobbies_table
 	local current_index = self.selected_show_lobbies_index or 1
-	local new_index = self._on_stepper_input(self, stepper, show_lobbies_table, current_index, index_change, specific_index)
+	local new_index = self:_on_stepper_input(stepper, show_lobbies_table, current_index, index_change, specific_index)
 	local show_lobbies_text = show_lobbies_table[new_index]
 	stepper.content.setting_text = Localize(show_lobbies_text)
 	self.selected_show_lobbies_index = new_index
@@ -1036,7 +1036,7 @@ StartGameWindowLobbyBrowser._on_distance_stepper_input = function (self, index_c
 	local stepper = self._lobbies_widgets_by_name.distance_stepper
 	local distance_table = definitions.distance_table
 	local current_index = self.selected_distance_index or 1
-	local new_index = self._on_stepper_input(self, stepper, distance_table, current_index, index_change, specific_index)
+	local new_index = self:_on_stepper_input(stepper, distance_table, current_index, index_change, specific_index)
 	local distance_text = distance_table[new_index]
 	stepper.content.setting_text = Localize(distance_text)
 	self.selected_distance_index = new_index
@@ -1047,7 +1047,7 @@ StartGameWindowLobbyBrowser._on_search_type_stepper_input = function (self, inde
 	local stepper = self._server_widgets_by_name.search_type_stepper
 	local search_type_text_table = definitions.search_type_text_table
 	local current_index = self.selected_search_type_index or 1
-	local new_index = self._on_stepper_input(self, stepper, search_type_text_table, current_index, index_change, specific_index)
+	local new_index = self:_on_stepper_input(stepper, search_type_text_table, current_index, index_change, specific_index)
 	local search_type_text = search_type_text_table[new_index]
 	stepper.content.setting_text = Localize(search_type_text)
 	self.selected_search_type_index = new_index
@@ -1086,35 +1086,35 @@ StartGameWindowLobbyBrowser._handle_stepper_input = function (self, stepper_name
 	local stepper_right_hotspot = stepper_content.button_hotspot_right
 
 	if stepper_left_hotspot.on_hover_enter then
-		self._on_stepper_arrow_hover(self, stepper_widget, stepper_name, "left_button_icon_clicked")
+		self:_on_stepper_arrow_hover(stepper_widget, stepper_name, "left_button_icon_clicked")
 	elseif stepper_right_hotspot.on_hover_enter then
-		self._on_stepper_arrow_hover(self, stepper_widget, stepper_name, "right_button_icon_clicked")
+		self:_on_stepper_arrow_hover(stepper_widget, stepper_name, "right_button_icon_clicked")
 	end
 
 	if stepper_left_hotspot.on_hover_exit then
-		self._on_stepper_arrow_dehover(self, stepper_widget, stepper_name, "left_button_icon_clicked")
+		self:_on_stepper_arrow_dehover(stepper_widget, stepper_name, "left_button_icon_clicked")
 	elseif stepper_right_hotspot.on_hover_exit then
-		self._on_stepper_arrow_dehover(self, stepper_widget, stepper_name, "right_button_icon_clicked")
+		self:_on_stepper_arrow_dehover(stepper_widget, stepper_name, "right_button_icon_clicked")
 	end
 
 	if stepper_left_hotspot.on_hover_enter or stepper_right_hotspot.on_hover_enter then
-		self._play_sound(self, "Play_hud_hover")
+		self:_play_sound("Play_hud_hover")
 	end
 
 	if stepper_left_hotspot.on_release then
 		stepper_left_hotspot.on_release = nil
 
 		step_function(-1)
-		self._play_sound(self, "Play_hud_select")
-		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "left_button_icon")
-		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "left_button_icon_clicked")
+		self:_play_sound("Play_hud_select")
+		self:_on_stepper_arrow_pressed(stepper_widget, stepper_name, "left_button_icon")
+		self:_on_stepper_arrow_pressed(stepper_widget, stepper_name, "left_button_icon_clicked")
 	elseif stepper_right_hotspot.on_release then
 		stepper_right_hotspot.on_release = nil
 
 		step_function(1)
-		self._play_sound(self, "Play_hud_select")
-		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "right_button_icon")
-		self._on_stepper_arrow_pressed(self, stepper_widget, stepper_name, "right_button_icon_clicked")
+		self:_play_sound("Play_hud_select")
+		self:_on_stepper_arrow_pressed(stepper_widget, stepper_name, "right_button_icon")
+		self:_on_stepper_arrow_pressed(stepper_widget, stepper_name, "right_button_icon_clicked")
 	end
 end
 
@@ -1133,9 +1133,9 @@ StartGameWindowLobbyBrowser._on_stepper_arrow_pressed = function (self, widget, 
 	local animation_duration = total_time
 
 	if 0 < animation_duration then
-		ui_animations[animation_name .. "_hover"] = self._animate_element_by_time(self, pass_style.color, 1, current_alpha, target_alpha, animation_duration)
-		ui_animations[animation_name .. "_selected_size_width"] = self._animate_element_by_catmullrom(self, pass_style.size, 1, default_size[1], 0.7, 1, 1, 0.7, animation_duration)
-		ui_animations[animation_name .. "_selected_size_height"] = self._animate_element_by_catmullrom(self, pass_style.size, 2, default_size[2], 0.7, 1, 1, 0.7, animation_duration)
+		ui_animations[animation_name .. "_hover"] = self:_animate_element_by_time(pass_style.color, 1, current_alpha, target_alpha, animation_duration)
+		ui_animations[animation_name .. "_selected_size_width"] = self:_animate_element_by_catmullrom(pass_style.size, 1, default_size[1], 0.7, 1, 1, 0.7, animation_duration)
+		ui_animations[animation_name .. "_selected_size_height"] = self:_animate_element_by_catmullrom(pass_style.size, 2, default_size[2], 0.7, 1, 1, 0.7, animation_duration)
 	else
 		pass_style.color[1] = target_alpha
 	end
@@ -1152,12 +1152,12 @@ StartGameWindowLobbyBrowser._on_stepper_arrow_hover = function (self, widget, na
 	local animation_duration = (1 - current_alpha / target_alpha) * total_time
 
 	if 0 < animation_duration then
-		ui_animations[animation_name .. "_hover"] = self._animate_element_by_time(self, pass_style.color, 1, current_alpha, target_alpha, animation_duration)
+		ui_animations[animation_name .. "_hover"] = self:_animate_element_by_time(pass_style.color, 1, current_alpha, target_alpha, animation_duration)
 	else
 		pass_style.color[1] = target_alpha
 	end
 
-	self._play_sound(self, "Play_hud_hover")
+	self:_play_sound("Play_hud_hover")
 end
 
 StartGameWindowLobbyBrowser._on_stepper_arrow_dehover = function (self, widget, name, style_id)
@@ -1171,7 +1171,7 @@ StartGameWindowLobbyBrowser._on_stepper_arrow_dehover = function (self, widget, 
 	local animation_duration = current_alpha / 255 * total_time
 
 	if 0 < animation_duration then
-		ui_animations[animation_name .. "_hover"] = self._animate_element_by_time(self, pass_style.color, 1, current_alpha, target_alpha, animation_duration)
+		ui_animations[animation_name .. "_hover"] = self:_animate_element_by_time(pass_style.color, 1, current_alpha, target_alpha, animation_duration)
 	else
 		pass_style.color[1] = target_alpha
 	end

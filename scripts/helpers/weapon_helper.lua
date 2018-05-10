@@ -265,7 +265,7 @@ WeaponHelper.calculate_trajectory = function (self, world, initial_position, tar
 		name = "trajectory_vectors"
 	})
 
-	drawer.reset(drawer)
+	drawer:reset()
 
 	local target_vector = target_position - initial_position
 	local normalized_target_vector = Vector3.normalize(Vector3.flat(target_vector))
@@ -305,7 +305,7 @@ WeaponHelper._trajectory_hits_target = function (self, world, radians, speed, gr
 		points[#points + 1] = WeaponHelper:position_on_trajectory(initial_position, normalized_target_vector, speed, radians, gravity, t)
 
 		if Development.parameter("ai_debug_trajectory_raycast") then
-			drawer.sphere(drawer, points[#points], 0.1, Color(255, 255, 255, 255))
+			drawer:sphere(points[#points], 0.1, Color(255, 255, 255, 255))
 		end
 
 		if 0 < t then
@@ -315,7 +315,7 @@ WeaponHelper._trajectory_hits_target = function (self, world, radians, speed, gr
 			local result, hit_position, _, _, actor = PhysicsWorld.immediate_raycast(physics_world, points[#points - 1], direction, length, "closest", "collision_filter", "filter_enemy_ray_projectile")
 
 			if Development.parameter("ai_debug_trajectory_raycast") then
-				drawer.vector(drawer, points[#points - 1], direction, Color(255, 255, 255, 255))
+				drawer:vector(points[#points - 1], direction, Color(255, 255, 255, 255))
 			end
 
 			if result then
@@ -347,7 +347,7 @@ end
 WeaponHelper.debug_draw_trajectory_hit = function (self, position, hit_target, drawer)
 	local color = (hit_target and Color(255, 74, 247, 115)) or Color(255, 245, 108, 49)
 
-	drawer.sphere(drawer, position, 0.1, color)
+	drawer:sphere(position, 0.1, color)
 end
 
 return

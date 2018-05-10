@@ -177,7 +177,7 @@ RespawnHandler.update = function (self, dt, t, player_statuses)
 
 				if Unit.alive(player_unit) then
 					local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-					respawn_time = buff_extension.apply_buffs_to_value(buff_extension, respawn_time, StatBuffIndex.FASTER_RESPAWN)
+					respawn_time = buff_extension:apply_buffs_to_value(respawn_time, StatBuffIndex.FASTER_RESPAWN)
 				end
 			end
 
@@ -209,7 +209,7 @@ RespawnHandler.get_respawn_unit = function (self)
 
 	local conflict = Managers.state.conflict
 	local level_analysis = conflict.level_analysis
-	local main_paths = level_analysis.get_main_paths(level_analysis)
+	local main_paths = level_analysis:get_main_paths()
 	local ahead_position = POSITION_LOOKUP[conflict.main_path_info.ahead_unit]
 
 	if not ahead_position then

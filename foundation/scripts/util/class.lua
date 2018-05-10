@@ -27,14 +27,14 @@ function class(class_table, ...)
 				setmetatable(object, class_table)
 
 				if object.init then
-					object.init(object, ...)
+					object:init(...)
 				end
 
 				return object
 			end,
 			delete = function (self, ...)
 				if self.destroy then
-					self.destroy(self, ...)
+					self:destroy(...)
 				end
 
 				setmetatable(self, destroyed_mt)

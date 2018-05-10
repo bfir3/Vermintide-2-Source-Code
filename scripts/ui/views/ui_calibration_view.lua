@@ -266,7 +266,7 @@ UICalibrationView.update = function (self, ui_renderer, input_service, dt)
 	local top_left_reticule_content = top_left_reticule.content
 
 	if top_left_reticule_content.on_pressed then
-		local cursor = input_service.get(input_service, "cursor")
+		local cursor = input_service:get("cursor")
 		self.cursor_start_pos = {
 			cursor.x,
 			cursor.y
@@ -278,7 +278,7 @@ UICalibrationView.update = function (self, ui_renderer, input_service, dt)
 	local bottom_right_reticule_content = bottom_right_reticule.content
 
 	if bottom_right_reticule_content.on_pressed then
-		local cursor = input_service.get(input_service, "cursor")
+		local cursor = input_service:get("cursor")
 		self.cursor_start_pos = {
 			cursor.x,
 			cursor.y
@@ -287,9 +287,9 @@ UICalibrationView.update = function (self, ui_renderer, input_service, dt)
 		self.modifying_retucile = "bottom_right"
 	end
 
-	if self.cursor_start_pos and not input_service.get(input_service, "left_hold") then
-		self.evaluate_new_root_scale(self, UISettings.root_scale)
-		self.save_new_root_scale(self, UISettings.root_scale)
+	if self.cursor_start_pos and not input_service:get("left_hold") then
+		self:evaluate_new_root_scale(UISettings.root_scale)
+		self:save_new_root_scale(UISettings.root_scale)
 
 		self.cursor_start_pos = nil
 		self.start_root = nil
@@ -298,7 +298,7 @@ UICalibrationView.update = function (self, ui_renderer, input_service, dt)
 
 	if self.cursor_start_pos then
 		local cursor_start = self.cursor_start_pos
-		local cursor = input_service.get(input_service, "cursor")
+		local cursor = input_service:get("cursor")
 		local start_x = cursor_start[1]
 		local cursor_x = cursor[1]
 		local w = RESOLUTION_LOOKUP.res_w
@@ -323,7 +323,7 @@ UICalibrationView.update = function (self, ui_renderer, input_service, dt)
 
 	for i, button in ipairs(self.buttons) do
 		if button.content.button_hotspot.on_release and button_navigation[i] == "reset" then
-			self.reset_root_scale(self)
+			self:reset_root_scale()
 		end
 	end
 end
@@ -332,7 +332,7 @@ UICalibrationView.reset_root_scale = function (self)
 	UISettings.root_scale[1] = 1
 	UISettings.root_scale[2] = 1
 
-	self.save_new_root_scale(self, UISettings.root_scale)
+	self:save_new_root_scale(UISettings.root_scale)
 end
 
 UICalibrationView.evaluate_new_root_scale = function (self, root_scale)

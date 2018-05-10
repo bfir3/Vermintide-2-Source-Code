@@ -65,7 +65,7 @@ BossDoorExtension.update = function (self, unit, input, dt, context, t)
 	local animation_stop_time = self.animation_stop_time
 
 	if animation_stop_time and animation_stop_time <= t then
-		self.update_nav_obstacles(self)
+		self:update_nav_obstacles()
 
 		self.animation_stop_time = nil
 	end
@@ -83,7 +83,7 @@ BossDoorExtension.hot_join_sync = function (self, sender)
 end
 
 BossDoorExtension.destroy = function (self)
-	self.destroy_box_obstacles(self)
+	self:destroy_box_obstacles()
 
 	self.unit = nil
 	self.world = nil

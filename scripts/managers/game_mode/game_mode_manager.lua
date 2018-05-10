@@ -13,7 +13,7 @@ local RPCS = {
 GameModeManager = class(GameModeManager)
 
 GameModeManager.init = function (self, world, lobby_host, lobby_client, level_transition_handler, network_event_delegate, statistics_db, game_mode_key, network_server, network_transmit)
-	local level_key = level_transition_handler.get_current_level_keys(level_transition_handler)
+	local level_key = level_transition_handler:get_current_level_keys()
 	self.level_transition_handler = level_transition_handler
 	self._lobby_host = lobby_host
 	self._lobby_client = lobby_client
@@ -30,18 +30,18 @@ GameModeManager.init = function (self, world, lobby_host, lobby_client, level_tr
 	self.network_server = network_server
 	self._network_transmit = network_transmit
 
-	self._init_game_mode(self, game_mode_key)
+	self:_init_game_mode(game_mode_key)
 
 	local event_manager = Managers.state.event
 
-	event_manager.register(event_manager, self, "reload_application_settings", "event_reload_application_settings")
-	event_manager.register(event_manager, self, "gm_event_end_conditions_met", "gm_event_end_conditions_met")
-	event_manager.register(event_manager, self, "gm_event_round_started", "gm_event_round_started")
-	event_manager.register(event_manager, self, "camera_teleported", "event_camera_teleported")
+	event_manager:register(self, "reload_application_settings", "event_reload_application_settings")
+	event_manager:register(self, "gm_event_end_conditions_met", "gm_event_end_conditions_met")
+	event_manager:register(self, "gm_event_round_started", "gm_event_round_started")
+	event_manager:register(self, "camera_teleported", "event_camera_teleported")
 
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self._object_sets = nil
 	self._object_set_names = nil
@@ -128,7 +128,7 @@ GameModeManager._set_flow_object_set_enabled = function (self, set, enable, set_
 		for i = 1, amount_to_remove, 1 do
 			local unit_index = buffer[read_index]
 
-			self._set_flow_object_set_unit_enabled(self, level, unit_index)
+			self:_set_flow_object_set_unit_enabled(level, unit_index)
 
 			read_index = read_index % max_size + 1
 			size = size - 1
@@ -152,7 +152,7 @@ GameModeManager._set_flow_object_set_enabled = function (self, set, enable, set_
 		Unit.set_data(unit, "flow_object_set_references", refs)
 
 		if i <= object_set_size_overflow then
-			self._set_flow_object_set_unit_enabled(self, level, unit_index)
+			self:_set_flow_object_set_unit_enabled(level, unit_index)
 		else
 			buffer[write_index] = unit_index
 			write_index = write_index % max_size + 1
@@ -184,7 +184,7 @@ GameModeManager.update_flow_object_set_enable = function (self, dt)
 		for i = 1, num_units, 1 do
 			local unit_index = buffer[read_index]
 
-			self._set_flow_object_set_unit_enabled(self, level, unit_index)
+			self:_set_flow_object_set_unit_enabled(level, unit_index)
 
 			read_index = read_index % max_size + 1
 			size = size - 1
@@ -271,7 +271,7 @@ GameModeManager.flow_cb_set_flow_object_set_enabled = function (self, set_name, 
 	local set = self._object_sets["flow_" .. set_name]
 
 	fassert(set, "[GameModeManager:flow_cb_set_flow_object_set_enabled()] Object set %s does not exist.", set_name)
-	self._set_flow_object_set_enabled(self, set, enabled, set_name)
+	self:_set_flow_object_set_enabled(set, enabled, set_name)
 end
 
 GameModeManager.register_object_sets = function (self, object_sets)
@@ -283,7 +283,7 @@ GameModeManager.register_object_sets = function (self, object_sets)
 		self._object_set_names[set.key] = set_name
 
 		if set.type == "flow" then
-			self._set_flow_object_set_enabled(self, set, false, set_name)
+			self:_set_flow_object_set_enabled(set, false, set_name)
 		end
 	end
 end
@@ -301,7 +301,7 @@ GameModeManager._init_game_mode = function (self, game_mode_key)
 
 	local settings = GameModeSettings[game_mode_key]
 	local class = rawget(_G, settings.class_name)
-	self._game_mode = class.new(class, settings, self._world, self.network_server, self.level_transition_handler)
+	self._game_mode = class:new(settings, self._world, self.network_server, self.level_transition_handler)
 end
 
 GameModeManager.rpc_to_client_spawn_player = function (self, sender, local_player_id, profile_index, position, rotation, is_initial_spawn)
@@ -311,7 +311,7 @@ GameModeManager.rpc_to_client_spawn_player = function (self, sender, local_playe
 end
 
 GameModeManager.round_started = function (self)
-	self.trigger_event(self, "round_started")
+	self:trigger_event("round_started")
 end
 
 GameModeManager.gm_event_round_started = function (self)
@@ -370,12 +370,12 @@ GameModeManager.start_specific_level = function (self, level_key, time_until_sta
 		self.specific_level_start_timer = nil
 		local level_transition_handler = self.level_transition_handler
 
-		if level_transition_handler.transition_in_progress(level_transition_handler) then
+		if level_transition_handler:transition_in_progress() then
 			return
 		end
 
-		level_transition_handler.set_next_level(level_transition_handler, level_key)
-		level_transition_handler.level_completed(level_transition_handler)
+		level_transition_handler:set_next_level(level_key)
+		level_transition_handler:level_completed()
 	end
 end
 
@@ -386,7 +386,7 @@ GameModeManager.update_timebased_level_start = function (self, dt)
 		time = time - dt
 
 		if time <= 0 then
-			self.start_specific_level(self, self.specific_level_to_start)
+			self:start_specific_level(self.specific_level_to_start)
 		else
 			self.specific_level_start_timer = time
 		end
@@ -400,10 +400,10 @@ end
 GameModeManager.server_update = function (self, dt, t)
 	if not self._end_conditions_met and not LEVEL_EDITOR_TEST then
 		if not self._game_mode:level_completed() then
-			local level_completed = self._update_end_level_areas(self)
+			local level_completed = self:_update_end_level_areas()
 
 			if level_completed then
-				self.complete_level(self)
+				self:complete_level()
 			end
 		end
 
@@ -423,13 +423,13 @@ GameModeManager.server_update = function (self, dt, t)
 			self._end_reason = reason
 			local checkpoint_available = (reason == "lost" and Managers.state.spawn:checkpoint_data() and true) or false
 			local mission_system = Managers.state.entity:system("mission_system")
-			local percentage_completed = mission_system.percentage_completed(mission_system)
+			local percentage_completed = mission_system:percentage_completed()
 
-			self.trigger_event(self, "end_conditions_met", reason, checkpoint_available, percentage_completed)
+			self:trigger_event("end_conditions_met", reason, checkpoint_available, percentage_completed)
 
 			self._gm_event_end_conditions_met = true
 
-			self._save_last_level_completed(self, reason)
+			self:_save_last_level_completed(reason)
 
 			self._ready_for_transition = {}
 			local human_players = Managers.player:human_players()
@@ -450,7 +450,7 @@ GameModeManager.server_update = function (self, dt, t)
 
 				self.level_transition_handler:set_next_level(default_level_key)
 			elseif reason == "reload" then
-				self.retry_level(self)
+				self:retry_level()
 			else
 				fassert(false, "Invalid end reason %q.", tostring(reason))
 			end
@@ -474,13 +474,13 @@ GameModeManager.server_update = function (self, dt, t)
 		if everyone_ready then
 			self.level_transition_handler:level_completed()
 		else
-			self.update_timebased_level_start(self, dt)
+			self:update_timebased_level_start(dt)
 		end
 	end
 end
 
 GameModeManager._save_last_level_completed = function (self, reason)
-	local level_key = self.level_key(self)
+	local level_key = self:level_key()
 	SaveData.last_played_level = level_key
 	SaveData.last_played_level_result = reason
 

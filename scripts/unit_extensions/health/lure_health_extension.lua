@@ -70,7 +70,7 @@ LureHealthExtension.update = function (self, dt, context, t)
 	if self._is_server and not self._is_dead and self._lifetime < t then
 		local death_system = Managers.state.entity:system("death_system")
 
-		death_system.kill_unit(death_system, self._unit, {})
+		death_system:kill_unit(self._unit, {})
 	end
 end
 

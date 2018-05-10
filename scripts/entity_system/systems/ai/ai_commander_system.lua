@@ -53,8 +53,8 @@ AICommanderSystem.update = function (self, context, t)
 	self.last_update_t = t
 
 	AICommanderSystem.super.update(self, context, t)
-	self.command_noncore_rats(self, t)
-	self.command_core_rats(self, t)
+	self:command_noncore_rats(t)
+	self:command_core_rats(t)
 end
 
 AICommanderSystem.command_noncore_rats = function (self, t)

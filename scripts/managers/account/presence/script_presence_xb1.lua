@@ -44,7 +44,7 @@ ScriptPresence.update_none = function (self, user_id)
 	local presence_name = ""
 
 	if self._current_presence_set ~= presence_name then
-		self._set_presence(self, user_id, presence_name)
+		self:_set_presence(user_id, presence_name)
 
 		self._current_presence_set = presence_name
 	end
@@ -54,7 +54,7 @@ ScriptPresence.update_menu = function (self, user_id)
 	local presence_name = "in_menus"
 
 	if self._current_presence_set ~= presence_name then
-		self._set_presence(self, user_id, presence_name)
+		self:_set_presence(user_id, presence_name)
 
 		self._current_presence_set = presence_name
 	end
@@ -68,22 +68,22 @@ ScriptPresence.update_playing = function (self, user_id)
 	local current_num_players = Managers.player and Managers.player:num_human_players()
 
 	if not current_level or not current_difficulty or not current_num_players then
-		self.set_presence(self, "menu")
+		self:set_presence("menu")
 	else
 		local prefix = ""
 
-		if self._has_new_data(self, current_level, current_difficulty, current_num_players) then
+		if self:_has_new_data(current_level, current_difficulty, current_num_players) then
 			if current_num_players == 4 then
 				prefix = "playing"
 			else
 				prefix = "needs_assistance"
 			end
 
-			self._setup_stat_data(self, current_level, current_difficulty, current_num_players)
+			self:_setup_stat_data(current_level, current_difficulty, current_num_players)
 
 			local presence_string = prefix .. "_" .. current_level .. "_" .. current_difficulty
 
-			self._set_presence(self, user_id, presence_string)
+			self:_set_presence(user_id, presence_string)
 
 			self._current_presence_set = presence_string
 		end
@@ -151,7 +151,7 @@ ScriptPresence.destroy = function (self)
 	local user_id = Managers.account and Managers.account:user_id()
 
 	if user_id then
-		self._set_presence(self, user_id, "")
+		self:_set_presence(user_id, "")
 	end
 end
 

@@ -29,7 +29,7 @@ ActionThrow.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local throw_time = self.action_time_started + current_action.throw_time
 
 	if throw_time <= t then
-		self._throw(self)
+		self:_throw()
 
 		self.thrown = true
 	end
@@ -40,7 +40,7 @@ ActionThrow._throw = function (self)
 	local current_action = self.current_action
 	local projectile_info = current_action.projectile_info
 	local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-	local first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
+	local first_person_unit = first_person_extension:get_first_person_unit()
 	local first_person_unit_pos = POSITION_LOOKUP[first_person_unit]
 	local speed = current_action.speed
 	local velocity_multiplier = current_action.velocity_multiplier or 0.25
@@ -98,7 +98,7 @@ ActionThrow._throw = function (self)
 		local event_data = FrameTable.alloc_table()
 		event_data.item_type = projectile_info.pickup_name
 
-		dialogue_input.trigger_networked_dialogue_event(dialogue_input, "throwing_item", event_data)
+		dialogue_input:trigger_networked_dialogue_event("throwing_item", event_data)
 	end
 
 	if self.ammo_extension then

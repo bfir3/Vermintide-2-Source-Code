@@ -38,8 +38,8 @@ PlayerCharacterStateFalling.on_enter = function (self, unit, input, dt, context,
 	local locomotion_extension = self.locomotion_extension
 	local first_person_extension = self.first_person_extension
 
-	status_extension.set_falling_height(status_extension)
-	locomotion_extension.set_maximum_upwards_velocity(locomotion_extension, math.huge)
+	status_extension:set_falling_height()
+	locomotion_extension:set_maximum_upwards_velocity(math.huge)
 	CharacterStateHelper.play_animation_event_first_person(first_person_extension, "idle")
 
 	if previous_state ~= "jumping" then
@@ -77,7 +77,7 @@ PlayerCharacterStateFalling.on_exit = function (self, unit, input, dt, context, 
 	local status_extension = self.status_extension
 	local locomotion_extension = self.locomotion_extension
 
-	locomotion_extension.reset_maximum_upwards_velocity(locomotion_extension)
+	locomotion_extension:reset_maximum_upwards_velocity()
 	CharacterStateHelper.play_animation_event(unit, "land_still")
 	CharacterStateHelper.play_animation_event(unit, "to_onground")
 
@@ -95,7 +95,7 @@ PlayerCharacterStateFalling.update = function (self, unit, input, dt, context, t
 	local world = self.world
 	local locomotion_extension = self.locomotion_extension
 	local first_person_extension = self.first_person_extension
-	local velocity = locomotion_extension.current_velocity(locomotion_extension)
+	local velocity = locomotion_extension:current_velocity()
 	local self_pos = POSITION_LOOKUP[unit]
 
 	if 0 < velocity.z then
@@ -120,7 +120,7 @@ PlayerCharacterStateFalling.update = function (self, unit, input, dt, context, t
 	end
 
 	if CharacterStateHelper.is_overcharge_exploding(status_extension) then
-		csm.change_state(csm, "overcharge_exploding")
+		csm:change_state("overcharge_exploding")
 
 		return
 	end
@@ -128,35 +128,35 @@ PlayerCharacterStateFalling.update = function (self, unit, input, dt, context, t
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 
 	if CharacterStateHelper.is_pushed(status_extension) then
-		status_extension.set_pushed(status_extension, false)
+		status_extension:set_pushed(false)
 
 		local params = movement_settings_table.stun_settings.pushed
-		local hit_react_type = status_extension.hit_react_type(status_extension)
+		local hit_react_type = status_extension:hit_react_type()
 		params.hit_react_type = hit_react_type .. "_push"
 
-		csm.change_state(csm, "stunned", params)
+		csm:change_state("stunned", params)
 
 		return
 	end
 
 	if CharacterStateHelper.is_block_broken(status_extension) then
-		status_extension.set_block_broken(status_extension, false)
+		status_extension:set_block_broken(false)
 
 		local params = movement_settings_table.stun_settings.parry_broken
 		params.hit_react_type = "medium_push"
 
-		csm.change_state(csm, "stunned", params)
+		csm:change_state("stunned", params)
 
 		return
 	end
 
-	if not csm.state_next and locomotion_extension.is_on_ground(locomotion_extension) then
+	if not csm.state_next and locomotion_extension:is_on_ground() then
 		if CharacterStateHelper.is_moving(locomotion_extension) then
-			csm.change_state(csm, "walking")
-			first_person_extension.change_state(first_person_extension, "walking")
+			csm:change_state("walking")
+			first_person_extension:change_state("walking")
 		else
-			csm.change_state(csm, "standing")
-			first_person_extension.change_state(first_person_extension, "standing")
+			csm:change_state("standing")
+			first_person_extension:change_state("standing")
 		end
 
 		return
@@ -177,19 +177,19 @@ PlayerCharacterStateFalling.update = function (self, unit, input, dt, context, t
 			local params = self.temp_params
 			params.ladder_unit = ladder_unit
 
-			csm.change_state(csm, "climbing_ladder", params)
+			csm:change_state("climbing_ladder", params)
 
 			return
 		end
 	end
 
 	if CharacterStateHelper.is_ledge_hanging(world, unit, self.temp_params) then
-		csm.change_state(csm, "ledge_hanging", self.temp_params)
+		csm:change_state("ledge_hanging", self.temp_params)
 
 		return
 	end
 
-	if script_data.use_super_jumps and (input_extension.get(input_extension, "jump") or input_extension.get(input_extension, "jump_only")) then
+	if script_data.use_super_jumps and (input_extension:get("jump") or input_extension:get("jump_only")) then
 		self.times_jumped_in_air = math.min(#fix, self.times_jumped_in_air + 1)
 		local text = string.format("%sjump!", fix[self.times_jumped_in_air])
 
@@ -205,7 +205,7 @@ PlayerCharacterStateFalling.update = function (self, unit, input, dt, context, t
 
 	local inventory_extension = self.inventory_extension
 	local move_speed = movement_settings_table.move_speed
-	local move_speed_multiplier = status_extension.current_move_speed_multiplier(status_extension)
+	local move_speed_multiplier = status_extension:current_move_speed_multiplier()
 	move_speed = move_speed * move_speed_multiplier
 	move_speed = move_speed * movement_settings_table.player_speed_scale
 	move_speed = move_speed * movement_settings_table.player_air_speed_scale
@@ -218,9 +218,9 @@ PlayerCharacterStateFalling.update = function (self, unit, input, dt, context, t
 	local interactor_extension = self.interactor_extension
 
 	if CharacterStateHelper.is_starting_interaction(input_extension, interactor_extension) then
-		local config = interactor_extension.interaction_config(interactor_extension)
+		local config = interactor_extension:interaction_config()
 
-		interactor_extension.start_interaction(interactor_extension, "interacting")
+		interactor_extension:start_interaction("interacting")
 
 		if not config.allow_movement then
 			local params = self.temp_params
@@ -228,14 +228,14 @@ PlayerCharacterStateFalling.update = function (self, unit, input, dt, context, t
 			params.show_weapons = config.show_weapons
 			params.activate_block = config.activate_block
 
-			csm.change_state(csm, "interacting", params)
+			csm:change_state("interacting", params)
 		end
 
 		return
 	end
 
 	if CharacterStateHelper.is_interacting(interactor_extension) then
-		local config = interactor_extension.interaction_config(interactor_extension)
+		local config = interactor_extension:interaction_config()
 
 		if not config.allow_movement then
 			local params = self.temp_params
@@ -243,7 +243,7 @@ PlayerCharacterStateFalling.update = function (self, unit, input, dt, context, t
 			params.show_weapons = config.show_weapons
 			params.activate_block = config.activate_block
 
-			csm.change_state(csm, "interacting", params)
+			csm:change_state("interacting", params)
 		end
 
 		return

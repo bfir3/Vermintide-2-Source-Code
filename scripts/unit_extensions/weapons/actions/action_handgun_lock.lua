@@ -57,7 +57,7 @@ ActionHandgunLock.client_owner_post_update = function (self, dt, t, world, can_d
 		if self.time_between_shots <= t then
 			local weapon_extension = ScriptUnit.extension(self.weapon_unit, "weapon_system")
 
-			weapon_extension.stop_action(weapon_extension, "action_abort")
+			weapon_extension:stop_action("action_abort")
 		end
 
 		return
@@ -82,8 +82,8 @@ ActionHandgunLock.client_owner_post_update = function (self, dt, t, world, can_d
 		self.fire_timer = (self.shots_on_target < 3 and t + self.time_between_shots) or t + self.time_between_targets
 		local ammo_extension = self.ammo_extension
 
-		if ammo_extension and 0 < ammo_extension.ammo_count(ammo_extension) then
-			ammo_extension.use_ammo(ammo_extension, 1)
+		if ammo_extension and 0 < ammo_extension:ammo_count() then
+			ammo_extension:use_ammo(1)
 		end
 
 		local event = current_action.anim_event
@@ -117,10 +117,10 @@ ActionHandgunLock.client_owner_post_update = function (self, dt, t, world, can_d
 			local direction = Vector3.normalize(target_position - owner_unit_position)
 			local rotation = Quaternion.look(direction)
 
-			first_person_extension.force_look_rotation(first_person_extension, rotation)
+			first_person_extension:force_look_rotation(rotation)
 
 			local direction = Quaternion.forward(rotation)
-			local result = self.raycast_to_target(self, world, owner_unit_position, direction, current_target)
+			local result = self:raycast_to_target(world, owner_unit_position, direction, current_target)
 			local owner_unit = self.owner_unit
 			local is_server = self.is_server
 

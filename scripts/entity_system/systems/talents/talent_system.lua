@@ -13,7 +13,7 @@ TalentSystem.init = function (self, entity_system_creation_context, system_name)
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 end
 
 TalentSystem.destroy = function (self)
@@ -41,8 +41,8 @@ TalentSystem.rpc_sync_talents = function (self, sender, unit_game_object_id, tal
 		talent_id_5
 	}
 
-	talent_extension.set_talent_ids(talent_extension, talent_ids)
-	talent_extension.apply_buffs_from_talents(talent_extension)
+	talent_extension:set_talent_ids(talent_ids)
+	talent_extension:apply_buffs_from_talents()
 end
 
 return

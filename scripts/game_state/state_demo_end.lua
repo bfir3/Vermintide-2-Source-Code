@@ -4,11 +4,11 @@ StateDemoEnd = class(StateDemoEnd)
 StateDemoEnd.NAME = "StateDemoEnd"
 
 StateDemoEnd.on_enter = function (self)
-	self._setup_world(self)
-	self._setup_input(self)
-	self._setup_ui(self)
-	self._handle_fade(self)
-	self._handle_video_playback(self)
+	self:_setup_world()
+	self:_setup_input()
+	self:_setup_ui()
+	self:_handle_fade()
+	self:_handle_video_playback()
 end
 
 StateDemoEnd._handle_video_playback = function (self)
@@ -46,9 +46,9 @@ StateDemoEnd._setup_input = function (self)
 	local input_manager = self._input_manager
 	Managers.input = input_manager
 
-	input_manager.initialize_device(input_manager, "keyboard", 1)
-	input_manager.initialize_device(input_manager, "mouse", 1)
-	input_manager.initialize_device(input_manager, "gamepad")
+	input_manager:initialize_device("keyboard", 1)
+	input_manager:initialize_device("mouse", 1)
+	input_manager:initialize_device("gamepad")
 end
 
 StateDemoEnd._setup_ui = function (self)
@@ -63,7 +63,7 @@ end
 StateDemoEnd.update = function (self, dt, t)
 	self._demo_end_ui:update(dt, t)
 
-	return self._try_exit(self)
+	return self:_try_exit()
 end
 
 StateDemoEnd.cb_fade_in_done = function (self, state)

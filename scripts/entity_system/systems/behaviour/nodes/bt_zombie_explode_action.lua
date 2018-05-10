@@ -14,7 +14,7 @@ BTZombieExplodeAction.enter = function (self, unit, blackboard, t)
 	local explode_animation = action.explode_animation
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, explode_animation)
+	network_manager:anim_event(unit, explode_animation)
 
 	blackboard.explosion_timer = t + action.explosion_at_time
 	blackboard.bot_threat_timer = t + action.explosion_at_time * 0.75
@@ -37,7 +37,7 @@ BTZombieExplodeAction.run = function (self, unit, blackboard, t, dt)
 	end
 
 	if blackboard.explosion_timer < t then
-		self.explode(self, unit, blackboard, t)
+		self:explode(unit, blackboard, t)
 
 		return "done"
 	end

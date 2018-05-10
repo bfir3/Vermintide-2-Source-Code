@@ -14,14 +14,14 @@ BTSpawningAction.enter = function (self, unit, blackboard, t)
 
 	if blackboard.spawn_type == "horde" then
 		local ai_extension = ScriptUnit.extension(unit, "ai_system")
-		local animation_translation_scale = 1 / ai_extension.size_variation(ai_extension)
+		local animation_translation_scale = 1 / ai_extension:size_variation()
 
 		LocomotionUtils.set_animation_translation_scale(unit, Vector3(animation_translation_scale, animation_translation_scale, animation_translation_scale))
 
 		local locomotion_extension = blackboard.locomotion_extension
 
-		locomotion_extension.use_lerp_rotation(locomotion_extension, false)
-		locomotion_extension.set_movement_type(locomotion_extension, "script_driven")
+		locomotion_extension:use_lerp_rotation(false)
+		locomotion_extension:set_movement_type("script_driven")
 		LocomotionUtils.set_animation_driven_movement(unit, true)
 	else
 		blackboard.spawning_finished = true
@@ -33,14 +33,14 @@ BTSpawningAction.enter = function (self, unit, blackboard, t)
 	local is_horde = blackboard.spawn_type == "horde" or blackboard.spawn_type == "horde_hidden"
 
 	if (is_horde or wield_inventory_on_spawn) and ScriptUnit.has_extension(unit, "ai_inventory_system") then
-		local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+		local unit_id = network_manager:unit_game_object_id(unit)
 
 		network_manager.network_transmit:send_rpc_all("rpc_ai_inventory_wield", unit_id, 1)
 	end
 
 	spawn_animation = blackboard.spawn_animation or breed.default_spawn_animation or "idle"
 
-	network_manager.anim_event(network_manager, unit, spawn_animation)
+	network_manager:anim_event(unit, spawn_animation)
 
 	blackboard.spawn_last_pos = Vector3Box(POSITION_LOOKUP[unit])
 	blackboard.spawn_immovable_time = 0
@@ -52,17 +52,17 @@ BTSpawningAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.spawn_last_pos = nil
 	local ai_navigation = blackboard.navigation_extension
 
-	ai_navigation.init_position(ai_navigation)
+	ai_navigation:init_position()
 
 	if (blackboard.spawn_type == "horde" or blackboard.spawn_type == "horde_hidden") and not destroy then
 		local ai_extension = ScriptUnit.extension(unit, "ai_system")
 
-		ai_extension.force_enemy_detection(ai_extension, t)
+		ai_extension:force_enemy_detection(t)
 
 		if unit_alive(blackboard.target_unit) then
 			local ai_slot_system = Managers.state.entity:system("ai_slot_system")
 
-			ai_slot_system.do_slot_search(ai_slot_system, unit, true)
+			ai_slot_system:do_slot_search(unit, true)
 		else
 			blackboard.target_unit = nil
 		end
@@ -70,10 +70,10 @@ BTSpawningAction.leave = function (self, unit, blackboard, t, reason, destroy)
 
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.set_movement_type(locomotion_extension, "snap_to_navmesh")
+	locomotion_extension:set_movement_type("snap_to_navmesh")
 
 	if blackboard.spawn_type == "horde" then
-		locomotion_extension.use_lerp_rotation(locomotion_extension, true)
+		locomotion_extension:use_lerp_rotation(true)
 		LocomotionUtils.set_animation_driven_movement(unit, false)
 
 		blackboard.spawn_landing_state = nil
@@ -101,15 +101,15 @@ BTSpawningAction.run = function (self, unit, blackboard, t, dt)
 		if is_position_on_navmesh then
 			local spawn_position = Vector3(current_pos.x, current_pos.y, altitude)
 			local network_manager = Managers.state.network
-			local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+			local unit_id = network_manager:unit_game_object_id(unit)
 
 			network_manager.network_transmit:send_rpc_clients("rpc_teleport_unit_to", unit_id, spawn_position, Unit.local_rotation(unit, 0))
-			locomotion_extension.teleport_to(locomotion_extension, spawn_position)
+			locomotion_extension:teleport_to(spawn_position)
 
 			return "done"
 		else
-			locomotion_extension.set_affected_by_gravity(locomotion_extension, true)
-			locomotion_extension.set_movement_type(locomotion_extension, "script_driven")
+			locomotion_extension:set_affected_by_gravity(true)
+			locomotion_extension:set_movement_type("script_driven")
 
 			blackboard.spawn_landing_state = "falling"
 			is_position_on_navmesh, altitude = GwNavQueries.triangle_from_position(nav_world, current_pos, 0, 20)
@@ -144,17 +144,17 @@ BTSpawningAction.run = function (self, unit, blackboard, t, dt)
 	end
 
 	if blackboard.spawn_landing_state == "falling" then
-		local fall_speed = locomotion_extension.current_velocity(locomotion_extension).z
+		local fall_speed = locomotion_extension:current_velocity().z
 		local landing_destination = blackboard.landing_destination:unbox()
 		local next_height = current_pos.z + fall_speed * dt * 2
 
 		if next_height < landing_destination.z then
 			local network_manager = Managers.state.network
-			local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+			local unit_id = network_manager:unit_game_object_id(unit)
 
 			network_manager.network_transmit:send_rpc_clients("rpc_teleport_unit_to", unit_id, landing_destination, Unit.local_rotation(unit, 0))
-			locomotion_extension.teleport_to(locomotion_extension, landing_destination)
-			locomotion_extension.set_movement_type(locomotion_extension, "snap_to_navmesh")
+			locomotion_extension:teleport_to(landing_destination)
+			locomotion_extension:set_movement_type("snap_to_navmesh")
 
 			if blackboard.spawn_animation then
 				LocomotionUtils.set_animation_driven_movement(unit, true, false, false)

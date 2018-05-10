@@ -12,12 +12,12 @@ PlayerCharacterStateGrabbedByTentacle.on_enter = function (self, unit, input, dt
 	local inventory_extension = self.inventory_extension
 
 	CharacterStateHelper.stop_weapon_actions(inventory_extension, "grabbed")
-	inventory_extension.check_and_drop_pickups(inventory_extension, "grabbed_by_tentacle")
+	inventory_extension:check_and_drop_pickups("grabbed_by_tentacle")
 
 	local first_person_extension = self.first_person_extension
 
-	first_person_extension.set_first_person_mode(first_person_extension, false)
-	first_person_extension.set_wanted_player_height(first_person_extension, "grabbed_by_tentacle", t)
+	first_person_extension:set_first_person_mode(false)
+	first_person_extension:set_wanted_player_height("grabbed_by_tentacle", t)
 
 	local status_extension = self.status_extension
 	local tentacle_unit = status_extension.grabbed_by_tentacle_unit
@@ -45,8 +45,8 @@ PlayerCharacterStateGrabbedByTentacle.on_enter = function (self, unit, input, dt
 	self.nav_world = self.nav_world or Managers.state.entity:system("ai_system"):nav_world()
 	local locomotion_extension = self.locomotion_extension
 
-	locomotion_extension.enable_script_driven_no_mover_movement(locomotion_extension)
-	locomotion_extension.enable_rotation_towards_velocity(locomotion_extension, false)
+	locomotion_extension:enable_script_driven_no_mover_movement()
+	locomotion_extension:enable_rotation_towards_velocity(false)
 
 	local grabbed_by_tentacle_status = CharacterStateHelper.grabbed_by_tentacle_status(status_extension)
 	local states = PlayerCharacterStateGrabbedByTentacle.states
@@ -79,7 +79,7 @@ end
 PlayerCharacterStateGrabbedByTentacle.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local status_extension = self.status_extension
 
-	status_extension.set_grabbed_by_tentacle(status_extension, false)
+	status_extension:set_grabbed_by_tentacle(false)
 
 	local camera_state = self.camera_state
 	local include_local_player = camera_state ~= "first_person" or false
@@ -89,7 +89,7 @@ PlayerCharacterStateGrabbedByTentacle.on_exit = function (self, unit, input, dt,
 	local player = self.player
 	local camera_system = Managers.state.entity:system("camera_system")
 
-	camera_system.set_follow_unit(camera_system, player)
+	camera_system:set_follow_unit(player)
 
 	if self.grabbed_by_tentacle_status ~= "portal_consume" then
 		local locomotion_extension = self.locomotion_extension
@@ -101,14 +101,14 @@ PlayerCharacterStateGrabbedByTentacle.on_exit = function (self, unit, input, dt,
 			CharacterStateHelper.change_camera_state(player, "follow")
 
 			if camera_state == "first_person" then
-				first_person_extension.set_first_person_mode(first_person_extension, true)
+				first_person_extension:set_first_person_mode(true)
 			else
-				first_person_extension.toggle_visibility(first_person_extension, CameraTransitionSettings.perspective_transition_time)
+				first_person_extension:toggle_visibility(CameraTransitionSettings.perspective_transition_time)
 			end
 
-			locomotion_extension.reset_maximum_upwards_velocity(locomotion_extension)
-			locomotion_extension.enable_script_driven_movement(locomotion_extension)
-			locomotion_extension.enable_rotation_towards_velocity(locomotion_extension, true)
+			locomotion_extension:reset_maximum_upwards_velocity()
+			locomotion_extension:enable_script_driven_movement()
+			locomotion_extension:enable_rotation_towards_velocity(true)
 		end
 
 		local nav_world = self.nav_world
@@ -116,7 +116,7 @@ PlayerCharacterStateGrabbedByTentacle.on_exit = function (self, unit, input, dt,
 		local navmesh_position = self.tentacle_spline_extension.tentacle_data.last_target_pos:unbox()
 
 		if navmesh_position then
-			locomotion_extension.teleport_to(locomotion_extension, navmesh_position)
+			locomotion_extension:teleport_to(navmesh_position)
 		end
 	end
 
@@ -137,7 +137,7 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 		run = function (parent, unit, t, dt)
 			local current_pos = Unit.world_position(unit, parent.hips_node)
 			local nav_world = parent.nav_world
-			local wanted_velocity = parent.get_drag_velocity(parent, current_pos, t, dt)
+			local wanted_velocity = parent:get_drag_velocity(current_pos, t, dt)
 			local new_pos = current_pos + wanted_velocity
 			local hit, hit_pos, distance, normal, actor = PhysicsWorld.immediate_raycast(parent.physics_world, current_pos, Vector3(0, 0, -1), 1, "all", "collision_filter", "filter_ledge_test")
 
@@ -173,7 +173,7 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 					local camera_system = Managers.state.entity:system("camera_system")
 					local camera_attach_node = parent.tentacle_template.portal_camera_node
 
-					camera_system.set_follow_unit(camera_system, player, portal_unit, camera_attach_node)
+					camera_system:set_follow_unit(player, portal_unit, camera_attach_node)
 
 					parent.camera_state = "portal"
 				end
@@ -224,7 +224,7 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 			}
 			local csm = parent.csm
 
-			csm.change_state(csm, "dead", params)
+			csm:change_state("dead", params)
 		end,
 		run = function (parent, unit, t, dt)
 			return
@@ -246,7 +246,7 @@ PlayerCharacterStateGrabbedByTentacle.states = {
 			if parent.wait_for_release < t then
 				local csm = parent.csm
 
-				csm.change_state(csm, "standing")
+				csm:change_state("standing")
 			end
 		end,
 		leave = function (parent, unit)
@@ -260,7 +260,7 @@ PlayerCharacterStateGrabbedByTentacle.get_drag_velocity = function (self, player
 	local spline = self.tentacle_spline_extension.spline
 	local tentacle_data = self.tentacle_spline_extension.tentacle_data
 	local out_dist = (tentacle_data.portal_spawn_type == "floor" and 3.3) or 2.5
-	local spline_pos = spline.get_point_at_distance(spline, self.winding_dist - out_dist)
+	local spline_pos = spline:get_point_at_distance(self.winding_dist - out_dist)
 	local travel_to_node_index = self.tentacle_spline_extension.tentacle_data.travel_to_node_index
 	local to_portal_along_spline, swing_vec = nil
 
@@ -307,13 +307,13 @@ PlayerCharacterStateGrabbedByTentacle.update = function (self, unit, input, dt, 
 
 	if not status_extension.grabbed_by_tentacle or not Unit.alive(tentacle_unit) then
 		if CharacterStateHelper.is_waiting_for_assisted_respawn(status_extension) then
-			csm.change_state(csm, "waiting_for_assisted_respawn")
+			csm:change_state("waiting_for_assisted_respawn")
 		elseif CharacterStateHelper.is_knocked_down(status_extension) then
-			csm.change_state(csm, "knocked_down")
+			csm:change_state("knocked_down")
 		elseif CharacterStateHelper.is_dead(status_extension) then
-			csm.change_state(csm, "dead")
+			csm:change_state("dead")
 		else
-			csm.change_state(csm, "standing")
+			csm:change_state("standing")
 		end
 
 		return

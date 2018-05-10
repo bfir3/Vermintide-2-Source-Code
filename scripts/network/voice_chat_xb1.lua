@@ -62,10 +62,10 @@ VoiceChatXboxOneManager.remove_local_user = function (self)
 end
 
 VoiceChatXboxOneManager._remove_all_users = function (self)
-	self.remove_local_user(self)
+	self:remove_local_user()
 
 	for xuid, _ in pairs(self._remote_users) do
-		self.remove_remote_user(self, xuid)
+		self:remove_remote_user(xuid)
 	end
 
 	table.clear(self._remote_users)
@@ -87,16 +87,16 @@ end
 
 VoiceChatXboxOneManager.set_enabled = function (self, enabled)
 	if enabled then
-		self.add_local_user(self)
+		self:add_local_user()
 	else
-		self._remove_all_users(self)
+		self:_remove_all_users()
 	end
 end
 
 VoiceChatXboxOneManager.bandwitdth_disable_voip = function (self)
 	self._popup_id = Managers.popup:queue_popup(Localize("popup_voice_chat_disabled_low_bandwidth"), Localize("popup_voice_chat_disabled_low_bandwidth_header"), "ok", Localize("menu_ok"))
 
-	self._remove_all_users(self)
+	self:_remove_all_users()
 
 	self._bandwidth_disabled = true
 end
@@ -164,8 +164,8 @@ VoiceChatXboxOneManager.unmute_all_users = function (self)
 end
 
 VoiceChatXboxOneManager.update = function (self, dt, t)
-	self._handle_popups(self)
-	self._update_members(self)
+	self:_handle_popups()
+	self:_update_members()
 end
 
 VoiceChatXboxOneManager._handle_popups = function (self)
@@ -189,10 +189,10 @@ VoiceChatXboxOneManager._update_members = function (self)
 		local lobby = Managers.state.network:lobby()
 
 		if lobby then
-			local lobby_members = lobby.members(lobby)
+			local lobby_members = lobby:members()
 
-			if lobby_members.check_members_changed(lobby_members) or self._force_update_members then
-				self._update_members_changed(self, lobby)
+			if lobby_members:check_members_changed() or self._force_update_members then
+				self:_update_members_changed(lobby)
 			end
 		end
 	end
@@ -210,13 +210,13 @@ VoiceChatXboxOneManager._update_members_changed = function (self, lobby)
 	table.clear(XUIDS_TO_REMOVE)
 
 	local my_xuid = Managers.account:xbox_user_id()
-	local members = lobby.members(lobby):get_members()
+	local members = lobby:members():get_members()
 
 	for _, peer_id in pairs(members) do
-		local xuid = lobby.xuid(lobby, peer_id)
+		local xuid = lobby:xuid(peer_id)
 
 		if xuid ~= my_xuid and not self._remote_users[xuid] then
-			self.add_remote_user(self, xuid, peer_id)
+			self:add_remote_user(xuid, peer_id)
 		end
 
 		REMOTE_XUIDS[xuid] = true
@@ -229,7 +229,7 @@ VoiceChatXboxOneManager._update_members_changed = function (self, lobby)
 	end
 
 	for xuid, _ in pairs(XUIDS_TO_REMOVE) do
-		self.remove_remote_user(self, xuid)
+		self:remove_remote_user(xuid)
 	end
 
 	self._force_update_members = nil

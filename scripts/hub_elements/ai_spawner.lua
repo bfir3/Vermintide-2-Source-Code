@@ -12,7 +12,7 @@ AISpawner.init = function (self, world, unit)
 	self._max_amount = 0
 
 	if Unit.has_data(unit, "spawner_settings") then
-		local spawner_name = self.check_for_enabled(self)
+		local spawner_name = self:check_for_enabled()
 
 		if spawner_name ~= nil then
 			local terror_event_id = Unit.get_data(unit, "terror_event_id")
@@ -92,7 +92,7 @@ end
 
 AISpawner.on_activate = function (self, amount, breeds, breed_list)
 	if breed_list then
-		self.add_breeds(self, breed_list)
+		self:add_breeds(breed_list)
 	else
 		self._breed_list = nil
 		self._breeds = breeds
@@ -110,11 +110,11 @@ end
 AISpawner.update = function (self, unit, input, dt, context, t)
 	if self._next_spawn < t then
 		if self._spawned_units < self._max_amount then
-			self.spawn_unit(self)
+			self:spawn_unit()
 
 			self._next_spawn = t + 1 / self._config.spawn_rate
 		else
-			self.on_deactivate(self)
+			self:on_deactivate()
 		end
 	end
 end
@@ -164,11 +164,11 @@ AISpawner.spawn_unit = function (self)
 	end
 
 	local spawn_animation = spawn_type == "horde" and animation_events[math.random(#animation_events)]
-	local spawner_name = self.get_spawner_name(self)
+	local spawner_name = self:get_spawner_name()
 	local optional_data = nil
 
-	conflict_director.spawn_queued_unit(conflict_director, breed, Vector3Box(spawn_pos), QuaternionBox(spawn_rotation), spawn_category, spawn_animation, spawn_type, optional_data, group_template)
-	conflict_director.add_horde(conflict_director, 1)
+	conflict_director:spawn_queued_unit(breed, Vector3Box(spawn_pos), QuaternionBox(spawn_rotation), spawn_category, spawn_animation, spawn_type, optional_data, group_template)
+	conflict_director:add_horde(1)
 
 	self._spawned_units = self._spawned_units + 1
 

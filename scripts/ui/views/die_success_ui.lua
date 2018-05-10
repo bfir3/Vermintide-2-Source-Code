@@ -5,7 +5,7 @@ DieSuccessUI.init = function (self, ui_renderer, input_manager, scenegraph_id)
 	self.ui_renderer = ui_renderer
 	self.input_manager = input_manager
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.scenegraph_id = scenegraph_id
 	self.num_successes = ""

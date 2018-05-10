@@ -19,7 +19,7 @@ function flow_callback_show_gdc_intro(params)
 	if player_unit and Unit.alive(player_unit) then
 		local hud_extension = ScriptUnit.extension(player_unit, "hud_system")
 
-		hud_extension.gdc_intro_active(hud_extension, true)
+		hud_extension:gdc_intro_active(true)
 	end
 end
 
@@ -228,7 +228,7 @@ function flow_query_number_of_active_players(params)
 		local unit = player_units[i]
 		local status_extension = ScriptUnit.extension(unit, "status_system")
 
-		if not status_extension.is_disabled(status_extension) then
+		if not status_extension:is_disabled() then
 			output_value = output_value + 1
 		end
 	end
@@ -246,17 +246,17 @@ end
 
 function flow_callback_idle_camera_dummy_spawned(params)
 	local entity_manager = Managers.state.entity
-	local camera_system = entity_manager.system(entity_manager, "camera_system")
+	local camera_system = entity_manager:system("camera_system")
 
-	camera_system.idle_camera_dummy_spawned(camera_system, params.unit)
+	camera_system:idle_camera_dummy_spawned(params.unit)
 end
 
 function flow_callback_pickup_gizmo_spawned(params)
 	local entity_manager = Managers.state.entity
-	local pickup_system = entity_manager.system(entity_manager, "pickup_system")
+	local pickup_system = entity_manager:system("pickup_system")
 
 	if pickup_system then
-		pickup_system.pickup_gizmo_spawned(pickup_system, params.unit)
+		pickup_system:pickup_gizmo_spawned(params.unit)
 	end
 end
 
@@ -282,11 +282,11 @@ end
 
 function flow_callback_activate_triggered_pickup_spawners(params)
 	local entity_manager = Managers.state.entity
-	local pickup_system = entity_manager.system(entity_manager, "pickup_system")
+	local pickup_system = entity_manager:system("pickup_system")
 	local spawned_unit = nil
 
 	if Managers.player.is_server or LEVEL_EDITOR_TEST then
-		spawned_unit = pickup_system.activate_triggered_pickup_spawners(pickup_system, params.triggered_spawn_id)
+		spawned_unit = pickup_system:activate_triggered_pickup_spawners(params.triggered_spawn_id)
 	end
 
 	flow_return_table.spawned_pickup_unit = spawned_unit
@@ -300,7 +300,7 @@ function flow_query_wielded_weapon(params)
 
 	if ScriptUnit.has_extension(player_unit, "inventory_system") then
 		local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-		equipment = inventory_extension.equipment(inventory_extension)
+		equipment = inventory_extension:equipment()
 	else
 		equipment = Unit.get_data(player_unit, "equipment")
 	end
@@ -361,8 +361,8 @@ function flow_callback_play_network_synched_particle_effect(params)
 	local rotation_offset = params.rotation_offset or Quaternion.identity()
 	local linked = params.linked or false
 	local network_manager = Managers.state.network
-	local game = network_manager.game(network_manager)
-	local game_object_id = unit and linked and network_manager.unit_game_object_id(network_manager, unit)
+	local game = network_manager:game()
+	local game_object_id = unit and linked and network_manager:unit_game_object_id(unit)
 
 	assert(game, "[flow_callback_play_network_synched_particle_effect] Trying to spawn effect with no network game running.")
 	assert(not unit or not linked or game_object_id, "[flow_callback_play_network_synched_particle_effect] Trying to spawn effect linked to unit not network_synched.")
@@ -588,7 +588,7 @@ function flow_callback_play_voice(params)
 	local dialogue_input = ScriptUnit.has_extension_input(playing_unit, "dialogue_system")
 
 	if dialogue_input then
-		dialogue_input.play_voice(dialogue_input, event_name, use_occlusion)
+		dialogue_input:play_voice(event_name, use_occlusion)
 	end
 end
 
@@ -707,7 +707,7 @@ function flow_callback_thrown_projectile_bounce(params)
 	if Unit.alive(unit) and ScriptUnit.has_extension(unit, "projectile_system") then
 		local ext = ScriptUnit.extension(unit, "projectile_system")
 
-		ext.flow_cb_bounce(ext, params.hit_unit, params.hit_actor, params.position, params.normal)
+		ext:flow_cb_bounce(params.hit_unit, params.hit_actor, params.position, params.normal)
 	end
 end
 
@@ -824,7 +824,7 @@ function flow_callback_projectile_bounce(params)
 	local impulse_force = params.impulse_force
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.bounce(locomotion_extension, touching_unit, position, normal, separation_distance, impulse_force)
+	locomotion_extension:bounce(touching_unit, position, normal, separation_distance, impulse_force)
 end
 
 local temp = {}
@@ -877,7 +877,7 @@ function flow_callback_trigger_dialogue_event(params)
 			event_table[params.argument3_name] = tonumber(params.argument3) or params.argument3
 		end
 
-		dialogue_input.trigger_dialogue_event(dialogue_input, params.concept, event_table)
+		dialogue_input:trigger_dialogue_event(params.concept, event_table)
 	else
 		print(string.format("[flow_callback_trigger_dialogue_event] No extension found belonging to system \"dialogue_system\" for unit %s", tostring(unit)))
 	end
@@ -907,7 +907,7 @@ function flow_callback_register_transport_navmesh_units(params)
 	local end_unit = params.end_unit
 	local transportation_extension = ScriptUnit.extension(unit, "transportation_system")
 
-	transportation_extension.register_navmesh_units(transportation_extension, start_unit, end_unit)
+	transportation_extension:register_navmesh_units(start_unit, end_unit)
 end
 
 function flow_callback_set_door_state_and_duration(params)
@@ -917,7 +917,7 @@ function flow_callback_set_door_state_and_duration(params)
 	local speed = params.speed
 	local door_extension = ScriptUnit.extension(unit, "door_system")
 
-	door_extension.set_door_state_and_duration(door_extension, new_door_state, frames, speed)
+	door_extension:set_door_state_and_duration(new_door_state, frames, speed)
 end
 
 function flow_callback_set_door_state(params)
@@ -925,7 +925,7 @@ function flow_callback_set_door_state(params)
 	local new_door_state = params.new_door_state
 	local door_extension = ScriptUnit.extension(unit, "door_system")
 
-	door_extension.set_door_state(door_extension, new_door_state)
+	door_extension:set_door_state(new_door_state)
 end
 
 function flow_callback_door_animation_played(params)
@@ -934,7 +934,7 @@ function flow_callback_door_animation_played(params)
 	local speed = params.speed
 	local door_extension = ScriptUnit.extension(unit, "door_system")
 
-	door_extension.animation_played(door_extension, frames, speed)
+	door_extension:animation_played(frames, speed)
 end
 
 function flow_callback_set_valid_ai_target(params)
@@ -959,7 +959,7 @@ function flow_callback_objective_entered_socket_zone(params)
 		local objective_unit = params.objective_unit
 		local objective_socket_extension = ScriptUnit.extension(socket_unit, "objective_socket_system")
 
-		objective_socket_extension.objective_entered_zone_server(objective_socket_extension, objective_unit)
+		objective_socket_extension:objective_entered_zone_server(objective_unit)
 	end
 end
 
@@ -999,7 +999,7 @@ function flow_callback_ussingen_barrel_challenge_completed(params)
 			if 3 <= num_valid_barrels then
 				local statistics_db = Managers.player:statistics_db()
 
-				statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+				statistics_db:increment_stat_and_sync_to_clients(stat_name)
 			end
 		end
 	end
@@ -1030,38 +1030,38 @@ end
 function flow_callback_volume_system_register_damage_volume(params)
 	local volume_system = Managers.state.entity:system("volume_system")
 
-	volume_system.register_volume(volume_system, params.volume_name, "damage_volume", params)
+	volume_system:register_volume(params.volume_name, "damage_volume", params)
 end
 
 function flow_callback_volume_system_register_movement_volume(params)
 	local volume_system = Managers.state.entity:system("volume_system")
 
-	volume_system.register_volume(volume_system, params.volume_name, "movement_volume", params)
+	volume_system:register_volume(params.volume_name, "movement_volume", params)
 end
 
 function flow_callback_volume_system_register_location_volume(params)
 	local volume_system = Managers.state.entity:system("volume_system")
 	local location_id = NetworkLookup.locations[params.location]
 
-	volume_system.register_volume(volume_system, params.volume_name, "location_volume", params)
+	volume_system:register_volume(params.volume_name, "location_volume", params)
 end
 
 function flow_callback_volume_system_register_trigger_volume(params)
 	local volume_system = Managers.state.entity:system("volume_system")
 
-	volume_system.register_volume(volume_system, params.volume_name, "trigger_volume", params)
+	volume_system:register_volume(params.volume_name, "trigger_volume", params)
 end
 
 function flow_callback_volume_system_register_despawn_volume(params)
 	local volume_system = Managers.state.entity:system("volume_system")
 
-	volume_system.register_volume(volume_system, params.volume_name, "despawn_volume", params)
+	volume_system:register_volume(params.volume_name, "despawn_volume", params)
 end
 
 function flow_callback_volume_system_unregister_volume(params)
 	local volume_system = Managers.state.entity:system("volume_system")
 
-	volume_system.unregister_volume(volume_system, params.volume_name)
+	volume_system:unregister_volume(params.volume_name)
 end
 
 function flow_callback_intro_cutscene_show_location(params)
@@ -1074,12 +1074,12 @@ function flow_callback_intro_cutscene_show_location(params)
 
 	local hud_extension = ScriptUnit.extension(player_unit, "hud_system")
 
-	hud_extension.set_current_location(hud_extension, params.location)
+	hud_extension:set_current_location(params.location)
 end
 
 function flow_callback_local_player_profile_switch(params)
 	local player = Managers.player:local_player()
-	local profile_index = player.profile_index(player)
+	local profile_index = player:profile_index()
 	local profile = SPProfiles[profile_index]
 	local profile_name = profile.display_name
 	local returns = {
@@ -1098,7 +1098,7 @@ function flow_callback_set_allowed_nav_tag_volume_layer(params)
 	local allowed = params.allowed
 	local ai_system = Managers.state.entity:system("ai_system")
 
-	ai_system.set_allowed_layer(ai_system, layer_name, allowed)
+	ai_system:set_allowed_layer(layer_name, allowed)
 end
 
 function flow_callback_register_spline_properties(params)
@@ -1106,7 +1106,7 @@ function flow_callback_register_spline_properties(params)
 	local despawn_patrol_at_end_of_spline = params.despawn_patrol_at_end_of_spline
 	local ai_group_system = Managers.state.entity:system("ai_group_system")
 
-	ai_group_system.register_spline_properties(ai_group_system, spline_name, {
+	ai_group_system:register_spline_properties(spline_name, {
 		despawn_patrol_at_end_of_spline = despawn_patrol_at_end_of_spline
 	})
 end
@@ -1120,7 +1120,7 @@ function flow_callback_register_sound_environment(params)
 	local environment_state = params.environment_state
 	local sound_environment_system = Managers.state.entity:system("sound_environment_system")
 
-	sound_environment_system.register_sound_environment(sound_environment_system, volume_name, prio, ambient_sound_event, fade_time, aux_bus_name, environment_state)
+	sound_environment_system:register_sound_environment(volume_name, prio, ambient_sound_event, fade_time, aux_bus_name, environment_state)
 end
 
 function flow_callback_wwise_trigger_event_with_environment(params)
@@ -1151,7 +1151,7 @@ function flow_callback_wwise_trigger_event_with_environment(params)
 	end
 
 	if Vector3.is_valid(position) then
-		sound_environment_system.set_source_environment(sound_environment_system, source, position)
+		sound_environment_system:set_source_environment(source, position)
 	end
 
 	local id = WwiseWorld.trigger_event(wwise_world, event, use_occlusion, source)
@@ -1185,7 +1185,7 @@ function flow_callback_wwise_create_environment_sampled_source(params)
 		fassert(false, "Missing unit or position in wwise environment sampled source creation flow node in unit %s", unit)
 	end
 
-	sound_environment_system.set_source_environment(sound_environment_system, source, pos)
+	sound_environment_system:set_source_environment(source, pos)
 
 	flow_return_table.source_id = source
 
@@ -1198,7 +1198,7 @@ function flow_callback_wwise_register_source_environment_update(params)
 
 	local sound_environment_system = Managers.state.entity:system("sound_environment_system")
 
-	sound_environment_system.register_source_environment_update(sound_environment_system, params.source_id, params.unit)
+	sound_environment_system:register_source_environment_update(params.source_id, params.unit)
 end
 
 function flow_callback_wwise_unregister_source_environment_update(params)
@@ -1206,14 +1206,14 @@ function flow_callback_wwise_unregister_source_environment_update(params)
 
 	local sound_environment_system = Managers.state.entity:system("sound_environment_system")
 
-	sound_environment_system.unregister_source_environment_update(sound_environment_system, params.source_id)
+	sound_environment_system:unregister_source_environment_update(params.source_id)
 end
 
 function flow_callback_clear_linked_projectiles(params)
 	local unit = params.unit
 	local projectile_linker_system = Managers.state.entity:system("projectile_linker_system")
 
-	projectile_linker_system.clear_linked_projectiles(projectile_linker_system, unit)
+	projectile_linker_system:clear_linked_projectiles(unit)
 end
 
 function flow_callback_activate_cutscene_camera(params)
@@ -1235,13 +1235,13 @@ function flow_callback_activate_cutscene_camera(params)
 	local letterbox_enabled = not params.letterbox_disabled
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 
-	cutscene_system.flow_cb_activate_cutscene_camera(cutscene_system, camera_unit, transition_data, ingame_hud_enabled, letterbox_enabled)
+	cutscene_system:flow_cb_activate_cutscene_camera(camera_unit, transition_data, ingame_hud_enabled, letterbox_enabled)
 end
 
 function flow_callback_deactivate_cutscene_cameras(params)
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 
-	cutscene_system.flow_cb_deactivate_cutscene_cameras(cutscene_system)
+	cutscene_system:flow_cb_deactivate_cutscene_cameras()
 end
 
 function flow_callback_activate_cutscene_logic(params)
@@ -1250,26 +1250,26 @@ function flow_callback_activate_cutscene_logic(params)
 	local event_on_skip = params.event_on_skip
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 
-	cutscene_system.flow_cb_activate_cutscene_logic(cutscene_system, player_input_enabled, event_on_activate, event_on_skip)
+	cutscene_system:flow_cb_activate_cutscene_logic(player_input_enabled, event_on_activate, event_on_skip)
 end
 
 function flow_callback_deactivate_cutscene_logic(params)
 	local event_on_deactivate = params.event_on_deactivate
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 
-	cutscene_system.flow_cb_deactivate_cutscene_logic(cutscene_system, event_on_deactivate)
+	cutscene_system:flow_cb_deactivate_cutscene_logic(event_on_deactivate)
 end
 
 function flow_callback_cutscene_fx_fade(params)
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 
-	cutscene_system.flow_cb_cutscene_effect(cutscene_system, "fx_fade", params)
+	cutscene_system:flow_cb_cutscene_effect("fx_fade", params)
 end
 
 function flow_callback_cutscene_fx_text_popup(params)
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 
-	cutscene_system.flow_cb_cutscene_effect(cutscene_system, "fx_text_popup", params)
+	cutscene_system:flow_cb_cutscene_effect("fx_text_popup", params)
 end
 
 function flow_callback_start_tutorial_intro_text(params)
@@ -1289,7 +1289,7 @@ function flow_callback_start_mission(params)
 	else
 		local mission_system = Managers.state.entity:system("mission_system")
 
-		mission_system.flow_callback_start_mission(mission_system, mission_name, params.unit)
+		mission_system:flow_callback_start_mission(mission_name, params.unit)
 	end
 end
 
@@ -1306,7 +1306,7 @@ function flow_callback_update_mission(params)
 	else
 		local mission_system = Managers.state.entity:system("mission_system")
 
-		mission_system.flow_callback_update_mission(mission_system, mission_name)
+		mission_system:flow_callback_update_mission(mission_name)
 	end
 end
 
@@ -1323,7 +1323,7 @@ function flow_callback_end_mission(params)
 	else
 		local mission_system = Managers.state.entity:system("mission_system")
 
-		mission_system.flow_callback_end_mission(mission_system, mission_name)
+		mission_system:flow_callback_end_mission(mission_name)
 	end
 end
 
@@ -1332,7 +1332,7 @@ function flow_callback_show_health_bar(params)
 
 	local tutorial_system = Managers.state.entity:system("tutorial_system")
 
-	tutorial_system.flow_callback_show_health_bar(tutorial_system, params.unit, params.show)
+	tutorial_system:flow_callback_show_health_bar(params.unit, params.show)
 end
 
 function flow_callback_spawn_tutorial_bot(params)
@@ -1382,7 +1382,7 @@ function flow_callback_get_players_and_bots(params)
 
 		if Unit.alive(unit) and ScriptUnit.extension(unit, "health_system"):is_alive() then
 			unit_list_n = unit_list_n + 1
-			local profile_index = player.profile_index(player)
+			local profile_index = player:profile_index()
 			unit_list[profile_index] = unit
 		end
 	end
@@ -1406,7 +1406,7 @@ function flow_is_carrying_explosive_barrel(params)
 
 	if ScriptUnit.has_extension(player_unit, "inventory_system") then
 		local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-		equipment = inventory_extension.equipment(inventory_extension)
+		equipment = inventory_extension:equipment()
 	else
 		equipment = Unit.get_data(player_unit, "equipment")
 	end
@@ -1436,7 +1436,7 @@ function flow_callback_teleport_unit(params)
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
 	if locomotion_extension.teleport_to then
-		locomotion_extension.teleport_to(locomotion_extension, position, rotation)
+		locomotion_extension:teleport_to(position, rotation)
 	end
 
 	local bot = Unit.get_data(unit, "bot")
@@ -1444,7 +1444,7 @@ function flow_callback_teleport_unit(params)
 	if bot then
 		local navigation_extension = ScriptUnit.extension(unit, "ai_navigation_system")
 
-		navigation_extension.teleport(navigation_extension, position)
+		navigation_extension:teleport(position)
 	end
 end
 
@@ -1458,7 +1458,7 @@ function flow_query_slots_status(params)
 
 	if ScriptUnit.has_extension(player_unit, "inventory_system") then
 		local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-		equipment = inventory_extension.equipment(inventory_extension)
+		equipment = inventory_extension:equipment()
 	end
 
 	local slot_healthkit = equipment.slots.slot_healthkit
@@ -1487,7 +1487,7 @@ function flow_callback_damage_player_bot_ai(params)
 		local damage_direction = Vector3.up()
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
-		health_extension.add_damage(health_extension, unit, damage, hit_zone_name, damage_type, damage_direction)
+		health_extension:add_damage(unit, damage, hit_zone_name, damage_type, damage_direction)
 	end
 end
 
@@ -1505,10 +1505,10 @@ function flow_callback_get_health_player_bot_ai(params)
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 		local status_extension = ScriptUnit.extension(unit, "status_system")
 
-		if status_extension.is_knocked_down(status_extension) or status_extension.is_ready_for_assisted_respawn(status_extension) then
+		if status_extension:is_knocked_down() or status_extension:is_ready_for_assisted_respawn() then
 			current_health = 0
 		else
-			current_health = health_extension.current_health(health_extension)
+			current_health = health_extension:current_health()
 		end
 	end
 
@@ -1524,7 +1524,7 @@ function flow_callback_clear_slot(params)
 	if ScriptUnit.has_extension(player_unit, "inventory_system") then
 		local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
 
-		inventory_extension.destroy_slot(inventory_extension, slot_name)
+		inventory_extension:destroy_slot(slot_name)
 	end
 end
 
@@ -1549,7 +1549,7 @@ function flow_callback_kill_player_bot_ai(params)
 
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
-		health_extension.die(health_extension)
+		health_extension:die()
 	end
 end
 
@@ -1566,10 +1566,10 @@ function flow_callback_overcharge_heal_unit(params)
 
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
-		health_extension.add_heal(health_extension, unit, health_added, nil, "n/a")
+		health_extension:add_heal(unit, health_added, nil, "n/a")
 
-		local unit_health = health_extension.current_health(health_extension)
-		local unit_damage = health_extension.get_damage_taken(health_extension)
+		local unit_health = health_extension:current_health()
+		local unit_damage = health_extension:get_damage_taken()
 		flow_return_table.current_health = unit_health
 		flow_return_table.current_damage = unit_damage
 
@@ -1588,7 +1588,7 @@ function flow_callback_overcharge_init_unit(params)
 		local hit_zone_name = "full"
 		local attack_direction = Vector3.up()
 
-		health_extension.add_damage(health_extension, unit, init_damage, hit_zone_name, "destructible_level_object_hit", attack_direction, "wounded_degen")
+		health_extension:add_damage(unit, init_damage, hit_zone_name, "destructible_level_object_hit", attack_direction, "wounded_degen")
 	end
 end
 
@@ -1599,7 +1599,7 @@ function flow_callback_overcharge_sync_damage(params)
 	local health_extension = ScriptUnit.extension(unit, "health_system")
 	local attack_direction = Vector3.up()
 
-	health_extension.add_damage(health_extension, unit, damage, hit_zone_name, "destructible_level_object_hit", attack_direction, "wounded_degen")
+	health_extension:add_damage(unit, damage, hit_zone_name, "destructible_level_object_hit", attack_direction, "wounded_degen")
 end
 
 function flow_callback_overcharge_damage_unit(params)
@@ -1617,7 +1617,7 @@ function flow_callback_overcharge_damage_unit(params)
 		local attack_direction = Vector3.up()
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
-		health_extension.add_damage(health_extension, unit, damage, hit_zone_name, "destructible_level_object_hit", attack_direction, "wounded_degen")
+		health_extension:add_damage(unit, damage, hit_zone_name, "destructible_level_object_hit", attack_direction, "wounded_degen")
 	end
 end
 
@@ -1630,8 +1630,8 @@ function flow_callback_overcharge_reset_unit(params)
 
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
-		health_extension.set_max_health(health_extension, max_health)
-		health_extension.set_current_damage(health_extension, 0)
+		health_extension:set_max_health(max_health)
+		health_extension:set_current_damage(0)
 	end
 end
 
@@ -1663,7 +1663,7 @@ function flow_callback_enable_climb_unit(params)
 	if Unit.alive(unit) then
 		local nav_graph_system = Managers.state.entity:system("nav_graph_system")
 
-		nav_graph_system.init_nav_graph_from_flow(nav_graph_system, unit)
+		nav_graph_system:init_nav_graph_from_flow(unit)
 	end
 end
 
@@ -1732,7 +1732,7 @@ function flow_callback_enable_poison_wind(params)
 	local enable = params.enable
 	local area_damage_system = Managers.state.entity:system("area_damage_system")
 
-	area_damage_system.enable_area_damage(area_damage_system, unit, enable)
+	area_damage_system:enable_area_damage(unit, enable)
 end
 
 function flow_callback_objective_unit_set_active(params)
@@ -1743,7 +1743,7 @@ function flow_callback_objective_unit_set_active(params)
 	local unit = params.unit
 	local extension = ScriptUnit.extension(unit, "tutorial_system")
 
-	extension.set_active(extension, params.active)
+	extension:set_active(params.active)
 end
 
 function flow_callback_umbra_set_gate_closed(params)
@@ -1807,9 +1807,9 @@ function flow_callback_synced_animation(params)
 	local animation_event = params.animation_event
 	local game = Managers.state.network:game()
 	local unit_storage = Managers.state.unit_storage
-	local go_id = unit_storage.go_id(unit_storage, unit)
+	local go_id = unit_storage:go_id(unit)
 	local animation_synced_unit_id = GameSession.game_object_field(game, go_id, "animation_synced_unit_id")
-	local target_unit = unit_storage.unit(unit_storage, animation_synced_unit_id)
+	local target_unit = unit_storage:unit(animation_synced_unit_id)
 
 	if target_unit and animation_event and Unit.has_animation_event(target_unit, animation_event) then
 		Unit.animation_event(target_unit, animation_event)
@@ -1866,7 +1866,7 @@ function flow_callback_damage_unit(params)
 		local attack_direction = Vector3.up()
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
-		health_extension.add_damage(health_extension, unit, damage, hit_zone_name, "destructible_level_object_hit", attack_direction, "wounded_degen")
+		health_extension:add_damage(unit, damage, hit_zone_name, "destructible_level_object_hit", attack_direction, "wounded_degen")
 	end
 end
 
@@ -1952,7 +1952,7 @@ function flow_callback_unit_spawner_mark_for_deletion(params)
 
 	local unit_spawner = Managers.state.unit_spawner
 
-	unit_spawner.mark_for_deletion(unit_spawner, params.unit)
+	unit_spawner:mark_for_deletion(params.unit)
 end
 
 function flow_callback_breakable_object_destroyed(params)
@@ -1972,9 +1972,9 @@ function flow_callback_breakable_object_destroyed(params)
 			return
 		end
 
-		local stats_id = player.stats_id(player)
+		local stats_id = player:stats_id()
 
-		statistics_db.increment_stat(statistics_db, stats_id, "dynamic_objects_destroyed")
+		statistics_db:increment_stat(stats_id, "dynamic_objects_destroyed")
 		Unit.set_data(unit, "destroyed_dynamic", true)
 	end
 end
@@ -1984,14 +1984,14 @@ function flow_callback_add_subtitle(params)
 	local subtitle = params.subtitle
 	local hud_system = Managers.state.entity:system("hud_system")
 
-	hud_system.add_subtitle(hud_system, speaker, subtitle)
+	hud_system:add_subtitle(speaker, subtitle)
 end
 
 function flow_callback_remove_subtitle(params)
 	local speaker = params.speaker
 	local hud_system = Managers.state.entity:system("hud_system")
 
-	hud_system.remove_subtitle(hud_system, speaker)
+	hud_system:remove_subtitle(speaker)
 end
 
 function flow_callback_fade_in_game_logo(params)
@@ -1999,7 +1999,7 @@ function flow_callback_fade_in_game_logo(params)
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 
 	if cutscene_system then
-		cutscene_system.fade_game_logo(cutscene_system, true, fade_time)
+		cutscene_system:fade_game_logo(true, fade_time)
 	end
 end
 
@@ -2008,7 +2008,7 @@ function flow_callback_fade_out_game_logo(params)
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 
 	if cutscene_system then
-		cutscene_system.fade_game_logo(cutscene_system, false, fade_time)
+		cutscene_system:fade_game_logo(false, fade_time)
 	end
 end
 
@@ -2027,7 +2027,7 @@ function flow_callback_enter_post_game(params)
 	local network_server = network_manager.network_server
 
 	if network_server then
-		network_server.enter_post_game(network_server)
+		network_server:enter_post_game()
 		print("flow_callback_enter_post_game")
 	end
 end
@@ -2157,7 +2157,7 @@ function flow_callback_show_difficulty(params)
 	if Unit.alive(player_unit) then
 		local hud_extension = ScriptUnit.extension(player_unit, "hud_system")
 
-		hud_extension.set_current_location(hud_extension, Localize("dlc1_2_survival_difficulty_increase") .. " " .. Localize("difficulty_" .. params.difficulty))
+		hud_extension:set_current_location(Localize("dlc1_2_survival_difficulty_increase") .. " " .. Localize("difficulty_" .. params.difficulty))
 	end
 end
 
@@ -2219,7 +2219,7 @@ function flow_callback_enable_end_level_area(params)
 		local from = -params.left_back_down_extents
 		local to = params.right_forward_up_extents
 
-		game_mode_manager.activate_end_level_area(game_mode_manager, unit, object, from, to)
+		game_mode_manager:activate_end_level_area(unit, object, from, to)
 	end
 end
 
@@ -2232,7 +2232,7 @@ function flow_callback_debug_end_level_area(params)
 		local from = -params.left_back_down_extents
 		local to = params.right_forward_up_extents
 
-		game_mode_manager.debug_end_level_area(game_mode_manager, unit, object, from, to)
+		game_mode_manager:debug_end_level_area(unit, object, from, to)
 	end
 end
 
@@ -2240,7 +2240,7 @@ function flow_callback_disable_end_level_area(params)
 	local game_mode_manager = Managers.state.game_mode
 
 	if game_mode_manager.is_server then
-		game_mode_manager.disable_end_level_area(game_mode_manager, params.unit)
+		game_mode_manager:disable_end_level_area(params.unit)
 	end
 end
 
@@ -2302,7 +2302,7 @@ function flow_callback_broadphase_deal_damage(params)
 		local damage = settings.difficulty_damage[Managers.state.difficulty:get_difficulty()]
 
 		for _, player in pairs(Managers.player:players()) do
-			local player_controlled = player.is_player_controlled(player)
+			local player_controlled = player:is_player_controlled()
 			local unit = player.player_unit
 
 			if (hits_bot_players and not player_controlled) or (hits_human_players and player_controlled and Unit.alive(unit) and Vector3.distance(pos, POSITION_LOOKUP[unit]) < radius) then
@@ -2367,8 +2367,8 @@ function flow_callback_barrel_explode(params)
 	local unit = params.unit
 	local health_extension = ScriptUnit.extension(unit, "health_system")
 
-	health_extension.set_max_health(health_extension, 1)
-	health_extension.add_damage(health_extension, unit, 1, "full", "grenade", Vector3(1, 0, 0))
+	health_extension:set_max_health(1)
+	health_extension:add_damage(unit, 1, "full", "grenade", Vector3(1, 0, 0))
 end
 
 function flow_callback_set_game_mode_variable(params)
@@ -2386,7 +2386,7 @@ function flow_callback_activate_payload(params)
 	local unit = params.payload_unit
 	local extension = ScriptUnit.extension(unit, "payload_system")
 
-	extension.activate(extension)
+	extension:activate()
 end
 
 function flow_callback_deactivate_payload(params)
@@ -2394,7 +2394,7 @@ function flow_callback_deactivate_payload(params)
 	local extension = ScriptUnit.extension(unit, "payload_system")
 	local stop = params.force_stop
 
-	extension.deactivate(extension, stop)
+	extension:deactivate(stop)
 end
 
 function flow_callback_activate_end_zone(params)
@@ -2403,14 +2403,14 @@ function flow_callback_activate_end_zone(params)
 	local props_ext = ScriptUnit.extension(unit, "props_system")
 	local always_activated = Unit.get_data(unit, "always_activated")
 
-	props_ext.activate(props_ext, activate, always_activated)
+	props_ext:activate(activate, always_activated)
 end
 
 function flow_callback_tutorial_restrict_camera_rotation(params)
 	local angle = params.angle
 	local restrict = params.restrict
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
+	local local_player = player_manager:local_player()
 
 	fassert(local_player, "[flow_callback_restrict_camera_rotation] The local player is not available")
 
@@ -2424,7 +2424,7 @@ function flow_callback_tutorial_restrict_camera_rotation(params)
 		fassert(angle, "[flow_callback_restrict_camera_rotation] You need to specify an angle when turning on rotation restriction")
 	end
 
-	first_person_ext.tutorial_restrict_camera_rotation(first_person_ext, restrict, angle)
+	first_person_ext:tutorial_restrict_camera_rotation(restrict, angle)
 end
 
 function flow_callback_prioritize_objective_tooltips(params)
@@ -2441,15 +2441,15 @@ local function split_string(text, sep)
 	local pos = 1
 
 	while true do
-		local b, e = text.find(text, sep, pos)
+		local b, e = text:find(sep, pos)
 
 		if not b then
-			table.insert(lines, text.sub(text, pos))
+			table.insert(lines, text:sub(pos))
 
 			break
 		end
 
-		table.insert(lines, text.sub(text, pos, b - 1))
+		table.insert(lines, text:sub(pos, b - 1))
 
 		pos = e + 1
 	end
@@ -2563,32 +2563,32 @@ function flow_callback_enforce_player_positions(params)
 		else
 			local status_ext = ScriptUnit.extension(unit, "status_system")
 
-			if status_ext.is_disabled(status_ext) and not status_ext.is_ready_for_assisted_respawn(status_ext) and not status_ext.is_dead(status_ext) then
-				health_system.suicide(health_system, unit)
+			if status_ext:is_disabled() and not status_ext:is_ready_for_assisted_respawn() and not status_ext:is_dead() then
+				health_system:suicide(unit)
 			end
 		end
 	end
 
 	for i, unit in pairs(PLAYER_AND_BOT_UNITS) do
-		local owner = player_manager.owner(player_manager, unit)
+		local owner = player_manager:owner(unit)
 
-		if owner and not owner.is_player_controlled(owner) then
+		if owner and not owner:is_player_controlled() then
 			local pos = PLAYER_AND_BOT_POSITIONS[i]
 			local pos_ok = Level.is_point_inside_volume(level, volume_name, pos) == inside
 
 			if not pos_ok then
 				local status_ext = ScriptUnit.extension(unit, "status_system")
-				local disabled = status_ext.is_disabled(status_ext)
-				local in_respawn = status_ext.is_ready_for_assisted_respawn(status_ext)
-				local dead = status_ext.is_dead(status_ext)
+				local disabled = status_ext:is_disabled()
+				local in_respawn = status_ext:is_ready_for_assisted_respawn()
+				local dead = status_ext:is_dead()
 
 				if disabled and not in_respawn and not dead then
-					health_system.suicide(health_system, unit)
+					health_system:suicide(unit)
 				elseif not in_respawn and not dead and valid_position then
 					local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
-					local current_rotation = locomotion_extension.current_rotation(locomotion_extension)
+					local current_rotation = locomotion_extension:current_rotation()
 
-					locomotion_extension.teleport_to(locomotion_extension, valid_position, current_rotation)
+					locomotion_extension:teleport_to(valid_position, current_rotation)
 				end
 			end
 		end
@@ -2603,7 +2603,7 @@ function flow_callback_tutorial_enable_equipment(params)
 	local enable = params.enable
 	local wield_anim = params.wield_anim
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
+	local local_player = player_manager:local_player()
 
 	fassert(local_player, "[flow_callback_tutorial_enable_equipment] The local player is not available")
 
@@ -2613,7 +2613,7 @@ function flow_callback_tutorial_enable_equipment(params)
 
 	local first_person_ext = ScriptUnit.extension(local_player_unit, "first_person_system")
 
-	first_person_ext.tutorial_show_first_person_units(first_person_ext, enable)
+	first_person_ext:tutorial_show_first_person_units(enable)
 
 	local actions_to_allow = {
 		action_two_release = true,
@@ -2634,12 +2634,12 @@ function flow_callback_tutorial_enable_equipment(params)
 	if enable then
 		if wield_anim then
 			local first_person_ext = ScriptUnit.extension(local_player_unit, "first_person_system")
-			local first_person_unit = first_person_ext.get_first_person_unit(first_person_ext)
+			local first_person_unit = first_person_ext:get_first_person_unit()
 
 			Unit.animation_event(first_person_unit, wield_anim)
 		end
 
-		local disallowed_input = player_input.disallowed_input_table(player_input)
+		local disallowed_input = player_input:disallowed_input_table()
 
 		for action, _ in pairs(actions_to_allow) do
 			disallowed_input[action] = nil
@@ -2647,16 +2647,16 @@ function flow_callback_tutorial_enable_equipment(params)
 
 		local game_mode = Managers.state.game_mode:game_mode()
 
-		game_mode.disable_hud(game_mode, false)
+		game_mode:disable_hud(false)
 	else
-		local disallowed_input = player_input.disallowed_input_table(player_input)
+		local disallowed_input = player_input:disallowed_input_table()
 
 		table.merge(disallowed_input, actions_to_allow)
-		player_input.set_disallowed_inputs(player_input, disallowed_input)
+		player_input:set_disallowed_inputs(disallowed_input)
 
 		local game_mode = Managers.state.game_mode:game_mode()
 
-		game_mode.disable_hud(game_mode, true)
+		game_mode:disable_hud(true)
 	end
 end
 
@@ -2697,36 +2697,36 @@ function flow_callbacks_add_tutorial_equipment(params)
 	local player_unit = player.player_unit
 	local inventory_ext = ScriptUnit.extension(player_unit, "inventory_system")
 
-	inventory_ext.add_equipment(inventory_ext, slot_name, item_data, nil, nil, starting_ammo)
+	inventory_ext:add_equipment(slot_name, item_data, nil, nil, starting_ammo)
 
 	if slot_name == "slot_melee" then
-		inventory_ext.wield(inventory_ext, "slot_melee")
+		inventory_ext:wield("slot_melee")
 	else
-		inventory_ext.wield(inventory_ext, "slot_ranged")
+		inventory_ext:wield("slot_ranged")
 	end
 end
 
 local function enabled_inputs(player_input, inputs_table, enabled)
 	if enabled then
-		local disallowed_input = player_input.disallowed_input_table(player_input)
+		local disallowed_input = player_input:disallowed_input_table()
 
 		for action, _ in pairs(inputs_table) do
 			disallowed_input[action] = nil
 		end
 
-		player_input.set_disallowed_inputs(player_input, disallowed_input)
-		player_input.set_allowed_inputs(player_input, inputs_table)
+		player_input:set_disallowed_inputs(disallowed_input)
+		player_input:set_allowed_inputs(inputs_table)
 	else
-		local disallowed_input = player_input.disallowed_input_table(player_input)
+		local disallowed_input = player_input:disallowed_input_table()
 
 		table.merge(disallowed_input, inputs_table)
-		player_input.set_disallowed_inputs(player_input, disallowed_input)
+		player_input:set_disallowed_inputs(disallowed_input)
 	end
 end
 
 function flow_callbacks_tutorial_inputs_enabled(params)
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
+	local local_player = player_manager:local_player()
 
 	fassert(local_player, "[flow_callbacks_tutorial_inputs_enabled] The local player is not available")
 
@@ -2805,7 +2805,7 @@ end
 function flow_callbacks_tutorial_enable_weapon_switching(params)
 	local enable = params.enable
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
+	local local_player = player_manager:local_player()
 
 	fassert(local_player, "[flow_callbacks_tutorial_enable_weapon_switching] The local player is not available")
 
@@ -2834,31 +2834,31 @@ function flow_callbacks_tutorial_enable_weapon_switching(params)
 	local player_input = ScriptUnit.extension(local_player_unit, "input_system")
 
 	if enable then
-		local disallowed_input = player_input.disallowed_input_table(player_input)
+		local disallowed_input = player_input:disallowed_input_table()
 
 		for action, _ in pairs(switch_actions) do
 			disallowed_input[action] = nil
 		end
 	else
-		local disallowed_input = player_input.disallowed_input_table(player_input)
+		local disallowed_input = player_input:disallowed_input_table()
 
 		table.merge(disallowed_input, switch_actions)
-		player_input.set_disallowed_inputs(player_input, disallowed_input)
+		player_input:set_disallowed_inputs(disallowed_input)
 	end
 end
 
 function flow_callbacks_tutorial_enable_career_skill(params)
 	local enable = params.enable
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
+	local local_player = player_manager:local_player()
 	local unit = local_player.player_unit
 	local career_extension = ScriptUnit.extension(unit, "career_system")
 
 	if not enable then
-		career_extension.start_activated_ability_cooldown(career_extension, 0)
-		career_extension.set_activated_ability_cooldown_paused(career_extension)
+		career_extension:start_activated_ability_cooldown(0)
+		career_extension:set_activated_ability_cooldown_paused()
 	else
-		career_extension.start_activated_ability_cooldown(career_extension, 1)
+		career_extension:start_activated_ability_cooldown(1)
 	end
 end
 
@@ -2867,7 +2867,7 @@ function flow_callback_enable_bot_loot(params)
 	local play_go_tutorial_system = Managers.state.entity:system("play_go_tutorial_system")
 
 	if play_go_tutorial_system then
-		play_go_tutorial_system.enable_bot_loot(play_go_tutorial_system, enable)
+		play_go_tutorial_system:enable_bot_loot(enable)
 	end
 end
 
@@ -2875,7 +2875,7 @@ function flow_callback_enable_bot_portrait(params)
 	local bot_display_name = params.bot_display_name
 	local play_go_tutorial_system = Managers.state.entity:system("play_go_tutorial_system")
 
-	play_go_tutorial_system.set_bot_portrait_enabled(play_go_tutorial_system, bot_display_name)
+	play_go_tutorial_system:set_bot_portrait_enabled(bot_display_name)
 end
 
 function flow_callback_set_player_invincibility(params)
@@ -2917,7 +2917,7 @@ function flow_callback_set_player_in_hanging_cage(params)
 			}
 		end
 
-		status_extension.set_in_hanging_cage(status_extension, true, cage_unit, state, animations)
+		status_extension:set_in_hanging_cage(true, cage_unit, state, animations)
 	end
 end
 
@@ -2935,7 +2935,7 @@ function flow_callback_set_player_fall_height(params)
 				assert(false, "Trying to set falling height on unit not owned")
 			end
 		else
-			status_ext.set_falling_height(status_ext, true)
+			status_ext:set_falling_height(true)
 		end
 	end
 end

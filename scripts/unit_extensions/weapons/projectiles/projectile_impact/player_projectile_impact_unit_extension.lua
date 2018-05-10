@@ -52,16 +52,16 @@ PlayerProjectileImpactUnitExtension.update = function (self, unit, input, dt, co
 	local static_impact_type = self.static_impact_type
 
 	if impact_type == "raycast" then
-		self.update_raycast(self, unit, input, dt, context, t)
+		self:update_raycast(unit, input, dt, context, t)
 	elseif impact_type == "sphere_sweep" then
 		if static_impact_type == "sphere_sweep" then
-			self.update_sphere_sweep(self, unit, input, dt, context, t, self.radius, self.enemy_collision_filter)
-			self.update_sphere_sweep(self, unit, input, dt, context, t, self.radius * 0.25, self.static_collision_filter)
+			self:update_sphere_sweep(unit, input, dt, context, t, self.radius, self.enemy_collision_filter)
+			self:update_sphere_sweep(unit, input, dt, context, t, self.radius * 0.25, self.static_collision_filter)
 		elseif static_impact_type == "raycast" then
-			self.update_sphere_sweep(self, unit, input, dt, context, t, self.radius, self.enemy_collision_filter)
-			self.update_raycast(self, unit, input, dt, context, t, self.static_collision_filter)
+			self:update_sphere_sweep(unit, input, dt, context, t, self.radius, self.enemy_collision_filter)
+			self:update_raycast(unit, input, dt, context, t, self.static_collision_filter)
 		else
-			self.update_sphere_sweep(self, unit, input, dt, context, t, self.radius, self.collision_filter)
+			self:update_sphere_sweep(unit, input, dt, context, t, self.radius, self.collision_filter)
 		end
 	else
 		local action_lookup_data = self.action_lookup_data
@@ -81,11 +81,11 @@ local INDEX_ACTOR = 4
 PlayerProjectileImpactUnitExtension.update_raycast = function (self, unit, input, dt, context, t, override_collision_filter)
 	local locomotion_extension = self.locomotion_extension
 
-	if not locomotion_extension.moved_this_frame(locomotion_extension) then
+	if not locomotion_extension:moved_this_frame() then
 		return
 	end
 
-	local velocity = locomotion_extension.current_velocity(locomotion_extension)
+	local velocity = locomotion_extension:current_velocity()
 	local cached_position = POSITION_LOOKUP[unit]
 	local moved_position = cached_position + velocity
 	local physics_world = self.physics_world
@@ -93,14 +93,14 @@ PlayerProjectileImpactUnitExtension.update_raycast = function (self, unit, input
 	local last_position = self.last_position
 
 	if last_position then
-		self._do_raycast(self, unit, last_position.unbox(last_position), cached_position, physics_world, collision_filter)
+		self:_do_raycast(unit, last_position:unbox(), cached_position, physics_world, collision_filter)
 	else
 		last_position = Vector3Box()
 		self.last_position = last_position
 	end
 
-	last_position.store(last_position, cached_position)
-	self._do_raycast(self, unit, cached_position, moved_position, physics_world, collision_filter)
+	last_position:store(cached_position)
+	self:_do_raycast(unit, cached_position, moved_position, physics_world, collision_filter)
 end
 
 PlayerProjectileImpactUnitExtension._do_raycast = function (self, unit, from, to, physics_world, collision_filter)
@@ -143,7 +143,7 @@ PlayerProjectileImpactUnitExtension._do_raycast = function (self, unit, from, to
 			end
 
 			assert(actor_index, "No actor index")
-			self.impact(self, hit_unit, hit_position, direction, hit_normal, actor_index)
+			self:impact(hit_unit, hit_position, direction, hit_normal, actor_index)
 		end
 	end
 end
@@ -151,12 +151,12 @@ end
 PlayerProjectileImpactUnitExtension.update_sphere_sweep = function (self, unit, input, dt, context, t, radius, collision_filter)
 	local locomotion_extension = self.locomotion_extension
 
-	if not locomotion_extension.moved_this_frame(locomotion_extension) then
+	if not locomotion_extension:moved_this_frame() then
 		return
 	end
 
 	local offset = Vector3(0, 0, self.scene_query_height_offset)
-	local velocity = locomotion_extension.current_velocity(locomotion_extension)
+	local velocity = locomotion_extension:current_velocity()
 	local cached_position = POSITION_LOOKUP[unit] + offset
 	local moved_position = cached_position + velocity + offset
 	local physics_world = self.physics_world
@@ -194,7 +194,7 @@ PlayerProjectileImpactUnitExtension.update_sphere_sweep = function (self, unit, 
 				end
 
 				assert(actor_index, "No actor index")
-				self.impact(self, hit_unit, hit_position, direction, hit_normal, actor_index)
+				self:impact(hit_unit, hit_position, direction, hit_normal, actor_index)
 			end
 		end
 	end

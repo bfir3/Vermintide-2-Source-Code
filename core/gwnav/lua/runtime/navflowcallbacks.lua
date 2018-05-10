@@ -19,28 +19,28 @@ end
 GwNavFlowCallbacks.destroy_navworld = function (t)
 	local world = NavWorld.get_navworld(Unit.level(t.unit))
 
-	world.shutdown(world)
+	world:shutdown()
 end
 
 GwNavFlowCallbacks.update_navworld = function (t)
 	local world = NavWorld.get_navworld(Unit.level(t.unit))
 
-	world.update(world, t.delta_time)
+	world:update(t.delta_time)
 end
 
 GwNavFlowCallbacks.add_navmesh = function (t)
 	local world = NavWorld.get_navworld(Unit.level(t.unit))
 
-	world.add_navdata(world, t.name)
+	world:add_navdata(t.name)
 end
 
 GwNavFlowCallbacks.create_navbot = function (t)
 	local world = NavWorld.get_navworld(Unit.level(t.unit))
 
 	if t.bot_configuration ~= nil then
-		world.init_bot_from_unit(world, t.unit, t.bot_configuration)
+		world:init_bot_from_unit(t.unit, t.bot_configuration)
 	else
-		world.init_bot(world, t.unit)
+		world:init_bot(t.unit)
 	end
 end
 
@@ -48,7 +48,7 @@ GwNavFlowCallbacks.destroy_navbot = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		bot.shutdown(bot)
+		bot:shutdown()
 	end
 end
 
@@ -56,7 +56,7 @@ GwNavFlowCallbacks.navbot_velocity = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		t.input_velocity = bot.velocity(bot)
+		t.input_velocity = bot:velocity()
 	else
 		t.input_velocity = Vector3(0, 0, 0)
 	end
@@ -68,7 +68,7 @@ GwNavFlowCallbacks.navbot_output_velocity = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		t.output_velocity = bot.output_velocity(bot)
+		t.output_velocity = bot:output_velocity()
 	else
 		t.output_velocity = Vector3(0, 0, 0)
 	end
@@ -80,7 +80,7 @@ GwNavFlowCallbacks.navbot_local_output_velocity = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		t.local_output_velocity = Matrix4x4.transform_without_translation(Matrix4x4.inverse(Unit.local_pose(t.unit, 1)), bot.output_velocity(bot))
+		t.local_output_velocity = Matrix4x4.transform_without_translation(Matrix4x4.inverse(Unit.local_pose(t.unit, 1)), bot:output_velocity())
 	else
 		t.local_output_velocity = Vector3(0, 0, 0)
 	end
@@ -104,7 +104,7 @@ GwNavFlowCallbacks.set_navbot_destination = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		bot.set_destination(bot, t.destination)
+		bot:set_destination(t.destination)
 	end
 end
 
@@ -112,7 +112,7 @@ GwNavFlowCallbacks.navbot_move_unit = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		bot.move_unit(bot, t.delta_time)
+		bot:move_unit(t.delta_time)
 	end
 end
 
@@ -120,7 +120,7 @@ GwNavFlowCallbacks.navbot_move_unit_with_mover = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		bot.move_unit_with_mover(bot, t.delta_time, t.gravity)
+		bot:move_unit_with_mover(t.delta_time, t.gravity)
 	end
 end
 
@@ -131,7 +131,7 @@ GwNavFlowCallbacks.set_navbot_route = function (t)
 		local bot = NavBot.get_navbot(t.unit)
 
 		if bot then
-			bot.set_route(bot, route.positions(route))
+			bot:set_route(route:positions())
 		end
 	end
 end
@@ -140,7 +140,7 @@ GwNavFlowCallbacks.navbot_set_layer_cost_multiplier = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		bot.set_layer_cost_multiplier(bot, t.layer, t.cost)
+		bot:set_layer_cost_multiplier(t.layer, t.cost)
 	end
 end
 
@@ -148,7 +148,7 @@ GwNavFlowCallbacks.navbot_allow_layer = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		bot.allow_layer(bot, t.layer)
+		bot:allow_layer(t.layer)
 	end
 end
 
@@ -156,7 +156,7 @@ GwNavFlowCallbacks.navbot_forbid_layer = function (t)
 	local bot = NavBot.get_navbot(t.unit)
 
 	if bot then
-		bot.forbid_layer(bot, t.layer)
+		bot:forbid_layer(t.layer)
 	end
 end
 
@@ -171,35 +171,35 @@ GwNavFlowCallbacks.add_position_to_route = function (t)
 	local route = routes[t.route_id]
 
 	if route then
-		route.add_position(route, Unit.local_position(t.unit, 1))
+		route:add_position(Unit.local_position(t.unit, 1))
 	end
 end
 
 GwNavFlowCallbacks.navboxobstacle_create = function (t)
 	local world = NavWorld.get_navworld(Unit.level(t.world_unit))
 
-	world.add_boxobstacle(world, t.obstacle_unit)
+	world:add_boxobstacle(t.obstacle_unit)
 end
 
 GwNavFlowCallbacks.navboxobstacle_destroy = function (t)
 	local box = NavBoxObstacle.get_navboxstacle(t.obstacle_unit)
 
 	if box then
-		box.shutdown(box)
+		box:shutdown()
 	end
 end
 
 GwNavFlowCallbacks.cylinderobstacle_create = function (t)
 	local world = NavWorld.get_navworld(Unit.level(t.world_unit))
 
-	world.add_cylinderobstacle(world, t.obstacle_unit)
+	world:add_cylinderobstacle(t.obstacle_unit)
 end
 
 GwNavFlowCallbacks.cylinderobstacle_destroy = function (t)
 	local cylinder = NavCylinderObstacle.get_navcylinderostacle(t.obstacle_unit)
 
 	if cylinder then
-		cylinder.shutdown(cylinder)
+		cylinder:shutdown()
 	end
 end
 

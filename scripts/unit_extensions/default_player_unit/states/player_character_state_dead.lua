@@ -15,8 +15,8 @@ PlayerCharacterStateDead.on_enter = function (self, unit, input, dt, context, t,
 
 	local first_person_extension = self.first_person_extension
 
-	first_person_extension.set_wanted_player_height(first_person_extension, "knocked_down", t)
-	first_person_extension.set_first_person_mode(first_person_extension, false)
+	first_person_extension:set_wanted_player_height("knocked_down", t)
+	first_person_extension:set_first_person_mode(false)
 
 	local include_local_player = true
 
@@ -54,7 +54,7 @@ PlayerCharacterStateDead.update = function (self, unit, input, dt, context, t)
 		local override_item_drop_direction = self.override_item_drop_direction and self.override_item_drop_direction:unbox()
 		local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
 
-		inventory_extension.check_and_drop_pickups(inventory_extension, "death", override_item_drop_position, override_item_drop_direction)
+		inventory_extension:check_and_drop_pickups("death", override_item_drop_position, override_item_drop_direction)
 
 		self.items_dropped = true
 	end

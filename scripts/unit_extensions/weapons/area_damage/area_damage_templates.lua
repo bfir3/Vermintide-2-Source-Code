@@ -377,7 +377,7 @@ AreaDamageTemplates.templates = {
 
 					assert(health_extension)
 
-					local is_alive = health_extension.is_alive(health_extension)
+					local is_alive = health_extension:is_alive()
 
 					if is_alive then
 						local die_roll = math.random(1, 100)
@@ -405,12 +405,12 @@ AreaDamageTemplates.templates = {
 				local damage_source_id = NetworkLookup.damage_sources[damage_source]
 				local damage_profile_name = "globadier_gas_cloud"
 				local damage_profile_id = NetworkLookup.damage_profiles[damage_profile_name]
-				local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+				local unit_id = network_manager:unit_game_object_id(unit)
 				local hit_zone_name = "full"
 				local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
 				local weapon_system = Managers.state.entity:system("weapon_system")
 
-				weapon_system.send_rpc_attack_hit(weapon_system, damage_source_id, unit_id, unit_id, hit_zone_id, damage_direction, damage_profile_id, "power_level", power_level, "hit_target_index", nil, "blocking", false, "shield_break_procced", false, "boost_curve_multiplier", 0, "is_critical_strike", false)
+				weapon_system:send_rpc_attack_hit(damage_source_id, unit_id, unit_id, hit_zone_id, damage_direction, damage_profile_id, "power_level", power_level, "hit_target_index", nil, "blocking", false, "shield_break_procced", false, "boost_curve_multiplier", 0, "is_critical_strike", false)
 			end
 		}
 	}

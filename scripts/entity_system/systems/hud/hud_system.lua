@@ -14,7 +14,7 @@ HUDSystem.init = function (self, entity_system_creation_context, system_name)
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.network_transmit = Managers.state.network.network_transmit
 end
@@ -40,7 +40,7 @@ HUDSystem.rpc_set_current_location = function (self, sender, unit_id, location_i
 	local location = NetworkLookup.locations[location_id]
 	local hud_extension = ScriptUnit.extension(unit, "hud_system")
 
-	hud_extension.set_current_location(hud_extension, location)
+	hud_extension:set_current_location(location)
 end
 
 HUDSystem.add_subtitle = function (self, speaker, subtitle)

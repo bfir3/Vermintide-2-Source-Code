@@ -31,7 +31,7 @@ KeepDecorationPaintingExtension.setup = function (self, settings, owned_painting
 		end
 
 		self._paintings = paintings
-		local selected_painting = self._get_selected_painting(self)
+		local selected_painting = self:_get_selected_painting()
 
 		local function on_material_loaded()
 			if Managers.state.network:in_game_session() then
@@ -41,7 +41,7 @@ KeepDecorationPaintingExtension.setup = function (self, settings, owned_painting
 			end
 		end
 
-		self._load_painting_material(self, selected_painting, on_material_loaded)
+		self:_load_painting_material(selected_painting, on_material_loaded)
 	end
 end
 
@@ -62,7 +62,7 @@ end
 
 KeepDecorationPaintingExtension.interacted_with = function (self)
 	local paintings = self._paintings
-	local current_painting = self._get_selected_painting(self)
+	local current_painting = self:_get_selected_painting()
 	local current_painting_index = table.find(paintings, current_painting)
 	local next_painting_index = current_painting_index + 1
 
@@ -84,7 +84,7 @@ KeepDecorationPaintingExtension.interacted_with = function (self)
 		end
 	end
 
-	self._load_painting_material(self, next_painting, on_material_loaded)
+	self:_load_painting_material(next_painting, on_material_loaded)
 end
 
 KeepDecorationPaintingExtension.hot_join_sync = function (self, sender)
@@ -94,9 +94,9 @@ end
 KeepDecorationPaintingExtension.distributed_update = function (self)
 	if self._is_leader then
 		if self._waiting_for_game_session and Managers.state.network:in_game_session() then
-			local selected_painting = self._get_selected_painting(self)
+			local selected_painting = self:_get_selected_painting()
 
-			self._create_game_object(self, selected_painting)
+			self:_create_game_object(selected_painting)
 
 			self._waiting_for_game_session = false
 		end
@@ -111,7 +111,7 @@ KeepDecorationPaintingExtension.distributed_update = function (self)
 				self._go_painting_index = painting_index
 				local painting = self._paintings_lookup[painting_index]
 
-				self._load_painting_material(self, painting, nil)
+				self:_load_painting_material(painting, nil)
 			end
 		end
 	end
@@ -120,7 +120,7 @@ end
 KeepDecorationPaintingExtension._get_selected_painting = function (self)
 	local backend_key = self._backend_key
 	local backend_interface = Managers.backend:get_interface("keep_decorations")
-	local selected_painting = backend_interface.get(backend_interface, backend_key)
+	local selected_painting = backend_interface:get(backend_key)
 	local paintings = self._paintings
 
 	if not selected_painting or not table.find(paintings, selected_painting) then
@@ -133,10 +133,10 @@ end
 KeepDecorationPaintingExtension._set_selected_painting = function (self, painting)
 	local backend_key = self._backend_key
 	local backend_manager = Managers.backend
-	local backend_interface = backend_manager.get_interface(backend_manager, "keep_decorations")
+	local backend_interface = backend_manager:get_interface("keep_decorations")
 
-	backend_interface.set(backend_interface, backend_key, painting)
-	backend_manager.commit(backend_manager)
+	backend_interface:set(backend_key, painting)
+	backend_manager:commit()
 end
 
 KeepDecorationPaintingExtension._load_painting_material = function (self, name, cb_done)
@@ -183,7 +183,7 @@ KeepDecorationPaintingExtension.on_game_object_created = function (self, go_id)
 	local painting_index = GameSession.game_object_field(game, go_id, "painting_index")
 	local painting = self._paintings_lookup[painting_index]
 
-	self._load_painting_material(self, painting, nil)
+	self:_load_painting_material(painting, nil)
 
 	self._go_painting_index = painting_index
 	self._go_id = go_id

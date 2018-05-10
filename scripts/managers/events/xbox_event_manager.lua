@@ -43,12 +43,12 @@ XboxEventManager.update = function (self, dt)
 	local priority_event = self._priority_events_queue[1]
 
 	if not priority_event and 0 < self._timer then
-		self._handle_immediate_event(self)
+		self:_handle_immediate_event()
 	elseif self._timer <= 0 then
 		if priority_event then
-			self._handle_priority_event(self, priority_event)
+			self:_handle_priority_event(priority_event)
 		else
-			self._handle_event(self)
+			self:_handle_event()
 		end
 
 		self._timer = TIME_BETWEEN_EVENTS

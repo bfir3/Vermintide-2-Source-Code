@@ -6,7 +6,7 @@ HeroSpawnerHandler.init = function (self, is_server, profile_synchronizer, netwo
 	self.request_id = 0
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, "rpc_to_client_spawn_player")
+	network_event_delegate:register(self, "rpc_to_client_spawn_player")
 end
 
 HeroSpawnerHandler.destroy = function (self)
@@ -40,13 +40,13 @@ HeroSpawnerHandler.start = function (self)
 		local position = Unit.world_position(player_unit, 0)
 		local rotation = Unit.world_rotation(player_unit, 0)
 
-		player.set_spawn_position_rotation(player, position, rotation)
+		player:set_spawn_position_rotation(position, rotation)
 
 		self.despawning_player_unit = player.player_unit
 
 		Managers.state.spawn:delayed_despawn(player)
 	else
-		self.profile_synchronizer:request_select_profile(self.hero_index, player.local_player_id(player))
+		self.profile_synchronizer:request_select_profile(self.hero_index, player:local_player_id())
 	end
 
 	self.pending_profile_request = true
@@ -58,7 +58,7 @@ HeroSpawnerHandler.update = function (self, dt)
 
 		if self.despawning_player_unit then
 			if not Unit.alive(self.despawning_player_unit) then
-				profile_synchronizer.request_select_profile(profile_synchronizer, self.hero_index, self.player:local_player_id())
+				profile_synchronizer:request_select_profile(self.hero_index, self.player:local_player_id())
 
 				self.hero_index = nil
 				self.despawning_player_unit = nil
@@ -68,27 +68,27 @@ HeroSpawnerHandler.update = function (self, dt)
 				end
 			end
 		else
-			local result, result_local_player_id = profile_synchronizer.profile_request_result(profile_synchronizer)
+			local result, result_local_player_id = profile_synchronizer:profile_request_result()
 			local local_player_id = self.player:local_player_id()
 
 			assert(not result or local_player_id == result_local_player_id, "Local player id mismatch between ui and request.")
 
 			if result == "success" then
 				local peer_id = self.peer_id
-				local hero_index = profile_synchronizer.profile_by_peer(profile_synchronizer, peer_id, local_player_id)
+				local hero_index = profile_synchronizer:profile_by_peer(peer_id, local_player_id)
 
 				self.player:set_profile_index(hero_index)
-				self.save_selected_profile(self, hero_index)
+				self:save_selected_profile(hero_index)
 
 				self.result = "success"
 
-				profile_synchronizer.clear_profile_request_result(profile_synchronizer)
+				profile_synchronizer:clear_profile_request_result()
 
 				self.pending_profile_request = nil
 			elseif result then
 				self.result = "failed"
 
-				profile_synchronizer.clear_profile_request_result(profile_synchronizer)
+				profile_synchronizer:clear_profile_request_result()
 
 				self.pending_profile_request = nil
 			end
@@ -101,7 +101,7 @@ HeroSpawnerHandler.save_selected_profile = function (self, index)
 	local save_data = SaveData
 	SaveData.wanted_profile_index = index
 
-	save_manager.auto_save(save_manager, SaveFileName, SaveData, nil)
+	save_manager:auto_save(SaveFileName, SaveData, nil)
 end
 
 HeroSpawnerHandler.query_result = function (self, request_id)

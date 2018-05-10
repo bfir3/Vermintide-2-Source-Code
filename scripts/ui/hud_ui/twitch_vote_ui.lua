@@ -20,7 +20,7 @@ TwitchVoteUI.init = function (self, ingame_ui_context)
 		alpha_multiplier = 1
 	}
 
-	self._create_elements(self)
+	self:_create_elements()
 	Managers.state.event:register(self, "add_vote_ui", "event_add_vote_ui")
 	Managers.state.event:register(self, "finish_vote_ui", "event_finish_vote_ui")
 	Managers.state.event:register(self, "reset_vote_ui", "event_reset_vote_ui")
@@ -34,9 +34,9 @@ TwitchVoteUI.event_add_vote_ui = function (self, vote_key)
 	end
 
 	if vote_data.vote_type == "standard_vote" then
-		self.start_standard_vote(self, vote_data.vote_templates[1], vote_data.vote_templates[2], vote_data.option_strings, vote_key)
+		self:start_standard_vote(vote_data.vote_templates[1], vote_data.vote_templates[2], vote_data.option_strings, vote_key)
 	elseif vote_data.vote_type == "multiple_choice" then
-		self.start_multiple_choice_vote(self, vote_data.vote_templates[1], vote_data.option_strings, vote_key)
+		self:start_multiple_choice_vote(vote_data.vote_templates[1], vote_data.option_strings, vote_key)
 	end
 end
 
@@ -59,9 +59,9 @@ TwitchVoteUI.event_finish_vote_ui = function (self, vote_key, winning_index)
 	}
 
 	if vote_type == "standard_vote" then
-		self.show_ui(self, "standard_vote_result")
+		self:show_ui("standard_vote_result")
 	elseif vote_type == "multiple_choice" then
-		self.show_ui(self, "multiple_choice_result")
+		self:show_ui("multiple_choice_result")
 	end
 
 	Application.error("[TwitchVoteUI] event_finish_vote_ui")
@@ -118,7 +118,7 @@ TwitchVoteUI.start_standard_vote = function (self, vote_template_a_name, vote_te
 	self.active = true
 	self._active_vote = vote
 
-	self.show_ui(self, "standard_vote")
+	self:show_ui("standard_vote")
 end
 
 TwitchVoteUI.start_multiple_choice_vote = function (self, vote_template_name, vote_inputs, vote_key)
@@ -144,7 +144,7 @@ TwitchVoteUI.start_multiple_choice_vote = function (self, vote_template_name, vo
 	self.active = true
 	self._active_vote = vote
 
-	self.show_ui(self, "multiple_choice_vote")
+	self:show_ui("multiple_choice_vote")
 end
 
 TwitchVoteUI.set_visible = function (self, visible)
@@ -174,7 +174,7 @@ TwitchVoteUI.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self._create_elements(self)
+		self:_create_elements()
 
 		self._ui_animations = {}
 		self._animation_callbacks = {}
@@ -191,18 +191,18 @@ TwitchVoteUI.update = function (self, dt, t)
 		end
 	end
 
-	self._update_transition(self, dt)
-	self._draw(self, dt, t)
-	self._update_active_vote(self, dt, t)
+	self:_update_transition(dt)
+	self:_draw(dt, t)
+	self:_update_active_vote(dt, t)
 
 	local ui = self._ui
 
 	if ui == "multiple_choice_vote" then
-		self._update_multiple_votes_ui(self, dt)
+		self:_update_multiple_votes_ui(dt)
 	elseif ui == "standard_vote" then
-		self._update_standard_vote(self, dt)
+		self:_update_standard_vote(dt)
 	elseif ui == "multiple_choice_result" or ui == "standard_vote_result" then
-		self._update_result(self, dt)
+		self:_update_result(dt)
 	end
 end
 
@@ -220,7 +220,7 @@ TwitchVoteUI._update_transition = function (self, dt)
 			self._fade_out = nil
 
 			if self._next_ui then
-				self._show_next_ui(self)
+				self:_show_next_ui()
 			else
 				self.active = false
 			end
@@ -251,7 +251,7 @@ TwitchVoteUI.show_ui = function (self, ui)
 	if self._ui then
 		self._fade_out = true
 	else
-		self._show_next_ui(self)
+		self:_show_next_ui()
 	end
 end
 
@@ -263,13 +263,13 @@ TwitchVoteUI._show_next_ui = function (self)
 	local ui = self._next_ui
 
 	if ui == "multiple_choice_vote" then
-		self._show_multiple_choice_vote(self)
+		self:_show_multiple_choice_vote()
 	elseif ui == "multiple_choice_result" then
-		self._show_multiple_choice_result(self)
+		self:_show_multiple_choice_result()
 	elseif ui == "standard_vote" then
-		self._show_standard_vote(self)
+		self:_show_standard_vote()
 	elseif ui == "standard_vote_result" then
-		self._show_standard_vote_result(self)
+		self:_show_standard_vote_result()
 	end
 
 	self._ui = ui
@@ -286,8 +286,8 @@ TwitchVoteUI._create_vote_icon = function (self, vote_index)
 	local base_name = "vote_icon_" .. self._vote_icon_count
 	local content = self._vote_widget.content
 	local style = self._vote_widget.style
-	local icon = content.icon_texture_func(content, style, vote_index)
-	local offset = content.icon_offset_func(content, style, vote_index)
+	local icon = content:icon_texture_func(style, vote_index)
+	local offset = content:icon_offset_func(style, vote_index)
 	scenegraph_definition[base_name] = {
 		parent = "vote_icon",
 		position = {
@@ -345,31 +345,31 @@ TwitchVoteUI._update_active_vote = function (self, dt, t)
 
 	if 0 < a_diff then
 		for i = 1, a_diff, 1 do
-			self._create_vote_icon(self, 1)
+			self:_create_vote_icon(1)
 		end
 	end
 
 	if 0 < b_diff then
 		for i = 1, b_diff, 1 do
-			self._create_vote_icon(self, 2)
+			self:_create_vote_icon(2)
 		end
 	end
 
 	if 0 < c_diff then
 		for i = 1, c_diff, 1 do
-			self._create_vote_icon(self, 3)
+			self:_create_vote_icon(3)
 		end
 	end
 
 	if 0 < d_diff then
 		for i = 1, d_diff, 1 do
-			self._create_vote_icon(self, 4)
+			self:_create_vote_icon(4)
 		end
 	end
 
 	if 0 < e_diff then
 		for i = 1, e_diff, 1 do
-			self._create_vote_icon(self, 5)
+			self:_create_vote_icon(5)
 		end
 	end
 
@@ -450,16 +450,16 @@ TwitchVoteUI._show_multiple_choice_vote = function (self)
 		self._widgets[widget_name] = UIWidget.init(widget_data)
 	end
 
-	local players = self._sorted_player_list(self)
+	local players = self:_sorted_player_list()
 	local option_strings = active_vote.inputs
 
 	for index, player in pairs(players) do
-		local profile_index = player.profile_index(player)
+		local profile_index = player:profile_index()
 		local player_profile = SPProfiles[profile_index]
 
 		if not player_profile then
 		else
-			local career_index = player.career_index(player)
+			local career_index = player:career_index()
 			local career_settings = player_profile.careers[career_index]
 			local base_portrait = career_settings.portrait_image .. "_twitch"
 			local masked_portrait = career_settings.portrait_image .. "_masked"
@@ -549,13 +549,13 @@ TwitchVoteUI._show_multiple_choice_result = function (self)
 	local human_and_bot_players = Managers.player:human_and_bot_players()
 
 	for peer_id, player in pairs(human_and_bot_players) do
-		local profile_index = player.profile_index(player)
+		local profile_index = player:profile_index()
 
 		if profile_index == winning_index then
-			local name = player.name(player)
+			local name = player:name()
 			winner_text_widget.content.text = name
 			local player_profile = SPProfiles[profile_index]
-			local career_index = player.career_index(player)
+			local career_index = player:career_index()
 			local career_settings = player_profile.careers[career_index]
 			local base_portrait = career_settings.portrait_image
 			winner_portrait_widget.content.portrait = base_portrait
@@ -584,7 +584,7 @@ TwitchVoteUI._update_result = function (self, dt)
 		return
 	end
 
-	self.hide_ui(self)
+	self:hide_ui()
 end
 
 TwitchVoteUI._show_standard_vote = function (self)
@@ -693,8 +693,8 @@ TwitchVoteUI._sorted_player_list = function (self)
 	end
 
 	local function sort_by_profile_index(player_a, player_b)
-		local profile_index_a = player_a.profile_index(player_a)
-		local profile_index_b = player_b.profile_index(player_b)
+		local profile_index_a = player_a:profile_index()
+		local profile_index_b = player_b:profile_index()
 
 		return profile_index_a < profile_index_b
 	end

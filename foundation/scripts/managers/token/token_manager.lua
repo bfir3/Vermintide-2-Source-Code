@@ -16,18 +16,18 @@ TokenManager.update = function (self, dt, t)
 	for id, entry in pairs(self._tokens) do
 		local token = entry.token
 
-		token.update(token)
+		token:update()
 
-		if token.done(token) or entry.timeout <= t then
+		if token:done() or entry.timeout <= t then
 			local callback = entry.callback
 
 			if callback then
-				local info = token.info(token)
+				local info = token:info()
 
 				callback(info)
 			end
 
-			token.close(token)
+			token:close()
 
 			self._tokens[id] = nil
 		end
@@ -38,7 +38,7 @@ TokenManager.destroy = function (self)
 	for id, entry in pairs(self._tokens) do
 		local token = entry.token
 
-		token.close(token)
+		token:close()
 
 		self._tokens[id] = nil
 	end

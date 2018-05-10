@@ -420,15 +420,15 @@ SplashView.init = function (self, input_manager, world)
 	end
 
 	if input_manager then
-		input_manager.create_input_service(input_manager, "splash_view", "SplashScreenKeymaps", "SplashScreenFilters")
-		input_manager.map_device_to_service(input_manager, "splash_view", "keyboard")
-		input_manager.map_device_to_service(input_manager, "splash_view", "gamepad")
-		input_manager.map_device_to_service(input_manager, "splash_view", "mouse")
+		input_manager:create_input_service("splash_view", "SplashScreenKeymaps", "SplashScreenFilters")
+		input_manager:map_device_to_service("splash_view", "keyboard")
+		input_manager:map_device_to_service("splash_view", "gamepad")
+		input_manager:map_device_to_service("splash_view", "mouse")
 
 		self.input_manager = input_manager
 	end
 
-	self._next_splash(self, true)
+	self:_next_splash(true)
 end
 
 SplashView._next_splash = function (self, override_skip)
@@ -468,7 +468,7 @@ SplashView._update_video = function (self, gui, dt)
 				Managers.music:trigger_event(self._current_splash_data.sound_stop)
 			end
 
-			self._next_splash(self)
+			self:_next_splash()
 		else
 			if not self._sound_started then
 				if self._current_splash_data.sound_start then
@@ -505,14 +505,14 @@ SplashView._update_texture = function (self, gui, dt)
 	self._current_splash_data.timer = self._current_splash_data.timer - dt
 
 	if self._current_splash_data.timer <= 0 then
-		self._next_splash(self)
+		self:_next_splash()
 	end
 end
 
 if PLATFORM == "xb1" or PLATFORM == "ps4" then
 	SplashView._wait_for_allow_console_skip = function (self)
 		if self._allow_console_skip then
-			self._next_splash(self)
+			self:_next_splash()
 		end
 	end
 end
@@ -520,7 +520,7 @@ end
 SplashView.set_index = function (self, index)
 	self._current_index = index
 
-	self._next_splash(self)
+	self:_next_splash()
 end
 
 local DO_RELOAD = true
@@ -545,7 +545,7 @@ SplashView._create_ui_elements = function (self)
 
 	self._current_index = self._current_index - 1
 
-	self._next_splash(self)
+	self:_next_splash()
 
 	DO_RELOAD = false
 end
@@ -558,7 +558,7 @@ SplashView.update = function (self, dt)
 	end
 
 	if DO_RELOAD then
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 	end
 
 	local w, h = Gui.resolution()
@@ -571,9 +571,9 @@ SplashView.update = function (self, dt)
 	local skip = nil
 
 	if PLATFORM == "xb1" or PLATFORM == "ps4" then
-		skip = self._get_console_input(self)
+		skip = self:_get_console_input()
 	else
-		skip = input_service.get(input_service, "skip_splash")
+		skip = input_service:get("skip_splash")
 	end
 
 	if skip and (not self._current_splash_data or not self._current_splash_data.forced) then
@@ -589,7 +589,7 @@ SplashView.update = function (self, dt)
 			self._sound_started = false
 		end
 
-		self._next_splash(self)
+		self:_next_splash()
 	elseif self[self._update_func] then
 		self[self._update_func](self, ui_renderer.gui, dt)
 	end

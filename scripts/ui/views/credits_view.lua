@@ -63,10 +63,10 @@ CreditsView.init = function (self, ingame_ui_context)
 	local input_manager = ingame_ui_context.input_manager
 	self.input_manager = input_manager
 
-	input_manager.create_input_service(input_manager, "credits_view", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "credits_view", "keyboard")
-	input_manager.map_device_to_service(input_manager, "credits_view", "mouse")
-	input_manager.map_device_to_service(input_manager, "credits_view", "gamepad")
+	input_manager:create_input_service("credits_view", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("credits_view", "keyboard")
+	input_manager:map_device_to_service("credits_view", "mouse")
+	input_manager:map_device_to_service("credits_view", "gamepad")
 
 	self.num_credits = #credits.entries
 	self.current_offset = 0
@@ -127,15 +127,15 @@ CreditsView.update = function (self, dt)
 
 	local input_manager = self.input_manager
 	local input_service = self.input_manager:get_service("credits_view")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 
-	if input_service.get(input_service, "toggle_menu", true) or (gamepad_active and input_service.get(input_service, "back", true)) then
-		self.exit(self)
+	if input_service:get("toggle_menu", true) or (gamepad_active and input_service:get("back", true)) then
+		self:exit()
 
 		return
 	end
 
-	local input_axis = (gamepad_active and input_service.get(input_service, "gamepad_left_axis")) or input_service.get(input_service, "scroll_axis")
+	local input_axis = (gamepad_active and input_service:get("gamepad_left_axis")) or input_service:get("scroll_axis")
 	local current_offset = math.max(0, (self.current_offset + dt * 50) - input_axis.y * 30)
 	self.current_offset = current_offset
 	local ui_top_renderer = self.ui_top_renderer

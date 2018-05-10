@@ -66,8 +66,8 @@ Development.init_parameters = function ()
 	new_params = {}
 
 	for param, value in pairs(hardcoded_dev_params) do
-		if param.find(param, "_") then
-			new_param = param.gsub(param, "_", "-")
+		if param:find("_") then
+			new_param = param:gsub("_", "-")
 			new_params[new_param] = value
 		end
 	end

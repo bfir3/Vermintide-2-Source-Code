@@ -34,11 +34,11 @@ BTStormVerminAttackAction.enter = function (self, unit, blackboard, t)
 	blackboard.target_unit_status_extension = (ScriptUnit.has_extension(target_unit, "status_system") and ScriptUnit.extension(target_unit, "status_system")) or nil
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
+	network_manager:anim_event(unit, "to_combat")
 
 	blackboard.special_attacking_target = blackboard.target_unit
 
-	self._init_attack(self, unit, blackboard, t)
+	self:_init_attack(unit, blackboard, t)
 
 	if not blackboard.moving_attack then
 		blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
@@ -60,7 +60,7 @@ BTStormVerminAttackAction.enter = function (self, unit, blackboard, t)
 	local target_unit_status_extension = blackboard.target_unit_status_extension
 
 	if target_unit_status_extension then
-		target_unit_status_extension.add_attack_intensity(target_unit_status_extension, attack_intensity * (0.75 + 0.5 * math.random()))
+		target_unit_status_extension:add_attack_intensity(attack_intensity * (0.75 + 0.5 * math.random()))
 	end
 end
 
@@ -116,7 +116,7 @@ BTStormVerminAttackAction._init_attack = function (self, unit, blackboard, t)
 	local bot_threat_duration = action.bot_threat_duration
 
 	if bot_threat_duration and not action.bot_threat_start_time then
-		self._create_bot_threat(self, unit, blackboard)
+		self:_create_bot_threat(unit, blackboard)
 	elseif action.bot_threat_start_time then
 		if blackboard.moving_attack and action.bot_threat_start_time_step then
 			blackboard.bot_threat_at_t = t + action.bot_threat_start_time_step
@@ -150,17 +150,17 @@ BTStormVerminAttackAction.leave = function (self, unit, blackboard, t, reason, d
 	if reset_stagger_count then
 		local ai_base_extension = ScriptUnit.extension(unit, "ai_system")
 
-		ai_base_extension.reset_stagger_count(ai_base_extension)
+		ai_base_extension:reset_stagger_count()
 	end
 
 	blackboard.action = nil
 end
 
 BTStormVerminAttackAction.run = function (self, unit, blackboard, t, dt)
-	self.update_reset_attack(self, unit, t, dt, blackboard)
+	self:update_reset_attack(unit, t, dt, blackboard)
 
 	if Unit.alive(blackboard.special_attacking_target) then
-		self.attack(self, unit, t, dt, blackboard)
+		self:attack(unit, t, dt, blackboard)
 	end
 
 	if blackboard.catapult_hit then
@@ -194,12 +194,12 @@ BTStormVerminAttackAction.run = function (self, unit, blackboard, t, dt)
 		if 0.25 < math.abs(target_speed - blackboard.target_speed) then
 			blackboard.target_speed = target_speed
 
-			navigation_extension.set_max_speed(navigation_extension, math.clamp(target_speed, 0, breed.run_speed))
+			navigation_extension:set_max_speed(math.clamp(target_speed, 0, breed.run_speed))
 		end
 	end
 
 	if Unit.alive(blackboard.special_attacking_target) and blackboard.bot_threat_at_t and blackboard.bot_threat_at_t < t then
-		self._create_bot_threat(self, unit, blackboard)
+		self:_create_bot_threat(unit, blackboard)
 
 		blackboard.bot_threat_at_t = nil
 	end
@@ -214,13 +214,13 @@ BTStormVerminAttackAction._create_bot_threat = function (self, unit, blackboard)
 	if bot_threat_duration then
 		if action.collision_type == "cylinder" then
 			local rot = LocomotionUtils.rotation_towards_unit_flat(unit, blackboard.special_attacking_target)
-			local pos = self._calculate_cylinder_collision(self, action, POSITION_LOOKUP[unit], rot)
+			local pos = self:_calculate_cylinder_collision(action, POSITION_LOOKUP[unit], rot)
 			local size = Vector3(action.radius, action.radius, action.height * 0.5)
 
 			Managers.state.entity:system("ai_bot_group_system"):aoe_threat_created(pos, "cylinder", size, nil, bot_threat_duration)
 		elseif action.collision_type == "oobb" or not action.collision_type then
 			local rot = LocomotionUtils.rotation_towards_unit_flat(unit, blackboard.special_attacking_target)
-			local pos, rot, size = self._calculate_oobb_collision(self, action, POSITION_LOOKUP[unit], rot)
+			local pos, rot, size = self:_calculate_oobb_collision(action, POSITION_LOOKUP[unit], rot)
 
 			Managers.state.entity:system("ai_bot_group_system"):aoe_threat_created(pos, "oobb", size, rot, bot_threat_duration)
 		end
@@ -229,7 +229,7 @@ end
 
 BTStormVerminAttackAction.anim_cb_attack_vce = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 
 	if game and blackboard.target_unit_status_extension then
 		DialogueSystem:TriggerAttack(blackboard.target_unit, unit, false, blackboard)
@@ -268,14 +268,14 @@ BTStormVerminAttackAction.attack = function (self, unit, t, dt, blackboard)
 	local locomotion = ScriptUnit.extension(unit, "locomotion_system")
 	local target_status_ext = blackboard.target_unit_status_extension
 
-	if t < blackboard.attack_rotation_update_timer and target_status_ext and not target_status_ext.get_is_dodging(target_status_ext) and not target_status_ext.is_invisible(target_status_ext) then
+	if t < blackboard.attack_rotation_update_timer and target_status_ext and not target_status_ext:get_is_dodging() and not target_status_ext:is_invisible() then
 		local rotation = LocomotionUtils.rotation_towards_unit_flat(unit, blackboard.special_attacking_target)
 		blackboard.attack_rotation = QuaternionBox(rotation)
 	end
 
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.set_wanted_rotation(locomotion_extension, blackboard.attack_rotation:unbox())
+	locomotion_extension:set_wanted_rotation(blackboard.attack_rotation:unbox())
 end
 
 local debug_drawer_info = {
@@ -305,11 +305,11 @@ BTStormVerminAttackAction.anim_cb_damage = function (self, unit, blackboard)
 	if Development.parameter("debug_weapons") then
 		local drawer = Managers.state.debug:drawer(debug_drawer_info)
 
-		drawer.reset(drawer)
+		drawer:reset()
 
 		local pose = Matrix4x4.from_quaternion_position(rat_rot, oobb_pos)
 
-		drawer.box(drawer, pose, hit_size)
+		drawer:box(pose, hit_size)
 	end
 
 	local hit_units = FrameTable.alloc_table()
@@ -363,7 +363,7 @@ BTStormVerminAttackAction.anim_cb_damage = function (self, unit, blackboard)
 				if not target_status_extension.knocked_down then
 					local player_locomotion = ScriptUnit.extension(target_unit, "locomotion_system")
 
-					player_locomotion.add_external_velocity(player_locomotion, push_speed * shove_dir, action.max_player_push_speed)
+					player_locomotion:add_external_velocity(push_speed * shove_dir, action.max_player_push_speed)
 				end
 			end
 		end

@@ -6,7 +6,7 @@ GameObjectSystem = class(GameObjectSystem, ExtensionSystemBase)
 GameObjectSystem.init = function (self, entity_system_creation_context, system_name)
 	local entity_manager = entity_system_creation_context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self.is_server = entity_system_creation_context.is_server
 	self.unit_storage = entity_system_creation_context.unit_storage

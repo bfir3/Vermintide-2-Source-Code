@@ -28,11 +28,11 @@ end
 
 GameServerManager.update = function (self, dt, t)
 	if Keyboard.pressed(Keyboard.button_index("q")) then
-		self.set_leader_peer_id(self, Network.peer_id())
-		self.set_start_game_params(self, Network.peer_id(), "magnus", "adventure", "hard", false)
+		self:set_leader_peer_id(Network.peer_id())
+		self:set_start_game_params(Network.peer_id(), "magnus", "adventure", "hard", false)
 	end
 
-	self._update_game_server(self, dt, t)
+	self:_update_game_server(dt, t)
 end
 
 GameServerManager.peer_name = function (self, peer_id)
@@ -46,7 +46,7 @@ GameServerManager.remove_peer = function (self, peer_id)
 end
 
 GameServerManager._update_game_server = function (self, dt, t)
-	self._update_leader(self)
+	self:_update_leader()
 end
 
 GameServerManager._update_leader = function (self)
@@ -54,30 +54,30 @@ GameServerManager._update_leader = function (self)
 	local leader = Managers.party:leader()
 
 	if leader ~= nil then
-		for _, peer_id in ipairs(members.get_members_left(members)) do
+		for _, peer_id in ipairs(members:get_members_left()) do
 			if peer_id == leader then
 				printf("Leader left, finding new one..")
 
-				local new_leader_peer_id = self._find_new_leader(self, members.get_members(members))
+				local new_leader_peer_id = self:_find_new_leader(members:get_members())
 
 				if new_leader_peer_id then
-					self.set_leader_peer_id(self, new_leader_peer_id)
+					self:set_leader_peer_id(new_leader_peer_id)
 
 					break
 				end
 
 				printf("No members, wants to restart")
-				self.restart(self)
+				self:restart()
 
 				break
 			end
 		end
 	else
-		local server_members = members.get_members(members)
+		local server_members = members:get_members()
 		local new_leader = server_members[1]
 
 		if new_leader ~= nil then
-			self.set_leader_peer_id(self, new_leader)
+			self:set_leader_peer_id(new_leader)
 		end
 	end
 end
@@ -89,7 +89,7 @@ GameServerManager._find_new_leader = function (self, members)
 end
 
 GameServerManager.register_rpcs = function (self, network_event_delegate)
-	network_event_delegate.register(network_event_delegate, self, unpack(rpcs))
+	network_event_delegate:register(self, unpack(rpcs))
 
 	self._network_event_delegate = network_event_delegate
 end

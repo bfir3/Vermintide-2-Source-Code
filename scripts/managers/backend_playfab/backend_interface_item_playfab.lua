@@ -7,7 +7,7 @@ BackendInterfaceItemPlayfab.init = function (self, backend_mirror)
 	self._backend_mirror = backend_mirror
 	self._modified_templates = {}
 
-	self._refresh(self)
+	self:_refresh()
 end
 
 local loadout_slots = {
@@ -22,15 +22,15 @@ local loadout_slots = {
 }
 
 BackendInterfaceItemPlayfab._refresh = function (self)
-	self._refresh_items(self)
-	self._refresh_loadouts(self)
+	self:_refresh_items()
+	self:_refresh_loadouts()
 
 	self._dirty = false
 end
 
 BackendInterfaceItemPlayfab._refresh_items = function (self)
 	local backend_mirror = self._backend_mirror
-	self._items = backend_mirror.get_all_inventory_items(backend_mirror)
+	self._items = backend_mirror:get_all_inventory_items()
 end
 
 BackendInterfaceItemPlayfab._refresh_loadouts = function (self)
@@ -41,7 +41,7 @@ BackendInterfaceItemPlayfab._refresh_loadouts = function (self)
 		if settings.playfab_name then
 			for i = 1, #loadout_slots, 1 do
 				local slot_name = loadout_slots[i]
-				local item_id = backend_mirror.get_character_data(backend_mirror, career_name, slot_name)
+				local item_id = backend_mirror:get_character_data(career_name, slot_name)
 				loadouts[career_name] = loadouts[career_name] or {}
 				loadouts[career_name][slot_name] = item_id
 			end
@@ -82,7 +82,7 @@ BackendInterfaceItemPlayfab.set_properties_serialized = function (self, backend_
 end
 
 BackendInterfaceItemPlayfab.get_properties = function (self, backend_id)
-	local item = self.get_item_from_id(self, backend_id)
+	local item = self:get_item_from_id(backend_id)
 
 	if item then
 		local properties = item.properties
@@ -94,7 +94,7 @@ BackendInterfaceItemPlayfab.get_properties = function (self, backend_id)
 end
 
 BackendInterfaceItemPlayfab.get_traits = function (self, backend_id)
-	local item = self.get_item_from_id(self, backend_id)
+	local item = self:get_item_from_id(backend_id)
 
 	if item then
 		local traits = item.traits
@@ -118,13 +118,13 @@ BackendInterfaceItemPlayfab.socket_rune = function (self, backend_id, rune_to_in
 end
 
 BackendInterfaceItemPlayfab.get_skin = function (self, backend_id)
-	local item = self.get_item_from_id(self, backend_id)
+	local item = self:get_item_from_id(backend_id)
 
 	return item.skin
 end
 
 BackendInterfaceItemPlayfab.get_item_masterlist_data = function (self, backend_id)
-	local item = self.get_item_from_id(self, backend_id)
+	local item = self:get_item_from_id(backend_id)
 
 	if item then
 		return item.data
@@ -132,33 +132,33 @@ BackendInterfaceItemPlayfab.get_item_masterlist_data = function (self, backend_i
 end
 
 BackendInterfaceItemPlayfab.get_item_amount = function (self, backend_id)
-	local item = self.get_item_from_id(self, backend_id)
+	local item = self:get_item_from_id(backend_id)
 
 	return item.RemainingUses or 1
 end
 
 BackendInterfaceItemPlayfab.get_item_power_level = function (self, backend_id)
-	local item = self.get_item_from_id(self, backend_id)
+	local item = self:get_item_from_id(backend_id)
 	local power_level = item.power_level
 
 	return power_level
 end
 
 BackendInterfaceItemPlayfab.get_item_rarity = function (self, backend_id)
-	local item = self.get_item_from_id(self, backend_id)
+	local item = self:get_item_from_id(backend_id)
 	local rarity = item.rarity
 
 	return rarity
 end
 
 BackendInterfaceItemPlayfab.get_key = function (self, backend_id)
-	local item = self.get_item_from_id(self, backend_id)
+	local item = self:get_item_from_id(backend_id)
 
 	return item.key
 end
 
 BackendInterfaceItemPlayfab.get_item_from_id = function (self, backend_id)
-	local items = self.get_all_backend_items(self)
+	local items = self:get_all_backend_items()
 	local item = items[backend_id]
 
 	return item
@@ -166,7 +166,7 @@ end
 
 BackendInterfaceItemPlayfab.get_all_backend_items = function (self)
 	if self._dirty then
-		self._refresh(self)
+		self:_refresh()
 	end
 
 	return self._items
@@ -174,14 +174,14 @@ end
 
 BackendInterfaceItemPlayfab.get_loadout = function (self)
 	if self._dirty then
-		self._refresh(self)
+		self:_refresh()
 	end
 
 	return self._loadouts
 end
 
 BackendInterfaceItemPlayfab.get_loadout_item_id = function (self, career_name, slot_name)
-	local loadouts = self.get_loadout(self)
+	local loadouts = self:get_loadout()
 
 	return loadouts[career_name][slot_name]
 end
@@ -189,15 +189,15 @@ end
 local empty_params = {}
 
 BackendInterfaceItemPlayfab.get_filtered_items = function (self, filter, params)
-	local all_items = self.get_all_backend_items(self)
+	local all_items = self:get_all_backend_items()
 	local backend_common = Managers.backend:get_interface("common")
-	local items = backend_common.filter_items(backend_common, all_items, filter, params or empty_params)
+	local items = backend_common:filter_items(all_items, filter, params or empty_params)
 
 	return items
 end
 
 BackendInterfaceItemPlayfab.set_loadout_item = function (self, item_id, career_name, slot_name)
-	local all_items = self.get_all_backend_items(self)
+	local all_items = self:get_all_backend_items()
 
 	if item_id then
 		fassert(all_items[item_id], "Trying to equip item that doesn't exist %d", item_id or "nil")
@@ -264,7 +264,7 @@ BackendInterfaceItemPlayfab.make_dirty = function (self)
 end
 
 BackendInterfaceItemPlayfab.has_item = function (self, item_key)
-	local items = self.get_all_backend_items(self)
+	local items = self:get_all_backend_items()
 
 	for backend_id, item in pairs(items) do
 		if item_key == item.key then

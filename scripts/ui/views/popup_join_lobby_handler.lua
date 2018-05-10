@@ -380,17 +380,17 @@ PopupJoinLobbyHandler.init = function (self, ingame_ui_context)
 	local input_manager = ingame_ui_context.input_manager
 	self.input_manager = input_manager
 
-	input_manager.create_input_service(input_manager, "popup_join_lobby_handler", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "popup_join_lobby_handler", "keyboard")
-	input_manager.map_device_to_service(input_manager, "popup_join_lobby_handler", "mouse")
-	input_manager.map_device_to_service(input_manager, "popup_join_lobby_handler", "gamepad")
+	input_manager:create_input_service("popup_join_lobby_handler", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("popup_join_lobby_handler", "keyboard")
+	input_manager:map_device_to_service("popup_join_lobby_handler", "mouse")
+	input_manager:map_device_to_service("popup_join_lobby_handler", "gamepad")
 
 	local input_service = Managers.input:get_service("popup_join_lobby_handler")
 	local gui_layer = scenegraph_definition.window.position[3]
 	self._difficulty = nil
 
 	rawset(_G, "GLOBAL_MM_JL_UI", self)
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.unblocked_services = {}
 	self.unblocked_services_n = 0
@@ -415,7 +415,7 @@ PopupJoinLobbyHandler.create_ui_elements = function (self)
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(scenegraph_definition)
 
 	UIRenderer.clear_scenegraph_queue(self.ui_top_renderer)
-	self._assign_hero_portraits(self)
+	self:_assign_hero_portraits()
 end
 
 PopupJoinLobbyHandler._get_widget = function (self, name)
@@ -426,22 +426,22 @@ PopupJoinLobbyHandler.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	local ui_top_renderer = self.ui_top_renderer
-	local input_service = self.input_service(self)
+	local input_service = self:input_service()
 
 	if self.cancel_timer then
 		self.cancel_timer = math.max(self.cancel_timer - dt, 0)
 		local timer_text = tostring(math.ceil(self.cancel_timer))
 
-		self._set_timer_text(self, timer_text)
+		self:_set_timer_text(timer_text)
 
 		if self.cancel_timer <= 0 then
 			local accepted = false
 
-			self.set_result(self, accepted)
+			self:set_result(accepted)
 		end
 	end
 
@@ -450,10 +450,10 @@ PopupJoinLobbyHandler.update = function (self, dt, t)
 	if self._disable_select_button ~= disable_select_button then
 		self._disable_select_button = disable_select_button
 
-		self.set_select_button_enable_state(self, not disable_select_button)
+		self:set_select_button_enable_state(not disable_select_button)
 	end
 
-	self._handle_input(self, dt, t)
+	self:_handle_input(dt, t)
 
 	for name, animation in pairs(self._ui_animations) do
 		UIAnimation.update(animation, dt)
@@ -463,7 +463,7 @@ PopupJoinLobbyHandler.update = function (self, dt, t)
 		end
 	end
 
-	self.draw(self, ui_top_renderer, input_service, dt)
+	self:draw(ui_top_renderer, input_service, dt)
 end
 
 PopupJoinLobbyHandler.show = function (self, current_profile_index, current_career_index, time_until_cancel, join_by_lobby_browser, difficulty)
@@ -480,29 +480,29 @@ PopupJoinLobbyHandler.show = function (self, current_profile_index, current_care
 	local profile_index = current_profile_index or 1
 	local career_index = current_career_index or 1
 
-	self._select_hero_and_career(self, profile_index, career_index)
+	self:_select_hero_and_career(profile_index, career_index)
 
 	self.cancel_timer = time_until_cancel
 	local input_manager = self.input_manager
-	self.unblocked_services_n = input_manager.get_unblocked_services(input_manager, nil, nil, self.unblocked_services)
+	self.unblocked_services_n = input_manager:get_unblocked_services(nil, nil, self.unblocked_services)
 
-	input_manager.device_block_services(input_manager, "keyboard", 1, self.unblocked_services, self.unblocked_services_n, "popup_join_lobby_handler")
-	input_manager.device_block_services(input_manager, "gamepad", 1, self.unblocked_services, self.unblocked_services_n, "popup_join_lobby_handler")
-	input_manager.device_block_services(input_manager, "mouse", 1, self.unblocked_services, self.unblocked_services_n, "popup_join_lobby_handler")
-	input_manager.device_unblock_service(input_manager, "keyboard", 1, "popup_join_lobby_handler")
-	input_manager.device_unblock_service(input_manager, "gamepad", 1, "popup_join_lobby_handler")
-	input_manager.device_unblock_service(input_manager, "mouse", 1, "popup_join_lobby_handler")
+	input_manager:device_block_services("keyboard", 1, self.unblocked_services, self.unblocked_services_n, "popup_join_lobby_handler")
+	input_manager:device_block_services("gamepad", 1, self.unblocked_services, self.unblocked_services_n, "popup_join_lobby_handler")
+	input_manager:device_block_services("mouse", 1, self.unblocked_services, self.unblocked_services_n, "popup_join_lobby_handler")
+	input_manager:device_unblock_service("keyboard", 1, "popup_join_lobby_handler")
+	input_manager:device_unblock_service("gamepad", 1, "popup_join_lobby_handler")
+	input_manager:device_unblock_service("mouse", 1, "popup_join_lobby_handler")
 end
 
 PopupJoinLobbyHandler.hide = function (self)
 	local input_manager = self.input_manager
 
-	input_manager.device_block_service(input_manager, "keyboard", 1, "popup_join_lobby_handler")
-	input_manager.device_block_service(input_manager, "gamepad", 1, "popup_join_lobby_handler")
-	input_manager.device_block_service(input_manager, "mouse", 1, "popup_join_lobby_handler")
-	input_manager.device_unblock_services(input_manager, "keyboard", 1, self.unblocked_services, self.unblocked_services_n)
-	input_manager.device_unblock_services(input_manager, "gamepad", 1, self.unblocked_services, self.unblocked_services_n)
-	input_manager.device_unblock_services(input_manager, "mouse", 1, self.unblocked_services, self.unblocked_services_n)
+	input_manager:device_block_service("keyboard", 1, "popup_join_lobby_handler")
+	input_manager:device_block_service("gamepad", 1, "popup_join_lobby_handler")
+	input_manager:device_block_service("mouse", 1, "popup_join_lobby_handler")
+	input_manager:device_unblock_services("keyboard", 1, self.unblocked_services, self.unblocked_services_n)
+	input_manager:device_unblock_services("gamepad", 1, self.unblocked_services, self.unblocked_services_n)
+	input_manager:device_unblock_services("mouse", 1, self.unblocked_services, self.unblocked_services_n)
 	table.clear(self.unblocked_services)
 
 	self.unblocked_services_n = 0
@@ -558,27 +558,27 @@ end
 PopupJoinLobbyHandler._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 
-	if self._is_tab_hovered(self, widgets_by_name.hero_tabs) then
-		self._play_sound(self, "play_gui_hero_select_hero_hover")
+	if self:_is_tab_hovered(widgets_by_name.hero_tabs) then
+		self:_play_sound("play_gui_hero_select_hero_hover")
 	end
 
-	if self._is_tab_hovered(self, widgets_by_name.career_tabs) then
-		self._play_sound(self, "play_gui_hero_select_career_hover")
+	if self:_is_tab_hovered(widgets_by_name.career_tabs) then
+		self:_play_sound("play_gui_hero_select_career_hover")
 	end
 
-	self._handle_tab_hover(self, widgets_by_name.hero_tabs, "icon")
-	self._handle_tab_hover(self, widgets_by_name.career_tabs, "icon")
+	self:_handle_tab_hover(widgets_by_name.hero_tabs, "icon")
+	self:_handle_tab_hover(widgets_by_name.career_tabs, "icon")
 
-	local hero_index = self._is_hero_tab_selected(self)
+	local hero_index = self:_is_hero_tab_selected()
 
 	if hero_index then
-		self._select_hero_tab_by_index(self, hero_index, nil, true)
+		self:_select_hero_tab_by_index(hero_index, nil, true)
 	end
 
-	local career_index = self._is_career_tab_selected(self)
+	local career_index = self:_is_career_tab_selected()
 
 	if career_index then
-		self._select_career_tab_by_index(self, career_index, nil, true)
+		self:_select_career_tab_by_index(career_index, nil, true)
 	end
 
 	local select_button = widgets_by_name.select_button
@@ -587,16 +587,16 @@ PopupJoinLobbyHandler._handle_input = function (self, dt, t)
 	UIWidgetUtils.animate_default_button(select_button, dt)
 	UIWidgetUtils.animate_default_button(cancel_button, dt)
 
-	if self._is_button_hover_enter(self, select_button) or self._is_button_hover_enter(self, cancel_button) then
-		self._play_sound(self, "play_gui_start_menu_button_hover")
+	if self:_is_button_hover_enter(select_button) or self:_is_button_hover_enter(cancel_button) then
+		self:_play_sound("play_gui_start_menu_button_hover")
 	end
 
-	if self._is_button_pressed(self, widgets_by_name.select_button) and not self._selected_career_locked then
-		self._play_sound(self, "play_gui_start_menu_button_click")
-		self.set_result(self, true)
-	elseif self._is_button_pressed(self, widgets_by_name.cancel_button) then
-		self._play_sound(self, "play_gui_start_menu_button_click")
-		self.set_result(self, false)
+	if self:_is_button_pressed(widgets_by_name.select_button) and not self._selected_career_locked then
+		self:_play_sound("play_gui_start_menu_button_click")
+		self:set_result(true)
+	elseif self:_is_button_pressed(widgets_by_name.cancel_button) then
+		self:_play_sound("play_gui_start_menu_button_click")
+		self:set_result(false)
 	end
 end
 
@@ -681,16 +681,16 @@ PopupJoinLobbyHandler._is_career_tab_selected = function (self)
 end
 
 PopupJoinLobbyHandler._handle_tab_hover = function (self, widget, style_prefix)
-	local hover_index = self._is_tab_hovered(self, widget)
+	local hover_index = self:_is_tab_hovered(widget)
 
 	if hover_index then
-		self._on_option_button_hover(self, widget, style_prefix .. "_" .. hover_index)
+		self:_on_option_button_hover(widget, style_prefix .. "_" .. hover_index)
 	end
 
-	local dehover_index = self._is_tab_dehovered(self, widget)
+	local dehover_index = self:_is_tab_dehovered(widget)
 
 	if dehover_index then
-		self._on_option_button_dehover(self, widget, style_prefix .. "_" .. dehover_index)
+		self:_on_option_button_dehover(widget, style_prefix .. "_" .. dehover_index)
 	end
 end
 
@@ -706,7 +706,7 @@ PopupJoinLobbyHandler._on_option_button_hover = function (self, widget, style_id
 
 	for i = 2, 4, 1 do
 		if 0 < animation_duration then
-			ui_animations[animation_name .. "_hover_" .. i] = self._animate_element_by_time(self, pass_style.color, i, current_color_value, target_color_value, animation_duration)
+			ui_animations[animation_name .. "_hover_" .. i] = self:_animate_element_by_time(pass_style.color, i, current_color_value, target_color_value, animation_duration)
 		else
 			pass_style.color[i] = target_color_value
 		end
@@ -725,7 +725,7 @@ PopupJoinLobbyHandler._on_option_button_dehover = function (self, widget, style_
 
 	for i = 2, 4, 1 do
 		if 0 < animation_duration then
-			ui_animations[animation_name .. "_hover_" .. i] = self._animate_element_by_time(self, pass_style.color, i, current_color_value, target_color_value, animation_duration)
+			ui_animations[animation_name .. "_hover_" .. i] = self:_animate_element_by_time(pass_style.color, i, current_color_value, target_color_value, animation_duration)
 		else
 			pass_style.color[1] = target_color_value
 		end
@@ -735,7 +735,7 @@ end
 PopupJoinLobbyHandler._select_hero_and_career = function (self, profile_index, career_index)
 	local profile_order_index = ProfileIndexToPriorityIndex[profile_index]
 
-	self._select_hero_tab_by_index(self, profile_order_index, career_index)
+	self:_select_hero_tab_by_index(profile_order_index, career_index)
 end
 
 PopupJoinLobbyHandler._select_hero_tab_by_index = function (self, index, optional_career_index, play_sound)
@@ -744,7 +744,7 @@ PopupJoinLobbyHandler._select_hero_tab_by_index = function (self, index, optiona
 	end
 
 	if play_sound then
-		self._play_sound(self, "play_gui_hero_select_hero_click")
+		self:_play_sound("play_gui_hero_select_hero_click")
 	end
 
 	local gui = self.ui_top_renderer.gui
@@ -773,16 +773,16 @@ PopupJoinLobbyHandler._select_hero_tab_by_index = function (self, index, optiona
 	local character_name = profile_settings.character_name
 	self._selected_hero_name = hero_name
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
-	local exp = hero_attributes.get(hero_attributes, hero_name, "experience") or 0
+	local exp = hero_attributes:get(hero_name, "experience") or 0
 	local level = ExperienceSettings.get_level(exp)
 
-	self._set_hero_info(self, Localize(character_name), level)
+	self:_set_hero_info(Localize(character_name), level)
 
-	local career_index = optional_career_index or hero_attributes.get(hero_attributes, hero_name, "career") or 1
+	local career_index = optional_career_index or hero_attributes:get(hero_name, "career") or 1
 	self._hero_tab_index = index
 
-	self._select_career_tab_by_index(self, career_index, true)
-	self.enable_career_selection(self)
+	self:_select_career_tab_by_index(career_index, true)
+	self:enable_career_selection()
 
 	self._selected_hero_disabled = false
 end
@@ -793,7 +793,7 @@ PopupJoinLobbyHandler._select_career_tab_by_index = function (self, career_index
 	end
 
 	if play_sound then
-		self._play_sound(self, "play_gui_hero_select_career_click")
+		self:_play_sound("play_gui_hero_select_career_click")
 	end
 
 	local gui = self.ui_top_renderer.gui
@@ -803,7 +803,7 @@ PopupJoinLobbyHandler._select_career_tab_by_index = function (self, career_index
 	local amount = widget_content.amount
 	local hero_name = self._selected_hero_name
 
-	self._assign_career_data_by_hero(self, hero_name)
+	self:_assign_career_data_by_hero(hero_name)
 
 	local selected_career_locked = false
 
@@ -833,7 +833,7 @@ PopupJoinLobbyHandler._select_career_tab_by_index = function (self, career_index
 	local career_display_name = career_settings.display_name
 	local career_name = career_settings.name
 
-	self._set_career_info(self, Localize(career_display_name))
+	self:_set_career_info(Localize(career_display_name))
 
 	self.career_index = career_index
 	self._selected_career_name = career_name
@@ -850,7 +850,7 @@ PopupJoinLobbyHandler._assign_career_data_by_hero = function (self, hero_name)
 	local profile = SPProfiles[profile_index]
 	local careers = profile.careers
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
-	local hero_experience = hero_attributes.get(hero_attributes, hero_name, "experience") or 0
+	local hero_experience = hero_attributes:get(hero_name, "experience") or 0
 	local hero_level = ExperienceSettings.get_level(hero_experience)
 	local selection_texture = "portrait_glow"
 	local selection_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(selection_texture)
@@ -949,13 +949,13 @@ PopupJoinLobbyHandler.set_unavailable_heroes = function (self, occupied_heroes)
 	end
 
 	if selected_hero_disabled then
-		self.disable_career_selection(self)
+		self:disable_career_selection()
 
 		self._selected_hero_disabled = true
 	else
 		self._selected_hero_disabled = false
 
-		self.enable_career_selection(self)
+		self:enable_career_selection()
 	end
 end
 

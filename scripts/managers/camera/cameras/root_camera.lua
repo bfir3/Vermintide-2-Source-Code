@@ -27,7 +27,7 @@ RootCamera.set_root_unit = function (self, unit, object, preserve_yaw)
 				name = "spawn"
 			})
 
-			drawer.quaternion(drawer, Unit.world_position(unit, 0), Unit.world_rotation(unit, 0), 1)
+			drawer:quaternion(Unit.world_position(unit, 0), Unit.world_rotation(unit, 0), 1)
 		end
 
 		self._aim_yaw = -init_yaw
@@ -61,7 +61,7 @@ RootCamera.parse_parameters = function (self, camera_settings, parent_node)
 end
 
 RootCamera.update = function (self, dt, data, pitch_speed, yaw_speed)
-	if not self.active(self) then
+	if not self:active() then
 		return
 	end
 
@@ -121,7 +121,7 @@ RootCamera.update_pitch_yaw = function (self, dt, data, current_node)
 	end
 
 	local pitch_delta_value = look_vec.y * pitch_speed * dyn_pitch_scale
-	local constraint_function = current_node.constraint_function(current_node)
+	local constraint_function = current_node:constraint_function()
 
 	if constraint_function then
 		local rot = Unit.local_rotation(self._root_unit, 0)

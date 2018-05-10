@@ -864,7 +864,7 @@ ExplosionTemplates = {
 				local achievements_enabled = Development.parameter("v2_achievements")
 				local death_extension = ScriptUnit.extension(hit_unit, "death_system")
 
-				if achievements_enabled and allowed_difficulty and not death_extension.has_death_started(death_extension) then
+				if achievements_enabled and allowed_difficulty and not death_extension:has_death_started() then
 					local local_player = Managers.player:local_player()
 					local status_extension = ScriptUnit.extension(local_player.player_unit, "status_system")
 
@@ -874,7 +874,7 @@ ExplosionTemplates = {
 						if QuestSettings.forest_fort_kill_cannonball <= status_extension.num_cannonball_kills then
 							local statistics_db = Managers.player:statistics_db()
 
-							statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+							statistics_db:increment_stat_and_sync_to_clients(stat_name)
 
 							status_extension.num_cannonball_kills = nil
 							status_extension.completed_cannonball_challenge = true
@@ -1157,7 +1157,7 @@ ExplosionTemplates.chaos_slow_bomb_missile = {
 		if VALID_PLAYERS_AND_BOTS[hit_unit] then
 			local status_extension = ScriptUnit.has_extension(hit_unit, "status_system")
 
-			if status_extension and not status_extension.is_disabled(status_extension) then
+			if status_extension and not status_extension:is_disabled() then
 				hit_player = true
 			end
 		end

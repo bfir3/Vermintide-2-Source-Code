@@ -3,7 +3,7 @@ require("scripts/network/game_server/game_server_aux")
 GameServerLobbyClient = class(GameServerLobbyClient)
 
 local function dprintf(string, ...)
-	local s = string.format(string, ...)
+	local s = string:format(...)
 
 	printf("[GameServerLobbyClient]: %s", s)
 end
@@ -38,7 +38,7 @@ end
 
 GameServerLobbyClient.update = function (self, dt)
 	local lobby = self._game_server_lobby
-	local lobby_state = lobby.state(lobby)
+	local lobby_state = lobby:state()
 	local new_state = GameServerInternal.lobby_state_map[lobby_state]
 	local old_state = self._state
 

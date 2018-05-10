@@ -6,7 +6,7 @@ PeerStates.Connecting = {
 
 		local ban_list_manager = Managers.ban_list
 
-		if ban_list_manager ~= nil and ban_list_manager.is_banned(ban_list_manager, self.peer_id) then
+		if ban_list_manager ~= nil and ban_list_manager:is_banned(self.peer_id) then
 			printf("[PSM] Disconnecting banned player (%s)", self.peer_id)
 
 			self._disconnect_peer = true
@@ -148,7 +148,7 @@ PeerStates.LoadingProfilePackages = {
 		local profile_synchronizer = server.profile_synchronizer
 		local peer_id = self.peer_id
 		local local_player_id = 1
-		local old_index = profile_synchronizer.profile_by_peer(profile_synchronizer, peer_id, local_player_id)
+		local old_index = profile_synchronizer:profile_by_peer(peer_id, local_player_id)
 		local wanted_profile_index = self.wanted_profile_index
 		self.wait_for_bot_despawn = false
 		local loaded_level = self.loaded_level
@@ -166,12 +166,12 @@ PeerStates.LoadingProfilePackages = {
 
 			return
 		elseif wanted_profile_index == 0 then
-			self.my_profile_index = profile_synchronizer.get_first_free_profile(profile_synchronizer)
+			self.my_profile_index = profile_synchronizer:get_first_free_profile()
 		else
-			local owner_type = profile_synchronizer.owner_type(profile_synchronizer, wanted_profile_index)
+			local owner_type = profile_synchronizer:owner_type(wanted_profile_index)
 
 			if owner_type == "human" then
-				self.my_profile_index = profile_synchronizer.get_first_free_profile(profile_synchronizer)
+				self.my_profile_index = profile_synchronizer:get_first_free_profile()
 			elseif owner_type == "bot" then
 				self.my_profile_index = wanted_profile_index
 				self.wait_for_bot_despawn = true
@@ -183,11 +183,11 @@ PeerStates.LoadingProfilePackages = {
 		end
 
 		if self.wait_for_bot_despawn then
-			profile_synchronizer.reserve_profile(profile_synchronizer, self.my_profile_index, peer_id, local_player_id)
+			profile_synchronizer:reserve_profile(self.my_profile_index, peer_id, local_player_id)
 		else
-			profile_synchronizer.peer_entered_session(profile_synchronizer, peer_id)
-			profile_synchronizer.set_profile_peer_id(profile_synchronizer, self.my_profile_index, peer_id, local_player_id)
-			profile_synchronizer.hot_join_sync(profile_synchronizer, peer_id, {
+			profile_synchronizer:peer_entered_session(peer_id)
+			profile_synchronizer:set_profile_peer_id(self.my_profile_index, peer_id, local_player_id)
+			profile_synchronizer:hot_join_sync(peer_id, {
 				local_player_id
 			})
 		end
@@ -201,22 +201,22 @@ PeerStates.LoadingProfilePackages = {
 
 		if self.wait_for_bot_despawn then
 			local profile_index = self.my_profile_index
-			local owner = synchronizer.owner(synchronizer, profile_index)
+			local owner = synchronizer:owner(profile_index)
 
 			if not owner then
 				local peer_id = self.peer_id
 				local local_player_id = 1
 
-				synchronizer.unreserve_profile(synchronizer, profile_index, peer_id, local_player_id)
-				synchronizer.peer_entered_session(synchronizer, peer_id)
-				synchronizer.set_profile_peer_id(synchronizer, profile_index, peer_id, local_player_id)
-				synchronizer.hot_join_sync(synchronizer, peer_id, {
+				synchronizer:unreserve_profile(profile_index, peer_id, local_player_id)
+				synchronizer:peer_entered_session(peer_id)
+				synchronizer:set_profile_peer_id(profile_index, peer_id, local_player_id)
+				synchronizer:hot_join_sync(peer_id, {
 					local_player_id
 				})
 
 				self.wait_for_bot_despawn = false
 			end
-		elseif synchronizer.all_synced(synchronizer) then
+		elseif synchronizer:all_synced() then
 			server.network_transmit:send_rpc("rpc_loading_synced", self.peer_id)
 
 			return PeerStates.WaitingForEnterGame
@@ -241,7 +241,7 @@ PeerStates.WaitingForEnterGame = {
 	end,
 	update = function (self, dt)
 		local server = self.server
-		local state_determined, can_play = server.eac_check_peer(server, self.peer_id)
+		local state_determined, can_play = server:eac_check_peer(self.peer_id)
 
 		if self.is_ingame and server.game_network_manager and state_determined and can_play then
 			local peer_id = self.peer_id
@@ -261,7 +261,7 @@ PeerStates.WaitingForEnterGame = {
 				end
 			end
 
-			self.change_state(self, PeerStates.WaitingForGameObjectSync)
+			self:change_state(PeerStates.WaitingForGameObjectSync)
 		end
 	end,
 	on_exit = function (self, new_state)
@@ -303,10 +303,10 @@ PeerStates.WaitingForPlayers = {
 		if not cutscene_system.cutscene_started then
 			local server = self.server
 
-			if server.are_all_peers_ready(server) then
+			if server:are_all_peers_ready() then
 				return PeerStates.SpawningPlayer
 			end
-		elseif cutscene_system.has_intro_cutscene_finished_playing(cutscene_system) then
+		elseif cutscene_system:has_intro_cutscene_finished_playing() then
 			return PeerStates.SpawningPlayer
 		end
 	end,
@@ -402,7 +402,7 @@ PeerStates.Disconnecting = {
 		end
 
 		if game_network_manager then
-			game_network_manager.remove_peer(game_network_manager, peer_id)
+			game_network_manager:remove_peer(peer_id)
 		end
 
 		server.peers_completed_game_object_sync[peer_id] = nil
@@ -424,15 +424,15 @@ PeerStates.Disconnected = {
 		local server = self.server
 		local profile_synchronizer = server.profile_synchronizer
 		local local_player_id = 1
-		local old_index = profile_synchronizer.profile_by_peer(profile_synchronizer, peer_id, local_player_id)
+		local old_index = profile_synchronizer:profile_by_peer(peer_id, local_player_id)
 
 		if old_index then
-			profile_synchronizer.set_profile_peer_id(profile_synchronizer, old_index, nil)
+			profile_synchronizer:set_profile_peer_id(old_index, nil)
 		else
 			server.slot_allocator:free_peer_slots(peer_id, local_player_id)
 		end
 
-		profile_synchronizer.peer_left_session(profile_synchronizer, peer_id)
+		profile_synchronizer:peer_left_session(peer_id)
 		server.connection_handler:disconnect_peers(peer_id)
 	end,
 	update = function (self, dt)

@@ -22,7 +22,7 @@ BackendInterfaceLootPlayfab._new_id = function (self)
 end
 
 BackendInterfaceLootPlayfab.open_loot_chest = function (self, hero_name, backend_id)
-	local id = self._new_id(self)
+	local id = self:_new_id()
 	local data = {
 		hero_name = hero_name,
 		playfab_id = backend_id,
@@ -48,18 +48,18 @@ BackendInterfaceLootPlayfab.open_loot_chest_challenge_request_cb = function (sel
 		local eac_response, response = nil
 
 		if challenge then
-			eac_response, response = self._get_eac_response(self, challenge)
+			eac_response, response = self:_get_eac_response(challenge)
 		end
 
 		if not challenge then
 			print("EAC disabled on backend")
-			self._open_loot_chest(self, data)
+			self:_open_loot_chest(data)
 		elseif not eac_response then
 			print("EAC disabled on client")
 			Managers.backend:playfab_eac_error()
 		else
 			print("EAC Enabled!")
-			self._open_loot_chest(self, data, response)
+			self:_open_loot_chest(data, response)
 		end
 	end
 end
@@ -103,15 +103,15 @@ BackendInterfaceLootPlayfab.loot_chest_rewards_request_cb = function (self, id, 
 			local item = items[i]
 			local backend_id = item.ItemInstanceId
 
-			backend_mirror.add_item(backend_mirror, backend_id, item)
+			backend_mirror:add_item(backend_id, item)
 
 			loot[#loot + 1] = backend_id
 		end
 
 		if 0 < remaining_uses then
-			backend_mirror.update_item_field(backend_mirror, chest_backend_id, "RemainingUses", remaining_uses)
+			backend_mirror:update_item_field(chest_backend_id, "RemainingUses", remaining_uses)
 		else
-			backend_mirror.remove_item(backend_mirror, chest_backend_id)
+			backend_mirror:remove_item(chest_backend_id)
 		end
 
 		self._loot_requests[id] = loot
@@ -119,7 +119,7 @@ BackendInterfaceLootPlayfab.loot_chest_rewards_request_cb = function (self, id, 
 end
 
 BackendInterfaceLootPlayfab.generate_end_of_level_loot = function (self, game_won, quick_play_bonus, difficulty, level_key, num_tomes, num_grims, num_loot_dice, hero_name, start_experience, end_experience, deed_item_name, deed_backend_id)
-	local id = self._new_id(self)
+	local id = self:_new_id()
 	local data = {
 		won = game_won,
 		quick_play_bonus = quick_play_bonus,
@@ -155,18 +155,18 @@ BackendInterfaceLootPlayfab.end_of_level_loot_challenge_request_cb = function (s
 		local eac_response, response = nil
 
 		if challenge then
-			eac_response, response = self._get_eac_response(self, challenge)
+			eac_response, response = self:_get_eac_response(challenge)
 		end
 
 		if not challenge then
 			print("EAC disabled on backend")
-			self._generate_end_of_level_loot(self, data)
+			self:_generate_end_of_level_loot(data)
 		elseif not eac_response then
 			print("EAC disabled on client")
 			Managers.backend:playfab_eac_error()
 		else
 			print("EAC Enabled!")
-			self._generate_end_of_level_loot(self, data, response)
+			self:_generate_end_of_level_loot(data, response)
 		end
 	end
 end
@@ -248,14 +248,14 @@ end
 
 BackendInterfaceLootPlayfab.achievement_rewards_claimed = function (self, achievement_id)
 	local mirror = self._backend_mirror
-	local claimed_achievements = mirror.get_claimed_achievements(mirror)
+	local claimed_achievements = mirror:get_claimed_achievements()
 
 	return claimed_achievements[achievement_id]
 end
 
 BackendInterfaceLootPlayfab.can_claim_achievement_rewards = function (self, achievement_id)
 	local mirror = self._backend_mirror
-	local claimed_achievements = mirror.get_claimed_achievements(mirror)
+	local claimed_achievements = mirror:get_claimed_achievements()
 
 	if not claimed_achievements[achievement_id] then
 		return true
@@ -265,7 +265,7 @@ BackendInterfaceLootPlayfab.can_claim_achievement_rewards = function (self, achi
 end
 
 BackendInterfaceLootPlayfab.claim_achievement_rewards = function (self, achievement_id)
-	local id = self._new_id(self)
+	local id = self:_new_id()
 	local data = {
 		achievement_id = achievement_id,
 		id = id
@@ -290,18 +290,18 @@ BackendInterfaceLootPlayfab.claim_achievement_rewards_challenge_request_cb = fun
 		local eac_response, response = nil
 
 		if challenge then
-			eac_response, response = self._get_eac_response(self, challenge)
+			eac_response, response = self:_get_eac_response(challenge)
 		end
 
 		if not challenge then
 			print("EAC disabled on backend")
-			self._claim_achievement_rewards(self, data)
+			self:_claim_achievement_rewards(data)
 		elseif not eac_response then
 			print("EAC disabled on client")
 			Managers.backend:playfab_eac_error()
 		else
 			print("EAC Enabled!")
-			self._claim_achievement_rewards(self, data, response)
+			self:_claim_achievement_rewards(data, response)
 		end
 	end
 end
@@ -356,7 +356,7 @@ BackendInterfaceLootPlayfab.achievement_rewards_request_cb = function (self, dat
 				local backend_id = item.ItemInstanceId
 				local amount = item.UsesIncrementedBy or 1
 
-				backend_mirror.add_item(backend_mirror, backend_id, item)
+				backend_mirror:add_item(backend_id, item)
 
 				loot[i] = {
 					backend_id,
@@ -365,7 +365,7 @@ BackendInterfaceLootPlayfab.achievement_rewards_request_cb = function (self, dat
 			end
 		end
 
-		backend_mirror.set_achievement_claimed(backend_mirror, achievement_id)
+		backend_mirror:set_achievement_claimed(achievement_id)
 
 		self._loot_requests[id] = loot
 	end

@@ -19,7 +19,7 @@ end
 BTBotVentOverchargeAction.run = function (self, unit, blackboard, t, dt)
 	local input_extension = blackboard.input_extension
 
-	input_extension.weapon_reload(input_extension)
+	input_extension:weapon_reload()
 
 	return "running", "evaluate"
 end

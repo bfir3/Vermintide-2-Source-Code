@@ -9,8 +9,8 @@ StateLoadingMigrateHost.NAME = "StateLoadingMigrateHost"
 
 StateLoadingMigrateHost.on_enter = function (self, params)
 	print("[Gamestate] Enter Substate StateLoadingMigrateHost")
-	self._init_params(self, params)
-	self._init_network(self)
+	self:_init_params(params)
+	self:_init_network()
 end
 
 StateLoadingMigrateHost._init_params = function (self, params)
@@ -81,14 +81,14 @@ StateLoadingMigrateHost.cb_server_created = function (self)
 	network_printf("cb_server_created")
 
 	local lobby_host = self.parent:get_lobby()
-	local stored_lobby_data = lobby_host.get_stored_lobby_data(lobby_host) or {}
+	local stored_lobby_data = lobby_host:get_stored_lobby_data() or {}
 	local lobby_data = self.parent.parent.loading_context.host_migration_info.lobby_data
 
 	for key, value in pairs(lobby_data) do
 		stored_lobby_data[key] = value
 	end
 
-	lobby_host.set_lobby_data(lobby_host, stored_lobby_data)
+	lobby_host:set_lobby_data(stored_lobby_data)
 
 	self._server_created = true
 end

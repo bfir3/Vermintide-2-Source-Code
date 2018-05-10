@@ -112,7 +112,7 @@ PatrolAnalysis.init = function (self, nav_world, using_editor, drawer)
 	self.line_drawer = drawer
 	local cost_table_standard = GwNavTagLayerCostTable.create()
 
-	self.setup_nav(self, NAVTAG_LAYERS_STANDARD, cost_table_standard)
+	self:setup_nav(NAVTAG_LAYERS_STANDARD, cost_table_standard)
 
 	local nav_cost_map_cost_table_standard = GwNavCostMap.create_tag_cost_table()
 
@@ -120,7 +120,7 @@ PatrolAnalysis.init = function (self, nav_world, using_editor, drawer)
 
 	local cost_table_roaming = GwNavTagLayerCostTable.create()
 
-	self.setup_nav(self, NAVTAG_LAYERS_ROAMING, cost_table_roaming)
+	self:setup_nav(NAVTAG_LAYERS_ROAMING, cost_table_roaming)
 
 	local nav_cost_map_cost_table_roaming = GwNavCostMap.create_tag_cost_table()
 
@@ -170,25 +170,25 @@ PatrolAnalysis.generate_patrol_splines = function (self, level_name, main_paths,
 		roaming = {}
 	}
 	self._spline_counter = 1
-	local result = self._generate_patrol_spline(self, level_name, main_paths, "units/hub_elements/boss_waypoint", "boss_waypoint", drawer, "standard")
+	local result = self:_generate_patrol_spline(level_name, main_paths, "units/hub_elements/boss_waypoint", "boss_waypoint", drawer, "standard")
 
 	if result ~= "success" then
 		return result
 	end
 
-	result = self._generate_patrol_spline(self, level_name, main_paths, "units/hub_elements/patrol_waypoint", "patrol_waypoint", drawer, "roaming")
+	result = self:_generate_patrol_spline(level_name, main_paths, "units/hub_elements/patrol_waypoint", "patrol_waypoint", drawer, "roaming")
 
 	if result ~= "success" then
 		return result
 	end
 
-	result = self._generate_patrol_spline(self, level_name, main_paths, "units/hub_elements/event_waypoint", "event_waypoint", drawer, "standard")
+	result = self:_generate_patrol_spline(level_name, main_paths, "units/hub_elements/event_waypoint", "event_waypoint", drawer, "standard")
 
 	if result ~= "success" then
 		return result
 	end
 
-	result = self._finilize_splines(self, main_paths, drawer)
+	result = self:_finilize_splines(main_paths, drawer)
 
 	return result
 end
@@ -241,7 +241,7 @@ PatrolAnalysis._finilize_splines = function (self, main_paths, drawer)
 			waypoint.travel_dist = travel_dist
 			local color = (spline.patrol_type == "boss_waypoint" and Color(255, 125, 0)) or Color(255, 255, 0)
 
-			drawer.line(drawer, p1 + h, p2 + h, color)
+			drawer:line(p1 + h, p2 + h, color)
 
 			p1 = p2
 		end
@@ -264,7 +264,7 @@ PatrolAnalysis._generate_patrol_spline = function (self, level_name, main_paths,
 
 		if Unit.alive(unit) and Unit.is_a(unit, gizmo_unit_name) then
 			local pos = Unit.local_position(unit, index_offset)
-			local script_data = object.script_data_overrides(object)
+			local script_data = object:script_data_overrides()
 			local patrol_id = Unit.get_data(unit, "patrol_id")
 			local map_section = Unit.get_data(unit, "map_section")
 			local spline = patrol_waypoints[patrol_id]
@@ -380,10 +380,10 @@ PatrolAnalysis.inject_spline_path = function (self, spline, line_drawer)
 				local ct = debug_colors_lookup[color_index]
 				local color = Color(ct[1], ct[2], ct[3], ct[4])
 
-				line_drawer.sphere(line_drawer, position + offset, 0.1, color)
+				line_drawer:sphere(position + offset, 0.1, color)
 
 				if previous_node_position then
-					line_drawer.line(line_drawer, position + offset, previous_node_position + offset, color)
+					line_drawer:line(position + offset, previous_node_position + offset, color)
 				end
 
 				previous_node_position = position
@@ -443,7 +443,7 @@ PatrolAnalysis.spline = function (self, spline_name)
 end
 
 PatrolAnalysis.draw_raw_spline = function (self, spline_name)
-	local spline = self.spline(self, spline_name)
+	local spline = self:spline(spline_name)
 	local p1 = spline[1].pos:unbox()
 
 	QuickDrawerStay:sphere(p1, 0.33, Color(0, 200, 175))
@@ -477,7 +477,7 @@ local Vector3_distance = Vector3.distance
 local Vector3_length = Vector3.length
 
 PatrolAnalysis.get_path_point = function (self, points, path_length, move_percent)
-	local path_length = path_length or self.get_path_length(self, points)
+	local path_length = path_length or self:get_path_length(points)
 	local travel_dist = 0
 	local goal_dist = move_percent * path_length
 
@@ -539,7 +539,7 @@ PatrolAnalysis.run = function (self)
 			if num_free_navbots == 0 or unique_navbot then
 				print("> starting new spline, using new navbot:", navbot_kind, ", id:", id)
 
-				navbot = self.create_navbot(self, self.nav_world, p1, navbot_kind)
+				navbot = self:create_navbot(self.nav_world, p1, navbot_kind)
 			else
 				print("> starting new spline, recycling navbot of kind:", navbot_kind, ", id:", id)
 
@@ -568,7 +568,7 @@ PatrolAnalysis.run = function (self)
 			local wp_index = spline.wp_index
 
 			if wp_index < #spline then
-				self.inject_spline_path(self, spline, line_drawer)
+				self:inject_spline_path(spline, line_drawer)
 				print("\t> continuing spline", spline.id, "index:", wp_index)
 
 				local p1 = spline[wp_index].pos:unbox()
@@ -584,7 +584,7 @@ PatrolAnalysis.run = function (self)
 				i = i + 1
 			else
 				print("\t> spline completed", spline.id)
-				self.inject_spline_path(self, spline, line_drawer)
+				self:inject_spline_path(spline, line_drawer)
 
 				local unique_navbot = spline.unique_navbot
 

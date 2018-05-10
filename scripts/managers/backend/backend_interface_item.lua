@@ -168,7 +168,7 @@ Items._refresh_entities_if_needed = function (self)
 end
 
 Items.get_all_backend_items = function (self)
-	self._refresh_entities_if_needed(self)
+	self:_refresh_entities_if_needed()
 
 	return self._items
 end
@@ -176,9 +176,9 @@ end
 local empty_params = {}
 
 Items.get_filtered_items = function (self, filter, params)
-	local all_items = self.get_all_backend_items(self)
+	local all_items = self:get_all_backend_items()
 	local backend_common = Managers.backend:get_interface("common")
-	local items = backend_common.filter_items(backend_common, all_items, filter, params or empty_params)
+	local items = backend_common:filter_items(all_items, filter, params or empty_params)
 
 	return items
 end
@@ -204,7 +204,7 @@ Items.update = function (self, dt)
 
 	if self._dice_game_data then
 		local backend_session = Managers.backend:get_interface("session")
-		local session_ready = not self._debug_end_of_round_timeout and backend_session.get_state(backend_session) == "END_OF_ROUND"
+		local session_ready = not self._debug_end_of_round_timeout and backend_session:get_state() == "END_OF_ROUND"
 		local sessions_disabled = not GameSettingsDevelopment.backend_settings.enable_sessions
 
 		if session_ready or sessions_disabled then
@@ -221,13 +221,13 @@ Items.update = function (self, dt)
 		elseif self._dice_game_data.time_out < Managers.time:time("main") then
 			self._dice_game_data = nil
 
-			self.set_error(self, {
+			self:set_error({
 				reason = BACKEND_LUA_ERRORS.ERR_DICE_TIMEOUT1
 			})
 		end
 	elseif self._upgrades_failed_game_data then
 		local backend_session = Managers.backend:get_interface("session")
-		local session_ready = not self._debug_end_of_round_timeout and backend_session.get_state(backend_session) == "END_OF_ROUND"
+		local session_ready = not self._debug_end_of_round_timeout and backend_session:get_state() == "END_OF_ROUND"
 		local sessions_disabled = not GameSettingsDevelopment.backend_settings.enable_sessions
 
 		if session_ready or sessions_disabled then
@@ -245,7 +245,7 @@ Items.update = function (self, dt)
 		elseif self._upgrades_failed_game_data.time_out < Managers.time:time("main") then
 			self._upgrades_failed_game_data = nil
 
-			self.set_error(self, {
+			self:set_error({
 				reason = BACKEND_LUA_ERRORS.ERR_UPGRADES_TIMEOUT
 			})
 		end
@@ -263,15 +263,15 @@ end
 Items.poll_upgrades = function (self)
 	local upgrades_item = self._upgrades_item
 
-	if upgrades_item and upgrades_item.is_done(upgrades_item) then
+	if upgrades_item and upgrades_item:is_done() then
 		self._upgrades_item = nil
 
-		return upgrades_item.items(upgrades_item)
+		return upgrades_item:items()
 	end
 end
 
 Items.get_loadout = function (self)
-	self._refresh_entities_if_needed(self)
+	self:_refresh_entities_if_needed()
 
 	return self._loadout
 end
@@ -389,7 +389,7 @@ BackendInterfaceItem.get_properties = function (self, backend_id)
 end
 
 BackendInterfaceItem.get_traits = function (self, backend_id)
-	local item = self.get_item_from_id(self, backend_id)
+	local item = self:get_item_from_id(backend_id)
 
 	if item then
 		return item.traits
@@ -402,13 +402,13 @@ BackendInterfaceItem.set_runes = function (self, backend_id, runes)
 	local rune_interface = Managers.backend:get_interface("runes")
 
 	for _, rune in pairs(runes) do
-		rune_interface.set(rune_interface, backend_id, rune)
+		rune_interface:set(backend_id, rune)
 	end
 end
 
 BackendInterfaceItem.get_runes = function (self, backend_id)
 	local rune_interface = Managers.backend:get_interface("runes")
-	local runes = rune_interface.get(rune_interface, backend_id)
+	local runes = rune_interface:get(backend_id)
 
 	return runes
 end
@@ -495,7 +495,7 @@ end
 
 BackendInterfaceItem.data_server_script = function (self, script_name, ...)
 	local queue = self._backend_items:data_server_queue()
-	local request = queue.add_item(queue, script_name, ...)
+	local request = queue:add_item(script_name, ...)
 
 	return request
 end
@@ -517,14 +517,14 @@ end
 BackendInterfaceItem.check_for_loot = function (self)
 	local dice_item = self._backend_items:dice_game_item()
 
-	if dice_item and dice_item.is_done(dice_item) then
-		local error_message = dice_item.error_message(dice_item)
+	if dice_item and dice_item:is_done() then
+		local error_message = dice_item:error_message()
 
 		if error_message then
 			self._backend_items:set_error(error_message)
-		elseif dice_item.items(dice_item) then
-			local parameters = dice_item.parameters(dice_item)
-			local items = dice_item.items(dice_item)
+		elseif dice_item:items() then
+			local parameters = dice_item:parameters()
+			local items = dice_item:items()
 			local successes = {}
 			local total_successes = 1
 			local successes_string = parameters.successes
@@ -557,7 +557,7 @@ BackendInterfaceItem.check_for_loot = function (self)
 
 			local backend_session = Managers.backend:get_interface("session")
 
-			backend_session.received_dice_game_loot(backend_session)
+			backend_session:received_dice_game_loot()
 			self._backend_items:reset_dice_game_item()
 			self._backend_items:make_dirty()
 
@@ -612,7 +612,7 @@ local SalvageableRarities = {
 }
 
 BackendInterfaceItem.is_salvageable = function (self, backend_id)
-	local unequipped = not self.is_equipped(self, backend_id)
+	local unequipped = not self:is_equipped(backend_id)
 	local items = self._backend_items:get_all_backend_items()
 	local item = items[backend_id]
 	local item_config = ItemMasterList[item.key]
@@ -633,7 +633,7 @@ local FuseableRarities = {
 }
 
 BackendInterfaceItem.is_fuseable = function (self, backend_id)
-	local unequipped = not self.is_equipped(self, backend_id)
+	local unequipped = not self:is_equipped(backend_id)
 	local items = self._backend_items:get_all_backend_items()
 	local item = items[backend_id]
 	local item_config = ItemMasterList[item.key]
@@ -649,8 +649,8 @@ BackendInterfaceItem.set_data_server_queue = function (self, queue)
 	local item_whitelist_script = GameSettingsDevelopment.backend_settings.item_whitelist
 
 	if item_whitelist_script then
-		queue.register_executor(queue, "item_whitelist", callback(self, "_command_item_whitelist"))
-		queue.add_item(queue, item_whitelist_script)
+		queue:register_executor("item_whitelist", callback(self, "_command_item_whitelist"))
+		queue:add_item(item_whitelist_script)
 	end
 end
 
@@ -737,16 +737,16 @@ BackendInterfaceItem.clean_inventory_for_prestige = function (self, profile_inde
 			if slot_type == "melee" or slot_type == "ranged" then
 				local slot = (slot_type == "melee" and "slot_melee") or "slot_ranged"
 
-				inventory_extension.create_equipment_in_slot(inventory_extension, slot, backend_id)
-				inventory_extension.wield(inventory_extension, slot)
+				inventory_extension:create_equipment_in_slot(slot, backend_id)
+				inventory_extension:wield(slot)
 			elseif slot_type == "hat" then
 				local attachment_extension = ScriptUnit.extension(unit, "attachment_system")
 
-				attachment_extension.create_attachment_in_slot(attachment_extension, slot, backend_id)
+				attachment_extension:create_attachment_in_slot(slot, backend_id)
 			elseif slot_type == "trinket" then
 				local attachment_extension = ScriptUnit.extension(unit, "attachment_system")
 
-				attachment_extension.create_attachment_in_slot(attachment_extension, slot, backend_id)
+				attachment_extension:create_attachment_in_slot(slot, backend_id)
 			end
 
 			ScriptApplication.send_to_crashify("BackendInterfaceItem", "Slot %q was empty, putting item %d in it", slot, backend_id)
@@ -768,12 +768,12 @@ BackendInterfaceItem.clean_inventory_for_prestige = function (self, profile_inde
 	self._dirty = true
 
 	for _, backend_id in ipairs(items_to_remove) do
-		self.remove_item(self, backend_id)
+		self:remove_item(backend_id)
 	end
 end
 
 BackendInterfaceItem.get_runes = function (self, item_id)
-	local item = self.get_item_from_id(self, item_id)
+	local item = self:get_item_from_id(item_id)
 
 	if item then
 		local runes = item.runes
@@ -825,12 +825,12 @@ BackendInterfaceItem._command_item_whitelist = function (self, data)
 	local backend_items = self._backend_items
 
 	if data.enabled then
-		backend_items.set_item_whitelist(backend_items, data.items)
+		backend_items:set_item_whitelist(data.items)
 	end
 
-	local queue = backend_items.data_server_queue(backend_items)
+	local queue = backend_items:data_server_queue()
 
-	queue.unregister_executor(queue, "item_whitelist")
+	queue:unregister_executor("item_whitelist")
 end
 
 return

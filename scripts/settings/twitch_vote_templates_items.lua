@@ -19,10 +19,10 @@ local function default_validation_func(vote_data)
 		}
 
 		for id, player in pairs(players) do
-			local profile_index = player.profile_index(player)
+			local profile_index = player:profile_index()
 			unused_indices[profile_index] = nil
 			validation_data[id] = {
-				name = player.name(player),
+				name = player:name(),
 				option = profile_index
 			}
 		end
@@ -53,7 +53,7 @@ end
 
 local function add_item(is_server, player_unit, pickup_type)
 	local player_manager = Managers.player
-	local player = player_manager.owner(player_manager, player_unit)
+	local player = player_manager:owner(player_unit)
 
 	if player then
 		local local_bot_or_human = not player.remote
@@ -65,7 +65,7 @@ local function add_item(is_server, player_unit, pickup_type)
 			local pickup_settings = AllPickups[pickup_type]
 			local slot_name = pickup_settings.slot_name
 			local item_name = pickup_settings.item_name
-			local slot_data = inventory_extension.get_slot_data(inventory_extension, slot_name)
+			local slot_data = inventory_extension:get_slot_data(slot_name)
 
 			if slot_data then
 				local item_data = slot_data.item_data
@@ -85,7 +85,7 @@ local function add_item(is_server, player_unit, pickup_type)
 					local position = POSITION_LOOKUP[player_unit]
 					local rotation = Unit.local_rotation(player_unit, 0)
 
-					network_transmit.send_rpc_server(network_transmit, "rpc_spawn_pickup", pickup_name_id, position, rotation, pickup_spawn_type_id)
+					network_transmit:send_rpc_server("rpc_spawn_pickup", pickup_name_id, position, rotation, pickup_spawn_type_id)
 				end
 			end
 
@@ -93,8 +93,8 @@ local function add_item(is_server, player_unit, pickup_type)
 			local unit_template = nil
 			local extra_extension_init_data = {}
 
-			inventory_extension.destroy_slot(inventory_extension, slot_name)
-			inventory_extension.add_equipment(inventory_extension, slot_name, item_data, unit_template, extra_extension_init_data)
+			inventory_extension:destroy_slot(slot_name)
+			inventory_extension:add_equipment(slot_name, item_data, unit_template, extra_extension_init_data)
 
 			local go_id = Managers.state.unit_storage:go_id(player_unit)
 			local slot_id = NetworkLookup.equipment_slots[slot_name]
@@ -102,16 +102,16 @@ local function add_item(is_server, player_unit, pickup_type)
 			local weapon_skin_id = NetworkLookup.weapon_skins["n/a"]
 
 			if is_server then
-				network_transmit.send_rpc_clients(network_transmit, "rpc_add_equipment", go_id, slot_id, item_id, weapon_skin_id)
+				network_transmit:send_rpc_clients("rpc_add_equipment", go_id, slot_id, item_id, weapon_skin_id)
 			else
-				network_transmit.send_rpc_server(network_transmit, "rpc_add_equipment", go_id, slot_id, item_id, weapon_skin_id)
+				network_transmit:send_rpc_server("rpc_add_equipment", go_id, slot_id, item_id, weapon_skin_id)
 			end
 
-			local wielded_slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
+			local wielded_slot_name = inventory_extension:get_wielded_slot_name()
 
 			if wielded_slot_name == slot_name then
 				CharacterStateHelper.stop_weapon_actions(inventory_extension, "picked_up_object")
-				inventory_extension.wield(inventory_extension, slot_name)
+				inventory_extension:wield(slot_name)
 			end
 		end
 	end
@@ -133,7 +133,7 @@ TwitchVoteTemplates.twitch_give_first_aid_kit = {
 		local players = Managers.player:human_and_bot_players()
 
 		for _, player in pairs(players) do
-			local profile_index = player.profile_index(player)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local display_name = profile.display_name
 
@@ -166,7 +166,7 @@ TwitchVoteTemplates.twitch_give_healing_draught = {
 		local players = Managers.player:human_and_bot_players()
 
 		for _, player in pairs(players) do
-			local profile_index = player.profile_index(player)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local display_name = profile.display_name
 
@@ -199,7 +199,7 @@ TwitchVoteTemplates.twitch_give_damage_boost_potion = {
 		local players = Managers.player:human_and_bot_players()
 
 		for _, player in pairs(players) do
-			local profile_index = player.profile_index(player)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local display_name = profile.display_name
 
@@ -232,7 +232,7 @@ TwitchVoteTemplates.twitch_give_speed_boost_potion = {
 		local players = Managers.player:human_and_bot_players()
 
 		for _, player in pairs(players) do
-			local profile_index = player.profile_index(player)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local display_name = profile.display_name
 
@@ -265,7 +265,7 @@ TwitchVoteTemplates.twitch_give_cooldown_reduction_potion = {
 		local players = Managers.player:human_and_bot_players()
 
 		for _, player in pairs(players) do
-			local profile_index = player.profile_index(player)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local display_name = profile.display_name
 
@@ -298,7 +298,7 @@ TwitchVoteTemplates.twitch_give_frag_grenade_t1 = {
 		local players = Managers.player:human_and_bot_players()
 
 		for _, player in pairs(players) do
-			local profile_index = player.profile_index(player)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local display_name = profile.display_name
 
@@ -331,7 +331,7 @@ TwitchVoteTemplates.twitch_give_fire_grenade_t1 = {
 		local players = Managers.player:human_and_bot_players()
 
 		for _, player in pairs(players) do
-			local profile_index = player.profile_index(player)
+			local profile_index = player:profile_index()
 			local profile = SPProfiles[profile_index]
 			local display_name = profile.display_name
 

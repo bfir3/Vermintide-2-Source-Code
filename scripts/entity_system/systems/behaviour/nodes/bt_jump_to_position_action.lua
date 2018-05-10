@@ -24,7 +24,7 @@ BTJumpToPositionAction.enter = function (self, unit, blackboard, t)
 		name = "BTJumpToPositionAction"
 	})
 
-	drawer.reset(drawer)
+	drawer:reset()
 	assert(blackboard.jump_from_pos and blackboard.exit_pos, "BTJumpToPositionAction needs jump_from_pos and exit_pos defined in blackboard.")
 
 	local entrance_pos = blackboard.jump_from_pos:unbox()
@@ -34,9 +34,9 @@ BTJumpToPositionAction.enter = function (self, unit, blackboard, t)
 	blackboard.jump_ledge_lookat_direction = Vector3Box(Vector3.normalize(Vector3.flat(exit_pos - entrance_pos)))
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.set_affected_by_gravity(locomotion_extension, false)
-	locomotion_extension.set_movement_type(locomotion_extension, "snap_to_navmesh")
-	locomotion_extension.set_rotation_speed(locomotion_extension, 10)
+	locomotion_extension:set_affected_by_gravity(false)
+	locomotion_extension:set_movement_type("snap_to_navmesh")
+	locomotion_extension:set_rotation_speed(10)
 
 	blackboard.jump_state = "moving_to_ledge"
 end
@@ -60,11 +60,11 @@ BTJumpToPositionAction.leave = function (self, unit, blackboard, t, reason, dest
 
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.set_movement_type(locomotion_extension, "snap_to_navmesh")
+	locomotion_extension:set_movement_type("snap_to_navmesh")
 
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_enabled(navigation_extension, true)
+	navigation_extension:set_enabled(true)
 
 	local hit_reaction_extension = ScriptUnit.extension(unit, "hit_reaction_system")
 	hit_reaction_extension.force_ragdoll_on_death = nil
@@ -79,9 +79,9 @@ BTJumpToPositionAction.run = function (self, unit, blackboard, t, dt)
 
 	if blackboard.jump_state == "moving_to_ledge" and Vector3.distance_squared(entrance_pos, unit_position) < 1 then
 		LocomotionUtils.set_animation_driven_movement(unit, false)
-		locomotion_extension.set_wanted_velocity(locomotion_extension, Vector3.zero())
-		locomotion_extension.set_movement_type(locomotion_extension, "script_driven")
-		navigation_extension.set_enabled(navigation_extension, false)
+		locomotion_extension:set_wanted_velocity(Vector3.zero())
+		locomotion_extension:set_movement_type("script_driven")
+		navigation_extension:set_enabled(false)
 
 		blackboard.is_jumping = true
 		blackboard.jump_state = "moving_towards_smartobject_entrance"
@@ -104,10 +104,10 @@ BTJumpToPositionAction.run = function (self, unit, blackboard, t, dt)
 			local direction_to_target = Vector3.normalize(vector_to_target)
 			local wanted_velocity = direction_to_target * speed
 
-			locomotion_extension.set_wanted_velocity(locomotion_extension, wanted_velocity)
-			locomotion_extension.set_wanted_rotation(locomotion_extension, wanted_rotation)
+			locomotion_extension:set_wanted_velocity(wanted_velocity)
+			locomotion_extension:set_wanted_rotation(wanted_rotation)
 		else
-			locomotion_extension.teleport_to(locomotion_extension, move_target, wanted_rotation)
+			locomotion_extension:teleport_to(move_target, wanted_rotation)
 			LocomotionUtils.set_animation_driven_movement(unit, true)
 			Managers.state.network:anim_event(unit, blackboard.action.jump_animation)
 
@@ -123,8 +123,8 @@ BTJumpToPositionAction.run = function (self, unit, blackboard, t, dt)
 	end
 
 	if blackboard.jump_state == "waiting_to_reach_end" and blackboard.jump_start_finished then
-		navigation_extension.set_navbot_position(navigation_extension, exit_pos)
-		locomotion_extension.teleport_to(locomotion_extension, exit_pos)
+		navigation_extension:set_navbot_position(exit_pos)
+		locomotion_extension:teleport_to(exit_pos)
 		Managers.state.network:anim_event(unit, blackboard.action.land_animation)
 
 		blackboard.spawn_to_running = true

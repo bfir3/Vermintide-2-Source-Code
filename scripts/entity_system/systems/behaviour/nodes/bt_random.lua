@@ -26,20 +26,20 @@ BTRandom.enter = function (self, unit, blackboard, t)
 end
 
 BTRandom.leave = function (self, unit, blackboard, t, reason, destroy)
-	self.set_running_child(self, unit, blackboard, t, nil)
+	self:set_running_child(unit, blackboard, t, nil)
 
 	blackboard.node_data[self._identifier] = nil
 end
 
 BTRandom.run = function (self, unit, blackboard, t, dt)
-	local running_child = self.current_running_child(self, blackboard)
+	local running_child = self:current_running_child(blackboard)
 
 	if running_child then
-		if not running_child.condition(running_child, blackboard) then
+		if not running_child:condition(blackboard) then
 			return "failed"
 		end
 
-		local result = running_child.run(running_child, unit, blackboard, t, dt)
+		local result = running_child:run(unit, blackboard, t, dt)
 
 		return result
 	end
@@ -52,10 +52,10 @@ BTRandom.run = function (self, unit, blackboard, t, dt)
 		local actual_index = ((i + child_to_run_index) - 2) % num_children + 1
 		local child = self._children[actual_index]
 
-		if child.condition(child, blackboard) then
-			self.set_running_child(self, unit, blackboard, t, child)
+		if child:condition(blackboard) then
+			self:set_running_child(unit, blackboard, t, child)
 
-			local result = child.run(child, unit, blackboard, t, dt)
+			local result = child:run(unit, blackboard, t, dt)
 
 			return result
 		end

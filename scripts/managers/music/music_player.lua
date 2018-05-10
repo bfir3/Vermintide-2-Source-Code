@@ -77,7 +77,7 @@ MusicPlayer.post_trigger = function (self, event)
 end
 
 MusicPlayer.update = function (self, flags, game_object_id)
-	local should_play = self._should_play(self, flags)
+	local should_play = self:_should_play(flags)
 
 	if not self._playing and should_play then
 		self._playing = Music:new(self._wwise_world, self._start_event, self._stop_switch, self._name, self._init_group_states, self._game_state_voice_thresholds)
@@ -101,10 +101,10 @@ MusicPlayer.update = function (self, flags, game_object_id)
 	end
 
 	for music, _ in pairs(self._old_music) do
-		if not music.is_playing(music) then
+		if not music:is_playing() then
 			self._old_music[music] = nil
 
-			music.destroy(music)
+			music:destroy()
 		end
 	end
 
@@ -127,7 +127,7 @@ MusicPlayer.destroy = function (self)
 	for music, _ in pairs(self._old_music) do
 		self._old_music[music] = nil
 
-		music.destroy(music)
+		music:destroy()
 	end
 end
 

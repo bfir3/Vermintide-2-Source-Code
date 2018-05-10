@@ -58,7 +58,7 @@ ChaosTrollHealthExtension.update = function (self, dt, context, t)
 	end
 
 	if self.state == "down" then
-		self.update_regen_effect(self, t, dt, self.downed_pulse_interval, self.downed_pulse_intensity)
+		self:update_regen_effect(t, dt, self.downed_pulse_interval, self.downed_pulse_intensity)
 
 		if self.start_reset_time < t then
 			self.down_reset_timer = self.down_reset_timer + dt
@@ -67,14 +67,14 @@ ChaosTrollHealthExtension.update = function (self, dt, context, t)
 			set_material_property(self.unit, "damage_value", "mtr_skin", percent_damage, true)
 		end
 	elseif self.state == "unhurt" or self.state == "wounded" then
-		self.update_regen_effect(self, t, dt, self.regen_pulse_interval, self.regen_pulse_intensity)
+		self:update_regen_effect(t, dt, self.regen_pulse_interval, self.regen_pulse_intensity)
 
 		if self._regen_time < t then
-			self.add_heal(self, self.unit, self._blackboard.health_regen_per_sec * self.regen_pulse_interval, nil, "buff")
+			self:add_heal(self.unit, self._blackboard.health_regen_per_sec * self.regen_pulse_interval, nil, "buff")
 
 			self._regen_time = t + self.regen_pulse_interval
 
-			self.sync_health_to_clients(self)
+			self:sync_health_to_clients()
 
 			self.pulse_time = 0
 		end
@@ -124,7 +124,7 @@ ChaosTrollHealthExtension.add_damage = function (self, attacker_unit, damage_amo
 		end
 	end
 
-	self.sync_health_to_clients(self)
+	self:sync_health_to_clients()
 end
 
 ChaosTrollHealthExtension.set_downed_finished = function (self)
@@ -141,7 +141,7 @@ ChaosTrollHealthExtension.set_downed_finished = function (self)
 			self.respawn_hp_min = new_health * action.respawn_hp_min_percent
 			self.go_down_health = new_health * action.become_downed_hp_percent
 
-			self.set_max_health(self, new_health)
+			self:set_max_health(new_health)
 
 			self.damage = 0
 		end
@@ -156,7 +156,7 @@ ChaosTrollHealthExtension.set_downed_finished = function (self)
 		self.down_reset_timer = nil
 
 		set_material_property(self.unit, "damage_value", "mtr_skin", 1, true)
-		self.sync_health_to_clients(self)
+		self:sync_health_to_clients()
 	end
 end
 

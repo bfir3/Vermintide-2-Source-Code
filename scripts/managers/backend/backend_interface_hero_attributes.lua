@@ -22,7 +22,7 @@ BackendInterfaceHeroAttributes._refresh_attributes = function (self)
 end
 
 BackendInterfaceHeroAttributes.on_authenticated = function (self)
-	self._refresh_attributes(self)
+	self:_refresh_attributes()
 end
 
 BackendInterfaceHeroAttributes.get = function (self, hero_name, attribute_name)
@@ -58,7 +58,7 @@ BackendInterfaceHeroAttributes.set = function (self, hero_name, attribute_name, 
 	local error_code = Backend.set_entity_attribute(entity_id, db_attribute_name, value_json)
 
 	fassert(not error_code or error_code == Backend.RES_NO_CHANGE, "[BackendInterfaceHeroAttributes:set] BackendItem.set_entity_attribute() returned an unexpected result: %d", error_code)
-	self._refresh_attributes(self)
+	self:_refresh_attributes()
 end
 
 return

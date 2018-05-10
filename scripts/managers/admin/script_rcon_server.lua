@@ -113,9 +113,9 @@ ScriptRconServer._find_player = function (self, find_str)
 	local found_id = nil
 
 	for _, player in pairs(Managers.player:players()) do
-		local peer_id = player.network_id(player)
+		local peer_id = player:network_id()
 
-		if string.find(peer_id, find_str, start_index, disable_pattern_matching) ~= nil or string.find(player.name(player), find_str, start_index, disable_pattern_matching) ~= nil then
+		if string.find(peer_id, find_str, start_index, disable_pattern_matching) ~= nil or string.find(player:name(), find_str, start_index, disable_pattern_matching) ~= nil then
 			if found_id ~= nil then
 				return nil
 			end
@@ -202,7 +202,7 @@ ScriptRconServer._command_ban = function (self, peer_id, name, days_str)
 		return string.format("%s\n", tr("rcon_server_command_response_invalid_peerid"))
 	end
 
-	if days_str ~= nil and days_str.match(days_str, "^%d+$") == nil then
+	if days_str ~= nil and days_str:match("^%d+$") == nil then
 		return string.format("%s\n", tr("rcon_server_command_response_invalid_days"))
 	end
 
@@ -220,8 +220,8 @@ ScriptRconServer._command_ban = function (self, peer_id, name, days_str)
 
 	local manager = Managers.ban_list
 
-	manager.ban(manager, peer_id, name, unban_at)
-	manager.save(manager, function (error)
+	manager:ban(peer_id, name, unban_at)
+	manager:save(function (error)
 		if error ~= nil then
 			cprintf("Ban list save failed (%s)", error)
 		end
@@ -233,7 +233,7 @@ end
 ScriptRconServer._command_banlist = function (self)
 	local result = ""
 	local manager = Managers.ban_list
-	local list = manager.ban_list(manager)
+	local list = manager:ban_list()
 
 	for _, info in ipairs(list) do
 		if info.ban_end ~= nil then
@@ -270,7 +270,7 @@ ScriptRconServer._command_id = function (self)
 end
 
 ScriptRconServer._command_kick = function (self, id_or_name)
-	local peer_id = self._find_player(self, id_or_name)
+	local peer_id = self:_find_player(id_or_name)
 
 	if peer_id == nil then
 		return string.format("%s\n", tr("rcon_server_command_response_unmatched_player"))
@@ -278,7 +278,7 @@ ScriptRconServer._command_kick = function (self, id_or_name)
 
 	local server = Managers.matchmaking.network_server
 
-	server.kick_peer(server, peer_id)
+	server:kick_peer(peer_id)
 
 	return string.format("%s\n", tr("rcon_server_command_response_ok"))
 end
@@ -287,7 +287,7 @@ ScriptRconServer._command_players = function (self)
 	local player_list = ""
 
 	for _, player in pairs(Managers.player:players()) do
-		player_list = string.format("%s%s - %s\n", player_list, player.network_id(player), player.name(player))
+		player_list = string.format("%s%s - %s\n", player_list, player:network_id(), player:name())
 	end
 
 	if player_list == "" then
@@ -307,15 +307,15 @@ ScriptRconServer._command_say = function (self, ...)
 	local say_text = varargs.join(" ", ...)
 	local chat = Managers.chat
 
-	if chat.has_channel(chat, 1) then
-		chat.send_chat_message(chat, 1, say_text)
+	if chat:has_channel(1) then
+		chat:send_chat_message(1, say_text)
 	end
 
 	return string.format("%s\n", tr("rcon_server_command_response_ok"))
 end
 
 ScriptRconServer._command_unban = function (self, id_or_name)
-	local peer_id = self._find_banned(self, id_or_name)
+	local peer_id = self:_find_banned(id_or_name)
 
 	if peer_id == nil then
 		return string.format("%s\n", tr("rcon_server_command_response_unmatched_player"))
@@ -323,8 +323,8 @@ ScriptRconServer._command_unban = function (self, id_or_name)
 
 	local manager = Managers.ban_list
 
-	manager.unban(manager, peer_id)
-	manager.save(manager, function (error)
+	manager:unban(peer_id)
+	manager:save(function (error)
 		if error ~= nil then
 			cprintf("Ban list save failed (%s)", error)
 		end

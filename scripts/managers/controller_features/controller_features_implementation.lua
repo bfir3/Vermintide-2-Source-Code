@@ -1,7 +1,7 @@
 ControllerFeaturesImplementation = class(ControllerFeaturesImplementation)
 
 ControllerFeaturesImplementation.init = function (self, is_in_inn)
-	self._reset(self)
+	self:_reset()
 
 	self._is_in_inn = is_in_inn
 
@@ -101,7 +101,7 @@ ControllerFeaturesImplementation.destroy = function (self)
 		end
 	end
 
-	self._reset(self)
+	self:_reset()
 end
 
 return

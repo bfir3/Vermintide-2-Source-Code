@@ -49,9 +49,9 @@ weapon_template.actions = {
 				}
 			},
 			enter_function = function (attacker_unit, input_extension)
-				input_extension.clear_input_buffer(input_extension)
+				input_extension:clear_input_buffer()
 
-				return input_extension.reset_release_input(input_extension)
+				return input_extension:reset_release_input()
 			end,
 			projectile_info = Projectiles.fireball,
 			impact_data = {
@@ -127,8 +127,8 @@ weapon_template.actions = {
 				}
 			},
 			enter_function = function (attacker_unit, input_extension)
-				input_extension.reset_release_input(input_extension)
-				input_extension.clear_input_buffer(input_extension)
+				input_extension:reset_release_input()
+				input_extension:clear_input_buffer()
 			end,
 			recoil_settings = {
 				horizontal_climb = -1,
@@ -200,8 +200,8 @@ weapon_template.actions = {
 				}
 			},
 			enter_function = function (attacker_unit, input_extension)
-				input_extension.reset_release_input(input_extension)
-				input_extension.clear_input_buffer(input_extension)
+				input_extension:reset_release_input()
+				input_extension:clear_input_buffer()
 			end
 		}
 	},
@@ -235,8 +235,8 @@ weapon_template.actions = {
 				}
 			},
 			enter_function = function (attacker_unit, input_extension)
-				input_extension.reset_release_input(input_extension)
-				input_extension.clear_input_buffer(input_extension)
+				input_extension:reset_release_input()
+				input_extension:clear_input_buffer()
 			end,
 			allowed_chain_actions = {
 				{
@@ -249,12 +249,12 @@ weapon_template.actions = {
 			condition_func = function (action_user, input_extension)
 				local overcharge_extension = ScriptUnit.extension(action_user, "overcharge_system")
 
-				return overcharge_extension.get_overcharge_value(overcharge_extension) ~= 0
+				return overcharge_extension:get_overcharge_value() ~= 0
 			end,
 			chain_condition_func = function (action_user, input_extension)
 				local overcharge_extension = ScriptUnit.extension(action_user, "overcharge_system")
 
-				return overcharge_extension.get_overcharge_value(overcharge_extension) ~= 0
+				return overcharge_extension:get_overcharge_value() ~= 0
 			end
 		}
 	},

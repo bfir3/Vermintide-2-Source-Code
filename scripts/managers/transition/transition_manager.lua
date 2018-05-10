@@ -12,8 +12,8 @@ end
 TransitionManager = class(TransitionManager)
 
 TransitionManager.init = function (self)
-	self._setup_names(self)
-	self._setup_world(self)
+	self:_setup_names()
+	self:_setup_world()
 
 	self._loading_icon_view = LoadingIconView:new(self._world)
 
@@ -98,9 +98,9 @@ TransitionManager.show_loading_icon = function (self, show_background)
 	self._loading_icon_view:show_loading_icon()
 
 	if show_background then
-		self.show_icon_background(self)
+		self:show_icon_background()
 	else
-		self.hide_icon_background(self)
+		self:hide_icon_background()
 	end
 end
 
@@ -217,7 +217,7 @@ TransitionManager._render = function (self, dt)
 end
 
 TransitionManager.force_render = function (self, dt)
-	local is_loading_icon_active = self.loading_icon_active(self)
+	local is_loading_icon_active = self:loading_icon_active()
 
 	if is_loading_icon_active and not Development.parameter("disable_loading_icon") then
 		self._loading_icon_view:update(dt)
@@ -231,7 +231,7 @@ TransitionManager.force_render = function (self, dt)
 		self._transition_video:update(dt)
 	end
 
-	self._render(self)
+	self:_render()
 end
 
 TransitionManager.update = function (self, dt)
@@ -239,7 +239,7 @@ TransitionManager.update = function (self, dt)
 		Managers.eac:draw_panel(self._gui, dt)
 	end
 
-	local is_loading_icon_active = self.loading_icon_active(self)
+	local is_loading_icon_active = self:loading_icon_active()
 
 	if is_loading_icon_active and not Development.parameter("disable_loading_icon") then
 		self._loading_icon_view:update(dt)
@@ -262,7 +262,7 @@ TransitionManager.update = function (self, dt)
 	end
 
 	if self._fade_state == "in" then
-		self._render(self, dt)
+		self:_render(dt)
 
 		return
 	end
@@ -294,7 +294,7 @@ TransitionManager.update = function (self, dt)
 	end
 
 	if self._fade_state ~= "out" then
-		self._render(self, dt)
+		self:_render(dt)
 	end
 end
 

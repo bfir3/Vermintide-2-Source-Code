@@ -14,7 +14,7 @@ SimpleDoorExtension.init = function (self, extension_init_context, unit, extensi
 end
 
 SimpleDoorExtension.destroy = function (self)
-	self.destroy_box_obstacle(self)
+	self:destroy_box_obstacle()
 
 	self.unit = nil
 	self.world = nil
@@ -97,7 +97,7 @@ SimpleDoorExtension.update = function (self, unit, input, dt, context, t)
 	local animation_stop_time = self.animation_stop_time
 
 	if animation_stop_time and animation_stop_time <= t then
-		self.update_nav_obstacle(self)
+		self:update_nav_obstacle()
 
 		self.animation_stop_time = nil
 		local closed = self.current_state == "closed"

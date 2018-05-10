@@ -44,7 +44,7 @@ BTRatlingGunnerWindUpAction.enter = function (self, unit, blackboard, t)
 
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
+	network_manager:anim_event(unit, "to_combat")
 
 	blackboard.move_state = "attacking"
 
@@ -56,11 +56,11 @@ BTRatlingGunnerWindUpAction.enter = function (self, unit, blackboard, t)
 
 	local inventory_template = blackboard.breed.default_inventory_template
 	local inventory_extension = ScriptUnit.extension(unit, "ai_inventory_system")
-	local ratling_gun_unit = inventory_extension.get_unit(inventory_extension, inventory_template)
+	local ratling_gun_unit = inventory_extension:get_unit(inventory_template)
 	data.ratling_gun_unit = ratling_gun_unit
 	local ai_navigation = blackboard.navigation_extension
 
-	ai_navigation.set_max_speed(ai_navigation, blackboard.breed.walk_speed)
+	ai_navigation:set_max_speed(blackboard.breed.walk_speed)
 end
 
 BTRatlingGunnerWindUpAction._update_target = function (self, unit, blackboard, data, t)
@@ -103,8 +103,8 @@ BTRatlingGunnerWindUpAction.leave = function (self, unit, blackboard, t, reason,
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_enabled(navigation_extension, true)
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_enabled(true)
+	navigation_extension:set_max_speed(default_move_speed)
 
 	local data = blackboard.attack_pattern_data or {}
 
@@ -121,7 +121,7 @@ BTRatlingGunnerWindUpAction.run = function (self, unit, blackboard, t, dt)
 	end
 
 	if not blackboard.first_shots_fired then
-		self._update_target(self, unit, blackboard, data, t)
+		self:_update_target(unit, blackboard, data, t)
 
 		return "done"
 	end
@@ -129,7 +129,7 @@ BTRatlingGunnerWindUpAction.run = function (self, unit, blackboard, t, dt)
 	data.wind_up_timer = data.wind_up_timer - dt
 
 	if data.target_check < t then
-		self._update_target(self, unit, blackboard, data, t)
+		self:_update_target(unit, blackboard, data, t)
 	end
 
 	local windup_start_finished = blackboard.anim_cb_attack_windup_start_finished

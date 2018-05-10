@@ -12,16 +12,16 @@ Music.init = function (self, wwise_world, start_event, stop, name, group_states,
 	self._name = name
 	self._game_state_voice_thresholds = game_state_voice_thresholds
 
-	self._init_group_states(self, group_states)
+	self:_init_group_states(group_states)
 
-	self._id = self._trigger_event(self, start_event)
+	self._id = self:_trigger_event(start_event)
 end
 
 Music._init_group_states = function (self, states)
 	self._group_states = {}
 
 	for group, state in pairs(states) do
-		self.set_group_state(self, group, state)
+		self:set_group_state(group, state)
 	end
 end
 
@@ -32,10 +32,10 @@ end
 Music.stop = function (self)
 	if self._stop then
 		dprint("Stopping Music player", self._name, "with switch:", self._stop.switch, "and value", self._stop.value)
-		self.set_group_state(self, self._stop.group, self._stop.state)
-		self._trigger_event(self, self._stop.event)
+		self:set_group_state(self._stop.group, self._stop.state)
+		self:_trigger_event(self._stop.event)
 	else
-		self.destroy(self)
+		self:destroy()
 	end
 
 	self._stopped = true
@@ -50,7 +50,7 @@ Music.is_playing = function (self)
 end
 
 Music.destroy = function (self)
-	if self.is_playing(self) then
+	if self:is_playing() then
 		WwiseWorld.stop_event(self._wwise_world, self._id)
 	end
 end

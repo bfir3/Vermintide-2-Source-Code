@@ -37,7 +37,7 @@ AINavigationExtension.extensions_ready = function (self)
 end
 
 AINavigationExtension.destroy = function (self)
-	self.release_bot(self)
+	self:release_bot()
 	GwNavSmartObjectInterval.destroy(self._next_smartobject_interval)
 end
 
@@ -214,7 +214,7 @@ AINavigationExtension.add_movement_modifier = function (self, new_modifier)
 	self._num_movement_modifiers = current_amount + 1
 	self._last_movement_modifier_index = id
 
-	self._recalculate_max_speed(self)
+	self:_recalculate_max_speed()
 
 	return id
 end
@@ -227,7 +227,7 @@ AINavigationExtension.remove_movement_modifier = function (self, id)
 	modifiers[id] = nil
 	self._num_movement_modifiers = self._num_movement_modifiers - 1
 
-	self._recalculate_max_speed(self)
+	self:_recalculate_max_speed()
 end
 
 AINavigationExtension._recalculate_max_speed = function (self)
@@ -256,7 +256,7 @@ AINavigationExtension.set_max_speed = function (self, speed)
 
 	self._max_speed = speed
 
-	self._recalculate_max_speed(self)
+	self:_recalculate_max_speed()
 end
 
 AINavigationExtension.get_max_speed = function (self)
@@ -349,14 +349,14 @@ end
 
 AINavigationExtension.distance_to_destination = function (self, position)
 	position = position or Unit.local_position(self._unit, 0)
-	local destination = self.destination(self)
+	local destination = self:destination()
 
 	return Vector3.distance(position, destination)
 end
 
 AINavigationExtension.distance_to_destination_sq = function (self, position)
 	position = position or Unit.local_position(self._unit, 0)
-	local destination = self.destination(self)
+	local destination = self:destination()
 
 	return Vector3.distance_squared(position, destination)
 end
@@ -365,7 +365,7 @@ local navigation_stop_distance_before_destination = 0.3
 
 AINavigationExtension.has_reached_destination = function (self, reach_distance)
 	local reach_distance_sq = (reach_distance or navigation_stop_distance_before_destination)^2
-	local distance_sq = self.distance_to_destination_sq(self)
+	local distance_sq = self:distance_to_destination_sq()
 
 	return distance_sq < reach_distance_sq
 end

@@ -18,7 +18,7 @@ ActionWield.client_owner_start_action = function (self, new_action, t)
 	if self.current_action.reset_aim_on_attack then
 		local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
 
-		first_person_extension.reset_aim_assist_multiplier(first_person_extension)
+		first_person_extension:reset_aim_assist_multiplier()
 	end
 
 	local new_slot, scroll_value = CharacterStateHelper.wield_input(self.input_extension, self.inventory_extension, "action_wield", true)
@@ -28,12 +28,12 @@ ActionWield.client_owner_start_action = function (self, new_action, t)
 
 	local input_extension = self.input_extension
 
-	input_extension.set_last_scroll_value(input_extension, scroll_value)
+	input_extension:set_last_scroll_value(scroll_value)
 
 	local clear_input_buffer_from_wield = true
 
-	input_extension.clear_input_buffer(input_extension, clear_input_buffer_from_wield)
-	input_extension.add_wield_cooldown(input_extension, t + new_action.wield_cooldown)
+	input_extension:clear_input_buffer(clear_input_buffer_from_wield)
+	input_extension:add_wield_cooldown(t + new_action.wield_cooldown)
 	self.inventory_extension:wield(self.new_slot)
 end
 
@@ -44,8 +44,8 @@ end
 ActionWield.finish = function (self, reason)
 	local status_extension = self.status_extension
 
-	if status_extension.is_zooming(status_extension) then
-		status_extension.set_zooming(status_extension, false)
+	if status_extension:is_zooming() then
+		status_extension:set_zooming(false)
 	end
 end
 

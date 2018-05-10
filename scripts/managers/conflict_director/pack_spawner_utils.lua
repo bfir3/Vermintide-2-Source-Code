@@ -151,8 +151,8 @@ PackSpawnerUtils.modify_spawn_position = function (unit_pos, pos)
 	local y = pos[2] + unit_pos[2]
 	local pos = Vector3(x, y, pos[3])
 	local entity_manager = Managers.state.entity
-	local ai_system = entity_manager.system(entity_manager, "ai_system")
-	local poly, altitude = ai_system.get_tri_on_navmesh(ai_system, pos)
+	local ai_system = entity_manager:system("ai_system")
+	local poly, altitude = ai_system:get_tri_on_navmesh(pos)
 
 	if poly then
 		pos.z = altitude

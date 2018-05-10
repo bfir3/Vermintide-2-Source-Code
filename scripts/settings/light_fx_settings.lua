@@ -45,7 +45,7 @@ LightFXSettings = {
 
 			if Unit.alive(unit) then
 				local health_ext = ScriptUnit.extension(unit, "health_system")
-				local health_percent = health_ext.current_health_percent(health_ext)
+				local health_percent = health_ext:current_health_percent()
 				v[1], v[2], v[3] = percent_to_rgb(health_percent)
 			end
 
@@ -81,7 +81,7 @@ LightFXConditionalSettings = {
 			if Unit.alive(unit) then
 				local status_ext = ScriptUnit.extension(unit, "status_system")
 
-				if status_ext.knocked_down or status_ext.is_ready_for_assisted_respawn(status_ext) then
+				if status_ext.knocked_down or status_ext:is_ready_for_assisted_respawn() then
 					return true
 				end
 			else
@@ -122,7 +122,7 @@ LightFXConditionalSettings = {
 			end
 
 			local health_extension = ScriptUnit.extension(unit, "health_system")
-			local strided_array, array_length = health_extension.recent_damages(health_extension)
+			local strided_array, array_length = health_extension:recent_damages()
 			local damaged = 0 < array_length
 
 			return damaged

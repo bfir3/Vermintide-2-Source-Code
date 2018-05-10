@@ -56,9 +56,9 @@ BlendCamera.update = function (self, dt, position, rotation, data)
 	for child_index, blend_setup in ipairs(self._blend_setups) do
 		local node = blend_setup.node
 
-		node.update(node, dt, position, rotation, data)
+		node:update(dt, position, rotation, data)
 
-		local offset = node.position(node) - position
+		local offset = node:position() - position
 		local weight = blend_setup.weight_function(blend_setup.definition, data)
 		total_weight = total_weight + weight
 

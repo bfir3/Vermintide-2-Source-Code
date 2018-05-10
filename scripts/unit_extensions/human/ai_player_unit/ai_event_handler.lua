@@ -13,8 +13,8 @@ AIEventHandler.ai_stopped = function (self, unit)
 
 	local brain = ScriptUnit.extension(self._unit, "ai_system"):brain()
 
-	if brain.has_behaviour(brain, "avoidance") then
-		brain.change_behaviour(brain, "avoidance", "nil_tree")
+	if brain:has_behaviour("avoidance") then
+		brain:change_behaviour("avoidance", "nil_tree")
 	end
 end
 
@@ -25,8 +25,8 @@ AIEventHandler.ai_moving = function (self, unit)
 
 	local brain = ScriptUnit.extension(self._unit, "ai_system"):brain()
 
-	if brain.has_behaviour(brain, "avoidance") then
-		brain.change_behaviour(brain, "avoidance", "default_avoidance")
+	if brain:has_behaviour("avoidance") then
+		brain:change_behaviour("avoidance", "default_avoidance")
 	end
 end
 

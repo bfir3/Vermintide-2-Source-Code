@@ -8,7 +8,7 @@ DifficultyManager.init = function (self, world, is_server, network_event_delegat
 	self.network_event_delegate = network_event_delegate
 	self.lobby_host = lobby_host
 
-	network_event_delegate.register(network_event_delegate, self, "rpc_set_difficulty")
+	network_event_delegate:register(self, "rpc_set_difficulty")
 
 	self.difficulty = nil
 end
@@ -31,7 +31,7 @@ DifficultyManager.set_difficulty = function (self, difficulty)
 			local network_transmit = network_manager.network_transmit
 			local difficulty_id = NetworkLookup.difficulties[self.difficulty]
 
-			network_transmit.send_rpc_clients(network_transmit, "rpc_set_difficulty", difficulty_id, false)
+			network_transmit:send_rpc_clients("rpc_set_difficulty", difficulty_id, false)
 		end
 	end
 end
@@ -61,7 +61,7 @@ DifficultyManager.hot_join_sync = function (self, sender)
 	local network_transmit = network_manager.network_transmit
 	local difficulty_id = NetworkLookup.difficulties[self.difficulty]
 
-	network_transmit.send_rpc(network_transmit, "rpc_set_difficulty", sender, difficulty_id, true)
+	network_transmit:send_rpc("rpc_set_difficulty", sender, difficulty_id, true)
 end
 
 DifficultyManager.destroy = function (self)
@@ -71,7 +71,7 @@ end
 DifficultyManager.rpc_set_difficulty = function (self, sender, difficulty_id, hot_join)
 	local difficulty = NetworkLookup.difficulties[difficulty_id]
 
-	self.set_difficulty(self, difficulty)
+	self:set_difficulty(difficulty)
 
 	if hot_join then
 		Managers.state.event:trigger("difficulty_synced")
@@ -86,7 +86,7 @@ DifficultyManager.players_below_required_power_level = function (difficulty_key,
 	local required_power_level = DifficultySettings[difficulty_key].required_power_level
 
 	for unique_id, player in pairs(players) do
-		if player.sync_data_active(player) and player.get_data(player, "best_aquired_power_level") < required_power_level then
+		if player:sync_data_active() and player:get_data("best_aquired_power_level") < required_power_level then
 			players_below_power_level[#players_below_power_level + 1] = player
 		end
 	end

@@ -44,7 +44,7 @@ ProjectileFlameWaveLocomotionExtension.init = function (self, extension_init_con
 	self._last_position_time = t
 	self._next_position_time = t + interval
 	self._last_position = Vector3Box(pos)
-	local next_pos = self._calculate_next_position(self, pos, flat_velocity)
+	local next_pos = self:_calculate_next_position(pos, flat_velocity)
 	self._next_position = Vector3Box(next_pos)
 
 	if not self.is_husk then
@@ -55,8 +55,8 @@ ProjectileFlameWaveLocomotionExtension.init = function (self, extension_init_con
 		else
 			self._neighbour_lateral_speed = 0
 
-			self._spawn_projectile(self, pos, flat_dir, -6)
-			self._spawn_projectile(self, pos, flat_dir, 6)
+			self:_spawn_projectile(pos, flat_dir, -6)
+			self:_spawn_projectile(pos, flat_dir, 6)
 		end
 
 		self._last_spawn = t
@@ -92,7 +92,7 @@ ProjectileFlameWaveLocomotionExtension._generate_next_position = function (self)
 	local old_next_position = self._next_position:unbox()
 
 	self._last_position:store(old_next_position)
-	self._next_position:store(self._calculate_next_position(self, old_next_position, self._flat_velocity:unbox()))
+	self._next_position:store(self:_calculate_next_position(old_next_position, self._flat_velocity:unbox()))
 
 	local old_next_time = self._next_position_time
 	self._last_position_time = old_next_time
@@ -110,8 +110,8 @@ ProjectileFlameWaveLocomotionExtension._update_position = function (self, dt, t)
 	local network_manager = Managers.state.network
 
 	if not self.is_husk then
-		local game = network_manager.game(network_manager)
-		local game_object_id = game and network_manager.unit_game_object_id(network_manager, self._unit)
+		local game = network_manager:game()
+		local game_object_id = game and network_manager:unit_game_object_id(self._unit)
 
 		if game_object_id then
 			GameSession.set_game_object_field(game, game_object_id, "distance_travelled", self._distance_travelled)
@@ -131,7 +131,7 @@ ProjectileFlameWaveLocomotionExtension._update_spawn = function (self, dt, t, ne
 	local lateral_diff = time_since_spawn * relative_speed + MAX_LATERAL_DIST * 0.5
 
 	if MAX_LATERAL_DIST < math.abs(lateral_diff) then
-		self._spawn_projectile(self, new_position, self._flat_direction:unbox(), (self._lateral_speed + self._neighbour_lateral_speed) * 0.5)
+		self:_spawn_projectile(new_position, self._flat_direction:unbox(), (self._lateral_speed + self._neighbour_lateral_speed) * 0.5)
 
 		self._last_spawn = self._last_spawn + MAX_LATERAL_DIST / math.abs(relative_speed)
 	end
@@ -149,20 +149,20 @@ end
 
 ProjectileFlameWaveLocomotionExtension.update = function (self, unit, input, dt, context, t)
 	while self._next_position_time < t do
-		self._generate_next_position(self)
+		self:_generate_next_position()
 	end
 
 	if self._max_distance < self._distance_travelled then
-		self.stop(self)
+		self:stop()
 	end
 
 	if not self._stopped and not self._dissipate then
 		local old_position = POSITION_LOOKUP[unit]
-		local new_position = self._update_position(self, dt, t)
+		local new_position = self:_update_position(dt, t)
 
 		Unit.set_local_position(unit, 0, new_position)
 		self._velocity:store((new_position - old_position) / dt)
-		self._update_spawn(self, dt, t, new_position)
+		self:_update_spawn(dt, t, new_position)
 	end
 end
 

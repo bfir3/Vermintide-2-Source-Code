@@ -44,7 +44,7 @@ BTTargetRageAction.enter = function (self, unit, blackboard, t)
 	blackboard.attack_anim_driven = anim_driven
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.use_lerp_rotation(locomotion_extension, not anim_driven)
+	locomotion_extension:use_lerp_rotation(not anim_driven)
 	LocomotionUtils.set_animation_driven_movement(unit, anim_driven, false, false)
 
 	if anim_driven then
@@ -58,8 +58,8 @@ BTTargetRageAction.enter = function (self, unit, blackboard, t)
 	blackboard.move_state = "attacking"
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
-	network_manager.anim_event(network_manager, unit, rage_anim)
+	network_manager:anim_event(unit, "to_combat")
+	network_manager:anim_event(unit, rage_anim)
 
 	if 7 < blackboard.target_dist then
 		blackboard.chasing_timer = 25

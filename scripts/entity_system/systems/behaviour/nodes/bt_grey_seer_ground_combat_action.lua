@@ -47,7 +47,7 @@ end
 local Unit_alive = Unit.alive
 
 BTGreySeerGroundCombatAction.run = function (self, unit, blackboard, t, dt)
-	local ready_to_cast = self.update_spells(self, unit, blackboard, t)
+	local ready_to_cast = self:update_spells(unit, blackboard, t)
 
 	if ready_to_cast then
 		blackboard.ready_to_summon = true
@@ -64,13 +64,13 @@ BTGreySeerGroundCombatAction.update_spells = function (self, unit, blackboard, t
 	local position = POSITION_LOOKUP[unit]
 	local target_unit_direction = blackboard.target_unit and position - POSITION_LOOKUP[blackboard.target_unit]
 
-	self.update_warp_lightning_spell(self, unit, blackboard, t, position, target_unit_direction)
-	self.update_vermintide_spell(self, unit, blackboard, t, position, target_unit_direction)
+	self:update_warp_lightning_spell(unit, blackboard, t, position, target_unit_direction)
+	self:update_vermintide_spell(unit, blackboard, t, position, target_unit_direction)
 
 	if current_phase < 4 then
-		ready_to_summon = self.update_regular_spells(self, unit, blackboard, t)
+		ready_to_summon = self:update_regular_spells(unit, blackboard, t)
 	elseif current_phase == 4 then
-		ready_to_summon = self.update_final_phase(self, unit, blackboard, t)
+		ready_to_summon = self:update_final_phase(unit, blackboard, t)
 	end
 
 	return ready_to_summon
@@ -102,7 +102,7 @@ BTGreySeerGroundCombatAction.update_final_phase = function (self, unit, blackboa
 
 		local event_data = FrameTable.alloc_table()
 
-		dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_teleport_away", event_data)
+		dialogue_input:trigger_networked_dialogue_event("egs_teleport_away", event_data)
 
 		return true
 	end
@@ -110,7 +110,7 @@ BTGreySeerGroundCombatAction.update_final_phase = function (self, unit, blackboa
 	local spawn_allies_timer = final_phase_data.spawn_allies_timer
 
 	if spawn_allies_timer < t then
-		self.spawn_allies(self, unit, blackboard, t)
+		self:spawn_allies(unit, blackboard, t)
 
 		final_phase_data.spawn_allies_timer = t + action.spawn_allies_cooldown
 
@@ -118,10 +118,10 @@ BTGreySeerGroundCombatAction.update_final_phase = function (self, unit, blackboa
 
 		local event_data = FrameTable.alloc_table()
 
-		dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_cast_vermintide", event_data)
+		dialogue_input:trigger_networked_dialogue_event("egs_cast_vermintide", event_data)
 	end
 
-	ready_to_summon = self.update_regular_spells(self, unit, blackboard, t)
+	ready_to_summon = self:update_regular_spells(unit, blackboard, t)
 
 	return ready_to_summon
 end
@@ -141,14 +141,14 @@ BTGreySeerGroundCombatAction.update_regular_spells = function (self, unit, black
 		spell_data.warp_lightning_spell_timer = t + spell_data.warp_lightning_spell_cooldown
 		local event_data = FrameTable.alloc_table()
 
-		dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_cast_lightning", event_data)
+		dialogue_input:trigger_networked_dialogue_event("egs_cast_lightning", event_data)
 	elseif vemintide_timer < t then
 		blackboard.current_spell_name = "vermintide"
 		ready_to_summon = true
 		spell_data.vermintide_spell_timer = t + spell_data.vermintide_spell_cooldown
 		local event_data = FrameTable.alloc_table()
 
-		dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_cast_vermintide", event_data)
+		dialogue_input:trigger_networked_dialogue_event("egs_cast_vermintide", event_data)
 	end
 
 	return ready_to_summon

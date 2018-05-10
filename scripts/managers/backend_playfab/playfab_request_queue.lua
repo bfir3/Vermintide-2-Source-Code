@@ -12,7 +12,7 @@ PlayFabRequestQueue.enqueue = function (self, name, request, immediate)
 	}
 
 	if immediate then
-		self.send_request(self, entry)
+		self:send_request(entry)
 
 		self._pending_request = false
 	else
@@ -32,7 +32,7 @@ PlayFabRequestQueue.update = function (self)
 
 	local entry = table.remove(self._queue, 1)
 
-	self.send_request(self, entry)
+	self:send_request(entry)
 end
 
 PlayFabRequestQueue.send_request = function (self, entry)

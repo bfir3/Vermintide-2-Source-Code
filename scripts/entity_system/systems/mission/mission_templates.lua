@@ -50,30 +50,30 @@ MissionTemplates = {
 		update = function (data, positive, dt)
 			local collect_amount = data.collect_amount
 			local evaluate_at_level_end = data.evaluate_at_level_end
-			local current_amount = data.increase_current_amount(data, (positive and 1) or -1)
+			local current_amount = data:increase_current_amount((positive and 1) or -1)
 
 			return not evaluate_at_level_end and current_amount == collect_amount
 		end,
 		update_text = function (data)
 			local collect_amount = data.collect_amount
-			local current_amount = data.get_current_amount(data)
+			local current_amount = data:get_current_amount()
 			local text = string.format("%s/%s\n%s", tostring(current_amount), tostring(collect_amount), data.mission_text)
 			local center_text = string.format("%s/%s %s", tostring(current_amount), tostring(collect_amount), data.mission_text)
 			data.text = text
 			data.center_text = center_text
 		end,
 		evaluate_mission = function (data, dt)
-			return data.get_current_amount(data) == data.collect_amount, data.get_current_amount(data) / data.collect_amount
+			return data:get_current_amount() == data.collect_amount, data:get_current_amount() / data.collect_amount
 		end,
 		create_sync_data = function (data)
 			local sync_data = {
-				data.get_current_amount(data)
+				data:get_current_amount()
 			}
 
 			return sync_data
 		end,
 		sync = function (data, sync_data)
-			data.set_current_amount(data, sync_data[1])
+			data:set_current_amount(sync_data[1])
 		end
 	},
 	defend = {
@@ -273,7 +273,7 @@ MissionTemplates = {
 				if Unit.alive(unit) then
 					local status_extension = ScriptUnit.extension(unit, "status_system")
 
-					if not status_extension.is_disabled(status_extension) then
+					if not status_extension:is_disabled() then
 						num_alive = num_alive + 1
 					end
 				end
@@ -436,7 +436,7 @@ MissionTemplates = {
 MissionTemplates.collect_uncompletable = table.clone(MissionTemplates.collect)
 
 MissionTemplates.collect_uncompletable.evaluate_mission = function (data, dt)
-	return false, data.get_current_amount(data)
+	return false, data:get_current_amount()
 end
 
 return

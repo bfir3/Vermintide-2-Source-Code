@@ -61,7 +61,7 @@ BackendInterfaceCraftingBase.salvage_validation_func = function (self, recipe, i
 
 	for i = 1, #item_backend_ids, 1 do
 		local backend_id = item_backend_ids[i]
-		local masterlist_data = backend_items.get_item_masterlist_data(backend_items, backend_id)
+		local masterlist_data = backend_items:get_item_masterlist_data(backend_id)
 		local slot_type = masterlist_data.slot_type
 
 		if not salvagable_slot_types[slot_type] then
@@ -91,7 +91,7 @@ BackendInterfaceCraftingBase.craft_validation_func = function (self, recipe, ite
 	for i = 1, #ingredients, 1 do
 		local ingredient = ingredients[i]
 		local amount = ingredient.amount
-		local valid, ingredient_ids = self._validate_ingredient(self, ingredient, cloned_backend_ids)
+		local valid, ingredient_ids = self:_validate_ingredient(ingredient, cloned_backend_ids)
 		local multiple_check_func = ingredient.multiple_check_func
 
 		if valid and multiple_check_func then
@@ -128,7 +128,7 @@ BackendInterfaceCraftingBase._validate_ingredient = function (self, ingredient, 
 
 	for i = 1, #item_backend_ids, 1 do
 		local item_backend_id = item_backend_ids[i]
-		local masterlist_data = backend_items.get_item_masterlist_data(backend_items, item_backend_id)
+		local masterlist_data = backend_items:get_item_masterlist_data(item_backend_id)
 		local item_name = masterlist_data.name
 
 		if ingredient_name and ingredient_name ~= item_name then
@@ -139,7 +139,7 @@ BackendInterfaceCraftingBase._validate_ingredient = function (self, ingredient, 
 		else
 			local can_stack = masterlist_data.can_stack
 			local amount_from_item = nil
-			local item_amount = backend_items.get_item_amount(backend_items, item_backend_id)
+			local item_amount = backend_items:get_item_amount(item_backend_id)
 		end
 	end
 
@@ -157,7 +157,7 @@ BackendInterfaceCraftingBase.weapon_skin_application_validation_func = function 
 
 	for i = 1, #cloned_backend_ids, 1 do
 		local backend_id = cloned_backend_ids[i]
-		local item = backend_items.get_item_from_id(backend_items, backend_id)
+		local item = backend_items:get_item_from_id(backend_id)
 		local item_data = item.data
 		local item_slot_type = item_data.slot_type
 
@@ -199,7 +199,7 @@ BackendInterfaceCraftingBase.check_same_item_func = function (self, item_backend
 
 	for _, data in ipairs(item_backend_ids) do
 		local item_backend_id = data.backend_id
-		local masterlist_data = backend_items.get_item_masterlist_data(backend_items, item_backend_id)
+		local masterlist_data = backend_items:get_item_masterlist_data(item_backend_id)
 		local item_name = masterlist_data.name
 		name = name or item_name
 
@@ -215,7 +215,7 @@ BackendInterfaceCraftingBase.check_has_skin = function (self, item_backend_ids)
 	local backend_items = Managers.backend:get_interface("items")
 	local data = item_backend_ids[1]
 	local item_backend_id = data.backend_id
-	local item_data = backend_items.get_item_from_id(backend_items, item_backend_id)
+	local item_data = backend_items:get_item_from_id(item_backend_id)
 
 	if item_data.skin then
 		return true

@@ -10,7 +10,7 @@ PopupManager.init = function (self)
 		world = top_world
 	}
 
-	self.create_own_handler(self, popup_context)
+	self:create_own_handler(popup_context)
 
 	local poll_data = {
 		num_updates = 0

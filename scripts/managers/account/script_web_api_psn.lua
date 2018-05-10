@@ -32,9 +32,9 @@ ScriptWebApiPsn.update = function (self, dt)
 		local status = web_api.status(id)
 
 		if status == web_api.COMPLETED then
-			self._handle_request_response(self, i, true)
+			self:_handle_request_response(i, true)
 		elseif status == web_api.ERROR then
-			self._handle_request_response(self, i, false)
+			self:_handle_request_response(i, false)
 		end
 	end
 end

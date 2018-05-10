@@ -213,7 +213,7 @@ end
 UIRenderer.create_video_player = function (self, world, resource, set_loop)
 	assert(not self.video_player)
 
-	self.video_player = world.create_video_player(world, resource, set_loop)
+	self.video_player = world:create_video_player(resource, set_loop)
 
 	if set_loop == false then
 		VideoPlayer.set_loop(self.video_player, false)
@@ -277,10 +277,10 @@ UIRenderer.begin_pass = function (self, ui_scenegraph, input_service, dt, parent
 	end
 
 	if script_data.ui_debug_pixeldistance and not parent_scenegraph_id then
-		local debug_pixeldistance_value = input_service and input_service.get(input_service, "debug_pixeldistance")
+		local debug_pixeldistance_value = input_service and input_service:get("debug_pixeldistance")
 
 		if debug_pixeldistance_value then
-			local cursor = input_service.get(input_service, "cursor")
+			local cursor = input_service:get("cursor")
 
 			if not self.debug_startpoint then
 				self.debug_startpoint = Vector3Aux.box({}, cursor)
@@ -309,7 +309,7 @@ UIRenderer.begin_pass = function (self, ui_scenegraph, input_service, dt, parent
 					Gui.text(self.gui, text, "materials/fonts/gw_arial_16", 14, "gw_arial_16", Vector3Aux.unbox(debug_startpoint), Color(255, 255, 255, 255))
 				end
 			end
-		elseif self.debug_startpoint and not input_service.is_blocked(input_service) then
+		elseif self.debug_startpoint and not input_service:is_blocked() then
 			self.debug_startpoint_direction = nil
 			self.debug_startpoint = nil
 		end
@@ -1318,7 +1318,7 @@ local NilCursor = {
 }
 
 UIRenderer.scaled_cursor_position_by_scenegraph = function (input_service, scenegraph, scenegraph_id, ignore_scale)
-	local cursor = input_service.get(input_service, "cursor") or NilCursor
+	local cursor = input_service:get("cursor") or NilCursor
 	local scaled_cursor = (not ignore_scale and UIInverseScaleVectorToResolution(cursor)) or cursor
 	local scenegraph_position = UISceneGraph.get_world_position(scenegraph, scenegraph_id)
 	scaled_cursor.x = scaled_cursor.x - scenegraph_position[1]

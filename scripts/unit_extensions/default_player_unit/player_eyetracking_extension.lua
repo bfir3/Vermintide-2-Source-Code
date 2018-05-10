@@ -46,9 +46,9 @@ PlayerEyeTrackingExtension.update = function (self, unit, input, dt, context, t)
 		return
 	end
 
-	self.update_extended_view(self, dt)
-	self.update_forward_rayhit(self)
-	self.calc_gaze_forward(self)
+	self:update_extended_view(dt)
+	self:update_forward_rayhit()
+	self:calc_gaze_forward()
 end
 
 PlayerEyeTrackingExtension.set_eyetracking_options_opened = function (self, opened)
@@ -77,8 +77,8 @@ PlayerEyeTrackingExtension.update_extended_view = function (self, dt)
 	self.extended_view.yaw = self.extended_view.yaw * (1 - self.current_fade_out_time / self.aim_fade_out_time)
 	self.extended_view.pitch = self.extended_view.pitch * (1 - self.current_fade_out_time / self.aim_fade_out_time)
 	local input_manager = Managers.input
-	local player_input_service = input_manager.get_service(input_manager, "Player")
-	local controlling_player = not player_input_service.is_blocked(player_input_service)
+	local player_input_service = input_manager:get_service("Player")
+	local controlling_player = not player_input_service:is_blocked()
 	local cutscene_system = Managers.state.entity:system("cutscene_system")
 
 	if not self.eyetracking_options_opened and (not controlling_player or (cutscene_system and cutscene_system.active_camera and not cutscene_system.ingame_hud_enabled)) then
@@ -114,8 +114,8 @@ end
 
 PlayerEyeTrackingExtension.update_forward_rayhit = function (self)
 	local first_person_extension = ScriptUnit.extension(self.unit, "first_person_system")
-	local cam_position = first_person_extension.current_position(first_person_extension)
-	local cam_rotation = first_person_extension.current_rotation(first_person_extension)
+	local cam_position = first_person_extension:current_position()
+	local cam_rotation = first_person_extension:current_rotation()
 	local cam_forward = Quaternion.forward(cam_rotation)
 	local found_collision, world_pos = self.physics_world:immediate_raycast(cam_position + cam_forward, cam_forward, 100, "closest", "collision_filter", "filter_ray_ping")
 
@@ -132,8 +132,8 @@ end
 
 PlayerEyeTrackingExtension.update_gaze_rayhit = function (self)
 	local first_person_extension = ScriptUnit.extension(self.unit, "first_person_system")
-	local position = first_person_extension.current_position(first_person_extension)
-	local forward = self.gaze_forward(self)
+	local position = first_person_extension:current_position()
+	local forward = self:gaze_forward()
 	local found_collision, world_pos = self.physics_world:immediate_raycast(position + forward, forward, 100, "closest", "collision_filter", "filter_ray_ping")
 
 	if not found_collision then
@@ -159,7 +159,7 @@ PlayerEyeTrackingExtension.calc_gaze_forward = function (self)
 	local viewport = ScriptWorld.viewport(self.world, viewport_name)
 	local camera = ScriptViewport.camera(viewport)
 	local gaze_in_world = Camera.screen_to_world(camera, Vector3(gaze_x, gaze_y, 0), 0.1)
-	local current_position = first_person_extension.current_position(first_person_extension)
+	local current_position = first_person_extension:current_position()
 	local forward = Vector3.normalize(gaze_in_world - current_position)
 
 	self.current_gaze_forward:store(forward)
@@ -170,7 +170,7 @@ PlayerEyeTrackingExtension.gaze_forward = function (self)
 end
 
 PlayerEyeTrackingExtension.gaze_rotation = function (self)
-	local forward = self.gaze_forward(self)
+	local forward = self:gaze_forward()
 
 	return Quaternion.look(forward, Vector3.up())
 end
@@ -180,7 +180,7 @@ PlayerEyeTrackingExtension.get_forward_rayhit = function (self)
 end
 
 PlayerEyeTrackingExtension.get_gaze_rayhit = function (self)
-	self.update_gaze_rayhit(self)
+	self:update_gaze_rayhit()
 
 	return (self.gaze_rayhit_position and self.gaze_rayhit_position:unbox()) or nil
 end

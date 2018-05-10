@@ -84,10 +84,10 @@ ActionTrueFlightBow.client_owner_post_update = function (self, dt, t, world, can
 
 	if self.state == "shooting" then
 		local buff_extension = self.owner_buff_extension
-		local _, procced = buff_extension.apply_buffs_to_value(buff_extension, 0, StatBuffIndex.EXTRA_SHOT)
+		local _, procced = buff_extension:apply_buffs_to_value(0, StatBuffIndex.EXTRA_SHOT)
 		local add_spread = not self.extra_buff_shot
 
-		self.fire(self, current_action, add_spread)
+		self:fire(current_action, add_spread)
 
 		if procced and not self.extra_buff_shot then
 			self.state = "waiting_to_shoot"
@@ -100,7 +100,7 @@ ActionTrueFlightBow.client_owner_post_update = function (self, dt, t, world, can
 		local first_person_extension = self.first_person_extension
 
 		if self.current_action.reset_aim_on_attack then
-			first_person_extension.reset_aim_assist_multiplier(first_person_extension)
+			first_person_extension:reset_aim_assist_multiplier()
 		end
 
 		local fire_sound_event = self.current_action.fire_sound_event
@@ -108,7 +108,7 @@ ActionTrueFlightBow.client_owner_post_update = function (self, dt, t, world, can
 		if fire_sound_event then
 			local play_on_husk = self.current_action.fire_sound_on_husk
 
-			first_person_extension.play_hud_sound_event(first_person_extension, fire_sound_event, nil, play_on_husk)
+			first_person_extension:play_hud_sound_event(fire_sound_event, nil, play_on_husk)
 		end
 
 		if self.current_action.extra_fire_sound_event then
@@ -124,7 +124,7 @@ ActionTrueFlightBow.finish = function (self, reason, data)
 	local current_action = self.current_action
 
 	if not data or data.new_action ~= "action_two" or data.new_sub_action ~= "default" then
-		owner_unit_status.set_zooming(owner_unit_status, false)
+		owner_unit_status:set_zooming(false)
 	end
 end
 
@@ -132,8 +132,8 @@ ActionTrueFlightBow.fire = function (self, current_action, add_spread)
 	local owner_unit = self.owner_unit
 	local speed = current_action.speed
 	local first_person_extension = self.first_person_extension
-	local position = first_person_extension.current_position(first_person_extension)
-	local rotation = first_person_extension.current_rotation(first_person_extension)
+	local position = first_person_extension:current_position()
+	local rotation = first_person_extension:current_rotation()
 	local spread_extension = self.spread_extension
 	local num_projectiles = self.num_projectiles
 
@@ -145,11 +145,11 @@ ActionTrueFlightBow.fire = function (self, current_action, add_spread)
 				local spread_horizontal_angle = math.pi * (self.num_projectiles_shot % 2 + 0.5)
 				local shot_count_offset = (self.num_projectiles_shot == 1 and 0) or math.round((self.num_projectiles_shot - 1) * 0.5, 0)
 				local angle_offset = self.multi_projectile_spread * shot_count_offset
-				fire_rotation = spread_extension.combine_spread_rotations(spread_extension, spread_horizontal_angle, angle_offset, fire_rotation)
+				fire_rotation = spread_extension:combine_spread_rotations(spread_horizontal_angle, angle_offset, fire_rotation)
 			end
 
 			if add_spread then
-				spread_extension.set_shooting(spread_extension)
+				spread_extension:set_shooting()
 			end
 		end
 

@@ -117,22 +117,22 @@ PlayerHuskLocomotionExtension.update = function (self, unit, input, dt, context,
 
 	if self.game and self.id then
 		local health_extension = ScriptUnit.extension(unit, "health_system")
-		local is_alive = health_extension.is_alive(health_extension)
+		local is_alive = health_extension:is_alive()
 
 		if is_alive then
 			local movement_state = "onground"
 
-			self.update_movement(self, dt, unit, movement_state)
+			self:update_movement(dt, unit, movement_state)
 		end
 	end
 
 	local is_on_ladder, ladder_unit = self.status_extension:get_is_on_ladder()
 
 	if is_on_ladder and ladder_unit then
-		self.update_ladder_animation_position(self, ladder_unit)
+		self:update_ladder_animation_position(ladder_unit)
 	end
 
-	self._update_last_position_on_navmesh(self)
+	self:_update_last_position_on_navmesh()
 end
 
 PlayerHuskLocomotionExtension.last_position_on_navmesh = function (self)
@@ -192,10 +192,10 @@ PlayerHuskLocomotionExtension.update_movement = function (self, dt, unit, moveme
 
 	self.has_moved_from_start_position = GameSession.game_object_field(self.game, self.id, "has_moved_from_start_position")
 
-	self._extrapolation_movement(self, unit, dt, old_pos, new_pos, new_rot, movement_state, velocity, linked_movement)
+	self:_extrapolation_movement(unit, dt, old_pos, new_pos, new_rot, movement_state, velocity, linked_movement)
 	self.velocity_current:store(velocity)
 	self._current_rotation:store(new_rot)
-	self._update_speed_variable(self)
+	self:_update_speed_variable()
 end
 
 PlayerHuskLocomotionExtension.update_ladder_animation_position = function (self, ladder_unit)

@@ -19,7 +19,7 @@ BTSkulkIdleAction.enter = function (self, unit, blackboard, t)
 
 	local ai_simple_extension = ScriptUnit.extension(unit, "ai_system")
 
-	ai_simple_extension.set_perception(ai_simple_extension, "perception_all_seeing_re_evaluate", "pick_ninja_skulking_target")
+	ai_simple_extension:set_perception("perception_all_seeing_re_evaluate", "pick_ninja_skulking_target")
 
 	if not skulk_data.attack_timer or skulk_data.attack_timer < t then
 		skulk_data.attack_timer = t + math.random(25, 30)

@@ -51,7 +51,7 @@ end
 local function is_valid_target(unit)
 	local status_ext = ScriptUnit.extension(unit, "status_system")
 
-	return not status_ext.is_in_end_zone(status_ext) and not status_ext.is_invisible(status_ext) and not status_ext.spawn_grace and ScriptUnit.extension(unit, "health_system"):is_alive()
+	return not status_ext:is_in_end_zone() and not status_ext:is_invisible() and not status_ext.spawn_grace and ScriptUnit.extension(unit, "health_system"):is_alive()
 end
 
 local function is_valid_aggro_target(unit)
@@ -62,7 +62,7 @@ local function is_valid_aggro_target(unit)
 	local status_ext = ScriptUnit.has_extension(unit, "status_system")
 
 	if status_ext then
-		return not status_ext.ready_for_assisted_respawn and not status_ext.is_in_end_zone(status_ext) and not status_ext.is_invisible(status_ext) and not status_ext.spawn_grace and ScriptUnit.extension(unit, "health_system"):is_alive()
+		return not status_ext.ready_for_assisted_respawn and not status_ext:is_in_end_zone() and not status_ext:is_invisible() and not status_ext.spawn_grace and ScriptUnit.extension(unit, "health_system"):is_alive()
 	end
 
 	return true
@@ -93,7 +93,7 @@ function UPDATE_PLAYER_LISTS()
 			human_and_bot_unit_positions[num_human_and_bot_units] = pos
 			valid_humans_and_bots[unit] = true
 
-			if player.is_player_controlled(player) then
+			if player:is_player_controlled() then
 				num_human_units = num_human_units + 1
 				human_units[num_human_units] = unit
 				human_unit_positions[num_human_units] = pos

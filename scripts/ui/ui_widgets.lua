@@ -1556,7 +1556,7 @@ UIWidgets.create_chain_scrollbar = function (scenegraph_id, size)
 						return content.bar_height_percentage < 1
 					end,
 					held_function = function (ui_scenegraph, ui_style, ui_content, input_service)
-						local cursor = UIInverseScaleVectorToResolution(input_service.get(input_service, "cursor"))
+						local cursor = UIInverseScaleVectorToResolution(input_service:get("cursor"))
 						local cursor_y = cursor[2]
 						local world_pos = UISceneGraph.get_world_position(ui_scenegraph, ui_content.scenegraph_id)
 						local world_pos_y = world_pos[2]
@@ -1801,7 +1801,7 @@ UIWidgets.create_scrollbar = function (scenegraph_id, size)
 					pass_type = "held",
 					content_id = "scroll_bar_info",
 					held_function = function (ui_scenegraph, ui_style, ui_content, input_service)
-						local cursor = UIInverseScaleVectorToResolution(input_service.get(input_service, "cursor"))
+						local cursor = UIInverseScaleVectorToResolution(input_service:get("cursor"))
 						local cursor_y = cursor[2]
 						local world_pos = UISceneGraph.get_world_position(ui_scenegraph, ui_content.scenegraph_id)
 						local world_pos_y = world_pos[2]

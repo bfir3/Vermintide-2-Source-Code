@@ -70,25 +70,25 @@ ActionBountyHunterHandgun.client_owner_start_action = function (self, new_action
 	if new_action.block then
 		local status_extension = ScriptUnit.extension(owner_unit, "status_system")
 
-		status_extension.set_blocking(status_extension, true)
+		status_extension:set_blocking(true)
 	end
 end
 
 ActionBountyHunterHandgun.client_owner_post_update = function (self, dt, t, world, can_damage)
 	if not self.upper_shot_done and self.time_to_shoot_upper <= t then
-		self.upper_shoot_function(self)
+		self:upper_shoot_function()
 
 		self.upper_shot_done = true
 	end
 
 	if not self.lower_shot_done and self.time_to_shoot_lower <= t then
-		self.lower_shoot_function(self)
+		self:lower_shoot_function()
 
 		self.lower_shot_done = true
 	end
 
 	if not self.aoe_done and self.time_to_aoe <= t then
-		self._do_aoe(self)
+		self:_do_aoe()
 
 		self.aoe_done = true
 	end
@@ -108,25 +108,25 @@ ActionBountyHunterHandgun._railgun_shoot = function (self)
 	end
 
 	local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-	local rotation = first_person_extension.current_rotation(first_person_extension)
+	local rotation = first_person_extension:current_rotation()
 	local spread_extension = self.spread_extension
 	local spread_template_override = current_action.railgun_spread_template
 
 	if spread_extension then
 		if spread_template_override then
-			spread_extension.override_spread_template(spread_extension, spread_template_override)
+			spread_extension:override_spread_template(spread_template_override)
 		end
 
-		rotation = spread_extension.get_randomised_spread(spread_extension, rotation)
+		rotation = spread_extension:get_randomised_spread(rotation)
 
 		if add_spread then
-			spread_extension.set_shooting(spread_extension)
+			spread_extension:set_shooting()
 		end
 	end
 
 	local angle = ActionUtils.pitch_from_rotation(rotation)
 	local speed = current_action.speed
-	local position = first_person_extension.current_position(first_person_extension)
+	local position = first_person_extension:current_position()
 	local target_vector = Vector3.normalize(Vector3.flat(Quaternion.forward(rotation)))
 	local lookup_data = current_action.lookup_data
 
@@ -137,10 +137,10 @@ ActionBountyHunterHandgun._railgun_shoot = function (self)
 	if fire_sound_event then
 		local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
 
-		first_person_extension.play_hud_sound_event(first_person_extension, fire_sound_event)
+		first_person_extension:play_hud_sound_event(fire_sound_event)
 	end
 
-	first_person_extension.reset_aim_assist_multiplier(first_person_extension)
+	first_person_extension:reset_aim_assist_multiplier()
 end
 
 ActionBountyHunterHandgun._shotgun_shoot = function (self)
@@ -156,8 +156,8 @@ ActionBountyHunterHandgun._shotgun_shoot = function (self)
 	end
 
 	local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-	local current_position = first_person_extension.current_position(first_person_extension)
-	local current_rotation = first_person_extension.current_rotation(first_person_extension)
+	local current_position = first_person_extension:current_position()
+	local current_rotation = first_person_extension:current_rotation()
 	local num_shots = current_action.shot_count or 1
 
 	if not Managers.player:owner(owner_unit).bot_player then
@@ -174,7 +174,7 @@ ActionBountyHunterHandgun._shotgun_shoot = function (self)
 		local rotation = current_rotation
 
 		if spread_extension then
-			rotation = spread_extension.get_target_style_spread(spread_extension, i, num_shots, current_rotation)
+			rotation = spread_extension:get_target_style_spread(i, num_shots, current_rotation)
 		end
 
 		local direction = Quaternion.forward(rotation)
@@ -204,7 +204,7 @@ ActionBountyHunterHandgun._shotgun_shoot = function (self)
 	local add_spread = not self.extra_buff_shot
 
 	if spread_extension and add_spread then
-		spread_extension.set_shooting(spread_extension)
+		spread_extension:set_shooting()
 	end
 
 	if current_action.alert_sound_range_fire then
@@ -216,7 +216,7 @@ ActionBountyHunterHandgun._shotgun_shoot = function (self)
 	if fire_sound_event then
 		local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
 
-		first_person_extension.play_hud_sound_event(first_person_extension, fire_sound_event)
+		first_person_extension:play_hud_sound_event(fire_sound_event)
 	end
 end
 
@@ -226,7 +226,7 @@ ActionBountyHunterHandgun._do_aoe = function (self)
 	local current_action = self.current_action
 	local network_manager = Managers.state.network
 	local physics_world = World.get_data(world, "physics_world")
-	local attacker_unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+	local attacker_unit_id = network_manager:unit_game_object_id(owner_unit)
 	local unit_forward = Quaternion.forward(Unit.local_rotation(owner_unit, 0))
 	local self_pos = POSITION_LOOKUP[owner_unit]
 	local attack_pos = self_pos + unit_forward * 0.5
@@ -240,7 +240,7 @@ ActionBountyHunterHandgun._do_aoe = function (self)
 	local target_breed_unit_health_extension = Unit.alive(target_breed_unit) and ScriptUnit.extension(target_breed_unit, "health_system")
 
 	if target_breed_unit_health_extension then
-		if not target_breed_unit_health_extension.is_alive(target_breed_unit_health_extension) then
+		if not target_breed_unit_health_extension:is_alive() then
 			target_breed_unit = nil
 		end
 	else
@@ -264,7 +264,7 @@ ActionBountyHunterHandgun._do_aoe = function (self)
 			local node = Actor.node(hit_actor)
 			local hit_zone = breed.hit_zones_lookup[node]
 			local hit_zone_name = hit_zone.name
-			local hit_unit_id = network_manager.unit_game_object_id(network_manager, hit_unit)
+			local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
 			local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
 			local power_level = self.power_level
 			local damage_profile_id = self.damage_profile_aoe_id
@@ -278,7 +278,7 @@ ActionBountyHunterHandgun._do_aoe = function (self)
 			local can_stagger = true
 			local target_index = nil
 
-			weapon_system.send_rpc_attack_hit(weapon_system, damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", target_index, "blocking", shield_blocked, "shield_break_procced", false, "boost_curve_multiplier", ranged_boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", can_damage, "can_stagger", can_stagger)
+			weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", target_index, "blocking", shield_blocked, "shield_break_procced", false, "boost_curve_multiplier", ranged_boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", can_damage, "can_stagger", can_stagger)
 		end
 	end
 end
@@ -290,13 +290,13 @@ ActionBountyHunterHandgun.finish = function (self, reason)
 	if reason ~= "new_interupting_action" then
 		local status_extension = ScriptUnit.extension(owner_unit, "status_system")
 
-		status_extension.set_zooming(status_extension, false)
+		status_extension:set_zooming(false)
 	end
 
 	if current_action.block then
 		local status_extension = ScriptUnit.extension(owner_unit, "status_system")
 
-		status_extension.set_blocking(status_extension, false)
+		status_extension:set_blocking(false)
 	end
 
 	local hud_extension = ScriptUnit.has_extension(owner_unit, "hud_system")

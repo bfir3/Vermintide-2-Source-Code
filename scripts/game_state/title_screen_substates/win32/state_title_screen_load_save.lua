@@ -11,14 +11,14 @@ StateTitleScreenLoadSave.on_enter = function (self, params)
 	self._viewport = self._params.viewport
 	self._title_start_ui = params.ui
 
-	self._handle_tutorial_auto_start(self)
-	self._setup_init_network_view(self)
+	self:_handle_tutorial_auto_start()
+	self:_setup_init_network_view()
 
 	local loading_context = self.parent.parent.loading_context
 	local loading_view = loading_context.loading_view
 
 	if loading_view then
-		loading_view.destroy(loading_view)
+		loading_view:destroy()
 
 		loading_context.loading_view = nil
 	end
@@ -31,7 +31,7 @@ StateTitleScreenLoadSave._handle_tutorial_auto_start = function (self)
 
 	local level_transition_handler = LevelTransitionHandler:new()
 
-	level_transition_handler.set_next_level(level_transition_handler, "prologue")
+	level_transition_handler:set_next_level("prologue")
 
 	self.parent.parent.loading_context.level_transition_handler = level_transition_handler
 	self.parent.parent.loading_context.switch_to_tutorial_backend = true
@@ -60,7 +60,7 @@ StateTitleScreenLoadSave.update = function (self, dt, t)
 		self._title_start_ui:update(dt, t)
 	end
 
-	return self._next_state(self)
+	return self:_next_state()
 end
 
 StateTitleScreenLoadSave._next_state = function (self)

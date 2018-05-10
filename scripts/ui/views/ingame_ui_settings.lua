@@ -6,7 +6,7 @@ local transitions = {
 
 		local network_server = Managers.state.network.network_server
 
-		if network_server and not network_server.are_all_peers_ingame(network_server) then
+		if network_server and not network_server:are_all_peers_ingame() then
 			local text = Localize("player_join_block_exit_game")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_error_topic"), "cancel_popup", Localize("menu_ok"))
 		else
@@ -29,7 +29,7 @@ local transitions = {
 
 		local network_server = Managers.state.network.network_server
 
-		if network_server and not network_server.are_all_peers_ingame(network_server) then
+		if network_server and not network_server:are_all_peers_ingame() then
 			local text = Localize("player_join_block_exit_game")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_error_topic"), "cancel_popup", Localize("menu_ok"))
 		else
@@ -44,7 +44,7 @@ local transitions = {
 
 		local network_server = Managers.state.network.network_server
 
-		if network_server and not network_server.are_all_peers_ingame(network_server) then
+		if network_server and not network_server:are_all_peers_ingame() then
 			local text = Localize("player_join_block_exit_game")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_error_topic"), "cancel_popup", Localize("menu_ok"))
 		else
@@ -59,7 +59,7 @@ local transitions = {
 
 		local network_server = Managers.state.network.network_server
 
-		if network_server and not network_server.are_all_peers_ingame(network_server) then
+		if network_server and not network_server:are_all_peers_ingame() then
 			local text = Localize("player_join_block_restart_demo")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_error_topic"), "cancel_popup", Localize("menu_ok"))
 		else
@@ -93,14 +93,14 @@ local transitions = {
 
 		if PLATFORM == "win32" then
 			local platform_key = "win32"
-			local input_filters = input_service.get_active_filters(input_service, platform_key)
+			local input_filters = input_service:get_active_filters(platform_key)
 			local look_filter = input_filters.look
 			local function_data = look_filter.function_data
 			function_data.filter_type = (button_name == "menu_invert_controls" and "scale_vector3") or "scale_vector3_invert_y"
 		end
 
 		platform_key = (PLATFORM == "ps4" and "ps4") or "xb1"
-		local input_filters = input_service.get_active_filters(input_service, platform_key)
+		local input_filters = input_service:get_active_filters(platform_key)
 		local look_filter = input_filters.look_controller
 		local function_data = look_filter.function_data
 		function_data.filter_type = (button_name == "menu_invert_controls" and "scale_vector3_xy_accelerated_x_inverted") or "scale_vector3_xy_accelerated_x"
@@ -123,8 +123,8 @@ local transitions = {
 		local telemetry_survey_view = self.views.telemetry_survey
 		local level_key = Managers.state.game_mode:level_key()
 		local use_survey = TelemetrySettings.send and TelemetrySettings.use_session_survey
-		local is_answered = telemetry_survey_view.is_survey_answered(telemetry_survey_view)
-		local is_timed_out = telemetry_survey_view.is_survey_timed_out(telemetry_survey_view)
+		local is_answered = telemetry_survey_view:is_survey_answered()
+		local is_timed_out = telemetry_survey_view:is_survey_timed_out()
 
 		Managers.backend:commit(true)
 
@@ -134,7 +134,7 @@ local transitions = {
 		else
 			self.current_view = "telemetry_survey"
 
-			telemetry_survey_view.set_transition(telemetry_survey_view, "end_game")
+			telemetry_survey_view:set_transition("end_game")
 		end
 	end,
 	do_return_to_title_screen = function (self)
@@ -156,7 +156,7 @@ local transitions = {
 
 		local network_server = Managers.state.network.network_server
 
-		if network_server and not network_server.are_all_peers_ingame(network_server) then
+		if network_server and not network_server:are_all_peers_ingame() then
 			local text = Localize("player_join_block_exit_game")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_error_topic"), "cancel_popup", Localize("menu_ok"))
 		else
@@ -174,7 +174,7 @@ local transitions = {
 
 		local network_server = Managers.state.network.network_server
 
-		if network_server and not network_server.are_all_peers_ingame(network_server) then
+		if network_server and not network_server:are_all_peers_ingame() then
 			local text = Localize("player_join_block_exit_game")
 			self.popup_id = Managers.popup:queue_popup(text, Localize("popup_error_topic"), "cancel_popup", Localize("menu_ok"))
 		else

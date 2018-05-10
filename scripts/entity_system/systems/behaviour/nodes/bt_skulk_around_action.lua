@@ -26,20 +26,20 @@ BTSkulkAroundAction.enter = function (self, unit, blackboard, t)
 
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
-	network_manager.anim_event(network_manager, unit, "move_fwd")
+	network_manager:anim_event(unit, "to_combat")
+	network_manager:anim_event(unit, "move_fwd")
 	blackboard.navigation_extension:set_max_speed(blackboard.breed.run_speed)
 
 	local locomotion = blackboard.locomotion_extension
 
-	locomotion.set_rotation_speed(locomotion, 5)
+	locomotion:set_rotation_speed(5)
 
 	if skulk_data.skulk_pos then
 		local pos = skulk_data.skulk_pos:unbox()
 
 		blackboard.navigation_extension:move_to(pos)
 	else
-		local pos = self.get_new_skulk_goal(self, unit, blackboard)
+		local pos = self:get_new_skulk_goal(unit, blackboard)
 		skulk_data.skulk_pos = Vector3Box(pos)
 
 		blackboard.navigation_extension:move_to(pos)
@@ -54,7 +54,7 @@ BTSkulkAroundAction.leave = function (self, unit, blackboard, t, reason, destroy
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 
 	if reason == "aborted" then
 	end

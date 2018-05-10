@@ -688,7 +688,7 @@ UITooltipPasses = {
 			position[3] = start_layer + 2
 			position[2] = position[2]
 			local loop_func = pairs
-			local show_advanced_description = input_service.get(input_service, "item_compare") or input_service.get(input_service, "item_detail")
+			local show_advanced_description = input_service:get("item_compare") or input_service:get("item_detail")
 
 			if properties then
 				position[1] = position[1] + frame_margin
@@ -1091,7 +1091,7 @@ UITooltipPasses = {
 			return data
 		end,
 		draw = function (draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
-			if not input_service.get(input_service, "item_compare") and not input_service.get(input_service, "item_detail") then
+			if not input_service:get("item_compare") and not input_service:get("item_detail") then
 				local item_data = item.data
 				local slot_type = item_data.slot_type
 				local is_weapon = slot_type == "melee" or slot_type == "ranged"
@@ -2090,7 +2090,7 @@ UITooltipPasses = {
 			local player = pass_data.player
 
 			if player then
-				local career_name = player.career_name(player)
+				local career_name = player:career_name()
 				local can_wield_table = item_data and item_data.can_wield
 				local can_wield = can_wield_table and table.contains(can_wield_table, career_name)
 
@@ -2446,7 +2446,7 @@ UITooltipPasses = {
 			local player = pass_data.player
 
 			if player then
-				local career_name = player.career_name(player)
+				local career_name = player:career_name()
 				local can_wield_table = item_data and item_data.can_wield
 				local can_wield = can_wield_table and table.contains(can_wield_table, career_name)
 
@@ -4780,8 +4780,8 @@ UITooltipPasses = {
 			local hero_name, career_name = nil
 
 			if player then
-				hero_name = player.profile_display_name(player)
-				career_name = player.career_name(player)
+				hero_name = player:profile_display_name()
+				career_name = player:career_name()
 
 				if not hero_name or not career_name then
 					return 0
@@ -5321,7 +5321,7 @@ UITooltipPasses = {
 			return data
 		end,
 		draw = function (draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
-			if input_service.get(input_service, "item_compare") then
+			if input_service:get("item_compare") then
 				local item_data = item.data
 				local slot_type = item_data.slot_type
 				local is_weapon = slot_type == "melee" or slot_type == "ranged"
@@ -5609,7 +5609,7 @@ UITooltipPasses = {
 			return data
 		end,
 		draw = function (draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
-			if input_service.get(input_service, "item_compare") then
+			if input_service:get("item_compare") then
 				local item_data = item.data
 				local slot_type = item_data.slot_type
 				local is_weapon = slot_type == "melee" or slot_type == "ranged"
@@ -5888,7 +5888,7 @@ UITooltipPasses = {
 			return data
 		end,
 		draw = function (draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
-			if input_service.get(input_service, "item_detail") then
+			if input_service:get("item_detail") then
 				local item_data = item.data
 				local slot_type = item_data.slot_type
 				local is_melee = slot_type == "melee"
@@ -6147,7 +6147,7 @@ UITooltipPasses = {
 			return data
 		end,
 		draw = function (draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
-			if input_service.get(input_service, "item_detail") then
+			if input_service:get("item_detail") then
 				local item_data = item.data
 				local slot_type = item_data.slot_type
 				local is_melee = slot_type == "melee"
@@ -6406,7 +6406,7 @@ UITooltipPasses = {
 			return data
 		end,
 		draw = function (draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
-			if input_service.get(input_service, "item_detail") then
+			if input_service:get("item_detail") then
 				local item_data = item.data
 				local slot_type = item_data.slot_type
 				local is_melee = slot_type == "melee"
@@ -6615,7 +6615,7 @@ UITooltipPasses = {
 			return data
 		end,
 		draw = function (draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
-			if input_service.get(input_service, "item_detail") then
+			if input_service:get("item_detail") then
 				local item_data = item.data
 				local slot_type = item_data.slot_type
 				local is_ranged = slot_type == "ranged"
@@ -6874,7 +6874,7 @@ UITooltipPasses = {
 			return data
 		end,
 		draw = function (draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
-			if input_service.get(input_service, "item_detail") then
+			if input_service:get("item_detail") then
 				local item_data = item.data
 				local slot_type = item_data.slot_type
 				local is_ranged = slot_type == "ranged"

@@ -57,7 +57,7 @@ BEQueueItem.poll_backend = function (self, caller)
 
 		local backend_items = Managers.backend:get_interface("items")
 
-		backend_items.__dirtify(backend_items)
+		backend_items:__dirtify()
 	end
 end
 
@@ -92,7 +92,7 @@ BECommands = class(BECommands)
 BECommands.init = function (self)
 	self._executors = {}
 
-	self.register_executor(self, "command_group", callback(self, "_command_group_executor"))
+	self:register_executor("command_group", callback(self, "_command_group_executor"))
 end
 
 BECommands.register_executor = function (self, executor_name, executor)
@@ -104,13 +104,13 @@ BECommands.unregister_executor = function (self, executor_name)
 end
 
 BECommands.execute = function (self, queue_item)
-	local commands = queue_item.parameters(queue_item)
+	local commands = queue_item:parameters()
 
 	for command, json_data in pairs(commands) do
 		if command ~= "queue_id" then
 			local data = cjson.decode(json_data)
 
-			self._execute(self, command, data)
+			self:_execute(command, data)
 		end
 	end
 end
@@ -123,7 +123,7 @@ end
 
 BECommands._command_group_executor = function (self, commands)
 	for command, data in pairs(commands) do
-		self._execute(self, command, data)
+		self:_execute(command, data)
 	end
 end
 
@@ -143,11 +143,11 @@ DataServerQueue._next_queue_id = function (self)
 end
 
 DataServerQueue.add_item = function (self, script_name, ...)
-	local queue_id = self._next_queue_id(self)
+	local queue_id = self:_next_queue_id()
 	local item = BEQueueItem:new("DataServerQueue", queue_id, script_name, ...)
 
 	if #self._queue == 0 then
-		item.submit_request(item, "DataServerQueue")
+		item:submit_request("DataServerQueue")
 	end
 
 	table.insert(self._queue, item)
@@ -171,12 +171,12 @@ DataServerQueue.update = function (self)
 	local current = self._queue[1]
 
 	if current then
-		current.poll_backend(current, "DataServerQueue")
+		current:poll_backend("DataServerQueue")
 
-		if current.is_done(current) then
-			if current.error_message(current) then
+		if current:is_done() then
+			if current:error_message() then
 				table.insert(self._error_items, current)
-			elseif current.use_registered_commands(current) then
+			elseif current:use_registered_commands() then
 				self._command_executors:execute(current)
 			end
 
@@ -185,7 +185,7 @@ DataServerQueue.update = function (self)
 			local new_item = self._queue[1]
 
 			if new_item then
-				new_item.submit_request(new_item, "DataServerQueue")
+				new_item:submit_request("DataServerQueue")
 			end
 		end
 	end
@@ -194,7 +194,7 @@ end
 DataServerQueue.check_for_errors = function (self)
 	if 0 < #self._error_items then
 		local error_item = table.remove(self._error_items, 1)
-		local error_message = error_item.error_message(error_item)
+		local error_message = error_item:error_message()
 
 		return {
 			reason = "data_server_error",

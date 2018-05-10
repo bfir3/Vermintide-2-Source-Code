@@ -27,7 +27,7 @@ TwitchVoteTemplates.twitch_add_speed_potion_buff = {
 					local buff_extension = Managers.state.entity:system("buff_system")
 					local server_controlled = false
 
-					buff_extension.add_buff(buff_extension, unit, "twitch_speed_boost", unit, server_controlled)
+					buff_extension:add_buff(unit, "twitch_speed_boost", unit, server_controlled)
 				end
 			end
 		end
@@ -55,7 +55,7 @@ TwitchVoteTemplates.twitch_add_damage_potion_buff = {
 					local buff_extension = Managers.state.entity:system("buff_system")
 					local server_controlled = false
 
-					buff_extension.add_buff(buff_extension, unit, "twitch_damage_boost", unit, server_controlled)
+					buff_extension:add_buff(unit, "twitch_damage_boost", unit, server_controlled)
 				end
 			end
 		end
@@ -83,7 +83,7 @@ TwitchVoteTemplates.twitch_add_cooldown_potion_buff = {
 					local buff_extension = Managers.state.entity:system("buff_system")
 					local server_controlled = false
 
-					buff_extension.add_buff(buff_extension, unit, "twitch_cooldown_reduction_boost", unit, server_controlled)
+					buff_extension:add_buff(unit, "twitch_cooldown_reduction_boost", unit, server_controlled)
 				end
 			end
 		end
@@ -111,7 +111,7 @@ TwitchVoteTemplates.twitch_grimoire_health_debuff = {
 					local buff_extension = Managers.state.entity:system("buff_system")
 					local server_controlled = false
 
-					buff_extension.add_buff(buff_extension, unit, "twitch_grimoire_health_debuff", unit, server_controlled)
+					buff_extension:add_buff(unit, "twitch_grimoire_health_debuff", unit, server_controlled)
 				end
 			end
 		end
@@ -139,12 +139,12 @@ TwitchVoteTemplates.twitch_no_overcharge_no_ammo_reloads = {
 					local buff_extension = Managers.state.entity:system("buff_system")
 					local server_controlled = false
 
-					buff_extension.add_buff(buff_extension, unit, "twitch_no_overcharge_no_ammo_reloads", unit, server_controlled)
+					buff_extension:add_buff(unit, "twitch_no_overcharge_no_ammo_reloads", unit, server_controlled)
 
 					local weapon_slot = "slot_ranged"
 					local ammo_amount = 1
 					local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
-					local slot_data = inventory_extension.get_slot_data(inventory_extension, weapon_slot)
+					local slot_data = inventory_extension:get_slot_data(weapon_slot)
 					local right_unit_1p = slot_data.right_unit_1p
 					local left_unit_1p = slot_data.left_unit_1p
 					local right_hand_ammo_extension = ScriptUnit.has_extension(right_unit_1p, "ammo_system")
@@ -152,7 +152,7 @@ TwitchVoteTemplates.twitch_no_overcharge_no_ammo_reloads = {
 					local ammo_extension = right_hand_ammo_extension or left_hand_ammo_extension
 
 					if ammo_extension then
-						ammo_extension.add_ammo(ammo_extension, ammo_amount)
+						ammo_extension:add_ammo(ammo_amount)
 					end
 				end
 			end
@@ -181,7 +181,7 @@ TwitchVoteTemplates.twitch_health_regen = {
 					local buff_extension = Managers.state.entity:system("buff_system")
 					local server_controlled = false
 
-					buff_extension.add_buff(buff_extension, unit, "twitch_health_regen", unit, server_controlled)
+					buff_extension:add_buff(unit, "twitch_health_regen", unit, server_controlled)
 				end
 			end
 		end
@@ -205,7 +205,7 @@ TwitchVoteTemplates.twitch_health_degen = {
 			local selected_display_name = SPProfiles[vote_index].display_name
 
 			for _, player in pairs(players) do
-				local profile_index = player.profile_index(player)
+				local profile_index = player:profile_index()
 				local profile = SPProfiles[profile_index]
 				local display_name = profile.display_name
 
@@ -216,7 +216,7 @@ TwitchVoteTemplates.twitch_health_degen = {
 						local buff_extension = Managers.state.entity:system("buff_system")
 						local server_controlled = false
 
-						buff_extension.add_buff(buff_extension, unit, "twitch_health_degen", unit, server_controlled)
+						buff_extension:add_buff(unit, "twitch_health_degen", unit, server_controlled)
 					end
 				end
 			end

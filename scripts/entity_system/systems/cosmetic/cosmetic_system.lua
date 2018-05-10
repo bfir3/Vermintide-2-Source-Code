@@ -35,7 +35,7 @@ CosmeticSystem.get_equipped_frame = function (self, unit)
 
 	if Unit.alive(unit) then
 		local ext = ScriptUnit.extension(unit, "cosmetic_system")
-		local frame_name = ext.get_equipped_frame_name(ext)
+		local frame_name = ext:get_equipped_frame_name()
 		player_portrait_frame = frame_name
 	end
 
@@ -45,7 +45,7 @@ end
 CosmeticSystem.set_equipped_frame = function (self, unit, frame_name)
 	local ext = ScriptUnit.extension(unit, "cosmetic_system")
 
-	ext.set_equipped_frame(ext, frame_name)
+	ext:set_equipped_frame(frame_name)
 
 	local unit_id = self.unit_storage:go_id(unit)
 	local frame_name_id = NetworkLookup.cosmetics[frame_name]
@@ -68,7 +68,7 @@ CosmeticSystem.rpc_set_equipped_frame = function (self, sender, unit_id, frame_n
 	if Unit.alive(unit) then
 		local ext = ScriptUnit.extension(unit, "cosmetic_system")
 
-		ext.set_equipped_frame(ext, frame_name)
+		ext:set_equipped_frame(frame_name)
 	end
 end
 

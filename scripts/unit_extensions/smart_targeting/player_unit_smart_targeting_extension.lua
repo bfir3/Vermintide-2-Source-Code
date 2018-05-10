@@ -54,27 +54,27 @@ PlayerUnitSmartTargetingExtension.update_opt2 = function (self, unit, input, dt,
 	local input_extension = self.input_extension
 	local first_person_extension = self.first_person_extension
 	local inventory_extension = self.inventory_extension
-	local camera = self._get_player_camera(self)
-	local own_position = first_person_extension.current_position(first_person_extension)
-	local look_rot = first_person_extension.current_rotation(first_person_extension)
+	local camera = self:_get_player_camera()
+	local own_position = first_person_extension:current_position()
+	local look_rot = first_person_extension:current_rotation()
 	local look_dir = Quaternion.forward(look_rot)
 	local look_right = Quaternion.right(look_rot)
 	local action_settings = nil
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 	local weapon_unit = equipment.right_hand_wielded_unit or equipment.left_hand_wielded_unit
 
 	if Unit.alive(weapon_unit) then
 		local weapon_extension = ScriptUnit.extension(weapon_unit, "weapon_system")
 
-		if weapon_extension.has_current_action(weapon_extension) then
-			action_settings = weapon_extension.get_current_action_settings(weapon_extension)
+		if weapon_extension:has_current_action() then
+			action_settings = weapon_extension:get_current_action_settings()
 		end
 	end
 
-	local weapon_template = inventory_extension.get_wielded_slot_item_template(inventory_extension)
+	local weapon_template = inventory_extension:get_wielded_slot_item_template()
 	local aim_assist_settings = nil
 	aim_assist_settings = (not action_settings or not action_settings.aim_assist_settings or action_settings.aim_assist_settings) and weapon_template and weapon_template.aim_assist_settings
-	local loaded_projectile_settings = inventory_extension.get_loaded_projectile_settings(inventory_extension)
+	local loaded_projectile_settings = inventory_extension:get_loaded_projectile_settings()
 	local projectile_speed = (loaded_projectile_settings and loaded_projectile_settings.speed) or 0
 	local drop_multiplier = (loaded_projectile_settings and loaded_projectile_settings.drop_multiplier) or 0
 	local debug_gui = (TARGETING_DEBUG and self._gui) or nil
@@ -132,7 +132,7 @@ PlayerUnitSmartTargetingExtension.update_opt2 = function (self, unit, input, dt,
 						local smart_targeting_outer_width = breed.smart_targeting_outer_width or smart_targeting_width * 2
 						local smart_targeting_height_multiplier = breed.smart_targeting_height_multiplier or 1
 						local locomotion = extension_func(unit, "locomotion_system")
-						local locomotion_velocity = locomotion.current_velocity(locomotion)
+						local locomotion_velocity = locomotion:current_velocity()
 						local aim_scalar = EngineOptimized.smart_targeting_optimized(camera, target_pos, look_right, distance, effective_max_range, range_scalar_at_effective_max_range, max_range, min_size, aim_screen_pos_x, aim_screen_pos_y, smart_targeting_width, smart_targeting_outer_width, smart_targeting_height_multiplier, (projectile_speed or 0) * 0.01, drop_multiplier, locomotion_velocity, debug_gui)
 						local score_modifier = previous_score_modifiers[unit] or 0.1
 						local score = breed_weapon_scalar * aim_scalar * score_modifier
@@ -158,7 +158,7 @@ PlayerUnitSmartTargetingExtension.update_opt2 = function (self, unit, input, dt,
 	local target_position = nil
 
 	if target_unit then
-		local visible_target, aim_position = self.get_target_visibility_and_aim_position(self, target_unit, own_position, aim_assist_settings)
+		local visible_target, aim_position = self:get_target_visibility_and_aim_position(target_unit, own_position, aim_assist_settings)
 		target_position = aim_position
 
 		if not visible_target then
@@ -180,7 +180,7 @@ end
 
 PlayerUnitSmartTargetingExtension.update = function (self, unit, input, dt, context, t)
 	if OPTIMIZED_AIM_ASSIST then
-		self.update_opt2(self, unit, input, dt, context, t)
+		self:update_opt2(unit, input, dt, context, t)
 
 		return
 	end
@@ -209,26 +209,26 @@ PlayerUnitSmartTargetingExtension.update = function (self, unit, input, dt, cont
 	local input_extension = self.input_extension
 	local first_person_extension = self.first_person_extension
 	local inventory_extension = self.inventory_extension
-	local camera = self._get_player_camera(self)
-	local own_position = first_person_extension.current_position(first_person_extension)
-	local look_rot = first_person_extension.current_rotation(first_person_extension)
+	local camera = self:_get_player_camera()
+	local own_position = first_person_extension:current_position()
+	local look_rot = first_person_extension:current_rotation()
 	local look_dir = forward_func(look_rot)
 	local action_settings = nil
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 	local weapon_unit = equipment.right_hand_wielded_unit or equipment.left_hand_wielded_unit
 
 	if Unit.alive(weapon_unit) then
 		local weapon_extension = ScriptUnit.extension(weapon_unit, "weapon_system")
 
-		if weapon_extension.has_current_action(weapon_extension) then
-			action_settings = weapon_extension.get_current_action_settings(weapon_extension)
+		if weapon_extension:has_current_action() then
+			action_settings = weapon_extension:get_current_action_settings()
 		end
 	end
 
 	local aim_assist_settings = nil
 	aim_assist_settings = (not action_settings or not action_settings.aim_assist_settings or action_settings.aim_assist_settings) and weapon_template and weapon_template.aim_assist_settings
-	local weapon_template = inventory_extension.get_wielded_slot_item_template(inventory_extension)
-	local loaded_projectile_settings = inventory_extension.get_loaded_projectile_settings(inventory_extension)
+	local weapon_template = inventory_extension:get_wielded_slot_item_template()
+	local loaded_projectile_settings = inventory_extension:get_loaded_projectile_settings()
 	local gamepad_active = Managers.input:is_device_active("gamepad")
 	local auto_aim_disabled = not Application.user_setting("gamepad_auto_aim_enabled")
 
@@ -298,7 +298,7 @@ PlayerUnitSmartTargetingExtension.update = function (self, unit, input, dt, cont
 	local target_position = nil
 
 	if target_unit then
-		local visible_target, aim_position = self.get_target_visibility_and_aim_position(self, target_unit, own_position, aim_assist_settings)
+		local visible_target, aim_position = self:get_target_visibility_and_aim_position(target_unit, own_position, aim_assist_settings)
 		target_position = aim_position
 
 		if not visible_target then

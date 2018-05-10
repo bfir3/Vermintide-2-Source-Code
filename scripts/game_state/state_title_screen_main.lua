@@ -24,7 +24,7 @@ StateTitleScreenMain.on_enter = function (self, params)
 		self._title_start_ui:clear_user_name()
 	end
 
-	self._setup_account_manager(self)
+	self:_setup_account_manager()
 
 	self._error_popups = {}
 
@@ -33,7 +33,7 @@ StateTitleScreenMain.on_enter = function (self, params)
 			Managers.account:reset()
 		end
 
-		self._update_ui_settings(self)
+		self:_update_ui_settings()
 
 		if Managers.xbox_stats then
 			Managers.xbox_stats:destroy()
@@ -104,7 +104,7 @@ StateTitleScreenMain._setup_account_manager = function (self)
 end
 
 StateTitleScreenMain.update = function (self, dt, t)
-	self._update_network(self, dt, t)
+	self:_update_network(dt, t)
 
 	if Managers.voice_chat then
 		Managers.voice_chat:update(dt, t)
@@ -117,7 +117,7 @@ StateTitleScreenMain.update = function (self, dt, t)
 			local previous_session_error = loading_context.previous_session_error
 			loading_context.previous_session_error = nil
 
-			self._queue_popup(self, Localize(previous_session_error), Localize("popup_error_topic"), "ok", Localize("menu_ok"))
+			self:_queue_popup(Localize(previous_session_error), Localize("popup_error_topic"), "ok", Localize("menu_ok"))
 		end
 
 		self._title_start_ui:update(dt, t)
@@ -139,15 +139,15 @@ StateTitleScreenMain.update = function (self, dt, t)
 				fassert(false, "Unhandled popup result %s", result)
 			end
 		else
-			self._handle_continue_input(self, dt, t)
-			self._update_input(self, dt, t)
-			self._update_attract_mode(self, dt, t)
+			self:_handle_continue_input(dt, t)
+			self:_update_input(dt, t)
+			self:_update_attract_mode(dt, t)
 		end
 	else
 		self._state = StateTitleScreenInitNetwork
 	end
 
-	return self._next_state(self)
+	return self:_next_state()
 end
 
 StateTitleScreenMain._update_network = function (self, dt, t)
@@ -159,13 +159,13 @@ end
 StateTitleScreenMain._update_attract_mode = function (self, dt, t)
 	if self._title_start_ui:attract_mode() then
 		if self._title_start_ui:video_completed() then
-			self._exit_attract_mode(self)
+			self:_exit_attract_mode()
 		end
 	else
 		self._attract_mode_timer = self._attract_mode_timer - dt
 
 		if self._attract_mode_timer <= 0 then
-			self._enter_attract_mode(self)
+			self:_enter_attract_mode()
 		end
 	end
 end
@@ -201,12 +201,12 @@ StateTitleScreenMain._handle_continue_input = function (self, dt, t)
 	end
 
 	if start_allowed then
-		if input_service.get(input_service, "start", true) then
+		if input_service:get("start", true) then
 			self._start_pressed = true
 		elseif script_data.honduras_demo then
 			local current_device = Managers.input:get_most_recent_device()
 
-			if current_device.any_pressed(current_device) then
+			if current_device:any_pressed() then
 				self._start_pressed = true
 			end
 		end
@@ -215,12 +215,12 @@ StateTitleScreenMain._handle_continue_input = function (self, dt, t)
 	if self._title_start_ui:attract_mode() then
 		local current_device = Managers.input:get_most_recent_device()
 
-		if current_device.any_pressed(current_device) then
+		if current_device:any_pressed() then
 			self._start_pressed = true
 		end
 	end
 
-	if input_service.has(input_service, "delete_save") and input_service.get(input_service, "delete_save") and BUILD ~= "release" then
+	if input_service:has("delete_save") and input_service:get("delete_save") and BUILD ~= "release" then
 		StateTitleScreenLoadSave.DELETE_SAVE = true
 	end
 end
@@ -252,16 +252,16 @@ StateTitleScreenMain._update_input = function (self, dt, t)
 
 				self._state = StateTitleScreenLoadSave
 			else
-				self._queue_popup(self, Localize("popup_ps4_not_signed_in"), Localize("popup_error_topic"), "ok", Localize("popup_choice_ok"))
+				self:_queue_popup(Localize("popup_ps4_not_signed_in"), Localize("popup_error_topic"), "ok", Localize("popup_choice_ok"))
 
 				self._start_pressed = false
 			end
 		else
-			self._queue_popup(self, Localize("popup_invite_not_installed"), Localize("popup_invite_not_installed_header"), "not_installed", Localize("menu_ok"))
+			self:_queue_popup(Localize("popup_invite_not_installed"), Localize("popup_invite_not_installed_header"), "not_installed", Localize("menu_ok"))
 		end
 	elseif (self._start_pressed or LEVEL_EDITOR_TEST or self._auto_start or GameSettingsDevelopment.skip_start_screen or self._params.switch_user_auto_sign_in or self._has_engaged) and not self._state then
 		if self._title_start_ui:attract_mode() then
-			self._exit_attract_mode(self)
+			self:_exit_attract_mode()
 
 			self._start_pressed = false
 		elseif platform == "win32" then
@@ -282,7 +282,7 @@ StateTitleScreenMain._update_input = function (self, dt, t)
 			local can_proceed = true
 
 			if self._has_engaged then
-				can_proceed = user_id and self._user_exists(self, user_id)
+				can_proceed = user_id and self:_user_exists(user_id)
 			end
 
 			if can_proceed and user_id and Managers.account:user_exists(user_id) then
@@ -325,7 +325,7 @@ StateTitleScreenMain._update_input = function (self, dt, t)
 
 				self._state = StateTitleScreenLoadSave
 			else
-				self._queue_popup(self, Localize("popup_ps4_not_signed_in"), Localize("popup_error_topic"), "ok", Localize("popup_choice_ok"))
+				self:_queue_popup(Localize("popup_ps4_not_signed_in"), Localize("popup_error_topic"), "ok", Localize("popup_choice_ok"))
 
 				self._start_pressed = false
 			end

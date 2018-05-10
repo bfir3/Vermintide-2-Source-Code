@@ -21,7 +21,7 @@ ActiveReloadAmmoUserExtension.init = function (self, extension_init_context, uni
 
 	self._gui = World.create_screen_gui(extension_init_context.world, "immediate")
 
-	self.reset(self)
+	self:reset()
 end
 
 ActiveReloadAmmoUserExtension.extensions_ready = function (self, world, unit)
@@ -50,7 +50,7 @@ ActiveReloadAmmoUserExtension.update = function (self, unit, input, dt, context,
 
 			if self.available_ammo == 0 then
 				local inventory_system = ScriptUnit.extension(self.owner_unit, "inventory_system")
-				local equipment = inventory_system.equipment(inventory_system)
+				local equipment = inventory_system:equipment()
 				local slot_name = equipment.wielded_slot
 				local slots = equipment.slots
 				local slot_data = slots[slot_name]
@@ -59,8 +59,8 @@ ActiveReloadAmmoUserExtension.update = function (self, unit, input, dt, context,
 				local ammo_data = item_template.ammo_data
 
 				if ammo_data.destroy_when_out_of_ammo then
-					inventory_system.destroy_slot(inventory_system, slot_name)
-					inventory_system.wield_previous_weapon(inventory_system)
+					inventory_system:destroy_slot(slot_name)
+					inventory_system:wield_previous_weapon()
 				end
 			end
 		end
@@ -94,7 +94,7 @@ ActiveReloadAmmoUserExtension.update = function (self, unit, input, dt, context,
 					Managers.state.network:anim_event(self.owner_unit, reload_event)
 				end
 
-				self._setup_indicator_area(self)
+				self:_setup_indicator_area()
 			else
 				self.next_reload_time = nil
 			end
@@ -103,8 +103,8 @@ ActiveReloadAmmoUserExtension.update = function (self, unit, input, dt, context,
 		end
 
 		if self.next_reload_time and not self.event_missed then
-			self._update_active_reload(self, dt, t)
-			self._debug_draw(self, dt, t)
+			self:_update_active_reload(dt, t)
+			self:_debug_draw(dt, t)
 		end
 	end
 end
@@ -117,7 +117,7 @@ ActiveReloadAmmoUserExtension._update_active_reload = function (self, dt, t)
 		return
 	end
 
-	local reload_start_time = self.reload_start_time(self)
+	local reload_start_time = self:reload_start_time()
 	local dead_zone_time = self.reload_time * DEAD_ZONE_PERCENT
 
 	if t < reload_start_time + dead_zone_time then
@@ -172,7 +172,7 @@ local EVENT_START_PERCENT = 0.6
 ActiveReloadAmmoUserExtension._setup_indicator_area = function (self)
 	assert(self.next_reload_time)
 
-	local reload_start = self.reload_start_time(self)
+	local reload_start = self:reload_start_time()
 	self.event_start = self.reload_time * EVENT_START_PERCENT
 end
 
@@ -189,11 +189,11 @@ end
 ActiveReloadAmmoUserExtension.use_ammo = function (self, ammo_used)
 	self.shots_fired = self.shots_fired + ammo_used
 
-	assert(0 <= self.ammo_count(self))
+	assert(0 <= self:ammo_count())
 end
 
 ActiveReloadAmmoUserExtension.start_reload = function (self, play_reload_animation)
-	assert(self.can_reload(self))
+	assert(self:can_reload())
 	assert(self.next_reload_time == nil)
 
 	self.start_reloading = true
@@ -201,7 +201,7 @@ ActiveReloadAmmoUserExtension.start_reload = function (self, play_reload_animati
 end
 
 ActiveReloadAmmoUserExtension.abort_reload = function (self)
-	assert(self.is_reloading(self))
+	assert(self:is_reloading())
 
 	self.start_reloading = nil
 	self.next_reload_time = nil
@@ -220,11 +220,11 @@ ActiveReloadAmmoUserExtension.remaining_ammo = function (self)
 end
 
 ActiveReloadAmmoUserExtension.can_reload = function (self)
-	if self.is_reloading(self) then
+	if self:is_reloading() then
 		return false
 	end
 
-	if self.ammo_count(self) == self.ammo_per_clip then
+	if self:ammo_count() == self.ammo_per_clip then
 		return false
 	end
 

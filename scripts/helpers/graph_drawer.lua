@@ -27,7 +27,7 @@ GraphDrawer.graph = function (self, graph_name)
 end
 
 GraphDrawer.update = function (self, input_service, t)
-	if input_service.get(input_service, "f11") then
+	if input_service:get("f11") then
 		if not self.active then
 			self.unblocked_services_n = self.input_manager:get_unblocked_services(nil, nil, self.unblocked_services)
 
@@ -54,10 +54,10 @@ GraphDrawer.update = function (self, input_service, t)
 	for graph_name, graph in pairs(self.graphs) do
 		if graph.active then
 			if self.active then
-				graph.update(graph, input_service, t)
+				graph:update(input_service, t)
 			end
 
-			graph.draw(graph, gui, input_service, t)
+			graph:draw(gui, input_service, t)
 		end
 	end
 end
@@ -219,22 +219,22 @@ Graph.update = function (self, input_service, t)
 		return
 	end
 
-	local mouse = input_service.get(input_service, "cursor")
+	local mouse = input_service:get("cursor")
 	local origin = Vector3(100, 100, 0)
 	local graph_size_x = 800
 	local graph_size_y = 400
 	self.state = self.state or "waiting_for_zoom_window"
 
 	if self.state == "waiting_for_zoom_window" then
-		if input_service.get(input_service, "mouse_left_held") then
+		if input_service:get("mouse_left_held") then
 			self.state = "drawing_zoom_window"
 		end
 
-		if input_service.get(input_service, "mouse_middle_held") then
+		if input_service:get("mouse_middle_held") then
 			self.state = "panning"
 		end
 
-		if input_service.get(input_service, "mouse_right_held") then
+		if input_service:get("mouse_right_held") then
 			self.zoom_window = {}
 			local zoom_factor_x_min = (self.visual_frame.x_max - self.range_x[1]) / (self.visual_frame.x_max - self.visual_frame.x_min)
 			local zoom_factor_x_max = (self.range_x[2] - self.visual_frame.x_min) / (self.visual_frame.x_max - self.visual_frame.x_min)
@@ -253,7 +253,7 @@ Graph.update = function (self, input_service, t)
 	end
 
 	if self.state == "drawing_zoom_window" then
-		if input_service.get(input_service, "mouse_left_held") then
+		if input_service:get("mouse_left_held") then
 			if self.zoom_window == nil then
 				local x_inside = true
 				local y_inside = true
@@ -327,7 +327,7 @@ Graph.update = function (self, input_service, t)
 	end
 
 	if self.state == "panning" then
-		if not input_service.get(input_service, "mouse_middle_held") then
+		if not input_service:get("mouse_middle_held") then
 			self.state = "waiting_for_zoom_window"
 			self.pan_previous = nil
 
@@ -420,7 +420,7 @@ Graph.update = function (self, input_service, t)
 end
 
 Graph.draw = function (self, gui, input_service, t)
-	local mouse = input_service.get(input_service, "cursor")
+	local mouse = input_service:get("cursor")
 	local layer = 1
 	local line_width = 2
 	local font_size = 26

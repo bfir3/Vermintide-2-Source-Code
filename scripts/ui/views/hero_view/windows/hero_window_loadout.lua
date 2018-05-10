@@ -20,14 +20,14 @@ HeroWindowLoadout.on_enter = function (self, params, offset)
 		snap_pixel_positions = true
 	}
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self._animations = {}
 	self._equipment_items = {}
 
-	self.create_ui_elements(self, params, offset)
+	self:create_ui_elements(params, offset)
 
 	self.hero_name = params.hero_name
 	self.career_index = params.career_index
@@ -69,14 +69,14 @@ HeroWindowLoadout.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self._update_animations(self, dt)
-	self._update_loadout_sync(self)
-	self._update_selected_loadout_slot_index(self)
-	self._handle_input(self, dt, t)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:_update_loadout_sync()
+	self:_update_selected_loadout_slot_index()
+	self:_handle_input(dt, t)
+	self:draw(dt)
 end
 
 HeroWindowLoadout.post_update = function (self, dt, t)
@@ -90,8 +90,8 @@ HeroWindowLoadout._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -113,17 +113,17 @@ end
 
 HeroWindowLoadout._handle_input = function (self, dt, t)
 	local parent = self.parent
-	local slot_index_hovered = self._is_equipment_slot_hovered(self)
+	local slot_index_hovered = self:_is_equipment_slot_hovered()
 
 	if slot_index_hovered then
-		self._play_sound(self, "play_gui_equipment_selection_hover")
+		self:_play_sound("play_gui_equipment_selection_hover")
 	end
 
-	local slot_index_pressed = self._is_equipment_slot_pressed(self)
+	local slot_index_pressed = self:_is_equipment_slot_pressed()
 
 	if slot_index_pressed then
-		parent.set_selected_loadout_slot_index(parent, slot_index_pressed)
-		self._play_sound(self, "play_gui_equipment_selection_click")
+		parent:set_selected_loadout_slot_index(slot_index_pressed)
+		self:_play_sound("play_gui_equipment_selection_click")
 	end
 end
 
@@ -131,7 +131,7 @@ HeroWindowLoadout._update_selected_loadout_slot_index = function (self)
 	local index = self.parent:get_selected_loadout_slot_index()
 
 	if index ~= self._selected_loadout_slot_index then
-		self._set_equipment_slot_selected(self, index)
+		self:_set_equipment_slot_selected(index)
 	end
 end
 
@@ -140,7 +140,7 @@ HeroWindowLoadout._update_loadout_sync = function (self)
 	local loadout_sync_id = parent.loadout_sync_id
 
 	if loadout_sync_id ~= self._loadout_sync_id then
-		self._populate_loadout(self)
+		self:_populate_loadout()
 
 		self._loadout_sync_id = loadout_sync_id
 	end
@@ -211,12 +211,12 @@ HeroWindowLoadout._populate_loadout = function (self)
 	for _, slot in pairs(slots) do
 		local slot_name = slot.name
 
-		self._clear_item_slot(self, slot)
+		self:_clear_item_slot(slot)
 
 		local item = BackendUtils.get_loadout_item(career_name, slot_name)
 
 		if item then
-			self._equip_item_presentation(self, item, slot)
+			self:_equip_item_presentation(item, slot)
 		end
 	end
 end

@@ -24,9 +24,9 @@ DebugTextManager.update = function (self, dt, viewport_name)
 		return
 	end
 
-	self._update_unit_texts(self, viewport_name, dt)
-	self._update_world_texts(self, viewport_name)
-	self._update_screen_text(self)
+	self:_update_unit_texts(viewport_name, dt)
+	self:_update_world_texts(viewport_name)
+	self:_update_screen_text()
 end
 
 DebugTextManager._update_unit_texts = function (self, viewport_name, dt)
@@ -62,7 +62,7 @@ DebugTextManager._update_unit_texts = function (self, viewport_name, dt)
 						local floating_position_box = gui_text.floating_position_box
 
 						if floating_position_box then
-							local floating_position = floating_position_box.unbox(floating_position_box)
+							local floating_position = floating_position_box:unbox()
 							floating_position = floating_position + Vector3.forward() * dt * 0.5
 							text_offset = text_offset + floating_position
 
@@ -74,7 +74,7 @@ DebugTextManager._update_unit_texts = function (self, viewport_name, dt)
 				end
 			end
 		else
-			self._destroy_unit_texts(self, unit)
+			self:_destroy_unit_texts(unit)
 		end
 	end
 end
@@ -299,7 +299,7 @@ DebugTextManager.destroy = function (self)
 	end
 
 	for unit, categories in pairs(self._unit_texts) do
-		self._destroy_unit_texts(self, unit)
+		self:_destroy_unit_texts(unit)
 	end
 
 	for category, gui_texts in pairs(self._world_texts) do

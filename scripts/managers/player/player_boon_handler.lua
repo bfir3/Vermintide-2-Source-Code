@@ -26,7 +26,7 @@ PlayerBoonHandler.init = function (self, player, world, is_server)
 	if is_local_player then
 		local quests_interface = Managers.backend:get_interface("quests")
 
-		quests_interface.query_boons(quests_interface)
+		quests_interface:query_boons()
 
 		self._boons_interface = Managers.backend:get_interface("boons")
 	end
@@ -36,10 +36,10 @@ end
 
 PlayerBoonHandler.update = function (self, dt, t)
 	if self.is_local_player then
-		self._poll_for_boons(self)
+		self:_poll_for_boons()
 	end
 
-	self._update_active_boons(self, dt, t)
+	self:_update_active_boons(dt, t)
 end
 
 PlayerBoonHandler._poll_for_boons = function (self)
@@ -52,7 +52,7 @@ PlayerBoonHandler._poll_for_boons = function (self)
 		if dirty then
 			local boons = self._boons_interface:get_boons()
 
-			self._update_boons(self, boons)
+			self:_update_boons(boons)
 
 			self._boons_inited = true
 		end
@@ -63,7 +63,7 @@ PlayerBoonHandler._update_boons = function (self, boons)
 	local name_ids = {}
 	local remaining_durations = {}
 	local network_manager = self.network_manager
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 
 	for i = 1, NUM_GO_BOONS, 1 do
 		local boon_data = boons[i]
@@ -81,7 +81,7 @@ PlayerBoonHandler._update_boons = function (self, boons)
 	end
 
 	if self.is_server then
-		self.set_game_object_fields(self, name_ids, remaining_durations)
+		self:set_game_object_fields(name_ids, remaining_durations)
 	else
 		local player = self.player
 		local player_game_object_id = player.game_object_id

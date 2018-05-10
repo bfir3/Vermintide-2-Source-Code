@@ -33,7 +33,7 @@ EffectHelper.play_surface_material_effects = function (effect_name, world, hit_u
 			local fwd = Quaternion.forward(rotation) * MaterialEffectSettings.material_query_depth
 			local draw_pos = position - fwd * 0.5
 
-			drawer.vector(drawer, draw_pos, fwd, Color(255, 255, 0, 0))
+			drawer:vector(draw_pos, fwd, Color(255, 255, 0, 0))
 		elseif script_data.debug_material_effects then
 			table.dump(material_ids)
 		end
@@ -47,7 +47,7 @@ EffectHelper.play_surface_material_effects = function (effect_name, world, hit_u
 		local fwd = Quaternion.forward(rotation) * MaterialEffectSettings.material_query_depth
 		local draw_pos = position - fwd * 0.5
 
-		drawer.vector(drawer, draw_pos, fwd, Color(255, 0, 255, 0))
+		drawer:vector(draw_pos, fwd, Color(255, 0, 255, 0))
 		Managers.state.debug_text:output_world_text(material, 0.1, draw_pos, 30, "material_text", Vector3(0, 255, 0))
 	end
 
@@ -72,7 +72,7 @@ EffectHelper.play_surface_material_effects = function (effect_name, world, hit_u
 			local drawer_space = Matrix4x4.from_quaternion_position(projector_rotation, projection_position + (Quaternion.forward(projector_rotation) * decal_settings.depth) / 2)
 			local drawer_extents = Vector3(decal_settings.width / 2, decal_settings.depth / 2, decal_settings.height / 2)
 
-			drawer.box(drawer, drawer_space, drawer_extents, Color(150, 0, 255, 0))
+			drawer:box(drawer_space, drawer_extents, Color(150, 0, 255, 0))
 		end
 	end
 
@@ -117,7 +117,7 @@ EffectHelper.play_surface_material_effects = function (effect_name, world, hit_u
 				name = "DEBUG_DRAW_IMPACT_DECAL_HIT"
 			})
 
-			drawer.quaternion(drawer, position, normal_rotation)
+			drawer:quaternion(position, normal_rotation)
 			printf("EffectHelper, creating partiles %s, %s", particles, effect_name)
 		end
 	end
@@ -233,7 +233,7 @@ EffectHelper.player_critical_hit = function (world, is_critical_hit, attacker_un
 	local critical_hit_hud_sound_event = "Play_player_combat_crit_hit_2D"
 	local first_person_extension = ScriptUnit.extension(attacker_unit, "first_person_system")
 
-	first_person_extension.play_hud_sound_event(first_person_extension, critical_hit_hud_sound_event, nil, false)
+	first_person_extension:play_hud_sound_event(critical_hit_hud_sound_event, nil, false)
 
 	local critical_hit_sound_event = "Play_player_combat_crit_hit_3D"
 
@@ -282,7 +282,7 @@ EffectHelper.remote_play_surface_material_effects = function (effect_name, world
 	local network_manager = Managers.state.network
 	local level = LevelHelper:current_level(world)
 	local unit_level_index = Level.unit_index(level, unit)
-	local unit_game_object_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_game_object_id = network_manager:unit_game_object_id(unit)
 	local effect_name_id = NetworkLookup.surface_material_effects[effect_name]
 	local network_safe_position = NetworkUtils.network_safe_position(position)
 
@@ -378,7 +378,7 @@ EffectHelper.flow_cb_play_footstep_surface_material_effects = function (effect_n
 				name = "DEBUG_DRAW_IMPACT_DECAL_HIT"
 			})
 
-			drawer.vector(drawer, raycast_position, raycast_direction * raycast_range, Color(255, 255, 0, 0))
+			drawer:vector(raycast_position, raycast_direction * raycast_range, Color(255, 255, 0, 0))
 			Managers.state.debug_text:output_world_text("MISS", 0.1, raycast_position, 30, "material_text", Vector3(0, 255, 0))
 		end
 

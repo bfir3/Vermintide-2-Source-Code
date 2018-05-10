@@ -16,7 +16,7 @@ DeathSystem.init = function (self, entity_system_creation_context, system_name)
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.unit_extensions = {}
 	self.death_reactions_to_start = {}
@@ -145,12 +145,12 @@ DeathSystem.kill_unit = function (self, unit, killing_blow)
 	if self.is_server then
 		local ping_system = Managers.state.entity:system("ping_system")
 
-		ping_system.remove_ping_from_unit(ping_system, unit)
+		ping_system:remove_ping_from_unit(unit)
 	end
 
 	local health_extension = extension.health_extension
 
-	health_extension.set_dead(health_extension)
+	health_extension:set_dead()
 
 	if is_hot_join_sync(killing_blow) then
 		extension.death_has_started = true

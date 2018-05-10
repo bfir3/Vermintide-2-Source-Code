@@ -43,8 +43,8 @@ GamePadEquipmentUI.init = function (self, ingame_ui_context)
 	self._retained_elements_visible = false
 	local event_manager = Managers.state.event
 
-	event_manager.register(event_manager, self, "input_changed", "event_input_changed")
-	self._create_ui_elements(self)
+	event_manager:register(self, "input_changed", "event_input_changed")
+	self:_create_ui_elements()
 	rawset(_G, "gamepad_equipment_ui", self)
 end
 
@@ -97,9 +97,9 @@ GamePadEquipmentUI._create_ui_elements = function (self)
 	self._added_items = {}
 
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
-	self.event_input_changed(self)
-	self.set_visible(self, true)
-	self.set_dirty(self)
+	self:event_input_changed()
+	self:set_visible(true)
+	self:set_dirty()
 
 	self._num_added_items = 0
 end
@@ -116,18 +116,18 @@ GamePadEquipmentUI.event_input_changed = function (self)
 
 		for k, slot_widget in ipairs(self._slot_widgets) do
 			if slot_widget.content.console_hud_index == console_hud_index then
-				self._set_slot_input(self, slot_widget, slot_name)
-				self._set_widget_dirty(self, slot_widget)
+				self:_set_slot_input(slot_widget, slot_name)
+				self:_set_widget_dirty(slot_widget)
 			end
 		end
 	end
 
-	self.set_dirty(self)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI._set_slot_input = function (self, widget, slot_name)
 	local input_action = input_actions_by_slot[slot_name]
-	local texture_data, input_text, prefix_text = self._get_input_texture_data(self, input_action)
+	local texture_data, input_text, prefix_text = self:_get_input_texture_data(input_action)
 	local text_length = (input_text and UTF8Utils.string_length(input_text)) or 0
 	local max_length = 40
 	local input_style = widget.style.input_text
@@ -139,15 +139,15 @@ end
 
 GamePadEquipmentUI._get_input_texture_data = function (self, input_action)
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "Player")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local input_service = input_manager:get_service("Player")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 	local platform = PLATFORM
 
 	if platform == "win32" and gamepad_active then
 		platform = "xb1"
 	end
 
-	local keymap_binding = input_service.get_keymapping(input_service, input_action, platform)
+	local keymap_binding = input_service:get_keymapping(input_action, platform)
 	local device_type = keymap_binding[1]
 	local key_index = keymap_binding[2]
 	local key_action_type = keymap_binding[3]
@@ -195,29 +195,29 @@ GamePadEquipmentUI._update_widgets = function (self)
 	local slot_widgets = self._slot_widgets
 
 	for index, widget in ipairs(slot_widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
-	self.set_dirty(self)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI._get_wield_scroll_input = function (self)
 	local player_manager = self.player_manager
-	local player = player_manager.local_player(player_manager, 1)
+	local player = player_manager:local_player(1)
 	local player_unit = player.player_unit
 
 	if not player_unit then
 		return
 	end
 
-	local peer_id = player.network_id(player)
+	local peer_id = player:network_id()
 	local input_extension = ScriptUnit.extension(player_unit, "input_system")
 
-	return input_extension.get_last_scroll_value(input_extension)
+	return input_extension:get_last_scroll_value()
 end
 
 GamePadEquipmentUI._set_wielded_item = function (self, item_name, force_select)
-	local scroll_dir = self._get_wield_scroll_input(self)
+	local scroll_dir = self:_get_wield_scroll_input()
 	local added_items = self._added_items
 
 	for _, data in ipairs(added_items) do
@@ -230,10 +230,10 @@ GamePadEquipmentUI._set_wielded_item = function (self, item_name, force_select)
 		if is_wielded then
 			local ammo_focus = slot_name == "slot_ranged"
 
-			self._set_ammo_text_focus(self, ammo_focus)
-			self._add_animation(self, slot_name .. "_wield_anim", widget, widget, "_animate_slot_wield")
+			self:_set_ammo_text_focus(ammo_focus)
+			self:_add_animation(slot_name .. "_wield_anim", widget, widget, "_animate_slot_wield")
 		elseif was_wielded then
-			self._add_animation(self, slot_name .. "_wield_anim", widget, widget, "_animate_slot_unwield")
+			self:_add_animation(slot_name .. "_wield_anim", widget, widget, "_animate_slot_unwield")
 		end
 
 		data.is_wielded = is_wielded
@@ -269,7 +269,7 @@ GamePadEquipmentUI._update_equipment_lookup = function (self, equipment)
 
 	if ranged_slot_data and ranged_slot_data.item_data then
 		local item_template = BackendUtils.get_item_template(ranged_slot_data.item_data)
-		local ammo_count, remaining_ammo, using_single_clip = self._get_ammunition_count(self, ranged_slot_data.left_unit_1p, ranged_slot_data.right_unit_1p, item_template)
+		local ammo_count, remaining_ammo, using_single_clip = self:_get_ammunition_count(ranged_slot_data.left_unit_1p, ranged_slot_data.right_unit_1p, item_template)
 		equipment_lookup.ammo_count = ammo_count
 		equipment_lookup.remaining_ammo = remaining_ammo
 	end
@@ -277,13 +277,13 @@ end
 
 GamePadEquipmentUI._check_equipment_changed = function (self, equipment)
 	if not self._equipment_lookup then
-		self._update_equipment_lookup(self, equipment)
+		self:_update_equipment_lookup(equipment)
 
 		return true
 	end
 
 	if self._equipment_lookup.wielded_slot ~= equipment.wielded_slot then
-		self._update_equipment_lookup(self, equipment)
+		self:_update_equipment_lookup(equipment)
 
 		return true
 	end
@@ -299,7 +299,7 @@ GamePadEquipmentUI._check_equipment_changed = function (self, equipment)
 		saved_item_name = equipment_lookup[slot_name]
 
 		if item_name ~= saved_item_name then
-			self._update_equipment_lookup(self, equipment)
+			self:_update_equipment_lookup(equipment)
 
 			return true
 		end
@@ -309,16 +309,16 @@ GamePadEquipmentUI._check_equipment_changed = function (self, equipment)
 
 	if ranged_slot_data and ranged_slot_data.item_data then
 		local item_template = BackendUtils.get_item_template(ranged_slot_data.item_data)
-		local ammo_count, remaining_ammo, using_single_clip = self._get_ammunition_count(self, ranged_slot_data.left_unit_1p, ranged_slot_data.right_unit_1p, item_template)
+		local ammo_count, remaining_ammo, using_single_clip = self:_get_ammunition_count(ranged_slot_data.left_unit_1p, ranged_slot_data.right_unit_1p, item_template)
 
 		if equipment_lookup.ammo_count ~= ammo_count then
-			self._update_equipment_lookup(self, equipment)
+			self:_update_equipment_lookup(equipment)
 
 			return true
 		end
 
 		if equipment_lookup.remaining_ammo ~= remaining_ammo then
-			self._update_equipment_lookup(self, equipment)
+			self:_update_equipment_lookup(equipment)
 
 			return true
 		end
@@ -335,22 +335,22 @@ GamePadEquipmentUI._sync_player_equipment = function (self)
 	end
 
 	local player_manager = self.player_manager
-	local player = player_manager.local_player(player_manager, 1)
+	local player = player_manager:local_player(1)
 	local player_unit = player.player_unit
 
 	if not player_unit then
 		return
 	end
 
-	local peer_id = player.network_id(player)
+	local peer_id = player:network_id()
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 
 	if not equipment then
 		return
 	end
 
-	if not self._check_equipment_changed(self, equipment) then
+	if not self:_check_equipment_changed(equipment) then
 		return
 	end
 
@@ -385,11 +385,11 @@ GamePadEquipmentUI._sync_player_equipment = function (self)
 				if slot_type == "melee" or slot_type == "ranged" then
 					self._weapon_was_wielded = true
 
-					self._add_animation(self, "weapon_slot", widget, widget, "_animate_weapon_wield", 0.5)
+					self:_add_animation("weapon_slot", widget, widget, "_animate_weapon_wield", 0.5)
 				elseif self._weapon_was_wielded then
 					self._weapon_was_wielded = false
 
-					self._add_animation(self, "weapon_slot", widget, widget, "_animate_weapon_unwield", 0.5)
+					self:_add_animation("weapon_slot", widget, widget, "_animate_weapon_unwield", 0.5)
 				end
 			end
 
@@ -415,7 +415,7 @@ GamePadEquipmentUI._sync_player_equipment = function (self)
 					verified = true
 					verified_widgets[j] = true
 
-					self._add_item(self, slot_data, data)
+					self:_add_item(slot_data, data)
 
 					inventory_modified = true
 
@@ -424,7 +424,7 @@ GamePadEquipmentUI._sync_player_equipment = function (self)
 			end
 
 			if not verified and slot_data ~= nil then
-				self._add_item(self, slot_data)
+				self:_add_item(slot_data)
 
 				verified_widgets[#added_items] = true
 				inventory_modified = true
@@ -435,8 +435,8 @@ GamePadEquipmentUI._sync_player_equipment = function (self)
 			end
 		else
 			if slot_name == "slot_ranged" and item_data then
-				self._update_ammo_count(self, item_data, slot_data, player_unit)
-				self._set_ammo_text_focus(self, is_wielded)
+				self:_update_ammo_count(item_data, slot_data, player_unit)
+				self:_set_ammo_text_focus(is_wielded)
 			end
 
 			if is_wielded then
@@ -458,21 +458,21 @@ GamePadEquipmentUI._sync_player_equipment = function (self)
 	for i = 1, #widgets_to_remove, 1 do
 		local index = widgets_to_remove[i] - index_mod
 
-		self._remove_item(self, index)
+		self:_remove_item(index)
 
 		index_mod = index_mod + 1
 		inventory_modified = true
 	end
 
 	if inventory_modified then
-		self._update_widgets(self)
+		self:_update_widgets()
 		table.sort(added_items, sort_by_console_hud_index)
 	end
 
 	if (wielded_item_name and self._wielded_item_name ~= wielded_item_name) or inventory_modified then
 		wielded_item_name = wielded_item_name or self._wielded_item_name
 
-		self._set_wielded_item(self, wielded_item_name, inventory_modified)
+		self:_set_wielded_item(wielded_item_name, inventory_modified)
 	end
 end
 
@@ -482,7 +482,7 @@ GamePadEquipmentUI._update_ammo_count = function (self, item_data, slot_data, pl
 	local draw_overheat = false
 
 	if item_template.ammo_data then
-		local ammo_count, remaining_ammo, using_single_clip = self._get_ammunition_count(self, slot_data.left_unit_1p, slot_data.right_unit_1p, item_template)
+		local ammo_count, remaining_ammo, using_single_clip = self:_get_ammunition_count(slot_data.left_unit_1p, slot_data.right_unit_1p, item_template)
 		local ammo_text_clip_widget = ammo_widgets_by_name.ammo_text_clip
 		local content = ammo_text_clip_widget.content
 		local ammo_empty = ammo_count + remaining_ammo == 0
@@ -494,7 +494,7 @@ GamePadEquipmentUI._update_ammo_count = function (self, item_data, slot_data, pl
 			local content = widget.content
 			content.text = tostring(ammo_count)
 
-			self._set_widget_dirty(self, widget)
+			self:_set_widget_dirty(widget)
 
 			ammo_changed = true
 		end
@@ -505,7 +505,7 @@ GamePadEquipmentUI._update_ammo_count = function (self, item_data, slot_data, pl
 			local content = widget.content
 			content.text = tostring(remaining_ammo)
 
-			self._set_widget_dirty(self, widget)
+			self:_set_widget_dirty(widget)
 
 			ammo_changed = true
 		end
@@ -514,20 +514,20 @@ GamePadEquipmentUI._update_ammo_count = function (self, item_data, slot_data, pl
 			self._ammo_counter_fade_delay = AMMO_PRESENTATION_DURATION
 			self._ammo_counter_fade_progress = 1
 
-			self._set_ammo_counter_alpha(self, 255)
+			self:_set_ammo_counter_alpha(255)
 
 			local ammo_text_color = (ammo_empty and ammo_colors.empty) or ammo_colors.normal
 
-			self._set_ammo_counter_color(self, ammo_text_color)
-			self.set_dirty(self)
+			self:_set_ammo_counter_color(ammo_text_color)
+			self:set_dirty()
 		end
 	else
-		local has_overcharge, overcharge_fraction, threshold_fraction = self._get_overcharge_amount(self, player_unit)
+		local has_overcharge, overcharge_fraction, threshold_fraction = self:_get_overcharge_amount(player_unit)
 
 		if self._overcharge_fraction ~= overcharge_fraction then
 			self._overcharge_fraction = overcharge_fraction
 
-			self._set_overheat_fraction(self, overcharge_fraction)
+			self:_set_overheat_fraction(overcharge_fraction)
 		end
 
 		draw_overheat = true
@@ -536,7 +536,7 @@ GamePadEquipmentUI._update_ammo_count = function (self, item_data, slot_data, pl
 	if self._draw_overheat ~= draw_overheat then
 		self._draw_overheat = draw_overheat
 
-		self._show_overheat_meter(self, draw_overheat)
+		self:_show_overheat_meter(draw_overheat)
 	end
 end
 
@@ -564,7 +564,7 @@ GamePadEquipmentUI._animate_ammo_counter = function (self, dt)
 	ammo_counter_fade_progress = math.max(ammo_counter_fade_progress - 0.01, 0)
 	local alpha = 100 + 155 * ammo_counter_fade_progress
 
-	self._set_ammo_counter_alpha(self, alpha)
+	self:_set_ammo_counter_alpha(alpha)
 
 	if ammo_counter_fade_progress == 0 then
 		self._ammo_counter_fade_progress = nil
@@ -582,22 +582,22 @@ GamePadEquipmentUI._set_ammo_counter_alpha = function (self, alpha)
 	local clip_text_color = ammo_clip_widget_style.text_color
 	clip_text_color[1] = alpha
 
-	self._set_widget_dirty(self, ammo_clip_widget)
+	self:_set_widget_dirty(ammo_clip_widget)
 
 	local ammo_remaining_widget = ammo_widgets_by_name.ammo_text_remaining
 	local ammo_remaining_widget_style = ammo_remaining_widget.style.text
 	local remaining_text_color = ammo_remaining_widget_style.text_color
 	remaining_text_color[1] = alpha
 
-	self._set_widget_dirty(self, ammo_remaining_widget)
+	self:_set_widget_dirty(ammo_remaining_widget)
 
 	local ammo_center_widget = ammo_widgets_by_name.ammo_text_center
 	local ammo_center_widget_style = ammo_center_widget.style.text
 	local center_text_color = ammo_center_widget_style.text_color
 	center_text_color[1] = alpha
 
-	self._set_widget_dirty(self, ammo_center_widget)
-	self.set_dirty(self)
+	self:_set_widget_dirty(ammo_center_widget)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI._set_ammo_counter_color = function (self, color)
@@ -608,7 +608,7 @@ GamePadEquipmentUI._set_ammo_counter_color = function (self, color)
 	clip_text_color[3] = color[3]
 	clip_text_color[4] = color[4]
 
-	self._set_widget_dirty(self, ammo_clip_widget)
+	self:_set_widget_dirty(ammo_clip_widget)
 
 	local ammo_remaining_widget = self._ammo_widgets_by_name.ammo_text_remaining
 	local ammo_remaining_widget_style = ammo_remaining_widget.style.text
@@ -617,7 +617,7 @@ GamePadEquipmentUI._set_ammo_counter_color = function (self, color)
 	remaining_text_color[3] = color[3]
 	remaining_text_color[4] = color[4]
 
-	self._set_widget_dirty(self, ammo_remaining_widget)
+	self:_set_widget_dirty(ammo_remaining_widget)
 
 	local ammo_center_widget = self._ammo_widgets_by_name.ammo_text_center
 	local ammo_center_widget_style = ammo_center_widget.style.text
@@ -626,8 +626,8 @@ GamePadEquipmentUI._set_ammo_counter_color = function (self, color)
 	center_text_color[3] = color[3]
 	center_text_color[4] = color[4]
 
-	self._set_widget_dirty(self, ammo_center_widget)
-	self.set_dirty(self)
+	self:_set_widget_dirty(ammo_center_widget)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI._set_ammo_text_focus = function (self, focus)
@@ -644,16 +644,16 @@ GamePadEquipmentUI._set_ammo_text_focus = function (self, focus)
 			fg_color[3] = color[3] * multiplier
 			fg_color[4] = color[4] * multiplier
 
-			self._set_widget_dirty(self, fg_widget)
-			self._set_widget_dirty(self, bg_widget)
-			self.set_dirty(self)
+			self:_set_widget_dirty(fg_widget)
+			self:_set_widget_dirty(bg_widget)
+			self:set_dirty()
 		end
 	else
 		local ammo_widgets_by_name = self._ammo_widgets_by_name
 		self._ammo_counter_fade_delay = AMMO_PRESENTATION_DURATION
 		self._ammo_counter_fade_progress = 1
 
-		self._set_ammo_counter_alpha(self, 255)
+		self:_set_ammo_counter_alpha(255)
 
 		if self._ammo_count ~= nil or self._remaining_ammo ~= nil then
 			local multiplier = 1
@@ -661,23 +661,23 @@ GamePadEquipmentUI._set_ammo_text_focus = function (self, focus)
 			local ammo_background_widget = self._widgets_by_name.ammo_background
 			ammo_background_widget.content.visible = focus
 
-			self._set_widget_dirty(self, ammo_background_widget)
+			self:_set_widget_dirty(ammo_background_widget)
 
 			local ammo_clip_widget = ammo_widgets_by_name.ammo_text_clip
 			ammo_clip_widget.content.visible = focus
 
-			self._set_widget_dirty(self, ammo_clip_widget)
+			self:_set_widget_dirty(ammo_clip_widget)
 
 			local ammo_remaining_widget = ammo_widgets_by_name.ammo_text_remaining
 			ammo_remaining_widget.content.visible = focus
 
-			self._set_widget_dirty(self, ammo_remaining_widget)
+			self:_set_widget_dirty(ammo_remaining_widget)
 
 			local ammo_center_widget = ammo_widgets_by_name.ammo_text_center
 			ammo_center_widget.content.visible = focus
 
-			self._set_widget_dirty(self, ammo_center_widget)
-			self.set_dirty(self)
+			self:_set_widget_dirty(ammo_center_widget)
+			self:set_dirty()
 		end
 	end
 
@@ -693,12 +693,12 @@ GamePadEquipmentUI._set_ammo_text_focus = function (self, focus)
 		local ammo_remaining_widget = ammo_widgets_by_name.ammo_text_remaining
 		local ammo_center_widget = ammo_widgets_by_name.ammo_text_center
 
-		self._set_widget_visibility(self, fg_widget, false)
-		self._set_widget_visibility(self, bg_widget, false)
-		self._set_widget_visibility(self, ammo_background_widget, false)
-		self._set_widget_visibility(self, ammo_clip_widget, false)
-		self._set_widget_visibility(self, ammo_remaining_widget, false)
-		self._set_widget_visibility(self, ammo_center_widget, false)
+		self:_set_widget_visibility(fg_widget, false)
+		self:_set_widget_visibility(bg_widget, false)
+		self:_set_widget_visibility(ammo_background_widget, false)
+		self:_set_widget_visibility(ammo_clip_widget, false)
+		self:_set_widget_visibility(ammo_remaining_widget, false)
+		self:_set_widget_visibility(ammo_center_widget, false)
 
 		self._ammo_dirty = true
 	end
@@ -721,18 +721,18 @@ GamePadEquipmentUI._get_ammunition_count = function (self, left_hand_wielded_uni
 		return
 	end
 
-	local ammo_count = ammo_extension.ammo_count(ammo_extension)
-	local remaining_ammo = ammo_extension.remaining_ammo(ammo_extension)
-	local single_clip = ammo_extension.using_single_clip(ammo_extension)
+	local ammo_count = ammo_extension:ammo_count()
+	local remaining_ammo = ammo_extension:remaining_ammo()
+	local single_clip = ammo_extension:using_single_clip()
 
 	return ammo_count, remaining_ammo, single_clip
 end
 
 GamePadEquipmentUI._get_overcharge_amount = function (self, player_unit)
 	local overcharge_extension = ScriptUnit.extension(player_unit, "overcharge_system")
-	local overcharge_fraction = overcharge_extension.overcharge_fraction(overcharge_extension)
-	local threshold_fraction = overcharge_extension.threshold_fraction(overcharge_extension)
-	local anim_blend_overcharge = overcharge_extension.get_anim_blend_overcharge(overcharge_extension)
+	local overcharge_fraction = overcharge_extension:overcharge_fraction()
+	local threshold_fraction = overcharge_extension:threshold_fraction()
+	local anim_blend_overcharge = overcharge_extension:get_anim_blend_overcharge()
 
 	return true, overcharge_fraction, threshold_fraction, anim_blend_overcharge
 end
@@ -767,7 +767,7 @@ GamePadEquipmentUI._update_animations = function (self, dt)
 		animations[name] = self[anim_func_name](self, animation_data, dt)
 		local widget = animation_data.widget
 
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 
 		dirty = true
 	end
@@ -953,7 +953,7 @@ GamePadEquipmentUI._remove_item = function (self, index)
 	self._num_added_items = num_added_items - 1
 
 	if was_selected then
-		self._add_animation(self, slot_name .. "_wield_anim", widget, widget, "_animate_slot_unwield")
+		self:_add_animation(slot_name .. "_wield_anim", widget, widget, "_animate_slot_unwield")
 	else
 		widget.style.texture_selected.color[1] = 0
 	end
@@ -965,21 +965,21 @@ GamePadEquipmentUI.set_position = function (self, x, y)
 	position[2] = y
 
 	for _, widget in ipairs(self._widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
 	for _, widget in ipairs(self._static_widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
-	self.set_dirty(self)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI.destroy = function (self)
 	local event_manager = Managers.state.event
 
-	event_manager.unregister(event_manager, "input_changed", self)
-	self.set_visible(self, false)
+	event_manager:unregister("input_changed", self)
+	self:set_visible(false)
 	rawset(_G, "gamepad_equipment_ui", nil)
 	print("[GamePadEquipmentUI] - Destroy")
 end
@@ -987,7 +987,7 @@ end
 GamePadEquipmentUI.set_visible = function (self, visible)
 	self._is_visible = visible
 
-	self._set_elements_visible(self, visible)
+	self:_set_elements_visible(visible)
 end
 
 GamePadEquipmentUI._set_elements_visible = function (self, visible)
@@ -1007,7 +1007,7 @@ GamePadEquipmentUI._set_elements_visible = function (self, visible)
 
 	self._retained_elements_visible = visible
 
-	self.set_dirty(self)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI._handle_gamepad = function (self)
@@ -1018,14 +1018,14 @@ GamePadEquipmentUI._handle_gamepad = function (self)
 		if not self.gamepad_active_last_frame then
 			self.gamepad_active_last_frame = true
 
-			self.on_gamepad_activated(self)
+			self:on_gamepad_activated()
 
 			dirty = true
 		end
 	elseif self.gamepad_active_last_frame or self.gamepad_active_last_frame == nil then
 		self.gamepad_active_last_frame = false
 
-		self.on_gamepad_deactivated(self)
+		self:on_gamepad_deactivated()
 
 		dirty = true
 	end
@@ -1037,8 +1037,8 @@ local DO_RELOAD = false
 
 GamePadEquipmentUI.update = function (self, dt, t)
 	if DO_RELOAD then
-		self.set_visible(self, false)
-		self._create_ui_elements(self)
+		self:set_visible(false)
+		self:_create_ui_elements()
 
 		DO_RELOAD = false
 		self._show_ammo_meter = false
@@ -1046,39 +1046,39 @@ GamePadEquipmentUI.update = function (self, dt, t)
 
 	local dirty = false
 
-	if self._update_animations(self, dt) then
+	if self:_update_animations(dt) then
 		dirty = true
 	end
 
-	if self._animate_ammo_counter(self, dt) then
+	if self:_animate_ammo_counter(dt) then
 		dirty = true
 	end
 
 	if dirty then
-		self.set_dirty(self)
+		self:set_dirty()
 	end
 
-	self._handle_resolution_modified(self)
-	self._sync_player_equipment(self)
-	self.draw(self, dt)
+	self:_handle_resolution_modified()
+	self:_sync_player_equipment()
+	self:draw(dt)
 end
 
 GamePadEquipmentUI._handle_resolution_modified = function (self)
 	if RESOLUTION_LOOKUP.modified then
-		self._on_resolution_modified(self)
+		self:_on_resolution_modified()
 	end
 end
 
 GamePadEquipmentUI._on_resolution_modified = function (self)
 	for _, widget in ipairs(self._widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
 	for _, widget in ipairs(self._static_widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
-	self.set_dirty(self)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI._handle_gamepad = function (self)
@@ -1086,13 +1086,13 @@ GamePadEquipmentUI._handle_gamepad = function (self)
 
 	if not gamepad_active then
 		if self._retained_elements_visible then
-			self._set_elements_visible(self, false)
+			self:_set_elements_visible(false)
 		end
 
 		return false
 	else
 		if not self._retained_elements_visible then
-			self._set_elements_visible(self, true)
+			self:_set_elements_visible(true)
 		end
 
 		return true
@@ -1104,7 +1104,7 @@ GamePadEquipmentUI.draw = function (self, dt)
 		return
 	end
 
-	local should_render = self._handle_gamepad(self)
+	local should_render = self:_handle_gamepad()
 
 	if not should_render then
 		return
@@ -1184,77 +1184,77 @@ GamePadEquipmentUI._set_overheat_fraction = function (self, fraction)
 	local size = scenegraph.size
 	size[1] = default_size[1] * fraction
 
-	self._set_widget_dirty(self, widget)
-	self.set_dirty(self)
+	self:_set_widget_dirty(widget)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI._show_overheat_meter = function (self, visible)
 	local widgets_by_name = self._widgets_by_name
 	local ammo_widgets_by_name = self._ammo_widgets_by_name
 
-	self._set_widget_visibility(self, widgets_by_name.overcharge, false)
-	self._set_widget_visibility(self, widgets_by_name.overcharge_background, false)
-	self._set_widget_visibility(self, ammo_widgets_by_name.ammo_text_clip, not visible)
-	self._set_widget_visibility(self, ammo_widgets_by_name.ammo_text_remaining, not visible)
-	self._set_widget_visibility(self, ammo_widgets_by_name.ammo_text_center, not visible)
-	self._set_widget_visibility(self, widgets_by_name.ammo_background, not visible)
-	self.set_dirty(self)
+	self:_set_widget_visibility(widgets_by_name.overcharge, false)
+	self:_set_widget_visibility(widgets_by_name.overcharge_background, false)
+	self:_set_widget_visibility(ammo_widgets_by_name.ammo_text_clip, not visible)
+	self:_set_widget_visibility(ammo_widgets_by_name.ammo_text_remaining, not visible)
+	self:_set_widget_visibility(ammo_widgets_by_name.ammo_text_center, not visible)
+	self:_set_widget_visibility(widgets_by_name.ammo_background, not visible)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI._set_widget_visibility = function (self, widget, visible)
 	widget.content.visible = visible
 
-	self._set_widget_dirty(self, widget)
+	self:_set_widget_dirty(widget)
 end
 
 GamePadEquipmentUI.set_alpha = function (self, alpha)
 	self.render_settings.alpha_multiplier = alpha
 
 	for widget_index, widget in pairs(self._widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
 	for widget_index, widget in pairs(self._slot_widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
 	for widget_index, widget in pairs(self._static_widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
 	for widget_index, widget in pairs(self._ammo_widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
-	self.set_dirty(self)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI.set_ammo_alpha = function (self, alpha)
 	self.ammo_alpha_multiplier = alpha
 
 	for widget_index, widget in pairs(self._ammo_widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
-	self.set_dirty(self)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI.set_panel_alpha = function (self, alpha)
 	self.panel_alpha_multiplier = alpha
 
 	for widget_index, widget in pairs(self._widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
 	for widget_index, widget in pairs(self._slot_widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
 	for widget_index, widget in pairs(self._static_widgets) do
-		self._set_widget_dirty(self, widget)
+		self:_set_widget_dirty(widget)
 	end
 
-	self.set_dirty(self)
+	self:set_dirty()
 end
 
 GamePadEquipmentUI.apply_crosshair_position = function (self, x, y)
@@ -1265,12 +1265,12 @@ GamePadEquipmentUI.apply_crosshair_position = function (self, x, y)
 	local widgets_by_name = self._widgets_by_name
 	local ammo_widgets_by_name = self._ammo_widgets_by_name
 
-	self._set_widget_dirty(self, ammo_widgets_by_name.ammo_text_clip)
-	self._set_widget_dirty(self, ammo_widgets_by_name.ammo_text_remaining)
-	self._set_widget_dirty(self, ammo_widgets_by_name.ammo_text_center)
-	self._set_widget_dirty(self, widgets_by_name.overcharge)
-	self._set_widget_dirty(self, widgets_by_name.overcharge_background)
-	self.set_dirty(self)
+	self:_set_widget_dirty(ammo_widgets_by_name.ammo_text_clip)
+	self:_set_widget_dirty(ammo_widgets_by_name.ammo_text_remaining)
+	self:_set_widget_dirty(ammo_widgets_by_name.ammo_text_center)
+	self:_set_widget_dirty(widgets_by_name.overcharge)
+	self:_set_widget_dirty(widgets_by_name.overcharge_background)
+	self:set_dirty()
 end
 
 return

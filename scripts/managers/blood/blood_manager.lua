@@ -19,26 +19,26 @@ BloodManager.update = function (self, dt, t)
 
 	if blood_enabled or blood_enabled == nil then
 		if not self._blood_active then
-			self._enable_blood(self, true)
+			self:_enable_blood(true)
 		end
 
 		local t = World.time(self._world)
 
-		self._update_weapon_blood(self, dt, t)
-		self._update_blood_decals(self, dt, t)
-		self._handle_delayed_fade_units(self, dt, t)
-		self._update_distance_fade(self, dt, t)
+		self:_update_weapon_blood(dt, t)
+		self:_update_blood_decals(dt, t)
+		self:_handle_delayed_fade_units(dt, t)
+		self:_update_distance_fade(dt, t)
 
 		if debug_decals then
-			self._update_debug(self, dt, t)
+			self:_update_debug(dt, t)
 		end
 	elseif self._blood_active then
-		self.clear_weapon_blood(self)
-		self.clear_blood_decals(self)
-		self._enable_blood(self, false)
+		self:clear_weapon_blood()
+		self:clear_blood_decals()
+		self:_enable_blood(false)
 	end
 
-	self._update_blood_effects(self)
+	self:_update_blood_effects()
 end
 
 BloodManager._enable_blood = function (self, enable)
@@ -53,7 +53,7 @@ BloodManager._update_weapon_blood = function (self, dt, t)
 		for weapon, amount in pairs(blood_data) do
 			blood_data[weapon] = math.clamp(amount - BloodSettings.weapon_blood.dissolve_rate * dt, 0, BloodSettings.weapon_blood.max_value)
 
-			self._set_weapon_blood_intensity(self, attacker_unit, weapon, blood_data[weapon])
+			self:_set_weapon_blood_intensity(attacker_unit, weapon, blood_data[weapon])
 		end
 	end
 end
@@ -63,7 +63,7 @@ BloodManager._update_blood_decals = function (self, dt, t)
 
 	for unit, time in pairs(self._blood_fades) do
 		if time <= t then
-			self._remove_blood_decal(self, unit)
+			self:_remove_blood_decal(unit)
 
 			to_remove = to_remove or {}
 			to_remove[#to_remove + 1] = unit
@@ -95,7 +95,7 @@ BloodManager._handle_delayed_fade_units = function (self, dt, t)
 	if self._delayed_fade_units then
 		for _, unit in pairs(self._delayed_fade_units) do
 			if Unit.alive(unit) then
-				self._add_to_fade_list(self, unit, t)
+				self:_add_to_fade_list(unit, t)
 			end
 		end
 	end
@@ -118,7 +118,7 @@ BloodManager._update_distance_fade = function (self, dt, t)
 				local distance_sq = Vector3.distance_squared(pos, camera_pos)
 
 				if t + 2 < time and BloodSettings.blood_decals.distance_despawn * BloodSettings.blood_decals.distance_despawn <= distance_sq then
-					self._set_fade_values(self, unit, t, 2)
+					self:_set_fade_values(unit, t, 2)
 
 					self._blood_fades[unit] = t + 2
 				end
@@ -153,7 +153,7 @@ BloodManager._update_debug = function (self, dt, t)
 		local position = Unit.local_position(unit, 0)
 		local vector = Quaternion.up(Unit.local_rotation(unit, 0))
 
-		drawer.vector(drawer, position, vector, Color(0, 255, 0))
+		drawer:vector(position, vector, Color(0, 255, 0))
 	end
 
 	local active_controller = Managers.account:active_controller()
@@ -176,12 +176,12 @@ BloodManager._update_debug = function (self, dt, t)
 		self._blood_units[#self._blood_units + 1] = World.spawn_unit(self._world, blood_unit, player_pos, Quaternion.identity())
 
 		Unit.set_local_scale(self._blood_units[#self._blood_units], 0, Vector3(BloodSettings.blood_decals.scale, BloodSettings.blood_decals.scale, 1))
-		self._add_to_fade_list(self, self._blood_units[#self._blood_units], t)
+		self:_add_to_fade_list(self._blood_units[#self._blood_units], t)
 	end
 end
 
 BloodManager._add_to_fade_list = function (self, unit, t)
-	self._set_fade_values(self, unit, t, BloodSettings.blood_decals.life_time)
+	self:_set_fade_values(unit, t, BloodSettings.blood_decals.life_time)
 
 	self._blood_fades[unit] = t + BloodSettings.blood_decals.life_time
 end
@@ -226,12 +226,12 @@ BloodManager.clear_weapon_blood = function (self, attacker, weapon)
 		local blood_data = self._weapon_blood[attacker]
 
 		if weapon and blood_data[weapon] then
-			self._set_weapon_blood_intensity(self, attacker, weapon, 0)
+			self:_set_weapon_blood_intensity(attacker, weapon, 0)
 
 			self._weapon_blood[attacker][weapon] = nil
 		elseif not weapon then
 			for weapon, amount in pairs(blood_data) do
-				self._set_weapon_blood_intensity(self, attacker, weapon, 0)
+				self:_set_weapon_blood_intensity(attacker, weapon, 0)
 			end
 
 			self._weapon_blood[attacker] = nil
@@ -241,7 +241,7 @@ BloodManager.clear_weapon_blood = function (self, attacker, weapon)
 			for weapon, amount in pairs(blood_data) do
 				self._weapon_blood[attacker][weapon] = nil
 
-				self._set_weapon_blood_intensity(self, attacker, weapon, 0)
+				self:_set_weapon_blood_intensity(attacker, weapon, 0)
 			end
 		end
 
@@ -276,11 +276,11 @@ BloodManager.spawn_blood_ball = function (self, position, direction, damage_type
 		local breed = Unit.get_data(hit_unit, "breed")
 
 		if breed.blood_effect_name then
-			self._spawn_effects(self, hit_unit, breed, health_ext)
+			self:_spawn_effects(hit_unit, breed, health_ext)
 		end
 
 		if breed.blood_intensity then
-			self._update_blood_intensity(self, hit_unit, breed, health_ext)
+			self:_update_blood_intensity(hit_unit, breed, health_ext)
 		end
 	end
 end
@@ -296,13 +296,13 @@ end
 BloodManager._spawn_effects = function (self, hit_unit, breed, health_ext)
 	local effect_name = breed.blood_effect_name
 	local blood_nodes = breed.blood_effect_nodes
-	local blood_effect_data = self._get_blood_effect_data(self, hit_unit, blood_nodes)
+	local blood_effect_data = self:_get_blood_effect_data(hit_unit, blood_nodes)
 
 	if blood_effect_data.done then
 		return
 	end
 
-	local inverse_health_percentage = 1 - health_ext.current_health_percent(health_ext)
+	local inverse_health_percentage = 1 - health_ext:current_health_percent()
 	local step = 1 / (#blood_effect_data + 1)
 	local current_threshold = step
 
@@ -329,7 +329,7 @@ end
 BloodManager._update_blood_intensity = function (self, hit_unit, breed, health_ext)
 	local blood_intensity_data = breed.blood_intensity
 	local num_meshes = Unit.num_meshes(hit_unit)
-	local inverse_health_percentage = 1 - health_ext.current_health_percent(health_ext)
+	local inverse_health_percentage = 1 - health_ext:current_health_percent()
 
 	for i = 0, num_meshes - 1, 1 do
 		local mesh = Unit.mesh(hit_unit, i)
@@ -373,9 +373,9 @@ end
 
 BloodManager.add_weapon_blood = function (self, attacker, damage_type)
 	if BloodSettings.weapon_blood.enabled then
-		local player = self._is_player(self, attacker)
+		local player = self:_is_player(attacker)
 
-		if player and self._is_melee_weapon(self, attacker) then
+		if player and self:_is_melee_weapon(attacker) then
 			local equipment = ScriptUnit.extension(attacker, "inventory_system"):equipment()
 			local weapon_right = equipment.right_hand_wielded_unit
 			local weapon_right_3p = equipment.right_hand_wielded_unit_3p
@@ -408,7 +408,7 @@ BloodManager.add_enemy_blood = function (self, position, normal, actor)
 		local unit = Actor.unit(actor)
 		local damage_ext = ScriptUnit.has_extension(unit, "health_system") and ScriptUnit.extension(unit, "health_system")
 
-		if damage_ext and damage_ext.is_alive(damage_ext) then
+		if damage_ext and damage_ext:is_alive() then
 			local enemy_base_pos = Unit.local_position(unit, 0)
 			local _, extents = Unit.box(unit)
 			local height = extents[3] * 0.5
@@ -462,7 +462,7 @@ BloodManager.test_enemy_blood = function (self, position)
 			return
 		end
 
-		self.add_enemy_blood(self, pos, normal, actor)
+		self:add_enemy_blood(pos, normal, actor)
 	end
 end
 
@@ -487,7 +487,7 @@ BloodManager._is_player = function (self, attacker)
 end
 
 BloodManager.destroy = function (self)
-	self.clear_weapon_blood(self)
+	self:clear_weapon_blood()
 end
 
 return

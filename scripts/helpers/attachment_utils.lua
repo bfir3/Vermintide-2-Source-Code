@@ -11,7 +11,7 @@ AttachmentUtils.create_attachment = function (world, owner_unit, attachments, sl
 		local unit_spawner = Managers.state.unit_spawner
 
 		if item_units.unit and item_units.unit ~= "" then
-			unit = unit_spawner.spawn_local_unit(unit_spawner, item_units.unit)
+			unit = unit_spawner:spawn_local_unit(item_units.unit)
 
 			Unit.set_unit_visibility(unit, show)
 
@@ -44,7 +44,7 @@ end
 
 AttachmentUtils.create_weapon_visual_attachment = function (world, owner_unit, unit_to_spawn, attachment_node_linking)
 	local unit_spawner = Managers.state.unit_spawner
-	local unit = unit_spawner.spawn_local_unit(unit_spawner, unit_to_spawn)
+	local unit = unit_spawner:spawn_local_unit(unit_to_spawn)
 
 	AttachmentUtils.link(world, owner_unit, unit, attachment_node_linking)
 
@@ -56,7 +56,7 @@ AttachmentUtils.destroy_attachment = function (world, owner_unit, slot_data)
 	local unit_spawner = Managers.state.unit_spawner
 
 	if unit then
-		unit_spawner.mark_for_deletion(unit_spawner, unit)
+		unit_spawner:mark_for_deletion(unit)
 	end
 end
 

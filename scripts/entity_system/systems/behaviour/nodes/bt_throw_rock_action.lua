@@ -27,7 +27,7 @@ BTThrowRockAction.run = function (self, unit, blackboard, t, dt)
 	local rot = LocomotionUtils.rotation_towards_unit(unit, blackboard.target_unit)
 	local locomotion = blackboard.locomotion_extension
 
-	locomotion.set_wanted_rotation(locomotion, rot)
+	locomotion:set_wanted_rotation(rot)
 
 	if blackboard.attack_cooldown < t then
 		blackboard.running_attack_action = nil

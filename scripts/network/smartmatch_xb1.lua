@@ -58,7 +58,7 @@ SmartMatch.init = function (self, hopper_name, is_host, ticket_params, timeout)
 		dprintf("No params sent to SmartMatch")
 	end
 
-	self._create_smartmatch_session(self)
+	self:_create_smartmatch_session()
 
 	self._state = "_start_smartmatch"
 
@@ -102,7 +102,7 @@ SmartMatch._start_smartmatch = function (self, dt)
 	local ticket_param_str = nil
 
 	if self._ticket_params then
-		ticket_param_str = self._convert_to_json(self, self._hopper_name, self._ticket_params)
+		ticket_param_str = self:_convert_to_json(self._hopper_name, self._ticket_params)
 
 		dprintf("Ticket Params: %s Hopper Name: %s", ticket_param_str, self._hopper_name)
 	end
@@ -226,7 +226,7 @@ SmartMatch._convert_to_json = function (self, hopper_name, params)
 end
 
 SmartMatch.update = function (self, dt)
-	self._handle_smartmatch_session(self)
+	self:_handle_smartmatch_session()
 	self[self._state](self, dt)
 
 	return self._ready and not self._done

@@ -20,10 +20,10 @@ StateTitleScreenLoadSave.on_enter = function (self, params)
 	Managers.transition:show_loading_icon(false)
 
 	if not Managers.account:user_id() then
-		self._close_menu(self)
+		self:_close_menu()
 	end
 
-	self._setup_input(self)
+	self:_setup_input()
 end
 
 StateTitleScreenLoadSave._setup_input = function (self)
@@ -34,58 +34,58 @@ end
 StateTitleScreenLoadSave.update = function (self, dt, t)
 	local title_start_ui = self._title_start_ui
 
-	title_start_ui.update(title_start_ui, dt, t)
-	self._update_network(self, dt, t)
+	title_start_ui:update(dt, t)
+	self:_update_network(dt, t)
 
 	if not Managers.account:user_detached() then
 		if self._state == "get_user_profile" then
-			self._get_user_profile(self)
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_acquiring_user_profile"))
+			self:_get_user_profile()
+			title_start_ui:set_information_text(Localize("loading_acquiring_user_profile"))
 		elseif self._state == "check_guest" then
-			self._check_guest(self)
+			self:_check_guest()
 		elseif self._state == "enumerate_dlc" then
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_checking_downloadable_content"))
-			self._enumerate_dlc(self)
+			title_start_ui:set_information_text(Localize("loading_checking_downloadable_content"))
+			self:_enumerate_dlc()
 		elseif self._state == "check_multiplayer_privileges" then
-			self._check_prviileges(self)
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_checking_privileges"))
+			self:_check_prviileges()
+			title_start_ui:set_information_text(Localize("loading_checking_privileges"))
 		elseif self._state == "acquire_storage" then
-			self._get_storage_space(self)
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_acquiring_storage"))
+			self:_get_storage_space()
+			title_start_ui:set_information_text(Localize("loading_acquiring_storage"))
 		elseif self._state == "query_storage_spaces" then
-			self._query_storage_spaces(self)
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_checking_save_data"))
+			self:_query_storage_spaces()
+			title_start_ui:set_information_text(Localize("loading_checking_save_data"))
 		elseif self._state == "load_save" then
-			self._load_save(self)
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_loading_settings"))
+			self:_load_save()
+			title_start_ui:set_information_text(Localize("loading_loading_settings"))
 		elseif self._state == "check_popup" then
-			self._check_popup(self)
+			self:_check_popup()
 		elseif self._state == "create_save" then
-			self._create_save(self)
+			self:_create_save()
 		elseif self._state == "signin_to_backend" then
-			self._signin(self)
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_signing_in"))
+			self:_signin()
+			title_start_ui:set_information_text(Localize("loading_signing_in"))
 		elseif self._state == "check_invite" then
-			self._check_invite(self)
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_checking_invites"))
+			self:_check_invite()
+			title_start_ui:set_information_text(Localize("loading_checking_invites"))
 		elseif self._state == "signin_to_xsts" then
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_acquiring_xsts_token"))
-			self._signin_to_xsts(self)
+			title_start_ui:set_information_text(Localize("loading_acquiring_xsts_token"))
+			self:_signin_to_xsts()
 		elseif self._state == "delete_save" then
-			self._delete_save(self)
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_deleting_settings"))
+			self:_delete_save()
+			title_start_ui:set_information_text(Localize("loading_deleting_settings"))
 		elseif self._state == "complete" then
-			self._close_menu(self)
+			self:_close_menu()
 			Managers.account:close_storage()
-			title_start_ui.set_information_text(title_start_ui, Localize("loading_returning_to_title"))
+			title_start_ui:set_information_text(Localize("loading_returning_to_title"))
 
 			self._state = "none"
 		end
 	elseif self._popup_id then
-		self._check_popup(self)
+		self:_check_popup()
 	end
 
-	return self._next_state(self)
+	return self:_next_state()
 end
 
 StateTitleScreenLoadSave._update_network = function (self, dt, t)
@@ -237,7 +237,7 @@ StateTitleScreenLoadSave.cb_query_done = function (self, data)
 	if data.error then
 		self._popup_id = Managers.popup:queue_popup(Localize("popup_query_storage_error"), Localize("popup_query_storage_error_header"), "query_storage_error", Localize("menu_ok"))
 		self._state = "check_popup"
-	elseif self._save_data_contains(self, data, "save_container") then
+	elseif self:_save_data_contains(data, "save_container") then
 		if StateTitleScreenLoadSave.DELETE_SAVE then
 			self._state = "delete_save"
 			StateTitleScreenLoadSave.DELETE_SAVE = false
@@ -283,8 +283,8 @@ StateTitleScreenLoadSave.cb_load_done = function (self, data)
 
 		local input_service = self.input_manager:get_service("main_menu")
 
-		if input_service.get(input_service, "show_support_info") then
-			self._show_support_info(self)
+		if input_service:get("show_support_info") then
+			self:_show_support_info()
 		else
 			self._state = "signin_to_xsts"
 		end
@@ -305,34 +305,34 @@ StateTitleScreenLoadSave._check_popup = function (self)
 	elseif result == "reset_save" then
 		self._state = "delete_save"
 	elseif result == "privilege_error" then
-		self._close_menu(self)
+		self:_close_menu()
 
 		self._state = "none"
 	elseif result == "profile_error" then
-		self._close_menu(self)
+		self:_close_menu()
 
 		self._state = "none"
 	elseif result == "storage_error" then
-		self._close_menu(self)
+		self:_close_menu()
 
 		self._state = "none"
 	elseif result == "query_storage_error" then
-		self._close_menu(self)
+		self:_close_menu()
 		Managers.account:close_storage()
 
 		self._state = "none"
 	elseif result == "save_error" then
-		self._close_menu(self)
+		self:_close_menu()
 		Managers.account:close_storage()
 
 		self._state = "none"
 	elseif result == "delete_save_error" then
-		self._close_menu(self)
+		self:_close_menu()
 		Managers.account:close_storage()
 
 		self._state = "none"
 	elseif result == "xsts_error" then
-		self._close_menu(self)
+		self:_close_menu()
 		Managers.account:close_storage()
 
 		self._state = "none"
@@ -415,7 +415,7 @@ StateTitleScreenLoadSave._next_state = function (self)
 		end
 
 		if Managers.backend and Managers.backend:is_disconnected() then
-			self._close_menu(self)
+			self:_close_menu()
 			Managers.account:close_storage()
 
 			return self._new_state

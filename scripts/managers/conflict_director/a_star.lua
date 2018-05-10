@@ -7,7 +7,7 @@ function dist_between(pos_a, pos_b)
 end
 
 function dist_between_nodes(node_a, node_b)
-	return Vector3.distance(node_a.get_group_center(node_a):unbox(), node_b.get_group_center(node_b):unbox())
+	return Vector3.distance(node_a:get_group_center():unbox(), node_b:get_group_center():unbox())
 end
 
 function heuristic_cost_estimate(node1, node2)
@@ -36,7 +36,7 @@ function lowest_f_score_node(nodes, f_score)
 end
 
 function neighbour_nodes(source_node, nodes)
-	local neighbour_nodes = source_node.get_group_neighbours(source_node)
+	local neighbour_nodes = source_node:get_group_neighbours()
 	local array = {}
 
 	for node, _ in pairs(neighbour_nodes) do

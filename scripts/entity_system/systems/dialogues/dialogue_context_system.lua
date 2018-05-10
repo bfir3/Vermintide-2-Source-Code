@@ -6,7 +6,7 @@ DialogueContextSystem = class(DialogueContextSystem, ExtensionSystemBase)
 DialogueContextSystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self.entity_manager = entity_manager
 	self.unit_extension_data = {}
@@ -52,9 +52,9 @@ DialogueContextSystem.update = function (self, system_context, t)
 		local context = extension.context
 		context.health = extension.health_extension:current_health_percent()
 		local status_extension = extension.status_extension
-		context.is_pounced_down = not not status_extension.is_pounced_down(status_extension)
-		context.is_knocked_down = not not status_extension.is_knocked_down(status_extension)
-		context.intensity = status_extension.get_intensity(status_extension)
+		context.is_pounced_down = not not status_extension:is_pounced_down()
+		context.is_knocked_down = not not status_extension:is_knocked_down()
+		context.intensity = status_extension:get_intensity()
 		context.pacing_state = Managers.state.conflict.pacing.pacing_state
 		local proximity_extension = extension.proximity_extension
 		local proximity_types = proximity_extension.proximity_types

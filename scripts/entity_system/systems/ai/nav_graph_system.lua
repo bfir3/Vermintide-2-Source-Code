@@ -9,13 +9,13 @@ script_data.nav_mesh_debug = script_data.nav_mesh_debug or Development.parameter
 NavGraphSystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self.entity_manager = entity_manager
 	self.world = context.world
 	self.unit_extension_data = {}
 	local ai_system = Managers.state.entity:system("ai_system")
-	self.nav_world = ai_system.nav_world(ai_system)
+	self.nav_world = ai_system:nav_world()
 	local version = nil
 	local level_settings = LevelHelper:current_level_settings(self.world)
 	local level_name = level_settings.level_name
@@ -115,37 +115,37 @@ NavGraphSystem.init_nav_graphs = function (self, unit, smart_object_id, extensio
 
 			if smart_object_type == "ledges" or smart_object_type == "ledges_with_fence" then
 				if smart_object_data.data.ledge_position1 then
-					drawer.line(drawer, control_points[1], Vector3Aux.unbox(smart_object_data.data.ledge_position1), debug_color)
-					drawer.line(drawer, Vector3Aux.unbox(smart_object_data.data.ledge_position1), Vector3Aux.unbox(smart_object_data.data.ledge_position2), debug_color)
-					drawer.line(drawer, control_points[2], Vector3Aux.unbox(smart_object_data.data.ledge_position2), debug_color)
+					drawer:line(control_points[1], Vector3Aux.unbox(smart_object_data.data.ledge_position1), debug_color)
+					drawer:line(Vector3Aux.unbox(smart_object_data.data.ledge_position1), Vector3Aux.unbox(smart_object_data.data.ledge_position2), debug_color)
+					drawer:line(control_points[2], Vector3Aux.unbox(smart_object_data.data.ledge_position2), debug_color)
 				else
-					drawer.line(drawer, control_points[1], Vector3Aux.unbox(smart_object_data.data.ledge_position), debug_color)
-					drawer.line(drawer, control_points[2], Vector3Aux.unbox(smart_object_data.data.ledge_position), debug_color)
+					drawer:line(control_points[1], Vector3Aux.unbox(smart_object_data.data.ledge_position), debug_color)
+					drawer:line(control_points[2], Vector3Aux.unbox(smart_object_data.data.ledge_position), debug_color)
 				end
 
 				if not smart_object_data.data.is_bidirectional then
-					drawer.vector(drawer, control_points[1], Vector3.up(), debug_color)
+					drawer:vector(control_points[1], Vector3.up(), debug_color)
 				end
 			elseif smart_object_type == "jumps" then
-				drawer.line(drawer, control_points[1], control_points[2], Colors.get("aqua_marine"))
+				drawer:line(control_points[1], control_points[2], Colors.get("aqua_marine"))
 			else
-				drawer.line(drawer, control_points[1], control_points[2], debug_color)
+				drawer:line(control_points[1], control_points[2], debug_color)
 			end
 
 			local is_position_on_navmesh = GwNavQueries.triangle_from_position(nav_world, control_points[1])
 
 			if is_position_on_navmesh then
-				drawer.sphere(drawer, control_points[1], 0.05, debug_color)
+				drawer:sphere(control_points[1], 0.05, debug_color)
 			else
-				drawer.sphere(drawer, control_points[1], 0.05, debug_color_fail)
+				drawer:sphere(control_points[1], 0.05, debug_color_fail)
 			end
 
 			is_position_on_navmesh = GwNavQueries.triangle_from_position(nav_world, control_points[2])
 
 			if is_position_on_navmesh then
-				drawer.sphere(drawer, control_points[2], 0.05, debug_color)
+				drawer:sphere(control_points[2], 0.05, debug_color)
 			else
-				drawer.sphere(drawer, control_points[2], 0.05, debug_color_fail)
+				drawer:sphere(control_points[2], 0.05, debug_color_fail)
 			end
 		end
 	end
@@ -168,7 +168,7 @@ NavGraphSystem.on_add_extension = function (self, world, unit, extension_name)
 
 		if smart_object_id and self.smart_objects[smart_object_id] then
 			if not self.no_nav_mesh and (not Unit.has_data(unit, "enabled_on_spawn") or Unit.get_data(unit, "enabled_on_spawn") == true) then
-				self.init_nav_graphs(self, unit, smart_object_id, extension)
+				self:init_nav_graphs(unit, smart_object_id, extension)
 			end
 		elseif Development.parameter("visualize_ledges") then
 			local drawer = Managers.state.debug:drawer({
@@ -177,18 +177,18 @@ NavGraphSystem.on_add_extension = function (self, world, unit, extension_name)
 			})
 			local pose, half_extents = Unit.box(unit)
 
-			drawer.box(drawer, pose, half_extents + Vector3(0.01, 0.01, 0.01), Colors.get("red"))
+			drawer:box(pose, half_extents + Vector3(0.01, 0.01, 0.01), Colors.get("red"))
 		end
 	end
 
 	if extension_name == "LevelUnitSmartObjectExtension" then
-		local smart_object_id = self._level_unit_smart_object_id(self, unit)
-		local smart_object = self.smart_object_from_unit_data(self, unit, smart_object_id)
+		local smart_object_id = self:_level_unit_smart_object_id(unit)
+		local smart_object = self:smart_object_from_unit_data(unit, smart_object_id)
 		self.smart_objects[smart_object_id] = smart_object
 		self.smart_object_ids[unit] = smart_object_id
 
 		if not self.no_nav_mesh then
-			self.init_nav_graphs(self, unit, smart_object_id, extension)
+			self:init_nav_graphs(unit, smart_object_id, extension)
 		end
 	end
 
@@ -218,7 +218,7 @@ NavGraphSystem.init_nav_graph_from_flow = function (self, unit)
 	local smart_object_id = Unit.get_data(unit, "smart_object_id") or Unit.get_data(unit, "ledge_id")
 
 	if smart_object_id and self.smart_objects[smart_object_id] and not self.no_nav_mesh then
-		self.init_nav_graphs(self, unit, smart_object_id, extension)
+		self:init_nav_graphs(unit, smart_object_id, extension)
 	end
 end
 
@@ -314,7 +314,7 @@ NavGraphSystem.update = function (self, context, t, dt)
 	if self._nav_mesh_debug or script_data.nav_mesh_debug then
 		self._nav_mesh_debug = script_data.nav_mesh_debug
 		local ai_system = Managers.state.entity:system("ai_system")
-		local nav_cost_maps_data, nav_cost_maps_count = ai_system.get_nav_cost_maps_data(ai_system)
+		local nav_cost_maps_data, nav_cost_maps_count = ai_system:get_nav_cost_maps_data()
 
 		NavigationUtils.debug_draw_nav_mesh(self.nav_world, nav_cost_maps_data, nav_cost_maps_count, self.world, self.line_object)
 

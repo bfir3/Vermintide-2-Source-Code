@@ -15,7 +15,7 @@ end
 AIMeleeLineOfSightSystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self._is_server = context.is_server
 	self._world = context.world
@@ -45,7 +45,7 @@ AIMeleeLineOfSightSystem.on_add_extension = function (self, world, unit, extensi
 end
 
 AIMeleeLineOfSightSystem.on_freeze_extension = function (self, unit, extension_name)
-	self.on_remove_extension(self, unit, extension_name)
+	self:on_remove_extension(unit, extension_name)
 end
 
 AIMeleeLineOfSightSystem.on_remove_extension = function (self, unit, extension_name)

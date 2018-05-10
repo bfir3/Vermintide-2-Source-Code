@@ -6,7 +6,7 @@ ExtensionSystemBase.init = function (self, entity_system_creation_context, syste
 	self.name = system_name
 	local entity_manager = entity_system_creation_context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extension_list)
+	entity_manager:register_system(self, system_name, extension_list)
 
 	self.entity_manager = entity_manager
 	self.unit_storage = entity_system_creation_context.unit_storage
@@ -86,7 +86,7 @@ ExtensionSystemBase.pre_update = function (self, context, t)
 		local profiler_name = self.profiler_names[extension_name]
 
 		for unit, extension in pairs(update_list[extension_name].pre_update) do
-			extension.pre_update(extension, unit, dummy_input, dt, context, t)
+			extension:pre_update(unit, dummy_input, dt, context, t)
 		end
 	end
 end
@@ -108,7 +108,7 @@ ExtensionSystemBase.update = function (self, context, t)
 		local profiler_name = self.profiler_names[extension_name]
 
 		for unit, extension in pairs(update_list[extension_name].update) do
-			extension.update(extension, unit, dummy_input, dt, context, t)
+			extension:update(unit, dummy_input, dt, context, t)
 		end
 	end
 end
@@ -122,7 +122,7 @@ ExtensionSystemBase.post_update = function (self, context, t)
 		local profiler_name = self.profiler_names[extension_name]
 
 		for unit, extension in pairs(update_list[extension_name].post_update) do
-			extension.post_update(extension, unit, dummy_input, dt, context, t)
+			extension:post_update(unit, dummy_input, dt, context, t)
 		end
 	end
 end
@@ -131,7 +131,7 @@ ExtensionSystemBase.pre_update_extension = function (self, extension_name, dt, c
 	local dummy_input = dummy_input
 
 	for unit, extension in pairs(self.update_list[extension_name].pre_update) do
-		extension.pre_update(extension, unit, dummy_input, dt, context, t)
+		extension:pre_update(unit, dummy_input, dt, context, t)
 	end
 end
 
@@ -139,7 +139,7 @@ ExtensionSystemBase.update_extension = function (self, extension_name, dt, conte
 	local dummy_input = dummy_input
 
 	for unit, extension in pairs(self.update_list[extension_name].update) do
-		extension.update(extension, unit, dummy_input, dt, context, t)
+		extension:update(unit, dummy_input, dt, context, t)
 	end
 end
 
@@ -147,13 +147,13 @@ ExtensionSystemBase.post_update_extension = function (self, extension_name, dt, 
 	local dummy_input = dummy_input
 
 	for unit, extension in pairs(self.update_list[extension_name].post_update) do
-		extension.post_update(extension, unit, dummy_input, dt, context, t)
+		extension:post_update(unit, dummy_input, dt, context, t)
 	end
 end
 
 ExtensionSystemBase.hot_join_sync = function (self, sender)
 	for extension_name, _ in pairs(self.extensions) do
-		self._hot_join_sync_extension(self, extension_name, sender)
+		self:_hot_join_sync_extension(extension_name, sender)
 	end
 end
 
@@ -162,7 +162,7 @@ ExtensionSystemBase._hot_join_sync_extension = function (self, extension_name, s
 
 	for unit, internal in pairs(entities) do
 		if internal.hot_join_sync then
-			internal.hot_join_sync(internal, sender)
+			internal:hot_join_sync(sender)
 		end
 	end
 end

@@ -82,7 +82,7 @@ InteractionHelper.approve_request = function (self, interaction_type, interactor
 
 	local interactable_extension = ScriptUnit.extension(interactable_unit, "interactable_system")
 
-	interactable_extension.set_is_being_interacted_with(interactable_extension, interactor_unit)
+	interactable_extension:set_is_being_interacted_with(interactor_unit)
 
 	local interaction_id = NetworkLookup.interactions[interaction_type]
 	local interactor_go_id = Managers.state.unit_storage:go_id(interactor_unit)
@@ -108,11 +108,11 @@ InteractionHelper.request_approved = function (self, interaction_type, interacto
 
 	local interactor_extension = ScriptUnit.extension(interactor_unit, "interactor_system")
 
-	interactor_extension.interaction_approved(interactor_extension, interaction_type, interactable_unit)
+	interactor_extension:interaction_approved(interaction_type, interactable_unit)
 
 	local interactable_extension = ScriptUnit.extension(interactable_unit, "interactable_system")
 
-	interactable_extension.set_is_being_interacted_with(interactable_extension, interactor_unit)
+	interactable_extension:set_is_being_interacted_with(interactor_unit)
 end
 
 InteractionHelper.request_denied = function (self, interactor_unit)
@@ -120,7 +120,7 @@ InteractionHelper.request_denied = function (self, interactor_unit)
 
 	local interactor_extension = ScriptUnit.extension(interactor_unit, "interactor_system")
 
-	interactor_extension.interaction_denied(interactor_extension)
+	interactor_extension:interaction_denied()
 end
 
 InteractionHelper.complete_interaction = function (self, interactor_unit, interactable_unit, result)
@@ -129,7 +129,7 @@ InteractionHelper.complete_interaction = function (self, interactor_unit, intera
 	if Unit.alive(interactable_unit) then
 		local interactable_extension = ScriptUnit.extension(interactable_unit, "interactable_system")
 
-		interactable_extension.set_is_being_interacted_with(interactable_extension, nil)
+		interactable_extension:set_is_being_interacted_with(nil)
 	end
 
 	local interactor_go_id = Managers.state.unit_storage:go_id(interactor_unit)
@@ -142,12 +142,12 @@ InteractionHelper.interaction_completed = function (self, interactor_unit, inter
 
 	local interactor_extension = ScriptUnit.extension(interactor_unit, "interactor_system")
 
-	interactor_extension.interaction_completed(interactor_extension, result)
+	interactor_extension:interaction_completed(result)
 
 	if Unit.alive(interactable_unit) then
 		local interactable_extension = ScriptUnit.extension(interactable_unit, "interactable_system")
 
-		interactable_extension.set_is_being_interacted_with(interactable_extension, nil)
+		interactable_extension:set_is_being_interacted_with(nil)
 	end
 end
 

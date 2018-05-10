@@ -18,7 +18,7 @@ FirstPersonSystem.init = function (self, entity_system_creation_context, system_
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 end
 
 FirstPersonSystem.destroy = function (self)
@@ -39,7 +39,7 @@ FirstPersonSystem.rpc_play_first_person_sound = function (self, sender, unit_id,
 
 	local fp_ext = ScriptUnit.extension(unit, "first_person_system")
 
-	fp_ext.play_sound_event(fp_ext, sound_event, position)
+	fp_ext:play_sound_event(sound_event, position)
 end
 
 FirstPersonSystem.rpc_play_husk_sound_event = function (self, sender, unit_id, event_id)

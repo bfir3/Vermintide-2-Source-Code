@@ -95,7 +95,7 @@ InputManager.remove_all_devices = function (self, input_device_type)
 
 	for _, old_input_device in ipairs(device_list) do
 		for name, service in pairs(self.input_services) do
-			service.unmap_device(service, input_device_type, old_input_device)
+			service:unmap_device(input_device_type, old_input_device)
 		end
 
 		self.input_devices[old_input_device] = nil
@@ -113,14 +113,14 @@ end
 InputManager.set_exclusive_gamepad = function (self, input_device)
 	local input_device_type = "gamepad"
 
-	self.remove_all_devices(self, input_device_type)
+	self:remove_all_devices(input_device_type)
 	InputAux.add_device(input_device_type, input_device)
-	self.initialize_device(self, input_device_type)
+	self:initialize_device(input_device_type)
 
 	local device_data = self.input_devices[input_device]
 
 	for name, service in pairs(self.input_services) do
-		service.map_device(service, input_device_type, input_device, self.input_devices[input_device])
+		service:map_device(input_device_type, input_device, self.input_devices[input_device])
 
 		if self.blocked_gamepad_services[name] then
 			device_data.blocked_access[name] = true
@@ -131,7 +131,7 @@ end
 InputManager.set_all_gamepads_available = function (self)
 	local input_device_type = "gamepad"
 
-	self.remove_all_devices(self, input_device_type)
+	self:remove_all_devices(input_device_type)
 
 	local device_list = {
 		rawget(_G, "Pad1"),
@@ -150,13 +150,13 @@ InputManager.set_all_gamepads_available = function (self)
 		InputAux.add_device(input_device_type, input_device)
 	end
 
-	self.initialize_device(self, input_device_type)
+	self:initialize_device(input_device_type)
 
 	for _, input_device in ipairs(device_list) do
 		local device_data = self.input_devices[input_device]
 
 		for name, service in pairs(self.input_services) do
-			service.map_device(service, input_device_type, input_device, self.input_devices[input_device])
+			service:map_device(input_device_type, input_device, self.input_devices[input_device])
 
 			if self.blocked_gamepad_services[name] then
 				device_data.blocked_access[name] = true
@@ -185,11 +185,11 @@ InputManager.block_device_except_service = function (self, service_exception, de
 				if service.block_reasons and service.block_reasons[block_reason] then
 					device_data.blocked_access[name] = true
 
-					service.set_blocked(service, true)
+					service:set_blocked(true)
 				elseif not service.block_reasons then
 					device_data.blocked_access[name] = true
 
-					service.set_blocked(service, true)
+					service:set_blocked(true)
 				end
 
 				self.blocked_gamepad_services[name] = true
@@ -214,11 +214,11 @@ InputManager.block_device_except_service = function (self, service_exception, de
 				if service.block_reasons and service.block_reasons[block_reason] then
 					device_data.blocked_access[name] = true
 
-					service.set_blocked(service, true)
+					service:set_blocked(true)
 				elseif not service.block_reasons then
 					device_data.blocked_access[name] = true
 
-					service.set_blocked(service, true)
+					service:set_blocked(true)
 				end
 			end
 
@@ -294,7 +294,7 @@ InputManager.device_block_service = function (self, device_type, device_index, s
 			local device_data = self.input_devices[input_device]
 			device_data.blocked_access[service_name] = true
 
-			input_service.set_blocked(input_service, true)
+			input_service:set_blocked(true)
 		end
 
 		self.blocked_gamepad_services[service_name] = true
@@ -306,7 +306,7 @@ InputManager.device_block_service = function (self, device_type, device_index, s
 		if device_data then
 			device_data.blocked_access[service_name] = true
 
-			input_service.set_blocked(input_service, true)
+			input_service:set_blocked(true)
 		end
 	end
 end
@@ -348,7 +348,7 @@ InputManager.get_unblocked_services = function (self, device_type, device_index,
 	local services_n = 0
 
 	for service_name, service in pairs(self.input_services) do
-		if not service.is_blocked(service) then
+		if not service:is_blocked() then
 			services_n = services_n + 1
 			services_dest[services_n] = service_name
 		end
@@ -361,7 +361,7 @@ InputManager.get_blocked_services = function (self, device_type, device_index, s
 	local services_n = 0
 
 	for service_name, service in pairs(self.input_services) do
-		if service.is_blocked(service) then
+		if service:is_blocked() then
 			services_n = services_n + 1
 			services_dest[services_n] = service_name
 		end
@@ -376,7 +376,7 @@ InputManager.device_block_services = function (self, device_type, device_index, 
 	for i = 1, services_n, 1 do
 		local service_name = services[i]
 
-		self.device_block_service(self, device_type, device_index, service_name, block_reason)
+		self:device_block_service(device_type, device_index, service_name, block_reason)
 	end
 end
 
@@ -386,7 +386,7 @@ InputManager.device_unblock_services = function (self, device_type, device_index
 	for i = 1, services_n, 1 do
 		local service_name = services[i]
 
-		self.device_unblock_service(self, device_type, device_index, service_name)
+		self:device_unblock_service(device_type, device_index, service_name)
 	end
 end
 
@@ -396,7 +396,7 @@ InputManager.create_input_service = function (self, input_service_name, keymaps_
 	fassert(keymaps, "[InputManager] - No keymaps found for %s", keymaps_name)
 
 	if not self.stored_keymaps_data[keymaps_name] then
-		self.add_keymaps_data(self, keymaps, keymaps_name)
+		self:add_keymaps_data(keymaps, keymaps_name)
 	end
 
 	if filters_name then
@@ -405,7 +405,7 @@ InputManager.create_input_service = function (self, input_service_name, keymaps_
 		fassert(filters, "[InputManager] - No filters found for %s", filters_name)
 
 		if not self.stored_filters_data[filters_name] then
-			self.add_filters_data(self, filters, filters_name)
+			self:add_filters_data(filters, filters_name)
 		end
 	end
 
@@ -418,7 +418,7 @@ end
 
 InputManager.get_active_input_service_by_device = function (self, device_name)
 	for service_name, service in pairs(self.input_services) do
-		if not service.is_blocked(service) then
+		if not service:is_blocked() then
 			local mapped_devices = service.mapped_devices
 
 			if mapped_devices then
@@ -453,7 +453,7 @@ InputManager.map_device_to_service = function (self, input_service_name, input_d
 		for _, input_device in ipairs(device_list) do
 			local input_device_data = self.input_devices[input_device]
 
-			input_service.map_device(input_service, input_device_type, input_device, input_device_data)
+			input_service:map_device(input_device_type, input_device, input_device_data)
 		end
 	else
 		input_device_slot = input_device_slot or 1
@@ -463,7 +463,7 @@ InputManager.map_device_to_service = function (self, input_service_name, input_d
 
 		local input_device_data = self.input_devices[input_device]
 
-		input_service.map_device(input_service, input_device_type, input_device, input_device_data)
+		input_service:map_device(input_device_type, input_device, input_device_data)
 	end
 end
 
@@ -473,7 +473,7 @@ InputManager.update = function (self, dt, t)
 	self._frame_hovering = false
 	self._showing_tooltip = false
 
-	self.update_devices(self, dt, t)
+	self:update_devices(dt, t)
 end
 
 InputManager.update_devices = function (self, dt, t)
@@ -611,7 +611,7 @@ InputManager.add_filters_data = function (self, filters, name)
 	local new_filters_data = {}
 
 	for filters_name, filters_table in pairs(filters) do
-		local new_filters = self.setup_filters(self, filters_table)
+		local new_filters = self:setup_filters(filters_table)
 		new_filters_data[filters_name] = new_filters
 	end
 
@@ -628,7 +628,7 @@ InputManager.update_filters_data = function (self, filters, name)
 
 	for filters_name, filters_table in pairs(filters) do
 		local current_filters = current_filters_table[filters_name]
-		local new_filters = self.setup_filters(self, filters_table)
+		local new_filters = self:setup_filters(filters_table)
 
 		table.merge_recursive(current_filters, new_filters)
 	end
@@ -672,7 +672,7 @@ InputManager.apply_saved_keymaps = function (self, specific_table_name)
 
 		for keybinding_table_name, keybinding_table in pairs(keymaps) do
 			if (not specific_table_name or specific_table_name == keybinding_table_name) and stored_keymaps_data[keybinding_table_name] then
-				self.update_keymaps_data(self, keybinding_table, keybinding_table_name)
+				self:update_keymaps_data(keybinding_table, keybinding_table_name)
 			end
 		end
 	end
@@ -693,7 +693,7 @@ InputManager.apply_saved_keymaps = function (self, specific_table_name)
 
 		for keybinding_table_name, keybinding_table in pairs(gamepad_keymaps) do
 			if (not specific_table_name or specific_table_name == keybinding_table_name) and stored_keymaps_data[keybinding_table_name] then
-				self.update_keymaps_data(self, keybinding_table, keybinding_table_name)
+				self:update_keymaps_data(keybinding_table, keybinding_table_name)
 			end
 		end
 	end
@@ -754,7 +754,7 @@ InputManager.add_keymaps_data = function (self, keymaps, name)
 	stored_keymaps_data[name] = new_keymaps_data
 
 	for keymaps_name, keymaps_table in pairs(keymaps) do
-		local new_keymaps, default_data_types = self.setup_keymaps(self, keymaps_table)
+		local new_keymaps, default_data_types = self:setup_keymaps(keymaps_table)
 		new_keymaps_data[keymaps_name] = {
 			keymaps = new_keymaps,
 			default_data_types = default_data_types
@@ -762,7 +762,7 @@ InputManager.add_keymaps_data = function (self, keymaps, name)
 	end
 
 	if saved_keymaps then
-		self.apply_saved_keymaps(self, name)
+		self:apply_saved_keymaps(name)
 	end
 
 	dprint("[InputManager] - Add keymaps data for name: %s", name)
@@ -776,7 +776,7 @@ InputManager.update_keymaps_data = function (self, keymaps, name)
 
 	for keymaps_name, keymaps_table in pairs(keymaps) do
 		local current_keymaps = current_keymaps_table[keymaps_name]
-		local new_keymaps, default_data_types = self.setup_keymaps(self, keymaps_table)
+		local new_keymaps, default_data_types = self:setup_keymaps(keymaps_table)
 
 		table.merge_recursive(current_keymaps.keymaps, new_keymaps)
 		table.merge_recursive(current_keymaps.default_data_types, default_data_types)
@@ -853,7 +853,7 @@ InputManager.setup_keymaps = function (self, keymaps)
 end
 
 InputManager.clear_keybinding = function (self, keybinding_table_name, keybinding_table_key, keymap_name)
-	local keymaps_data = self.keymaps_data(self, keybinding_table_name)
+	local keymaps_data = self:keymaps_data(keybinding_table_name)
 
 	assert(keymaps_data, "No keymaps data found under table_name: %s", keybinding_table_name)
 
@@ -875,7 +875,7 @@ end
 InputManager.change_keybinding = function (self, keybinding_table_name, keybinding_table_key, keymap_name, new_button_index, new_device_type)
 	assert(type(new_button_index) == "number", "New button index must be a number.")
 
-	local keymaps_data = self.keymaps_data(self, keybinding_table_name)
+	local keymaps_data = self:keymaps_data(keybinding_table_name)
 
 	assert(keymaps_data, "No keymaps data found under table_name: %s", keybinding_table_name)
 
@@ -899,7 +899,7 @@ end
 InputManager.add_keybinding = function (self, keybinding_table_name, keybinding_table_key, keymap_name, ...)
 	assert(type(new_button_index) == "number", "New button index must be a number.")
 
-	local keymaps_data = self.keymaps_data(self, keybinding_table_name)
+	local keymaps_data = self:keymaps_data(keybinding_table_name)
 
 	assert(keymaps_data, "No keymaps data found under table_name: %s", keybinding_table_name)
 

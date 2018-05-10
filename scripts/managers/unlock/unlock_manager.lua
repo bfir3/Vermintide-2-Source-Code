@@ -6,7 +6,7 @@ require("scripts/settings/unlock_settings")
 UnlockManager = class(UnlockManager)
 
 UnlockManager.init = function (self)
-	self._init_unlocks(self)
+	self:_init_unlocks()
 
 	self._state = "query_unlocked"
 	self._query_unlocked_index = 0
@@ -32,7 +32,7 @@ UnlockManager._init_unlocks = function (self)
 			local id = unlock_config.id
 			local backend_id = unlock_config.backend_id
 			local class = rawget(_G, class_name)
-			local instance = class.new(class, unlock_name, id, backend_id)
+			local instance = class:new(unlock_name, id, backend_id)
 			unlocks[unlock_name] = instance
 			unlocks_indexed[i][unlock_name] = instance
 		end
@@ -48,8 +48,8 @@ UnlockManager.update = function (self, dt)
 		local status = XboxDLC.status()
 
 		if status ~= XboxDLC.IDLE then
-			self._check_licenses(self)
-			self._reinitialize_backend_dlc(self)
+			self:_check_licenses()
+			self:_reinitialize_backend_dlc()
 		end
 
 		if self._popup_id then
@@ -93,7 +93,7 @@ UnlockManager._check_licenses = function (self)
 
 	for _, unlock in pairs(self._unlocks) do
 		if unlock.update_license then
-			unlock.update_license(unlock)
+			unlock:update_license()
 		end
 	end
 
@@ -128,24 +128,24 @@ UnlockManager._update_backend_unlocks = function (self)
 	elseif self._state == "query_unlocked" then
 		local backend_manager = Managers.backend
 
-		if backend_manager.profiles_loaded(backend_manager) then
-			if not backend_manager.available(backend_manager) then
+		if backend_manager:profiles_loaded() then
+			if not backend_manager:available() then
 				self._state = "backend_not_available"
 
 				return
 			end
 
 			if not self._startup_script_started then
-				local queue = backend_manager.get_data_server_queue(backend_manager)
+				local queue = backend_manager:get_data_server_queue()
 
-				queue.register_executor(queue, "script_startup", callback(self, "_executor_script_startup"))
+				queue:register_executor("script_startup", callback(self, "_executor_script_startup"))
 
 				local startup_script = GameSettingsDevelopment.backend_settings.startup_script
-				local backend_items = backend_manager.get_interface(backend_manager, "items")
+				local backend_items = backend_manager:get_interface("items")
 				local startup_script_params = {}
 
 				if PLATFORM == "win32" then
-					queue.register_executor(queue, "revision_check", callback(self, "_executor_revision_check"))
+					queue:register_executor("revision_check", callback(self, "_executor_revision_check"))
 
 					local engine_revision = script_data.build_identifier
 
@@ -162,7 +162,7 @@ UnlockManager._update_backend_unlocks = function (self)
 					end
 				end
 
-				backend_items.data_server_script(backend_items, startup_script, unpack(startup_script_params))
+				backend_items:data_server_script(startup_script, unpack(startup_script_params))
 
 				self._startup_script_started = true
 			end
@@ -181,8 +181,8 @@ UnlockManager._update_backend_unlocks = function (self)
 
 			if unlock_script then
 				local profile_attribute = settings.profile_attribute
-				local backend_profile_attributes = backend_manager.get_interface(backend_manager, "profile_attributes")
-				local profile_unlocked_string = backend_profile_attributes.get_string(backend_profile_attributes, profile_attribute)
+				local backend_profile_attributes = backend_manager:get_interface("profile_attributes")
+				local profile_unlocked_string = backend_profile_attributes:get_string(profile_attribute)
 				local profile_unlocked_table = {}
 
 				if profile_unlocked_string then
@@ -197,10 +197,10 @@ UnlockManager._update_backend_unlocks = function (self)
 				local all_unlocked = ""
 
 				for _, unlock in pairs(unlocks) do
-					local id = unlock.backend_id(unlock)
+					local id = unlock:backend_id()
 
 					if id then
-						if unlock.unlocked(unlock) then
+						if unlock:unlocked() then
 							all_unlocked = string.format("%s%s,", all_unlocked, id)
 
 							if not profile_unlocked_table[id] then
@@ -216,12 +216,12 @@ UnlockManager._update_backend_unlocks = function (self)
 				local remove_script_param = settings.remove_script_param
 
 				if new_unlocked ~= "" or (remove_script_param and removed_unlocked ~= "") then
-					local backend_items = backend_manager.get_interface(backend_manager, "items")
+					local backend_items = backend_manager:get_interface("items")
 
 					if remove_script_param then
-						self._data_server_request = backend_items.data_server_script(backend_items, unlock_script, unlock_script_param, new_unlocked, remove_script_param, removed_unlocked)
+						self._data_server_request = backend_items:data_server_script(unlock_script, unlock_script_param, new_unlocked, remove_script_param, removed_unlocked)
 					else
-						self._data_server_request = backend_items.data_server_script(backend_items, unlock_script, unlock_script_param, new_unlocked)
+						self._data_server_request = backend_items:data_server_script(unlock_script, unlock_script_param, new_unlocked)
 					end
 
 					self._data_server_request:disable_registered_commands()
@@ -237,32 +237,32 @@ UnlockManager._update_backend_unlocks = function (self)
 	elseif self._state == "generating" then
 		local request = self._data_server_request
 
-		if request.is_done(request) then
-			if request.error_message(request) then
-				print("[DlcManager] ERROR generating unlock loot:", request.error_message(request))
+		if request:is_done() then
+			if request:error_message() then
+				print("[DlcManager] ERROR generating unlock loot:", request:error_message())
 
 				self._state = "query_unlocked"
 			else
-				table.dump(request.items(request), "dlc items")
+				table.dump(request:items(), "dlc items")
 
 				local attribute_name = self._set_profile_attribute.name
 				local attribute_value = self._set_profile_attribute.value
 				local backend_manager = Managers.backend
-				local backend_profile_attributes = backend_manager.get_interface(backend_manager, "profile_attributes")
+				local backend_profile_attributes = backend_manager:get_interface("profile_attributes")
 
-				backend_profile_attributes.set_string(backend_profile_attributes, attribute_name, attribute_value)
-				backend_manager.commit(backend_manager)
+				backend_profile_attributes:set_string(attribute_name, attribute_value)
+				backend_manager:commit()
 
 				self._set_profile_attribute = nil
 				self._state = "query_unlocked"
-				local parameters = request.parameters(request)
+				local parameters = request:parameters()
 				local presentation_data_json = parameters.presentation_data
 
 				if presentation_data_json then
 					local presentation_data = cjson.decode(presentation_data_json)
 
 					for _, popup_data in ipairs(presentation_data) do
-						self._add_startup_award(self, popup_data)
+						self:_add_startup_award(popup_data)
 					end
 				end
 			end
@@ -284,12 +284,12 @@ end
 
 UnlockManager._executor_script_startup = function (self, script_startup_data)
 	for _, data in ipairs(script_startup_data) do
-		self._add_startup_award(self, data)
+		self:_add_startup_award(data)
 	end
 
 	local queue = Managers.backend:get_data_server_queue()
 
-	queue.unregister_executor(queue, "script_startup")
+	queue:unregister_executor("script_startup")
 end
 
 UnlockManager._add_startup_award = function (self, data)
@@ -320,7 +320,7 @@ UnlockManager.is_dlc_unlocked = function (self, name)
 
 	fassert(unlock, "No such unlock %q", name or "nil")
 
-	return unlock.unlocked(unlock)
+	return unlock:unlocked()
 end
 
 UnlockManager.dlc_id = function (self, name)
@@ -328,7 +328,7 @@ UnlockManager.dlc_id = function (self, name)
 
 	fassert(unlock, "No such unlock %q", name or "nil")
 
-	return unlock.id(unlock)
+	return unlock:id()
 end
 
 UnlockManager.ps4_dlc_product_label = function (self, name)
@@ -338,7 +338,7 @@ UnlockManager.ps4_dlc_product_label = function (self, name)
 
 	fassert(unlock, "No such unlock %q", name or "nil")
 
-	return unlock.product_label(unlock)
+	return unlock:product_label()
 end
 
 return

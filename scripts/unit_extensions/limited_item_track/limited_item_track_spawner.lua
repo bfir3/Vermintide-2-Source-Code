@@ -35,7 +35,7 @@ end
 
 LimitedItemTrackSpawner.spawn_item = function (self)
 	local self_unit = self.unit
-	local id = self.find_empty_id(self)
+	local id = self:find_empty_id()
 
 	fassert(id, "Found no empty id")
 

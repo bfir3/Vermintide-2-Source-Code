@@ -727,7 +727,7 @@ local action_data = {
 					blackboard.stagger_time = blackboard.stagger_time + math.max(0.5, stagger / block_count) * breed.block_stagger_mod
 					stagger_anims = action.shield_block_anims[stagger_type]
 
-					ai_shield_extension.set_is_blocking(ai_shield_extension, true)
+					ai_shield_extension:set_is_blocking(true)
 
 					idle_event = "idle_shield_up"
 				elseif not blocked and is_blocking and block_count < stagger and action.shield_stagger_anims then
@@ -739,7 +739,7 @@ local action_data = {
 					}
 					idle_event = anim_table[index]
 
-					ai_shield_extension.set_is_blocking(ai_shield_extension, false)
+					ai_shield_extension:set_is_blocking(false)
 
 					blackboard.wake_up_push = math.huge
 					stagger_anims = action.stagger_anims[stagger_type]
@@ -747,7 +747,7 @@ local action_data = {
 					blackboard.stagger_time = 0
 					blackboard.stagger = 0
 
-					ai_shield_extension.set_is_blocking(ai_shield_extension, true)
+					ai_shield_extension:set_is_blocking(true)
 
 					stagger_anims = action.stagger_anims[stagger_type]
 					blackboard.stagger_time = 0.2
@@ -762,7 +762,7 @@ local action_data = {
 					}
 					idle_event = anim_table[index]
 
-					ai_shield_extension.set_is_blocking(ai_shield_extension, false)
+					ai_shield_extension:set_is_blocking(false)
 				end
 			else
 				stagger_anims = action.stagger_anims[stagger_type]

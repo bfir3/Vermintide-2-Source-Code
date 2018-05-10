@@ -14,27 +14,27 @@ BTBotInteractAction.enter = function (self, unit, blackboard, t)
 	blackboard.current_interaction_unit = interaction_unit
 	local interaction_ext = blackboard.interaction_extension
 
-	interaction_ext.set_exclusive_interaction_unit(interaction_ext, interaction_unit)
+	interaction_ext:set_exclusive_interaction_unit(interaction_unit)
 
 	blackboard.interact = {
 		tried = false,
-		wait_on_previous_interaction = interaction_ext.is_interacting(interaction_ext)
+		wait_on_previous_interaction = interaction_ext:is_interacting()
 	}
 	local input_ext = blackboard.input_extension
 	local soft_aiming = true
 
-	input_ext.set_aiming(input_ext, true, soft_aiming)
+	input_ext:set_aiming(true, soft_aiming)
 end
 
 BTBotInteractAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.interact = false
 	local interaction_ext = blackboard.interaction_extension
 
-	interaction_ext.set_exclusive_interaction_unit(interaction_ext, nil)
+	interaction_ext:set_exclusive_interaction_unit(nil)
 
 	local input_ext = blackboard.input_extension
 
-	input_ext.set_aiming(input_ext, false)
+	input_ext:set_aiming(false)
 
 	blackboard.current_interaction_unit = nil
 end
@@ -55,9 +55,9 @@ BTBotInteractAction.run = function (self, unit, blackboard, t, dt)
 	local do_interaction = true
 
 	if action_data and action_data.use_block_interaction then
-		input_ext.defend(input_ext)
+		input_ext:defend()
 
-		do_interaction = status_ext.is_blocking(status_ext)
+		do_interaction = status_ext:is_blocking()
 	end
 
 	if do_interaction then
@@ -84,7 +84,7 @@ BTBotInteractAction.run = function (self, unit, blackboard, t, dt)
 		aim_position = Unit.world_position(interaction_unit, 0)
 	end
 
-	input_ext.set_aim_position(input_ext, aim_position)
+	input_ext:set_aim_position(aim_position)
 
 	return "running"
 end

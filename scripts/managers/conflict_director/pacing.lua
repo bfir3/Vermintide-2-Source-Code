@@ -35,31 +35,31 @@ end
 
 Pacing.pacing_build_up = function (self, t)
 	if CurrentPacing.peak_intensity_threshold < self.total_intensity then
-		self.advance_pacing(self, t)
+		self:advance_pacing(t)
 	end
 end
 
 Pacing.pacing_sustain_peak = function (self, t)
 	if self._end_pacing_time < t then
-		self.advance_pacing(self, t)
+		self:advance_pacing(t)
 	end
 end
 
 Pacing.pacing_peak_fade = function (self, t)
 	if self.total_intensity < CurrentPacing.peak_fade_threshold then
-		self.advance_pacing(self, t)
+		self:advance_pacing(t)
 	end
 end
 
 Pacing.pacing_relax = function (self, t)
 	if CurrentPacing.leave_relax_if_zero_intensity and self.total_intensity <= 0 then
-		self.advance_pacing(self, t)
+		self:advance_pacing(t)
 
 		return
 	end
 
 	if self._end_pacing_time < t then
-		self.advance_pacing(self, t)
+		self:advance_pacing(t)
 	end
 end
 
@@ -103,7 +103,7 @@ Pacing.enemy_killed = function (self, killed_unit, player_units)
 
 		local status_ext = ScriptUnit.extension(player_unit, "status_system")
 
-		status_ext.add_intensity(status_ext, amount)
+		status_ext:add_intensity(amount)
 	end
 end
 
@@ -141,10 +141,10 @@ Pacing.advance_pacing = function (self, t, reason)
 	end
 
 	if script_data.debug_player_intensity then
-		self.annotate_graph(self, next_pacing, "orange")
+		self:annotate_graph(next_pacing, "orange")
 
 		if reason then
-			self.annotate_graph(self, reason, "firebrick")
+			self:annotate_graph(reason, "firebrick")
 		end
 	end
 
@@ -174,7 +174,7 @@ Pacing.update = function (self, t, dt, alive_player_units)
 	for k = 1, num_alive_player_units, 1 do
 		local unit = alive_player_units[k]
 		local status_ext = ScriptUnit.extension(unit, "status_system")
-		local intensity = status_ext.get_intensity(status_ext)
+		local intensity = status_ext:get_intensity()
 		self.player_intensity[k] = intensity
 		sum_intensity = sum_intensity + intensity
 	end
@@ -207,7 +207,7 @@ Pacing.debug_add_intensity = function (self, player_units, value)
 		local unit = player_units[k]
 		local status_ext = ScriptUnit.extension(unit, "status_system")
 
-		status_ext.add_intensity(status_ext, value)
+		status_ext:add_intensity(value)
 	end
 end
 
@@ -233,25 +233,25 @@ Pacing.intensity_graphs = function (self, t, dt, alive_player_units)
 			self.graph.scroll_lock.left = false
 			g = self.graph
 
-			g.set_plot_color(g, "rats", "blue", "blue")
-			g.set_plot_color(g, "sum", "red", "red")
+			g:set_plot_color("rats", "blue", "blue")
+			g:set_plot_color("sum", "red", "red")
 		end
 
 		local sum_intensity = self.total_intensity
 
-		g.add_point(g, t, sum_intensity, "sum")
+		g:add_point(t, sum_intensity, "sum")
 
 		self.graph.visual_frame.x_min = t - time_width
 
 		for k = 1, #alive_player_units, 1 do
 			local intensity = self.player_intensity[k]
 
-			g.add_point(g, t, intensity, player_names[k])
+			g:add_point(t, intensity, player_names[k])
 		end
 
 		local num_rats = Managers.state.conflict:count_units_by_breed("skaven_clan_rat")
 
-		g.add_point(g, t, num_rats, "rats")
+		g:add_point(t, num_rats, "rats")
 	elseif self.graph then
 		Managers.state.debug.graph_drawer:destroy_graph(self.graph)
 

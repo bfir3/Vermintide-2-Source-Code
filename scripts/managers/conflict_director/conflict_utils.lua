@@ -197,10 +197,10 @@ local hidden_cover_units = {}
 ConflictUtils.hidden_cover_points = function (center_position, avoid_pos_list, min_rad, max_rad, dot_threshold)
 	if script_data.debug_near_cover_points then
 		local free_flight_manager = Managers.free_flight
-		local in_free_flight = free_flight_manager.active(free_flight_manager, "global")
+		local in_free_flight = free_flight_manager:active("global")
 
 		if in_free_flight then
-			center_position = free_flight_manager.camera_position_rotation(free_flight_manager)
+			center_position = free_flight_manager:camera_position_rotation()
 		end
 	end
 
@@ -921,10 +921,10 @@ ConflictUtils.make_roaming_spawns = function (self, nav_world, level_analysis)
 		false
 	}
 	local offset = Vector3(0, 0, 0.1)
-	local seed_pos = level_analysis.get_start_and_finish(level_analysis)
+	local seed_pos = level_analysis:get_start_and_finish()
 
 	if seed_pos then
-		seed_pos = seed_pos.unbox(seed_pos)
+		seed_pos = seed_pos:unbox()
 	else
 		local level_key = Managers.state.game_mode:level_key()
 		local level_name = LevelSettings[level_key].level_name

@@ -17,12 +17,12 @@ BossHealthUI.init = function (self, ingame_ui_context)
 		snap_pixel_positions = true
 	}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self._animations = {}
 	local event_manager = Managers.state.event
 
-	event_manager.register(event_manager, self, "show_boss_health_bar", "event_show_boss_health_bar")
+	event_manager:register(self, "show_boss_health_bar", "event_show_boss_health_bar")
 
 	self._proximity_update_time = 0
 	self._look_at_boss_unit_timer = 0
@@ -33,7 +33,7 @@ BossHealthUI.destroy = function (self)
 
 	local event_manager = Managers.state.event
 
-	event_manager.unregister(event_manager, "show_boss_health_bar", self)
+	event_manager:unregister("show_boss_health_bar", self)
 end
 
 BossHealthUI.create_ui_elements = function (self)
@@ -61,12 +61,12 @@ BossHealthUI._set_portrait_by_breed = function (self, breed_name)
 end
 
 BossHealthUI.update = function (self, dt, t)
-	self._sync_boss_health(self, dt, t)
-	self._update_targeted_boss(self, dt, t)
+	self:_sync_boss_health(dt, t)
+	self:_update_targeted_boss(dt, t)
 
 	if self._current_progress and not script_data.hide_boss_health_ui then
-		self._update_animations(self, dt, t)
-		self._draw(self, dt, t)
+		self:_update_animations(dt, t)
+		self:_draw(dt, t)
 	end
 end
 
@@ -87,7 +87,7 @@ BossHealthUI._update_targeted_boss = function (self, dt, t)
 	local proximity_boss_unit = proximity_system.closest_boss_unit
 
 	if proximity_boss_unit and self._boss_unit ~= proximity_boss_unit then
-		self.event_show_boss_health_bar(self, proximity_boss_unit)
+		self:event_show_boss_health_bar(proximity_boss_unit)
 	end
 end
 
@@ -143,13 +143,13 @@ BossHealthUI.event_show_boss_health_bar = function (self, unit)
 			self._switch_healthbars = self._boss_unit and unit ~= self._boss_unit
 			self._breed_name = breed_name
 
-			self._set_portrait_by_breed(self, breed_name)
+			self:_set_portrait_by_breed(breed_name)
 
 			self.render_settings.alpha_multiplier = (not self._boss_unit and 0) or self.render_settings.alpha_multiplier
 			self._boss_unit = unit
 
-			self._set_healing_amount(self, 0, 0)
-			self._set_health_effect_alpha(self, 0)
+			self:_set_healing_amount(0, 0)
+			self:_set_health_effect_alpha(0)
 
 			self._freeze_healing = false
 			self._next_update_is_instant = true
@@ -175,7 +175,7 @@ BossHealthUI._sync_boss_health = function (self, dt, t)
 	end
 
 	if not AiUtils.unit_alive(unit) then
-		self._reset(self)
+		self:_reset()
 
 		return
 	end
@@ -184,8 +184,8 @@ BossHealthUI._sync_boss_health = function (self, dt, t)
 
 	if unit and Unit.alive(unit) then
 		local health_extension = ScriptUnit.extension(unit, "health_system")
-		local health_percentage = health_extension.current_health_percent(health_extension)
-		local health_max_percentage = health_extension.current_max_health_percent(health_extension)
+		local health_percentage = health_extension:current_health_percent()
+		local health_max_percentage = health_extension:current_max_health_percent()
 		progress = health_percentage * health_max_percentage
 		max_health_fraction = health_max_percentage
 		self._freeze_healing = self._breed_name == "chaos_troll" and health_extension.state == "down"
@@ -197,22 +197,22 @@ BossHealthUI._sync_boss_health = function (self, dt, t)
 	if (progress and current_raw_progress and current_raw_progress < progress) or (progress and self._switch_healthbars) then
 		local healing_start_progress = self._current_progress or 0
 
-		self._set_healing_amount(self, healing_start_progress, progress, t)
+		self:_set_healing_amount(healing_start_progress, progress, t)
 
 		self._healing_start_progress = healing_start_progress
 		healing_gained = true
 	end
 
 	if progress ~= self._current_progress or max_health_fraction ~= self._current_max_health_fraction then
-		self._set_bar_progress(self, progress, max_health_fraction, healing_gained, dt, t)
+		self:_set_bar_progress(progress, max_health_fraction, healing_gained, dt, t)
 	end
 
-	self._update_healing_bar(self, dt, t, self._freeze_healing)
-	self._update_healing_effect(self, dt, t)
-	self._set_health_edge_texture_position_progress(self, self._healing_start_progress or self._current_progress or 0)
+	self:_update_healing_bar(dt, t, self._freeze_healing)
+	self:_update_healing_effect(dt, t)
+	self:_set_health_edge_texture_position_progress(self._healing_start_progress or self._current_progress or 0)
 
 	if not progress or self._current_progress == 0 then
-		self._reset(self)
+		self:_reset()
 	end
 end
 
@@ -320,11 +320,11 @@ BossHealthUI._update_healing_bar = function (self, dt, t, freeze_healing)
 		local action = BreedActions.chaos_troll.downed
 		local min_health_percent = action.respawn_hp_min_percent
 		local health_extension = ScriptUnit.extension(unit, "health_system")
-		local current_max_health = health_extension.current_max_health_percent(health_extension)
+		local current_max_health = health_extension:current_max_health_percent()
 		new_healing_start_progress = min_health_percent * current_max_health
 	end
 
-	self._set_healing_amount(self, new_healing_start_progress, healing_end_progress)
+	self:_set_healing_amount(new_healing_start_progress, healing_end_progress)
 
 	self._healing_start_progress = new_healing_start_progress
 
@@ -351,7 +351,7 @@ BossHealthUI._update_healing_effect = function (self, dt, t)
 		local healing_effect_progress = 1 - time_progress
 		local effect_alpha = 255 * math.ease_pulse(healing_effect_progress)
 
-		self._set_health_effect_alpha(self, effect_alpha)
+		self:_set_health_effect_alpha(effect_alpha)
 
 		if time_progress == 0 then
 			self._healing_effect_life_time = nil

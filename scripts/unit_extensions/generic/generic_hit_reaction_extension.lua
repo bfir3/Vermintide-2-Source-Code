@@ -51,7 +51,7 @@ local function get_attacker_direction(attacker_unit, hit_direction, explosion_pu
 	if Unit.alive(attacker_unit) and not explosion_push then
 		if ScriptUnit.has_extension(attacker_unit, "first_person_system") then
 			local first_person_extension = ScriptUnit.extension(attacker_unit, "first_person_system")
-			attacker_unit = first_person_extension.get_first_person_unit(first_person_extension)
+			attacker_unit = first_person_extension:get_first_person_unit()
 		end
 
 		local attacker_rotation = Unit.world_rotation(attacker_unit, 0)
@@ -202,7 +202,7 @@ GenericHitReactionExtension.update = function (self, unit, input, dt, context, t
 	end
 
 	if self._delayed_push then
-		local has_pushed = self._do_push(self, unit, dt)
+		local has_pushed = self:_do_push(unit, dt)
 
 		if has_pushed then
 			self._delayed_push = nil
@@ -212,7 +212,7 @@ GenericHitReactionExtension.update = function (self, unit, input, dt, context, t
 	end
 
 	local health_extension = self.health_extension
-	local damages, num_damages = health_extension.recent_damages(health_extension)
+	local damages, num_damages = health_extension:recent_damages()
 
 	if num_damages == 0 then
 		return
@@ -237,7 +237,7 @@ GenericHitReactionExtension.update = function (self, unit, input, dt, context, t
 
 	pack_index[stride](biggest_hit, 1, unpack_index[stride](damages, best_damage_index))
 
-	local is_dead = not health_extension.is_alive(health_extension)
+	local is_dead = not health_extension:is_alive()
 
 	if not is_dead then
 		local hit_reaction = HitReactions.get_reaction(self.hit_reaction_template, self.is_husk)
@@ -287,13 +287,13 @@ GenericHitReactionExtension.update = function (self, unit, input, dt, context, t
 		debug_printf("    Hit direction: %q", tostring(damage_direction))
 	end
 
-	local hit_effects, num_effects = self._resolve_effects(self, conditions, temp_effect_results)
+	local hit_effects, num_effects = self:_resolve_effects(conditions, temp_effect_results)
 	local parameters = conditions
 	local buff_extension = ScriptUnit.has_extension(attacker_unit, "buff_system")
-	parameters.force_dismember = buff_extension and buff_extension.has_buff_perk(buff_extension, "bloody_mess")
+	parameters.force_dismember = buff_extension and buff_extension:has_buff_perk("bloody_mess")
 
 	for i = 1, num_effects, 1 do
-		self._execute_effect(self, unit, hit_effects[i], biggest_hit, parameters, t, dt)
+		self:_execute_effect(unit, hit_effects[i], biggest_hit, parameters, t, dt)
 	end
 end
 
@@ -427,18 +427,18 @@ GenericHitReactionExtension._execute_effect = function (self, unit, effect_templ
 	local flow_event = (type(effect_template.flow_event) == "table" and table.clone(effect_template.flow_event)) or effect_template.flow_event
 	local death_ext = self.death_extension
 	local hit_ragdoll_actor_name = biggest_hit[DamageDataIndex.HIT_RAGDOLL_ACTOR_NAME]
-	local can_wall_nail = self._can_wall_nail(self, effect_template)
+	local can_wall_nail = self:_can_wall_nail(effect_template)
 	local death_has_started = death_ext and death_ext.death_has_started
 
 	if effect_template.buff then
 		local buff_system = Managers.state.entity:system("buff_system")
 
-		buff_system.add_buff(buff_system, self.unit, effect_template.buff, attacker_unit)
+		buff_system:add_buff(self.unit, effect_template.buff, attacker_unit)
 	end
 
 	dismember = effect_template.do_dismember or (parameters.force_dismember and parameters.death)
 
-	if dismember and (not death_ext or not death_ext.is_wall_nailed(death_ext)) then
+	if dismember and (not death_ext or not death_ext:is_wall_nailed()) then
 		local event_table = Dismemberments[breed_data.name]
 		local dismember_event = event_table[hit_zone]
 
@@ -454,13 +454,13 @@ GenericHitReactionExtension._execute_effect = function (self, unit, effect_templ
 		end
 
 		if effect_template.do_diagonal_dismemberments and allowed_diagonal_hit_zones[hit_zone] then
-			flow_event = self._check_for_diagonal_dismemberment(self, unit, actors[1], hit_direction, flow_event, hit_zone)
+			flow_event = self:_check_for_diagonal_dismemberment(unit, actors[1], hit_direction, flow_event, hit_zone)
 		end
 
 		if ScriptUnit.has_extension(unit, "projectile_linker_system") then
 			local projectile_linker_system = Managers.state.entity:system("projectile_linker_system")
 
-			projectile_linker_system.clear_linked_projectiles(projectile_linker_system, unit)
+			projectile_linker_system:clear_linked_projectiles(unit)
 		end
 	end
 
@@ -522,7 +522,7 @@ GenericHitReactionExtension._execute_effect = function (self, unit, effect_templ
 		local random_animation = math.random(#animations)
 		local animation_event = animations[random_animation]
 
-		if death_has_started and death_ext.second_hit_ragdoll_allowed(death_ext) then
+		if death_has_started and death_ext:second_hit_ragdoll_allowed() then
 			animation_event = "ragdoll"
 		elseif death_has_started then
 			animation_event = nil
@@ -683,7 +683,7 @@ GenericHitReactionExtension._do_push = function (self, unit, dt)
 	local push_force = nil
 
 	if death_velocity then
-		push_force = distal_vector + lateral_vector + vertical_vector + death_velocity.unbox(death_velocity) * 20
+		push_force = distal_vector + lateral_vector + vertical_vector + death_velocity:unbox() * 20
 	else
 		push_force = distal_vector + lateral_vector + vertical_vector
 	end

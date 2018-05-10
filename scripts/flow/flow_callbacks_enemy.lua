@@ -412,7 +412,7 @@ local function enemy_dismember(params, spawn_gib)
 
 		if hit_reaction_extension then
 			local wwise_world = Wwise.wwise_world(world)
-			local playing_id = hit_reaction_extension.death_sound_event_id(hit_reaction_extension)
+			local playing_id = hit_reaction_extension:death_sound_event_id()
 
 			if playing_id then
 				WwiseWorld.stop_event(wwise_world, playing_id)

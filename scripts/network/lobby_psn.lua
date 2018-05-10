@@ -122,7 +122,7 @@ LobbyInternal.leave_lobby = function (psn_room)
 end
 
 LobbyInternal.get_lobby = function (room_browser, index)
-	local network_psn_room_info = room_browser.lobby(room_browser, index)
+	local network_psn_room_info = room_browser:lobby(index)
 	local data_string = network_psn_room_info.data
 	local data_table = LobbyInternal.unserialize_psn_data(data_string)
 	data_table.id = network_psn_room_info.id
@@ -234,13 +234,13 @@ end
 LobbyInternal.clear_filter_requirements = function ()
 	local room_browser = LobbyInternal.psn_room_browser
 
-	room_browser.clear_filters(room_browser)
+	room_browser:clear_filters()
 end
 
 LobbyInternal.add_filter_requirements = function (requirements)
 	local room_browser = LobbyInternal.psn_room_browser
 
-	room_browser.clear_filters(room_browser, room_browser)
+	room_browser:clear_filters(room_browser)
 
 	local lobby_data_network_lookups = LobbyInternal.lobby_data_network_lookups
 
@@ -257,7 +257,7 @@ LobbyInternal.add_filter_requirements = function (requirements)
 				value = NetworkLookup[lobby_data_network_lookups[key]][value]
 			end
 
-			room_browser.add_filter(room_browser, id, value, psn_comparison)
+			room_browser:add_filter(id, value, psn_comparison)
 			mm_printf("Filter: %s, comparison(%s), id=%s, value(untouched)=%s, value=%s", tostring(key), tostring(comparison), tostring(id), tostring(filter.value), tostring(value))
 		else
 			mm_printf("Skipping filter %q matchmaking_lobby_data not setup. Probably redundant on ps4", key)

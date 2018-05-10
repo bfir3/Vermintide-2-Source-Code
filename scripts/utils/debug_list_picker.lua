@@ -16,7 +16,7 @@ DebugListPicker.init = function (self, list, save_data_name, max_cols_seen)
 	self.font = font
 	self.font_size = font_size
 
-	self.setup(self, save_data_name)
+	self:setup(save_data_name)
 
 	self.column = self.pick_list[self.column_index]
 	self.item = self.column[self.row_index]
@@ -54,7 +54,7 @@ DebugListPicker.setup = function (self)
 				self.item = self.column[self.row_index]
 			end
 
-			local min, max = Gui.text_extents(self.gui, text.upper(text), self.font_mtrl, self.font_size)
+			local min, max = Gui.text_extents(self.gui, text:upper(), self.font_mtrl, self.font_size)
 			local width = max.x - min.x
 			local height = max.y - min.y
 

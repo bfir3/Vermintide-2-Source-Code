@@ -21,7 +21,7 @@ BTChaosSorcererPlagueSkulkAction.enter = function (self, unit, blackboard, t)
 	blackboard.action = action
 
 	if blackboard.move_state ~= "idle" then
-		self.idle(self, unit, blackboard)
+		self:idle(unit, blackboard)
 	end
 
 	LocomotionUtils.set_animation_driven_movement(unit, false)
@@ -29,7 +29,7 @@ BTChaosSorcererPlagueSkulkAction.enter = function (self, unit, blackboard, t)
 	if blackboard.move_pos then
 		local move_pos = blackboard.move_pos:unbox()
 
-		self.move_to(self, move_pos, unit, blackboard)
+		self:move_to(move_pos, unit, blackboard)
 	end
 
 	blackboard.ready_to_summon = false
@@ -58,7 +58,7 @@ BTChaosSorcererPlagueSkulkAction.enter = function (self, unit, blackboard, t)
 		local audio_system = Managers.state.entity:system("audio_system")
 		local skulk_foreshadowing_sound = action.skulk_foreshadowing_sound
 
-		audio_system.play_audio_unit_event(audio_system, skulk_foreshadowing_sound, unit)
+		audio_system:play_audio_unit_event(skulk_foreshadowing_sound, unit)
 
 		blackboard.played_foreshadow = true
 	end
@@ -69,13 +69,13 @@ BTChaosSorcererPlagueSkulkAction.leave = function (self, unit, blackboard, t, re
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 
 	if reason == "aborted" then
-		local path_found = navigation_extension.is_following_path(navigation_extension)
+		local path_found = navigation_extension:is_following_path()
 
 		if blackboard.move_pos and path_found and blackboard.move_state == "idle" then
-			self.start_move_animation(self, unit, blackboard)
+			self:start_move_animation(unit, blackboard)
 		end
 	end
 
@@ -83,7 +83,7 @@ BTChaosSorcererPlagueSkulkAction.leave = function (self, unit, blackboard, t, re
 		local audio_system = Managers.state.entity:system("audio_system")
 		local skulk_foreshadowing_sound = blackboard.action.skulk_foreshadowing_sound_stop
 
-		audio_system.play_audio_unit_event(audio_system, skulk_foreshadowing_sound, unit)
+		audio_system:play_audio_unit_event(skulk_foreshadowing_sound, unit)
 	end
 
 	skulk_data.animation_state = nil
@@ -100,15 +100,15 @@ BTChaosSorcererPlagueSkulkAction.run = function (self, unit, blackboard, t, dt)
 	end
 
 	local ai_navigation = blackboard.navigation_extension
-	local path_found = ai_navigation.is_following_path(ai_navigation)
-	local failed_attempts = ai_navigation.number_failed_move_attempts(ai_navigation)
+	local path_found = ai_navigation:is_following_path()
+	local failed_attempts = ai_navigation:number_failed_move_attempts()
 	local action = blackboard.action
 	local plague_wave_data = blackboard.plague_wave_data
 	local skulk_data = blackboard.skulk_data
 	local target_unit = blackboard.target_unit
 
 	if blackboard.move_pos and path_found and blackboard.move_state == "idle" then
-		self.start_move_animation(self, unit, blackboard)
+		self:start_move_animation(unit, blackboard)
 	end
 
 	local current_health_percent = blackboard.health_extension:current_health_percent()
@@ -141,13 +141,13 @@ BTChaosSorcererPlagueSkulkAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.vanish_timer and t < blackboard.vanish_timer then
 		local ping_system = Managers.state.entity:system("ping_system")
 
-		ping_system.remove_ping_from_unit(ping_system, unit)
+		ping_system:remove_ping_from_unit(unit)
 
 		return "running"
 	end
 
 	if blackboard.travel_teleport_timer < t then
-		local teleport_pos = self.get_skulk_target(self, unit, blackboard, true)
+		local teleport_pos = self:get_skulk_target(unit, blackboard, true)
 
 		if teleport_pos then
 			blackboard.quick_teleport_exit_pos = Vector3Box(teleport_pos)
@@ -158,12 +158,12 @@ BTChaosSorcererPlagueSkulkAction.run = function (self, unit, blackboard, t, dt)
 		end
 	end
 
-	if blackboard.vanish_countdown and blackboard.vanish_countdown < t and self.vanish(self, unit, blackboard, t) then
+	if blackboard.vanish_countdown and blackboard.vanish_countdown < t and self:vanish(unit, blackboard, t) then
 		return "done"
 	end
 
 	if plague_wave_data.plague_wave_timer < t and not ScriptUnit.extension(target_unit, "status_system"):is_invisible() then
-		local teleport_position = self.get_plague_wave_cast_position(self, unit, blackboard, blackboard.plague_wave_data)
+		local teleport_position = self:get_plague_wave_cast_position(unit, blackboard, blackboard.plague_wave_data)
 
 		if teleport_position then
 			local skulk_time = 6
@@ -189,7 +189,7 @@ BTChaosSorcererPlagueSkulkAction.run = function (self, unit, blackboard, t, dt)
 				local audio_system = Managers.state.entity:system("audio_system")
 				local skulk_foreshadowing_sound = action.skulk_foreshadowing_sound_stop
 
-				audio_system.play_audio_unit_event(audio_system, skulk_foreshadowing_sound, unit)
+				audio_system:play_audio_unit_event(skulk_foreshadowing_sound, unit)
 			end
 
 			return "done"
@@ -199,7 +199,7 @@ BTChaosSorcererPlagueSkulkAction.run = function (self, unit, blackboard, t, dt)
 	local position = blackboard.move_pos
 
 	if position then
-		local at_goal = self.at_goal(self, unit, blackboard)
+		local at_goal = self:at_goal(unit, blackboard)
 
 		if at_goal or 0 < failed_attempts then
 			blackboard.move_pos = nil
@@ -208,16 +208,16 @@ BTChaosSorcererPlagueSkulkAction.run = function (self, unit, blackboard, t, dt)
 		return "running"
 	end
 
-	local position = self.get_skulk_target(self, unit, blackboard)
+	local position = self:get_skulk_target(unit, blackboard)
 
 	if position then
-		self.move_to(self, position, unit, blackboard)
+		self:move_to(position, unit, blackboard)
 
 		return "running"
 	end
 
 	if blackboard.move_state ~= "idle" then
-		self.idle(self, unit, blackboard)
+		self:idle(unit, blackboard)
 	end
 
 	return "running"
@@ -234,7 +234,7 @@ BTChaosSorcererPlagueSkulkAction.at_goal = function (self, unit, blackboard)
 		return false
 	end
 
-	local goal_position = position_boxed.unbox(position_boxed)
+	local goal_position = position_boxed:unbox()
 	local goal_distance = Vector3.distance_squared(unit_position, goal_position)
 
 	if goal_distance < 0.25 then
@@ -247,7 +247,7 @@ BTChaosSorcererPlagueSkulkAction.move_to = function (self, position, unit, black
 	local ai_navigation = blackboard.navigation_extension
 	local breed = blackboard.breed
 
-	ai_navigation.move_to(ai_navigation, position)
+	ai_navigation:move_to(position)
 
 	blackboard.move_pos = Vector3Box(position)
 end
@@ -264,7 +264,7 @@ BTChaosSorcererPlagueSkulkAction.vanish = function (self, unit, blackboard, t)
 		blackboard.vanish_timer = t + action.vanish_timer
 		local ai_navigation = blackboard.navigation_extension
 
-		ai_navigation.move_to(ai_navigation, escape_position)
+		ai_navigation:move_to(escape_position)
 		blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
 
 		return true
@@ -274,7 +274,7 @@ BTChaosSorcererPlagueSkulkAction.vanish = function (self, unit, blackboard, t)
 end
 
 BTChaosSorcererPlagueSkulkAction.idle = function (self, unit, blackboard)
-	self.anim_event(self, unit, blackboard, "idle")
+	self:anim_event(unit, blackboard, "idle")
 
 	blackboard.move_state = "idle"
 end
@@ -282,7 +282,7 @@ end
 BTChaosSorcererPlagueSkulkAction.start_move_animation = function (self, unit, blackboard)
 	local move_animation = blackboard.action.move_animation
 
-	self.anim_event(self, unit, blackboard, move_animation)
+	self:anim_event(unit, blackboard, move_animation)
 
 	blackboard.move_state = "moving"
 end

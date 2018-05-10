@@ -1010,8 +1010,8 @@ UIPasses.scrollbar_hotspot = {
 		local is_hover = nil
 		local cursor_name = "cursor"
 		local cursor_stack = ShowCursorStack.stack_depth
-		local has_cursor = input_service and input_service.has(input_service, cursor_name)
-		local cursor = 0 < cursor_stack and has_cursor and input_service.get(input_service, cursor_name)
+		local has_cursor = input_service and input_service:has(cursor_name)
+		local cursor = 0 < cursor_stack and has_cursor and input_service:get(cursor_name)
 
 		if not cursor or Script.type_name(cursor) ~= cursor_value_type_name then
 			cursor = NilCursor
@@ -1056,8 +1056,8 @@ UIPasses.scrollbar_hotspot = {
 		scrollbar_position[3] = hotspot_position[3] + 1
 		local is_hover_scrollbar = math.point_is_inside_2d_box(cursor_position, scrollbar_position, scrollbar_size)
 		ui_content.is_hover_scrollbar = is_hover_scrollbar
-		local left_pressed = input_service and input_service.get(input_service, "left_press")
-		local left_hold = input_service and input_service.get(input_service, "left_hold")
+		local left_pressed = input_service and input_service:get("left_press")
+		local left_hold = input_service and input_service:get("left_hold")
 		local target_value = nil
 		local should_update_scrollbar_position = false
 
@@ -1104,7 +1104,7 @@ UIPasses.scrollbar_hotspot = {
 			is_hover_scroll_area = math.point_is_inside_2d_box(cursor_position, scroll_area_position, scroll_area_size)
 
 			if is_hover_scroll_area then
-				local scroll_axis = input_service.get(input_service, "scroll_axis")
+				local scroll_axis = input_service:get("scroll_axis")
 				local y = scroll_axis[2]
 				local move = ui_content.scroll_amount * y
 				target_value = math.clamp(ui_content.scroll_value + move, 0, 1)
@@ -1511,14 +1511,14 @@ UIPasses.text_area_chat = {
 			end
 
 			if link_array[i] then
-				local cursor = input_service.get(input_service, "cursor") or NilCursor
+				local cursor = input_service:get("cursor") or NilCursor
 				local cursor_position = UIInverseScaleVectorToResolution(cursor)
 				local is_hover = math.point_is_inside_2d_box(cursor_position, position, row_size)
 
 				if is_hover then
 					UIRenderer.draw_rect(ui_renderer, position, row_size, Colors.get_color_table_with_alpha("magenta", 50))
 
-					if input_service.get(input_service, "left_press") then
+					if input_service:get("left_press") then
 						print("PRESSED")
 
 						ui_content.link_pressed = link_array[i]
@@ -2275,16 +2275,16 @@ UIPasses.drag = {
 			return
 		end
 
-		local cursor = input_service.get(input_service, "cursor") or NilCursor
+		local cursor = input_service:get("cursor") or NilCursor
 		local scaled_cursor = UIInverseScaleVectorToResolution(cursor)
 		local on_drag_started = ui_content.on_drag_started
 		local is_dragging = ui_content.is_dragging
 
 		if not is_dragging then
-			if input_service.get(input_service, "left_press") and math.point_is_inside_2d_box(scaled_cursor, position, size) then
+			if input_service:get("left_press") and math.point_is_inside_2d_box(scaled_cursor, position, size) then
 				ui_content.hover_start_timer = 0
 			elseif ui_content.hover_start_timer then
-				if input_service.get(input_service, "left_hold") then
+				if input_service:get("left_hold") then
 					ui_content.hover_start_timer = ui_content.hover_start_timer + dt
 				else
 					ui_content.hover_start_timer = nil
@@ -2299,7 +2299,7 @@ UIPasses.drag = {
 			ui_content.on_drag_started = true
 			ui_content.is_dragging = true
 			UIPasses.is_dragging_item = true
-		elseif is_dragging and input_service.get(input_service, "left_hold") then
+		elseif is_dragging and input_service:get("left_hold") then
 			if on_drag_started then
 				ui_content.on_drag_started = nil
 			end
@@ -2313,7 +2313,7 @@ UIPasses.drag = {
 			drag_position_table[3] = 999
 
 			UIRenderer_draw_texture(ui_renderer, ui_content[pass_definition.texture_id], drag_position_table, drag_texture_size, nil, nil, false)
-		elseif is_dragging and input_service.get(input_service, "left_release") then
+		elseif is_dragging and input_service:get("left_release") then
 			ui_content.is_dragging = nil
 			ui_content.on_drag_stopped = true
 		end
@@ -2347,7 +2347,7 @@ UIPasses.gamepad_cursor = {
 			ui_renderer = ui_content.ui_top_renderer
 		end
 
-		local cursor = input_service.get(input_service, "cursor") or NilCursor
+		local cursor = input_service:get("cursor") or NilCursor
 		local offset = ui_style.offset or {
 			0,
 			0
@@ -2402,10 +2402,10 @@ UIPasses.hover = {
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local was_hover = ui_content.is_hover
 		local is_hover = nil
-		local cursor = (input_service and input_service.has(input_service, "cursor") and input_service.get(input_service, "cursor")) or NilCursor
+		local cursor = (input_service and input_service:has("cursor") and input_service:get("cursor")) or NilCursor
 
 		if ui_content.hover_type == "circle" then
-			local half_size = (ui_renderer.get_scaling(ui_renderer) * size) / 2
+			local half_size = (ui_renderer:get_scaling() * size) / 2
 			local pos_center = Vector3Aux.flat(ScaleVectorToResolution(position)) + half_size
 			local square_distance = Vector3.distance_squared(Vector3Aux.unbox(cursor), pos_center)
 		else
@@ -2455,7 +2455,7 @@ UIPasses.click = {
 		return nil
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
-		if ui_content.is_hover and input_service.get(input_service, "left_release") then
+		if ui_content.is_hover and input_service:get("left_release") then
 			ui_content.is_clicked = 0
 		else
 			ui_content.is_clicked = (ui_content.is_clicked or 10) + dt
@@ -3178,20 +3178,20 @@ UIPasses.item_tooltip = {
 					table.clear(equipped_items)
 
 					local backend_items = Managers.backend:get_interface("items")
-					local profile_index = player.profile_index(player)
-					local career_index = player.career_index(player)
+					local profile_index = player:profile_index()
+					local career_index = player:career_index()
 					local hero_data = SPProfiles[profile_index]
 					local career_data = hero_data.careers[career_index]
 					local career_name = career_data.name
-					local loadout = backend_items.get_loadout(backend_items)[career_name]
+					local loadout = backend_items:get_loadout()[career_name]
 
 					for _, item_id in pairs(loadout) do
-						table.insert(equipped_items, backend_items.get_item_from_id(backend_items, item_id))
+						table.insert(equipped_items, backend_items:get_item_from_id(item_id))
 					end
 
 					local backend_common = Managers.backend:get_interface("common")
 					local item_filter = "slot_type == " .. slot_type
-					equipped_items = backend_common.filter_items(backend_common, equipped_items, item_filter)
+					equipped_items = backend_common:filter_items(equipped_items, item_filter)
 					pass_data.equipped_items = equipped_items
 
 					for _, item in ipairs(equipped_items) do
@@ -3548,7 +3548,7 @@ UIPasses.tooltip_text = {
 			temp_cursor_pos[1] = position[1] + fixed_position[1]
 			temp_cursor_pos[2] = position[2] + fixed_position[2]
 		else
-			local cursor = input_service.get(input_service, "cursor") or NilCursor
+			local cursor = input_service:get("cursor") or NilCursor
 			temp_cursor_pos[1] = cursor[1]
 			temp_cursor_pos[2] = cursor[2]
 		end
@@ -3741,8 +3741,8 @@ UIPasses.hotspot = {
 		local is_hover = nil
 		local cursor_name = "cursor"
 		local cursor_stack = ShowCursorStack.stack_depth
-		local has_cursor = input_service and input_service.has(input_service, cursor_name)
-		local cursor = 0 < cursor_stack and has_cursor and input_service.get(input_service, cursor_name)
+		local has_cursor = input_service and input_service:has(cursor_name)
+		local cursor = 0 < cursor_stack and has_cursor and input_service:get(cursor_name)
 
 		if not cursor or Script.type_name(cursor) ~= cursor_value_type_name then
 			cursor = NilCursor
@@ -3831,8 +3831,8 @@ UIPasses.hotspot = {
 			ui_content.internal_is_hover = nil
 		end
 
-		local left_pressed = input_service and input_service.get(input_service, "left_press")
-		local left_hold = input_service and input_service.get(input_service, "left_hold")
+		local left_pressed = input_service and input_service:get("left_press")
+		local left_hold = input_service and input_service:get("left_hold")
 		local double_click_accepted = ui_content.is_clicked and ui_content.is_clicked < double_click_threshold
 
 		if is_hover then
@@ -3853,7 +3853,7 @@ UIPasses.hotspot = {
 		ui_content.on_double_click = false
 
 		if ui_content.input_pressed then
-			local left_release = input_service.get(input_service, "left_release")
+			local left_release = input_service:get("left_release")
 
 			if left_release then
 				ui_content.on_release = true
@@ -3871,7 +3871,7 @@ UIPasses.hotspot = {
 				end
 			end
 		else
-			if is_hover and not left_pressed and not left_hold and input_service.get(input_service, "right_press") then
+			if is_hover and not left_pressed and not left_hold and input_service:get("right_press") then
 				ui_content.on_right_click = true
 			end
 
@@ -3887,7 +3887,7 @@ UIPasses.controller_hotspot = {
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local was_hover = ui_content.is_hover
 		local is_hover = nil
-		local controller_cursor_position = input_service.get_controller_cursor_position(input_service) or NilCursor
+		local controller_cursor_position = input_service:get_controller_cursor_position() or NilCursor
 		local pixel_pos = position
 		local pixel_size = size
 		is_hover = math.point_is_inside_2d_box(controller_cursor_position, pixel_pos, pixel_size)
@@ -3926,18 +3926,18 @@ UIPasses.controller_hotspot = {
 		ui_content.on_double_click = false
 
 		if is_hover or ui_content.is_clicked == 0 then
-			local left_release = input_service.get(input_service, "confirm")
+			local left_release = input_service:get("confirm")
 
 			if left_release then
 				ui_content.on_release = true
 				ui_content.is_clicked = 0
 			else
 				ui_content.on_release = false
-				local left_hold = input_service.get(input_service, "confirm_hold")
+				local left_hold = input_service:get("confirm_hold")
 
 				if ui_content.is_clicked == 0 and left_hold then
 					ui_content.is_clicked = 0
-				elseif input_service.get(input_service, "confirm_press") and ui_content.is_clicked < UISettings.double_click_threshold then
+				elseif input_service:get("confirm_press") and ui_content.is_clicked < UISettings.double_click_threshold then
 					ui_content.on_double_click = true
 					ui_content.is_clicked = 0
 				else
@@ -3960,7 +3960,7 @@ UIPasses.game_pad_connected = {
 }
 
 local function gamepad_button_clicked(ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, button_type)
-	local button_released = input_service.get(input_service, button_type)
+	local button_released = input_service:get(button_type)
 
 	if button_released then
 		ui_content.on_release = true
@@ -4056,7 +4056,7 @@ UIPasses.scroll = {
 		return nil
 	end,
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
-		local cursor = input_service.get(input_service, "cursor") or NilCursor
+		local cursor = input_service:get("cursor") or NilCursor
 		local cursor_position = nil
 		local gamepad_active = Managers.input:is_device_active("gamepad")
 
@@ -4068,7 +4068,7 @@ UIPasses.scroll = {
 
 		local is_hover = math.point_is_inside_2d_box(cursor_position, position, size) and not UIPasses.is_dragging_item
 		ui_content.is_hover = is_hover
-		local scroll_axis = input_service.get(input_service, "scroll_axis")
+		local scroll_axis = input_service:get("scroll_axis")
 
 		if scroll_axis then
 			pass_definition.scroll_function(ui_scenegraph, ui_style, ui_content, input_service, scroll_axis, dt)
@@ -4082,12 +4082,12 @@ UIPasses.held = {
 	draw = function (ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt)
 		local content = (pass_definition.content_check_hover and ui_content[pass_definition.content_check_hover]) or ui_content
 
-		if not content.is_held and content.is_hover and input_service.get(input_service, "left_press") then
+		if not content.is_held and content.is_hover and input_service:get("left_press") then
 			content.is_held = true
 		end
 
 		if content.is_held then
-			if input_service.get(input_service, "left_hold") then
+			if input_service:get("left_hold") then
 				if pass_definition.held_function then
 					pass_definition.held_function(ui_scenegraph, ui_style, ui_content, input_service)
 				end

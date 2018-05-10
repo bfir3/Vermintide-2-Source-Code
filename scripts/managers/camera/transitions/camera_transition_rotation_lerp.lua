@@ -8,7 +8,7 @@ CameraTransitionRotationLerp.init = function (self, node_1, node_2, duration, sp
 	self._freeze_node_1 = settings.freeze_start_node
 
 	if self._freeze_node_1 then
-		local node_1_rot = node_1.rotation(node_1)
+		local node_1_rot = node_1:rotation()
 		self._node_1_rot_table = QuaternionBox(node_1_rot)
 	end
 end

@@ -81,7 +81,7 @@ NavigationUtils.debug_draw_nav_mesh = function (nav_world, nav_cost_maps_data, n
 end
 
 NavigationUtils.get_closest_index_on_spline = function (spline_curve, position)
-	local splines = spline_curve.splines(spline_curve)
+	local splines = spline_curve:splines()
 	local smallest_distance = math.huge
 	local point = nil
 	local best_index = 1

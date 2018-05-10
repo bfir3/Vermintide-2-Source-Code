@@ -25,11 +25,11 @@ BTChaosSorcererSummoningAction.enter = function (self, unit, blackboard, t)
 	if not action.is_spawner then
 		local locomotion_extension = blackboard.locomotion_extension
 
-		locomotion_extension.set_wanted_velocity(locomotion_extension, Vector3.zero())
+		locomotion_extension:set_wanted_velocity(Vector3.zero())
 
 		local navigation_extension = blackboard.navigation_extension
 
-		navigation_extension.set_enabled(navigation_extension, false)
+		navigation_extension:set_enabled(false)
 
 		local attack_animation = action.attack_anim
 
@@ -46,7 +46,7 @@ BTChaosSorcererSummoningAction.enter = function (self, unit, blackboard, t)
 	end
 
 	if blackboard.breed.summon_sound_event then
-		self.trigger_summon_sound(self, unit, blackboard, t)
+		self:trigger_summon_sound(unit, blackboard, t)
 	end
 end
 
@@ -57,7 +57,7 @@ BTChaosSorcererSummoningAction.trigger_summon_sound = function (self, unit, blac
 	local no_summon_sound_for_target = breed.no_summon_sound_for_target
 	local player_manager = Managers.player
 	local player_unit = blackboard.target_unit
-	local player = player_manager.unit_owner(player_manager, player_unit)
+	local player = player_manager:unit_owner(player_unit)
 	local dialogue_input = ScriptUnit.has_extension_input(unit, "dialogue_system")
 	local audio_system_extension = Managers.state.entity:system("audio_system")
 	local unit_id = NetworkUnit.game_object_id(unit)
@@ -65,12 +65,12 @@ BTChaosSorcererSummoningAction.trigger_summon_sound = function (self, unit, blac
 
 	if no_summon_sound_for_target then
 		if not player.local_player then
-			dialogue_input.play_voice(dialogue_input, summon_sound_event, true)
+			dialogue_input:play_voice(summon_sound_event, true)
 		end
 
 		network_manager.network_transmit:send_rpc_clients_except("rpc_server_audio_unit_dialogue_event", player.peer_id, sound_event_id, unit_id, 0)
 	else
-		dialogue_input.play_voice(dialogue_input, summon_sound_event, true)
+		dialogue_input:play_voice(summon_sound_event, true)
 		network_manager.network_transmit:send_rpc_clients("rpc_server_audio_unit_dialogue_event", sound_event_id, unit_id, 0)
 	end
 end
@@ -81,7 +81,7 @@ BTChaosSorcererSummoningAction.leave = function (self, unit, blackboard, t, reas
 	if not action.is_spawner then
 		local navigation_extension = blackboard.navigation_extension
 
-		navigation_extension.set_enabled(navigation_extension, true)
+		navigation_extension:set_enabled(true)
 
 		local cleanup_func_name = action.cleanup_func_name
 
@@ -106,7 +106,7 @@ BTChaosSorcererSummoningAction.run = function (self, unit, blackboard, t, dt)
 	if Unit.alive(target_unit) then
 		local status_ext = ScriptUnit.has_extension(target_unit, "status_system")
 
-		if status_ext and not status_ext.is_invisible(status_ext) and not status_ext.get_is_dodging(status_ext) then
+		if status_ext and not status_ext:is_invisible() and not status_ext:get_is_dodging() then
 			blackboard.target_position:store(POSITION_LOOKUP[target_unit])
 		end
 
@@ -114,7 +114,7 @@ BTChaosSorcererSummoningAction.run = function (self, unit, blackboard, t, dt)
 			local rotation = LocomotionUtils.rotation_towards_unit_flat(unit, target_unit)
 			local locomotion_extension = blackboard.locomotion_extension
 
-			locomotion_extension.set_wanted_rotation(locomotion_extension, rotation)
+			locomotion_extension:set_wanted_rotation(rotation)
 		end
 	end
 
@@ -217,13 +217,13 @@ BTChaosSorcererSummoningAction._clean_up_vortex_summoning = function (self, unit
 	local inner_decal_unit = vortex_data.inner_decal_unit
 
 	if Unit.alive(inner_decal_unit) then
-		unit_spawner.mark_for_deletion(unit_spawner, inner_decal_unit)
+		unit_spawner:mark_for_deletion(inner_decal_unit)
 	end
 
 	local outer_decal_unit = vortex_data.outer_decal_unit
 
 	if Unit.alive(outer_decal_unit) then
-		unit_spawner.mark_for_deletion(unit_spawner, outer_decal_unit)
+		unit_spawner:mark_for_deletion(outer_decal_unit)
 	end
 
 	vortex_data.inner_decal_unit = nil
@@ -244,7 +244,7 @@ BTChaosSorcererSummoningAction._update_vortex_summoning = function (self, unit, 
 	local rotation = LocomotionUtils.look_at_position_flat(unit, summon_position)
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.set_wanted_rotation(locomotion_extension, rotation)
+	locomotion_extension:set_wanted_rotation(rotation)
 
 	if blackboard.attack_finished then
 		return
@@ -259,7 +259,7 @@ BTChaosSorcererSummoningAction._update_vortex_summoning = function (self, unit, 
 		local hand_node = Unit.node(unit, "j_lefthand")
 		local hand_position = Unit.world_position(unit, hand_node)
 
-		self._launch_vortex_dummy_missile(self, unit, action, vortex_data, hand_position, summon_position, summon_direction)
+		self:_launch_vortex_dummy_missile(unit, action, vortex_data, hand_position, summon_position, summon_direction)
 
 		vortex_data.next_missile_cast_t = vortex_data.next_missile_cast_t + action.missile_cast_interval
 	end
@@ -337,7 +337,7 @@ BTChaosSorcererSummoningAction._spawn_boss_vortex = function (self, unit, blackb
 		boss_vortex_data.outer_decal_unit = Managers.state.unit_spawner:spawn_network_unit(outer_decal_unit_name, "network_synched_dummy_unit", nil, outer_spawn_pose)
 	end
 
-	self._spawn_vortex(self, unit, blackboard, t, dt, target_position, boss_vortex_data)
+	self:_spawn_vortex(unit, blackboard, t, dt, target_position, boss_vortex_data)
 end
 
 BTChaosSorcererSummoningAction._spawn_vortex = function (self, unit, blackboard, t, dt, target_position, vortex_data)
@@ -530,7 +530,7 @@ BTChaosSorcererSummoningAction.spawn_plague_wave = function (self, unit, blackbo
 		else
 			blackboard.ready_to_summon = false
 
-			damage_wave_extension.abort(damage_wave_extension)
+			damage_wave_extension:abort()
 
 			return false
 		end
@@ -544,7 +544,7 @@ BTChaosSorcererSummoningAction.spawn_plague_wave = function (self, unit, blackbo
 		else
 			blackboard.ready_to_summon = false
 
-			damage_wave_extension.abort(damage_wave_extension)
+			damage_wave_extension:abort()
 
 			return false
 		end
@@ -579,7 +579,7 @@ BTChaosSorcererSummoningAction.spawn_plague_wave = function (self, unit, blackbo
 		if not found_new_target_pos then
 			blackboard.ready_to_summon = false
 
-			damage_wave_extension.abort(damage_wave_extension)
+			damage_wave_extension:abort()
 
 			return false
 		end
@@ -592,12 +592,12 @@ BTChaosSorcererSummoningAction.spawn_plague_wave = function (self, unit, blackbo
 	if max_dist_sq < dist_sq then
 		blackboard.ready_to_summon = false
 
-		damage_wave_extension.abort(damage_wave_extension)
+		damage_wave_extension:abort()
 
 		return false
 	end
 
-	damage_wave_extension.launch_wave(damage_wave_extension, blackboard.summon_target_unit, optional_target_pos)
+	damage_wave_extension:launch_wave(blackboard.summon_target_unit, optional_target_pos)
 
 	return true
 end
@@ -624,7 +624,7 @@ BTChaosSorcererSummoningAction.spawn_plague_wave_from_spawner = function (self, 
 	local damage_wave_unit = Managers.state.unit_spawner:spawn_network_unit(unit_name, "damage_wave_unit", extension_init_data, spawn_pos, spawn_rot)
 	local wave_extension = ScriptUnit.extension(damage_wave_unit, "area_damage_system")
 
-	wave_extension.launch_wave(wave_extension, target_unit)
+	wave_extension:launch_wave(target_unit)
 
 	blackboard.attack_finished = true
 
@@ -684,12 +684,12 @@ BTChaosSorcererSummoningAction.spawn_plague_waves_in_patterns = function (self, 
 				local wave_extension = ScriptUnit.extension(damage_wave_unit, "area_damage_system")
 
 				if action.damage_wave_update_func then
-					wave_extension.set_update_func(wave_extension, action.damage_wave_update_func, action.damage_wave_init_func, t)
+					wave_extension:set_update_func(action.damage_wave_update_func, action.damage_wave_init_func, t)
 				end
 
 				local target_unit = nil
 
-				wave_extension.launch_wave(wave_extension, target_unit, target_pos)
+				wave_extension:launch_wave(target_unit, target_pos)
 
 				blackboard.attack_finished = true
 			end

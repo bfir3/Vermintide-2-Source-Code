@@ -28,7 +28,7 @@ DarknessSystem.init = function (self, entity_system_creation_context, system_nam
 		local player_light_intensity = darkness_settings.player_light_intensity
 
 		if player_light_intensity then
-			self.set_player_light_intensity(self, player_light_intensity)
+			self:set_player_light_intensity(player_light_intensity)
 		end
 
 		if darkness_settings.disable_screen_fx then
@@ -90,9 +90,9 @@ DarknessSystem.update = function (self, context, t)
 	local dt = context.dt
 
 	if self._darkness_volumes or self._global_darkness then
-		self._update_light_sources(self, dt, t)
-		self._update_player_unit_darkness(self, dt, t)
-		self._update_darkness_fx(self, dt, t)
+		self:_update_light_sources(dt, t)
+		self:_update_player_unit_darkness(dt, t)
+		self:_update_darkness_fx(dt, t)
 	end
 end
 
@@ -114,11 +114,11 @@ end
 DarknessSystem._update_player_unit_darkness = function (self, dt, t)
 	for unit, data in pairs(self._player_unit_darkness_data) do
 		local pos = POSITION_LOOKUP[unit] + Vector3(0, 0, 1)
-		local in_darkness = self.is_in_darkness_volume(self, pos)
+		local in_darkness = self:is_in_darkness_volume(pos)
 		local light_value = nil
 
 		if in_darkness then
-			light_value = self.calculate_light_value(self, pos)
+			light_value = self:calculate_light_value(pos)
 
 			if LIGHT_LIGHT_VALUE < light_value then
 				data.intensity = 0
@@ -141,7 +141,7 @@ local SOURCE_ID = 0
 
 DarknessSystem._update_darkness_fx = function (self, dt, t)
 	local player_manager = Managers.player
-	local player = player_manager.local_player(player_manager, 1)
+	local player = player_manager:local_player(1)
 
 	if player then
 		local world = self.world
@@ -150,8 +150,8 @@ DarknessSystem._update_darkness_fx = function (self, dt, t)
 		local observed_player, unit = nil
 
 		if camera_extension then
-			local observed_player_id = camera_extension.get_observed_player_id(camera_extension)
-			observed_player = observed_player_id and player_manager.players(player_manager)[observed_player_id]
+			local observed_player_id = camera_extension:get_observed_player_id()
+			observed_player = observed_player_id and player_manager:players()[observed_player_id]
 		end
 
 		if observed_player and Unit.alive(observed_player.player_unit) then
@@ -265,11 +265,11 @@ DarknessSystem.calculate_light_value = function (self, position)
 end
 
 DarknessSystem.is_in_darkness = function (self, position, darkness_treshold)
-	if not self.is_in_darkness_volume(self, position) then
+	if not self:is_in_darkness_volume(position) then
 		return false
 	end
 
-	local light_value = self.calculate_light_value(self, position)
+	local light_value = self:calculate_light_value(position)
 
 	return light_value < (darkness_treshold or DarknessSystem.DARKNESS_THRESHOLD)
 end

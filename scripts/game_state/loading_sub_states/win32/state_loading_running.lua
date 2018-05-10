@@ -6,7 +6,7 @@ StateLoadingRunning.NAME = "StateLoadingRunning"
 
 StateLoadingRunning.on_enter = function (self, params)
 	print("[Gamestate] Enter Substate StateLoadingRunning")
-	self._init_network(self)
+	self:_init_network()
 
 	self._loading_view = params.loading_view
 	self._level_transition_handler = params.level_transition_handler
@@ -54,9 +54,9 @@ StateLoadingRunning._init_network = function (self)
 		local network_client_setup_successful = self.parent:setup_network_client(true, lobby_client)
 
 		if network_client_setup_successful then
-			self.parent:setup_chat_manager(lobby_client, lobby_client.lobby_host(lobby_client), Network.peer_id(), false)
-			self.parent:setup_deed_manager(lobby_client, lobby_client.lobby_host(lobby_client), Network.peer_id())
-			self.parent:setup_enemy_package_loader(lobby_client, lobby_client.lobby_host(lobby_client), Network.peer_id())
+			self.parent:setup_chat_manager(lobby_client, lobby_client:lobby_host(), Network.peer_id(), false)
+			self.parent:setup_deed_manager(lobby_client, lobby_client:lobby_host(), Network.peer_id())
+			self.parent:setup_enemy_package_loader(lobby_client, lobby_client:lobby_host(), Network.peer_id())
 		end
 
 		loading_context.start_lobby_data = nil

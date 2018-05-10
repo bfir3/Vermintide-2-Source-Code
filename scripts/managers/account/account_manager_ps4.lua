@@ -16,7 +16,7 @@ local FETCH_FRIEND_TIME = 12
 local FETCH_FRIEND_NUM = 500
 
 AccountManager.init = function (self)
-	self.fetch_user_data(self)
+	self:fetch_user_data()
 
 	self._web_api = ScriptWebApiPsn:new()
 	self._initial_user_id = PS4.initial_user_id()
@@ -106,29 +106,29 @@ AccountManager.destroy = function (self)
 	self._web_api = nil
 
 	if self._has_presence_game_data then
-		self.delete_presence_game_data(self)
+		self:delete_presence_game_data()
 	end
 
 	local session = self._session
 
 	if session then
 		if session.is_owner then
-			self.delete_session(self)
+			self:delete_session()
 		else
-			self.leave_session(self)
+			self:leave_session()
 		end
 	end
 end
 
 AccountManager.update = function (self, dt)
-	self._update_psn_client(self, dt)
-	self._aquire_np_title_id(self, dt)
-	self._update_psn(self)
-	self._notify_plus(self)
-	self._update_friends(self, dt)
-	self._update_matchmaking_data(self, dt)
+	self:_update_psn_client(dt)
+	self:_aquire_np_title_id(dt)
+	self:_update_psn()
+	self:_notify_plus()
+	self:_update_friends(dt)
+	self:_update_matchmaking_data(dt)
 	self._web_api:update(dt)
-	self._update_profile_dialog(self)
+	self:_update_profile_dialog()
 end
 
 local PSN_CLIENT_READY_TIMEOUT = 20
@@ -175,7 +175,7 @@ AccountManager._aquire_np_title_id = function (self, dt)
 		self._request_np_title_timer = (self._request_np_title_timer and self._request_np_title_timer + dt) or 10
 
 		if 10 <= self._request_np_title_timer then
-			self.get_user_presence(self, self._np_id, callback(self, "_cb_presence_aquired"))
+			self:get_user_presence(self._np_id, callback(self, "_cb_presence_aquired"))
 
 			self._requesting_np_title_id = true
 			self._request_np_title_timer = 0
@@ -186,7 +186,7 @@ end
 AccountManager._update_psn = function (self)
 	local current_room = self._current_room
 	local previous_room = self._previous_room
-	local room_state_current = current_room and current_room.state(current_room)
+	local room_state_current = current_room and current_room:state()
 	local room_state_previous = self._room_state
 	local room_joined = false
 	local room_left = false
@@ -199,8 +199,8 @@ AccountManager._update_psn = function (self)
 		room_left = room_state_previous == PsnRoom.JOINED and room_state_current ~= PsnRoom.JOINED
 	end
 
-	self._update_psn_presence(self, room_joined, room_left)
-	self._update_psn_session(self, room_joined, room_left)
+	self:_update_psn_presence(room_joined, room_left)
+	self:_update_psn_session(room_joined, room_left)
 
 	self._previous_room = current_room
 	self._room_state = room_state_current
@@ -212,9 +212,9 @@ AccountManager._update_psn_presence = function (self, room_joined, room_left)
 
 	if room_joined then
 		local room = self._current_room
-		local room_id = room.sce_np_room_id(room)
+		local room_id = room:sce_np_room_id()
 
-		self.set_presence_game_data(self, room_id)
+		self:set_presence_game_data(room_id)
 	end
 end
 
@@ -223,23 +223,23 @@ AccountManager._update_psn_session = function (self, room_joined, room_left)
 
 	if room_left and session then
 		if session.is_owner then
-			self.delete_session(self)
+			self:delete_session()
 		else
-			self.leave_session(self)
+			self:leave_session()
 		end
 	end
 
 	if room_joined then
 		local room = self._current_room
-		local room_id = room.sce_np_room_id(room)
+		local room_id = room:sce_np_room_id()
 
-		if room.lobby_host(room) == Network.peer_id() then
-			self.create_session(self, room_id)
+		if room:lobby_host() == Network.peer_id() then
+			self:create_session(room_id)
 		else
-			local session_id = room.data(room, "session_id")
+			local session_id = room:data("session_id")
 
 			if session_id then
-				self.join_session(self, session_id)
+				self:join_session(session_id)
 			end
 		end
 	end
@@ -263,7 +263,7 @@ AccountManager._notify_plus = function (self)
 		return
 	end
 
-	NpCheck.notify_plus(self.user_id(self), NpCheck.REALTIME_MULTIPLAY)
+	NpCheck.notify_plus(self:user_id(), NpCheck.REALTIME_MULTIPLAY)
 end
 
 AccountManager._update_friends = function (self, dt)
@@ -276,7 +276,7 @@ AccountManager._update_friends = function (self, dt)
 	if FETCH_FRIEND_TIME <= self._fetch_friends_timer then
 		self._fetch_friends_timer = 0
 
-		self._fetch_friends(self)
+		self:_fetch_friends()
 	end
 end
 
@@ -292,7 +292,7 @@ AccountManager._update_matchmaking_data = function (self, dt)
 	local t = Managers.time:time("main")
 
 	if not self._matchmaking_data and not self._fetching_matchmaking_data and self._next_matchmaking_data_fetch <= t then
-		self._fetch_matchmaking_data(self, t)
+		self:_fetch_matchmaking_data(t)
 	end
 end
 
@@ -403,25 +403,25 @@ AccountManager.all_lobbies_freed = function (self)
 end
 
 AccountManager.has_access = function (self, restriction, user_id)
-	local user_id = user_id or self.user_id(self)
+	local user_id = user_id or self:user_id()
 
 	return self._ps_restrictions:has_access(user_id, restriction)
 end
 
 AccountManager.has_error = function (self, restriction, user_id)
-	local user_id = user_id or self.user_id(self)
+	local user_id = user_id or self:user_id()
 
 	return self._ps_restrictions:has_error(user_id, restriction)
 end
 
 AccountManager.restriction_access_fetched = function (self, restriction)
-	local user_id = self.user_id(self)
+	local user_id = self:user_id()
 
 	return self._ps_restrictions:restriction_access_fetched(user_id, restriction)
 end
 
 AccountManager.refetch_restriction_access = function (self, user_id, restrictions)
-	local user_id = user_id or self.user_id(self)
+	local user_id = user_id or self:user_id()
 
 	self._ps_restrictions:refetch_restriction_access(user_id, restrictions)
 end
@@ -431,8 +431,8 @@ AccountManager.show_player_profile = function (self, user_id)
 		return
 	end
 
-	local own_user_id = self.user_id(self)
-	user_id = user_id or self.user_id(self)
+	local own_user_id = self:user_id()
+	user_id = user_id or self:user_id()
 
 	NpProfileDialog.initialize()
 	NpProfileDialog.open(own_user_id, user_id)
@@ -445,8 +445,8 @@ AccountManager.show_player_profile_with_np_id = function (self, np_id)
 		return
 	end
 
-	local own_user_id = self.user_id(self)
-	np_id = np_id or self.np_id(self)
+	local own_user_id = self:user_id()
+	np_id = np_id or self:np_id()
 
 	NpProfileDialog.initialize()
 	NpProfileDialog.open_with_np_id(own_user_id, np_id)
@@ -473,7 +473,7 @@ AccountManager.set_presence = function (self, presence, append_string)
 	local api_group = "userProfile"
 	local path = string.format("/v1/users/%s/presence/gameStatus", tostring(np_id))
 	local method = WebApi.PUT
-	local content = self._set_presence_status_content(self, presence, append_string)
+	local content = self:_set_presence_status_content(presence, append_string)
 
 	self._web_api:send_request(np_id, api_group, path, method, content)
 end
@@ -522,7 +522,7 @@ AccountManager.create_session = function (self, room_id)
 		platforms = "[\"PS4\"]",
 		lock_flag = lock_flag
 	}
-	local session_parameters = self._format_session_parameters(self, session_parameters_table)
+	local session_parameters = self:_format_session_parameters(session_parameters_table)
 	local session_image = "/app0/content/session_images/session_image_default.jpg"
 	local session_data = room_id
 	local changable_session_data = nil
@@ -540,13 +540,13 @@ AccountManager._cb_session_created = function (self, result)
 		local room = self._current_room
 
 		if room then
-			room.set_data(room, "session_id", session_id)
+			room:set_data("session_id", session_id)
 		end
 
 		local play_together_list = SessionInvitation.play_together_list()
 
 		if play_together_list then
-			self.send_session_invitation_multiple(self, play_together_list)
+			self:send_session_invitation_multiple(play_together_list)
 		end
 	else
 		self._session = nil

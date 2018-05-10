@@ -50,7 +50,7 @@ GenericStateMachine.update = function (self, unit, input, dt, context, t)
 
 		local state = self.states[self.state_next]
 
-		state.on_enter(state, unit, input, dt, context, t, self.state_current.name, self.state_next_params or self.dummy_params)
+		state:on_enter(unit, input, dt, context, t, self.state_current.name, self.state_next_params or self.dummy_params)
 
 		self.state_current = state
 		self.state_next = nil

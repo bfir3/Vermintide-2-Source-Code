@@ -20,11 +20,11 @@ ContractPresentationScreenUI.init = function (self, ingame_ui_context)
 	self.quest_manager = quest_manager
 	local input_manager = self.input_manager
 
-	input_manager.create_input_service(input_manager, "contract_presentation_screen_ui", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "contract_presentation_screen_ui", "keyboard")
-	input_manager.map_device_to_service(input_manager, "contract_presentation_screen_ui", "mouse")
-	input_manager.map_device_to_service(input_manager, "contract_presentation_screen_ui", "gamepad")
-	self._create_ui_elements(self)
+	input_manager:create_input_service("contract_presentation_screen_ui", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("contract_presentation_screen_ui", "keyboard")
+	input_manager:map_device_to_service("contract_presentation_screen_ui", "mouse")
+	input_manager:map_device_to_service("contract_presentation_screen_ui", "gamepad")
+	self:_create_ui_elements()
 	rawset(_G, "contract_log_ui", self)
 end
 
@@ -36,12 +36,12 @@ ContractPresentationScreenUI.on_enter = function (self, ignore_input_blocking)
 		local input_manager = self.input_manager
 
 		if not ignore_input_blocking and not chat_focused then
-			input_manager.block_device_except_service(input_manager, "contract_presentation_screen_ui", "keyboard")
-			input_manager.block_device_except_service(input_manager, "contract_presentation_screen_ui", "mouse")
-			input_manager.block_device_except_service(input_manager, "contract_presentation_screen_ui", "gamepad")
+			input_manager:block_device_except_service("contract_presentation_screen_ui", "keyboard")
+			input_manager:block_device_except_service("contract_presentation_screen_ui", "mouse")
+			input_manager:block_device_except_service("contract_presentation_screen_ui", "gamepad")
 		end
 
-		local missing_contracts = self._initialize_active_contracts(self)
+		local missing_contracts = self:_initialize_active_contracts()
 
 		if not self.game_won or missing_contracts or self.num_active_contract_widget == 0 then
 			self.is_complete = true
@@ -69,7 +69,7 @@ end
 
 ContractPresentationScreenUI.update = function (self, dt, t)
 	if DO_RELOAD then
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 
 		DO_RELOAD = false
 	end
@@ -80,26 +80,26 @@ ContractPresentationScreenUI.update = function (self, dt, t)
 
 	local ui_animator = self.ui_animator
 
-	ui_animator.update(ui_animator, dt)
+	ui_animator:update(dt)
 
-	local auto_continue = self._update_continue_timer(self, dt)
+	local auto_continue = self:_update_continue_timer(dt)
 
 	if not self.waiting_for_input then
-		if self._handle_animations(self) then
+		if self:_handle_animations() then
 			self.waiting_for_input = true
 			self.continue_timer = AUTO_CONTINUE_DURATION
 		end
 	elseif not self.exit_anim_id and (self.input_manager:any_input_pressed() or auto_continue) then
-		self.exit_anim_id = self._start_contract_animation(self, nil, "contracts_exit")
+		self.exit_anim_id = self:_start_contract_animation(nil, "contracts_exit")
 	end
 
-	if self.exit_anim_id and ui_animator.is_animation_completed(ui_animator, self.exit_anim_id) then
-		ui_animator.stop_animation(ui_animator, self.exit_anim_id)
+	if self.exit_anim_id and ui_animator:is_animation_completed(self.exit_anim_id) then
+		ui_animator:stop_animation(self.exit_anim_id)
 
 		self.is_complete = true
 	end
 
-	self._draw(self, dt)
+	self:_draw(dt)
 end
 
 ContractPresentationScreenUI._update_continue_timer = function (self, dt)
@@ -122,8 +122,8 @@ ContractPresentationScreenUI._draw = function (self, dt)
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "contract_presentation_screen_ui")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local input_service = input_manager:get_service("contract_presentation_screen_ui")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 
 	UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt)
 	UIRenderer.draw_widget(ui_renderer, self.title_text)
@@ -182,7 +182,7 @@ ContractPresentationScreenUI._initialize_active_contracts = function (self)
 			local widget = widgets[widget_index]
 
 			if widget then
-				local task_data, contract_start_progress, contract_session_progress = self._set_contract_start_info_by_contract_id(self, widget, contract_id)
+				local task_data, contract_start_progress, contract_session_progress = self:_set_contract_start_info_by_contract_id(widget, contract_id)
 				contract_entries[contract_id] = {
 					contract_start_progress = contract_start_progress,
 					contract_session_progress = contract_session_progress,
@@ -207,12 +207,12 @@ end
 
 ContractPresentationScreenUI._set_contract_start_info_by_contract_id = function (self, widget, contract_id)
 	local quest_manager = self.quest_manager
-	local contract_template = quest_manager.get_contract_by_id(quest_manager, contract_id)
+	local contract_template = quest_manager:get_contract_by_id(contract_id)
 	local task = contract_template.requirements.task
-	local contract_name = quest_manager.get_title_for_contract_id(quest_manager, contract_id)
+	local contract_name = quest_manager:get_title_for_contract_id(contract_id)
 	widget.content.title_text = contract_name
-	local contract_progress = quest_manager.get_contract_progress(quest_manager, contract_id)
-	local contract_session_progress = quest_manager.get_session_progress_by_contract_id(quest_manager, contract_id)
+	local contract_progress = quest_manager:get_contract_progress(contract_id)
+	local contract_session_progress = quest_manager:get_session_progress_by_contract_id(contract_id)
 	local index_count = 0
 	local task_data = {}
 	local tasks_total_end_values = 0
@@ -228,7 +228,7 @@ ContractPresentationScreenUI._set_contract_start_info_by_contract_id = function 
 		local value_text = tostring(task_start_progress) .. "/" .. tostring(task_required)
 		index_count = index_count + 1
 
-		self._set_widget_task_info(self, widget, index_count, task.type, value_text)
+		self:_set_widget_task_info(widget, index_count, task.type, value_text)
 
 		task_data[index_count] = {
 			end_value = task_required,
@@ -246,8 +246,8 @@ ContractPresentationScreenUI._set_contract_start_info_by_contract_id = function 
 	local tasks_total_session_progress = (0 < tasks_total_end_values and tasks_total_session_values / tasks_total_end_values) or 0
 	tasks_total_session_progress = math.max(math.min(tasks_total_session_progress, 1), 0)
 
-	self._set_widget_task_amount(self, widget, index_count)
-	self._set_widget_contract_progress(self, widget, tasks_total_progress)
+	self:_set_widget_task_amount(widget, index_count)
+	self:_set_widget_contract_progress(widget, tasks_total_progress)
 
 	return task_data, tasks_total_progress, tasks_total_session_progress
 end
@@ -286,7 +286,7 @@ ContractPresentationScreenUI._sync_contracts_task_progress = function (self)
 
 	if contract_entries then
 		for contract_id, entry_data in pairs(contract_entries) do
-			self._sync_contract_task_progress(self, contract_id)
+			self:_sync_contract_task_progress(contract_id)
 		end
 	end
 end
@@ -301,7 +301,7 @@ ContractPresentationScreenUI._sync_contract_task_progress = function (self, cont
 	local task_data = task_data[index_count]
 	local value_text = tostring(task_value) .. "/" .. tostring(task_data.end_value)
 
-	self._set_widget_task_info(self, widget, index_count, nil, value_text)
+	self:_set_widget_task_info(widget, index_count, nil, value_text)
 end
 
 ContractPresentationScreenUI._set_widget_contract_progress = function (self, widget, progress)
@@ -379,14 +379,14 @@ ContractPresentationScreenUI._handle_animations = function (self)
 				all_entries_completed = true
 
 				if not entry.intro_started then
-					local anim_id = self._start_contract_animation(self, contract_id, "contract_entry")
+					local anim_id = self:_start_contract_animation(contract_id, "contract_entry")
 					entry.widget.content.visible = true
 					entry.intro_started = true
 					entry.intro_anim_id = anim_id
 
 					return
-				elseif entry.intro_anim_id and ui_animator.is_animation_completed(ui_animator, entry.intro_anim_id) then
-					ui_animator.stop_animation(ui_animator, entry.intro_anim_id)
+				elseif entry.intro_anim_id and ui_animator:is_animation_completed(entry.intro_anim_id) then
+					ui_animator:stop_animation(entry.intro_anim_id)
 
 					entry.intro_anim_id = nil
 
@@ -404,7 +404,7 @@ ContractPresentationScreenUI._handle_animations = function (self)
 
 									if data.has_changed then
 										local animating_task_index = i
-										local anim_id = self._start_contract_animation(self, contract_id, "contract_task_progress", animating_task_index)
+										local anim_id = self:_start_contract_animation(contract_id, "contract_task_progress", animating_task_index)
 										entry.task_anim_id = anim_id
 										entry.animating_task_index = animating_task_index
 
@@ -416,8 +416,8 @@ ContractPresentationScreenUI._handle_animations = function (self)
 							entry.task_anims_done = true
 
 							return
-						elseif entry.task_anim_id and ui_animator.is_animation_completed(ui_animator, entry.task_anim_id) then
-							ui_animator.stop_animation(ui_animator, entry.task_anim_id)
+						elseif entry.task_anim_id and ui_animator:is_animation_completed(entry.task_anim_id) then
+							ui_animator:stop_animation(entry.task_anim_id)
 
 							entry.task_anim_id = nil
 							local task_data = entry.task_data
@@ -429,7 +429,7 @@ ContractPresentationScreenUI._handle_animations = function (self)
 
 									if data.has_changed then
 										animating_task_index = i
-										local anim_id = self._start_contract_animation(self, contract_id, "contract_task_progress", animating_task_index)
+										local anim_id = self:_start_contract_animation(contract_id, "contract_task_progress", animating_task_index)
 										entry.task_anim_id = anim_id
 										entry.animating_task_index = animating_task_index
 
@@ -447,13 +447,13 @@ ContractPresentationScreenUI._handle_animations = function (self)
 					elseif not entry.summary_anim_done then
 						if not entry.summary_started then
 							local animation_name = (0 < entry.contract_session_progress and "contract_summary") or "no_progress"
-							local anim_id = self._start_contract_animation(self, contract_id, animation_name)
+							local anim_id = self:_start_contract_animation(contract_id, animation_name)
 							entry.summary_anim_id = anim_id
 							entry.summary_started = true
 
 							return
-						elseif entry.summary_anim_id and ui_animator.is_animation_completed(ui_animator, entry.summary_anim_id) then
-							ui_animator.stop_animation(ui_animator, entry.summary_anim_id)
+						elseif entry.summary_anim_id and ui_animator:is_animation_completed(entry.summary_anim_id) then
+							ui_animator:stop_animation(entry.summary_anim_id)
 
 							entry.summary_anim_id = nil
 							entry.summary_anim_done = true
@@ -464,7 +464,7 @@ ContractPresentationScreenUI._handle_animations = function (self)
 						end
 					elseif not entry.end_started then
 						if index < num_active_contract_widget then
-							local anim_id = self._start_contract_animation(self, contract_id, "contract_move")
+							local anim_id = self:_start_contract_animation(contract_id, "contract_move")
 							entry.end_started = true
 							entry.end_anim_id = anim_id
 
@@ -472,8 +472,8 @@ ContractPresentationScreenUI._handle_animations = function (self)
 						else
 							entry.animations_done = true
 						end
-					elseif entry.end_anim_id and ui_animator.is_animation_completed(ui_animator, entry.end_anim_id) then
-						ui_animator.stop_animation(ui_animator, entry.end_anim_id)
+					elseif entry.end_anim_id and ui_animator:is_animation_completed(entry.end_anim_id) then
+						ui_animator:stop_animation(entry.end_anim_id)
 
 						entry.end_anim_id = nil
 						entry.animations_done = true

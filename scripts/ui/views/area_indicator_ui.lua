@@ -8,7 +8,7 @@ AreaIndicatorUI.init = function (self, ingame_ui_context)
 	local world = ingame_ui_context.world_manager:world("level_world")
 	self.wwise_world = Managers.world:wwise_world(world)
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 	rawset(_G, "area_indicator_ui", self)
 end
 
@@ -25,7 +25,7 @@ end
 
 AreaIndicatorUI.update = function (self, dt)
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
+	local local_player = player_manager:local_player()
 	local player_unit = local_player.player_unit
 
 	if Unit.alive(player_unit) then
@@ -49,10 +49,10 @@ AreaIndicatorUI.update = function (self, dt)
 		return
 	end
 
-	self.area_text_box_animation = self.update_animation(self, self.area_text_box_animation, dt)
-	self.area_text_box_shadow_animation = self.update_animation(self, self.area_text_box_shadow_animation, dt)
+	self.area_text_box_animation = self:update_animation(self.area_text_box_animation, dt)
+	self.area_text_box_shadow_animation = self:update_animation(self.area_text_box_shadow_animation, dt)
 
-	self.draw(self, dt)
+	self:draw(dt)
 end
 
 AreaIndicatorUI.update_animation = function (self, animation, dt)

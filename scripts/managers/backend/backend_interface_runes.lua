@@ -22,7 +22,7 @@ BackendInterfaceRunes._refresh_attributes = function (self)
 end
 
 BackendInterfaceRunes.on_authenticated = function (self)
-	self._refresh_attributes(self)
+	self:_refresh_attributes()
 end
 
 BackendInterfaceRunes.get = function (self, backend_id)
@@ -57,7 +57,7 @@ BackendInterfaceRunes.set = function (self, backend_id, rune)
 	local error_code = Backend.set_entity_attribute(entity_id, db_attribute_name, value_json)
 
 	fassert(not error_code or error_code == Backend.RES_NO_CHANGE, "[BackendInterfaceRunes:set] BackendItem.set_entity_attribute() returned an unexpected result: %d", error_code)
-	self._refresh_attributes(self)
+	self:_refresh_attributes()
 end
 
 return

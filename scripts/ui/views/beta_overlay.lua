@@ -61,7 +61,7 @@ BetaOverlay.init = function (self)
 	self.top_world = top_world
 	local widget_definition = UIWidgets.create_simple_texture("beta_text", "beta_tag")
 
-	self.create_ui_elements(self, widget_definition)
+	self:create_ui_elements(widget_definition)
 end
 
 BetaOverlay.create_ui_elements = function (self, widget_definition)
@@ -70,7 +70,7 @@ BetaOverlay.create_ui_elements = function (self, widget_definition)
 end
 
 BetaOverlay.update = function (self, dt)
-	self.draw(self, dt)
+	self:draw(dt)
 end
 
 BetaOverlay.draw = function (self, dt)

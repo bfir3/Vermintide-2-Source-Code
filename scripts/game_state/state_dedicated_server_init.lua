@@ -5,7 +5,7 @@ StateDedicatedServerInit = class(StateDedicatedServerInit)
 StateDedicatedServerInit.NAME = "StateDedicatedServerInit"
 
 StateDedicatedServerInit.on_enter = function (self, params)
-	self._init_network(self)
+	self:_init_network()
 end
 
 StateDedicatedServerInit._init_network = function (self)
@@ -42,7 +42,7 @@ StateDedicatedServerInit._init_network = function (self)
 	self._game_server = GameServer:new(network_options, game_server_name)
 
 	Managers.party:set_leader(nil)
-	self._load_save_data(self)
+	self:_load_save_data()
 
 	self._state = "waiting_for_backend"
 	Managers.ban_list = Managers.ban_list or BanListManager:new()
@@ -68,7 +68,7 @@ end
 
 StateDedicatedServerInit.update = function (self, dt, t)
 	local game_server = self._game_server
-	local server_state = game_server.update(game_server, dt, t)
+	local server_state = game_server:update(dt, t)
 	local state = self._state
 
 	if state == "waiting_for_backend" then

@@ -37,8 +37,8 @@ end
 ProjectilePhysicsHuskLocomotionExtension.update = function (self, unit, input, dt, context, t)
 	if script_data.debug_projectiles then
 		local network_manager = Managers.state.network
-		local go_id = network_manager.unit_game_object_id(network_manager, unit)
-		local game = network_manager.game(network_manager)
+		local go_id = network_manager:unit_game_object_id(unit)
+		local game = network_manager:game()
 		local debug_pos = GameSession.game_object_field(game, go_id, "debug_pos")
 		local pos = Unit.local_position(unit, 0)
 

@@ -53,7 +53,7 @@ PerformanceManager.init = function (self, gui, is_server, level_key)
 	local event_manager = Managers.state.event
 
 	for event_name, cb_name in pairs(self._events) do
-		event_manager.register(event_manager, self, event_name, cb_name)
+		event_manager:register(self, event_name, cb_name)
 	end
 
 	local level_settings = LevelSettings[level_key]
@@ -158,7 +158,7 @@ PerformanceManager.destroy = function (self)
 	local event_manager = Managers.state.event
 
 	for event_name, cb_name in pairs(self._events) do
-		event_manager.unregister(event_manager, event_name, self)
+		event_manager:unregister(event_name, self)
 	end
 end
 

@@ -19,15 +19,15 @@ VoteTemplates = {
 		on_complete = function (vote_result, ingame_context)
 			local level_transition_handler = ingame_context.level_transition_handler
 
-			if level_transition_handler.transition_in_progress(level_transition_handler) then
+			if level_transition_handler:transition_in_progress() then
 				return
 			end
 
 			if vote_result == 1 then
-				level_transition_handler.reload_level(level_transition_handler)
+				level_transition_handler:reload_level()
 			else
-				level_transition_handler.set_next_level(level_transition_handler, "inn_level")
-				level_transition_handler.level_completed(level_transition_handler)
+				level_transition_handler:set_next_level("inn_level")
+				level_transition_handler:level_completed()
 			end
 		end,
 		pack_sync_data = function (data)
@@ -57,7 +57,7 @@ VoteTemplates = {
 		on_complete = function (vote_result, ingame_context)
 			local level_transition_handler = ingame_context.level_transition_handler
 
-			if level_transition_handler.transition_in_progress(level_transition_handler) then
+			if level_transition_handler:transition_in_progress() then
 				return
 			end
 
@@ -102,9 +102,9 @@ VoteTemplates = {
 			if vote_result == 1 then
 				local checkpoint_data = Managers.state.spawn:checkpoint_data()
 
-				level_transition_handler.reload_level(level_transition_handler, checkpoint_data)
+				level_transition_handler:reload_level(checkpoint_data)
 			elseif vote_result == 2 then
-				level_transition_handler.reload_level(level_transition_handler)
+				level_transition_handler:reload_level()
 			else
 				Managers.state.event:trigger("checkpoint_vote_cancelled")
 			end
@@ -149,7 +149,7 @@ VoteTemplates = {
 			if vote_result == 1 then
 				local network_server = ingame_context.network_server
 
-				network_server.kick_peer(network_server, data.kick_peer_id)
+				network_server:kick_peer(data.kick_peer_id)
 			end
 		end,
 		pack_sync_data = function (data)
@@ -172,7 +172,7 @@ VoteTemplates = {
 		end,
 		modify_title_text = function (text, data)
 			local player = Managers.player:player_from_peer_id(data.kick_peer_id)
-			local name = (player and player.name(player)) or "n/a"
+			local name = (player and player:name()) or "n/a"
 
 			return sprintf("%s\n%s", text, tostring(name))
 		end,
@@ -222,7 +222,7 @@ VoteTemplates = {
 			if vote_result == 1 then
 				local network_server = ingame_context.network_server
 
-				network_server.kick_peer(network_server, data.kick_peer_id)
+				network_server:kick_peer(data.kick_peer_id)
 			end
 		end,
 		pack_sync_data = function (data)
@@ -245,7 +245,7 @@ VoteTemplates = {
 		end,
 		modify_title_text = function (text, data)
 			local player = Managers.player:player_from_peer_id(data.kick_peer_id)
-			local name = player.name(player)
+			local name = player:name()
 
 			return sprintf("%s\n%s", text, tostring(name))
 		end

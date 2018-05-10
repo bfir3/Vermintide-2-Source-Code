@@ -7,8 +7,8 @@ XBOX_PRIVILEGE_LUT = XBOX_PRIVILEGE_LUT or {}
 PRIVILEGES_ERROR_CODES = PRIVILEGES_ERROR_CODES or {}
 
 XboxUserPrivileges.init = function (self)
-	self.reset(self)
-	self._setup_lookup_tables(self)
+	self:reset()
+	self:_setup_lookup_tables()
 end
 
 XboxUserPrivileges.reset = function (self)
@@ -19,7 +19,7 @@ XboxUserPrivileges.reset = function (self)
 end
 
 XboxUserPrivileges.add_user = function (self, user_id)
-	self.reset(self)
+	self:reset()
 
 	self._current_users[user_id] = {}
 

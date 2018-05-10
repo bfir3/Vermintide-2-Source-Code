@@ -6,7 +6,7 @@ AnimationCallbackTemplates = {
 AnimationCallbackTemplates.client.anim_cb_enable_second_hit_ragdoll = function (unit, param)
 	local death_ext = ScriptUnit.extension(unit, "death_system")
 
-	death_ext.enable_second_hit_ragdoll(death_ext)
+	death_ext:enable_second_hit_ragdoll()
 end
 
 AnimationCallbackTemplates.server = {
@@ -111,7 +111,7 @@ AnimationCallbackTemplates.server.anim_cb_damage = function (unit, param)
 		if blackboard.target_dodged_during_attack then
 			local locomotion = ScriptUnit.extension(unit, "locomotion_system")
 
-			locomotion.set_rotation_speed_modifier(locomotion, blackboard.breed.speed_modifier_on_target_dodge_damage_done or DEFAULT_SPEED_MODIFIER_ON_TARGET_DODGE_DAMAGE_DONE, blackboard.breed.speed_lerp_time_on_target_dodge_damage_done or DEFAULT_SPEED_LERP_TIME_ON_TARGET_DODGE_DAMAGE_DONE, blackboard.current_time_for_dodge + (blackboard.breed.rotation_stun_time_on_dodge_damage_done or DEFAULT_ROTATION_STUN_TIME_ON_DODGE_DAMAGE_DONE))
+			locomotion:set_rotation_speed_modifier(blackboard.breed.speed_modifier_on_target_dodge_damage_done or DEFAULT_SPEED_MODIFIER_ON_TARGET_DODGE_DAMAGE_DONE, blackboard.breed.speed_lerp_time_on_target_dodge_damage_done or DEFAULT_SPEED_LERP_TIME_ON_TARGET_DODGE_DAMAGE_DONE, blackboard.current_time_for_dodge + (blackboard.breed.rotation_stun_time_on_dodge_damage_done or DEFAULT_ROTATION_STUN_TIME_ON_DODGE_DAMAGE_DONE))
 		end
 
 		return
@@ -149,30 +149,30 @@ end
 
 AnimationCallbackTemplates.server.anim_cb_reset_attack_animation_locked = function (unit, param)
 	local ai_extension = ScriptUnit.extension(unit, "ai_system")
-	local blackboard = ai_extension.blackboard(ai_extension)
+	local blackboard = ai_extension:blackboard()
 	blackboard.reset_attack_animation_locked = true
 end
 
 AnimationCallbackTemplates.server.anim_cb_unlink_unit = function (unit, param)
 	local ai_extension = ScriptUnit.extension(unit, "ai_system")
-	local blackboard = ai_extension.blackboard(ai_extension)
+	local blackboard = ai_extension:blackboard()
 	blackboard.unlink_unit = true
 end
 
 AnimationCallbackTemplates.server.anim_cb_mounted_knocked_off = function (unit, param)
 	local ai_extension = ScriptUnit.extension(unit, "ai_system")
-	local blackboard = ai_extension.blackboard(ai_extension)
+	local blackboard = ai_extension:blackboard()
 	blackboard.knocked_off_mount = true
 	local locomotion_extension = blackboard.locomotion_extension
 
 	LocomotionUtils.set_animation_driven_movement(unit, false, false, true)
-	locomotion_extension.use_lerp_rotation(locomotion_extension, true)
-	locomotion_extension.set_movement_type(locomotion_extension, "snap_to_navmesh")
+	locomotion_extension:use_lerp_rotation(true)
+	locomotion_extension:set_movement_type("snap_to_navmesh")
 end
 
 AnimationCallbackTemplates.server.anim_cb_mounting_finished = function (unit, param)
 	local ai_extension = ScriptUnit.extension(unit, "ai_system")
-	local blackboard = ai_extension.blackboard(ai_extension)
+	local blackboard = ai_extension:blackboard()
 	blackboard.mounting_finished = true
 end
 
@@ -195,7 +195,7 @@ AnimationCallbackTemplates.server.anim_cb_frenzy_damage = function (unit, param)
 	local active_node = blackboard.active_node
 
 	if active_node and active_node.anim_cb_frenzy_damage then
-		active_node.anim_cb_frenzy_damage(active_node, unit, blackboard)
+		active_node:anim_cb_frenzy_damage(unit, blackboard)
 	end
 end
 
@@ -210,7 +210,7 @@ AnimationCallbackTemplates.server.anim_cb_attack_vce = function (unit, param)
 	local active_node = blackboard.active_node
 
 	if active_node and active_node.anim_cb_attack_vce then
-		active_node.anim_cb_attack_vce(active_node, unit, blackboard)
+		active_node:anim_cb_attack_vce(unit, blackboard)
 	end
 end
 
@@ -369,7 +369,7 @@ AnimationCallbackTemplates.server.anim_cb_attack_throw_score_finished = function
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.anim_cb_attack_throw_score_finished = true
 	end
 end
@@ -378,7 +378,7 @@ AnimationCallbackTemplates.server.anim_cb_attack_jump_start_finished = function 
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.anim_cb_attack_jump_start_finished = true
 	end
 end
@@ -387,7 +387,7 @@ AnimationCallbackTemplates.server.anim_cb_attack_shoot_start_finished = function
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.anim_cb_attack_shoot_start_finished = true
 	end
 end
@@ -396,7 +396,7 @@ AnimationCallbackTemplates.server.anim_cb_reload_start_finished = function (unit
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.anim_cb_reload_start_finished = true
 	end
 end
@@ -405,7 +405,7 @@ AnimationCallbackTemplates.server.anim_cb_attack_windup_start_finished = functio
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.anim_cb_attack_windup_start_finished = true
 	end
 end
@@ -414,7 +414,7 @@ AnimationCallbackTemplates.server.anim_cb_attack_shoot_random_shot = function (u
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.anim_cb_attack_shoot_random_shot = true
 	end
 end
@@ -423,7 +423,7 @@ AnimationCallbackTemplates.server.anim_cb_stormvermin_voice = function (unit, pa
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.anim_cb_stormvermin_voice = true
 	end
 end
@@ -432,7 +432,7 @@ AnimationCallbackTemplates.server.anim_cb_patrol_sound = function (unit, param)
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.anim_cb_patrol_sound = true
 	end
 end
@@ -441,7 +441,7 @@ AnimationCallbackTemplates.server.anim_cb_exit_shooting_hit_react = function (un
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.in_hit_reaction = nil
 	end
 end
@@ -450,7 +450,7 @@ AnimationCallbackTemplates.server.anim_cb_enter_shooting_hit_react = function (u
 	local ai_base_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_base_extension then
-		local blackboard = ai_base_extension.blackboard(ai_base_extension)
+		local blackboard = ai_base_extension:blackboard()
 		blackboard.in_hit_reaction = true
 	end
 end
@@ -551,7 +551,7 @@ AnimationCallbackTemplates.server.anim_cb_teleport_start_finished = function (un
 	local active_node = blackboard.active_node
 
 	if active_node and active_node.anim_cb_teleport_start_finished then
-		active_node.anim_cb_teleport_start_finished(active_node, unit, blackboard)
+		active_node:anim_cb_teleport_start_finished(unit, blackboard)
 	end
 end
 
@@ -560,7 +560,7 @@ AnimationCallbackTemplates.server.anim_cb_teleport_end_finished = function (unit
 	local active_node = blackboard.active_node
 
 	if active_node and active_node.anim_cb_teleport_end_finished then
-		active_node.anim_cb_teleport_end_finished(active_node, unit, blackboard)
+		active_node:anim_cb_teleport_end_finished(unit, blackboard)
 	end
 end
 
@@ -569,7 +569,7 @@ AnimationCallbackTemplates.server.anim_cb_move_jump_finished = function (unit, p
 	local active_node = blackboard.active_node
 
 	if active_node and active_node.anim_cb_move_jump_finished then
-		active_node.anim_cb_move_jump_finished(active_node, unit, blackboard)
+		active_node:anim_cb_move_jump_finished(unit, blackboard)
 	end
 end
 
@@ -600,19 +600,19 @@ AnimationCallbackTemplates.client.anim_cb_hide_unit = function (unit, param)
 	local inventory_extension = ScriptUnit.has_extension(unit, "inventory_system")
 
 	if inventory_extension then
-		inventory_extension.show_third_person_inventory(inventory_extension, false)
+		inventory_extension:show_third_person_inventory(false)
 	end
 
 	local attachment_extension = ScriptUnit.has_extension(unit, "attachment_system")
 
 	if attachment_extension then
-		attachment_extension.show_attachments(attachment_extension, false)
+		attachment_extension:show_attachments(false)
 	end
 end
 
 AnimationCallbackTemplates.client.anim_cb_hide_weapons = function (unit, param)
 	local player_manager = Managers.player
-	local player = player_manager.unit_owner(player_manager, unit)
+	local player = player_manager:unit_owner(unit)
 
 	if not player then
 		return
@@ -628,14 +628,14 @@ AnimationCallbackTemplates.client.anim_cb_hide_weapons = function (unit, param)
 
 	local inventory_extension = ScriptUnit.has_extension(unit, "inventory_system")
 
-	if allowed_to_set and inventory_extension and inventory_extension.is_showing_third_person_inventory(inventory_extension) then
-		inventory_extension.show_third_person_inventory(inventory_extension, false)
+	if allowed_to_set and inventory_extension and inventory_extension:is_showing_third_person_inventory() then
+		inventory_extension:show_third_person_inventory(false)
 	end
 end
 
 AnimationCallbackTemplates.client.anim_cb_unhide_weapons = function (unit, param)
 	local player_manager = Managers.player
-	local player = player_manager.unit_owner(player_manager, unit)
+	local player = player_manager:unit_owner(unit)
 
 	if not player then
 		return
@@ -651,8 +651,8 @@ AnimationCallbackTemplates.client.anim_cb_unhide_weapons = function (unit, param
 
 	local inventory_extension = ScriptUnit.has_extension(unit, "inventory_system")
 
-	if allowed_to_set and inventory_extension and not inventory_extension.is_showing_third_person_inventory(inventory_extension) then
-		inventory_extension.show_third_person_inventory(inventory_extension, true)
+	if allowed_to_set and inventory_extension and not inventory_extension:is_showing_third_person_inventory() then
+		inventory_extension:show_third_person_inventory(true)
 	end
 end
 
@@ -664,19 +664,19 @@ end
 AnimationCallbackTemplates.client.anim_cb_start_stormfiend_right_beam = function (unit, param)
 	local beam_effect_extension = ScriptUnit.extension(unit, "ai_beam_effect_system")
 
-	beam_effect_extension.anim_cb_start_stormfiend_beam(beam_effect_extension, "right")
+	beam_effect_extension:anim_cb_start_stormfiend_beam("right")
 end
 
 AnimationCallbackTemplates.client.anim_cb_start_stormfiend_left_beam = function (unit, param)
 	local beam_effect_extension = ScriptUnit.extension(unit, "ai_beam_effect_system")
 
-	beam_effect_extension.anim_cb_start_stormfiend_beam(beam_effect_extension, "left")
+	beam_effect_extension:anim_cb_start_stormfiend_beam("left")
 end
 
 AnimationCallbackTemplates.client.anim_cb_stop_stormfiend_beam = function (unit, param)
 	local beam_effect_extension = ScriptUnit.extension(unit, "ai_beam_effect_system")
 
-	beam_effect_extension.anim_cb_stop_stormfiend_beam(beam_effect_extension)
+	beam_effect_extension:anim_cb_stop_stormfiend_beam()
 end
 
 AnimationCallbackTemplates.server.anim_cb_chew_attack = function (unit, param)

@@ -10,7 +10,7 @@ FriendsUIComponent.init = function (self, ingame_ui_context)
 	self._network_lobby = ingame_ui_context.network_lobby
 	self._invite_cooldown = {}
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 end
 
 FriendsUIComponent._create_ui_elements = function (self)
@@ -43,7 +43,7 @@ FriendsUIComponent.activate_friends_ui = function (self)
 
 	self._active = true
 
-	self._refresh_friends_list(self)
+	self:_refresh_friends_list()
 
 	self._widgets_by_name.hotspot_area.content.disregard_exit = nil
 end
@@ -56,8 +56,8 @@ FriendsUIComponent._refresh_friends_list = function (self)
 	local empty_list = {}
 	local widgets_by_name = self._widgets_by_name
 
-	self._populate_tab(self, widgets_by_name.online_tab, empty_list)
-	self._populate_tab(self, widgets_by_name.offline_tab, empty_list)
+	self:_populate_tab(widgets_by_name.online_tab, empty_list)
+	self:_populate_tab(widgets_by_name.offline_tab, empty_list)
 
 	local friend_list_limit = definitions.scenegraph_info.friend_list_limit
 
@@ -106,8 +106,8 @@ FriendsUIComponent.cb_refresh_friends_done = function (self, friend_list)
 
 	local widgets_by_name = self._widgets_by_name
 
-	self._populate_tab(self, widgets_by_name.online_tab, playing_friends, true)
-	self._populate_tab(self, widgets_by_name.offline_tab, offline_friends, false)
+	self:_populate_tab(widgets_by_name.online_tab, playing_friends, true)
+	self:_populate_tab(widgets_by_name.offline_tab, offline_friends, false)
 end
 
 FriendsUIComponent._button_pressed = function (self, hotspot_content)
@@ -124,14 +124,14 @@ FriendsUIComponent.update = function (self, dt, input_service)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 	end
 
-	self._update_invite_cooldown(self, dt)
-	self._update_animations(self, dt)
-	self._handle_input(self, input_service, dt)
-	self._update_active_tab(self, input_service, dt)
-	self._draw(self, input_service, dt)
+	self:_update_invite_cooldown(dt)
+	self:_update_animations(dt)
+	self:_handle_input(input_service, dt)
+	self:_update_active_tab(input_service, dt)
+	self:_draw(input_service, dt)
 end
 
 FriendsUIComponent._update_invite_cooldown = function (self, dt)
@@ -149,7 +149,7 @@ FriendsUIComponent._update_invite_cooldown = function (self, dt)
 end
 
 FriendsUIComponent._update_animations = function (self, dt)
-	self._update_refresh_animations(self, dt)
+	self:_update_refresh_animations(dt)
 end
 
 FriendsUIComponent._update_refresh_animations = function (self, dt)
@@ -179,44 +179,44 @@ FriendsUIComponent._handle_input = function (self, input_service, dt)
 	local widgets_by_name = self._widgets_by_name
 	local active = self._active
 
-	if self._button_pressed(self, self._friends_button_widget.content.button_hotspot) then
+	if self:_button_pressed(self._friends_button_widget.content.button_hotspot) then
 		if active then
-			self.deactivate_friends_ui(self)
+			self:deactivate_friends_ui()
 		else
-			self.activate_friends_ui(self)
+			self:activate_friends_ui()
 		end
 	end
 
 	if active then
 		local hotspot_area_content = widgets_by_name.hotspot_area.content
 
-		if input_service.get(input_service, "left_press") and (hotspot_area_content.is_hover or self._friends_button_widget.content.button_hotspot.is_hover) then
+		if input_service:get("left_press") and (hotspot_area_content.is_hover or self._friends_button_widget.content.button_hotspot.is_hover) then
 			hotspot_area_content.disregard_exit = true
 		end
 
-		if input_service.get(input_service, "left_release") then
+		if input_service:get("left_release") then
 			if hotspot_area_content.disregard_exit or hotspot_area_content.is_hover or self._friends_button_widget.content.button_hotspot.is_hover then
 				hotspot_area_content.disregard_exit = nil
 			else
-				self.deactivate_friends_ui(self)
+				self:deactivate_friends_ui()
 			end
 		end
 
-		if self._button_pressed(self, widgets_by_name.exit_button.content) then
-			self.deactivate_friends_ui(self)
+		if self:_button_pressed(widgets_by_name.exit_button.content) then
+			self:deactivate_friends_ui()
 		end
 
-		if self._button_pressed(self, widgets_by_name.refresh_button.content) then
-			self._animate_refresh_button(self, widgets_by_name.refresh_button)
-			self._refresh_friends_list(self)
+		if self:_button_pressed(widgets_by_name.refresh_button.content) then
+			self:_animate_refresh_button(widgets_by_name.refresh_button)
+			self:_refresh_friends_list()
 		end
 
-		if self._button_pressed(self, widgets_by_name.online_tab.content.button_hotspot) then
-			self._tab_pressed(self, widgets_by_name.online_tab)
+		if self:_button_pressed(widgets_by_name.online_tab.content.button_hotspot) then
+			self:_tab_pressed(widgets_by_name.online_tab)
 		end
 
-		if self._button_pressed(self, widgets_by_name.offline_tab.content.button_hotspot) then
-			self._tab_pressed(self, widgets_by_name.offline_tab)
+		if self:_button_pressed(widgets_by_name.offline_tab.content.button_hotspot) then
+			self:_tab_pressed(widgets_by_name.offline_tab)
 		end
 	end
 end
@@ -238,8 +238,8 @@ FriendsUIComponent._update_active_tab = function (self, input_service, dt)
 	local value = 1 - active_tab.content.scrollbar.scroll_value
 	scenegraph_pos[2] = -tabs_size[2] + size_y * value
 
-	self._update_list(self, active_tab)
-	self._handle_list_input(self, active_tab)
+	self:_update_list(active_tab)
+	self:_handle_list_input(active_tab)
 end
 
 FriendsUIComponent._animate_refresh_button = function (self, widget)
@@ -253,7 +253,7 @@ local _update_list_temp_pos_table = {
 
 FriendsUIComponent._update_list = function (self, active_tab)
 	local list_style = active_tab.style.list_style
-	local mask_pos, mask_size = self._get_mask_position_and_size(self, active_tab)
+	local mask_pos, mask_size = self:_get_mask_position_and_size(active_tab)
 	local list_pos = UISceneGraph.get_world_position(self._ui_scenegraph, list_style.scenegraph_id)
 	local list_size = UISceneGraph.get_size(self._ui_scenegraph, list_style.scenegraph_id)
 	local item_contents = active_tab.content.list_content
@@ -288,16 +288,16 @@ FriendsUIComponent._handle_list_input = function (self, active_tab)
 	for i = 1, num_draws, 1 do
 		local content = item_contents[i]
 
-		if self._button_pressed(self, content.invite_button) then
-			self._send_invite(self, content)
+		if self:_button_pressed(content.invite_button) then
+			self:_send_invite(content)
 		end
 
-		if self._button_pressed(self, content.profile_button) then
-			self._open_player_profile(self, content)
+		if self:_button_pressed(content.profile_button) then
+			self:_open_player_profile(content)
 		end
 
-		if self._button_pressed(self, content.join_button) then
-			self._join_player(self, content)
+		if self:_button_pressed(content.join_button) then
+			self:_join_player(content)
 		end
 	end
 end
@@ -322,13 +322,13 @@ end
 
 FriendsUIComponent._tab_pressed = function (self, widget)
 	if self._active_tab == widget then
-		self._deactivate_active_tab(self)
+		self:_deactivate_active_tab()
 	else
 		if self._active_tab then
-			self._deactivate_active_tab(self)
+			self:_deactivate_active_tab()
 		end
 
-		self._activate_tab(self, widget)
+		self:_activate_tab(widget)
 	end
 end
 
@@ -416,7 +416,7 @@ FriendsUIComponent._populate_tab = function (self, widget, list, allow_invite)
 	content.real_text = string.format("%s (%s)", content.text, tostring(num_friends))
 	style.num_draws = num_friends
 
-	self._setup_tab_scrollbar(self, widget)
+	self:_setup_tab_scrollbar(widget)
 end
 
 FriendsUIComponent._setup_tab_scrollbar = function (self, widget)

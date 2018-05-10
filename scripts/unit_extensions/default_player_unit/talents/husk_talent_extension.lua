@@ -23,7 +23,7 @@ HuskTalentExtension.extensions_ready = function (self, world, unit)
 	local current_hero_index = self._profile_index
 	local current_hero = SPProfiles[current_hero_index]
 	local hero_name = current_hero.display_name
-	local career_name = career_extension.career_name(career_extension)
+	local career_name = career_extension:career_name()
 	self._hero_name = hero_name
 	self._career_name = career_name
 end
@@ -40,7 +40,7 @@ HuskTalentExtension.apply_buffs_from_talents = function (self)
 	local buff_extension = self.buff_extension
 	local player = self.player
 
-	self._clear_buffs_from_talents(self)
+	self:_clear_buffs_from_talents()
 
 	local talent_buff_ids = self._talent_buff_ids
 
@@ -58,7 +58,7 @@ HuskTalentExtension.apply_buffs_from_talents = function (self)
 				if 0 < num_buffs then
 					for j = 1, num_buffs, 1 do
 						local buff_template = buffs[j]
-						local id = buff_extension.add_buff(buff_extension, buff_template)
+						local id = buff_extension:add_buff(buff_template)
 						talent_buff_ids[#talent_buff_ids + 1] = id
 					end
 				end
@@ -75,7 +75,7 @@ HuskTalentExtension._clear_buffs_from_talents = function (self)
 	for i = 1, num_talent_buff_ids, 1 do
 		local id = talent_buff_ids[i]
 
-		buff_extension.remove_buff(buff_extension, id)
+		buff_extension:remove_buff(id)
 	end
 
 	table.clear(self._talent_buff_ids)

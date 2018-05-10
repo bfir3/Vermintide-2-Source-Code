@@ -33,7 +33,7 @@ CareerAbilityESKnight.destroy = function (self)
 end
 
 CareerAbilityESKnight.update = function (self, unit, input, dt, context, t)
-	if not self._ability_available(self) then
+	if not self:_ability_available() then
 		return
 	end
 
@@ -44,20 +44,20 @@ CareerAbilityESKnight.update = function (self, unit, input, dt, context, t)
 	end
 
 	if not self._is_priming then
-		if input_extension.get(input_extension, "action_career") then
-			self._start_priming(self)
+		if input_extension:get("action_career") then
+			self:_start_priming()
 		end
 	elseif self._is_priming then
-		self._update_priming(self, dt)
+		self:_update_priming(dt)
 
-		if input_extension.get(input_extension, "action_two") then
-			self._stop_priming(self)
+		if input_extension:get("action_two") then
+			self:_stop_priming()
 
 			return
 		end
 
-		if input_extension.get(input_extension, "action_career_release") then
-			self._run_ability(self)
+		if input_extension:get("action_career_release") then
+			self:_run_ability()
 		end
 	end
 end
@@ -66,14 +66,14 @@ CareerAbilityESKnight._ability_available = function (self)
 	local career_extension = self._career_extension
 	local status_extension = self._status_extension
 
-	return career_extension.can_use_activated_ability(career_extension) and not status_extension.is_disabled(status_extension)
+	return career_extension:can_use_activated_ability() and not status_extension:is_disabled()
 end
 
 CareerAbilityESKnight._start_priming = function (self)
 	if self._local_player then
 		local decal_unit_name = self._decal_unit_name
 		local unit_spawner = Managers.state.unit_spawner
-		self._decal_unit = unit_spawner.spawn_local_unit(unit_spawner, decal_unit_name)
+		self._decal_unit = unit_spawner:spawn_local_unit(decal_unit_name)
 		local flow_event = "lua_es_knight_activated_start_priming"
 
 		Unit.flow_event(self._owner_unit, flow_event)
@@ -85,7 +85,7 @@ CareerAbilityESKnight._start_priming = function (self)
 	local buff_params = {
 		external_optional_multiplier = 0.3
 	}
-	self._buff_id = buff_extension.add_buff(buff_extension, buff_template_name, buff_params)
+	self._buff_id = buff_extension:add_buff(buff_template_name, buff_params)
 	self._is_priming = true
 end
 
@@ -93,7 +93,7 @@ CareerAbilityESKnight._update_priming = function (self, dt)
 	if self._decal_unit then
 		local first_person_extension = self._first_person_extension
 		local player_position = Unit.local_position(self._owner_unit, 0)
-		local player_rotation = first_person_extension.current_rotation(first_person_extension)
+		local player_rotation = first_person_extension:current_rotation()
 		local player_direction_flat = Vector3.flat(Vector3.normalize(Quaternion.forward(player_rotation)))
 		local player_rotation_flat = Quaternion.look(player_direction_flat, Vector3.up())
 
@@ -115,13 +115,13 @@ CareerAbilityESKnight._stop_priming = function (self)
 	if self._decal_unit then
 		local unit_spawner = Managers.state.unit_spawner
 
-		unit_spawner.mark_for_deletion(unit_spawner, self._decal_unit)
+		unit_spawner:mark_for_deletion(self._decal_unit)
 	end
 
 	if self._buff_id then
 		local buff_extension = self._buff_extension
 
-		buff_extension.remove_buff(buff_extension, self._buff_id)
+		buff_extension:remove_buff(self._buff_id)
 
 		self._buff_id = nil
 	end
@@ -141,7 +141,7 @@ CareerAbilityESKnight._stop_priming = function (self)
 end
 
 CareerAbilityESKnight._run_ability = function (self)
-	self._stop_priming(self)
+	self:_stop_priming()
 
 	local owner_unit = self._owner_unit
 	local local_player = self._local_player
@@ -151,18 +151,18 @@ CareerAbilityESKnight._run_ability = function (self)
 	local talent_extension = ScriptUnit.extension(owner_unit, "talent_system")
 	local buff_name = "markus_knight_activated_ability"
 
-	buff_extension.add_buff(buff_extension, buff_name, {
+	buff_extension:add_buff(buff_name, {
 		attacker_unit = owner_unit
 	})
 
-	if talent_extension.has_talent(talent_extension, "markus_knight_activated_ability_damage_buff", "empire_soldier", true) then
-		buff_extension.add_buff(buff_extension, "markus_knight_activated_ability_damage_buff", {
+	if talent_extension:has_talent("markus_knight_activated_ability_damage_buff", "empire_soldier", true) then
+		buff_extension:add_buff("markus_knight_activated_ability_damage_buff", {
 			attacker_unit = owner_unit
 		})
 	end
 
-	if talent_extension.has_talent(talent_extension, "markus_knight_activated_ability_infinite_block", "empire_soldier", true) then
-		buff_extension.add_buff(buff_extension, "markus_knight_activated_ability_infinite_block", {
+	if talent_extension:has_talent("markus_knight_activated_ability_infinite_block", "empire_soldier", true) then
+		buff_extension:add_buff("markus_knight_activated_ability_infinite_block", {
 			attacker_unit = owner_unit
 		})
 	end
@@ -172,8 +172,8 @@ CareerAbilityESKnight._run_ability = function (self)
 	if local_player then
 		local first_person_extension = self._first_person_extension
 
-		first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_kruber_charge_enter")
-		first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_kruber_charge_forward")
+		first_person_extension:play_hud_sound_event("Play_career_ability_kruber_charge_enter")
+		first_person_extension:play_hud_sound_event("Play_career_ability_kruber_charge_forward")
 
 		flow_events = {
 			impact = "lua_es_knight_activated_impact",
@@ -182,7 +182,7 @@ CareerAbilityESKnight._run_ability = function (self)
 		}
 	end
 
-	status_extension.set_noclip(status_extension, true)
+	status_extension:set_noclip(true)
 
 	local hold_duration = 0.03
 	local windup_duration = 0.15
@@ -285,8 +285,8 @@ CareerAbilityESKnight._run_ability = function (self)
 		}
 	}
 
-	career_extension.start_activated_ability_cooldown(career_extension)
-	self._play_vo(self)
+	career_extension:start_activated_ability_cooldown()
+	self:_play_vo()
 end
 
 CareerAbilityESKnight._play_vo = function (self)
@@ -294,7 +294,7 @@ CareerAbilityESKnight._play_vo = function (self)
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
+	dialogue_input:trigger_networked_dialogue_event("activate_ability", event_data)
 end
 
 return

@@ -88,7 +88,7 @@ PeerStateMachine.update = function (self, dt)
 	local new_state = self.current_state.update(state_data, dt)
 
 	if new_state then
-		state_data.change_state(state_data, new_state)
+		state_data:change_state(new_state)
 	end
 end
 

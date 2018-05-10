@@ -15,7 +15,7 @@ GameModeInn.evaluate_end_conditions = function (self, round_started)
 		return true, "won"
 	end
 
-	if self._is_time_up(self) then
+	if self:_is_time_up() then
 		return true, "reload"
 	end
 

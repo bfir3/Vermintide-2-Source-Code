@@ -13,7 +13,7 @@ NavClass.NavClass = function (class, super)
 				setmetatable(object, class)
 
 				if object.init then
-					object.init(object, ...)
+					object:init(...)
 				end
 
 				return object

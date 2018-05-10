@@ -39,7 +39,7 @@ DamageBlobTemplates = {
 		if Unit.alive(warpfire_thrower_unit) then
 			local inventory_extension = ScriptUnit.extension(warpfire_thrower_unit, "ai_inventory_system")
 			local inventory_template = Breeds.skaven_warpfire_thrower.default_inventory_template
-			local warpfire_gun_unit = inventory_extension.get_unit(inventory_extension, inventory_template)
+			local warpfire_gun_unit = inventory_extension:get_unit(inventory_template)
 			self._warpfire_gun_unit = warpfire_gun_unit
 			local action = BreedActions.skaven_warpfire_thrower.shoot_warpfire_thrower
 			local node_name = action.muzzle_node

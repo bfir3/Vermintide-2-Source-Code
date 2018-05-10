@@ -18,11 +18,11 @@ MatchmakingStateHostGame.on_enter = function (self, state_context)
 	self.state_context = state_context
 	self.search_config = state_context.search_config
 
-	self._start_hosting_game(self)
+	self:_start_hosting_game()
 	self._matchmaking_manager:send_system_chat_message("matchmaking_status_start_hosting_game")
 
 	if not DEDICATED_SERVER then
-		self.set_debug_info(self)
+		self:set_debug_info()
 
 		local player = Managers.player:local_player()
 		local connection_state = "started_hosting"
@@ -41,7 +41,7 @@ MatchmakingStateHostGame.set_debug_info = function (self)
 	local difficulty = search_config.difficulty
 	local peer_id = Network.peer_id()
 	local player = Managers.player:player_from_peer_id(peer_id)
-	local profile_index = player.profile_index(player)
+	local profile_index = player:profile_index()
 	local profile = SPProfiles[profile_index]
 	local profile_name = profile.display_name
 	Managers.matchmaking.debug.state = "hosting game"

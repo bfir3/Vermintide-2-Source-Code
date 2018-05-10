@@ -13,7 +13,7 @@ PlayFabMirrorDedicated.update_items = function (self, leader_peer_id)
 	self._leader_id = leader_peer_id
 	self._data_is_ready = false
 
-	self._request_user_inventory(self)
+	self:_request_user_inventory()
 end
 
 PlayFabMirrorDedicated.is_update_items_done = function (self)

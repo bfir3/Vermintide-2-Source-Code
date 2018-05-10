@@ -32,7 +32,7 @@ AnimationSystem.init = function (self, entity_system_creation_context, system_na
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.anim_variable_update_list = {}
 end
@@ -60,7 +60,7 @@ AnimationSystem.animation_callback = function (self, unit, callback, param)
 end
 
 AnimationSystem.update = function (self, context, t)
-	self.update_anim_variables(self, t)
+	self:update_anim_variables(t)
 end
 
 AnimationSystem.update_anim_variables = function (self, t)
@@ -195,7 +195,7 @@ end
 AnimationSystem.rpc_anim_set_variable_by_distance = function (self, sender, unit_id, anim_variable_index, goal_pos, scale, flat_distance)
 	local unit = self.unit_storage:unit(unit_id)
 
-	self._set_variable_by_distance(self, unit, anim_variable_index, goal_pos, scale, flat_distance)
+	self:_set_variable_by_distance(unit, anim_variable_index, goal_pos, scale, flat_distance)
 end
 
 AnimationSystem._set_variable_by_distance = function (self, unit, anim_variable_index, goal_pos, scale, flat_distance)
@@ -235,7 +235,7 @@ AnimationSystem.rpc_anim_set_variable_by_time = function (self, sender, unit_id,
 	local unit = self.unit_storage:unit(unit_id)
 	local duration = int_16bit_duration * 0.00390625
 
-	self._set_variable_by_time(self, unit, anim_variable_index, duration, scale)
+	self:_set_variable_by_time(unit, anim_variable_index, duration, scale)
 end
 
 AnimationSystem._set_variable_by_time = function (self, unit, anim_variable_index, duration, scale)
@@ -268,7 +268,7 @@ end
 
 AnimationSystem.set_update_anim_variable_done = function (self, unit)
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 
 	self.network_transmit:send_rpc_clients("rpc_update_anim_variable_done", unit_id)
 
@@ -277,19 +277,19 @@ end
 
 AnimationSystem.start_anim_variable_update_by_distance = function (self, unit, anim_variable_index, goal_pos, scale, flat_distance)
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 
 	self.network_transmit:send_rpc_clients("rpc_anim_set_variable_by_distance", unit_id, anim_variable_index, goal_pos, scale, flat_distance)
-	self._set_variable_by_distance(self, unit, anim_variable_index, goal_pos, scale, flat_distance)
+	self:_set_variable_by_distance(unit, anim_variable_index, goal_pos, scale, flat_distance)
 end
 
 AnimationSystem.start_anim_variable_update_by_time = function (self, unit, anim_variable_index, duration, scale)
 	local int_16bit_duration = math.clamp(duration * 256, 0, 65535)
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 
 	self.network_transmit:send_rpc_clients("rpc_anim_set_variable_by_time", unit_id, anim_variable_index, int_16bit_duration, scale)
-	self._set_variable_by_time(self, unit, anim_variable_index, duration, scale)
+	self:_set_variable_by_time(unit, anim_variable_index, duration, scale)
 end
 
 return

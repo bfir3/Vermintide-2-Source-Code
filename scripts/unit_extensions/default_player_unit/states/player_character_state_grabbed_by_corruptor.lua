@@ -11,16 +11,16 @@ PlayerCharacterStateGrabbedByCorruptor.on_enter = function (self, unit, input, d
 	local inventory_extension = self.inventory_extension
 
 	CharacterStateHelper.stop_weapon_actions(inventory_extension, "grabbed")
-	inventory_extension.check_and_drop_pickups(inventory_extension, "grabbed_by_pack_master")
+	inventory_extension:check_and_drop_pickups("grabbed_by_pack_master")
 	CharacterStateHelper.change_camera_state(self.player, "follow_third_person")
 
 	local first_person_extension = self.first_person_extension
 
-	first_person_extension.set_first_person_mode(first_person_extension, false)
+	first_person_extension:set_first_person_mode(false)
 
 	if self.ai_extension == nil then
 		local wwise_world = Managers.world:wwise_world(self.world)
-		local wwise_playing_id, wwise_source_id = WwiseWorld.trigger_event(wwise_world, "start_strangled_state", first_person_extension.get_first_person_unit(first_person_extension))
+		local wwise_playing_id, wwise_source_id = WwiseWorld.trigger_event(wwise_world, "start_strangled_state", first_person_extension:get_first_person_unit())
 		self.grabbed_by_corruptor_start_sound_event = "chaos_corruptor_corrupting"
 		self.grabbed_by_corruptor_stop_sound_event = "chaos_corruptor_corrupting_stop"
 
@@ -37,7 +37,7 @@ PlayerCharacterStateGrabbedByCorruptor.on_enter = function (self, unit, input, d
 
 	local locomotion = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion.enable_rotation_towards_velocity(locomotion, false)
+	locomotion:enable_rotation_towards_velocity(false)
 	CharacterStateHelper.show_inventory_3p(unit, false, true, Managers.player.is_server, self.inventory_extension)
 end
 
@@ -46,17 +46,17 @@ PlayerCharacterStateGrabbedByCorruptor.on_exit = function (self, unit, input, dt
 	local status_extension = self.status_extension
 	local locomotion_extension = self.locomotion_extension
 
-	if not status_extension.is_knocked_down(status_extension) and not status_extension.is_dead(status_extension) then
+	if not status_extension:is_knocked_down() and not status_extension:is_dead() then
 		CharacterStateHelper.change_camera_state(self.player, "follow")
-		first_person_extension.toggle_visibility(first_person_extension, CameraTransitionSettings.perspective_transition_time)
-		locomotion_extension.enable_script_driven_movement(locomotion_extension)
+		first_person_extension:toggle_visibility(CameraTransitionSettings.perspective_transition_time)
+		locomotion_extension:enable_script_driven_movement()
 	end
 
-	locomotion_extension.enable_rotation_towards_velocity(locomotion_extension, true)
+	locomotion_extension:enable_rotation_towards_velocity(true)
 
 	if self.ai_extension == nil then
 		local wwise_world = Managers.world:wwise_world(self.world)
-		local wwise_playing_id, wwise_source_id = WwiseWorld.trigger_event(wwise_world, "stop_strangled_state", first_person_extension.get_first_person_unit(first_person_extension))
+		local wwise_playing_id, wwise_source_id = WwiseWorld.trigger_event(wwise_world, "stop_strangled_state", first_person_extension:get_first_person_unit())
 
 		WwiseUtils.trigger_unit_event(self.world, self.grabbed_by_corruptor_stop_sound_event, unit, 0)
 	end
@@ -64,10 +64,10 @@ PlayerCharacterStateGrabbedByCorruptor.on_exit = function (self, unit, input, dt
 	local inventory_extension = self.inventory_extension
 
 	if inventory_extension then
-		if inventory_extension.get_wielded_slot_name(inventory_extension) == "slot_career_skill_weapon" then
-			inventory_extension.wield_previous_weapon(inventory_extension)
+		if inventory_extension:get_wielded_slot_name() == "slot_career_skill_weapon" then
+			inventory_extension:wield_previous_weapon()
 		else
-			inventory_extension.rewield_wielded_slot(inventory_extension)
+			inventory_extension:rewield_wielded_slot()
 		end
 	end
 end
@@ -83,9 +83,9 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 				local current_pos = position_lookup[unit]
 				local to_corruptor = Vector3.normalize(wanted_pos - current_pos)
 
-				locomotion.set_wanted_velocity(locomotion, Vector3.zero())
+				locomotion:set_wanted_velocity(Vector3.zero())
 				Unit.set_local_rotation(unit, 0, Quaternion.look(to_corruptor))
-				locomotion.enable_rotation_towards_velocity(locomotion, true, Quaternion.look(to_corruptor), 1)
+				locomotion:enable_rotation_towards_velocity(true, Quaternion.look(to_corruptor), 1)
 			end
 		end,
 		run = function (parent, unit)
@@ -99,8 +99,8 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 				local to_corruptor = wanted_pos - current_pos
 				local velocity = Vector3.normalize(to_corruptor) * 2
 
-				locomotion.set_maximum_upwards_velocity(locomotion, velocity.z)
-				locomotion.set_forced_velocity(locomotion, velocity)
+				locomotion:set_maximum_upwards_velocity(velocity.z)
+				locomotion:set_forced_velocity(velocity)
 			end
 		end
 	},
@@ -114,7 +114,7 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 			if Unit.alive(corruptor_unit) then
 				local locomotion = ScriptUnit.extension(unit, "locomotion_system")
 
-				locomotion.set_disable_rotation_update(locomotion)
+				locomotion:set_disable_rotation_update()
 
 				local wanted_pos = position_lookup[corruptor_unit]
 				local current_pos = position_lookup[unit]
@@ -122,9 +122,9 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 				local velocity = Vector3.normalize(wanted_pos - current_pos) * 4
 
 				if 1.5 < distance then
-					locomotion.set_forced_velocity(locomotion, velocity)
+					locomotion:set_forced_velocity(velocity)
 				else
-					locomotion.set_wanted_velocity(locomotion, Vector3.zero())
+					locomotion:set_wanted_velocity(Vector3.zero())
 				end
 			end
 
@@ -143,27 +143,27 @@ PlayerCharacterStateGrabbedByCorruptor.states = {
 			local status_extension = parent.status_extension
 
 			if CharacterStateHelper.is_dead(status_extension) then
-				csm.change_state(csm, "dead")
+				csm:change_state("dead")
 			elseif CharacterStateHelper.is_knocked_down(status_extension) then
 				local inventory_extension = parent.inventory_extension
 
-				if inventory_extension and inventory_extension.get_wielded_slot_name(inventory_extension) == "slot_career_skill_weapon" then
-					inventory_extension.wield_previous_weapon(inventory_extension)
+				if inventory_extension and inventory_extension:get_wielded_slot_name() == "slot_career_skill_weapon" then
+					inventory_extension:wield_previous_weapon()
 				else
-					inventory_extension.rewield_wielded_slot(inventory_extension)
+					inventory_extension:rewield_wielded_slot()
 				end
 
-				csm.change_state(csm, "knocked_down", parent.temp_params)
+				csm:change_state("knocked_down", parent.temp_params)
 			else
 				local inventory_extension = parent.inventory_extension
 
-				if inventory_extension and inventory_extension.get_wielded_slot_name(inventory_extension) == "slot_career_skill_weapon" then
-					inventory_extension.wield_previous_weapon(inventory_extension)
+				if inventory_extension and inventory_extension:get_wielded_slot_name() == "slot_career_skill_weapon" then
+					inventory_extension:wield_previous_weapon()
 				else
-					inventory_extension.rewield_wielded_slot(inventory_extension)
+					inventory_extension:rewield_wielded_slot()
 				end
 
-				csm.change_state(csm, "standing")
+				csm:change_state("standing")
 			end
 
 			CharacterStateHelper.show_inventory_3p(unit, true, true, Managers.player.is_server, parent.inventory_extension)

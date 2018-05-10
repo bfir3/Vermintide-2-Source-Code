@@ -1156,7 +1156,7 @@ local action_data = {
 						if QuestSettings.exalted_champion_charge_chaos_warrior <= blackboard.num_times_hit_chaos_warrior then
 							local statistics_db = Managers.player:statistics_db()
 
-							statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+							statistics_db:increment_stat_and_sync_to_clients(stat_name)
 
 							blackboard.hit_warrior_challenge_completed = true
 						end

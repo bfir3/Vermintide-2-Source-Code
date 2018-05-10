@@ -10,7 +10,7 @@ PlayerWhereaboutsExtension.init = function (self, extension_init_context, unit, 
 	self.closest_positions = {}
 	self._input = {}
 
-	self._setup(self, self.nav_world, unit)
+	self:_setup(self.nav_world, unit)
 
 	self._last_onground_pos_on_nav_mesh = Vector3Box(Vector3.invalid_vector())
 	self._jumping = false
@@ -63,11 +63,11 @@ PlayerWhereaboutsExtension.update = function (self, unit, input, dt, context, t)
 	local pos = position_lookup[unit]
 	local input = self._input
 
-	self._get_closest_positions(self, pos, input.is_onground, self.closest_positions, self.closest_distances)
-	self._check_bot_nav_transition(self, self.nav_world, input, pos)
+	self:_get_closest_positions(pos, input.is_onground, self.closest_positions, self.closest_distances)
+	self:_check_bot_nav_transition(self.nav_world, input, pos)
 
 	if self.hang_ledge_position then
-		self._calculate_hang_ledge_spawn_position(self, self.hang_ledge_position:unbox())
+		self:_calculate_hang_ledge_spawn_position(self.hang_ledge_position:unbox())
 
 		self.hang_ledge_position = nil
 	end
@@ -107,7 +107,7 @@ PlayerWhereaboutsExtension._check_bot_nav_transition = function (self, nav_world
 
 		self._jumping = true
 		local perform_distance_check = input.player_state == nil or (input.player_state ~= "lunging" and input.player_state ~= "leaping")
-		local pos = self._find_start_position(self, current_position, perform_distance_check)
+		local pos = self:_find_start_position(current_position, perform_distance_check)
 
 		if pos then
 			self._jump_position:store(pos)
@@ -118,7 +118,7 @@ PlayerWhereaboutsExtension._check_bot_nav_transition = function (self, nav_world
 
 		self._falling = true
 		local perform_distance_check = input.player_state == nil or (input.player_state ~= "lunging" and input.player_state ~= "leaping")
-		local pos = self._find_start_position(self, current_position, perform_distance_check)
+		local pos = self:_find_start_position(current_position, perform_distance_check)
 
 		if pos then
 			self._fall_position:store(pos)

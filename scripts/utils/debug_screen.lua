@@ -265,22 +265,22 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 	local DebugScreen = DebugScreen
 	local script_data = script_data
 	local opened_this_frame = false
-	local mod_key_down = input_service.get(input_service, "console_mod_key")
+	local mod_key_down = input_service:get("console_mod_key")
 
-	if input_service.get(input_service, "console_open_key") then
+	if input_service:get("console_open_key") then
 		DebugScreen.active = not DebugScreen.active
 
 		if DebugScreen.active then
-			input_manager.device_block_service(input_manager, "keyboard", 1, "Debug")
+			input_manager:device_block_service("keyboard", 1, "Debug")
 		else
-			input_manager.device_unblock_service(input_manager, "keyboard", 1, "Debug")
+			input_manager:device_unblock_service("keyboard", 1, "Debug")
 		end
 	end
 
-	if input_service.get(input_service, "right_key") and not DebugScreen.active then
+	if input_service:get("right_key") and not DebugScreen.active then
 		DebugScreen.active = not DebugScreen.active
 
-		input_manager.device_block_service(input_manager, "keyboard", 1, "Debug", "debug_screen")
+		input_manager:device_block_service("keyboard", 1, "Debug", "debug_screen")
 
 		opened_this_frame = true
 	end
@@ -295,7 +295,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 				end
 
 				if cs.func then
-					cs.func(cs, cs.hot_id)
+					cs:func(cs.hot_id)
 				else
 					update_option(cs, cs.hot_id)
 				end
@@ -338,7 +338,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 			local current_item = cs.title:lower()
 			current_item = string.gsub(current_item, "[_ ]", "")
 
-			if current_item.find(current_item, search_string, 1, true) ~= nil then
+			if current_item:find(search_string, 1, true) ~= nil then
 				filtered_console_settings[#filtered_console_settings + 1] = cs
 			end
 		end
@@ -356,7 +356,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 
 	DebugScreen.filtered_console_settings = filtered_console_settings
 
-	if input_service.get(input_service, "up_key") and DebugScreen.hold_to_move_timer < t then
+	if input_service:get("up_key") and DebugScreen.hold_to_move_timer < t then
 		if DebugScreen.is_holding then
 			DebugScreen.hold_to_move_timer = t + 0.1 * GLOBAL_TIME_SCALE * accelerate_factor
 			accelerate_factor = accelerate_factor * 0.95
@@ -406,7 +406,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 		end
 	end
 
-	if input_service.get(input_service, "down_key") and DebugScreen.hold_to_move_timer < t then
+	if input_service:get("down_key") and DebugScreen.hold_to_move_timer < t then
 		if DebugScreen.is_holding then
 			DebugScreen.hold_to_move_timer = t + 0.1 * GLOBAL_TIME_SCALE * accelerate_factor
 			accelerate_factor = accelerate_factor * 0.95
@@ -456,7 +456,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 		end
 	end
 
-	if not input_service.get(input_service, "down_key") and not input_service.get(input_service, "up_key") then
+	if not input_service:get("down_key") and not input_service:get("up_key") then
 		DebugScreen.is_holding = false
 	end
 
@@ -615,7 +615,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 
 					Gui.text(gui, text_sub, font_mtrl, font_size, font, Vector3(option_x, pos_y, base_text_layer), text_color_active)
 				elseif is_hot_sub then
-					if (input_service.get(input_service, "right_key") or (input_service.has(input_service, "exclusive_right_key") and input_service.get(input_service, "exclusive_right_key"))) and not opened_this_frame then
+					if (input_service:get("right_key") or (input_service:has("exclusive_right_key") and input_service:get("exclusive_right_key"))) and not opened_this_frame then
 						update_option(cs, j)
 
 						if current_selected_option_position then
@@ -638,7 +638,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 								DebugScreen.active = false
 								opened_this_frame = true
 
-								input_manager.device_unblock_service(input_manager, "keyboard", 1, "Debug")
+								input_manager:device_unblock_service("keyboard", 1, "Debug")
 							end
 
 							if cs.clear_when_selected then
@@ -657,7 +657,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 				pos_y = pos_y - (font_size + 2)
 			end
 
-			if cs.func and (input_service.get(input_service, "right_key") or (input_service.has(input_service, "exclusive_right_key") and input_service.get(input_service, "exclusive_right_key"))) and not opened_this_frame then
+			if cs.func and (input_service:get("right_key") or (input_service:has("exclusive_right_key") and input_service:get("exclusive_right_key"))) and not opened_this_frame then
 				cs.func(cs.options, cs.hot_id)
 
 				if cs.clear_setting then
@@ -674,18 +674,18 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 					DebugScreen.active = false
 					opened_this_frame = true
 
-					input_manager.device_unblock_service(input_manager, "keyboard", 1, "Debug")
+					input_manager:device_unblock_service("keyboard", 1, "Debug")
 				end
 
 				Application.save_user_settings()
 			end
 
-			if cs.preset and (input_service.get(input_service, "right_key") or (input_service.has(input_service, "exclusive_right_key") and input_service.get(input_service, "exclusive_right_key"))) and not opened_this_frame then
+			if cs.preset and (input_service:get("right_key") or (input_service:has("exclusive_right_key") and input_service:get("exclusive_right_key"))) and not opened_this_frame then
 				activate_preset(cs)
 				Application.save_user_settings()
 			end
 
-			if input_service.get(input_service, "left_key") then
+			if input_service:get("left_key") then
 				DebugScreen.active_id = nil
 			end
 
@@ -701,7 +701,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 			Gui.text(gui, ">", font_mtrl, font_size, font, Vector3(10 + indicator_offset_anim, pos_y, base_text_layer), text_color_hot)
 			Gui.text(gui, text, font_mtrl, font_size, font, Vector3(setting_x, pos_y, base_text_layer), text_color_hot)
 
-			if input_service.get(input_service, "left_key") and DebugScreen.active_id == nil then
+			if input_service:get("left_key") and DebugScreen.active_id == nil then
 				if mod_key_down and 0 < #cs.options then
 					if cs.is_boolean then
 						cs.hot_id = 3
@@ -717,11 +717,11 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 				else
 					DebugScreen.active = false
 
-					input_manager.device_unblock_service(input_manager, "keyboard", 1, "Debug")
+					input_manager:device_unblock_service("keyboard", 1, "Debug")
 				end
 			end
 
-			if (input_service.get(input_service, "right_key") or (input_service.has(input_service, "exclusive_right_key") and input_service.get(input_service, "exclusive_right_key"))) and not opened_this_frame then
+			if (input_service:get("right_key") or (input_service:has("exclusive_right_key") and input_service:get("exclusive_right_key"))) and not opened_this_frame then
 				if cs.load_items_source_func then
 					cs.load_items_source_func(cs.options)
 				end
@@ -743,7 +743,7 @@ DebugScreen.update = function (dt, t, input_service, input_manager)
 				end
 			end
 
-			if not DebugScreen.search_active and input_service.get(input_service, "console_favorite_key") then
+			if not DebugScreen.search_active and input_service:get("console_favorite_key") then
 				if cs.category == "Favorites" then
 					cs.copy.copy = nil
 					local unfiltered_index = table.find(DebugScreen.console_settings, cs)
@@ -910,21 +910,21 @@ DebugScreen.set_texture_quality = function (value)
 end
 
 DebugScreen.update_search = function (input_manager, input_service, gui, t, dt)
-	local exit_using_backspace = input_service.get(input_service, "console_search_key") and DebugScreen.search_string == ""
+	local exit_using_backspace = input_service:get("console_search_key") and DebugScreen.search_string == ""
 	local exit_due_to_exiting_debugscreen = not DebugScreen.active and DebugScreen.search_active
-	local exit_with_no_search_hits_hack = DebugScreen.search_active and DebugScreen.hot_id == 0 and input_service.get(input_service, "left_key")
+	local exit_with_no_search_hits_hack = DebugScreen.search_active and DebugScreen.hot_id == 0 and input_service:get("left_key")
 
 	if exit_using_backspace or exit_due_to_exiting_debugscreen or exit_with_no_search_hits_hack then
 		if not DebugScreen.search_active then
-			DebugScreen.unblocked_services_n = input_manager.get_unblocked_services(input_manager, nil, nil, DebugScreen.unblocked_services)
+			DebugScreen.unblocked_services_n = input_manager:get_unblocked_services(nil, nil, DebugScreen.unblocked_services)
 
-			input_manager.device_block_services(input_manager, "keyboard", 1, DebugScreen.unblocked_services, DebugScreen.unblocked_services_n, "debug_screen")
-			input_manager.device_unblock_service(input_manager, "keyboard", 1, "DebugMenu")
+			input_manager:device_block_services("keyboard", 1, DebugScreen.unblocked_services, DebugScreen.unblocked_services_n, "debug_screen")
+			input_manager:device_unblock_service("keyboard", 1, "DebugMenu")
 
 			DebugScreen.search_active = true
 		else
-			input_manager.device_block_service(input_manager, "keyboard", 1, "DebugMenu")
-			input_manager.device_unblock_services(input_manager, "keyboard", 1, DebugScreen.unblocked_services, DebugScreen.unblocked_services_n)
+			input_manager:device_block_service("keyboard", 1, "DebugMenu")
+			input_manager:device_unblock_services("keyboard", 1, DebugScreen.unblocked_services, DebugScreen.unblocked_services_n)
 
 			DebugScreen.search_active = false
 			DebugScreen.search_string = ""

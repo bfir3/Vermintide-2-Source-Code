@@ -60,7 +60,7 @@ LiquidAreaDamageHuskExtension.add_damage_blob = function (self, blob_id, positio
 	local fx_name_rim = self._fx_name_rim
 
 	if not script_data.debug_liquid_system and fx_name_rim then
-		local rotation = self._get_rotation_from_navmesh(self, position)
+		local rotation = self:_get_rotation_from_navmesh(position)
 		fx_id = World.create_particles(self._world, fx_name_rim, position, rotation)
 	end
 
@@ -71,7 +71,7 @@ LiquidAreaDamageHuskExtension.add_damage_blob = function (self, blob_id, positio
 	}
 
 	if is_filled then
-		self.set_damage_blob_filled(self, blob_id)
+		self:set_damage_blob_filled(blob_id)
 	end
 end
 
@@ -88,7 +88,7 @@ LiquidAreaDamageHuskExtension.set_damage_blob_filled = function (self, blob_id)
 
 	if not script_data.debug_liquid_system and fx_name_filled then
 		local position = blob.position:unbox()
-		local rotation = self._get_rotation_from_navmesh(self, position)
+		local rotation = self:_get_rotation_from_navmesh(position)
 		blob.fx_id = World.create_particles(world, fx_name_filled, position, rotation)
 	else
 		blob.fx_id = nil
@@ -105,7 +105,7 @@ LiquidAreaDamageHuskExtension.update = function (self, unit, input, dt, context,
 	local liquid_update_function = self._liquid_update_function
 
 	if liquid_update_function then
-		local result = self._liquid_update_function(self, t, dt)
+		local result = self:_liquid_update_function(t, dt)
 
 		if not result then
 			self._liquid_update_function = nil

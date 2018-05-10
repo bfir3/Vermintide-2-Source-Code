@@ -16,8 +16,8 @@ StateLoadingRestartNetwork.NAME = "StateLoadingRestartNetwork"
 
 StateLoadingRestartNetwork.on_enter = function (self, params)
 	print("[Gamestate] Enter Substate StateLoadingRestartNetwork")
-	self._init_params(self, params)
-	self._init_network(self)
+	self:_init_params(params)
+	self:_init_network()
 end
 
 StateLoadingRestartNetwork._init_params = function (self, params)

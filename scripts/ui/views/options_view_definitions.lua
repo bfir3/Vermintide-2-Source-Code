@@ -1269,9 +1269,9 @@ local function create_slider_widget(text, tooltip_text, scenegraph_id, base_offs
 						local gamepad_active = Managers.input:is_device_active("gamepad")
 
 						if gamepad_active then
-							cursor = input_service.get(input_service, "cursor")
+							cursor = input_service:get("cursor")
 						else
-							cursor = UIInverseScaleVectorToResolution(input_service.get(input_service, "cursor"))
+							cursor = UIInverseScaleVectorToResolution(input_service:get("cursor"))
 						end
 
 						local scenegraph_id = ui_content.scenegraph_id
@@ -1285,11 +1285,11 @@ local function create_slider_widget(text, tooltip_text, scenegraph_id, base_offs
 						ui_content.internal_value = value
 
 						if old_value ~= value and not ui_content.callback_on_release then
-							ui_content.callback(ui_content)
+							ui_content:callback()
 						end
 					end,
 					release_function = function (ui_scenegraph, ui_style, ui_content, input_service)
-						ui_content.callback(ui_content)
+						ui_content:callback()
 					end
 				},
 				{
@@ -3637,7 +3637,7 @@ SettingsWidgetTypeTemplate = {
 			local list_style = style.list_style
 
 			if content.active then
-				if input_service.get(input_service, "move_up") then
+				if input_service:get("move_up") then
 					local num_draws = list_style.num_draws
 					local selected_index = nil
 
@@ -3661,7 +3661,7 @@ SettingsWidgetTypeTemplate = {
 					end
 
 					return true
-				elseif input_service.get(input_service, "move_down") then
+				elseif input_service:get("move_down") then
 					local num_draws = list_style.num_draws
 					local selected_index = nil
 
@@ -3688,7 +3688,7 @@ SettingsWidgetTypeTemplate = {
 				end
 			end
 
-			if input_service.get(input_service, "confirm") then
+			if input_service:get("confirm") then
 				if not content.active then
 					content.active = true
 					list_style.active = true
@@ -3712,14 +3712,14 @@ SettingsWidgetTypeTemplate = {
 					if selected_index then
 						content.current_selection = selected_index
 
-						content.callback(content)
+						content:callback()
 					end
 				end
 
 				return true, content.active
 			end
 
-			if content.active and input_service.get(input_service, "back") then
+			if content.active and input_service:get("back") then
 				content.active = false
 				list_style.active = false
 				local num_draws = list_style.num_draws
@@ -3761,7 +3761,7 @@ SettingsWidgetTypeTemplate = {
 		input_function = function (widget, input_service)
 			local content = widget.content
 
-			if input_service.get(input_service, "confirm") then
+			if input_service:get("confirm") then
 				content.hotspot.on_release = true
 
 				return true
@@ -3785,14 +3785,14 @@ SettingsWidgetTypeTemplate = {
 			local num_options = content.num_options
 			local current_selection = content.current_selection
 
-			if input_service.get(input_service, "move_left") then
+			if input_service:get("move_left") then
 				if 1 < current_selection then
 					local new_selection_index = current_selection - 1
 					content["option_" .. new_selection_index].on_release = true
 				end
 
 				return true
-			elseif input_service.get(input_service, "move_right") then
+			elseif input_service:get("move_right") then
 				if current_selection < num_options then
 					local new_selection_index = current_selection + 1
 					content["option_" .. new_selection_index].on_release = true
@@ -3807,13 +3807,13 @@ SettingsWidgetTypeTemplate = {
 			local content = widget.content
 			local style = widget.style
 
-			if content.active and input_service.get(input_service, "back", true) then
+			if content.active and input_service:get("back", true) then
 				content.controller_input_pressed = true
 
 				return true
 			end
 
-			if content.active and (input_service.get(input_service, "move_up") or input_service.get(input_service, "move_down") or input_service.get(input_service, "move_up_hold") or input_service.get(input_service, "move_down_hold")) then
+			if content.active and (input_service:get("move_up") or input_service:get("move_down") or input_service:get("move_up_hold") or input_service:get("move_down_hold")) then
 				return true
 			end
 		end,
@@ -3827,11 +3827,11 @@ SettingsWidgetTypeTemplate = {
 		input_function = function (widget, input_service)
 			local content = widget.content
 
-			if input_service.get(input_service, "move_left") then
+			if input_service:get("move_left") then
 				content.controller_on_release_left = true
 
 				return true
-			elseif input_service.get(input_service, "move_right") then
+			elseif input_service:get("move_right") then
 				content.controller_on_release_right = true
 
 				return true
@@ -3861,12 +3861,12 @@ SettingsWidgetTypeTemplate = {
 			local step = 1 / total_step
 			local input_been_made = false
 
-			if input_service.get(input_service, "move_left_hold") then
+			if input_service:get("move_left_hold") then
 				if not input_cooldown then
 					content.internal_value = math.clamp(internal_value - step, 0, 1)
 					input_been_made = true
 				end
-			elseif input_service.get(input_service, "move_right_hold") and not input_cooldown then
+			elseif input_service:get("move_right_hold") and not input_cooldown then
 				content.internal_value = math.clamp(internal_value + step, 0, 1)
 				input_been_made = true
 			end

@@ -52,7 +52,7 @@ PlayerUnitCosmeticExtension.extensions_ready = function (self, world, unit)
 	local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
 
 	if first_person_extension then
-		local first_person_unit = first_person_extension.get_first_person_mesh_unit(first_person_extension)
+		local first_person_unit = first_person_extension:get_first_person_mesh_unit()
 		local skin_data = self._cosmetics.skin
 		local material_changes = skin_data.material_changes
 

@@ -40,26 +40,26 @@ EndViewStateScore.on_enter = function (self, params)
 	self._animations = {}
 	self._ui_animations = {}
 
-	self.create_ui_elements(self, params)
+	self:create_ui_elements(params)
 
 	if params.initial_state then
 		self._initial_preview = true
 		params.initial_state = nil
 	end
 
-	self._start_transition_animation(self, "on_enter", "transition_enter")
+	self:_start_transition_animation("on_enter", "transition_enter")
 
 	self._exit_timer = nil
 	local players_session_score = self._context.players_session_score
 
-	self._setup_player_scores(self, players_session_score)
-	self._play_sound(self, "play_gui_mission_summary_team_summary_enter")
+	self:_setup_player_scores(players_session_score)
+	self:_play_sound("play_gui_mission_summary_team_summary_enter")
 end
 
 EndViewStateScore.exit = function (self, direction)
 	self._exit_started = true
 
-	self._start_transition_animation(self, "on_enter", "transition_exit")
+	self:_start_transition_animation("on_enter", "transition_exit")
 end
 
 EndViewStateScore.exit_done = function (self)
@@ -129,20 +129,20 @@ EndViewStateScore.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 
 		local players_session_score = self._context.players_session_score
 
-		self._setup_player_scores(self, players_session_score)
+		self:_setup_player_scores(players_session_score)
 	end
 
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "end_of_level")
+	local input_service = input_manager:get_service("end_of_level")
 
-	self.draw(self, input_service, dt)
-	self._update_transition_timer(self, dt)
+	self:draw(input_service, dt)
+	self:_update_transition_timer(dt)
 
-	local wanted_state = self._wanted_state(self)
+	local wanted_state = self:_wanted_state()
 
 	if not self._transition_timer and (wanted_state or self._new_state) then
 		self.parent:clear_wanted_menu_state()
@@ -150,14 +150,14 @@ EndViewStateScore.update = function (self, dt, t)
 		return wanted_state or self._new_state
 	end
 
-	self._update_entry_hover(self, dt)
+	self:_update_entry_hover(dt)
 	self.ui_animator:update(dt)
-	self._update_animations(self, dt)
+	self:_update_animations(dt)
 
 	local transitioning = self.parent:transitioning()
 
 	if not transitioning and not self._transition_timer then
-		self._handle_input(self, dt, t)
+		self:_handle_input(dt, t)
 	end
 end
 
@@ -178,8 +178,8 @@ EndViewStateScore._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -211,7 +211,7 @@ EndViewStateScore._update_entry_hover = function (self)
 	end
 
 	if hover_index ~= self._current_topic_hover_index then
-		self._set_entry_hover_index(self, hover_index)
+		self:_set_entry_hover_index(hover_index)
 
 		self._current_topic_hover_index = hover_index
 	end
@@ -233,7 +233,7 @@ end
 
 EndViewStateScore._handle_input = function (self, dt, t)
 	if Development.parameter("tobii_button") then
-		self._handle_tobii_button(self, dt)
+		self:_handle_tobii_button(dt)
 	end
 end
 
@@ -243,12 +243,12 @@ EndViewStateScore._handle_tobii_button = function (self, dt)
 
 	UIWidgetUtils.animate_default_button(tobii_button, dt)
 
-	if self._is_button_hover_enter(self, tobii_button) then
-		self._play_sound(self, "play_gui_start_menu_button_hover")
+	if self:_is_button_hover_enter(tobii_button) then
+		self:_play_sound("play_gui_start_menu_button_hover")
 	end
 
-	if self._is_button_pressed(self, tobii_button) then
-		self._play_sound(self, "play_gui_start_menu_button_click")
+	if self:_is_button_pressed(tobii_button) then
+		self:_play_sound("play_gui_start_menu_button_click")
 
 		local tobii_contest_url = "https://vermintide2beta.com/?utm_medium=referral&utm_campaign=vermintide2beta&utm_source=ingame#challenge"
 
@@ -380,8 +380,8 @@ EndViewStateScore._setup_player_scores = function (self, players_session_scores)
 	local hero_widgets = self._hero_widgets
 
 	for stats_id, player_data in pairs(players_session_scores) do
-		self._set_topic_data(self, player_data, widget_index)
-		self._group_scores_by_player_and_topic(self, score_panel_scores, player_data, widget_index)
+		self:_set_topic_data(player_data, widget_index)
+		self:_group_scores_by_player_and_topic(score_panel_scores, player_data, widget_index)
 
 		player_names[widget_index] = player_data.name
 		local peer_id = player_data.peer_id
@@ -400,7 +400,7 @@ EndViewStateScore._setup_player_scores = function (self, players_session_scores)
 		widget_index = widget_index + 1
 	end
 
-	self._setup_score_panel(self, score_panel_scores, player_names)
+	self:_setup_score_panel(score_panel_scores, player_names)
 end
 
 local position_colors = {
@@ -488,7 +488,7 @@ EndViewStateScore._setup_score_panel = function (self, score_panel_scores, playe
 				row_content.has_highscore = has_highscore
 				row_content.has_score = true
 
-				self._set_score_topic_by_row(self, total_row_index, Localize(score_data.display_text))
+				self:_set_score_topic_by_row(total_row_index, Localize(score_data.display_text))
 			end
 
 			total_row_index = total_row_index + 1

@@ -21,7 +21,7 @@ WaterMarkView.init = function (self, world)
 		snap_pixel_positions = true
 	}
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 end
 
 WaterMarkView._create_ui_elements = function (self)
@@ -37,10 +37,10 @@ WaterMarkView.update = function (self, dt)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 	end
 
-	self._draw(self, dt)
+	self:_draw(dt)
 end
 
 WaterMarkView._draw = function (self, dt)

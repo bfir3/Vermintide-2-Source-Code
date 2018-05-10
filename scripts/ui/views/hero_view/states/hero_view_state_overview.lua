@@ -69,8 +69,8 @@ HeroViewStateOverview.on_enter = function (self, params)
 	self.world_previewer = params.world_previewer
 	self.platform = PLATFORM
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self.local_player_id = ingame_ui_context.local_player_id
@@ -80,7 +80,7 @@ HeroViewStateOverview.on_enter = function (self, params)
 	local display_name = profile_settings.display_name
 	local character_name = profile_settings.character_name
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
-	local career_index = hero_attributes.get(hero_attributes, display_name, "career")
+	local career_index = hero_attributes:get(display_name, "career")
 	self.hero_name = display_name
 	self.career_index = career_index
 	self.profile_index = profile_index
@@ -94,12 +94,12 @@ HeroViewStateOverview.on_enter = function (self, params)
 	self.disabled_backend_ids_sync_id = 0
 	self._disabled_backend_ids = {}
 
-	self.create_ui_elements(self, params)
+	self:create_ui_elements(params)
 
 	if params.initial_state then
 		params.initial_state = nil
 
-		self._start_transition_animation(self, "on_enter", "on_enter")
+		self:_start_transition_animation("on_enter", "on_enter")
 	end
 
 	local window_params = {
@@ -114,7 +114,7 @@ HeroViewStateOverview.on_enter = function (self, params)
 		start_state = params.start_state
 	}
 
-	self._initial_windows_setups(self, window_params)
+	self:_initial_windows_setups(window_params)
 end
 
 HeroViewStateOverview.create_ui_elements = function (self, params)
@@ -145,14 +145,14 @@ HeroViewStateOverview._initial_windows_setups = function (self, params)
 	local start_state = params.start_state
 
 	if start_state then
-		self.set_layout_by_name(self, start_state)
+		self:set_layout_by_name(start_state)
 	else
-		self.set_layout(self, 1)
+		self:set_layout(1)
 	end
 end
 
 HeroViewStateOverview.window_input_service = function (self)
-	return (self._input_blocked and fake_input_service) or self.input_service(self)
+	return (self._input_blocked and fake_input_service) or self:input_service()
 end
 
 HeroViewStateOverview._close_window_at_index = function (self, window_index)
@@ -161,7 +161,7 @@ HeroViewStateOverview._close_window_at_index = function (self, window_index)
 	local current_window = active_windows[window_index]
 
 	if current_window and current_window.on_exit then
-		current_window.on_exit(current_window, params)
+		current_window:on_exit(params)
 	end
 
 	active_windows[window_index] = nil
@@ -180,11 +180,11 @@ HeroViewStateOverview._change_window = function (self, window_index, window_name
 			return
 		end
 
-		self._close_window_at_index(self, window_index)
+		self:_close_window_at_index(window_index)
 	end
 
 	local window_class = rawget(_G, window_class_name)
-	local window = window_class.new(window_class)
+	local window = window_class:new()
 	local window_default_settings = UISettings.game_start_windows
 	local window_size = window_default_settings.size
 	local window_spacing = window_default_settings.spacing or 10
@@ -200,7 +200,7 @@ HeroViewStateOverview._change_window = function (self, window_index, window_name
 	}
 
 	if window.on_enter then
-		window.on_enter(window, params, window_offset)
+		window:on_enter(params, window_offset)
 	end
 
 	active_windows[window_index] = window
@@ -209,7 +209,7 @@ end
 HeroViewStateOverview.set_layout_by_name = function (self, name)
 	for index, layout_setting in ipairs(window_layouts) do
 		if layout_setting.name == name then
-			self.set_layout(self, index)
+			self:set_layout(index)
 
 			return
 		end
@@ -217,13 +217,13 @@ HeroViewStateOverview.set_layout_by_name = function (self, name)
 end
 
 HeroViewStateOverview.set_layout = function (self, index)
-	local layout_setting = self._get_layout_setting(self, index)
+	local layout_setting = self:_get_layout_setting(index)
 	local windows = layout_setting.windows
 	local sound_event_enter = layout_setting.sound_event_enter
 	local close_on_exit = layout_setting.close_on_exit
 
 	if sound_event_enter then
-		self.play_sound(self, sound_event_enter)
+		self:play_sound(sound_event_enter)
 	end
 
 	self._widgets_by_name.exit_button.content.visible = close_on_exit
@@ -235,14 +235,14 @@ HeroViewStateOverview.set_layout = function (self, index)
 
 		for window_name, window_position_index in pairs(windows) do
 			if window_position_index == i then
-				self._change_window(self, window_position_index, window_name)
+				self:_change_window(window_position_index, window_name)
 
 				window_changed = true
 			end
 		end
 
 		if not window_changed then
-			self._close_window_at_index(self, i)
+			self:_close_window_at_index(i)
 		end
 	end
 
@@ -269,7 +269,7 @@ HeroViewStateOverview._windows_update = function (self, dt, t)
 	local active_windows = self._active_windows
 
 	for _, window in pairs(active_windows) do
-		window.update(window, dt, t)
+		window:update(dt, t)
 	end
 end
 
@@ -278,7 +278,7 @@ HeroViewStateOverview._windows_post_update = function (self, dt, t)
 
 	for _, window in pairs(active_windows) do
 		if window.post_update then
-			window.post_update(window, dt, t)
+			window:post_update(dt, t)
 		end
 	end
 end
@@ -323,7 +323,7 @@ end
 HeroViewStateOverview.requested_screen_change_by_name = function (self, state)
 	self._on_close_next_state = state
 
-	self.close_menu(self)
+	self:close_menu()
 end
 
 HeroViewStateOverview.on_exit = function (self, params)
@@ -332,10 +332,10 @@ HeroViewStateOverview.on_exit = function (self, params)
 	self.ui_animator = nil
 
 	if self._fullscreen_effect_enabled then
-		self.set_fullscreen_effect_enable_state(self, false)
+		self:set_fullscreen_effect_enable_state(false)
 	end
 
-	self._close_active_windows(self)
+	self:_close_active_windows()
 end
 
 HeroViewStateOverview._close_active_windows = function (self)
@@ -344,7 +344,7 @@ HeroViewStateOverview._close_active_windows = function (self)
 
 	for _, window in pairs(active_windows) do
 		if window.on_exit then
-			window.on_exit(window, params)
+			window:on_exit(params)
 		end
 	end
 
@@ -371,27 +371,27 @@ HeroViewStateOverview.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	local input_manager = self.input_manager
-	local input_service = self.window_input_service(self)
+	local input_service = self:window_input_service()
 
-	self.draw(self, input_service, dt)
-	self._update_transition_timer(self, dt)
-	self._windows_update(self, dt, t)
+	self:draw(input_service, dt)
+	self:_update_transition_timer(dt)
+	self:_windows_update(dt, t)
 
 	local transitioning = self.parent:transitioning()
-	local wanted_state = self._wanted_state(self)
+	local wanted_state = self:_wanted_state()
 
 	if not self._transition_timer then
 		if not transitioning then
-			if self._has_active_level_vote(self) then
+			if self:_has_active_level_vote() then
 				local ignore_sound_on_close_menu = true
 
-				self.close_menu(self, ignore_sound_on_close_menu)
+				self:close_menu(ignore_sound_on_close_menu)
 			else
-				self._handle_input(self, dt, t)
+				self:_handle_input(dt, t)
 			end
 		end
 
@@ -407,19 +407,19 @@ end
 
 HeroViewStateOverview._has_active_level_vote = function (self)
 	local voting_manager = self.voting_manager
-	local active_vote_name = voting_manager.vote_in_progress(voting_manager)
+	local active_vote_name = voting_manager:vote_in_progress()
 	local is_mission_vote = active_vote_name == "game_settings_vote" or active_vote_name == "game_settings_deed_vote"
 
-	return is_mission_vote and not voting_manager.has_voted(voting_manager, Network.peer_id())
+	return is_mission_vote and not voting_manager:has_voted(Network.peer_id())
 end
 
 HeroViewStateOverview.post_update = function (self, dt, t)
 	self.ui_animator:update(dt)
-	self._update_animations(self, dt)
-	self._windows_post_update(self, dt, t)
+	self:_update_animations(dt)
+	self:_windows_post_update(dt, t)
 
 	if self._new_state then
-		self._close_active_windows(self)
+		self:_close_active_windows()
 	end
 end
 
@@ -436,8 +436,8 @@ HeroViewStateOverview._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -460,9 +460,9 @@ HeroViewStateOverview._handle_input = function (self, dt, t)
 
 	local widgets_by_name = self._widgets_by_name
 	local input_service = self.parent:input_service()
-	local input_pressed = input_service.get(input_service, "toggle_menu")
+	local input_pressed = input_service:get("toggle_menu")
 	local gamepad_active = Managers.input:is_device_active("gamepad")
-	local back_pressed = gamepad_active and input_service.get(input_service, "back_menu")
+	local back_pressed = gamepad_active and input_service:get("back_menu")
 	local close_on_exit = self._close_on_exit
 	local exit_button = widgets_by_name.exit_button
 	local back_button = widgets_by_name.back_button
@@ -470,22 +470,22 @@ HeroViewStateOverview._handle_input = function (self, dt, t)
 	UIWidgetUtils.animate_default_button(exit_button, dt)
 	UIWidgetUtils.animate_default_button(back_button, dt)
 
-	if self._is_button_hover_enter(self, back_button) or self._is_button_hover_enter(self, exit_button) then
-		self.play_sound(self, "play_gui_equipment_button_hover")
+	if self:_is_button_hover_enter(back_button) or self:_is_button_hover_enter(exit_button) then
+		self:play_sound("play_gui_equipment_button_hover")
 	end
 
-	if close_on_exit and (input_pressed or back_pressed or self._is_button_pressed(self, exit_button)) then
-		self.play_sound(self, "Play_hud_hover")
-		self.close_menu(self)
+	if close_on_exit and (input_pressed or back_pressed or self:_is_button_pressed(exit_button)) then
+		self:play_sound("Play_hud_hover")
+		self:close_menu()
 
 		return
-	elseif input_pressed or back_pressed or self._is_button_pressed(self, back_button) then
-		self.play_sound(self, "Play_hud_hover")
+	elseif input_pressed or back_pressed or self:_is_button_pressed(back_button) then
+		self:play_sound("Play_hud_hover")
 
-		local previous_layout_key = self.get_previous_selected_game_mode_index(self)
+		local previous_layout_key = self:get_previous_selected_game_mode_index()
 
 		if previous_layout_key then
-			self.set_layout(self, previous_layout_key)
+			self:set_layout(previous_layout_key)
 		end
 	end
 end
@@ -637,7 +637,7 @@ HeroViewStateOverview._set_loadout_item = function (self, item, strict_slot_type
 	local career_index = self.career_index
 	local player_manager = self.player_manager
 	local peer_id = self.peer_id
-	local player = player_manager.player_from_peer_id(player_manager, peer_id)
+	local player = player_manager:player_from_peer_id(peer_id)
 	local unit = player.player_unit
 
 	if not unit or not Unit.alive(unit) then
@@ -645,7 +645,7 @@ HeroViewStateOverview._set_loadout_item = function (self, item, strict_slot_type
 	end
 
 	local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
-	local resyncing_loadout = inventory_extension.resyncing_loadout(inventory_extension)
+	local resyncing_loadout = inventory_extension:resyncing_loadout()
 
 	if resyncing_loadout or not Managers.state.network:game() then
 		return
@@ -654,7 +654,7 @@ HeroViewStateOverview._set_loadout_item = function (self, item, strict_slot_type
 	local backend_id = item.backend_id
 	local item_data = item.data
 	local slot_type = strict_slot_type or item_data.slot_type
-	local slot = self._get_slot_by_type(self, slot_type)
+	local slot = self:_get_slot_by_type(slot_type)
 	local slot_name = slot.name
 	local profile_index = FindProfileIndex(hero_name)
 	local profile = SPProfiles[profile_index]
@@ -662,24 +662,24 @@ HeroViewStateOverview._set_loadout_item = function (self, item, strict_slot_type
 	local career_name = career_data.name
 	local backend_items = Managers.backend:get_interface("items")
 
-	backend_items.set_loadout_item(backend_items, backend_id, career_name, slot_name)
+	backend_items:set_loadout_item(backend_id, career_name, slot_name)
 
 	if slot_type == "melee" or slot_type == "ranged" then
-		inventory_extension.create_equipment_in_slot(inventory_extension, slot_name, backend_id)
+		inventory_extension:create_equipment_in_slot(slot_name, backend_id)
 	elseif slot_type == "hat" then
 		local attachment_extension = ScriptUnit.extension(unit, "attachment_system")
 
-		attachment_extension.create_attachment_in_slot(attachment_extension, slot_name, backend_id)
+		attachment_extension:create_attachment_in_slot(slot_name, backend_id)
 	elseif slot_type == "trinket" or slot_type == "ring" or slot_type == "necklace" then
 		local attachment_extension = ScriptUnit.extension(unit, "attachment_system")
 
-		attachment_extension.create_attachment_in_slot(attachment_extension, slot_name, backend_id)
+		attachment_extension:create_attachment_in_slot(slot_name, backend_id)
 	elseif slot_type == "frame" then
 		local frame_data = ItemHelper.get_template_by_item_name(item_data.key)
 		local frame_name = frame_data.name
 		local cosmetic_system = Managers.state.entity:system("cosmetic_system")
 
-		cosmetic_system.set_equipped_frame(cosmetic_system, unit, frame_name)
+		cosmetic_system:set_equipped_frame(unit, frame_name)
 	end
 
 	self.loadout_sync_id = self.loadout_sync_id + 1
@@ -707,7 +707,7 @@ end
 HeroViewStateOverview.unequip_item_in_slot = function (self, slot_type)
 	local hero_name = self.hero_name
 	local career_index = self.career_index
-	local slot = self._get_slot_by_type(self, slot_type)
+	local slot = self:_get_slot_by_type(slot_type)
 
 	if not slot.unequippable then
 		return false
@@ -727,7 +727,7 @@ HeroViewStateOverview.unequip_item_in_slot = function (self, slot_type)
 
 	local backend_items = Managers.backend:get_interface("items")
 
-	backend_items.set_loadout_item(backend_items, nil, career_name, slot_name)
+	backend_items:set_loadout_item(nil, career_name, slot_name)
 
 	self.loadout_sync_id = self.loadout_sync_id + 1
 	self.inventory_sync_id = self.inventory_sync_id + 1

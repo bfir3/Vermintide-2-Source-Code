@@ -17,7 +17,7 @@ BTGreySeerMountedAction.enter = function (self, unit, blackboard, t)
 
 	self.game = Managers.state.network:game()
 	local unit_storage = Managers.state.unit_storage
-	self.go_id = unit_storage.go_id(unit_storage, unit)
+	self.go_id = unit_storage:go_id(unit)
 	blackboard.move_state = "moving"
 end
 

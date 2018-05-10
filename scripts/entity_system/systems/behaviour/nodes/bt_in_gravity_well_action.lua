@@ -13,7 +13,7 @@ BTInGravityWellAction.enter = function (self, unit, blackboard, t)
 	local locomotion_extension = blackboard.locomotion_extension
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_enabled(navigation_extension, false)
+	navigation_extension:set_enabled(false)
 
 	local breed = blackboard.breed
 	local overlap_radius = breed.stagger_in_air_mover_check_radius or DEFAULT_IN_AIR_MOVER_CHECK_RADIUS
@@ -27,7 +27,7 @@ BTInGravityWellAction.enter = function (self, unit, blackboard, t)
 	if actor_count == 0 then
 		local override_mover_move_distance = breed.override_mover_move_distance
 
-		locomotion_extension.set_movement_type(locomotion_extension, "constrained_by_mover", override_mover_move_distance)
+		locomotion_extension:set_movement_type("constrained_by_mover", override_mover_move_distance)
 	end
 
 	blackboard.attack_aborted = true
@@ -44,7 +44,7 @@ BTInGravityWellAction._set_wanted_velocity = function (self, dt, blackboard, sel
 	local offset = gravity_well_pos - self_pos
 	local dir = Vector3.normalize(offset)
 	local dist_sq = Vector3.length_squared(offset)
-	local old_velocity = locomotion_extension.current_velocity(locomotion_extension)
+	local old_velocity = locomotion_extension:current_velocity()
 	local broke_free = false
 	local new_velocity = nil
 
@@ -58,8 +58,8 @@ BTInGravityWellAction._set_wanted_velocity = function (self, dt, blackboard, sel
 		new_velocity.z = math.min(new_velocity.z, 2)
 	end
 
-	locomotion_extension.set_wanted_velocity(locomotion_extension, new_velocity)
-	locomotion_extension.set_wanted_rotation(locomotion_extension, Quaternion.look(Vector3.flat(-dir), Vector3.up()))
+	locomotion_extension:set_wanted_velocity(new_velocity)
+	locomotion_extension:set_wanted_rotation(Quaternion.look(Vector3.flat(-dir), Vector3.up()))
 
 	return new_velocity, broke_free
 end
@@ -69,12 +69,12 @@ BTInGravityWellAction.leave = function (self, unit, blackboard, t, reason, destr
 	blackboard.stagger_hit_wall = nil
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.set_movement_type(locomotion_extension, "snap_to_navmesh")
-	locomotion_extension.set_wanted_velocity(locomotion_extension, Vector3.zero())
+	locomotion_extension:set_movement_type("snap_to_navmesh")
+	locomotion_extension:set_wanted_velocity(Vector3.zero())
 
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_enabled(navigation_extension, true)
+	navigation_extension:set_enabled(true)
 
 	blackboard.gravity_well_position = nil
 	blackboard.gravity_well_strength = nil
@@ -83,7 +83,7 @@ end
 
 BTInGravityWellAction.run = function (self, unit, blackboard, t, dt)
 	local position = POSITION_LOOKUP[unit]
-	local velocity, broke_free = self._set_wanted_velocity(self, dt, blackboard, position)
+	local velocity, broke_free = self:_set_wanted_velocity(dt, blackboard, position)
 	local locomotion_extension = blackboard.locomotion_extension
 
 	if locomotion_extension.movement_type ~= "constrained_by_mover" and not blackboard.stagger_hit_wall then
@@ -91,7 +91,7 @@ BTInGravityWellAction.run = function (self, unit, blackboard, t, dt)
 		local world = blackboard.world
 		local physics_world = World.physics_world(world)
 		local navigation_extension = blackboard.navigation_extension
-		local traverse_logic = navigation_extension.traverse_logic(navigation_extension)
+		local traverse_logic = navigation_extension:traverse_logic()
 		local result = LocomotionUtils.navmesh_movement_check(position, velocity, nav_world, physics_world, traverse_logic)
 
 		if result == "navmesh_hit_wall" then
@@ -100,10 +100,10 @@ BTInGravityWellAction.run = function (self, unit, blackboard, t, dt)
 			local breed = blackboard.breed
 			local override_mover_move_distance = breed.override_mover_move_distance
 			local ignore_forced_mover_kill = true
-			local successful = locomotion_extension.set_movement_type(locomotion_extension, "constrained_by_mover", override_mover_move_distance, ignore_forced_mover_kill)
+			local successful = locomotion_extension:set_movement_type("constrained_by_mover", override_mover_move_distance, ignore_forced_mover_kill)
 
 			if not successful then
-				locomotion_extension.set_movement_type(locomotion_extension, "snap_to_navmesh")
+				locomotion_extension:set_movement_type("snap_to_navmesh")
 
 				blackboard.stagger_hit_wall = true
 			end

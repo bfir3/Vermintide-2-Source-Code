@@ -18,15 +18,15 @@ GameModeSurvival.evaluate_end_conditions = function (self, round_started, dt, t)
 	end
 
 	local spawn_manager = Managers.state.spawn
-	local humans_dead = spawn_manager.all_humans_dead(spawn_manager)
-	local players_disabled = spawn_manager.all_players_disabled(spawn_manager)
-	local lost = not self._lose_condition_disabled and (humans_dead or players_disabled or self._level_failed or self._is_time_up(self))
+	local humans_dead = spawn_manager:all_humans_dead()
+	local players_disabled = spawn_manager:all_players_disabled()
+	local lost = not self._lose_condition_disabled and (humans_dead or players_disabled or self._level_failed or self:_is_time_up())
 
 	if self.about_to_lose then
 		if lost then
 			if self.lost_condition_timer < t then
 				local mission_system = Managers.state.entity:system("mission_system")
-				local active_missions, completed_missions = mission_system.get_missions(mission_system)
+				local active_missions, completed_missions = mission_system:get_missions()
 
 				if active_missions then
 					local mission_data = active_missions.survival_wave

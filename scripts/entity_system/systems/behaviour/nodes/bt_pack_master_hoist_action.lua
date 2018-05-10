@@ -46,7 +46,7 @@ BTPackMasterHoistAction.run = function (self, unit, blackboard, t, dt)
 	if not AiUtils.is_of_interest_to_packmaster(unit, drag_target_unit) then
 		local status_extension = ScriptUnit.extension(drag_target_unit, "status_system")
 
-		if not status_extension.is_knocked_down(status_extension) then
+		if not status_extension:is_knocked_down() then
 			return "failed"
 		end
 	end

@@ -79,12 +79,12 @@ end
 
 NavDefaultSmartObjectFollower.handle_next_smartobject = function (self, botpos, next_smartobject_interval, entrance_pos, entrance_is_at_bot_progress_on_path, exit_pos, exit_is_at_the_end_of_path)
 	local approachingDistance = 1
-	local smartobject_type = self.get_smartobject_type(self, next_smartobject_interval)
+	local smartobject_type = self:get_smartobject_type(next_smartobject_interval)
 
 	if smartobject_type == "Door" then
-		self.manage_door_smartobject(self, botpos, next_smartobject_interval, entrance_pos, approachingDistance)
+		self:manage_door_smartobject(botpos, next_smartobject_interval, entrance_pos, approachingDistance)
 	elseif smartobject_type == "Jump" then
-		self.manage_jump_smartobject(self, botpos, next_smartobject_interval, entrance_pos, exit_pos, approachingDistance)
+		self:manage_jump_smartobject(botpos, next_smartobject_interval, entrance_pos, exit_pos, approachingDistance)
 	end
 end
 
@@ -112,8 +112,8 @@ NavDefaultSmartObjectFollower.manage_jump_smartobject = function (self, botpos, 
 			local in_manual_control = GwNavBot.enter_manual_control(self.navbot.gwnavbot, next_smartobject_interval)
 
 			if in_manual_control == true then
-				self.start_follow(self, exit_pos, "Jump")
-				self.initial_jump_velocity(self)
+				self:start_follow(exit_pos, "Jump")
+				self:initial_jump_velocity()
 			end
 		end
 	end

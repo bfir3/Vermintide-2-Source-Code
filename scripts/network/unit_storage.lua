@@ -45,10 +45,10 @@ NetworkUnitStorage.unit = function (self, o)
 end
 
 NetworkUnitStorage.remove = function (self, o)
-	local unit = self.unit(self, o)
-	local go_id = self.go_id(self, o)
+	local unit = self:unit(o)
+	local go_id = self:go_id(o)
 
-	self.remove_owner(self, o)
+	self:remove_owner(o)
 
 	self.map_goid_to_gotype[go_id] = nil
 	self.map_goid_to_unit[go_id] = nil
@@ -58,8 +58,8 @@ NetworkUnitStorage.remove = function (self, o)
 end
 
 NetworkUnitStorage.remove_owner = function (self, o)
-	local unit = self.unit(self, o)
-	local go_id = self.go_id(self, o)
+	local unit = self:unit(o)
+	local go_id = self:go_id(o)
 	local current_owner = self.map_goid_to_owner[go_id]
 
 	if current_owner then
@@ -71,10 +71,10 @@ NetworkUnitStorage.remove_owner = function (self, o)
 end
 
 NetworkUnitStorage.set_owner = function (self, o, owner)
-	self.remove_owner(self, o)
+	self:remove_owner(o)
 
-	local unit = self.unit(self, o)
-	local go_id = self.go_id(self, o)
+	local unit = self:unit(o)
+	local go_id = self:go_id(o)
 	local owner_goid_list = self.owner_goid_array[owner]
 
 	if not owner_goid_list then
@@ -89,7 +89,7 @@ NetworkUnitStorage.set_owner = function (self, o, owner)
 end
 
 NetworkUnitStorage.owner = function (self, o)
-	local go_id = self.go_id(self, o)
+	local go_id = self:go_id(o)
 
 	return self.map_goid_to_owner[go_id]
 end
@@ -103,7 +103,7 @@ NetworkUnitStorage.add_unit = function (self, unit, go_id, owner)
 	NetworkUnit.set_game_object_id(unit, go_id)
 
 	if owner then
-		self.set_owner(self, unit, owner)
+		self:set_owner(unit, owner)
 	end
 end
 
@@ -111,11 +111,11 @@ NetworkUnitStorage.add_unit_info = function (self, unit, go_id, go_type, owner)
 	self.map_goid_to_gotype[go_id] = go_type
 
 	NetworkUnit.set_game_object_type(unit, go_type)
-	self.add_unit(self, unit, go_id, owner)
+	self:add_unit(unit, go_id, owner)
 end
 
 NetworkUnitStorage.go_type = function (self, o)
-	return self.map_goid_to_gotype[self.go_id(self, o)]
+	return self.map_goid_to_gotype[self:go_id(o)]
 end
 
 return

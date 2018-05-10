@@ -13,7 +13,7 @@ OverchargeBarUI.init = function (self, ingame_ui_context)
 	self.slot_animations = {}
 	self.ui_animations = {}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.peer_id = ingame_ui_context.peer_id
 	self.player_manager = ingame_ui_context.player_manager
@@ -26,9 +26,9 @@ end
 
 local function get_overcharge_amount(player_unit)
 	local overcharge_extension = ScriptUnit.extension(player_unit, "overcharge_system")
-	local overcharge_fraction = overcharge_extension.overcharge_fraction(overcharge_extension)
-	local threshold_fraction = overcharge_extension.threshold_fraction(overcharge_extension)
-	local anim_blend_overcharge = overcharge_extension.get_anim_blend_overcharge(overcharge_extension)
+	local overcharge_fraction = overcharge_extension:overcharge_fraction()
+	local threshold_fraction = overcharge_extension:threshold_fraction()
+	local anim_blend_overcharge = overcharge_extension:get_anim_blend_overcharge()
 
 	return overcharge_fraction, threshold_fraction, 0.8, anim_blend_overcharge
 end
@@ -50,7 +50,7 @@ OverchargeBarUI._update_overcharge = function (self, player, dt)
 	end
 
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 
 	if not equipment then
 		return
@@ -77,7 +77,7 @@ OverchargeBarUI._update_overcharge = function (self, player, dt)
 						self.wielded_item_name = item_name
 					end
 
-					self.set_charge_bar_fraction(self, overcharge_fraction, min_threshold_fraction, max_threshold_fraction, anim_blend_overcharge)
+					self:set_charge_bar_fraction(overcharge_fraction, min_threshold_fraction, max_threshold_fraction, anim_blend_overcharge)
 
 					return true
 				end
@@ -97,10 +97,10 @@ end
 OverchargeBarUI.update = function (self, dt, t, player)
 	local ui_scenegraph = self.ui_scenegraph
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "ingame_menu")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local input_service = input_manager:get_service("ingame_menu")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 
-	if self._update_overcharge(self, player, dt) then
+	if self:_update_overcharge(player, dt) then
 		local ui_renderer = self.ui_renderer
 
 		UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt, nil, self.render_settings)

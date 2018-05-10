@@ -26,8 +26,8 @@ BTPrepareForCrazyJumpAction.enter = function (self, unit, blackboard, t)
 
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
-	network_manager.anim_event(network_manager, unit, "move_fwd")
+	network_manager:anim_event(unit, "to_combat")
+	network_manager:anim_event(unit, "move_fwd")
 
 	blackboard.jump_data = {
 		crouching = false,
@@ -52,7 +52,7 @@ BTPrepareForCrazyJumpAction.leave = function (self, unit, blackboard, t, reason,
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 
 	if reason ~= "done" then
 		Managers.state.network:anim_event(unit, "to_upright")
@@ -73,7 +73,7 @@ BTPrepareForCrazyJumpAction.run = function (self, unit, blackboard, t, dt)
 
 	if unit_alive(target_unit) then
 		local status_extension = ScriptUnit.extension(target_unit, "status_system")
-		local is_pounced_by_other = status_extension.is_pounced_down(status_extension)
+		local is_pounced_by_other = status_extension:is_pounced_down()
 
 		if is_pounced_by_other then
 			return "failed"
@@ -84,7 +84,7 @@ BTPrepareForCrazyJumpAction.run = function (self, unit, blackboard, t, dt)
 
 	if blackboard.move_closer_to_target then
 		LocomotionUtils.follow_target(unit, blackboard, t, dt)
-		locomotion.set_wanted_rotation(locomotion, nil)
+		locomotion:set_wanted_rotation(nil)
 
 		if blackboard.move_closer_to_target_timer < t then
 			local data = blackboard.jump_data
@@ -110,7 +110,7 @@ BTPrepareForCrazyJumpAction.run = function (self, unit, blackboard, t, dt)
 		local target_position = POSITION_LOOKUP[target_unit]
 		local rot = LocomotionUtils.look_at_position_flat(unit, target_position)
 
-		locomotion.set_wanted_rotation(locomotion, rot)
+		locomotion:set_wanted_rotation(rot)
 
 		local data = blackboard.jump_data
 
@@ -121,16 +121,16 @@ BTPrepareForCrazyJumpAction.run = function (self, unit, blackboard, t, dt)
 				if not data.jump_at_target_outside_mesh then
 					local network_manager = Managers.state.network
 
-					network_manager.anim_event(network_manager, unit, "idle")
+					network_manager:anim_event(unit, "idle")
 
 					local navigation = blackboard.navigation_extension
 
-					navigation.move_to(navigation, position_lookup[unit])
+					navigation:move_to(position_lookup[unit])
 
 					data.jump_at_target_outside_mesh = true
 				end
 			else
-				locomotion.set_wanted_rotation(locomotion, nil)
+				locomotion:set_wanted_rotation(nil)
 			end
 
 			if data.ready_crouch_time < t then
@@ -166,7 +166,7 @@ BTPrepareForCrazyJumpAction.start_crawling = function (unit, blackboard, t, data
 
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_crouch")
+	network_manager:anim_event(unit, "to_crouch")
 
 	local prepare_jump_time = action.difficulty_prepare_jump_time[Managers.state.difficulty:get_difficulty_rank()]
 	data.crouching = true

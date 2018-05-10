@@ -38,11 +38,11 @@ CareerExtension.extensions_ready = function (self, world, unit)
 		for i = 1, #buffs, 1 do
 			local buff = buffs[i]
 
-			buff_extension.add_buff(buff_extension, buff)
+			buff_extension:add_buff(buff)
 		end
 	end
 
-	self.start_activated_ability_cooldown(self)
+	self:start_activated_ability_cooldown()
 
 	self._first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
 	self._buff_extension = ScriptUnit.extension(unit, "buff_system")
@@ -59,7 +59,7 @@ CareerExtension.update = function (self, unit, input, dt, context, t)
 	if aoe_data then
 		aoe_data.duration_left = math.max(aoe_data.duration_left - dt, 0)
 
-		if aoe_data.duration_left <= 0 or not self.is_in_aoe(self, POSITION_LOOKUP[unit]) then
+		if aoe_data.duration_left <= 0 or not self:is_in_aoe(POSITION_LOOKUP[unit]) then
 			ProcFunctions[aoe_data.end_function_name](player)
 
 			self._aoe_data = nil
@@ -71,7 +71,7 @@ CareerExtension.update = function (self, unit, input, dt, context, t)
 	end
 
 	local buff_extension = ScriptUnit.extension(unit, "buff_system")
-	local cooldown_speed_multiplier = buff_extension.apply_buffs_to_value(buff_extension, 1, StatBuffIndex.COOLDOWN_REGEN)
+	local cooldown_speed_multiplier = buff_extension:apply_buffs_to_value(1, StatBuffIndex.COOLDOWN_REGEN)
 	self._cooldown = math.max(self._cooldown - dt * cooldown_speed_multiplier, 0)
 
 	if self._is_ready then
@@ -85,11 +85,11 @@ CareerExtension.update = function (self, unit, input, dt, context, t)
 		local first_person_extension = self._first_person_extension
 
 		if first_person_extension then
-			first_person_extension.play_hud_sound_event(first_person_extension, "Play_hud_ability_ready")
+			first_person_extension:play_hud_sound_event("Play_hud_ability_ready")
 		end
 	end
 
-	self._update_game_object_field(self, unit)
+	self:_update_game_object_field(unit)
 end
 
 CareerExtension._update_game_object_field = function (self, unit)
@@ -97,7 +97,7 @@ CareerExtension._update_game_object_field = function (self, unit)
 		return
 	end
 
-	local ability_cooldown, max_cooldown = self.current_ability_cooldown(self)
+	local ability_cooldown, max_cooldown = self:current_ability_cooldown()
 	local ability_percentage = 1
 
 	if ability_cooldown then
@@ -105,7 +105,7 @@ CareerExtension._update_game_object_field = function (self, unit)
 	end
 
 	local network_manager = Managers.state.network
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 	local go_id = Managers.state.unit_storage:go_id(unit)
 	ability_percentage = math.min(1, ability_percentage)
 
@@ -125,11 +125,11 @@ end
 
 CareerExtension.start_activated_ability_cooldown = function (self, refund_percent)
 	self._is_ready = false
-	local activated_ability_data = self.get_activated_ability_data(self)
+	local activated_ability_data = self:get_activated_ability_data()
 	local cooldown = activated_ability_data.cooldown
 	self._max_cooldown = activated_ability_data.cooldown
 	local buff_extension = ScriptUnit.extension(self._unit, "buff_system")
-	local cooldown = buff_extension.apply_buffs_to_value(buff_extension, cooldown, StatBuffIndex.ACTIVATED_COOLDOWN)
+	local cooldown = buff_extension:apply_buffs_to_value(cooldown, StatBuffIndex.ACTIVATED_COOLDOWN)
 	self._cooldown = cooldown * (1 - (refund_percent or 0))
 	self._cooldown_paused = false
 
@@ -184,7 +184,7 @@ CareerExtension.career_settings = function (self)
 end
 
 CareerExtension.career_skill_weapon_name = function (self)
-	return self.get_activated_ability_data(self).weapon_name
+	return self:get_activated_ability_data().weapon_name
 end
 
 CareerExtension.get_base_critical_strike_chance = function (self)
@@ -213,7 +213,7 @@ end
 
 CareerExtension.has_melee_boost = function (self)
 	local buff_extension = self._buff_extension
-	local has_shade_buff = buff_extension.has_buff_type(buff_extension, "kerillian_shade_activated_ability") or buff_extension.has_buff_type(buff_extension, "kerillian_shade_activated_ability_duration")
+	local has_shade_buff = buff_extension:has_buff_type("kerillian_shade_activated_ability") or buff_extension:has_buff_type("kerillian_shade_activated_ability_duration")
 	local has_murder_hobo_buff = false
 	local multiplier = (has_shade_buff and 4) or (has_murder_hobo_buff and 1) or 0
 
@@ -222,8 +222,8 @@ end
 
 CareerExtension.has_ranged_boost = function (self)
 	local buff_extension = self._buff_extension
-	local has_murder_hobo_buff = buff_extension.has_buff_type(buff_extension, "markus_huntsman_activated_ability")
-	local has_ranger_buff = buff_extension.has_buff_type(buff_extension, "bardin_ranger_activated_ability") or buff_extension.has_buff_type(buff_extension, "bardin_ranger_activated_ability_duration")
+	local has_murder_hobo_buff = buff_extension:has_buff_type("markus_huntsman_activated_ability")
+	local has_ranger_buff = buff_extension:has_buff_type("bardin_ranger_activated_ability") or buff_extension:has_buff_type("bardin_ranger_activated_ability_duration")
 	local multiplier = (has_murder_hobo_buff and 2) or (has_ranger_buff and 1) or 0
 
 	return has_murder_hobo_buff or has_ranger_buff, multiplier
@@ -236,18 +236,18 @@ CareerExtension.get_career_power_level = function (self)
 
 	if player.bot_player then
 		local player_manager = Managers.player
-		local leader_player = player_manager.party_leader_player(player_manager)
+		local leader_player = player_manager:party_leader_player()
 
 		if leader_player then
 			if DEDICATED_SERVER then
-				local power_level = leader_player.get_data(leader_player, "power_level")
+				local power_level = leader_player:get_data("power_level")
 
 				if power_level then
 					return power_level
 				end
 			else
-				local leader_profile_display_name = leader_player.profile_display_name(leader_player)
-				local leader_career_name = leader_player.career_name(leader_player)
+				local leader_profile_display_name = leader_player:profile_display_name()
+				local leader_career_name = leader_player:career_name()
 
 				if not leader_profile_display_name then
 				end

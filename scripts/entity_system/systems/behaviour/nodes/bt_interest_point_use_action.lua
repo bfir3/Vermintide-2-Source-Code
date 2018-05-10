@@ -31,7 +31,7 @@ BTInterestPointUseAction.enter = function (self, unit, blackboard, t)
 
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_enabled(navigation_extension, false)
+	navigation_extension:set_enabled(false)
 end
 
 BTInterestPointUseAction.leave = function (self, unit, blackboard, t, reason, destroy)
@@ -45,7 +45,7 @@ BTInterestPointUseAction.leave = function (self, unit, blackboard, t, reason, de
 
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_enabled(navigation_extension, true)
+	navigation_extension:set_enabled(true)
 
 	blackboard.ip_end_time = nil
 

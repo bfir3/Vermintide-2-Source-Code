@@ -351,15 +351,15 @@ local function split_string(text, sep)
 	local pos = 1
 
 	while true do
-		local b, e = text.find(text, sep, pos)
+		local b, e = text:find(sep, pos)
 
 		if not b then
-			table.insert(lines, text.sub(text, pos))
+			table.insert(lines, text:sub(pos))
 
 			break
 		end
 
-		table.insert(lines, text.sub(text, pos, b - 1))
+		table.insert(lines, text:sub(pos, b - 1))
 
 		pos = e + 1
 	end
@@ -925,15 +925,15 @@ function split(text, sep)
 	local pos = 1
 
 	while true do
-		local b, e = text.find(text, sep, pos)
+		local b, e = text:find(sep, pos)
 
 		if not b then
-			table.insert(lines, text.sub(text, pos))
+			table.insert(lines, text:sub(pos))
 
 			break
 		end
 
-		table.insert(lines, text.sub(text, pos, b - 1))
+		table.insert(lines, text:sub(pos, b - 1))
 
 		pos = e + 1
 	end

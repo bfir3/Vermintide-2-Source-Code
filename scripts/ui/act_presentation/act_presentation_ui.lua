@@ -20,15 +20,15 @@ ActPresentationUI.init = function (self, ingame_ui_context)
 	self.world = ingame_ui_context.world_manager:world("level_world")
 	self.wwise_world = Managers.world:wwise_world(self.world)
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 	rawset(_G, "act_presentation_ui", self)
 
 	local input_manager = self.input_manager
 
-	input_manager.create_input_service(input_manager, "act_presentation", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "act_presentation", "keyboard")
-	input_manager.map_device_to_service(input_manager, "act_presentation", "mouse")
-	input_manager.map_device_to_service(input_manager, "act_presentation", "gamepad")
+	input_manager:create_input_service("act_presentation", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("act_presentation", "keyboard")
+	input_manager:map_device_to_service("act_presentation", "mouse")
+	input_manager:map_device_to_service("act_presentation", "gamepad")
 end
 
 ActPresentationUI.create_ui_elements = function (self)
@@ -62,9 +62,9 @@ ActPresentationUI.start = function (self, level_key, previous_completed_difficul
 
 	self._presentation_aborted = nil
 
-	self._set_presentation_info(self, act_key, level_key)
+	self:_set_presentation_info(act_key, level_key)
 
-	local first_time_completed, difficulty_index_completed = self._setup_level(self, act_key, level_key, previous_completed_difficulty_index)
+	local first_time_completed, difficulty_index_completed = self:_setup_level(act_key, level_key, previous_completed_difficulty_index)
 	local animation_params = {
 		wwise_world = self.wwise_world,
 		level_key = level_key,
@@ -77,7 +77,7 @@ ActPresentationUI.start = function (self, level_key, previous_completed_difficul
 	self.animation_params = animation_params
 	local animation_name = (first_time_completed and "enter_first_time") or "enter"
 
-	self.start_presentation_animation(self, animation_name, animation_params)
+	self:start_presentation_animation(animation_name, animation_params)
 
 	self.active = true
 end
@@ -100,7 +100,7 @@ ActPresentationUI._setup_level = function (self, act_key, played_level_key, prev
 	local widgets_by_name = self._widgets_by_name
 	local statistics_db = self.statistics_db
 	local stats_id = self.stats_id
-	local level_stat = statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_levels", played_level_key) or 0
+	local level_stat = statistics_db:get_persistent_stat(stats_id, "completed_levels", played_level_key) or 0
 	local level_completed = level_stat ~= 0
 	local difficulty_complete_index = (level_completed and LevelUnlockUtils.completed_level_difficulty_index(statistics_db, stats_id, played_level_key)) or 0
 	local first_time_completed = previous_difficulty_index_completed < difficulty_complete_index
@@ -123,11 +123,11 @@ ActPresentationUI._update_animations = function (self, dt)
 	local animations = self._animations
 	local ui_animator = self.ui_animator
 
-	ui_animator.update(ui_animator, dt)
+	ui_animator:update(dt)
 
 	for animation_key, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_key] = nil
 			local animation_params = self.animation_params
@@ -148,11 +148,11 @@ end
 
 ActPresentationUI.update = function (self, dt, t)
 	if RELOAD_UI then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self._update_animations(self, dt)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:draw(dt)
 end
 
 ActPresentationUI.draw = function (self, dt)

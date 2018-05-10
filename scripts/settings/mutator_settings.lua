@@ -22,7 +22,7 @@ local function apply_buff_to_alive_player_units(context, data, buff_name)
 			}
 			local buff_ext = get_extension(unit, "buff_system")
 
-			buff_ext.add_buff(buff_ext, buff_name, params)
+			buff_ext:add_buff(buff_name, params)
 		end
 
 		player_units[unit] = true

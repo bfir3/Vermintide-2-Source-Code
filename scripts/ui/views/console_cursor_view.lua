@@ -22,7 +22,7 @@ ConsoleCursorView.init = function (self, world)
 		snap_pixel_positions = false
 	}
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 
 	DO_RELOAD = false
 end
@@ -42,15 +42,15 @@ ConsoleCursorView.update = function (self, dt)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 	end
 
 	if not Managers.input:is_device_active("gamepad") then
 		return
 	end
 
-	self._update_position(self, dt)
-	self._draw(self, dt)
+	self:_update_position(dt)
+	self:_draw(dt)
 end
 
 ConsoleCursorView._update_position = function (self, dt)

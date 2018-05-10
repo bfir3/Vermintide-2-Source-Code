@@ -29,7 +29,7 @@ end
 PlayerCharacterStateInHangingCage.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local status_extension = self.status_extension
 
-	status_extension.set_in_hanging_cage(status_extension, false)
+	status_extension:set_in_hanging_cage(false)
 end
 
 PlayerCharacterStateInHangingCage.update = function (self, unit, input, dt, context, t)
@@ -58,10 +58,10 @@ PlayerCharacterStateInHangingCage.update = function (self, unit, input, dt, cont
 			local current_position = POSITION_LOOKUP[unit]
 			local locomotion_extension = self.locomotion_extension
 
-			locomotion_extension.teleport_to(locomotion_extension, current_position)
-			locomotion_extension.enable_script_driven_movement(locomotion_extension)
+			locomotion_extension:teleport_to(current_position)
+			locomotion_extension:enable_script_driven_movement()
 			self.health_extension:die()
-			csm.change_state(csm, "knocked_down", {
+			csm:change_state("knocked_down", {
 				already_in_ko_anim = true
 			})
 		end

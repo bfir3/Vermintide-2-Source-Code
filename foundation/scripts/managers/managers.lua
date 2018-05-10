@@ -21,7 +21,7 @@ local function destroy_global_managers()
 		local manager = Managers[alias]
 
 		if manager and type(manager.destroy) == "function" then
-			manager.destroy(manager)
+			manager:destroy()
 		end
 
 		Managers[alias] = nil
@@ -37,7 +37,7 @@ local function destroy_state_managers()
 		local manager = Managers.state[alias]
 
 		if manager and type(manager.destroy) == "function" then
-			manager.destroy(manager)
+			manager:destroy()
 		end
 
 		Managers.state[alias] = nil

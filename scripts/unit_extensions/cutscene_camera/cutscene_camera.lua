@@ -34,7 +34,7 @@ CutsceneCamera.activate = function (self, transition_data)
 	end
 
 	if transition == "PLAYER_TO_CUTSCENE" then
-		local external_camera = self.setup_external_camera(self, transition, "first_person", "first_person_node")
+		local external_camera = self:setup_external_camera(transition, "first_person", "first_person_node")
 		local time = Managers.time:time("game")
 		source_camera = external_camera
 		target_camera = self
@@ -43,7 +43,7 @@ CutsceneCamera.activate = function (self, transition_data)
 	end
 
 	if transition == "CUTSCENE_TO_PLAYER" then
-		local external_camera = self.setup_external_camera(self, transition, "first_person", "first_person_node")
+		local external_camera = self:setup_external_camera(transition, "first_person", "first_person_node")
 		local time = Managers.time:time("game")
 		source_camera = self
 		target_camera = external_camera
@@ -66,16 +66,16 @@ end
 
 CutsceneCamera.setup_external_camera = function (self, transition, tree_name, node_name)
 	local camera_manager = Managers.state.camera
-	local camera_node = camera_manager.tree_node(camera_manager, self.viewport, tree_name, node_name)
+	local camera_node = camera_manager:tree_node(self.viewport, tree_name, node_name)
 
-	camera_node.set_active(camera_node, true)
-	camera_manager.force_update_nodes(camera_manager, 0, self.viewport)
+	camera_node:set_active(true)
+	camera_manager:force_update_nodes(0, self.viewport)
 
 	return camera_node
 end
 
 CutsceneCamera.update = function (self)
-	self.update_cutscene_camera(self)
+	self:update_cutscene_camera()
 end
 
 CutsceneCamera.update_cutscene_camera = function (self)
@@ -85,16 +85,16 @@ CutsceneCamera.update_cutscene_camera = function (self)
 
 	if target_camera then
 		local time = Managers.time:time("game")
-		local progress = self.transition_progress(self, self.transition_start_time, self.transition_end_time, time)
-		pose = Matrix4x4.lerp(source_camera.pose(source_camera), target_camera.pose(target_camera), progress)
-		vertical_fov = math.lerp(source_camera.vertical_fov(source_camera), target_camera.vertical_fov(target_camera), progress)
-		near_range = math.lerp(source_camera.near_range(source_camera), target_camera.near_range(target_camera), progress)
-		far_range = math.lerp(source_camera.far_range(source_camera), target_camera.far_range(target_camera), progress)
+		local progress = self:transition_progress(self.transition_start_time, self.transition_end_time, time)
+		pose = Matrix4x4.lerp(source_camera:pose(), target_camera:pose(), progress)
+		vertical_fov = math.lerp(source_camera:vertical_fov(), target_camera:vertical_fov(), progress)
+		near_range = math.lerp(source_camera:near_range(), target_camera:near_range(), progress)
+		far_range = math.lerp(source_camera:far_range(), target_camera:far_range(), progress)
 	else
-		pose = source_camera.pose(source_camera)
-		vertical_fov = source_camera.vertical_fov(source_camera)
-		near_range = source_camera.near_range(source_camera)
-		far_range = source_camera.far_range(source_camera)
+		pose = source_camera:pose()
+		vertical_fov = source_camera:vertical_fov()
+		near_range = source_camera:near_range()
+		far_range = source_camera:far_range()
 	end
 
 	if Unit.has_data(self.unit, "dof_data") then
@@ -109,27 +109,27 @@ CutsceneCamera.update_cutscene_camera = function (self)
 	end
 
 	if self.allow_controls then
-		self._handle_input(self, pose)
+		self:_handle_input(pose)
 	end
 
 	local camera_manager = Managers.state.camera
 	local viewport = self.viewport
 
-	camera_manager.set_node_tree_root_position(camera_manager, viewport, "cutscene", Matrix4x4.translation(pose))
-	camera_manager.set_node_tree_root_rotation(camera_manager, viewport, "cutscene", Matrix4x4.rotation(pose))
-	camera_manager.set_node_tree_root_vertical_fov(camera_manager, viewport, "cutscene", vertical_fov)
-	camera_manager.set_node_tree_root_near_range(camera_manager, viewport, "cutscene", near_range)
-	camera_manager.set_node_tree_root_far_range(camera_manager, viewport, "cutscene", far_range)
-	camera_manager.set_node_tree_root_dof_enabled(camera_manager, viewport, "cutscene", dof_enabled)
+	camera_manager:set_node_tree_root_position(viewport, "cutscene", Matrix4x4.translation(pose))
+	camera_manager:set_node_tree_root_rotation(viewport, "cutscene", Matrix4x4.rotation(pose))
+	camera_manager:set_node_tree_root_vertical_fov(viewport, "cutscene", vertical_fov)
+	camera_manager:set_node_tree_root_near_range(viewport, "cutscene", near_range)
+	camera_manager:set_node_tree_root_far_range(viewport, "cutscene", far_range)
+	camera_manager:set_node_tree_root_dof_enabled(viewport, "cutscene", dof_enabled)
 
 	if 0 < dof_enabled then
-		camera_manager.set_node_tree_root_focal_distance(camera_manager, viewport, "cutscene", focal_distance)
-		camera_manager.set_node_tree_root_focal_region(camera_manager, viewport, "cutscene", focal_region)
-		camera_manager.set_node_tree_root_focal_padding(camera_manager, viewport, "cutscene", focal_padding)
-		camera_manager.set_node_tree_root_focal_scale(camera_manager, viewport, "cutscene", focal_scale)
+		camera_manager:set_node_tree_root_focal_distance(viewport, "cutscene", focal_distance)
+		camera_manager:set_node_tree_root_focal_region(viewport, "cutscene", focal_region)
+		camera_manager:set_node_tree_root_focal_padding(viewport, "cutscene", focal_padding)
+		camera_manager:set_node_tree_root_focal_scale(viewport, "cutscene", focal_scale)
 	end
 
-	camera_manager.set_camera_node(camera_manager, viewport, "cutscene", "root_node")
+	camera_manager:set_camera_node(viewport, "cutscene", "root_node")
 end
 
 CutsceneCamera._handle_input = function (self, pose)

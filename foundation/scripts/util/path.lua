@@ -1,7 +1,7 @@
 Path = {
 	normalize_path = function (string_path)
-		string_path = string_path.gsub(string_path, "\\", "/")
-		string_path = string_path.gsub(string_path, "//", "/")
+		string_path = string_path:gsub("\\", "/")
+		string_path = string_path:gsub("//", "/")
 
 		return string_path
 	end
@@ -17,8 +17,8 @@ Path.path_from_string = function (string_path)
 	local index = 0
 
 	while index ~= nil do
-		local next_slash_index = string_path.find(string_path, "/", index)
-		local path_part = string_path.sub(string_path, index, (next_slash_index and next_slash_index - 1) or nil)
+		local next_slash_index = string_path:find("/", index)
+		local path_part = string_path:sub(index, (next_slash_index and next_slash_index - 1) or nil)
 		path_n = path_n + 1
 		path[path_n] = path_part
 

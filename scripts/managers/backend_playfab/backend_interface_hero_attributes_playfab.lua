@@ -26,7 +26,7 @@ BackendInterfaceHeroAttributesPlayFab.init = function (self, backend_mirror)
 	self._attributes_to_save = {}
 	self._backend_mirror = backend_mirror
 
-	self._refresh(self)
+	self:_refresh()
 
 	self._initialized = true
 end
@@ -39,7 +39,7 @@ BackendInterfaceHeroAttributesPlayFab._refresh = function (self)
 	table.clear(self._attributes)
 
 	local mirror = self._backend_mirror
-	local read_only_data = mirror.get_read_only_data(mirror)
+	local read_only_data = mirror:get_read_only_data()
 
 	for attribute_name, default_value in pairs(DEFAULT_ATTRIBUTES) do
 		local backend_value = read_only_data[attribute_name]
@@ -57,7 +57,7 @@ end
 
 BackendInterfaceHeroAttributesPlayFab.get = function (self, hero, attribute)
 	if self._dirty then
-		self._refresh(self)
+		self:_refresh()
 	end
 
 	local key = hero .. "_" .. attribute
@@ -71,7 +71,7 @@ BackendInterfaceHeroAttributesPlayFab.set = function (self, hero, attribute, val
 	local key = hero .. "_" .. attribute
 	local mirror = self._backend_mirror
 
-	mirror.set_read_only_data(mirror, key, value, false)
+	mirror:set_read_only_data(key, value, false)
 
 	self._dirty = true
 end

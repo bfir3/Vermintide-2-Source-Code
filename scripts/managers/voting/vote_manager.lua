@@ -39,11 +39,11 @@ VoteManager.request_vote = function (self, name, vote_data, voter_peer_id)
 	vote_data.voter_peer_id = voter_peer_id
 
 	if self.is_server then
-		local start_new_voting = self.can_start_vote(self, name, vote_data)
+		local start_new_voting = self:can_start_vote(name, vote_data)
 
 		if start_new_voting then
-			self._server_abort_active_vote(self)
-			self._server_start_vote(self, name, nil, vote_data)
+			self:_server_abort_active_vote()
+			self:_server_start_vote(name, nil, vote_data)
 
 			local sync_data = vote_template.pack_sync_data(vote_data)
 			local server_start_vote_rpc = vote_template.server_start_vote_rpc
@@ -55,7 +55,7 @@ VoteManager.request_vote = function (self, name, vote_data, voter_peer_id)
 				local votes = vote_template.initial_vote_func(vote_data)
 
 				for peer_id, vote in pairs(votes) do
-					self.rpc_vote(self, peer_id, vote)
+					self:rpc_vote(peer_id, vote)
 				end
 			end
 
@@ -77,7 +77,7 @@ VoteManager._server_abort_active_vote = function (self)
 		local vote_data = active_voting.data
 		local result_data = active_voting.template.on_complete(0, ingame_context, vote_data)
 
-		self.rpc_client_complete_vote(self, nil, 0)
+		self:rpc_client_complete_vote(nil, 0)
 		Managers.state.network.network_transmit:send_rpc_clients("rpc_client_complete_vote", 0)
 	end
 end
@@ -121,8 +121,8 @@ VoteManager.vote = function (self, vote)
 	local network_manager = Managers.state.network
 
 	if is_server then
-		self.rpc_vote(self, Network.peer_id(), vote)
-	elseif network_manager.in_game_session(network_manager) then
+		self:rpc_vote(Network.peer_id(), vote)
+	elseif network_manager:in_game_session() then
 		network_manager.network_transmit:send_rpc_server("rpc_vote", vote)
 	end
 end
@@ -202,18 +202,18 @@ VoteManager.update = function (self, dt)
 	local t = Managers.state.network:network_time()
 
 	if self.is_server then
-		self._server_update(self, dt, t)
+		self:_server_update(dt, t)
 	else
-		self._client_update(self, dt, t)
+		self:_client_update(dt, t)
 	end
 
 	if self._allow_vote_input then
 		local active_voting = self.active_voting
 
-		if active_voting and active_voting.template.ingame_vote and not self.has_voted(self, Network.peer_id()) then
+		if active_voting and active_voting.template.ingame_vote and not self:has_voted(Network.peer_id()) then
 			local input_manager = self.input_manager
-			local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
-			local input_source = input_manager.get_service(input_manager, "ingame_menu")
+			local gamepad_active = input_manager:is_device_active("gamepad")
+			local input_source = input_manager:get_service("ingame_menu")
 			local vote_options = active_voting.template.vote_options
 			local vote_options_n = #vote_options
 			local input_hold_timer = active_voting.input_hold_timer or 0
@@ -224,7 +224,7 @@ VoteManager.update = function (self, dt)
 				if gamepad_active then
 					local input = vote_option.input
 
-					if input_source.get(input_source, input) then
+					if input_source:get(input) then
 						if input ~= active_voting.current_hold_input then
 							active_voting.current_hold_input = input
 							input_hold_timer = 0
@@ -235,7 +235,7 @@ VoteManager.update = function (self, dt)
 						if input_hold_timer == input_hold_time then
 							active_voting.input_hold_timer = nil
 
-							self.vote(self, vote_option.vote)
+							self:vote(vote_option.vote)
 						else
 							active_voting.input_hold_timer = math.min(input_hold_timer + dt, input_hold_time)
 							active_voting.input_hold_progress = active_voting.input_hold_timer / input_hold_time
@@ -245,8 +245,8 @@ VoteManager.update = function (self, dt)
 						active_voting.input_hold_timer = nil
 						active_voting.input_hold_progress = nil
 					end
-				elseif input_source.get(input_source, vote_option.input) then
-					self.vote(self, vote_option.vote)
+				elseif input_source:get(vote_option.input) then
+					self:vote(vote_option.vote)
 				end
 			end
 		end
@@ -266,7 +266,7 @@ end
 VoteManager._vote_result = function (self, vote_time_ended)
 	local active_voting = self.active_voting
 	local template = active_voting.template
-	local num_of_votes, current_vote_results = self._number_of_votes(self)
+	local num_of_votes, current_vote_results = self:_number_of_votes()
 	local number_of_voters = #active_voting.voters
 	local votes = active_voting.votes
 	local minimum_voter_percent = template.minimum_voter_percent
@@ -331,7 +331,7 @@ VoteManager._server_start_vote = function (self, name, ignore_peer_list, data)
 		template = vote_template,
 		end_time = (vote_template.duration and network_time + vote_template.duration) or nil,
 		votes = {},
-		voters = self._get_voter_start_list(self, ignore_peer_list),
+		voters = self:_get_voter_start_list(ignore_peer_list),
 		data = data
 	}
 
@@ -342,7 +342,7 @@ VoteManager._server_start_vote = function (self, name, ignore_peer_list, data)
 	local start_sound_event = vote_template.start_sound_event
 
 	if start_sound_event then
-		self.play_sound(self, start_sound_event)
+		self:play_sound(start_sound_event)
 	end
 end
 
@@ -414,12 +414,12 @@ VoteManager.rpc_vote = function (self, peer_id, vote_cast)
 		local current_votes = active_voting.votes
 		local current_voters = active_voting.voters
 
-		if self.has_voted(self, peer_id) then
+		if self:has_voted(peer_id) then
 			return
 		end
 
 		Managers.state.network.network_transmit:send_rpc_clients("rpc_client_add_vote", peer_id, vote_cast)
-		self._server_add_vote(self, peer_id, vote_cast)
+		self:_server_add_vote(peer_id, vote_cast)
 	end
 end
 
@@ -438,20 +438,20 @@ VoteManager._server_update = function (self, dt, t)
 		return
 	end
 
-	local active_peers = self._active_peers(self)
-	local changed = self._update_voter_list_by_active_peers(self, active_peers, active_voting.voters, active_voting.votes)
+	local active_peers = self:_active_peers()
+	local changed = self:_update_voter_list_by_active_peers(active_peers, active_voting.voters, active_voting.votes)
 
 	if changed then
 		Managers.state.network.network_transmit:send_rpc_clients("rpc_update_voters_list", active_voting.voters)
 	end
 
-	local vote_time_ended = self._time_ended(self, t)
+	local vote_time_ended = self:_time_ended(t)
 
 	if vote_time_ended then
-		self._handle_undecided_votes(self, active_voting)
+		self:_handle_undecided_votes(active_voting)
 	end
 
-	local vote_result = self._vote_result(self, vote_time_ended)
+	local vote_result = self:_vote_result(vote_time_ended)
 
 	if vote_result ~= nil then
 		local result_data = active_voting.template.on_complete(vote_result, self.ingame_context, active_voting.data)
@@ -478,7 +478,7 @@ VoteManager._handle_undecided_votes = function (self, active_voting)
 		local peer_id = voters[i]
 
 		if not votes[peer_id] then
-			self.rpc_vote(self, peer_id, timeout_vote_option)
+			self:rpc_vote(peer_id, timeout_vote_option)
 		end
 	end
 end
@@ -488,15 +488,15 @@ VoteManager.rpc_server_request_start_vote_base = function (self, peer_id, vote_t
 	local vote_template = VoteTemplates[vote_type_name]
 	local vote_data = vote_template.extract_sync_data(sync_data)
 
-	self.request_vote(self, vote_type_name, vote_data, peer_id)
+	self:request_vote(vote_type_name, vote_data, peer_id)
 end
 
 VoteManager.rpc_server_request_start_vote_peer_id = function (self, peer_id, vote_type_id, sync_data)
-	self.rpc_server_request_start_vote_base(self, peer_id, vote_type_id, sync_data)
+	self:rpc_server_request_start_vote_base(peer_id, vote_type_id, sync_data)
 end
 
 VoteManager.rpc_server_request_start_vote_lookup = function (self, peer_id, vote_type_id, sync_data)
-	self.rpc_server_request_start_vote_base(self, peer_id, vote_type_id, sync_data)
+	self:rpc_server_request_start_vote_base(peer_id, vote_type_id, sync_data)
 end
 
 VoteManager._start_vote_base = function (self, peer_id, vote_type_id, sync_data, voters)
@@ -518,11 +518,11 @@ VoteManager._start_vote_base = function (self, peer_id, vote_type_id, sync_data,
 end
 
 VoteManager.rpc_client_start_vote_peer_id = function (self, peer_id, vote_type_id, sync_data, voters)
-	self._start_vote_base(self, peer_id, vote_type_id, sync_data, voters)
+	self:_start_vote_base(peer_id, vote_type_id, sync_data, voters)
 end
 
 VoteManager.rpc_client_start_vote_lookup = function (self, peer_id, vote_type_id, sync_data, voters)
-	self._start_vote_base(self, peer_id, vote_type_id, sync_data, voters)
+	self:_start_vote_base(peer_id, vote_type_id, sync_data, voters)
 end
 
 VoteManager.rpc_client_add_vote = function (self, sender_id, peer_id, vote_option)
@@ -535,7 +535,7 @@ end
 
 VoteManager.rpc_client_complete_vote = function (self, sender_id, vote_result)
 	if self.active_voting then
-		local number_of_votes, vote_results = self._number_of_votes(self)
+		local number_of_votes, vote_results = self:_number_of_votes()
 		self.previous_voting_info = {
 			text = self.active_voting.text,
 			number_of_votes = number_of_votes,
@@ -562,7 +562,7 @@ VoteManager.rpc_update_voters_list = function (self, peer_id, voters)
 			active_peers[voters[i]] = true
 		end
 
-		local changed = self._update_voter_list_by_active_peers(self, active_peers, active_voting.voters, active_voting.votes)
+		local changed = self:_update_voter_list_by_active_peers(active_peers, active_voting.voters, active_voting.votes)
 
 		if not changed then
 			table.dump(voters, "voters")

@@ -52,7 +52,7 @@ GenericVolumeExtension.on_volume_enter = function (self, dt, t, volume)
 	end
 
 	if data.update_func then
-		self.set_update_active(self, data, true)
+		self:set_update_active(data, true)
 	end
 end
 
@@ -65,7 +65,7 @@ GenericVolumeExtension.on_volume_exit = function (self, volume)
 	end
 
 	if data.update_func then
-		self.set_update_active(self, data, false)
+		self:set_update_active(data, false)
 	end
 end
 

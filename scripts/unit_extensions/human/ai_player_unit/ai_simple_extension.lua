@@ -76,9 +76,9 @@ AISimpleExtension.init = function (self, extension_init_context, unit, extension
 		WwiseUtils.trigger_unit_event(self._world, breed.special_spawn_stinger, unit, 0)
 	end
 
-	self._init_event_handler(self)
-	self._init_brain(self, breed, is_horde)
-	self._set_size_variation(self, extension_init_data.size_variation, extension_init_data.size_variation_normalized)
+	self:_init_event_handler()
+	self:_init_brain(breed, is_horde)
+	self:_set_size_variation(extension_init_data.size_variation, extension_init_data.size_variation_normalized)
 	GarbageLeakDetector.register_object(blackboard, "ai_blackboard")
 end
 
@@ -110,7 +110,7 @@ AISimpleExtension.extensions_ready = function (self, world, unit)
 	local spawn_type = blackboard.spawn_type
 	local is_horde = spawn_type == "horde_hidden" or spawn_type == "horde"
 
-	self.init_perception(self, breed, is_horde)
+	self:init_perception(breed, is_horde)
 
 	if health_extension then
 		self.broadphase_id = Broadphase.add(blackboard.group_blackboard.broadphase, unit, Unit.local_position(unit, 0), 1)
@@ -144,12 +144,12 @@ end
 
 AISimpleExtension.set_properties = function (self, params)
 	for _, property in pairs(params) do
-		local prop_name, prop_value = property.match(property, "(%S+) (%S+)")
+		local prop_name, prop_value = property:match("(%S+) (%S+)")
 		local prop_type = type(self._breed.properties[prop_name])
 
 		if prop_type == "table" then
 			prop_value = AIProperties
-			local prop_iterator = property.gmatch(property, "(%S+)")
+			local prop_iterator = property:gmatch("(%S+)")
 
 			prop_iterator()
 
@@ -283,7 +283,7 @@ AISimpleExtension.force_enemy_detection = function (self, t)
 	local random_enemy = PLAYER_AND_BOT_UNITS[target]
 
 	if random_enemy then
-		self.enemy_aggro(self, self._unit, random_enemy)
+		self:enemy_aggro(self._unit, random_enemy)
 	end
 end
 
@@ -305,7 +305,7 @@ AISimpleExtension.die = function (self, killer_unit, killing_blow)
 
 	local conflict_director = Managers.state.conflict
 
-	conflict_director.register_unit_killed(conflict_director, unit, blackboard, killer_unit, killing_blow)
+	conflict_director:register_unit_killed(unit, blackboard, killer_unit, killing_blow)
 end
 
 AISimpleExtension.attacked = function (self, attacker_unit, t, damage_hit)
@@ -357,7 +357,7 @@ AISimpleExtension.enemy_aggro = function (self, alerting_unit, enemy_unit)
 
 	if ScriptUnit.has_extension(self_unit, "ai_inventory_system") then
 		local network_manager = Managers.state.network
-		local self_unit_id = network_manager.unit_game_object_id(network_manager, self_unit)
+		local self_unit_id = network_manager:unit_game_object_id(self_unit)
 
 		network_manager.network_transmit:send_rpc_all("rpc_ai_inventory_wield", self_unit_id, 1)
 	end
@@ -376,7 +376,7 @@ AISimpleExtension.enemy_alert = function (self, alerting_unit, enemy_unit)
 	end
 
 	if blackboard.hesitating or (blackboard.in_alerted_state and blackboard.alerted_deadline_reached) then
-		self.enemy_aggro(self, alerting_unit, enemy_unit)
+		self:enemy_aggro(alerting_unit, enemy_unit)
 	end
 
 	local attacker_is_player = Managers.player:owner(enemy_unit)

@@ -34,8 +34,8 @@ PlayerCharacterStateInspecting.update = function (self, unit, input, dt, context
 		return
 	end
 
-	if not input_extension.get(input_extension, "character_inspecting") then
-		csm.change_state(csm, "standing")
+	if not input_extension:get("character_inspecting") then
+		csm:change_state("standing")
 
 		return
 	end

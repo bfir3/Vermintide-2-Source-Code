@@ -20,7 +20,7 @@ PingTargetExtension.set_pinged = function (self, pinged, pinger_unit)
 
 	if self.outline_extension then
 		self.outline_extension.set_pinged(pinged)
-		self._add_witch_hunter_buff(self, unit, pinger_unit)
+		self:_add_witch_hunter_buff(unit, pinger_unit)
 	end
 end
 
@@ -46,7 +46,7 @@ PingTargetExtension._add_witch_hunter_buff = function (self, unit, pinger_unit)
 
 	if buff_extension then
 		local wh_buff_name = "defence_debuff_enemies"
-		local has_buff = buff_extension.has_buff_type(buff_extension, wh_buff_name)
+		local has_buff = buff_extension:has_buff_type(wh_buff_name)
 
 		if not has_buff then
 			local player_and_bot_units = PLAYER_AND_BOT_UNITS
@@ -55,10 +55,10 @@ PingTargetExtension._add_witch_hunter_buff = function (self, unit, pinger_unit)
 			for i = 1, num_units, 1 do
 				local player_unit = player_and_bot_units[i]
 				local career_extension = ScriptUnit.has_extension(player_unit, "career_system")
-				local career_name = career_extension and career_extension.career_name(career_extension)
+				local career_name = career_extension and career_extension:career_name()
 
 				if career_name and career_name == "wh_captain" then
-					buff_extension.add_buff(buff_extension, wh_buff_name)
+					buff_extension:add_buff(wh_buff_name)
 				end
 			end
 		end

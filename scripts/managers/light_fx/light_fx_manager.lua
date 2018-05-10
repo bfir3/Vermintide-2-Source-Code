@@ -25,7 +25,7 @@ LightFXManager.init = function (self)
 
 	self._color_value = {}
 
-	self.set_lightfx_color_scheme(self, "loading")
+	self:set_lightfx_color_scheme("loading")
 end
 
 LightFXManager.set_lightfx_color_scheme = function (self, color_scheme)
@@ -45,9 +45,9 @@ LightFXManager.set_lightfx_color_scheme = function (self, color_scheme)
 		return
 	end
 
-	local v = self._get_value_from_color_scheme(self, color_scheme)
+	local v = self:_get_value_from_color_scheme(color_scheme)
 
-	self.set_lightfx_color(self, v[1], v[2], v[3], v[4], v[5])
+	self:set_lightfx_color(v[1], v[2], v[3], v[4], v[5])
 end
 
 LightFXManager.set_lightfx_color = function (self, red, green, blue, intensity, blendtime)
@@ -123,20 +123,20 @@ LightFXManager.update = function (self, dt)
 
 		conditional_color_scheme.update_func(dt, t, v)
 	elseif conditional_scheme_was_set then
-		local v = self._get_value_from_color_scheme(self, self._color_scheme)
+		local v = self:_get_value_from_color_scheme(self._color_scheme)
 
-		self.set_lightfx_color(self, v[1], v[2], v[3], v[4], v[5])
+		self:set_lightfx_color(v[1], v[2], v[3], v[4], v[5])
 	elseif color_scheme_data.update_func then
-		local v = self._get_value_from_color_scheme(self, color_scheme)
+		local v = self:_get_value_from_color_scheme(color_scheme)
 
-		self.set_lightfx_color(self, v[1], v[2], v[3], v[4], v[5])
+		self:set_lightfx_color(v[1], v[2], v[3], v[4], v[5])
 	end
 
 	self._conditional_color_scheme = conditional_color_scheme
 	self._conditional_color_scheme_timer = conditional_color_scheme_timer
 
 	if script_data.debug_lightfx then
-		self.udpate_debug(self, dt)
+		self:udpate_debug(dt)
 	end
 end
 

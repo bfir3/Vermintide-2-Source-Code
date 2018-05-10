@@ -15,7 +15,7 @@ ObserverUI.init = function (self, ingame_ui_context)
 	self.player_shielded = false
 	self._is_visible = false
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 end
 
 ObserverUI.create_ui_elements = function (self)
@@ -27,8 +27,8 @@ ObserverUI.create_ui_elements = function (self)
 	self.player_name_widget.style.text.localize = false
 	RELOAD_UI = false
 
-	self.set_visible(self, false)
-	self.draw(self)
+	self:set_visible(false)
+	self:draw()
 end
 
 ObserverUI.get_player_camera_extension = function (self)
@@ -42,22 +42,22 @@ ObserverUI.get_player_camera_extension = function (self)
 end
 
 ObserverUI.handle_observer_player_changed = function (self)
-	local camera_extension = self.get_player_camera_extension(self)
+	local camera_extension = self:get_player_camera_extension()
 
 	if not camera_extension then
 		return
 	end
 
-	local observed_player_id = camera_extension.get_observed_player_id(camera_extension)
+	local observed_player_id = camera_extension:get_observed_player_id()
 
 	if observed_player_id then
 		local current_observing_player_id = self.observing_player_id
 
 		if not current_observing_player_id or current_observing_player_id ~= observed_player_id then
-			self.set_observer_player(self, observed_player_id)
+			self:set_observer_player(observed_player_id)
 		end
 	else
-		self.stop_draw_observer_ui(self)
+		self:stop_draw_observer_ui()
 	end
 end
 
@@ -65,13 +65,13 @@ ObserverUI.set_observer_player = function (self, player_id)
 	local profiles = SPProfiles
 	local profile_synchronizer = self.profile_synchronizer
 	local player_manager = Managers.player
-	local players = player_manager.players(player_manager)
+	local players = player_manager:players()
 	local follow_player = players[player_id]
-	local is_player_controlled = follow_player.is_player_controlled(follow_player)
-	local local_player_id = follow_player.local_player_id(follow_player)
-	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, follow_player.peer_id, local_player_id)
+	local is_player_controlled = follow_player:is_player_controlled()
+	local local_player_id = follow_player:local_player_id()
+	local profile_index = profile_synchronizer:profile_by_peer(follow_player.peer_id, local_player_id)
 	local hero_display_name = profiles[profile_index] and profiles[profile_index].display_name
-	local player_name = follow_player.name(follow_player)
+	local player_name = follow_player:name()
 	self.player_name_widget.content.text = (is_player_controlled and player_name) or player_name .. " (BOT)"
 	self.hero_name_widget.content.text = hero_display_name
 	self.observing_player_id = player_id
@@ -92,23 +92,23 @@ end
 
 ObserverUI.update = function (self, dt, t)
 	if RELOAD_UI then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	if not self._is_visible then
 		return
 	end
 
-	self.handle_observer_player_changed(self)
+	self:handle_observer_player_changed()
 
 	if self.observing_player_id then
-		self.update_follow_player_health_bar(self, self.observing_player_id)
-		self.update_health_animations(self, dt)
+		self:update_follow_player_health_bar(self.observing_player_id)
+		self:update_health_animations(dt)
 
 		self._skip_bar_animation = nil
 	end
 
-	self.draw(self, dt)
+	self:draw(dt)
 end
 
 ObserverUI.draw = function (self, dt)
@@ -172,14 +172,14 @@ end
 ObserverUI.update_follow_player_health_bar = function (self, peer_id)
 	local profile_synchronizer = self.profile_synchronizer
 	local player_manager = Managers.player
-	local players = player_manager.players(player_manager)
+	local players = player_manager:players()
 	local player = players[peer_id]
 
 	if not player then
 		return
 	end
 
-	local local_player_id = player.local_player_id(player)
+	local local_player_id = player:local_player_id()
 	local player_unit = player.player_unit
 	local health_percent, is_knocked_down, is_dead, is_wounded, is_ready_for_assisted_respawn = nil
 	local shield_percent = 0
@@ -192,9 +192,9 @@ ObserverUI.update_follow_player_health_bar = function (self, peer_id)
 	if player_unit then
 		local health_extension = ScriptUnit.extension(player_unit, "health_system")
 		local status_extension = ScriptUnit.extension(player_unit, "status_system")
-		health_percent = health_extension.current_health_percent(health_extension)
-		local max_health = health_extension.get_max_health(health_extension)
-		local has_shield, shield_amount = health_extension.has_assist_shield(health_extension)
+		health_percent = health_extension:current_health_percent()
+		local max_health = health_extension:get_max_health()
+		local has_shield, shield_amount = health_extension:has_assist_shield()
 
 		if has_shield then
 			shield_percent = shield_amount / max_health
@@ -220,13 +220,13 @@ ObserverUI.update_follow_player_health_bar = function (self, peer_id)
 			self.player_shielded = false
 		end
 
-		is_wounded = status_extension.is_wounded(status_extension)
-		is_knocked_down = status_extension.is_knocked_down(status_extension) and 0 < health_percent
-		is_ready_for_assisted_respawn = status_extension.is_ready_for_assisted_respawn(status_extension)
+		is_wounded = status_extension:is_wounded()
+		is_knocked_down = status_extension:is_knocked_down() and 0 < health_percent
+		is_ready_for_assisted_respawn = status_extension:is_ready_for_assisted_respawn()
 		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-		local num_grimoires = buff_extension.num_buff_perk(buff_extension, "skaven_grimoire")
-		local multiplier = buff_extension.apply_buffs_to_value(buff_extension, PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF, StatBuffIndex.CURSE_PROTECTION)
-		local num_twitch_grimoires = buff_extension.num_buff_perk(buff_extension, "twitch_grimoire")
+		local num_grimoires = buff_extension:num_buff_perk("skaven_grimoire")
+		local multiplier = buff_extension:apply_buffs_to_value(PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF, StatBuffIndex.CURSE_PROTECTION)
+		local num_twitch_grimoires = buff_extension:num_buff_perk("twitch_grimoire")
 		local twitch_multiplier = PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF
 		active_percentage = 1 + num_grimoires * multiplier + num_twitch_grimoires * twitch_multiplier
 	else
@@ -238,8 +238,8 @@ ObserverUI.update_follow_player_health_bar = function (self, peer_id)
 	is_dead = health_percent <= 0
 	local num_of_health_dividers = MIN_HEALTH_DIVIDERS
 	local low_health = (not is_dead and not is_knocked_down and health_percent < UISettings.unit_frames.low_health_threshold) or nil
-	local health_changed = self.on_player_health_changed(self, "my_player", hp_bar_widget, health_percent * active_percentage)
-	local grims_changed = self.on_num_grimoires_changed(self, "my_player_grimoires", hp_bar_widget, 1 - active_percentage)
+	local health_changed = self:on_player_health_changed("my_player", hp_bar_widget, health_percent * active_percentage)
+	local grims_changed = self:on_num_grimoires_changed("my_player_grimoires", hp_bar_widget, 1 - active_percentage)
 	modified_bar = modified_bar or health_changed or grims_changed
 	local hp_bar_value = hp_bar_widget.content.hp_bar.bar_value
 	local grimoire_value = hp_bar_widget.content.hp_bar_grimoire_debuff.bar_value
@@ -269,7 +269,7 @@ ObserverUI.update_follow_player_health_bar = function (self, peer_id)
 		end
 	end
 
-	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, player.peer_id, local_player_id)
+	local profile_index = profile_synchronizer:profile_by_peer(player.peer_id, local_player_id)
 
 	if profile_index then
 		if is_knocked_down or is_dead then
@@ -380,7 +380,7 @@ ObserverUI.update_health_animations = function (self, dt)
 			end
 
 			if animation_data.animate_highlight and not self.player_shielded then
-				animation_data.animate_highlight = self.update_damage_highlight(self, widget, animation_data.animate_highlight, dt)
+				animation_data.animate_highlight = self:update_damage_highlight(widget, animation_data.animate_highlight, dt)
 			end
 
 			if animation_data.animate then
@@ -388,7 +388,7 @@ ObserverUI.update_health_animations = function (self, dt)
 				local total_time = animation_data.total_time
 				local new_health = animation_data.new_health
 				local previous_health = animation_data.previous_health
-				local time_left = self.update_player_bar_animation(self, widget, bar, time, total_time, previous_health, new_health, dt)
+				local time_left = self:update_player_bar_animation(widget, bar, time, total_time, previous_health, new_health, dt)
 
 				if time_left then
 					animation_data.time = time_left

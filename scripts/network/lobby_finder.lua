@@ -23,7 +23,7 @@ LobbyFinder.add_filter_requirements = function (self, requirements, force_refres
 	LobbyInternal.add_filter_requirements(requirements)
 
 	if force_refresh then
-		self.refresh(self)
+		self:refresh()
 	end
 
 	table.clear(self._cached_lobbies)
@@ -44,7 +44,7 @@ end
 LobbyFinder.refresh = function (self)
 	local lobby_browser = LobbyInternal.lobby_browser()
 
-	lobby_browser.refresh(lobby_browser, self._lobby_port)
+	lobby_browser:refresh(self._lobby_port)
 
 	self._refreshing = true
 end
@@ -62,11 +62,11 @@ end
 LobbyFinder.update = function (self, dt)
 	if self._refreshing then
 		local lobby_browser = LobbyInternal.lobby_browser()
-		local is_refreshing = lobby_browser.is_refreshing(lobby_browser)
+		local is_refreshing = lobby_browser:is_refreshing()
 
 		if not is_refreshing then
 			local lobbies = {}
-			local num_lobbies = lobby_browser.num_lobbies(lobby_browser)
+			local num_lobbies = lobby_browser:num_lobbies()
 			local max_num_lobbies = self._max_num_lobbies
 
 			if max_num_lobbies then

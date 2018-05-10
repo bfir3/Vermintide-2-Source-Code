@@ -7,7 +7,7 @@ LootCratesPreviewer.init = function (self, rewards, units, spawn_positions, end_
 	self.end_positions = end_positions
 	self.units = units
 	self._rewards = rewards
-	self._spawned_units = self.spawn_units(self, units)
+	self._spawned_units = self:spawn_units(units)
 	local item_key_by_unit = {}
 
 	for index, item_data in ipairs(rewards) do
@@ -20,7 +20,7 @@ LootCratesPreviewer.init = function (self, rewards, units, spawn_positions, end_
 end
 
 LootCratesPreviewer.destroy = function (self)
-	self._destroy_units(self)
+	self:_destroy_units()
 end
 
 LootCratesPreviewer._destroy_units = function (self)
@@ -42,7 +42,7 @@ end
 
 LootCratesPreviewer.post_update = function (self, dt, t)
 	if not self._entry_animation_complete then
-		self._animate_entry_positions(self, dt, t)
+		self:_animate_entry_positions(dt, t)
 	end
 end
 
@@ -140,12 +140,12 @@ LootCratesPreviewer.spawn_units = function (self, units_name)
 			local spawn_position = spawn_positions[i]
 			local unit_name = units_name[i]
 			local unit = World.spawn_unit(world, unit_name)
-			local camera_rotation = self._get_camera_rotation(self)
+			local camera_rotation = self:_get_camera_rotation()
 			local camera_forward_vector = Quaternion.forward(camera_rotation)
 			local camera_look_rotation = Quaternion.look(camera_forward_vector, Vector3.up())
 			local horizontal_rotation = Quaternion.axis_angle(Vector3.up(), math.pi * 1)
 			local unit_spawn_rotation = Quaternion.multiply(camera_look_rotation, horizontal_rotation)
-			local camera_position = self._get_camera_position(self)
+			local camera_position = self:_get_camera_position()
 			local unit_spawn_position = Vector3(spawn_position[1], spawn_position[2], spawn_position[3])
 			local unit_box, box_dimension = Unit.box(unit)
 			local unit_center_position = Matrix4x4.translation(unit_box)
@@ -203,7 +203,7 @@ LootCratesPreviewer._enable_units_visibility = function (self)
 
 			local unit_event = "lua_presentation"
 
-			self._trigger_unit_flow_event(self, unit, unit_event)
+			self:_trigger_unit_flow_event(unit, unit_event)
 		end
 	end
 end

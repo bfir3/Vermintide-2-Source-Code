@@ -13,7 +13,7 @@ SystemDialogManager.destroy = function (self)
 end
 
 SystemDialogManager.update = function (self, dt)
-	self._handle_dialogs(self)
+	self:_handle_dialogs()
 end
 
 SystemDialogManager.check_status = function (self, dialog_instance)
@@ -26,7 +26,7 @@ SystemDialogManager.check_status = function (self, dialog_instance)
 	local status = nil
 
 	if data then
-		status = self._get_status(self, dialog_instance)
+		status = self:_get_status(dialog_instance)
 	end
 
 	return status
@@ -71,12 +71,12 @@ SystemDialogManager._handle_dialogs = function (self)
 
 	if data then
 		local dialog_instance = data.dialog_instance
-		local status = self._get_status(self, dialog_instance)
+		local status = self:_get_status(dialog_instance)
 
 		if status == dialog_instance.NONE then
-			self._initialize(self, dialog_instance)
+			self:_initialize(dialog_instance)
 		elseif status == dialog_instance.INITIALIZED then
-			local result = data.open(data)
+			local result = data:open()
 
 			if result then
 				if result == PS4.SCE_OK then
@@ -91,7 +91,7 @@ SystemDialogManager._handle_dialogs = function (self)
 				data.callback(status)
 			end
 
-			if self._terminate(self, dialog_instance) then
+			if self:_terminate(dialog_instance) then
 				table.remove(self._dialogs, 1)
 			end
 		end

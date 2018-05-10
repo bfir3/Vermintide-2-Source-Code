@@ -39,7 +39,7 @@ PlayerCharacterStateLunging.on_enter = function (self, unit, input, dt, context,
 
 	Unit.set_local_rotation(unit, 0, flat_rotation)
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, first_person_extension, status_extension, self.inventory_extension)
-	self._on_enter_animation(self, unit, lunge_data.animation_event, lunge_data.animation_variable_name, lunge_data.animation_variable_value, lunge_data.first_person_animation_event)
+	self:_on_enter_animation(unit, lunge_data.animation_event, lunge_data.animation_variable_name, lunge_data.animation_variable_value, lunge_data.first_person_animation_event)
 
 	self.amount_of_mass_hit = 0
 	self._hit_units = {}
@@ -55,12 +55,12 @@ PlayerCharacterStateLunging.on_enter = function (self, unit, input, dt, context,
 		local start_flow = flow_events.start
 
 		if start_flow then
-			Unit.flow_event(first_person_extension.get_first_person_unit(first_person_extension), start_flow)
+			Unit.flow_event(first_person_extension:get_first_person_unit(), start_flow)
 			Unit.flow_event(unit, start_flow)
 		end
 	end
 
-	first_person_extension.disable_rig_movement(first_person_extension)
+	first_person_extension:disable_rig_movement()
 
 	local damage_settings = lunge_data.damage
 
@@ -68,7 +68,7 @@ PlayerCharacterStateLunging.on_enter = function (self, unit, input, dt, context,
 		local career_power_level = self.career_extension:get_career_power_level()
 		local power_level_multiplier = damage_settings.power_level_multiplier
 		local damage_profile_name = damage_settings.damage_profile or "default"
-		local damage_profile_id, power_level, hit_zone_id, ignore_shield, allow_backstab = self._parse_attack_data(self, damage_settings)
+		local damage_profile_id, power_level, hit_zone_id, ignore_shield, allow_backstab = self:_parse_attack_data(damage_settings)
 		self.damage_profile_id = NetworkLookup.damage_profiles[damage_profile_name]
 		local damage_profile = DamageProfileTemplates[damage_profile_name]
 		self.damage_profile = damage_profile
@@ -140,14 +140,14 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 		if self._falling then
 			self._falling = false
 
-			whereabouts_extension.set_landed(whereabouts_extension)
+			whereabouts_extension:set_landed()
 		end
 
-		whereabouts_extension.set_is_onground(whereabouts_extension)
+		whereabouts_extension:set_is_onground()
 	elseif not self._falling then
 		self._falling = true
 
-		whereabouts_extension.set_fell(whereabouts_extension, self.name)
+		whereabouts_extension:set_fell(self.name)
 	end
 
 	local lunge_data = self._lunge_data
@@ -162,7 +162,7 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 				local event_name = first_flow.event_name
 
 				Unit.flow_event(unit, event_name)
-				Unit.flow_event(first_person_extension.get_first_person_unit(first_person_extension), event_name)
+				Unit.flow_event(first_person_extension:get_first_person_unit(), event_name)
 				table.remove(flow_events, 1)
 
 				first_flow = flow_events[1]
@@ -177,36 +177,36 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 	end
 
 	if CharacterStateHelper.is_using_transport(status_extension) then
-		csm.change_state(csm, "using_transport")
+		csm:change_state("using_transport")
 
 		return
 	end
 
 	if CharacterStateHelper.is_overcharge_exploding(status_extension) then
-		csm.change_state(csm, "overcharge_exploding")
+		csm:change_state("overcharge_exploding")
 
 		return
 	end
 
 	if CharacterStateHelper.is_pushed(status_extension) then
-		status_extension.set_pushed(status_extension, false)
+		status_extension:set_pushed(false)
 
 		local params = movement_settings_table.stun_settings.pushed
-		local hit_react_type = status_extension.hit_react_type(status_extension)
+		local hit_react_type = status_extension:hit_react_type()
 		params.hit_react_type = hit_react_type .. "_push"
 
-		csm.change_state(csm, "stunned", params)
+		csm:change_state("stunned", params)
 
 		return
 	end
 
 	if CharacterStateHelper.is_block_broken(status_extension) then
-		status_extension.set_block_broken(status_extension, false)
+		status_extension:set_block_broken(false)
 
 		local params = movement_settings_table.stun_settings.parry_broken
 		params.hit_react_type = "medium_push"
 
-		csm.change_state(csm, "stunned", params)
+		csm:change_state("stunned", params)
 
 		return
 	end
@@ -215,25 +215,25 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 		local damage_data = lunge_data.damage
 
 		if damage_data and damage_start_time <= t then
-			stop = self._update_damage(self, unit, dt, t, damage_data)
+			stop = self:_update_damage(unit, dt, t, damage_data)
 		end
 
 		local input_service = Managers.input:get_service("Player")
 
-		if input_service.get(input_service, "action_two", true) then
+		if input_service:get("action_two", true) then
 			local position = POSITION_LOOKUP[unit]
-			local forward_direction = Quaternion.forward(first_person_extension.current_rotation(first_person_extension))
+			local forward_direction = Quaternion.forward(first_person_extension:current_rotation())
 
-			self._do_blast(self, position, forward_direction)
+			self:_do_blast(position, forward_direction)
 
 			stop = true
 		end
 
-		if not self._update_movement(self, unit, dt, t, lunge_data) and not stop then
+		if not self:_update_movement(unit, dt, t, lunge_data) and not stop then
 			local position = POSITION_LOOKUP[unit]
-			local forward_direction = Quaternion.forward(first_person_extension.current_rotation(first_person_extension))
+			local forward_direction = Quaternion.forward(first_person_extension:current_rotation())
 
-			self._do_blast(self, position, forward_direction)
+			self:_do_blast(position, forward_direction)
 
 			stop = true
 		end
@@ -241,19 +241,19 @@ PlayerCharacterStateLunging.update = function (self, unit, input, dt, context, t
 
 	if stop then
 		if not self.csm.state_next and self._falling then
-			csm.change_state(csm, "falling", self.temp_params)
+			csm:change_state("falling", self.temp_params)
 
 			self.temp_params.hit = false
 
-			first_person_extension.change_state(first_person_extension, "falling")
+			first_person_extension:change_state("falling")
 
 			return
 		else
-			csm.change_state(csm, "walking", self.temp_params)
+			csm:change_state("walking", self.temp_params)
 
 			self.temp_params.hit = false
 
-			first_person_extension.change_state(first_person_extension, "walking")
+			first_person_extension:change_state("walking")
 
 			return
 		end
@@ -266,10 +266,10 @@ end
 
 PlayerCharacterStateLunging._update_movement = function (self, unit, dt, t, lunge_data)
 	if self._falling then
-		return self._move_in_air(self, unit, dt, t, lunge_data)
+		return self:_move_in_air(unit, dt, t, lunge_data)
 	end
 
-	return self._move_on_ground(self, unit, dt, t, lunge_data)
+	return self:_move_on_ground(unit, dt, t, lunge_data)
 end
 
 PlayerCharacterStateLunging._move_on_ground = function (self, unit, dt, t, lunge_data)
@@ -280,7 +280,7 @@ PlayerCharacterStateLunging._move_on_ground = function (self, unit, dt, t, lunge
 	local move_direction = nil
 
 	if lunge_data.allow_rotation then
-		local forward_direction = Quaternion.forward(first_person_extension.current_rotation(first_person_extension))
+		local forward_direction = Quaternion.forward(first_person_extension:current_rotation())
 		move_direction = Vector3.normalize(Vector3.flat(forward_direction))
 	else
 		move_direction = self._direction:unbox()
@@ -299,10 +299,10 @@ PlayerCharacterStateLunging._move_on_ground = function (self, unit, dt, t, lunge
 	local base_speed = 1
 
 	if base_speed < speed then
-		locomotion_extension.set_wanted_velocity(locomotion_extension, move_direction * base_speed)
-		locomotion_extension.set_script_movement_time_scale(locomotion_extension, speed / base_speed)
+		locomotion_extension:set_wanted_velocity(move_direction * base_speed)
+		locomotion_extension:set_script_movement_time_scale(speed / base_speed)
 	else
-		locomotion_extension.set_wanted_velocity(locomotion_extension, move_direction * speed)
+		locomotion_extension:set_wanted_velocity(move_direction * speed)
 	end
 
 	return lunge_time < duration
@@ -316,7 +316,7 @@ PlayerCharacterStateLunging._move_in_air = function (self, unit, dt, t, lunge_da
 	local move_direction = nil
 
 	if lunge_data.allow_rotation then
-		local forward_direction = Quaternion.forward(first_person_extension.current_rotation(first_person_extension))
+		local forward_direction = Quaternion.forward(first_person_extension:current_rotation())
 		move_direction = Vector3.normalize(Vector3.flat(forward_direction))
 	else
 		move_direction = self._direction:unbox()
@@ -333,12 +333,12 @@ PlayerCharacterStateLunging._move_in_air = function (self, unit, dt, t, lunge_da
 	end
 
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
-	local prev_move_velocity = Vector3.flat(locomotion_extension.current_velocity(locomotion_extension))
+	local prev_move_velocity = Vector3.flat(locomotion_extension:current_velocity())
 	local new_move_velocity = prev_move_velocity + move_direction * speed
 	local new_move_speed = Vector3.length(new_move_velocity)
 	local new_move_direction = Vector3.normalize(new_move_velocity)
 
-	locomotion_extension.set_wanted_velocity(locomotion_extension, new_move_direction * speed)
+	locomotion_extension:set_wanted_velocity(new_move_direction * speed)
 
 	return lunge_time < duration
 end
@@ -384,7 +384,7 @@ PlayerCharacterStateLunging._update_damage = function (self, unit, dt, t, damage
 	local half_length = Vector3.length(delta_move) * 0.5 + padding
 	local rot = Quaternion.look(delta_move, Vector3.up())
 	local first_person_extension = self.first_person_extension
-	local forward_direction = Quaternion.forward(first_person_extension.current_rotation(first_person_extension))
+	local forward_direction = Quaternion.forward(first_person_extension:current_rotation())
 	local mid_pos = (new_pos + old_pos) * 0.5 + Vector3(0, 0, half_height) + (damage_data.offset_forward or 0) * forward_direction
 	local size = Vector3(half_width, half_length, half_height)
 	local collision_filter = damage_data.collision_filter
@@ -392,7 +392,7 @@ PlayerCharacterStateLunging._update_damage = function (self, unit, dt, t, damage
 	local hit_units = self._hit_units
 	local buff_extension = self.buff_extension
 	local network_manager = Managers.state.network
-	local attacker_unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local attacker_unit_id = network_manager:unit_game_object_id(unit)
 	local attack_direction = Vector3.normalize(delta_move)
 	local weapon_system = Managers.state.entity:system("weapon_system")
 
@@ -402,12 +402,12 @@ PlayerCharacterStateLunging._update_damage = function (self, unit, dt, t, damage
 
 		if not hit_units[hit_unit] then
 			hit_units[hit_unit] = true
-			local hit_unit_id = network_manager.unit_game_object_id(network_manager, hit_unit)
+			local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
 			local hit_unit_pos = POSITION_LOOKUP[hit_unit]
 			local shield_blocked = false
 			local backstab_multiplier = 1
 			local breed = Unit.get_data(hit_unit, "breed")
-			local damage_profile_id, power_level, hit_zone_id, ignore_shield, allow_backstab = self._parse_attack_data(self, damage_data)
+			local damage_profile_id, power_level, hit_zone_id, ignore_shield, allow_backstab = self:_parse_attack_data(damage_data)
 
 			if breed and AiUtils.unit_alive(hit_unit) then
 				shield_blocked = not ignore_shield and AiUtils.attack_is_shield_blocked(hit_unit, unit)
@@ -420,11 +420,11 @@ PlayerCharacterStateLunging._update_damage = function (self, unit, dt, t, damage
 
 					if behind_target then
 						local procced = false
-						backstab_multiplier, procced = buff_extension.apply_buffs_to_value(buff_extension, backstab_multiplier, StatBuffIndex.BACKSTAB_MULTIPLIER)
+						backstab_multiplier, procced = buff_extension:apply_buffs_to_value(backstab_multiplier, StatBuffIndex.BACKSTAB_MULTIPLIER)
 					end
 				end
 
-				shield_blocked = self._calculate_hit_mass(self, shield_blocked, damage_data, hit_unit, breed)
+				shield_blocked = self:_calculate_hit_mass(shield_blocked, damage_data, hit_unit, breed)
 			else
 				shield_blocked = false
 			end
@@ -453,7 +453,7 @@ PlayerCharacterStateLunging._update_damage = function (self, unit, dt, t, damage
 				local can_damage = true
 				local can_stagger = true
 
-				weapon_system.send_rpc_attack_hit(weapon_system, damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, final_stagger_direction, damage_profile_id, "power_level", power_level, "hit_target_index", actual_hit_target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", can_damage, "can_stagger", can_stagger)
+				weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, final_stagger_direction, damage_profile_id, "power_level", power_level, "hit_target_index", actual_hit_target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", can_damage, "can_stagger", can_stagger)
 
 				local flow_events = self._lunge_data.flow_events
 
@@ -461,7 +461,7 @@ PlayerCharacterStateLunging._update_damage = function (self, unit, dt, t, damage
 					local impact_flow = flow_events.impact
 
 					if impact_flow then
-						Unit.flow_event(first_person_extension.get_first_person_unit(first_person_extension), impact_flow)
+						Unit.flow_event(first_person_extension:get_first_person_unit(), impact_flow)
 						Unit.flow_event(unit, impact_flow)
 					end
 				end
@@ -473,7 +473,7 @@ PlayerCharacterStateLunging._update_damage = function (self, unit, dt, t, damage
 				local hit_mass_count_reached = self.max_targets <= self.amount_of_mass_hit or breed.armor_category == 2 or breed.armor_category == 3
 
 				if AiUtils.unit_alive(hit_unit) and (damage_data.interrupt_on_first_hit or (hit_mass_count_reached and damage_data.interrupt_on_max_hit_mass)) then
-					self._do_blast(self, new_pos, forward_direction)
+					self:_do_blast(new_pos, forward_direction)
 
 					return true
 				end
@@ -500,7 +500,7 @@ PlayerCharacterStateLunging._do_blast = function (self, new_pos, forward_directi
 		local network_manager = Managers.state.network
 		local weapon_system = Managers.state.entity:system("weapon_system")
 		local unit = self.unit
-		local attacker_unit_id = network_manager.unit_game_object_id(network_manager, unit)
+		local attacker_unit_id = network_manager:unit_game_object_id(unit)
 		local radius = blast_damage_data.radius
 		local blast_pos = new_pos + forward_direction * radius
 		local actors, num_actors = PhysicsWorld.immediate_overlap(physics_world, "shape", "sphere", "position", blast_pos, "size", radius, "collision_filter", collision_filter, "use_global_table")
@@ -516,8 +516,8 @@ PlayerCharacterStateLunging._do_blast = function (self, new_pos, forward_directi
 				local breed = Unit.get_data(hit_unit, "breed")
 
 				if breed then
-					local damage_profile_id, power_level, hit_zone_id, ignore_shield, allow_backstab = self._parse_attack_data(self, blast_damage_data)
-					local hit_unit_id = network_manager.unit_game_object_id(network_manager, hit_unit)
+					local damage_profile_id, power_level, hit_zone_id, ignore_shield, allow_backstab = self:_parse_attack_data(blast_damage_data)
+					local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
 					local damage_source = "career_ability"
 					local damage_source_id = NetworkLookup.damage_sources[damage_source]
 					local attack_direction = Vector3.normalize(blast_pos - POSITION_LOOKUP[hit_unit])
@@ -529,7 +529,7 @@ PlayerCharacterStateLunging._do_blast = function (self, new_pos, forward_directi
 					local can_damage = true
 					local can_stagger = true
 
-					weapon_system.send_rpc_attack_hit(weapon_system, damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", actual_hit_target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", can_damage, "can_stagger", can_stagger)
+					weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", actual_hit_target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", can_damage, "can_stagger", can_stagger)
 				end
 			end
 		end

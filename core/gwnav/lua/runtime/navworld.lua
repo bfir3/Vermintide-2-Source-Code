@@ -60,27 +60,27 @@ NavWorld.init = function (self, world, level)
 
 	for ku, unit in pairs(Level.units(level)) do
 		if Unit.alive(unit) and Unit.has_data(unit, "GwNavWorld") then
-			self.init_fromnavworldunit(self, unit)
+			self:init_fromnavworldunit(unit)
 			GwNavWorld.init_visual_debug_server(self.gwnavworld, visualdebug_server_port)
 		elseif Unit.alive(unit) and Unit.has_data(unit, "GwNavBotConfiguration") then
-			self.init_bot_configuration(self, unit)
+			self:init_bot_configuration(unit)
 		elseif Unit.alive(unit) and Unit.has_data(unit, "GwNavGraphConnector") then
-			self.init_graph_connector(self, unit)
+			self:init_graph_connector(unit)
 		elseif Unit.alive(unit) and Unit.has_data(unit, "GwNavTagBox") then
-			self.init_tagbox(self, unit)
+			self:init_tagbox(unit)
 		elseif Unit.alive(unit) and Unit.has_data(unit, "GwNavBoxObstacle") then
-			self.add_boxobstacle(self, unit)
+			self:add_boxobstacle(unit)
 		elseif Unit.alive(unit) and Unit.has_data(unit, "GwNavCylinderObstacle") then
-			self.add_cylinderobstacle(self, unit)
+			self:add_cylinderobstacle(unit)
 		elseif Unit.alive(unit) and Unit.has_data(unit, "GwNavMarker") then
-			self.init_navmarker(self, unit)
+			self:init_navmarker(unit)
 		elseif Unit.alive(unit) and Unit.has_data(unit, "GwNavBot") then
 			bot_units[#bot_units + 1] = unit
 		end
 	end
 
 	for ku, unit in pairs(bot_units) do
-		self.init_bot(self, unit)
+		self:init_bot(unit)
 	end
 
 	_navworlds[level] = self
@@ -152,11 +152,11 @@ end
 
 NavWorld.init_fromnavworldunit = function (self, unit)
 	if Unit.has_data(unit, "GwNavWorld", "dynamicnavmesh_budget") then
-		self.set_dynamicnavmesh_budget(self, Unit.get_data(unit, "GwNavWorld", "dynamicnavmesh_budget"))
+		self:set_dynamicnavmesh_budget(Unit.get_data(unit, "GwNavWorld", "dynamicnavmesh_budget"))
 	end
 
 	if Unit.has_data(unit, "GwNavWorld", "pathfinder_budget") then
-		self.set_pathfinder_budget_in(self, Unit.get_data(unit, "GwNavWorld", "pathfinder_budget"))
+		self:set_pathfinder_budget_in(Unit.get_data(unit, "GwNavWorld", "pathfinder_budget"))
 	end
 
 	if Unit.has_data(unit, "GwNavWorld", "render_navdata") then
@@ -164,7 +164,7 @@ NavWorld.init_fromnavworldunit = function (self, unit)
 	end
 
 	if Unit.has_data(unit, "GwNavWorld", "enable_crowd_dispersion_navtag") then
-		self.set_pathvariety_mode(self, Unit.get_data(unit, "GwNavWorld", "enable_crowd_dispersion_navtag"))
+		self:set_pathvariety_mode(Unit.get_data(unit, "GwNavWorld", "enable_crowd_dispersion_navtag"))
 	end
 end
 
@@ -198,7 +198,7 @@ NavWorld.init_graph_connector = function (self, unit)
 	end
 
 	if 0 <= smartobject_id then
-		self.set_smartobject_cost_multiplier(self, smartobject_id, 1, "Jump")
+		self:set_smartobject_cost_multiplier(smartobject_id, 1, "Jump")
 	end
 
 	local temp_a = unitPos
@@ -287,7 +287,7 @@ end
 
 NavWorld.force_all_bots_to_repath = function (self)
 	for kb, bot in pairs(self.bots) do
-		bot.force_repath(bot)
+		bot:force_repath()
 	end
 end
 
@@ -297,15 +297,15 @@ NavWorld.update = function (self, dt)
 	end
 
 	for kb, bot in pairs(self.bots) do
-		bot.update(bot, dt)
+		bot:update(dt)
 	end
 
 	for kb, box in pairs(self.navboxobstacles) do
-		box.update(box, dt)
+		box:update(dt)
 	end
 
 	for kc, cylinder in pairs(self.navcylinderobstacles) do
-		cylinder.update(cylinder, dt)
+		cylinder:update(dt)
 	end
 
 	GwNavWorld.update(self.gwnavworld, dt)
@@ -314,12 +314,12 @@ end
 NavWorld.shutdown = function (self)
 	self.markers = {}
 
-	self.clear_bot_configuration(self)
-	self.clear_bots(self)
-	self.clear_navgraphs(self)
-	self.clear_tagboxes(self)
-	self.clear_boxobstacles(self)
-	self.clear_cylinderobstacles(self)
+	self:clear_bot_configuration()
+	self:clear_bots()
+	self:clear_navgraphs()
+	self:clear_tagboxes()
+	self:clear_boxobstacles()
+	self:clear_cylinderobstacles()
 	GwNavWorld.remove_navdata(self.gwnavworld, self.navdata)
 
 	self.navdata = nil
@@ -332,7 +332,7 @@ end
 
 NavWorld.clear_bot_configuration = function (self)
 	for kc, configuration in pairs(self.bot_configurations) do
-		configuration.shutdown(configuration)
+		configuration:shutdown()
 	end
 
 	self.bot_configurations = {}
@@ -340,7 +340,7 @@ end
 
 NavWorld.clear_navgraphs = function (self)
 	for kg, graph in pairs(self.navgraphs) do
-		graph.shutdown(graph)
+		graph:shutdown()
 	end
 
 	self.navgraphs = {}
@@ -348,8 +348,8 @@ end
 
 NavWorld.clear_tagboxes = function (self)
 	for kn, volume in pairs(self.navtagvolumes) do
-		volume.remove_from_world(volume)
-		volume.shutdown(volume)
+		volume:remove_from_world()
+		volume:shutdown()
 	end
 
 	self.navtagvolumes = {}
@@ -357,8 +357,8 @@ end
 
 NavWorld.clear_boxobstacles = function (self)
 	for kb, box in pairs(self.navboxobstacles) do
-		box.remove_from_world(box)
-		box.shutdown(box)
+		box:remove_from_world()
+		box:shutdown()
 	end
 
 	self.navboxobstacles = {}
@@ -366,8 +366,8 @@ end
 
 NavWorld.clear_cylinderobstacles = function (self)
 	for kc, cylinder in pairs(self.navcylinderobstacles) do
-		cylinder.remove_from_world(cylinder)
-		cylinder.shutdown(cylinder)
+		cylinder:remove_from_world()
+		cylinder:shutdown()
 	end
 
 	self.navcylinderobstacles = {}
@@ -375,7 +375,7 @@ end
 
 NavWorld.clear_bots = function (self)
 	for kb, bot in pairs(self.bots) do
-		bot.shutdown(bot)
+		bot:shutdown()
 	end
 
 	self.bots = {}

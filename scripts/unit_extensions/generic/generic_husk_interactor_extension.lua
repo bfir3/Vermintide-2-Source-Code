@@ -31,7 +31,7 @@ GenericHuskInteractorExtension.game_object_unit_destroyed = function (self)
 			local t = Managers.time:time("game")
 
 			InteractionHelper:complete_interaction(self.unit, interactable_unit, InteractionResult.FAILURE)
-			self.stop_interaction(self, t)
+			self:stop_interaction(t)
 		end
 	end
 end
@@ -77,7 +77,7 @@ GenericHuskInteractorExtension.update = function (self, unit, input, dt, context
 
 			if interaction_result ~= InteractionResult.ONGOING then
 				InteractionHelper:complete_interaction(unit, interactable_unit, interaction_result)
-				self.stop_interaction(self, t)
+				self:stop_interaction(t)
 			end
 		end
 	end
@@ -127,7 +127,7 @@ GenericHuskInteractorExtension.stop_interaction = function (self, t)
 	local interaction_context = self.interaction_context
 	local interactable_unit = interaction_context.interactable_unit
 
-	self._stop_interaction(self, interactable_unit, t)
+	self:_stop_interaction(interactable_unit, t)
 	Managers.state.unit_spawner:remove_destroy_listener(interactable_unit, "interactable_unit_for_husk")
 end
 
@@ -140,13 +140,13 @@ GenericHuskInteractorExtension.is_stopping = function (self)
 end
 
 GenericHuskInteractorExtension.interactable_unit = function (self)
-	assert(self.is_interacting(self), "Attempted to get interactable unit when interactor unit wasn't interacting.")
+	assert(self:is_interacting(), "Attempted to get interactable unit when interactor unit wasn't interacting.")
 
 	return self.interaction_context.interactable_unit
 end
 
 GenericHuskInteractorExtension.hot_join_sync = function (self, sender)
-	if not self.is_interacting(self) then
+	if not self:is_interacting() then
 		return
 	end
 
@@ -154,11 +154,11 @@ GenericHuskInteractorExtension.hot_join_sync = function (self, sender)
 	local context = self.interaction_context
 	local state_id = NetworkLookup.interaction_states[self.state]
 	local interaction_type_id = NetworkLookup.interactions[context.interaction_type]
-	local interactable_unit_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, context.interactable_unit)
+	local interactable_unit_id, is_level_unit = network_manager:game_object_or_level_id(context.interactable_unit)
 	local data = context.data
 	local start_time = data.start_time
 	local duration = data.duration
-	local unit_id = network_manager.unit_game_object_id(network_manager, self.unit)
+	local unit_id = network_manager:unit_game_object_id(self.unit)
 
 	RPC.rpc_sync_interaction_state(sender, unit_id, state_id, interaction_type_id, interactable_unit_id, start_time, duration, is_level_unit)
 end
@@ -174,7 +174,7 @@ GenericHuskInteractorExtension.set_interaction_context = function (self, state, 
 	self.interaction_context.result = InteractionResult.ONGOING
 	local interactable_extension = ScriptUnit.extension(interactable_unit, "interactable_system")
 
-	interactable_extension.set_is_being_interacted_with(interactable_extension, self.unit)
+	interactable_extension:set_is_being_interacted_with(self.unit)
 end
 
 GenericHuskInteractorExtension.interaction_approved = function (self, interaction_type, interactable_unit)
@@ -209,7 +209,7 @@ GenericHuskInteractorExtension.interaction_completed = function (self, interacti
 	self.interaction_context.result = interaction_result
 	local t = Managers.time:time("game")
 
-	self.stop_interaction(self, t)
+	self:stop_interaction(t)
 end
 
 return

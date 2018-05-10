@@ -56,7 +56,7 @@ local function default_start_game_mode_function_server(context, data)
 		local pickup_units = Managers.state.entity:get_entities("PickupUnitExtension")
 
 		for unit, extension in pairs(pickup_units) do
-			local pickup_settings = extension.get_pickup_settings(extension)
+			local pickup_settings = extension:get_pickup_settings()
 
 			if pickup_types.all or pickup_types[pickup_settings.type] then
 				mutator_dprint("Removing pickup with type(%s)", pickup_settings.type)

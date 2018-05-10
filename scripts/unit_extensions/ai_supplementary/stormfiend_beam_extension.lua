@@ -15,7 +15,7 @@ StormfiendBeamExtension.init = function (self, extension_init_context, unit, ext
 end
 
 StormfiendBeamExtension.destroy = function (self)
-	self.remove_vfx_and_sfx(self)
+	self:remove_vfx_and_sfx()
 end
 
 StormfiendBeamExtension.remove_vfx_and_sfx = function (self)
@@ -39,14 +39,14 @@ end
 
 StormfiendBeamExtension.anim_cb_start_stormfiend_beam = function (self, arm)
 	if arm == "right" then
-		self.create_beam(self, "fx_right_muzzle")
+		self:create_beam("fx_right_muzzle")
 	elseif arm == "left" then
-		self.create_beam(self, "fx_left_muzzle")
+		self:create_beam("fx_left_muzzle")
 	end
 end
 
 StormfiendBeamExtension.anim_cb_stop_stormfiend_beam = function (self)
-	self.remove_vfx_and_sfx(self)
+	self:remove_vfx_and_sfx()
 end
 
 StormfiendBeamExtension.create_beam = function (self, node_name)
@@ -79,7 +79,7 @@ end
 StormfiendBeamExtension.get_target_position = function (self, unit)
 	local game = Managers.state.network:game()
 	local unit_storage = Managers.state.unit_storage
-	local go_id = unit_storage.go_id(unit_storage, unit)
+	local go_id = unit_storage:go_id(unit)
 	local target_position = GameSession.game_object_field(game, go_id, "aim_target")
 
 	if target_position then
@@ -98,7 +98,7 @@ StormfiendBeamExtension.update = function (self, unit, input, dt, context, t)
 	local world = self.world
 
 	if Unit.alive(unit) and self.muzzle_node then
-		local target_unit_pos = self.get_target_position(self, unit)
+		local target_unit_pos = self:get_target_position(unit)
 
 		if target_unit_pos then
 			local muzzle_node = self.muzzle_node

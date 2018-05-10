@@ -24,7 +24,7 @@ EnvironmentHandler.add_blend = function (self, blend_class_name, group, priority
 	end
 
 	local blend_class = rawget(_G, blend_class_name)
-	local blend = blend_class.new(blend_class, blend_data)
+	local blend = blend_class:new(blend_data)
 	local group = self._blends[group]
 	group[#group + 1] = {
 		priority = priority,
@@ -46,7 +46,7 @@ EnvironmentHandler.remove_blend = function (self, id)
 				blend_data.blend:destroy()
 				table.remove(group, key)
 				table.clear(self._weights)
-				self._update_weights(self)
+				self:_update_weights()
 
 				return
 			end
@@ -55,8 +55,8 @@ EnvironmentHandler.remove_blend = function (self, id)
 end
 
 EnvironmentHandler.update = function (self, dt, t)
-	self._update_blends(self, dt)
-	self._update_weights(self, dt)
+	self:_update_blends(dt)
+	self:_update_weights(dt)
 end
 
 EnvironmentHandler._update_blends = function (self, dt)
@@ -115,7 +115,7 @@ EnvironmentHandler.override_settings = function (self)
 	end
 
 	if blend_volume then
-		return blend_volume.override_settings(blend_volume)
+		return blend_volume:override_settings()
 	end
 
 	return nil

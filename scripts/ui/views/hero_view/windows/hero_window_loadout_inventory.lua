@@ -58,8 +58,8 @@ HeroWindowLoadoutInventory.on_enter = function (self, params, offset)
 		snap_pixel_positions = true
 	}
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self.hero_name = params.hero_name
@@ -67,16 +67,16 @@ HeroWindowLoadoutInventory.on_enter = function (self, params, offset)
 	self.profile_index = params.profile_index
 	self._animations = {}
 
-	self.create_ui_elements(self, params, offset)
+	self:create_ui_elements(params, offset)
 
 	local item_grid = ItemGridUI:new(category_settings, self._widgets_by_name.item_grid, self.hero_name, self.career_index)
 	self._item_grid = item_grid
 
-	item_grid.mark_equipped_items(item_grid, true)
-	item_grid.mark_locked_items(item_grid, true)
-	item_grid.disable_locked_items(item_grid, true)
-	item_grid.disable_item_drag(item_grid)
-	item_grid.apply_item_sorting_function(item_grid, item_sort_func)
+	item_grid:mark_equipped_items(true)
+	item_grid:mark_locked_items(true)
+	item_grid:disable_locked_items(true)
+	item_grid:disable_item_drag()
+	item_grid:apply_item_sorting_function(item_sort_func)
 
 	local player_unit = local_player and local_player.player_unit
 
@@ -84,7 +84,7 @@ HeroWindowLoadoutInventory.on_enter = function (self, params, offset)
 		local inventory_extension = ScriptUnit.has_extension(player_unit, "inventory_system")
 
 		if inventory_extension then
-			inventory_extension.check_and_drop_pickups(inventory_extension, "enter_inventory")
+			inventory_extension:check_and_drop_pickups("enter_inventory")
 		end
 	end
 end
@@ -118,7 +118,7 @@ HeroWindowLoadoutInventory.create_ui_elements = function (self, params, offset)
 		window_position[3] = window_position[3] + offset[3]
 	end
 
-	self._setup_tab_widget(self)
+	self:_setup_tab_widget()
 end
 
 HeroWindowLoadoutInventory._setup_tab_widget = function (self)
@@ -211,16 +211,16 @@ HeroWindowLoadoutInventory.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	self._item_grid:update(dt, t)
-	self._update_animations(self, dt)
-	self._handle_input(self, dt, t)
-	self._update_selected_loadout_slot_index(self)
-	self._update_loadout_sync(self)
-	self._update_page_info(self)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:_handle_input(dt, t)
+	self:_update_selected_loadout_slot_index()
+	self:_update_loadout_sync()
+	self:_update_page_info()
+	self:draw(dt)
 end
 
 HeroWindowLoadoutInventory.post_update = function (self, dt, t)
@@ -234,8 +234,8 @@ HeroWindowLoadoutInventory._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -315,43 +315,43 @@ HeroWindowLoadoutInventory._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local item_grid = self._item_grid
 	local allow_single_press = false
-	local item, is_equipped = item_grid.is_item_pressed(item_grid, allow_single_press)
+	local item, is_equipped = item_grid:is_item_pressed(allow_single_press)
 
-	if item_grid.is_item_hovered(item_grid) then
-		self._play_sound(self, "play_gui_inventory_item_hover")
+	if item_grid:is_item_hovered() then
+		self:_play_sound("play_gui_inventory_item_hover")
 	end
 
 	if item and not is_equipped then
-		parent._set_loadout_item(parent, item, self._strict_slot_type)
-		self._play_sound(self, "play_gui_equipment_equip_hero")
+		parent:_set_loadout_item(item, self._strict_slot_type)
+		self:_play_sound("play_gui_equipment_equip_hero")
 	end
 
 	local item_tabs = widgets_by_name.item_tabs
 
 	UIWidgetUtils.animate_default_icon_tabs(item_tabs, dt)
 
-	local tab_index_hovered = self._is_inventory_tab_hovered(self)
+	local tab_index_hovered = self:_is_inventory_tab_hovered()
 
 	if tab_index_hovered then
-		self._play_sound(self, "play_gui_inventory_tab_hover")
+		self:_play_sound("play_gui_inventory_tab_hover")
 	end
 
-	local tab_index_pressed = self._is_inventory_tab_pressed(self)
+	local tab_index_pressed = self:_is_inventory_tab_pressed()
 
 	if tab_index_pressed and tab_index_pressed ~= self._internal_slot_index then
-		parent.set_selected_loadout_slot_index(parent, tab_index_pressed)
-		self._play_sound(self, "play_gui_inventory_tab_click")
+		parent:set_selected_loadout_slot_index(tab_index_pressed)
+		self:_play_sound("play_gui_inventory_tab_click")
 	elseif Managers.input:is_device_active("gamepad") then
 		local input_service = Managers.input:get_service("hero_view")
 		local current_index = parent._selected_loadout_slot_index or 1
 		local num_tabs = #self._career_category_settings_index_lookup
 
-		if input_service.get(input_service, "cycle_previous") and 1 < current_index then
-			parent.set_selected_loadout_slot_index(parent, current_index - 1)
-			self._play_sound(self, "play_gui_inventory_tab_click")
-		elseif input_service.get(input_service, "cycle_next") and current_index < num_tabs then
-			parent.set_selected_loadout_slot_index(parent, current_index + 1)
-			self._play_sound(self, "play_gui_inventory_tab_click")
+		if input_service:get("cycle_previous") and 1 < current_index then
+			parent:set_selected_loadout_slot_index(current_index - 1)
+			self:_play_sound("play_gui_inventory_tab_click")
+		elseif input_service:get("cycle_next") and current_index < num_tabs then
+			parent:set_selected_loadout_slot_index(current_index + 1)
+			self:_play_sound("play_gui_inventory_tab_click")
 		end
 	end
 
@@ -361,20 +361,20 @@ HeroWindowLoadoutInventory._handle_input = function (self, dt, t)
 	UIWidgetUtils.animate_default_button(page_button_next, dt)
 	UIWidgetUtils.animate_default_button(page_button_previous, dt)
 
-	if self._is_button_hovered(self, page_button_next) or self._is_button_hovered(self, page_button_previous) then
-		self._play_sound(self, "play_gui_inventory_next_hover")
+	if self:_is_button_hovered(page_button_next) or self:_is_button_hovered(page_button_previous) then
+		self:_play_sound("play_gui_inventory_next_hover")
 	end
 
-	if self._is_button_pressed(self, page_button_next) then
+	if self:_is_button_pressed(page_button_next) then
 		local next_page_index = self._current_page + 1
 
-		item_grid.set_item_page(item_grid, next_page_index)
-		self._play_sound(self, "play_gui_equipment_inventory_next_click")
-	elseif self._is_button_pressed(self, page_button_previous) then
+		item_grid:set_item_page(next_page_index)
+		self:_play_sound("play_gui_equipment_inventory_next_click")
+	elseif self:_is_button_pressed(page_button_previous) then
 		local next_page_index = self._current_page - 1
 
-		item_grid.set_item_page(item_grid, next_page_index)
-		self._play_sound(self, "play_gui_equipment_inventory_next_click")
+		item_grid:set_item_page(next_page_index)
+		self:_play_sound("play_gui_equipment_inventory_next_click")
 	end
 end
 
@@ -403,7 +403,7 @@ HeroWindowLoadoutInventory._update_selected_loadout_slot_index = function (self)
 	local internal_slot_index = self._career_category_settings_index_lookup[index]
 
 	if index ~= self._selected_loadout_slot_index then
-		self._change_category_by_index(self, index)
+		self:_change_category_by_index(index)
 
 		self._selected_loadout_slot_index = index
 		self._internal_slot_index = internal_slot_index
@@ -418,7 +418,7 @@ HeroWindowLoadoutInventory._update_loadout_sync = function (self)
 	if loadout_sync_id ~= self._loadout_sync_id then
 		self._loadout_sync_id = loadout_sync_id
 
-		item_grid.update_items_status(item_grid)
+		item_grid:update_items_status()
 	end
 end
 
@@ -462,7 +462,7 @@ end
 HeroWindowLoadoutInventory._change_category_by_index = function (self, index, force_update)
 	local internal_slot_index = self._career_category_settings_index_lookup[index]
 
-	self._select_tab_by_category_index(self, internal_slot_index)
+	self:_select_tab_by_category_index(internal_slot_index)
 
 	if force_update then
 		index = self._internal_slot_index or 1

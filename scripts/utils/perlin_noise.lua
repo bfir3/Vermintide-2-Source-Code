@@ -8,7 +8,7 @@ PerlinNoise.init = function (self, world)
 	self.world_gui = World.create_world_gui(world, Matrix4x4.identity(), 1, 1, "material", "materials/fonts/gw_fonts")
 	self._line_object = World.create_line_object(world, false)
 
-	self.setup(self)
+	self:setup()
 end
 
 local colors = {
@@ -104,7 +104,7 @@ PerlinNoise.draw_height = function (self, height, x, y, z, rad)
 
 	local color = colors[index]
 
-	drawer.sphere(drawer, Vector3(x, y, z + 0.5), rad or 0.35, Color(color[1], color[2], color[3]))
+	drawer:sphere(Vector3(x, y, z + 0.5), rad or 0.35, Color(color[1], color[2], color[3]))
 end
 
 PerlinNoise.filter_list_using_noise = function (self, list, height_threshold)
@@ -116,7 +116,7 @@ PerlinNoise.filter_list_using_noise = function (self, list, height_threshold)
 		local pos = list[i]:unbox()
 		local x = pos.x
 		local y = pos.y
-		local height = self.get_height(self, x, y)
+		local height = self:get_height(x, y)
 		local radius = nil
 
 		if height < height_threshold then
@@ -127,7 +127,7 @@ PerlinNoise.filter_list_using_noise = function (self, list, height_threshold)
 		end
 
 		if script_data.debug_perlin_noise_spawning then
-			self.draw_height(self, height, x, y, pos.z, radius)
+			self:draw_height(height, x, y, pos.z, radius)
 		end
 
 		if height < lowest then
@@ -172,7 +172,7 @@ PerlinNoise.setup = function (self)
 			end
 		until not check
 
-		self._gradients[i][1], self._gradients[i][2] = self.normalize(self, self._gradients[i][1], self._gradients[i][2])
+		self._gradients[i][1], self._gradients[i][2] = self:normalize(self._gradients[i][1], self._gradients[i][2])
 	end
 
 	local k, j = nil
@@ -233,17 +233,17 @@ PerlinNoise.get_height = function (self, x, y)
 	local p10 = self._permutations[j + p0_y]
 	local p01 = self._permutations[i + p1_y]
 	local p11 = self._permutations[j + p1_y]
-	local s_curve_x = self.getSCurve(self, rx0)
-	local s_curve_y = self.getSCurve(self, ry0)
+	local s_curve_x = self:getSCurve(rx0)
+	local s_curve_y = self:getSCurve(ry0)
 	local gradient, s, t, u, v = nil
 	gradient = self._gradients[p00]
-	s = self.at2(self, gradient, rx0, ry0)
+	s = self:at2(gradient, rx0, ry0)
 	gradient = self._gradients[p10]
-	t = self.at2(self, gradient, rx1, ry0)
+	t = self:at2(gradient, rx1, ry0)
 	gradient = self._gradients[p01]
-	u = self.at2(self, gradient, rx0, ry1)
+	u = self:at2(gradient, rx0, ry1)
 	gradient = self._gradients[p11]
-	v = self.at2(self, gradient, rx1, ry1)
+	v = self:at2(gradient, rx1, ry1)
 	local a = math.lerp(s, t, s_curve_x)
 	local b = math.lerp(u, v, s_curve_x)
 	local z = math.lerp(a, b, s_curve_y)
@@ -283,7 +283,7 @@ PerlinNoise.simulate_points = function (self)
 		for j = self._lowest_point.y, self._highest_point.y, 1 do
 			local lalal = j
 			j = j + Math.random(-1, 1) / 10
-			local height = self.get_height(self, i, j)
+			local height = self:get_height(i, j)
 
 			if height < lowest then
 				lowest = height
@@ -305,7 +305,7 @@ PerlinNoise.simulate_points = function (self)
 			local color = colors[index]
 			j = lalal
 
-			drawer.sphere(drawer, Vector3(lal, lalal, 100), 0.5, Color(color[1], color[2], color[3]))
+			drawer:sphere(Vector3(lal, lalal, 100), 0.5, Color(color[1], color[2], color[3]))
 		end
 
 		i = lal

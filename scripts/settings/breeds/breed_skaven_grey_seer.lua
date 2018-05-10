@@ -77,13 +77,13 @@ local breed_data = {
 	run_on_despawn = AiBreedSnippets.on_grey_seer_despawn,
 	stagger_modifier_function = function (stagger, duration, length, hit_zone_name, blackboard, breed)
 		local health_extension = ScriptUnit.extension(blackboard.unit, "health_system")
-		local hp = health_extension.current_health_percent(health_extension)
+		local hp = health_extension:current_health_percent()
 
 		if not health_extension.is_invincible and hp < 0.05 and blackboard.current_phase ~= 6 then
-			local max_health = health_extension.get_max_health(health_extension)
+			local max_health = health_extension:get_max_health()
 			health_extension.is_invincible = true
 
-			health_extension.set_current_damage(health_extension, max_health * 0.95)
+			health_extension:set_current_damage(max_health * 0.95)
 
 			blackboard.death_sequence = true
 		end

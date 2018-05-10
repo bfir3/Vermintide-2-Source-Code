@@ -18,7 +18,7 @@ StateTitleScreenInitNetwork.on_enter = function (self, params)
 	self._world = self._params.world
 	self._viewport = self._params.viewport
 
-	self._init_network(self)
+	self:_init_network()
 end
 
 StateTitleScreenInitNetwork._init_network = function (self)
@@ -53,7 +53,7 @@ StateTitleScreenInitNetwork.update = function (self, dt, t)
 	Network.update(dt, self._network_event_delegate.event_table)
 	Managers.backend:update(dt)
 
-	return self._next_state(self)
+	return self:_next_state()
 end
 
 StateTitleScreenInitNetwork._create_session = function (self)
@@ -198,9 +198,9 @@ end
 StateTitleScreenInitNetwork._update_lobby_join = function (self, dt, t)
 	local lobby_finder = self._lobby_finder
 
-	lobby_finder.update(lobby_finder, dt)
+	lobby_finder:update(dt)
 
-	local lobbies = lobby_finder.lobbies(lobby_finder)
+	local lobbies = lobby_finder:lobbies()
 
 	for i, lobby in ipairs(lobbies) do
 		local auto_join = lobby.unique_server_name == Development.parameter("unique_server_name")
@@ -222,7 +222,7 @@ StateTitleScreenInitNetwork._error = function (self, dt, t)
 end
 
 StateTitleScreenInitNetwork._next_state = function (self)
-	if not self._packages_loaded(self) or not self._wanted_game_state then
+	if not self:_packages_loaded() or not self._wanted_game_state then
 		return
 	end
 
@@ -410,7 +410,7 @@ StateTitleScreenInitNetwork._packages_loaded = function (self)
 		local package_manager = Managers.package
 
 		for i, name in ipairs(GlobalResources) do
-			if not package_manager.has_loaded(package_manager, name) then
+			if not package_manager:has_loaded(name) then
 				return false
 			end
 		end

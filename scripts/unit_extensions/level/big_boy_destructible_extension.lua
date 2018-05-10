@@ -68,7 +68,7 @@ BigBoyDestructibleExtension.update = function (self, unit, input, dt, context, t
 		frames_since_obstacle_update = frames_since_obstacle_update + 1
 
 		if frames_since_obstacle_update == NAVMESH_UPDATE_DELAY then
-			self.handle_breeds_failed_leaving_smart_object(self)
+			self:handle_breeds_failed_leaving_smart_object()
 
 			self.frames_since_obstacle_update = nil
 		else
@@ -83,7 +83,7 @@ BigBoyDestructibleExtension.update = function (self, unit, input, dt, context, t
 	local animation_stop_time = self.animation_stop_time
 
 	if animation_stop_time and animation_stop_time <= t then
-		self.update_nav_obstacles(self)
+		self:update_nav_obstacles()
 
 		self.animation_stop_time = nil
 	end
@@ -91,7 +91,7 @@ BigBoyDestructibleExtension.update = function (self, unit, input, dt, context, t
 	if not self.health_extension:is_alive() then
 		self.dead = true
 
-		self.destroy_box_obstacles(self)
+		self:destroy_box_obstacles()
 	end
 end
 
@@ -113,7 +113,7 @@ BigBoyDestructibleExtension.handle_breeds_failed_leaving_smart_object = function
 			local navigation_extension = ScriptUnit.has_extension(unit, "ai_navigation_system")
 
 			if navigation_extension then
-				navigation_extension.reset_destination(navigation_extension)
+				navigation_extension:reset_destination()
 			end
 		end
 	end
@@ -122,7 +122,7 @@ BigBoyDestructibleExtension.handle_breeds_failed_leaving_smart_object = function
 end
 
 BigBoyDestructibleExtension.destroy = function (self)
-	self.destroy_box_obstacles(self)
+	self:destroy_box_obstacles()
 
 	self.unit = nil
 	self.world = nil

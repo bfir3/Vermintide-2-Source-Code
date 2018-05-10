@@ -292,7 +292,7 @@ function get_chain_damages(values, action, unit, item, stat_descriptor)
 	local impact_data = action.impact_data
 	local career_extension = ScriptUnit.has_extension(unit, "career_system")
 	local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
-	local power_level = career_extension.get_career_power_level(career_extension)
+	local power_level = career_extension:get_career_power_level()
 	local difficulty_level = Managers.state.difficulty:get_difficulty()
 	local armor_types = stat_descriptor.armor_types or {}
 	local armor_type = armor_types[1] or 1
@@ -350,7 +350,7 @@ function get_chain_max_targets(values, action, unit, item, stat_descriptor)
 	local impact_data = action.impact_data
 	local career_extension = ScriptUnit.has_extension(unit, "career_system")
 	local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
-	local power_level = career_extension.get_career_power_level(career_extension)
+	local power_level = career_extension:get_career_power_level()
 	local difficulty_level = Managers.state.difficulty:get_difficulty()
 	local damage_profile_name = (impact_data and impact_data.damage_profile) or action.damage_profile
 	local damage_profile_name_left = (impact_data and impact_data.damage_profile_left) or action.damage_profile_left
@@ -409,7 +409,7 @@ function get_chain_stagger_strengths(values, action, unit, item, stat_descriptor
 	local impact_data = action.impact_data
 	local career_extension = ScriptUnit.has_extension(unit, "career_system")
 	local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
-	local power_level = career_extension.get_career_power_level(career_extension)
+	local power_level = career_extension:get_career_power_level()
 	local difficulty_level = Managers.state.difficulty:get_difficulty()
 	local damage_profile_name = (impact_data and impact_data.damage_profile) or action.damage_profile
 	local damage_profile_name_left = (impact_data and impact_data.damage_profile_left) or action.damage_profile_left
@@ -618,7 +618,7 @@ end
 function get_push_strengths(values, action, unit, item, stat_descriptor)
 	local career_extension = ScriptUnit.has_extension(unit, "career_system")
 	local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
-	local power_level = career_extension.get_career_power_level(career_extension)
+	local power_level = career_extension:get_career_power_level()
 	local difficulty_level = Managers.state.difficulty:get_difficulty()
 	local item_data = item.data
 	local item_template = BackendUtils.get_item_template(item_data)

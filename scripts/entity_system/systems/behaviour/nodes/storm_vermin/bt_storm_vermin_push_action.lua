@@ -33,11 +33,11 @@ BTStormVerminPushAction.enter = function (self, unit, blackboard, t)
 	blackboard.attacking_target = target_unit
 	blackboard.move_state = "attacking"
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
+	network_manager:anim_event(unit, "to_combat")
 
 	local attack_anim = randomize(action.attack_anim)
 
-	network_manager.anim_event(network_manager, unit, attack_anim)
+	network_manager:anim_event(unit, attack_anim)
 
 	blackboard.spawn_to_running = nil
 	blackboard.wake_up_push = 0
@@ -58,13 +58,13 @@ BTStormVerminPushAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.attack_aborted then
 		local network_manager = Managers.state.network
 
-		network_manager.anim_event(network_manager, unit, "idle")
+		network_manager:anim_event(unit, "idle")
 
 		return "done"
 	elseif blackboard.attack_finished then
 		return "done"
 	else
-		self.attack(self, unit, t, dt, blackboard)
+		self:attack(unit, t, dt, blackboard)
 
 		return "running"
 	end
@@ -77,7 +77,7 @@ BTStormVerminPushAction.attack = function (self, unit, t, dt, blackboard)
 	if Unit.alive(attacking_target) then
 		local rotation = LocomotionUtils.rotation_towards_unit_flat(unit, attacking_target)
 
-		locomotion.set_wanted_rotation(locomotion, rotation)
+		locomotion:set_wanted_rotation(rotation)
 	end
 end
 
@@ -91,13 +91,13 @@ BTStormVerminPushAction.anim_cb_stormvermin_push = function (self, unit, blackbo
 
 	AiUtils.damage_target(target_unit, unit, action, action.damage)
 
-	if not status_extension.is_disabled(status_extension) then
+	if not status_extension:is_disabled() then
 		StatusUtils.set_pushed_network(target_unit, true)
 
 		local velocity = Quaternion.forward(Unit.local_rotation(unit, 0)) * action.impact_push_speed
 		local locomotion_extension = ScriptUnit.extension(target_unit, "locomotion_system")
 
-		locomotion_extension.add_external_velocity(locomotion_extension, velocity, action.max_impact_push_speed)
+		locomotion_extension:add_external_velocity(velocity, action.max_impact_push_speed)
 	end
 end
 

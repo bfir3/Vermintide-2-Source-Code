@@ -31,10 +31,10 @@ LinkerTransportationExtension.init = function (self, extension_init_context, uni
 	}
 	self._bot_slots = {}
 	self.story_teller = story_teller
-	local story_id = story_teller.play_level_story(story_teller, level, story_name)
+	local story_id = story_teller:play_level_story(level, story_name)
 	self.story_id = story_id
 
-	story_teller.set_speed(story_teller, story_id, 0)
+	story_teller:set_speed(story_id, 0)
 
 	self.story_state = "stopped_beginning"
 	self.current_story_time = 0
@@ -100,7 +100,7 @@ LinkerTransportationExtension.register_navmesh_units = function (self, start_uni
 	self.nav_obstacle_end = obstacle_end
 	self.has_nav_obstacles = true
 
-	self.update_nav_obstacles(self)
+	self:update_nav_obstacles()
 end
 
 LinkerTransportationExtension.interacted_with = function (self, interactor_unit)
@@ -110,15 +110,15 @@ LinkerTransportationExtension.interacted_with = function (self, interactor_unit)
 		Unit.flow_event(self.unit, "lua_transportation_story_started")
 	end
 
-	self.update_nav_obstacles(self)
+	self:update_nav_obstacles()
 
 	local transported_units = self.transported_units
 	local num_transported_units = #transported_units
 
 	if 0 < num_transported_units then
-		self._unlink_all_transported_units(self)
+		self:_unlink_all_transported_units()
 	else
-		self._link_all_transported_units(self, interactor_unit)
+		self:_link_all_transported_units(interactor_unit)
 	end
 end
 
@@ -140,7 +140,7 @@ LinkerTransportationExtension.hot_join_sync = function (self, peer)
 		end
 
 		if interactor_unit then
-			local interactor_unit_id = network_manager.unit_game_object_id(network_manager, interactor_unit)
+			local interactor_unit_id = network_manager:unit_game_object_id(interactor_unit)
 
 			RPC.rpc_hot_join_sync_linker_transporting(peer, level_id, interactor_unit_id)
 		end
@@ -152,20 +152,20 @@ end
 LinkerTransportationExtension.rpc_hot_join_sync_linker_transporting = function (self, interactor_unit_id)
 	local interactor_unit = Managers.state.network.unit_storage:unit(interactor_unit_id)
 
-	self.interacted_with(self, interactor_unit)
+	self:interacted_with(interactor_unit)
 end
 
 LinkerTransportationExtension.rpc_hot_join_sync_linker_transport_state = function (self, state_id, story_time)
 	self.story_state = STORY_STATES[state_id]
 	self.current_story_time = story_time
 
-	self.update_nav_obstacles(self)
+	self:update_nav_obstacles()
 end
 
 LinkerTransportationExtension._link_all_transported_units = function (self, interactor_unit)
 	local story_teller = self.story_teller
 	local story_id = self.story_id
-	local story_length = story_teller.length(story_teller, story_id)
+	local story_length = story_teller:length(story_id)
 
 	assert(not self._transporting, "Trying to link units before unlinking.")
 
@@ -180,7 +180,7 @@ LinkerTransportationExtension._link_all_transported_units = function (self, inte
 	local transported_units = self.transported_units
 	transported_units[1] = interactor_unit
 
-	self._link_transported_unit(self, interactor_unit)
+	self:_link_transported_unit(interactor_unit)
 
 	if self.takes_party then
 		local players = Managers.player:players()
@@ -189,27 +189,27 @@ LinkerTransportationExtension._link_all_transported_units = function (self, inte
 			local unit = player.player_unit
 
 			if unit_alive(unit) and unit ~= interactor_unit then
-				local is_bot = self._is_bot(self, player)
+				local is_bot = self:_is_bot(player)
 				local status_ext = ScriptUnit.extension(unit, "status_system")
-				local is_dead = status_ext.is_dead(status_ext)
-				local is_inside_transportation_unit = self._is_inside_transportation_unit(self, unit)
-				local is_disabled = status_ext.is_disabled(status_ext)
+				local is_dead = status_ext:is_dead()
+				local is_inside_transportation_unit = self:_is_inside_transportation_unit(unit)
+				local is_disabled = status_ext:is_disabled()
 
 				if not is_dead and is_inside_transportation_unit then
 					num_transported_units = num_transported_units + 1
 					transported_units[num_transported_units] = unit
 
-					self._link_transported_unit(self, unit)
-				elseif self._is_bot(self, player) and not is_disabled then
+					self:_link_transported_unit(unit)
+				elseif self:_is_bot(player) and not is_disabled then
 					num_transported_units = num_transported_units + 1
 					transported_units[num_transported_units] = player.player_unit
 
-					self._link_transported_unit(self, player.player_unit, true)
+					self:_link_transported_unit(player.player_unit, true)
 				elseif player.local_player and not is_dead and not is_disabled and not is_inside_transportation_unit then
 					num_transported_units = num_transported_units + 1
 					transported_units[num_transported_units] = player.player_unit
 
-					self._link_transported_unit(self, player.player_unit, true)
+					self:_link_transported_unit(player.player_unit, true)
 				end
 			end
 		end
@@ -263,7 +263,7 @@ LinkerTransportationExtension.update_units_inside_oobb = function (self)
 	local players = Managers.player:players()
 
 	for _, player in pairs(players) do
-		if not self._is_bot(self, player) then
+		if not self:_is_bot(player) then
 			local u = player.player_unit
 
 			if AiUtils.unit_alive(u) then
@@ -308,7 +308,7 @@ LinkerTransportationExtension.update_units_inside_oobb = function (self)
 		local status_extension = ScriptUnit.extension(u, "status_system")
 		local arg = (is_inside and unit) or nil
 
-		status_extension.set_inside_transport_unit(status_extension, arg)
+		status_extension:set_inside_transport_unit(arg)
 	end
 end
 
@@ -339,21 +339,21 @@ end
 LinkerTransportationExtension.update = function (self, unit, input, dt, context, t)
 	local story_teller = self.story_teller
 	local story_id = self.story_id
-	local story_length = story_teller.length(story_teller, story_id)
+	local story_length = story_teller:length(story_id)
 	local current_time = self.current_story_time
 	local new_time = current_time
 
 	if self.story_state == "moving_forward" then
 		new_time = current_time + dt
 
-		self._update_local_player_position(self)
+		self:_update_local_player_position()
 
 		if story_length <= new_time then
 			new_time = story_length
 			self.story_state = "stopped_end"
 
 			if self.auto_exit then
-				self.update_nav_obstacles(self)
+				self:update_nav_obstacles()
 
 				self._unlink_after_update = true
 			end
@@ -366,7 +366,7 @@ LinkerTransportationExtension.update = function (self, unit, input, dt, context,
 		if self.return_to_start and units_inside_oobb and units_inside_oobb.human.count == 0 and units_inside_oobb.bot.count == 0 then
 			self.story_state = "moving_backward"
 
-			self.update_nav_obstacles(self)
+			self:update_nav_obstacles()
 			Unit.flow_event(self.unit, "lua_transportation_story_started")
 		end
 	elseif self.story_state == "moving_backward" then
@@ -376,7 +376,7 @@ LinkerTransportationExtension.update = function (self, unit, input, dt, context,
 			new_time = 0
 			self.story_state = "stopped_beginning"
 
-			self.update_nav_obstacles(self)
+			self:update_nav_obstacles()
 			Unit.flow_event(self.unit, "lua_transportation_story_stopped")
 		end
 	end
@@ -384,13 +384,13 @@ LinkerTransportationExtension.update = function (self, unit, input, dt, context,
 	local old_pos = Unit.world_position(unit, 0)
 
 	self._old_position:store(old_pos)
-	story_teller.set_time(story_teller, story_id, new_time)
+	story_teller:set_time(story_id, new_time)
 
 	self.current_story_time = new_time
 	local units_inside_oobb = self.units_inside_oobb
 
 	if units_inside_oobb and self.oobb_next_update <= t then
-		self.update_units_inside_oobb(self)
+		self:update_units_inside_oobb()
 
 		local update_interval = (0 < units_inside_oobb.human.count and UPDATE_INTERVAL_OOBB_HUMANS_INSIDE) or UPDATE_INTERVAL_OOBB_NO_HUMANS_INSIDE
 		self.oobb_next_update = t + update_interval
@@ -413,7 +413,7 @@ LinkerTransportationExtension.post_update = function (self, unit, input, dt, con
 	elseif self._unlink_after_update3 then
 		self._unlink_after_update3 = false
 
-		self._unlink_all_transported_units(self)
+		self:_unlink_all_transported_units()
 	end
 end
 
@@ -427,17 +427,17 @@ LinkerTransportationExtension._update_local_player_position = function (self)
 
 		if not Unit.alive(unit) then
 		else
-			local unit_owner = player_manager.owner(player_manager, unit)
+			local unit_owner = player_manager:owner(unit)
 
 			if unit_owner then
 				if not unit_owner.local_player then
 				else
 					local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
-					local platform_unit = locomotion_extension.get_moving_platform(locomotion_extension)
+					local platform_unit = locomotion_extension:get_moving_platform()
 
 					if platform_unit ~= self.unit then
 					else
-						local is_inside_transportation_unit = self._is_inside_transportation_unit(self, unit, 1)
+						local is_inside_transportation_unit = self:_is_inside_transportation_unit(unit, 1)
 
 						if not is_inside_transportation_unit then
 							local index = table.find(self._bot_slots, unit)
@@ -446,10 +446,10 @@ LinkerTransportationExtension._update_local_player_position = function (self)
 								index = math.random(1, 4)
 							end
 
-							local position = self._get_position_from_index(self, index)
-							local current_rotation = locomotion_extension.current_rotation(locomotion_extension)
+							local position = self:_get_position_from_index(index)
+							local current_rotation = locomotion_extension:current_rotation()
 
-							locomotion_extension.teleport_to(locomotion_extension, position, current_rotation)
+							locomotion_extension:teleport_to(position, current_rotation)
 						end
 					end
 				end
@@ -496,7 +496,7 @@ LinkerTransportationExtension.destroy = function (self)
 			if unit_alive(player_unit) then
 				local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-				status_extension.set_inside_transport_unit(status_extension, nil)
+				status_extension:set_inside_transport_unit(nil)
 			end
 		end
 
@@ -510,7 +510,7 @@ end
 LinkerTransportationExtension._unlink_all_transported_units = function (self)
 	local story_teller = self.story_teller
 	local story_id = self.story_id
-	local story_length = story_teller.length(story_teller, story_id)
+	local story_length = story_teller:length(story_id)
 
 	assert(self._transporting, "Trying to unlink units before linking.")
 
@@ -536,7 +536,7 @@ LinkerTransportationExtension._unlink_all_transported_units = function (self)
 		transported_units[i] = nil
 
 		if unit_alive(unit) then
-			self._unlink_transported_unit(self, unit)
+			self:_unlink_transported_unit(unit)
 		end
 	end
 
@@ -548,7 +548,7 @@ LinkerTransportationExtension._unlink_transported_unit = function (self, unit_to
 	local locomotion_extension = ScriptUnit.extension(unit_to_unlink, "locomotion_system")
 	local status_extension = ScriptUnit.extension(unit_to_unlink, "status_system")
 	local player_manager = Managers.player
-	local player = player_manager.owner(player_manager, unit_to_unlink)
+	local player = player_manager:owner(unit_to_unlink)
 	local index = table.find(self._bot_slots, unit_to_unlink)
 
 	if index then
@@ -569,26 +569,26 @@ LinkerTransportationExtension._unlink_transported_unit = function (self, unit_to
 				end
 
 				local transport_position = Unit.world_position(unit, link_node)
-				local link_data = locomotion_extension.get_link_data(locomotion_extension)
+				local link_data = locomotion_extension:get_link_data()
 				end_position = transport_position + link_data.offset:unbox()
 			end
 
-			local current_rotation = locomotion_extension.current_rotation(locomotion_extension)
+			local current_rotation = locomotion_extension:current_rotation()
 
-			locomotion_extension.teleport_to(locomotion_extension, end_position, current_rotation)
-			locomotion_extension.enable_script_driven_movement(locomotion_extension)
+			locomotion_extension:teleport_to(end_position, current_rotation)
+			locomotion_extension:enable_script_driven_movement()
 		end
 
-		status_extension.set_using_transport(status_extension, false)
+		status_extension:set_using_transport(false)
 		LocomotionUtils.disable_linked_movement(unit_to_unlink)
 	elseif player.local_player or player.bot_player then
-		locomotion_extension.set_on_moving_platform(locomotion_extension, nil)
+		locomotion_extension:set_on_moving_platform(nil)
 
 		if self.teleport_on_exit then
 			local end_position = Unit.world_position(unit, Unit.node(unit, "g_end"))
-			local current_rotation = locomotion_extension.current_rotation(locomotion_extension)
+			local current_rotation = locomotion_extension:current_rotation()
 
-			locomotion_extension.teleport_to(locomotion_extension, end_position, current_rotation)
+			locomotion_extension:teleport_to(end_position, current_rotation)
 		end
 	end
 end
@@ -618,7 +618,7 @@ LinkerTransportationExtension._link_transported_unit = function (self, unit_to_l
 	local player_position = Unit.world_position(unit_to_link, 0)
 	local offset = nil
 	local player_manager = Managers.player
-	local player = player_manager.owner(player_manager, unit_to_link)
+	local player = player_manager:owner(unit_to_link)
 
 	if LINK_UNITS_ON_TRANSPORT then
 		if teleport_on_enter or self.teleport_on_enter then
@@ -643,7 +643,7 @@ LinkerTransportationExtension._link_transported_unit = function (self, unit_to_l
 
 		local status_extension = ScriptUnit.extension(unit_to_link, "status_system")
 
-		status_extension.set_using_transport(status_extension, true)
+		status_extension:set_using_transport(true)
 		LocomotionUtils.enable_linked_movement(self.world, unit_to_link, unit, link_node, offset)
 	else
 		local locomotion_extension = ScriptUnit.extension(unit_to_link, "locomotion_system")
@@ -651,17 +651,17 @@ LinkerTransportationExtension._link_transported_unit = function (self, unit_to_l
 		if teleport_on_enter or self.teleport_on_enter then
 			local index = #self._bot_slots + 1
 			self._bot_slots[index] = unit_to_link
-			local position = self._get_position_from_index(self, index)
+			local position = self:_get_position_from_index(index)
 
 			if not player.remote then
-				local current_rotation = locomotion_extension.current_rotation(locomotion_extension)
+				local current_rotation = locomotion_extension:current_rotation()
 
-				locomotion_extension.teleport_to(locomotion_extension, position, current_rotation)
+				locomotion_extension:teleport_to(position, current_rotation)
 			end
 		end
 
 		if not player.remote then
-			locomotion_extension.set_on_moving_platform(locomotion_extension, unit)
+			locomotion_extension:set_on_moving_platform(unit)
 		end
 	end
 end

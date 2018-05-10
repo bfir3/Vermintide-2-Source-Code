@@ -18,7 +18,7 @@ AttachmentSystem.init = function (self, entity_system_creation_context, system_n
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 end
 
 AttachmentSystem.destroy = function (self)
@@ -39,13 +39,13 @@ AttachmentSystem.rpc_create_attachment = function (self, sender, unit_go_id, slo
 	end
 
 	local unit_storage = self.unit_storage
-	local unit = unit_storage.unit(unit_storage, unit_go_id)
+	local unit = unit_storage:unit(unit_go_id)
 	local attachment_extension = ScriptUnit.extension(unit, "attachment_system")
 	local slot_name = NetworkLookup.equipment_slots[slot_id]
 	local item_name = NetworkLookup.item_names[item_name_id]
 	local item_data = ItemMasterList[item_name]
 
-	attachment_extension.create_attachment(attachment_extension, slot_name, item_data)
+	attachment_extension:create_attachment(slot_name, item_data)
 end
 
 AttachmentSystem.rpc_remove_attachment = function (self, sender, unit_go_id, slot_id)
@@ -54,11 +54,11 @@ AttachmentSystem.rpc_remove_attachment = function (self, sender, unit_go_id, slo
 	end
 
 	local unit_storage = self.unit_storage
-	local unit = unit_storage.unit(unit_storage, unit_go_id)
+	local unit = unit_storage:unit(unit_go_id)
 	local attachment_extension = ScriptUnit.extension(unit, "attachment_system")
 	local slot_name = NetworkLookup.equipment_slots[slot_id]
 
-	attachment_extension.remove_attachment(attachment_extension, slot_name)
+	attachment_extension:remove_attachment(slot_name)
 end
 
 AttachmentSystem.rpc_add_attachment_buffs = function (self, sender, go_id, slot_id, buff_1_id, buff_data_type_1_id, value_1, buff_2_id, buff_data_type_2_id, value_2, buff_3_id, buff_data_type_3_id, value_3, buff_4_id, buff_data_type_4_id, value_4)
@@ -76,7 +76,7 @@ AttachmentSystem.rpc_add_attachment_buffs = function (self, sender, go_id, slot_
 	local buff_data_type_4 = NetworkLookup.buff_data_types[buff_data_type_4_id]
 	local attachment_extension = ScriptUnit.extension(unit, "attachment_system")
 
-	attachment_extension.add_buffs_to_slot(attachment_extension, slot_name, buff_name_1, buff_data_type_1, value_1, buff_name_2, buff_data_type_2, value_2, buff_name_3, buff_data_type_3, value_3, buff_name_4, buff_data_type_4, value_4)
+	attachment_extension:add_buffs_to_slot(slot_name, buff_name_1, buff_data_type_1, value_1, buff_name_2, buff_data_type_2, value_2, buff_name_3, buff_data_type_3, value_3, buff_name_4, buff_data_type_4, value_4)
 end
 
 return

@@ -15,7 +15,7 @@ TransportationSystem.init = function (self, context, system_name)
 	local network_event_delegate = context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 end
 
 TransportationSystem.destroy = function (self)

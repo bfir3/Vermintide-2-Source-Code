@@ -57,7 +57,7 @@ ProjectileScriptUnitLocomotionExtension.update = function (self, unit, input, _,
 	local length = Vector3.length(direction)
 
 	if not NetworkUtils.network_safe_position(new_position) then
-		self.stop(self)
+		self:stop()
 
 		if not self.is_husk then
 			Managers.state.unit_spawner:mark_for_deletion(self.unit)

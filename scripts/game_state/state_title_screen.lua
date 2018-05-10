@@ -47,18 +47,18 @@ StateTitleScreen.on_enter = function (self, params)
 	end
 
 	if script_data.honduras_demo then
-		self._demo_hack_state_managers(self)
+		self:_demo_hack_state_managers()
 	end
 
 	self._params = params
 
-	self._setup_world(self)
-	self._setup_leak_prevention(self)
-	self._init_input(self)
-	self._init_ui(self)
-	self._setup_state_machine(self)
-	self._init_popup_manager(self)
-	self._init_chat_manager(self)
+	self:_setup_world()
+	self:_setup_leak_prevention()
+	self:_init_input()
+	self:_init_ui()
+	self:_setup_state_machine()
+	self:_init_popup_manager()
+	self:_init_chat_manager()
 
 	Managers.rcon = Managers.rcon or RconManager:new()
 
@@ -67,7 +67,7 @@ StateTitleScreen.on_enter = function (self, params)
 	end
 
 	if Development.parameter("use_beta_overlay") or script_data.settings.use_beta_overlay then
-		self._init_beta_overlay(self)
+		self:_init_beta_overlay()
 	end
 
 	self._platform = PLATFORM
@@ -76,7 +76,7 @@ StateTitleScreen.on_enter = function (self, params)
 		Managers.account:set_presence("title_screen")
 	end
 
-	self._fade_out(self)
+	self:_fade_out()
 
 	if rawget(_G, "ControllerFeaturesManager") then
 		Managers.state.controller_features = ControllerFeaturesManager:new()
@@ -175,10 +175,10 @@ StateTitleScreen._init_input = function (self)
 	local input_manager = self._input_manager
 	Managers.input = input_manager
 
-	input_manager.initialize_device(input_manager, "keyboard", 1)
-	input_manager.initialize_device(input_manager, "mouse", 1)
-	input_manager.initialize_device(input_manager, "gamepad")
-	input_manager.create_input_service(input_manager, "Player", "PlayerControllerKeymaps", "PlayerControllerFilters")
+	input_manager:initialize_device("keyboard", 1)
+	input_manager:initialize_device("mouse", 1)
+	input_manager:initialize_device("gamepad")
+	input_manager:create_input_service("Player", "PlayerControllerKeymaps", "PlayerControllerFilters")
 end
 
 local DO_RELOAD = true
@@ -232,7 +232,7 @@ StateTitleScreen._init_beta_overlay = function (self)
 end
 
 StateTitleScreen.update = function (self, dt, t)
-	self._handle_delayed_fade_in(self)
+	self:_handle_delayed_fade_in()
 	Managers.input:update(dt, t)
 	self._machine:update(dt, t)
 
@@ -240,7 +240,7 @@ StateTitleScreen.update = function (self, dt, t)
 		Managers.backend:update(dt)
 	end
 
-	self._update_play_go_progress(self, dt, t)
+	self:_update_play_go_progress(dt, t)
 
 	if Managers.state.controller_features then
 		Managers.state.controller_features:update(dt, t)
@@ -252,13 +252,13 @@ StateTitleScreen.update = function (self, dt, t)
 
 	local render_only_background = GameSettingsDevelopment.skip_start_screen
 
-	self._render(self, dt, render_only_background)
+	self:_render(dt, render_only_background)
 
 	if script_data.debug_enabled then
 		VisualAssertLog.update(dt)
 	end
 
-	return self._next_state(self)
+	return self:_next_state()
 end
 
 StateTitleScreen.post_update = function (self, dt, t)

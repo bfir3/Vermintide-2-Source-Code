@@ -32,14 +32,14 @@ PlayerUnitOverchargeExtension.init = function (self, extension_init_context, uni
 	self.venting_anim = nil
 	local first_person_extension = ScriptUnit.extension(self.unit, "first_person_system")
 	self.first_person_extension = first_person_extension
-	self.first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
+	self.first_person_unit = first_person_extension:get_first_person_unit()
 	self.overcharge_blend_id = Unit.animation_find_variable(self.first_person_unit, "overcharge")
 	self.inventory_extension = ScriptUnit.extension(self.unit, "inventory_system")
 	self.update_overcharge_flow_timer = 0
 	self.is_exploding = false
 	local overcharge_opacity = Application.user_setting("overcharge_opacity") or 100
 
-	self.set_screen_particle_opacity_modifier(self, overcharge_opacity)
+	self:set_screen_particle_opacity_modifier(overcharge_opacity)
 
 	self._overcharge_rumble_effect_id = nil
 	self._overcharge_rumble_critical_effect_id = nil
@@ -50,7 +50,7 @@ PlayerUnitOverchargeExtension.extensions_ready = function (self, world, unit)
 	local buff_extension = ScriptUnit.extension(self.unit, "buff_system")
 	self.buff_extension = buff_extension
 	self.original_max_value = self.max_value
-	local max_value = buff_extension.apply_buffs_to_value(buff_extension, self.max_value, StatBuffIndex.MAX_OVERCHARGE)
+	local max_value = buff_extension:apply_buffs_to_value(self.max_value, StatBuffIndex.MAX_OVERCHARGE)
 	local ammo_percent = self.ammo_percent
 	self.max_value = max_value
 	self.overcharge_value = (ammo_percent and (1 - ammo_percent) * max_value) or 0
@@ -68,15 +68,15 @@ PlayerUnitOverchargeExtension.reset = function (self)
 	local overcharged_critical_buff_id = self.overcharged_critical_buff_id
 	local overcharged_buff_id = self.overcharged_buff_id
 
-	if has_buff_extension and buff_extension.active_buffs(buff_extension) then
+	if has_buff_extension and buff_extension:active_buffs() then
 		if overcharged_critical_buff_id then
-			buff_extension.remove_buff(buff_extension, overcharged_critical_buff_id)
+			buff_extension:remove_buff(overcharged_critical_buff_id)
 
 			self.overcharged_critical_buff_id = nil
 		end
 
 		if overcharged_buff_id and self.overcharge_value < self.overcharge_limit then
-			buff_extension.remove_buff(buff_extension, overcharged_buff_id)
+			buff_extension:remove_buff(overcharged_buff_id)
 
 			self.overcharged_buff_id = nil
 		end
@@ -87,7 +87,7 @@ PlayerUnitOverchargeExtension.reset = function (self)
 	self.is_exploding = false
 
 	StatusUtils.set_overcharge_exploding(self.unit, false)
-	self.set_animation_variable(self)
+	self:set_animation_variable()
 end
 
 PlayerUnitOverchargeExtension.destroy = function (self)
@@ -101,15 +101,15 @@ PlayerUnitOverchargeExtension.destroy = function (self)
 	local overcharged_buff_id = self.overcharged_buff_id
 	local has_buff_extension = ScriptUnit.has_extension(self.unit, "buff_system")
 
-	if has_buff_extension and buff_extension.active_buffs(buff_extension) then
+	if has_buff_extension and buff_extension:active_buffs() then
 		if overcharged_critical_buff_id then
-			buff_extension.remove_buff(buff_extension, overcharged_critical_buff_id)
+			buff_extension:remove_buff(overcharged_critical_buff_id)
 
 			self.overcharged_critical_buff_id = nil
 		end
 
 		if overcharged_buff_id and self.overcharge_value < self.overcharge_limit then
-			buff_extension.remove_buff(buff_extension, overcharged_buff_id)
+			buff_extension:remove_buff(overcharged_buff_id)
 
 			self.overcharged_buff_id = nil
 		end
@@ -119,7 +119,7 @@ end
 PlayerUnitOverchargeExtension.set_animation_variable = function (self)
 	local first_person_unit = self.first_person_unit
 	local overcharge_blend_id = self.overcharge_blend_id
-	local anim_blend_overcharge = self.get_anim_blend_overcharge(self)
+	local anim_blend_overcharge = self:get_anim_blend_overcharge()
 
 	Unit.animation_set_variable(first_person_unit, overcharge_blend_id, anim_blend_overcharge)
 end
@@ -130,14 +130,14 @@ PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context,
 	if not self.is_exploding and self.venting_overcharge and 0 <= self.overcharge_value then
 		local buff_extension = self.buff_extension
 		local wielder = self.unit
-		local vent_speed = buff_extension.apply_buffs_to_value(buff_extension, dt, StatBuffIndex.VENT_SPEED)
+		local vent_speed = buff_extension:apply_buffs_to_value(dt, StatBuffIndex.VENT_SPEED)
 		local vent_amount = self.overcharge_value * self.original_max_value / 80 * vent_speed
 		self.vent_damage_pool = self.vent_damage_pool + vent_amount * 2
 		self.overcharge_value = self.overcharge_value - vent_amount
 
 		if 20 <= self.vent_damage_pool and not self.no_damage and self.overcharge_threshold < self.overcharge_value then
 			local damage_amount = 2 + self.overcharge_value / 12
-			damage_amount = buff_extension.apply_buffs_to_value(buff_extension, damage_amount, StatBuffIndex.VENT_DAMAGE)
+			damage_amount = buff_extension:apply_buffs_to_value(damage_amount, StatBuffIndex.VENT_DAMAGE)
 
 			DamageUtils.add_damage_network(wielder, wielder, damage_amount, "torso", "overcharge", Vector3(0, 1, 0), "overcharge")
 
@@ -148,7 +148,7 @@ PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context,
 	end
 
 	if 0 <= self.overcharge_value then
-		self.set_animation_variable(self)
+		self:set_animation_variable()
 	end
 
 	if self.venting_anim then
@@ -161,7 +161,7 @@ PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context,
 		if DebugKeyHandler.key_pressed("v", "fill overcharge", "player", "left shift") then
 			local amount = PlayerUnitStatusSettings.overcharge_values.overcharge_debug_value
 
-			self.add_charge(self, amount)
+			self:add_charge(amount)
 		end
 
 		Debug.text("overCharge level: " .. tostring(self.overcharge_value))
@@ -169,9 +169,9 @@ PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context,
 
 	local buff_extension = self.buff_extension
 
-	if 0 < self.overcharge_value or buff_extension.has_buff_type(buff_extension, "sienna_unchained_activated_ability") then
+	if 0 < self.overcharge_value or buff_extension:has_buff_type("sienna_unchained_activated_ability") then
 		if self.update_overcharge_flow_timer < t and not self.venting_overcharge then
-			self.set_animation_variable(self)
+			self:set_animation_variable()
 
 			self.update_overcharge_flow_timer = t + 0.3
 		end
@@ -186,10 +186,10 @@ PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context,
 			end
 
 			local value = decay * self.overcharge_value_decrease_rate * dt
-			value = self.overcharge_value - buff_extension.apply_buffs_to_value(buff_extension, value, StatBuffIndex.OVERCHARGE_REGEN)
+			value = self.overcharge_value - buff_extension:apply_buffs_to_value(value, StatBuffIndex.OVERCHARGE_REGEN)
 
-			if buff_extension.has_buff_type(buff_extension, "sienna_unchained_activated_ability") and self.max_value <= value then
-				self.add_charge(self, 1)
+			if buff_extension:has_buff_type("sienna_unchained_activated_ability") and self.max_value <= value then
+				self:add_charge(1)
 			end
 
 			self.overcharge_value = math.min(math.max(0, value), self.max_value)
@@ -197,11 +197,11 @@ PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context,
 			local overcharged_buff_id = self.overcharged_buff_id
 
 			if overcharged_critical_buff_id and self.overcharge_value < self.overcharge_critical_limit then
-				buff_extension.remove_buff(buff_extension, overcharged_critical_buff_id)
+				buff_extension:remove_buff(overcharged_critical_buff_id)
 
 				self.overcharged_critical_buff_id = nil
 			elseif overcharged_buff_id and self.overcharge_value < self.overcharge_limit then
-				buff_extension.remove_buff(buff_extension, overcharged_buff_id)
+				buff_extension:remove_buff(overcharged_buff_id)
 
 				self.overcharged_buff_id = nil
 			end
@@ -266,8 +266,8 @@ PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context,
 
 	if not self.onscreen_particles_id and not is_bot and Development.parameter("screen_space_player_camera_reactions") ~= false then
 		local first_person_extension = self.first_person_extension
-		self.onscreen_particles_id = first_person_extension.create_screen_particles(first_person_extension, "fx/screenspace_overheat_indicator")
-		self.critical_onscreen_particles_id = first_person_extension.create_screen_particles(first_person_extension, "fx/screenspace_overheat_critical")
+		self.onscreen_particles_id = first_person_extension:create_screen_particles("fx/screenspace_overheat_indicator")
+		self.critical_onscreen_particles_id = first_person_extension:create_screen_particles("fx/screenspace_overheat_critical")
 	end
 
 	local onscreen_particles_id = self.onscreen_particles_id
@@ -280,7 +280,7 @@ PlayerUnitOverchargeExtension.update = function (self, unit, input, dt, context,
 
 		local critical_onscreen_particles_id = self.critical_onscreen_particles_id
 
-		if self.is_above_critical_limit(self) then
+		if self:is_above_critical_limit() then
 			local critical_scalar = math.min(1, (self.overcharge_value - self.overcharge_critical_limit) / (self.max_value - self.overcharge_critical_limit) * 2)
 
 			World.set_particles_material_scalar(world, critical_onscreen_particles_id, charge_effect_material_name, charge_effect_material_variable_name, critical_scalar * self._screen_particle_opacity_modifier)
@@ -297,7 +297,7 @@ PlayerUnitOverchargeExtension.add_charge = function (self, overcharge_amount, ch
 
 	local buff_extension = self.buff_extension
 
-	if buff_extension.has_buff_type(buff_extension, "twitch_no_overcharge_no_ammo_reloads") then
+	if buff_extension:has_buff_type("twitch_no_overcharge_no_ammo_reloads") then
 		return
 	end
 
@@ -328,13 +328,13 @@ PlayerUnitOverchargeExtension.add_charge = function (self, overcharge_amount, ch
 		local overcharged_buff_id = self.overcharged_buff_id
 
 		if overcharged_critical_buff_id then
-			buff_extension.remove_buff(buff_extension, overcharged_critical_buff_id)
+			buff_extension:remove_buff(overcharged_critical_buff_id)
 
 			self.overcharged_critical_buff_id = nil
 		end
 
 		if overcharged_buff_id and self.overcharge_value < self.overcharge_limit then
-			buff_extension.remove_buff(buff_extension, overcharged_buff_id)
+			buff_extension:remove_buff(overcharged_buff_id)
 
 			self.overcharged_buff_id = nil
 		end
@@ -352,17 +352,17 @@ PlayerUnitOverchargeExtension.add_charge = function (self, overcharge_amount, ch
 				local overcharged_buff_id = self.overcharged_buff_id
 
 				if overcharged_buff_id then
-					buff_extension.remove_buff(buff_extension, overcharged_buff_id)
+					buff_extension:remove_buff(overcharged_buff_id)
 
 					self.overcharged_buff_id = false
 
 					PlayerUnitOverchargeExtension:hud_sound(self.overcharge_warning_high_sound_event or "staff_overcharge_warning_high", self.first_person_extension)
 				end
 
-				if buff_extension.has_buff_type(buff_extension, "sienna_unchained_passive") then
-					self.overcharged_critical_buff_id = buff_extension.add_buff(buff_extension, "overcharged_critical_no_attack_penalty")
+				if buff_extension:has_buff_type("sienna_unchained_passive") then
+					self.overcharged_critical_buff_id = buff_extension:add_buff("overcharged_critical_no_attack_penalty")
 				else
-					self.overcharged_critical_buff_id = buff_extension.add_buff(buff_extension, "overcharged_critical")
+					self.overcharged_critical_buff_id = buff_extension:add_buff("overcharged_critical")
 				end
 			end
 
@@ -390,15 +390,15 @@ PlayerUnitOverchargeExtension.add_charge = function (self, overcharge_amount, ch
 			local event_data = FrameTable.alloc_table()
 			local event_name = "overcharge"
 
-			dialogue_input.trigger_dialogue_event(dialogue_input, event_name, event_data)
+			dialogue_input:trigger_dialogue_event(event_name, event_data)
 
 			if not self.overcharged_buff_id and not self.overcharged_critical_buff_id then
 				PlayerUnitOverchargeExtension:hud_sound(self.overcharge_warning_med_sound_event or "staff_overcharge_warning_med", self.first_person_extension)
 
-				if buff_extension.has_buff_type(buff_extension, "sienna_unchained_passive") then
-					self.overcharged_buff_id = buff_extension.add_buff(buff_extension, "overcharged_no_attack_penalty")
+				if buff_extension:has_buff_type("sienna_unchained_passive") then
+					self.overcharged_buff_id = buff_extension:add_buff("overcharged_no_attack_penalty")
 				else
-					self.overcharged_buff_id = buff_extension.add_buff(buff_extension, "overcharged")
+					self.overcharged_buff_id = buff_extension:add_buff("overcharged")
 				end
 			end
 
@@ -445,7 +445,7 @@ PlayerUnitOverchargeExtension.remove_charge = function (self, amount)
 end
 
 PlayerUnitOverchargeExtension.hud_sound = function (self, event, fp_extension)
-	fp_extension.play_hud_sound_event(fp_extension, event)
+	fp_extension:play_hud_sound_event(event)
 end
 
 PlayerUnitOverchargeExtension.get_overcharge_value = function (self)
@@ -481,9 +481,9 @@ PlayerUnitOverchargeExtension.threshold_fraction = function (self)
 end
 
 PlayerUnitOverchargeExtension.current_overcharge_status = function (self)
-	local value = self.get_overcharge_value(self)
-	local threshold = self.get_overcharge_threshold(self)
-	local max_value = self.get_max_value(self)
+	local value = self:get_overcharge_value()
+	local threshold = self:get_overcharge_threshold()
+	local max_value = self:get_max_value()
 
 	return value, threshold, max_value
 end

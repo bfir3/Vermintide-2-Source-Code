@@ -9,7 +9,7 @@ AIPanicSystem = class(AIPanicSystem, ExtensionSystemBase)
 AIPanicSystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self.entity_manager = entity_manager
 	self.is_server = context.is_server
@@ -49,7 +49,7 @@ AIPanicSystem.on_add_extension = function (self, world, unit, extension_name, ex
 		extension.fear_radius = fear_radius
 
 		if fear_active_on_spawn then
-			self.activate_fear(self, unit)
+			self:activate_fear(unit)
 		end
 	end
 
@@ -87,7 +87,7 @@ AIPanicSystem.on_remove_extension = function (self, unit, extension_name)
 				local panic_zone = extension.panic_zone
 
 				if panic_zone then
-					self.deregister_panic_zone(self, panic_zone)
+					self:deregister_panic_zone(panic_zone)
 				end
 
 				fear_units[i] = fear_units[fear_units_n]
@@ -111,7 +111,7 @@ AIPanicSystem.activate_fear = function (self, unit)
 	local extension = self.unit_extension_data[unit]
 	local position = POSITION_LOOKUP[unit]
 	local fear_radius = extension.fear_radius
-	local panic_zone = self.register_panic_zone(self, position, fear_radius)
+	local panic_zone = self:register_panic_zone(position, fear_radius)
 	extension.panic_zone = panic_zone
 	extension.active = true
 end
@@ -192,7 +192,7 @@ AIPanicSystem.update_fear_units = function (self)
 			local panic_zone = extension.panic_zone
 			local position = POSITION_LOOKUP[unit]
 
-			self.set_panic_zone_position(self, panic_zone, position)
+			self:set_panic_zone_position(panic_zone, position)
 		end
 	end
 
@@ -215,9 +215,9 @@ AIPanicSystem.update_panic_units = function (self)
 	for i = start_index, end_index, 1 do
 		local unit = panic_units[i]
 		local position = POSITION_LOOKUP[unit]
-		local panic_zone = self.inside_panic_zone(self, position)
+		local panic_zone = self:inside_panic_zone(position)
 		local ai_extension = ScriptUnit.extension(unit, "ai_system")
-		local blackboard = ai_extension.blackboard(ai_extension)
+		local blackboard = ai_extension:blackboard()
 		blackboard.panic_zone = panic_zone
 	end
 
@@ -225,11 +225,11 @@ AIPanicSystem.update_panic_units = function (self)
 end
 
 AIPanicSystem.update = function (self, context, t, dt)
-	self.update_fear_units(self)
-	self.update_panic_units(self)
+	self:update_fear_units()
+	self:update_panic_units()
 
 	if script_data.ai_debug_panic_zones then
-		self.debug_draw_panic_zones(self)
+		self:debug_draw_panic_zones()
 	end
 end
 
@@ -246,7 +246,7 @@ AIPanicSystem.debug_draw_panic_zones = function (self)
 		local radius = panic_zone.radius
 		local position = panic_zone.position:unbox()
 
-		drawer.sphere(drawer, position, radius, Colors.get("red"))
+		drawer:sphere(position, radius, Colors.get("red"))
 	end
 end
 

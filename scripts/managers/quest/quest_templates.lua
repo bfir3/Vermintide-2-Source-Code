@@ -38,11 +38,11 @@ quest_templates.quests.daily_complete_quickplay_missions = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 3 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 3 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,
@@ -71,11 +71,11 @@ quest_templates.quests.daily_collect_tomes = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 6 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 6 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,
@@ -104,11 +104,11 @@ quest_templates.quests.daily_collect_grimoires = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 2 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 2 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,
@@ -135,11 +135,11 @@ quest_templates.quests.daily_kill_bosses = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 2 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 2 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,
@@ -167,11 +167,11 @@ quest_templates.quests.daily_kill_elites = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 15 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 15 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,
@@ -200,11 +200,11 @@ quest_templates.quests.daily_complete_levels_hero_wood_elf = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 3 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 3 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,
@@ -233,11 +233,11 @@ quest_templates.quests.daily_complete_levels_hero_witch_hunter = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 3 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 3 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,
@@ -266,11 +266,11 @@ quest_templates.quests.daily_complete_levels_hero_dwarf_ranger = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 3 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 3 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,
@@ -299,11 +299,11 @@ quest_templates.quests.daily_complete_levels_hero_bright_wizard = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 3 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 3 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,
@@ -332,11 +332,11 @@ quest_templates.quests.daily_complete_levels_hero_empire_soldier = {
 	completed = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
 
-		return 3 <= statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		return 3 <= statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 	end,
 	progress = function (statistics_db, stats_id, quest_key)
 		local stat_name = stat_names_by_quest_key[quest_key][1]
-		local count = statistics_db.get_persistent_stat(statistics_db, stats_id, "quest_statistics", stat_name)
+		local count = statistics_db:get_persistent_stat(stats_id, "quest_statistics", stat_name)
 
 		return {
 			count,

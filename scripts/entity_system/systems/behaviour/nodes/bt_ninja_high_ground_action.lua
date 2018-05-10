@@ -22,7 +22,7 @@ BTNinjaHighGroundAction.enter = function (self, unit, blackboard, t)
 			blackboard.fence_jumping = true
 
 			print("fence jumping")
-		elseif smart_data.smart_object_type == "ledges" and pos2.z < pos1.z and self.try_jump(self, unit, blackboard, t, pos1) then
+		elseif smart_data.smart_object_type == "ledges" and pos2.z < pos1.z and self:try_jump(unit, blackboard, t, pos1) then
 			blackboard.high_ground_opportunity = true
 		end
 	end
@@ -42,14 +42,14 @@ BTNinjaHighGroundAction.leave = function (self, unit, blackboard, t, reason, des
 			local navigation_extension = blackboard.navigation_extension
 			local locomotion_extension = blackboard.locomotion_extension
 
-			navigation_extension.set_enabled(navigation_extension, true)
+			navigation_extension:set_enabled(true)
 
 			local exit_pos = blackboard.climb_exit_pos:unbox()
 
-			navigation_extension.set_navbot_position(navigation_extension, exit_pos)
-			locomotion_extension.set_wanted_velocity(locomotion_extension, Vector3.zero())
-			locomotion_extension.set_movement_type(locomotion_extension, "script_driven")
-			locomotion_extension.teleport_to(locomotion_extension, blackboard.ledge_position:unbox(), Unit.local_rotation(unit, 0))
+			navigation_extension:set_navbot_position(exit_pos)
+			locomotion_extension:set_wanted_velocity(Vector3.zero())
+			locomotion_extension:set_movement_type("script_driven")
+			locomotion_extension:teleport_to(blackboard.ledge_position:unbox(), Unit.local_rotation(unit, 0))
 
 			blackboard.climb_spline_ground = nil
 			blackboard.climb_spline_ledge = nil
@@ -74,8 +74,8 @@ BTNinjaHighGroundAction.leave = function (self, unit, blackboard, t, reason, des
 			local hit_reaction_extension = ScriptUnit.extension(unit, "hit_reaction_system")
 			hit_reaction_extension.force_ragdoll_on_death = nil
 
-			if navigation_extension.is_using_smart_object(navigation_extension) then
-				slot10 = navigation_extension.use_smart_object(navigation_extension, false)
+			if navigation_extension:is_using_smart_object() then
+				slot10 = navigation_extension:use_smart_object(false)
 			end
 		end
 	else
@@ -94,7 +94,7 @@ BTNinjaHighGroundAction.run = function (self, unit, blackboard, t, dt)
 		return "running"
 	else
 		if blackboard.fence_jumping and blackboard.climb_state == "waiting_for_finished_climb_anim" and blackboard.jump_climb_finished then
-			if self.try_jump(self, unit, blackboard, t, blackboard.ledge_position:unbox()) then
+			if self:try_jump(unit, blackboard, t, blackboard.ledge_position:unbox()) then
 				blackboard.high_ground_opportunity = true
 
 				return "failed"
@@ -144,10 +144,10 @@ BTNinjaHighGroundAction.try_jump = function (self, unit, blackboard, t, pos1, fo
 
 			local network_manager = Managers.state.network
 
-			network_manager.anim_event(network_manager, unit, "to_crouch")
+			network_manager:anim_event(unit, "to_crouch")
 
 			if force_idle then
-				network_manager.anim_event(network_manager, unit, "idle")
+				network_manager:anim_event(unit, "idle")
 			end
 
 			local wanted_rot = Quaternion.look(p2 - p1, Vector3.up())

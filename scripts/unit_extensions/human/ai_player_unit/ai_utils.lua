@@ -42,7 +42,7 @@ AiUtils.aggro_nearby_friends_of_enemy = function (unit, broadphase, enemy_unit)
 			local ai_simple_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 			if ai_simple_extension then
-				ai_simple_extension.enemy_aggro(ai_simple_extension, unit, enemy_unit)
+				ai_simple_extension:enemy_aggro(unit, enemy_unit)
 			end
 		end
 
@@ -60,7 +60,7 @@ AiUtils.aggro_unit_of_enemy = function (unit, enemy_unit)
 	local ai_simple_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_simple_extension then
-		ai_simple_extension.enemy_aggro(ai_simple_extension, unit, enemy_unit)
+		ai_simple_extension:enemy_aggro(unit, enemy_unit)
 	end
 end
 
@@ -97,7 +97,7 @@ AiUtils.stormvermin_champion_set_ward_state = function (unit, state, is_server)
 
 	if is_server then
 		local network_manager = Managers.state.network
-		local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+		local unit_id = network_manager:unit_game_object_id(unit)
 
 		network_manager.network_transmit:send_rpc_clients("rpc_set_ward_state", unit_id, state)
 	end
@@ -112,7 +112,7 @@ AiUtils.chaos_exalted_champion_set_shield_state = function (unit, state, is_serv
 
 	if is_server then
 		local network_manager = Managers.state.network
-		slot4 = network_manager.unit_game_object_id(network_manager, unit)
+		slot4 = network_manager:unit_game_object_id(unit)
 	end
 end
 
@@ -126,7 +126,7 @@ AiUtils.alert_unit_of_enemy = function (unit, enemy_unit)
 	local ai_simple_extension = ScriptUnit.has_extension(unit, "ai_system")
 
 	if ai_simple_extension then
-		ai_simple_extension.enemy_alert(ai_simple_extension, unit, enemy_unit)
+		ai_simple_extension:enemy_alert(unit, enemy_unit)
 	end
 end
 
@@ -147,7 +147,7 @@ AiUtils.alert_nearby_friends_of_enemy = function (unit, broadphase, enemy_unit, 
 			local ai_simple_extension = ScriptUnit.has_extension(other_unit, "ai_system")
 
 			if ai_simple_extension then
-				ai_simple_extension.enemy_alert(ai_simple_extension, unit, enemy_unit)
+				ai_simple_extension:enemy_alert(unit, enemy_unit)
 			end
 		end
 
@@ -197,7 +197,7 @@ AiUtils.damage_target = function (target_unit, attacker_unit, action, damage_tri
 
 		if dimishing_damage_data and has_ai_slot_extension then
 			local ai_slot_system = Managers.state.entity:system("ai_slot_system")
-			local slots_n = ai_slot_system.slots_count(ai_slot_system, target_unit)
+			local slots_n = ai_slot_system:slots_count(target_unit)
 
 			if 0 < slots_n then
 				local dimishing_damage = dimishing_damage_data[math.min(slots_n, 9)]
@@ -214,10 +214,10 @@ AiUtils.damage_target = function (target_unit, attacker_unit, action, damage_tri
 		if is_player_unit and push_speed then
 			local target_status_extension = ScriptUnit.extension(target_unit, "status_system")
 
-			if not target_status_extension.is_disabled(target_status_extension) then
+			if not target_status_extension:is_disabled() then
 				local player_locomotion = ScriptUnit.extension(target_unit, "locomotion_system")
 
-				player_locomotion.add_external_velocity(player_locomotion, push_speed * damage_direction, action.max_player_push_speed)
+				player_locomotion:add_external_velocity(push_speed * damage_direction, action.max_player_push_speed)
 			end
 		end
 	end
@@ -308,7 +308,7 @@ AiUtils.warpfire_explode_unit = function (unit, blackboard)
 		local liquid_aoe_unit = Managers.state.unit_spawner:spawn_network_unit(aoe_unit_name, "liquid_aoe_unit", extension_init_data, position_on_navmesh)
 		local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 
-		liquid_area_damage_extension.ready(liquid_area_damage_extension)
+		liquid_area_damage_extension:ready()
 	end
 end
 
@@ -379,8 +379,8 @@ AiUtils.spawn_overpowering_blob = function (network_manager, target_unit, blob_h
 
 	World.link_unit(world, child_unit, target_unit, parent_node)
 
-	local child_unit_id = network_manager.unit_game_object_id(network_manager, child_unit)
-	local parent_unit_id = network_manager.unit_game_object_id(network_manager, target_unit)
+	local child_unit_id = network_manager:unit_game_object_id(child_unit)
+	local parent_unit_id = network_manager:unit_game_object_id(target_unit)
 
 	network_manager.network_transmit:send_rpc_clients("rpc_link_unit", child_unit_id, child_node, parent_unit_id, parent_node)
 
@@ -485,7 +485,7 @@ AiUtils.unit_alive = function (unit)
 	end
 
 	local health_extension = ScriptUnit.has_extension(unit, "health_system")
-	local is_alive = health_extension and health_extension.is_alive(health_extension)
+	local is_alive = health_extension and health_extension:is_alive()
 
 	return is_alive
 end
@@ -512,7 +512,7 @@ AiUtils.unit_knocked_down = function (unit)
 		return false
 	end
 
-	local is_knocked_down = status_extension.is_knocked_down(status_extension)
+	local is_knocked_down = status_extension:is_knocked_down()
 
 	return is_knocked_down
 end
@@ -528,22 +528,22 @@ AiUtils.unit_disabled = function (unit)
 		return false
 	end
 
-	local is_disabled = status_extension.is_disabled(status_extension)
+	local is_disabled = status_extension:is_disabled()
 
 	return is_disabled
 end
 
 AiUtils.position_is_on_large_navmesh = function (position, min_group_size, min_group_neighbour_count)
 	local group = self.navigation_group_manager:get_group_from_position(target_pos)
-	local group_area = (group and group.get_group_area(group)) or 0
-	local group_neighbours_count = (group and #group.get_group_neighbours(group)) or 0
+	local group_area = (group and group:get_group_area()) or 0
+	local group_neighbours_count = (group and #group:get_group_neighbours()) or 0
 	local navmesh_is_large_enough = 30 < group_area and 0 < group_neighbours_count
 end
 
 AiUtils.is_unwanted_target = function (enemy_unit)
 	if VALID_TARGETS_PLAYERS_AND_BOTS[enemy_unit] then
 		local status_extension = ScriptUnit.extension(enemy_unit, "status_system")
-		local is_grabbed_by_chaos_spawn = status_extension.is_grabbed_by_chaos_spawn(status_extension)
+		local is_grabbed_by_chaos_spawn = status_extension:is_grabbed_by_chaos_spawn()
 
 		if is_grabbed_by_chaos_spawn then
 			return true
@@ -566,27 +566,27 @@ AiUtils.is_of_interest_to_gutter_runner = function (gutter_runner_unit, enemy_un
 
 	local status_extension = ScriptUnit.extension(enemy_unit, "status_system")
 
-	if status_extension.is_knocked_down(status_extension) and not ignore_knocked_down then
+	if status_extension:is_knocked_down() and not ignore_knocked_down then
 		return
 	end
 
-	if status_extension.is_grabbed_by_pack_master(status_extension) then
+	if status_extension:is_grabbed_by_pack_master() then
 		return
 	end
 
-	if status_extension.is_grabbed_by_corruptor(status_extension) then
+	if status_extension:is_grabbed_by_corruptor() then
 		return
 	end
 
-	if status_extension.is_grabbed_by_chaos_spawn(status_extension) then
+	if status_extension:is_grabbed_by_chaos_spawn() then
 		return
 	end
 
-	if status_extension.get_is_ledge_hanging(status_extension) then
+	if status_extension:get_is_ledge_hanging() then
 		return
 	end
 
-	if status_extension.is_pounced_down(status_extension) and status_extension.get_pouncer_unit(status_extension) ~= gutter_runner_unit then
+	if status_extension:is_pounced_down() and status_extension:get_pouncer_unit() ~= gutter_runner_unit then
 		return
 	end
 
@@ -600,15 +600,15 @@ end
 AiUtils.is_of_interest_to_packmaster = function (packmaster_unit, enemy_unit)
 	if VALID_TARGETS_PLAYERS_AND_BOTS[enemy_unit] then
 		local status_extension = ScriptUnit.extension(enemy_unit, "status_system")
-		local is_knocked_down = status_extension.is_knocked_down(status_extension)
-		local is_pounced_down = status_extension.is_pounced_down(status_extension)
-		local is_grabbed_by_chaos_spawn = status_extension.is_grabbed_by_chaos_spawn(status_extension)
-		local grabbed = status_extension.is_grabbed_by_pack_master(status_extension)
-		local is_grabbed_by_other_pack_master = grabbed and status_extension.get_pack_master_grabber(status_extension) ~= packmaster_unit
+		local is_knocked_down = status_extension:is_knocked_down()
+		local is_pounced_down = status_extension:is_pounced_down()
+		local is_grabbed_by_chaos_spawn = status_extension:is_grabbed_by_chaos_spawn()
+		local grabbed = status_extension:is_grabbed_by_pack_master()
+		local is_grabbed_by_other_pack_master = grabbed and status_extension:get_pack_master_grabber() ~= packmaster_unit
 		local is_hanging = status_extension.pack_master_status == "pack_master_hanging"
 		local is_using_transport = status_extension.using_transport
 		local ledge_hanging = status_extension.is_ledge_hanging
-		local is_grabbed_by_corruptor = status_extension.is_grabbed_by_corruptor(status_extension)
+		local is_grabbed_by_corruptor = status_extension:is_grabbed_by_corruptor()
 
 		if not is_knocked_down and not is_pounced_down and not is_grabbed_by_other_pack_master and not is_hanging and not is_using_transport and not ledge_hanging and not is_grabbed_by_chaos_spawn and not is_grabbed_by_corruptor then
 			return true
@@ -621,15 +621,15 @@ end
 AiUtils.is_of_interest_to_corruptor = function (corruptor_unit, enemy_unit)
 	if VALID_TARGETS_PLAYERS_AND_BOTS[enemy_unit] then
 		local status_extension = ScriptUnit.extension(enemy_unit, "status_system")
-		local is_knocked_down = status_extension.is_knocked_down(status_extension)
-		local is_pounced_down = status_extension.is_pounced_down(status_extension)
-		local is_grabbed_by_chaos_spawn = status_extension.is_grabbed_by_chaos_spawn(status_extension)
-		local grabbed = status_extension.is_grabbed_by_corruptor(status_extension)
+		local is_knocked_down = status_extension:is_knocked_down()
+		local is_pounced_down = status_extension:is_pounced_down()
+		local is_grabbed_by_chaos_spawn = status_extension:is_grabbed_by_chaos_spawn()
+		local grabbed = status_extension:is_grabbed_by_corruptor()
 		local is_grabbed_by_other_corruptor = grabbed and status_extension.corruptor_unit ~= corruptor_unit
 		local is_hanging = status_extension.pack_master_status == "pack_master_hanging"
 		local is_using_transport = status_extension.using_transport
 		local ledge_hanging = status_extension.is_ledge_hanging
-		local is_grabbed_by_pack_master = status_extension.is_grabbed_by_pack_master(status_extension)
+		local is_grabbed_by_pack_master = status_extension:is_grabbed_by_pack_master()
 
 		if not is_knocked_down and not is_pounced_down and not is_grabbed_by_other_corruptor and not is_hanging and not is_using_transport and not ledge_hanging and not is_grabbed_by_chaos_spawn and not is_grabbed_by_pack_master then
 			return true
@@ -641,14 +641,14 @@ end
 
 AiUtils.is_of_interest_to_tentacle = function (enemy_unit, tentacle_unit)
 	local status_extension = ScriptUnit.extension(enemy_unit, "status_system")
-	local is_knocked_down = status_extension.is_knocked_down(status_extension)
-	local is_pounced_down = status_extension.is_pounced_down(status_extension)
-	local is_grabbed_by_chaos_spawn = status_extension.is_grabbed_by_chaos_spawn(status_extension)
+	local is_knocked_down = status_extension:is_knocked_down()
+	local is_pounced_down = status_extension:is_pounced_down()
+	local is_grabbed_by_chaos_spawn = status_extension:is_grabbed_by_chaos_spawn()
 	local is_hanging = status_extension.pack_master_status == "pack_master_hanging"
 	local is_using_transport = status_extension.using_transport
 	local ledge_hanging = status_extension.is_ledge_hanging
 	local in_end_zone = status_extension.in_end_zone
-	local is_grabbed_by_corruptor = status_extension.is_grabbed_by_corruptor(status_extension)
+	local is_grabbed_by_corruptor = status_extension:is_grabbed_by_corruptor()
 	local tentacle_pos = POSITION_LOOKUP[tentacle_unit]
 	local player_pos = POSITION_LOOKUP[enemy_unit]
 
@@ -661,16 +661,16 @@ end
 
 AiUtils.is_of_interest_to_vortex = function (enemy_unit)
 	local status_extension = ScriptUnit.extension(enemy_unit, "status_system")
-	local is_knocked_down = status_extension.is_knocked_down(status_extension)
-	local is_pounced_down = status_extension.is_pounced_down(status_extension)
-	local grabbed = status_extension.is_grabbed_by_pack_master(status_extension)
+	local is_knocked_down = status_extension:is_knocked_down()
+	local is_pounced_down = status_extension:is_pounced_down()
+	local grabbed = status_extension:is_grabbed_by_pack_master()
 	local is_hanging = status_extension.pack_master_status == "pack_master_hanging"
 	local is_using_transport = status_extension.using_transport
 	local ledge_hanging = status_extension.is_ledge_hanging
-	local is_grabbed_by_chaos_spawn = status_extension.is_grabbed_by_chaos_spawn(status_extension)
-	local is_in_vortex = status_extension.is_in_vortex(status_extension)
+	local is_grabbed_by_chaos_spawn = status_extension:is_grabbed_by_chaos_spawn()
+	local is_in_vortex = status_extension:is_in_vortex()
 	local in_end_zone = status_extension.in_end_zone
-	local is_grabbed_by_corruptor = status_extension.is_grabbed_by_corruptor(status_extension)
+	local is_grabbed_by_corruptor = status_extension:is_grabbed_by_corruptor()
 
 	if not is_knocked_down and not is_pounced_down and not grabbed and not is_hanging and not is_using_transport and not ledge_hanging and not is_grabbed_by_chaos_spawn and not is_in_vortex and not in_end_zone and not is_grabbed_by_corruptor then
 		return true
@@ -681,13 +681,13 @@ end
 
 AiUtils.is_of_interest_plague_wave_sorcerer = function (enemy_unit)
 	local status_extension = ScriptUnit.extension(enemy_unit, "status_system")
-	local is_knocked_down = status_extension.is_knocked_down(status_extension)
-	local is_pounced_down = status_extension.is_pounced_down(status_extension)
-	local grabbed = status_extension.is_grabbed_by_pack_master(status_extension)
+	local is_knocked_down = status_extension:is_knocked_down()
+	local is_pounced_down = status_extension:is_pounced_down()
+	local grabbed = status_extension:is_grabbed_by_pack_master()
 	local is_hanging = status_extension.pack_master_status == "pack_master_hanging"
 	local is_using_transport = status_extension.using_transport
 	local ledge_hanging = status_extension.is_ledge_hanging
-	local is_grabbed_by_chaos_spawn = status_extension.is_grabbed_by_chaos_spawn(status_extension)
+	local is_grabbed_by_chaos_spawn = status_extension:is_grabbed_by_chaos_spawn()
 	local overpowered = status_extension.overpowered
 	local in_end_zone = status_extension.in_end_zone
 
@@ -700,14 +700,14 @@ end
 
 AiUtils.is_of_interest_boss_sorcerer = function (enemy_unit)
 	local status_extension = ScriptUnit.extension(enemy_unit, "status_system")
-	local is_knocked_down = status_extension.is_knocked_down(status_extension)
-	local is_pounced_down = status_extension.is_pounced_down(status_extension)
-	local grabbed = status_extension.is_grabbed_by_pack_master(status_extension)
+	local is_knocked_down = status_extension:is_knocked_down()
+	local is_pounced_down = status_extension:is_pounced_down()
+	local grabbed = status_extension:is_grabbed_by_pack_master()
 	local is_hanging = status_extension.pack_master_status == "pack_master_hanging"
 	local is_using_transport = status_extension.using_transport
 	local ledge_hanging = status_extension.is_ledge_hanging
-	local is_grabbed_by_chaos_spawn = status_extension.is_grabbed_by_chaos_spawn(status_extension)
-	local is_in_vortex = status_extension.is_in_vortex(status_extension)
+	local is_grabbed_by_chaos_spawn = status_extension:is_grabbed_by_chaos_spawn()
+	local is_in_vortex = status_extension:is_in_vortex()
 	local overpowered = status_extension.overpowered
 
 	if not is_knocked_down and not is_pounced_down and not grabbed and not is_hanging and not is_using_transport and not ledge_hanging and not is_grabbed_by_chaos_spawn and not is_in_vortex and not overpowered then
@@ -719,7 +719,7 @@ end
 
 AiUtils.is_of_interest_stormfiend_demo = function (enemy_unit)
 	local player_manager = Managers.player
-	local player = player_manager.unit_owner(player_manager, enemy_unit)
+	local player = player_manager:unit_owner(enemy_unit)
 
 	return not player.bot_player
 end
@@ -729,7 +729,7 @@ AiUtils.show_polearm = function (packmaster_unit, show)
 	local go_id = Managers.state.unit_storage:go_id(packmaster_unit)
 	local network_manager = Managers.state.network
 
-	if network_manager.game(network_manager) then
+	if network_manager:game() then
 		network_manager.network_transmit:send_rpc_all("rpc_ai_show_single_item", go_id, item_inventory_index, show)
 	end
 end
@@ -762,7 +762,7 @@ AiUtils.stagger = function (unit, blackboard, attacker_unit, stagger_direction, 
 		end
 
 		if ai_extension.attacked then
-			ai_extension.attacked(ai_extension, attacker_unit, t)
+			ai_extension:attacked(attacker_unit, t)
 		end
 	end
 end
@@ -774,14 +774,14 @@ AiUtils.override_stagger = function (unit, blackboard, attacker_unit, stagger_di
 		return false
 	end
 
-	if active_node.stagger_override(active_node, unit, blackboard, attacker_unit, stagger_direction, stagger_length, stagger_type, stagger_duration, stagger_animation_scale, t, is_push) then
+	if active_node:stagger_override(unit, blackboard, attacker_unit, stagger_direction, stagger_length, stagger_type, stagger_duration, stagger_animation_scale, t, is_push) then
 		assert(0 < stagger_type, "Tried to use invalid stagger type %q", stagger_type)
 
 		if unit ~= attacker_unit and ScriptUnit.has_extension(unit, "ai_system") then
 			local ai_extension = ScriptUnit.extension(unit, "ai_system")
 
 			if ai_extension.attacked then
-				ai_extension.attacked(ai_extension, attacker_unit, t)
+				ai_extension:attacked(attacker_unit, t)
 			end
 		end
 
@@ -892,7 +892,7 @@ end
 
 AiUtils.ninja_vanish_when_taking_damage = function (unit, blackboard)
 	local health_extension = ScriptUnit.extension(unit, "health_system")
-	local recent_damages, nr_damages = health_extension.recent_damages(health_extension)
+	local recent_damages, nr_damages = health_extension:recent_damages()
 
 	if 0 < nr_damages then
 		blackboard.ninja_vanish = true
@@ -942,7 +942,7 @@ local DEFAULT_AGGRO_MULTIPLIERS = {
 AiUtils.update_aggro = function (unit, blackboard, breed, t, dt)
 	local aggro_list = blackboard.aggro_list
 	local health_extension = ScriptUnit.extension(unit, "health_system")
-	local strided_array, array_length = health_extension.recent_damages(health_extension)
+	local strided_array, array_length = health_extension:recent_damages()
 	local aggro_decay = dt * breed.perception_weights.aggro_decay_per_sec
 
 	for enemy_unit, aggro in pairs(aggro_list) do
@@ -1009,7 +1009,7 @@ AiUtils.debug_bot_transitions = function (gui, t, x1, y1)
 			local unit = player.player_unit
 
 			if unit_alive(unit) then
-				local profile_index = player.profile_index(player)
+				local profile_index = player:profile_index()
 				local profile = SPProfiles[profile_index]
 				local unit_name = profile and profile.unit_name
 				local text = nil
@@ -1063,7 +1063,7 @@ AiUtils.push_intersecting_players = function (unit, displaced_units, data, t, dt
 			if dodge_radius then
 				local status_extension = ScriptUnit.has_extension(hit_unit, "status_system")
 
-				if status_extension and status_extension.get_is_dodging(status_extension) then
+				if status_extension and status_extension:get_is_dodging() then
 					push_radius = dodge_radius
 				end
 			end
@@ -1086,7 +1086,7 @@ AiUtils.push_intersecting_players = function (unit, displaced_units, data, t, dt
 								local push_scaler = 1 - ahead_dist / data.ahead_dist
 								push_scaler = push_scaler * push_scaler
 
-								locomotion_extension.add_external_velocity(locomotion_extension, pushed_velocity * push_scaler)
+								locomotion_extension:add_external_velocity(pushed_velocity * push_scaler)
 
 								if hit_func then
 									hit_func(hit_unit, unit, ...)
@@ -1124,12 +1124,12 @@ AiUtils.set_material_property = function (unit, variable_name, material_name, va
 end
 
 AiUtils.allow_smart_object_layers = function (navigation_extension, status)
-	navigation_extension.allow_layer(navigation_extension, "ledges", status)
-	navigation_extension.allow_layer(navigation_extension, "ledges_with_fence", status)
-	navigation_extension.allow_layer(navigation_extension, "doors", status)
-	navigation_extension.allow_layer(navigation_extension, "planks", status)
-	navigation_extension.allow_layer(navigation_extension, "jumps", status)
-	navigation_extension.allow_layer(navigation_extension, "teleporters", status)
+	navigation_extension:allow_layer("ledges", status)
+	navigation_extension:allow_layer("ledges_with_fence", status)
+	navigation_extension:allow_layer("doors", status)
+	navigation_extension:allow_layer("planks", status)
+	navigation_extension:allow_layer("jumps", status)
+	navigation_extension:allow_layer("teleporters", status)
 end
 
 AiUtils.shield_user = function (unit)
@@ -1152,7 +1152,7 @@ AiUtils.attack_is_shield_blocked = function (hit_unit, attacker_unit, trueflight
 	end
 
 	local ai_shield_extension = ScriptUnit.extension(hit_unit, "ai_shield_system")
-	local shield_blocked = ai_shield_extension.can_block_attack(ai_shield_extension, attacker_unit, trueflight_blocking, hit_direction)
+	local shield_blocked = ai_shield_extension:can_block_attack(attacker_unit, trueflight_blocking, hit_direction)
 
 	return shield_blocked
 end
@@ -1168,8 +1168,8 @@ end
 
 AiUtils.unit_is_behind_player = function (enemy_unit, player_unit)
 	local network_manager = Managers.state.network
-	local player_unit_id = network_manager.unit_game_object_id(network_manager, player_unit)
-	local game = network_manager.game(network_manager)
+	local player_unit_id = network_manager:unit_game_object_id(player_unit)
+	local game = network_manager:game()
 
 	if game and player_unit_id then
 		local to_target_vec = Vector3.normalize(POSITION_LOOKUP[enemy_unit] - POSITION_LOOKUP[player_unit])

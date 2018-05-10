@@ -34,7 +34,7 @@ BTJumpSlamImpactAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.anim_cb_damage then
 		blackboard.anim_cb_damage = nil
 
-		self.jump_slam_impact(self, unit, blackboard, t)
+		self:jump_slam_impact(unit, blackboard, t)
 
 		blackboard.attacking_target = nil
 	elseif blackboard.attack_finished then
@@ -93,7 +93,7 @@ BTJumpSlamImpactAction.impact_damage = function (attacking_unit, t, radius, stag
 
 		if ai_unit ~= attacking_unit then
 			local health_extension = ScriptUnit.extension(ai_unit, "health_system")
-			local is_alive = health_extension.is_alive(health_extension)
+			local is_alive = health_extension:is_alive()
 
 			if is_alive then
 				local unit_position = position_lookup[ai_unit]

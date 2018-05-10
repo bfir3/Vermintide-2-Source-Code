@@ -27,7 +27,7 @@ local function lines(str)
 		return ""
 	end
 
-	helper(str.gsub(str, "(.-)\r?\n", helper))
+	helper(str:gsub("(.-)\r?\n", helper))
 
 	return t
 end
@@ -80,7 +80,7 @@ NewsTickerManager.refresh_loading_screen_message = function (self)
 	self._refreshing_loading_screen_message = true
 
 	if self._platform == "win32" and not rawget(_G, "Curl") then
-		self.cb_loading_screen_loaded(self, {
+		self:cb_loading_screen_loaded({
 			done = true,
 			data = "This executable is built without Curl. News ticker will be unavailable."
 		})
@@ -88,7 +88,7 @@ NewsTickerManager.refresh_loading_screen_message = function (self)
 		return
 	end
 
-	self._load(self, self._loading_screen_url, callback(self, "cb_loading_screen_loaded"))
+	self:_load(self._loading_screen_url, callback(self, "cb_loading_screen_loaded"))
 end
 
 NewsTickerManager.cb_loading_screen_loaded = function (self, info)
@@ -114,7 +114,7 @@ NewsTickerManager.refresh_ingame_message = function (self)
 	self._refreshing_ingame_message = true
 
 	if self._platform == "win32" and not rawget(_G, "Curl") then
-		self.cb_ingame_loaded(self, {
+		self:cb_ingame_loaded({
 			done = true,
 			data = "This executable is built without Curl. News ticker will be unavailable."
 		})
@@ -122,7 +122,7 @@ NewsTickerManager.refresh_ingame_message = function (self)
 		return
 	end
 
-	self._load(self, self._ingame_url, callback(self, "cb_ingame_loaded"))
+	self:_load(self._ingame_url, callback(self, "cb_ingame_loaded"))
 end
 
 NewsTickerManager.refreshing_ingame_message = function (self)

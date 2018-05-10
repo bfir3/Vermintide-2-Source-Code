@@ -46,13 +46,13 @@ ActionGeiser.client_owner_post_update = function (self, dt, t, world, can_damage
 	end
 
 	if self.state == "shooting" then
-		self.fire(self)
+		self:fire()
 
 		self.state = "doing_damage"
 	end
 
 	if self.state == "doing_damage" then
-		local done = self._update_damage(self, current_action)
+		local done = self:_update_damage(current_action)
 
 		if done then
 			self.state = "shot"
@@ -99,7 +99,7 @@ ActionGeiser.fire = function (self, reason)
 	elseif charge_value < 0.66 then
 		size = "_medium"
 	elseif 1 <= charge_value and not global_is_inside_inn then
-		local owner_unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+		local owner_unit_id = network_manager:unit_game_object_id(owner_unit)
 		local damage_source_id = NetworkLookup.damage_sources[self.item_name]
 		local explosion_template_name = current_action.aoe_name
 		local explosion_template_id = NetworkLookup.explosion_templates[explosion_template_name]
@@ -128,7 +128,7 @@ ActionGeiser.fire = function (self, reason)
 		local play_on_husk = self.current_action.fire_sound_on_husk
 		local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
 
-		first_person_extension.play_hud_sound_event(first_person_extension, fire_sound_event, nil, play_on_husk)
+		first_person_extension:play_hud_sound_event(fire_sound_event, nil, play_on_husk)
 	end
 
 	local damage_buffer = self._damage_buffer
@@ -146,8 +146,8 @@ ActionGeiser.fire = function (self, reason)
 			local dummy = not breed and Unit.get_data(hit_unit, "is_dummy")
 
 			if not hit_units[hit_unit] and (breed or dummy or (table.contains(PLAYER_AND_BOT_UNITS, hit_unit) and not ignore_hitting_allies)) then
-				local attacker_unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
-				local hit_unit_id = network_manager.unit_game_object_id(network_manager, hit_unit)
+				local attacker_unit_id = network_manager:unit_game_object_id(owner_unit)
+				local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
 				local hit_zone_id = NetworkLookup.hit_zones.torso
 				local attack_vector = hit_position - source_pos
 				local attack_distance = Vector3.length(attack_vector)
@@ -211,7 +211,7 @@ ActionGeiser._update_damage = function (self, current_action)
 	local owner_unit = self.owner_unit
 	local damage_source = self.item_name
 	local damage_source_id = NetworkLookup.damage_sources[damage_source]
-	local attacker_unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+	local attacker_unit_id = network_manager:unit_game_object_id(owner_unit)
 	local attacker_position = self.position:unbox()
 	local check_buffs = self._check_buffs
 	local buff_extension = self.owner_buff_extension
@@ -238,7 +238,7 @@ ActionGeiser._update_damage = function (self, current_action)
 				self._check_buffs = false
 			end
 
-			local hit_unit_id = network_manager.unit_game_object_id(network_manager, hit_unit)
+			local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
 
 			if not hit_unit_id then
 			else
@@ -253,7 +253,7 @@ ActionGeiser._update_damage = function (self, current_action)
 				local is_critical_strike = self._is_critical_strike or has_ranged_boost
 				local weapon_system = Managers.state.entity:system("weapon_system")
 
-				weapon_system.send_rpc_attack_hit(weapon_system, damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", ranged_boost_curve_multiplier, "is_critical_strike", is_critical_strike)
+				weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", ranged_boost_curve_multiplier, "is_critical_strike", is_critical_strike)
 			end
 		end
 	end

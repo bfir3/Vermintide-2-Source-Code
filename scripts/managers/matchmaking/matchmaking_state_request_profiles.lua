@@ -16,7 +16,7 @@ MatchmakingStateRequestProfiles.on_enter = function (self, state_context)
 	self._matchmaking_manager.debug.profiles_data = {}
 	self.lobby_client = state_context.lobby_client
 
-	self._request_profiles_data(self)
+	self:_request_profiles_data()
 
 	self.state_context.profiles_data = nil
 	self.profiles_data = {}
@@ -66,7 +66,7 @@ MatchmakingStateRequestProfiles.rpc_matchmaking_request_profiles_data_reply = fu
 
 	self._reply_timer = nil
 
-	self._update_profiles_data(self, profile_array, player_id_array)
+	self:_update_profiles_data(profile_array, player_id_array)
 
 	self._next_state = MatchmakingStateJoinGame
 	self._matchmaking_manager.debug.text = "profiles_data_received"
@@ -79,7 +79,7 @@ MatchmakingStateRequestProfiles.rpc_matchmaking_update_profiles_data = function 
 		return
 	end
 
-	self._update_profiles_data(self, profile_array, player_id_array)
+	self:_update_profiles_data(profile_array, player_id_array)
 
 	if self.popup_id then
 		self.popup_join_lobby_handler:update_lobby_data(self.profiles_data)

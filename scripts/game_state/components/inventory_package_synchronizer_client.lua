@@ -136,7 +136,7 @@ InventoryPackageSynchronizerClient.destroy = function (self)
 	local package_manager = Managers.package
 
 	for package_name, _ in pairs(self.packages_map) do
-		package_manager.unload(package_manager, package_name, "InventoryPackageSynchronizerClient")
+		package_manager:unload(package_name, "InventoryPackageSynchronizerClient")
 	end
 end
 
@@ -157,7 +157,7 @@ InventoryPackageSynchronizerClient.register_rpc = function (self, network_transm
 	self.network_transmit = network_transmit
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, "rpc_server_set_inventory_packages")
+	network_event_delegate:register(self, "rpc_server_set_inventory_packages")
 end
 
 InventoryPackageSynchronizerClient.unregister = function (self)
@@ -213,11 +213,11 @@ InventoryPackageSynchronizerClient.rpc_server_set_inventory_packages = function 
 		packages_map[package_name] = nil
 
 		if package_info == nil then
-			package_manager.load(package_manager, package_name, "InventoryPackageSynchronizerClient", nil, asynchronous)
+			package_manager:load(package_name, "InventoryPackageSynchronizerClient", nil, asynchronous)
 
 			unload_package_map[package_name] = nil
 		else
-			assert(package_manager.is_loading(package_manager, package_name) or package_manager.has_loaded(package_manager, package_name), "Package %q should be loaded or loading but isn't!", package_name)
+			assert(package_manager:is_loading(package_name) or package_manager:has_loaded(package_name), "Package %q should be loaded or loading but isn't!", package_name)
 		end
 	end
 
@@ -229,7 +229,7 @@ InventoryPackageSynchronizerClient.rpc_server_set_inventory_packages = function 
 	local package_manager = Managers.package
 
 	for package_name, _ in pairs(temp_package_map) do
-		packages_map[package_name] = package_manager.has_loaded(package_manager, package_name)
+		packages_map[package_name] = package_manager:has_loaded(package_name)
 		unload_package_map[package_name] = nil
 	end
 
@@ -244,8 +244,8 @@ InventoryPackageSynchronizerClient.update = function (self, dt)
 
 	for package_name, timer in pairs(unload_package_map) do
 		if timer <= 0 then
-			if package_manager.can_unload(package_manager, package_name) then
-				package_manager.unload(package_manager, package_name, "InventoryPackageSynchronizerClient")
+			if package_manager:can_unload(package_name) then
+				package_manager:unload(package_name, "InventoryPackageSynchronizerClient")
 
 				unload_package_map[package_name] = nil
 			else
@@ -264,7 +264,7 @@ InventoryPackageSynchronizerClient.update = function (self, dt)
 
 		for package_name, is_loaded in pairs(packages_map) do
 			if not is_loaded then
-				is_loaded = package_manager.has_loaded(package_manager, package_name)
+				is_loaded = package_manager:has_loaded(package_name)
 				all_loaded = all_loaded and is_loaded
 				packages_map[package_name] = is_loaded
 			end

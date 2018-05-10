@@ -83,7 +83,7 @@ NetworkEventDelegate._cleanup = function (self)
 end
 
 NetworkEventDelegate.destroy = function (self)
-	self._cleanup(self)
+	self:_cleanup()
 
 	self.event_table = nil
 

@@ -39,7 +39,7 @@ AIInterestPointSystem.init = function (self, context, name)
 	self.interest_points_to_spawn = {}
 	self.reachable_interest_points = {}
 	local ai_system = Managers.state.entity:system("ai_system")
-	local nav_world = ai_system.nav_world(ai_system)
+	local nav_world = ai_system:nav_world()
 	self.nav_world = nav_world
 	self.astar = GwNavAStar.create(nav_world)
 	self.processing_astar = false
@@ -69,7 +69,7 @@ AIInterestPointSystem.init = function (self, context, name)
 	local network_event_delegate = context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, "rpc_interest_point_chatter_update")
+	network_event_delegate:register(self, "rpc_interest_point_chatter_update")
 
 	self.level_seed = Managers.state.game_mode.level_transition_handler.level_seed
 
@@ -274,10 +274,10 @@ end
 
 AIInterestPointSystem.update = function (self, context, t)
 	if self.is_server then
-		self.debug_draw(self, t, context.dt)
-		self.spawn_interest_points(self)
-		self.release_obsolete_requests(self, t)
-		self.resolve_requests(self)
+		self:debug_draw(t, context.dt)
+		self:spawn_interest_points()
+		self:release_obsolete_requests(t)
+		self:resolve_requests()
 	end
 
 	local dt = context.dt
@@ -364,7 +364,7 @@ AIInterestPointSystem.spawn_interest_points = function (self)
 					breed = Breeds[breed_override_lookup[breed.name]]
 				end
 
-				local id = conflict.spawn_queued_unit(conflict, breed, Vector3Box(Vector3Aux.unbox(point.position)), point.rotation, spawn_category, spawn_animation, spawn_type, optional_data, group_data, point)
+				local id = conflict:spawn_queued_unit(breed, Vector3Box(Vector3Aux.unbox(point.position)), point.rotation, spawn_category, spawn_animation, spawn_type, optional_data, group_data, point)
 				point[1] = id
 			else
 				print("FAIL INTEREST POINT SPAWN UNIT")
@@ -412,7 +412,7 @@ AIInterestPointSystem.release_obsolete_requests = function (self, t)
 	if release_claim then
 		self.current_obsolete_request = nil
 
-		self.api_release_claim(self, request_id)
+		self:api_release_claim(request_id)
 	else
 		self.current_obsolete_request = request_id
 	end
@@ -542,9 +542,9 @@ local function _check_and_update_request_result(request, best_unit, best_point, 
 			chatter_number = 0
 		end
 
-		local go_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, best_unit)
+		local go_id, is_level_unit = network_manager:game_object_or_level_id(best_unit)
 
-		network_transmit.send_rpc_all(network_transmit, "rpc_interest_point_chatter_update", go_id, is_level_unit, chatter_number)
+		network_transmit:send_rpc_all("rpc_interest_point_chatter_update", go_id, is_level_unit, chatter_number)
 
 		return true
 	else
@@ -580,7 +580,7 @@ AIInterestPointSystem.resolve_requests = function (self)
 					local start_position = claim_unit_position
 					local end_position = Vector3Aux.unbox(best_point.position)
 
-					self._start_astar_query(self, astar, start_position, end_position, self.nav_world, self.traverse_logic, best_unit, best_point, best_point_extension)
+					self:_start_astar_query(astar, start_position, end_position, self.nav_world, self.traverse_logic, best_unit, best_point, best_point_extension)
 
 					path_check_done = false
 				else
@@ -594,7 +594,7 @@ AIInterestPointSystem.resolve_requests = function (self)
 			best_point = self.processing_best_point
 			best_point_extension = self.processing_best_point_extension
 			path_check_done = true
-			path_found = self._update_astar_result(self, current_request_point_unit, request, best_unit, astar)
+			path_found = self:_update_astar_result(current_request_point_unit, request, best_unit, astar)
 		end
 
 		if path_check_done then
@@ -627,17 +627,17 @@ AIInterestPointSystem.debug_draw = function (self, t, dt)
 			local forward = Quaternion.forward(point.rotation:unbox())
 
 			if not point.is_position_on_navmesh then
-				QuickDrawer.cylinder(QuickDrawer, position, position + Vector3.up(), 0.25, Colors.get("dark_red"), 5)
-				QuickDrawer.cone(QuickDrawer, position + Vector3.up() * 1.3 + forward * 0.25, (position + Vector3.up() * 1.3) - forward * 0.25, 0.1, Colors.get("dark_red"), 8, 8)
+				QuickDrawer:cylinder(position, position + Vector3.up(), 0.25, Colors.get("dark_red"), 5)
+				QuickDrawer:cone(position + Vector3.up() * 1.3 + forward * 0.25, (position + Vector3.up() * 1.3) - forward * 0.25, 0.1, Colors.get("dark_red"), 8, 8)
 			elseif point.claimed then
 				local offset = Vector3.up() * self.debug_anim_t * 0.2
 
-				QuickDrawer.circle(QuickDrawer, position + Vector3.up() * 0.8, 0.25, Vector3.up(), Colors.get("lime_green"))
-				QuickDrawer.cylinder(QuickDrawer, position - offset, (position + Vector3.up() * 1) - offset, 0.25, Colors.get("lime_green"), 5)
-				QuickDrawer.cone(QuickDrawer, position + Vector3.up() * 1.3 + forward * 0.25, (position + Vector3.up() * 1.3) - forward * 0.25, 0.1, Colors.get("lime_green"), 8, 8)
+				QuickDrawer:circle(position + Vector3.up() * 0.8, 0.25, Vector3.up(), Colors.get("lime_green"))
+				QuickDrawer:cylinder(position - offset, (position + Vector3.up() * 1) - offset, 0.25, Colors.get("lime_green"), 5)
+				QuickDrawer:cone(position + Vector3.up() * 1.3 + forward * 0.25, (position + Vector3.up() * 1.3) - forward * 0.25, 0.1, Colors.get("lime_green"), 8, 8)
 			else
-				QuickDrawer.cylinder(QuickDrawer, position, position + Vector3.up(), 0.25, Colors.get("dark_green"), 5)
-				QuickDrawer.cone(QuickDrawer, position + Vector3.up() * 1.3 + forward * 0.25, (position + Vector3.up() * 1.3) - forward * 0.25, 0.1, Colors.get("dark_green"), 8, 8)
+				QuickDrawer:cylinder(position, position + Vector3.up(), 0.25, Colors.get("dark_green"), 5)
+				QuickDrawer:cone(position + Vector3.up() * 1.3 + forward * 0.25, (position + Vector3.up() * 1.3) - forward * 0.25, 0.1, Colors.get("dark_green"), 8, 8)
 			end
 
 			Script.set_temp_count(a, b, c)
@@ -653,7 +653,7 @@ AIInterestPointSystem.debug_draw = function (self, t, dt)
 			if ip_end_time then
 				local end_position = POSITION_LOOKUP[claim_unit] + Vector3.up() * (ip_end_time - t) + Vector3.up()
 
-				QuickDrawer.cylinder(QuickDrawer, POSITION_LOOKUP[claim_unit], end_position, 0.25, Colors.get("dark_red"), 5)
+				QuickDrawer:cylinder(POSITION_LOOKUP[claim_unit], end_position, 0.25, Colors.get("dark_red"), 5)
 			end
 		end
 	end

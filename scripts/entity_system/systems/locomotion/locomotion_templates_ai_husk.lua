@@ -53,7 +53,7 @@ LocomotionTemplates.AiHuskLocomotionExtension.update_alive = function (data, t, 
 
 	for unit, extension in pairs(all_update_units) do
 		local health_extension = ScriptUnit.extension(unit, "health_system")
-		local is_alive = health_extension.is_alive(health_extension)
+		local is_alive = health_extension:is_alive()
 
 		if not is_alive then
 			all_update_units[unit] = nil
@@ -86,7 +86,7 @@ LocomotionTemplates.AiHuskLocomotionExtension.update_pure_network_update_units =
 
 	for unit, extension in pairs(data.pure_network_update_units) do
 		local old_pos = POSITION_LOOKUP[unit]
-		local go_id = unit_storage.go_id(unit_storage, unit)
+		local go_id = unit_storage:go_id(unit)
 		local network_pos = GameSession_game_object_field(game, go_id, "position")
 		local has_teleported = GameSession_game_object_field(game, go_id, "has_teleported")
 		local network_yaw = GameSession_game_object_field(game, go_id, "yaw_rot")
@@ -161,15 +161,15 @@ LocomotionTemplates.AiHuskLocomotionExtension.update_other_update_units_navmesh_
 	for unit, extension in pairs(data.other_update_units) do
 		if not extension.is_network_driven and not extension.hit_wall and Unit.mover(unit) == nil then
 			local current_position = Unit.local_position(unit, 0)
-			traverse_logic = traverse_logic or extension.traverse_logic(extension)
+			traverse_logic = traverse_logic or extension:traverse_logic()
 			physics_world = physics_world or World.physics_world(extension._world)
-			local velocity = extension.current_velocity(extension)
+			local velocity = extension:current_velocity()
 			local result = LocomotionUtils.navmesh_movement_check(current_position, velocity, nav_world, physics_world, traverse_logic)
 
 			if result == "navmesh_hit_wall" then
 				extension.hit_wall = true
 			elseif result == "navmesh_use_mover" then
-				extension.set_mover_disable_reason(extension, "not_constrained_by_mover", false)
+				extension:set_mover_disable_reason("not_constrained_by_mover", false)
 
 				local mover = Unit.mover(unit)
 
@@ -186,7 +186,7 @@ LocomotionTemplates.AiHuskLocomotionExtension.update_other_update_units_navmesh_
 
 						Unit.set_local_position(unit, 0, mover_position)
 					else
-						extension.set_mover_disable_reason(extension, "not_constrained_by_mover", true)
+						extension:set_mover_disable_reason("not_constrained_by_mover", true)
 
 						extension.hit_wall = true
 					end
@@ -212,13 +212,13 @@ LocomotionTemplates.AiHuskLocomotionExtension.update_other_update_units = functi
 
 	for unit, extension in pairs(data.other_update_units) do
 		local current_position = Unit.local_position(unit, 0)
-		traverse_logic = traverse_logic or extension.traverse_logic(extension)
+		traverse_logic = traverse_logic or extension:traverse_logic()
 		local wanted_pose = Unit.animation_wanted_root_pose(unit)
 		local wanted_position = Matrix4x4.translation(wanted_pose)
 		local wanted_rotation = nil
 
 		if extension.has_network_driven_rotation then
-			local go_id = unit_storage.go_id(unit_storage, unit)
+			local go_id = unit_storage:go_id(unit)
 			local yaw = GameSession_game_object_field(game, go_id, "yaw_rot")
 			wanted_rotation = Quaternion(Vector3.up(), yaw)
 		else

@@ -32,7 +32,7 @@ local rpcs = {
 EnemyPackageLoader.register_rpcs = function (self, network_event_delegate)
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(rpcs))
+	network_event_delegate:register(self, unpack(rpcs))
 end
 
 EnemyPackageLoader.unregister_rpcs = function (self)
@@ -82,7 +82,7 @@ EnemyPackageLoader._find_unused_breed_to_unload = function (self, loaded_breeds)
 	local ResourcePackage_can_unload = ResourcePackage.can_unload
 
 	for breed_name, state in pairs(loaded_breeds) do
-		if num_spawned_by_breed[breed_name] <= 0 and not unit_spawner.breed_in_death_watch(unit_spawner, breed_name) and ResourcePackage_can_unload(package_handles[breed_name]) then
+		if num_spawned_by_breed[breed_name] <= 0 and not unit_spawner:breed_in_death_watch(breed_name) and ResourcePackage_can_unload(package_handles[breed_name]) then
 			return breed_name
 		end
 	end
@@ -111,18 +111,18 @@ EnemyPackageLoader.request_breed = function (self, breed_name, ignore_breed_limi
 
 	if not ignore_breed_limits and package_limit <= current_packages then
 		local loaded_breeds = breed_category_data.loaded_breeds
-		local unused_breed_name = self._find_unused_breed_to_unload(self, loaded_breeds)
+		local unused_breed_name = self:_find_unused_breed_to_unload(loaded_breeds)
 
 		if unused_breed_name then
-			self._unload_package(self, unused_breed_name, breed_category_data)
+			self:_unload_package(unused_breed_name, breed_category_data)
 		else
-			local replacement_breed_name = self._pick_breed_from_loaded_breeds(self, loaded_breeds, package_limit)
+			local replacement_breed_name = self:_pick_breed_from_loaded_breeds(loaded_breeds, package_limit)
 
 			return false, replacement_breed_name
 		end
 	end
 
-	self._load_package(self, breed_name, breed_category_data)
+	self:_load_package(breed_name, breed_category_data)
 
 	return true
 end
@@ -187,7 +187,7 @@ EnemyPackageLoader.update_breeds_loading_status = function (self)
 		if loading_done then
 			breeds_list[breed_name] = nil
 
-			self._set_breed_loaded_on_all_peers(self, breed_name, true)
+			self:_set_breed_loaded_on_all_peers(breed_name, true)
 		end
 	end
 end
@@ -200,7 +200,7 @@ EnemyPackageLoader._start_loading_package = function (self, breed_name, callback
 	local package_name = BREED_PATH .. ((self.use_optimized and OPT_LOOKUP_BREED_NAMES[breed_name]) or breed_name)
 	self._package_state[breed_name] = "loading"
 
-	self._set_breed_processed(self, breed_name, true)
+	self:_set_breed_processed(breed_name, true)
 
 	local async = true
 	local prioritize = true
@@ -217,7 +217,7 @@ EnemyPackageLoader._load_package = function (self, breed_name, breed_category_da
 
 	dynamic_loaded_packages[breed_name][self._peer_id] = false
 
-	self._start_loading_package(self, breed_name)
+	self:_start_loading_package(breed_name)
 
 	breed_category_data.current = breed_category_data.current + 1
 	local is_server = self._is_server
@@ -225,7 +225,7 @@ EnemyPackageLoader._load_package = function (self, breed_name, breed_category_da
 	if is_server and not LEVEL_EDITOR_TEST then
 		local breed_id = NetworkLookup.breeds[breed_name]
 
-		self._send_rpc_to_clients(self, "rpc_from_server_load_breed_package", breed_id)
+		self:_send_rpc_to_clients("rpc_from_server_load_breed_package", breed_id)
 
 		self._currently_loading_breeds[breed_name] = true
 	end
@@ -247,17 +247,17 @@ EnemyPackageLoader._unload_package = function (self, breed_name, breed_category_
 		breed_category_data.loaded_breeds[breed_name] = nil
 		local breed_id = NetworkLookup.breeds[breed_name]
 
-		self._send_rpc_to_clients(self, "rpc_from_server_unload_breed_package", breed_id)
+		self:_send_rpc_to_clients("rpc_from_server_unload_breed_package", breed_id)
 
 		self._dynamic_loaded_packages[breed_name][self._peer_id] = false
 		self._currently_loading_breeds[breed_name] = nil
 
-		self._set_breed_loaded_on_all_peers(self, breed_name, false)
+		self:_set_breed_loaded_on_all_peers(breed_name, false)
 	end
 
 	self._package_state[breed_name] = "unloaded"
 
-	self._set_breed_processed(self, breed_name, false)
+	self:_set_breed_processed(breed_name, false)
 end
 
 EnemyPackageLoader.cb_breed_package_loaded = function (self, breed_name)
@@ -272,7 +272,7 @@ EnemyPackageLoader.cb_breed_package_loaded = function (self, breed_name)
 			breed_category_data.loaded_breeds[breed_name] = true
 		end
 	else
-		self._send_rpc_to_server(self, "rpc_from_client_loading_breed_package_done", breed_id)
+		self:_send_rpc_to_server("rpc_from_client_loading_breed_package_done", breed_id)
 	end
 
 	self._package_state[breed_name] = "loaded"
@@ -285,7 +285,7 @@ end
 EnemyPackageLoader.cb_startup_breed_package_loaded = function (self, breed_name)
 	self._package_state[breed_name] = "loaded"
 
-	self._set_breed_loaded_on_all_peers(self, breed_name, true)
+	self:_set_breed_loaded_on_all_peers(breed_name, true)
 end
 
 EnemyPackageLoader._add_package_handles = function (self, breed_list)
@@ -343,7 +343,7 @@ EnemyPackageLoader.setup_startup_enemies = function (self, level_key)
 				local breeds = data.breeds
 
 				if data.dynamic_loading then
-					self._create_breed_category_lookup(self, breeds, id, data.limit)
+					self:_create_breed_category_lookup(breeds, id, data.limit)
 				else
 					local num_breeds = #breeds
 
@@ -353,11 +353,11 @@ EnemyPackageLoader.setup_startup_enemies = function (self, level_key)
 					end
 				end
 
-				self._add_package_handles(self, breeds)
+				self:_add_package_handles(breeds)
 			end
 		end
 
-		self._load_startup_enemy_packages(self)
+		self:_load_startup_enemy_packages()
 	end
 end
 
@@ -379,8 +379,8 @@ EnemyPackageLoader._load_startup_enemy_packages = function (self)
 		local breed_package_name = BREED_PATH .. ((use_optimized and OPT_LOOKUP_BREED_NAMES[breed_name]) or breed_name)
 		package_state[breed_name] = "loading"
 
-		package_manager.load(package_manager, breed_package_name, "EnemyPackageLoader", callback(self, "cb_startup_breed_package_loaded", breed_name), async, prioritize)
-		self._set_breed_processed(self, breed_name, true)
+		package_manager:load(breed_package_name, "EnemyPackageLoader", callback(self, "cb_startup_breed_package_loaded", breed_name), async, prioritize)
+		self:_set_breed_processed(breed_name, true)
 	end
 
 	breeds_to_load_at_startup.loaded = true
@@ -419,8 +419,8 @@ EnemyPackageLoader.unload_enemy_packages = function (self, force_unload_startup_
 
 			package_state[breed_name] = "unloaded"
 
-			self._set_breed_processed(self, breed_name, false)
-			self._set_breed_loaded_on_all_peers(self, breed_name, false)
+			self:_set_breed_processed(breed_name, false)
+			self:_set_breed_loaded_on_all_peers(breed_name, false)
 		end
 	end
 
@@ -461,7 +461,7 @@ EnemyPackageLoader._sync_dynamic_to_client = function (self, peer_id, connection
 		end
 	end
 
-	self._send_rpc(self, "rpc_from_server_load_breeds_by_bitmask", peer_id, connection_key, bitmasks)
+	self:_send_rpc("rpc_from_server_load_breeds_by_bitmask", peer_id, connection_key, bitmasks)
 end
 
 EnemyPackageLoader.rpc_from_server_load_breeds_by_bitmask = function (self, sender, connection_key, bitmasks)
@@ -481,7 +481,7 @@ EnemyPackageLoader.rpc_from_server_load_breeds_by_bitmask = function (self, send
 					local breed_index = j + 1 + 32 * (i - 1)
 					local breed_name = NetworkLookup.breeds[breed_index]
 
-					self._start_loading_package(self, breed_name, "cb_breed_package_loaded_client_startup")
+					self:_start_loading_package(breed_name, "cb_breed_package_loaded_client_startup")
 				end
 			end
 		end
@@ -504,7 +504,7 @@ EnemyPackageLoader.rpc_from_server_load_breed_package = function (self, sender, 
 
 	local breed_name = NetworkLookup.breeds[breed_id]
 
-	self._start_loading_package(self, breed_name)
+	self:_start_loading_package(breed_name)
 end
 
 EnemyPackageLoader.rpc_from_server_unload_breed_package = function (self, sender, connection_key, breed_id)
@@ -523,7 +523,7 @@ EnemyPackageLoader.rpc_from_server_unload_breed_package = function (self, sender
 
 	local breed_name = NetworkLookup.breeds[breed_id]
 
-	self._unload_package(self, breed_name)
+	self:_unload_package(breed_name)
 end
 
 EnemyPackageLoader.rpc_from_client_loading_breed_package_done = function (self, sender, connection_key, breed_id)
@@ -611,7 +611,7 @@ EnemyPackageLoader.client_connected = function (self, peer_id)
 	local connection_key = self._unique_connection_counter
 	self._unique_connections[peer_id] = connection_key
 
-	self._sync_dynamic_to_client(self, peer_id, connection_key)
+	self:_sync_dynamic_to_client(peer_id, connection_key)
 
 	local connection_key_max = self._connection_key_max
 	self._unique_connection_counter = (connection_key + 1) % connection_key_max

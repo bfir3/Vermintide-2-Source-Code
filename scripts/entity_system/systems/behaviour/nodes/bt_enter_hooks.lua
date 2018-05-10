@@ -65,8 +65,8 @@ BTEnterHooks.on_warlord_disable_blocking = function (unit, blackboard, t)
 	local ai_shield_extension = ScriptUnit.has_extension(unit, "ai_shield_system")
 
 	if ai_shield_extension then
-		ai_shield_extension.set_is_blocking(ai_shield_extension, false)
-		ai_shield_extension.set_is_dodging(ai_shield_extension, false)
+		ai_shield_extension:set_is_blocking(false)
+		ai_shield_extension:set_is_dodging(false)
 	end
 end
 
@@ -77,12 +77,12 @@ BTEnterHooks.on_grey_seer_intro_enter = function (unit, blackboard, t)
 	local network_transmit = network_manager.network_transmit
 	local go_id = Managers.state.unit_storage:go_id(unit)
 
-	network_transmit.send_rpc_clients(network_transmit, "rpc_set_hit_reaction_template", go_id, "HitEffectsSkavenGreySeerMounted")
+	network_transmit:send_rpc_clients("rpc_set_hit_reaction_template", go_id, "HitEffectsSkavenGreySeerMounted")
 
 	local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_intro", event_data)
+	dialogue_input:trigger_networked_dialogue_event("egs_intro", event_data)
 end
 
 BTEnterHooks.grey_seer_death_sequence_teleport = function (unit, blackboard, t)
@@ -90,7 +90,7 @@ BTEnterHooks.grey_seer_death_sequence_teleport = function (unit, blackboard, t)
 	local teleport_position = blackboard.death_sequence_positions[index]
 
 	if teleport_position then
-		blackboard.quick_teleport_exit_pos = Vector3Box(teleport_position.unbox(teleport_position))
+		blackboard.quick_teleport_exit_pos = Vector3Box(teleport_position:unbox())
 		blackboard.quick_teleport = true
 		blackboard.current_death_sequence_index = index + 1
 	end
@@ -120,7 +120,7 @@ BTEnterHooks.grey_seer_call_stormfiend_enter = function (unit, blackboard, t)
 	mount_blackboard.start_anim_done = true
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_calls_mount_battle", event_data)
+	dialogue_input:trigger_networked_dialogue_event("egs_calls_mount_battle", event_data)
 
 	blackboard.quick_teleport = true
 	blackboard.quick_teleport_exit_pos = Vector3Box(projected_wanted_pos)
@@ -198,7 +198,7 @@ BTEnterHooks.on_chaos_exalted_sorcerer_intro_enter = function (unit, blackboard,
 	local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "ebh_intro", event_data)
+	dialogue_input:trigger_networked_dialogue_event("ebh_intro", event_data)
 end
 
 BTEnterHooks.on_skaven_warlord_intro_enter = function (unit, blackboard, t)
@@ -233,7 +233,7 @@ BTEnterHooks.grey_seer_stagger_enter = function (unit, blackboard, t)
 	local damage_wave_extension = blackboard.damage_wave_extension
 
 	if damage_wave_extension then
-		damage_wave_extension.abort(damage_wave_extension)
+		damage_wave_extension:abort()
 	end
 end
 
@@ -285,7 +285,7 @@ BTEnterHooks.sorcerer_begin_defensive_mode = function (unit, blackboard, t)
 	local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "ebh_summon", event_data)
+	dialogue_input:trigger_networked_dialogue_event("ebh_summon", event_data)
 end
 
 BTEnterHooks.sorcerer_spawn_horde = function (unit, blackboard, t)
@@ -303,7 +303,7 @@ BTEnterHooks.sorcerer_defensive_seeking_bomb = function (unit, blackboard, t)
 	local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "ebh_insect_spell", event_data)
+	dialogue_input:trigger_networked_dialogue_event("ebh_insect_spell", event_data)
 end
 
 BTEnterHooks.teleport_to_center = function (unit, blackboard, t)
@@ -369,7 +369,7 @@ BTEnterHooks.sorcerer_evade = function (unit, blackboard, t)
 	local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "ebh_taunt", event_data)
+	dialogue_input:trigger_networked_dialogue_event("ebh_taunt", event_data)
 end
 
 BTEnterHooks.warlord_defensive_on_enter = function (unit, blackboard, t)

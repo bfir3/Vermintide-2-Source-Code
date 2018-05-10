@@ -13,12 +13,12 @@ StateTitleScreenInitNetwork.on_enter = function (self, params)
 	local loading_view = loading_context.loading_view
 
 	if loading_view then
-		loading_view.destroy(loading_view)
+		loading_view:destroy()
 
 		loading_context.loading_view = nil
 	end
 
-	self._load_save_data(self)
+	self:_load_save_data()
 	Managers.transition:show_loading_icon(false)
 end
 
@@ -49,15 +49,15 @@ StateTitleScreenInitNetwork.update = function (self, dt, t)
 	end
 
 	if self._popup_id then
-		self._handle_popup(self)
+		self:_handle_popup()
 
 		return
 	end
 
-	local connected_to_steam = self._connected_to_steam(self)
+	local connected_to_steam = self:_connected_to_steam()
 
 	if not connected_to_steam then
-		self.create_popup(self, "failure_start_no_steam")
+		self:create_popup("failure_start_no_steam")
 
 		return
 	end
@@ -65,13 +65,13 @@ StateTitleScreenInitNetwork.update = function (self, dt, t)
 	local backend_signin_initated = self.backend_signin_initated
 	local backend_manager = Managers.backend
 
-	if not backend_signin_initated and not backend_manager.signed_in(backend_manager) and self._save_data_loaded then
-		backend_manager.signin(backend_manager)
+	if not backend_signin_initated and not backend_manager:signed_in() and self._save_data_loaded then
+		backend_manager:signin()
 
 		self.backend_signin_initated = true
 	end
 
-	return self._next_state(self)
+	return self:_next_state()
 end
 
 StateTitleScreenInitNetwork._connected_to_steam = function (self)
@@ -95,7 +95,7 @@ StateTitleScreenInitNetwork._next_state = function (self)
 
 	if ready_to_exit then
 		if eac_init_error then
-			self._create_eac_error_popup(self, eac_error)
+			self:_create_eac_error_popup(eac_error)
 
 			return
 		end

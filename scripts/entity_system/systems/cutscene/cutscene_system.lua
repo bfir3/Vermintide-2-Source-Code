@@ -55,11 +55,11 @@ CutsceneSystem.update = function (self)
 	local active_camera = self.active_camera
 
 	if active_camera then
-		self.set_first_person_mode(self, false)
-		active_camera.update(active_camera)
+		self:set_first_person_mode(false)
+		active_camera:update()
 	end
 
-	self.handle_loading_icon(self)
+	self:handle_loading_icon()
 end
 
 CutsceneSystem.handle_loading_icon = function (self)
@@ -82,8 +82,8 @@ CutsceneSystem.skip_pressed = function (self)
 
 		self.event_on_skip = nil
 
-		self.flow_cb_deactivate_cutscene_cameras(self)
-		self.flow_cb_deactivate_cutscene_logic(self)
+		self:flow_cb_deactivate_cutscene_cameras()
+		self:flow_cb_deactivate_cutscene_logic()
 	end
 end
 
@@ -95,19 +95,19 @@ CutsceneSystem.set_first_person_mode = function (self, enabled)
 		local first_person_extension = ScriptUnit.extension(player_unit, "first_person_system")
 
 		if enabled ~= first_person_extension.first_person_mode then
-			first_person_extension.set_first_person_mode(first_person_extension, enabled)
+			first_person_extension:set_first_person_mode(enabled)
 		end
 	end
 end
 
 CutsceneSystem.flow_cb_activate_cutscene_camera = function (self, camera_unit, transition_data, ingame_hud_enabled, letterbox_enabled)
 	if not self.active_camera then
-		self.set_first_person_mode(self, false)
+		self:set_first_person_mode(false)
 	end
 
 	local camera = self.cameras[camera_unit]
 
-	camera.activate(camera, transition_data)
+	camera:activate(transition_data)
 
 	self.active_camera = camera
 	self.ingame_hud_enabled = ingame_hud_enabled
@@ -121,7 +121,7 @@ CutsceneSystem.flow_cb_activate_cutscene_camera = function (self, camera_unit, t
 end
 
 CutsceneSystem.flow_cb_deactivate_cutscene_cameras = function (self)
-	self.set_first_person_mode(self, true)
+	self:set_first_person_mode(true)
 
 	self.active_camera = nil
 	self.ingame_hud_enabled = true

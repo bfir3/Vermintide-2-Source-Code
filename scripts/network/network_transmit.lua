@@ -94,7 +94,7 @@ NetworkTransmit.send_rpc = function (self, rpc_name, peer_id, ...)
 	assert(rpc, "[NetworkTransmit:send_rpc()] rpc does not exist %q", rpc_name)
 
 	if peer_id == my_peer_id then
-		self.queue_local_rpc(self, rpc_name, ...)
+		self:queue_local_rpc(rpc_name, ...)
 	else
 		rpc(peer_id, ...)
 	end
@@ -106,7 +106,7 @@ NetworkTransmit.send_rpc_server = function (self, rpc_name, ...)
 	assert(rpc, "[NetworkTransmit:send_rpc_server()] rpc does not exist %q", rpc_name)
 
 	if self.is_server then
-		self.queue_local_rpc(self, rpc_name, ...)
+		self:queue_local_rpc(rpc_name, ...)
 	else
 		assert(self.server_peer_id, "We don't have any server connection when trying to send RPC %q", rpc_name)
 		rpc(self.server_peer_id, ...)
@@ -166,7 +166,7 @@ NetworkTransmit.send_rpc_all = function (self, rpc_name, ...)
 	local my_peer_id = self.peer_id
 
 	assert(rpc, "[NetworkTransmit:send_rpc_all()] rpc does not exist: %q", rpc_name)
-	self.queue_local_rpc(self, rpc_name, ...)
+	self:queue_local_rpc(rpc_name, ...)
 
 	local session = self.game_session
 
@@ -193,7 +193,7 @@ NetworkTransmit.send_rpc_all_except = function (self, rpc_name, except, ...)
 	local my_peer_id = self.peer_id
 
 	if except ~= my_peer_id then
-		self.queue_local_rpc(self, rpc_name, ...)
+		self:queue_local_rpc(rpc_name, ...)
 	end
 
 	local session = self.game_session

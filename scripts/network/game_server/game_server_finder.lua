@@ -16,7 +16,7 @@ end
 GameServerFinder.refresh = function (self)
 	local server_browser = GameServerInternal.server_browser()
 
-	server_browser.refresh(server_browser)
+	server_browser:refresh()
 
 	self._pending_refresh_request = true
 
@@ -26,19 +26,19 @@ end
 GameServerFinder.set_search_type = function (self, search_type)
 	local server_browser = GameServerInternal.server_browser()
 
-	server_browser.set_search_type(server_browser, search_type)
+	server_browser:set_search_type(search_type)
 end
 
 GameServerFinder.add_to_favorites = function (self, ip, connection_port, query_port)
 	local server_browser = GameServerInternal.server_browser()
 
-	server_browser.add_to_favorites(server_browser, ip, connection_port, query_port)
+	server_browser:add_to_favorites(ip, connection_port, query_port)
 end
 
 GameServerFinder.remove_from_favorites = function (self, ip, connection_port, query_port)
 	local server_browser = GameServerInternal.server_browser()
 
-	server_browser.remove_from_favorites(server_browser, ip, connection_port, query_port)
+	server_browser:remove_from_favorites(ip, connection_port, query_port)
 end
 
 GameServerFinder.add_filter_requirements = function (self, requirements, skip_verify_lobby_data)
@@ -58,13 +58,13 @@ end
 GameServerFinder.update = function (self, dt)
 	local server_browser = GameServerInternal.server_browser()
 
-	server_browser.update(server_browser, dt)
+	server_browser:update(dt)
 
-	local is_refreshing = server_browser.is_refreshing(server_browser)
+	local is_refreshing = server_browser:is_refreshing()
 
 	if self._pending_refresh_request and not is_refreshing then
 		local cached_server = self._cached_servers
-		local servers = server_browser.servers(server_browser)
+		local servers = server_browser:servers()
 
 		for _, server in ipairs(servers) do
 			if self._skip_verify_lobby_data or GameServerAux.verify_lobby_data(server) then

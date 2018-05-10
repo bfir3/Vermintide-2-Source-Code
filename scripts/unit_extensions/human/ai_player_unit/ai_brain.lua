@@ -17,8 +17,8 @@ AIBrain.init = function (self, world, unit, blackboard, breed, behavior)
 	blackboard.destination_dist = 0
 	blackboard.nav_target_dist_sq = 0
 
-	self.load_brain(self, behavior)
-	self.init_utility_actions(self, blackboard, breed)
+	self:load_brain(behavior)
+	self:init_utility_actions(blackboard, breed)
 end
 
 AIBrain.destroy = function (self)
@@ -26,7 +26,7 @@ AIBrain.destroy = function (self)
 		return
 	end
 
-	self.exit_last_action(self)
+	self:exit_last_action()
 end
 
 AIBrain.init_utility_actions = function (self, blackboard, breed)
@@ -54,7 +54,7 @@ end
 AIBrain.load_brain = function (self, tree_name)
 	self._current_action = nil
 	local ai_system = Managers.state.entity:system("ai_system")
-	self._bt = ai_system.behavior_tree(ai_system, tree_name)
+	self._bt = ai_system:behavior_tree(tree_name)
 
 	fassert(self._bt, "Cannot find behavior tree '%s' specified for unit '%s'", tree_name, self._unit)
 end
@@ -69,7 +69,7 @@ AIBrain.exit_last_action = function (self)
 	local root = self._bt:root()
 	local t = Managers.time:time("game")
 
-	root.set_running_child(root, self._unit, blackboard, t, nil, "aborted", true)
+	root:set_running_child(self._unit, blackboard, t, nil, "aborted", true)
 end
 
 AIBrain.update = function (self, unit, t, dt)
@@ -127,11 +127,11 @@ AIBrain.debug_draw_current_behavior = function (self)
 	local unit = self._unit
 	local node = self._bt:root()
 	local bb = self._blackboard
-	local child = node.current_running_child(node, bb)
+	local child = node:current_running_child(bb)
 
 	while child do
 		node = child
-		child = node.current_running_child(node, bb)
+		child = node:current_running_child(bb)
 	end
 
 	local viewport_name = "player_1"

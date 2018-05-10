@@ -227,7 +227,7 @@ VoiceChatUI.init = function (self, ingame_ui_context)
 	self._talking_this_frame = {}
 	self._dirty = false
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 end
 
 VoiceChatUI.set_input_manager = function (self, input_manager)
@@ -302,8 +302,8 @@ VoiceChatUI.update = function (self, dt)
 	table.clear(MEMBERS)
 
 	local lobby = self._lobby
-	local lobby_members = lobby and lobby.members(lobby)
-	local members = lobby_members and lobby_members.get_members(lobby_members)
+	local lobby_members = lobby and lobby:members()
+	local members = lobby_members and lobby_members:get_members()
 
 	if members then
 		for _, peer_id in ipairs(members) do
@@ -364,7 +364,7 @@ VoiceChatUI.update = function (self, dt)
 					local lobby_state = lobby.state
 
 					if lobby_state and lobby_state == "joined" then
-						self._cached_names[peer_id] = lobby.user_name(lobby, peer_id)
+						self._cached_names[peer_id] = lobby:user_name(peer_id)
 					end
 				end
 
@@ -395,7 +395,7 @@ VoiceChatUI.update = function (self, dt)
 
 	self._talked_last_frame = talking_this_frame
 
-	self.draw(self, dt)
+	self:draw(dt)
 end
 
 VoiceChatUI.draw = function (self, dt)

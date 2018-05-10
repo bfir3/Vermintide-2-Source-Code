@@ -23,9 +23,9 @@ PlayerCharacterStateLeaveLedgeHangingPullUp.on_enter = function (self, unit, inp
 	self.ledge_unit = ledge_unit
 	self.start_rotation_box = start_rotation_box
 
-	self.calculate_end_position(self)
+	self:calculate_end_position()
 	self.locomotion_extension:enable_animation_driven_movement_with_rotation_no_mover()
-	self.on_enter_animation_event(self)
+	self:on_enter_animation_event()
 
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 	self.finish_time = t + movement_settings_table.ledge_hanging.leaving_animation_time
@@ -64,19 +64,19 @@ PlayerCharacterStateLeaveLedgeHangingPullUp.update = function (self, unit, input
 	local locomotion_extension = self.locomotion_extension
 
 	if CharacterStateHelper.is_dead(status_extension) then
-		csm.change_state(csm, "dead")
+		csm:change_state("dead")
 
 		return
 	end
 
 	if CharacterStateHelper.is_knocked_down(status_extension) then
-		csm.change_state(csm, "knocked_down")
+		csm:change_state("knocked_down")
 
 		return
 	end
 
 	if CharacterStateHelper.is_pounced_down(status_extension) then
-		csm.change_state(csm, "pounced_down")
+		csm:change_state("pounced_down")
 
 		return
 	end
@@ -89,13 +89,13 @@ PlayerCharacterStateLeaveLedgeHangingPullUp.update = function (self, unit, input
 			direction = direction
 		}
 
-		csm.change_state(csm, "catapulted", params)
+		csm:change_state("catapulted", params)
 
 		return
 	end
 
 	if self.finish_time < t then
-		csm.change_state(csm, "walking")
+		csm:change_state("walking")
 
 		return
 	end
@@ -145,7 +145,7 @@ PlayerCharacterStateLeaveLedgeHangingPullUp.calculate_end_position = function (s
 	elseif script_data.debug_hang_ledges then
 		local debug_text_manager = Managers.state.debug_text
 
-		debug_text_manager.output_world_text(debug_text_manager, "Could not find a nav-mesh position for pull up position.", 0.1, new_position, nil, "ledge_haning_text", Vector3(255, 255, 0))
+		debug_text_manager:output_world_text("Could not find a nav-mesh position for pull up position.", 0.1, new_position, nil, "ledge_haning_text", Vector3(255, 255, 0))
 	end
 
 	self.end_position:store(new_position)

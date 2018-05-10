@@ -26,7 +26,7 @@ ActionHealingDraught.finish = function (self, reason)
 	local network_transmit = network_manager.network_transmit
 	local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 
-	if reason ~= "action_complete" or buff_extension.has_buff_type(buff_extension, "trait_necklace_no_healing_health_regen") then
+	if reason ~= "action_complete" or buff_extension:has_buff_type("trait_necklace_no_healing_health_regen") then
 		return
 	end
 
@@ -34,7 +34,7 @@ ActionHealingDraught.finish = function (self, reason)
 		local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 		local event_data = FrameTable.alloc_table()
 
-		dialogue_input.trigger_networked_dialogue_event(dialogue_input, current_action.dialogue_event, event_data)
+		dialogue_input:trigger_networked_dialogue_event(current_action.dialogue_event, event_data)
 
 		if 80 < ScriptUnit.extension(owner_unit, "health_system"):current_health() then
 			local target_name = ScriptUnit.extension(owner_unit, "dialogue_system").context.player_profile
@@ -46,20 +46,20 @@ ActionHealingDraught.finish = function (self, reason)
 	if self.is_server or LEVEL_EDITOR_TEST then
 		DamageUtils.heal_network(owner_unit, owner_unit, 75, "healing_draught")
 	else
-		local owner_unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+		local owner_unit_id = network_manager:unit_game_object_id(owner_unit)
 		local heal_type_id = NetworkLookup.heal_types.healing_draught
 
-		network_transmit.send_rpc_server(network_transmit, "rpc_request_heal", owner_unit_id, 75, heal_type_id)
+		network_transmit:send_rpc_server("rpc_request_heal", owner_unit_id, 75, heal_type_id)
 	end
 
 	local ammo_extension = self.ammo_extension
 
 	if ammo_extension then
 		local ammo_usage = current_action.ammo_usage
-		local _, procced = buff_extension.apply_buffs_to_value(buff_extension, 0, StatBuffIndex.NOT_CONSUME_MEDPACK)
+		local _, procced = buff_extension:apply_buffs_to_value(0, StatBuffIndex.NOT_CONSUME_MEDPACK)
 
 		if not procced then
-			ammo_extension.use_ammo(ammo_extension, ammo_usage)
+			ammo_extension:use_ammo(ammo_usage)
 		end
 	end
 

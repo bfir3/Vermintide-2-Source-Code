@@ -13,7 +13,7 @@ LimitedItemTrackSystem.init = function (self, entity_system_creation_context, sy
 
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.network_event_delegate = network_event_delegate
 	self.network_manager = Managers.state.network
@@ -77,7 +77,7 @@ LimitedItemTrackSystem.decrease_group_pool_size = function (self, group_name)
 	group.pool_size = pool_size
 
 	if pool_size == 0 then
-		self.deactivate_group(self, group_name)
+		self:deactivate_group(group_name)
 	end
 end
 
@@ -201,7 +201,7 @@ LimitedItemTrackSystem.on_add_extension = function (self, world, unit, extension
 					ScriptApplication.send_to_crashify("LimitedItemTrackSystem", "Added limited unit with occupied id")
 				end
 
-				if spawner_extension.is_transformed(spawner_extension, extension.id) then
+				if spawner_extension:is_transformed(extension.id) then
 					spawner_extension.items[extension.id] = unit
 				end
 			end
@@ -231,9 +231,9 @@ LimitedItemTrackSystem.on_remove_extension = function (self, unit, extension_nam
 			local marked_id = self.marked_items[unit]
 
 			if marked_id then
-				spawner_extension.transform(spawner_extension, marked_id)
+				spawner_extension:transform(marked_id)
 			else
-				spawner_extension.remove(spawner_extension, item_extension.id)
+				spawner_extension:remove(item_extension.id)
 			end
 		end
 
@@ -276,7 +276,7 @@ LimitedItemTrackSystem.spawn_batch = function (self, group)
 		local num_items = spawner.num_items
 
 		fassert(num_items == 0, "Sanity Check")
-		spawner.spawn_item(spawner)
+		spawner:spawn_item()
 	end
 end
 
@@ -302,7 +302,7 @@ LimitedItemTrackSystem.update = function (self, context, t)
 			end
 
 			if no_items then
-				self.spawn_batch(self, group)
+				self:spawn_batch(group)
 			end
 		end
 	end
@@ -327,7 +327,7 @@ LimitedItemTrackSystem.held_limited_item_destroyed = function (self, spawner_uni
 
 	local spawner_extension = self.spawners[spawner_unit]
 
-	spawner_extension.remove(spawner_extension, id)
+	spawner_extension:remove(id)
 end
 
 return

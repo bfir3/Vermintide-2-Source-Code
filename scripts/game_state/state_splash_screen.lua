@@ -44,23 +44,23 @@ StateSplashScreen.on_enter = function (self)
 	end
 
 	Managers.transition:force_fade_in()
-	self.setup_world(self)
+	self:setup_world()
 
 	if PLATFORM == "win32" then
-		self.setup_input(self)
+		self:setup_input()
 	end
 
 	if PLATFORM == "win32" then
 		Managers.package:load("resource_packages/start_menu_splash", "StateSplashScreen", callback(self, "cb_splashes_loaded"), true, true)
 	elseif PLATFORM == "ps4" then
 		if PS4.title_id() == "CUSA02133_00" then
-			self.setup_esrb_logo(self)
+			self:setup_esrb_logo()
 		else
 			Managers.package:load("resource_packages/start_menu_splash", "StateSplashScreen", callback(self, "cb_splashes_loaded"), true, true)
 		end
 	elseif PLATFORM == "xb1" then
-		if self._is_in_esrb_terratory(self) then
-			self.setup_esrb_logo(self)
+		if self:_is_in_esrb_terratory() then
+			self:setup_esrb_logo()
 		else
 			Managers.package:load("resource_packages/start_menu_splash", "StateSplashScreen", callback(self, "cb_splashes_loaded"), true, true)
 		end
@@ -73,10 +73,10 @@ StateSplashScreen.on_enter = function (self)
 	local loading_context = self.parent.loading_context
 
 	if loading_context.reload_packages then
-		self.unload_packages(self)
+		self:unload_packages()
 	end
 
-	self.load_packages(self)
+	self:load_packages()
 	Managers.transition:fade_out(1)
 
 	local args = {
@@ -144,7 +144,7 @@ StateSplashScreen.update_esrb_logo = function (self, dt, t)
 	self.esrb_timer = math.clamp(self.esrb_timer + math.clamp(dt, 0, 0.1), 0, total_time)
 
 	if total_time <= self.esrb_timer and self.splashes_loaded then
-		self.setup_splash_screen_view(self)
+		self:setup_splash_screen_view()
 		Managers.transition:force_fade_in()
 	end
 end
@@ -153,7 +153,7 @@ StateSplashScreen.cb_splashes_loaded = function (self)
 	self.splashes_loaded = true
 
 	if not self.showing_esrb then
-		self.setup_splash_screen_view(self)
+		self:setup_splash_screen_view()
 	end
 end
 
@@ -204,15 +204,15 @@ StateSplashScreen.update = function (self, dt, t)
 	if self.splash_view then
 		self.splash_view:update(dt)
 	elseif self.showing_esrb then
-		self.update_esrb_logo(self, dt, t)
+		self:update_esrb_logo(dt, t)
 	end
 
-	if not self.wanted_state and ((self.splash_view and self.splash_view:is_completed()) or self._skip_splash) and self.packages_loaded(self) then
+	if not self.wanted_state and ((self.splash_view and self.splash_view:is_completed()) or self._skip_splash) and self:packages_loaded() then
 		require("scripts/game_state/state_title_screen")
 		Managers.transition:fade_in(0.5, callback(self, "cb_fade_in_done"))
 	end
 
-	local state = self.next_state(self)
+	local state = self:next_state()
 
 	return state
 end
@@ -224,7 +224,7 @@ StateSplashScreen.render = function (self)
 end
 
 StateSplashScreen.next_state = function (self)
-	if not self.packages_loaded(self) or not self.wanted_state then
+	if not self:packages_loaded() or not self.wanted_state then
 		return
 	end
 
@@ -241,8 +241,8 @@ StateSplashScreen.unload_packages = function (self)
 	local package_manager = Managers.package
 
 	for i, name in ipairs(StateSplashScreen.packages_to_load) do
-		if package_manager.has_loaded(package_manager, name, "state_splash_screen") then
-			package_manager.unload(package_manager, name, "state_splash_screen")
+		if package_manager:has_loaded(name, "state_splash_screen") then
+			package_manager:unload(name, "state_splash_screen")
 		end
 	end
 
@@ -250,7 +250,7 @@ StateSplashScreen.unload_packages = function (self)
 		GlobalResources.loaded = nil
 
 		for i, name in ipairs(GlobalResources) do
-			package_manager.unload(package_manager, name, "global")
+			package_manager:unload(name, "global")
 		end
 	end
 end
@@ -259,8 +259,8 @@ StateSplashScreen.load_packages = function (self)
 	local package_manager = Managers.package
 
 	for i, name in ipairs(StateSplashScreen.packages_to_load) do
-		if not package_manager.has_loaded(package_manager, name, "state_splash_screen") then
-			package_manager.load(package_manager, name, "state_splash_screen", nil, true)
+		if not package_manager:has_loaded(name, "state_splash_screen") then
+			package_manager:load(name, "state_splash_screen", nil, true)
 		end
 	end
 end
@@ -269,7 +269,7 @@ StateSplashScreen.packages_loaded = function (self)
 	local package_manager = Managers.package
 
 	for i, name in ipairs(StateSplashScreen.packages_to_load) do
-		if not package_manager.has_loaded(package_manager, name) then
+		if not package_manager:has_loaded(name) then
 			return false
 		end
 	end
@@ -280,8 +280,8 @@ StateSplashScreen.packages_loaded = function (self)
 
 	if not GlobalResources.loaded then
 		for i, name in ipairs(GlobalResources) do
-			if not package_manager.has_loaded(package_manager, name) then
-				package_manager.load(package_manager, name, "global", nil, true)
+			if not package_manager:has_loaded(name) then
+				package_manager:load(name, "global", nil, true)
 			end
 		end
 

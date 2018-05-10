@@ -79,24 +79,24 @@ AILocomotionExtensionC.set_animation_driven = function (self, is_animation_drive
 		local position = param2
 		local rotation = param3
 
-		network_transmit.send_rpc_clients(network_transmit, "rpc_set_animation_driven_script_movement", game_object_id, position, rotation, is_affected_by_gravity)
+		network_transmit:send_rpc_clients("rpc_set_animation_driven_script_movement", game_object_id, position, rotation, is_affected_by_gravity)
 	elseif r == 2 then
 		local network_transmit = Managers.state.network.network_transmit
 		local game_object_id = param1
 		local position = param2
 		local rotation = param3
 
-		network_transmit.send_rpc_clients(network_transmit, "rpc_set_animation_driven", game_object_id, position, rotation, is_affected_by_gravity)
+		network_transmit:send_rpc_clients("rpc_set_animation_driven", game_object_id, position, rotation, is_affected_by_gravity)
 	elseif r == 3 then
 		local network_transmit = Managers.state.network.network_transmit
 		local game_object_id = param1
 
-		network_transmit.send_rpc_clients(network_transmit, "rpc_set_script_driven", game_object_id, is_affected_by_gravity)
+		network_transmit:send_rpc_clients("rpc_set_script_driven", game_object_id, is_affected_by_gravity)
 	elseif r == 4 then
 		local network_transmit = Managers.state.network.network_transmit
 		local game_object_id = param1
 
-		network_transmit.send_rpc_clients(network_transmit, "rpc_set_affected_by_gravity", game_object_id, is_affected_by_gravity)
+		network_transmit:send_rpc_clients("rpc_set_affected_by_gravity", game_object_id, is_affected_by_gravity)
 	end
 end
 

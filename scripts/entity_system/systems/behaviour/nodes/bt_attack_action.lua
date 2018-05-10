@@ -32,7 +32,7 @@ BTAttackAction.enter = function (self, unit, blackboard, t)
 	blackboard.moving_attack = action.moving_attack
 	local target_unit = blackboard.target_unit
 	local target_unit_status_extension = (ScriptUnit.has_extension(target_unit, "status_system") and ScriptUnit.extension(target_unit, "status_system")) or nil
-	local attack = self._select_attack(self, action, unit, target_unit, blackboard, target_unit_status_extension)
+	local attack = self:_select_attack(action, unit, target_unit, blackboard, target_unit_status_extension)
 	local attack_anim = randomize(attack.anims)
 	blackboard.attack_anim = attack_anim
 
@@ -49,18 +49,18 @@ BTAttackAction.enter = function (self, unit, blackboard, t)
 	end
 
 	if target_unit_status_extension then
-		blackboard.attack_token = (target_unit_status_extension and target_unit_status_extension.want_an_attack(target_unit_status_extension)) or nil
+		blackboard.attack_token = (target_unit_status_extension and target_unit_status_extension:want_an_attack()) or nil
 	else
 		blackboard.attack_token = true
 	end
 
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 
 	if blackboard.attack_token and target_unit_status_extension then
 		local attack_intensity = (blackboard.moving_attack and action.moving_attack_intensity) or action.attack_intensity or 0.75
 
-		target_unit_status_extension.add_attack_intensity(target_unit_status_extension, attack_intensity * (0.75 + 0.5 * math.random()))
+		target_unit_status_extension:add_attack_intensity(attack_intensity * (0.75 + 0.5 * math.random()))
 
 		local is_behind_player = AiUtils.unit_is_behind_player(unit, target_unit)
 		local breed = blackboard.breed
@@ -75,9 +75,9 @@ BTAttackAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.target_unit_status_extension = target_unit_status_extension
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
+	network_manager:anim_event(unit, "to_combat")
 
-	local target_unit_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, target_unit)
+	local target_unit_id, is_level_unit = network_manager:game_object_or_level_id(target_unit)
 
 	network_manager.network_transmit:send_rpc_all("rpc_enemy_has_target", unit_id, target_unit_id, is_level_unit)
 
@@ -92,10 +92,10 @@ end
 
 BTAttackAction.anim_cb_attack_vce = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 
 	if game and blackboard.target_unit_status_extension then
-		self.trigger_attack_sound(self, blackboard.action, unit, blackboard.target_unit, blackboard, blackboard.target_unit_status_extension)
+		self:trigger_attack_sound(blackboard.action, unit, blackboard.target_unit, blackboard, blackboard.target_unit_status_extension)
 	end
 end
 
@@ -129,7 +129,7 @@ BTAttackAction._select_attack = function (self, action, unit, target_unit, black
 			return mid_attack
 		elseif low_attack and z_offset < low_attack.z_threshold then
 			return low_attack
-		elseif knocked_down_attack and z_offset < knocked_down_attack.z_threshold and target_unit_status_extension and target_unit_status_extension.is_knocked_down(target_unit_status_extension) then
+		elseif knocked_down_attack and z_offset < knocked_down_attack.z_threshold and target_unit_status_extension and target_unit_status_extension:is_knocked_down() then
 			return knocked_down_attack
 		elseif step_attack and (((step_attack.step_speed_moving or 1) < blackboard.target_speed_away and (step_attack.step_distance_moving or 1.5) < flat_distance) or (step_attack.step_distance_stationary or 2.5) < flat_distance) then
 			blackboard.moving_attack = true
@@ -146,7 +146,7 @@ BTAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 		if not blackboard.blocked then
 			local network_manager = Managers.state.network
 
-			network_manager.anim_event(network_manager, unit, "idle")
+			network_manager:anim_event(unit, "idle")
 		end
 
 		blackboard.move_state = "idle"
@@ -156,8 +156,8 @@ BTAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_enabled(navigation_extension, true)
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_enabled(true)
+	navigation_extension:set_max_speed(default_move_speed)
 
 	blackboard.attack_rotation = nil
 	blackboard.locked_attack_rotation = nil
@@ -188,7 +188,7 @@ BTAttackAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	if ScriptUnit.has_extension(unit, "ai_shield_system") then
 		local shield_extension = ScriptUnit.extension(unit, "ai_shield_system")
 
-		shield_extension.set_is_blocking(shield_extension, true)
+		shield_extension:set_is_blocking(true)
 	end
 end
 
@@ -219,7 +219,7 @@ BTAttackAction.run = function (self, unit, blackboard, t, dt)
 		if ScriptUnit.has_extension(unit, "ai_shield_system") then
 			local shield_extension = ScriptUnit.extension(unit, "ai_shield_system")
 
-			shield_extension.set_is_blocking(shield_extension, false)
+			shield_extension:set_is_blocking(false)
 		end
 	end
 
@@ -248,7 +248,7 @@ BTAttackAction.run = function (self, unit, blackboard, t, dt)
 		if 0.25 < math.abs(target_speed - blackboard.target_speed) then
 			blackboard.target_speed = target_speed
 
-			navigation_extension.set_max_speed(navigation_extension, math.clamp(target_speed, 0, breed.run_speed))
+			navigation_extension:set_max_speed(math.clamp(target_speed, 0, breed.run_speed))
 		end
 	end
 
@@ -261,14 +261,14 @@ BTAttackAction.run = function (self, unit, blackboard, t, dt)
 		blackboard.attack_setup_delayed = false
 	end
 
-	self.attack(self, unit, t, dt, blackboard)
+	self:attack(unit, t, dt, blackboard)
 
 	return "running"
 end
 
 BTAttackAction.attack_cooldown = function (self, unit, blackboard)
 	local t = Managers.time:time("game")
-	local cooldown, cooldown_at = self.get_attack_cooldown_finished_at(self, unit, blackboard, t)
+	local cooldown, cooldown_at = self:get_attack_cooldown_finished_at(unit, blackboard, t)
 	blackboard.attack_cooldown_at = cooldown_at
 	blackboard.is_in_attack_cooldown = cooldown
 end
@@ -297,7 +297,7 @@ BTAttackAction.attack = function (self, unit, t, dt, blackboard)
 	local target_status_ext = bb.target_unit_status_extension
 
 	if target_status_ext then
-		local target_is_dodging = target_status_ext.get_is_dodging(target_status_ext) or target_status_ext.is_invisible(target_status_ext)
+		local target_is_dodging = target_status_ext:get_is_dodging() or target_status_ext:is_invisible()
 		local should_rotate = not target_is_dodging and bb.attack_rotation_lock_timer < t
 		local should_lock_rotation = target_is_dodging and not bb.locked_attack_rotation and bb.moving_attack and bb.target_dist < 3 and bb.attack_dodge_window_start < t
 
@@ -315,7 +315,7 @@ BTAttackAction.attack = function (self, unit, t, dt, blackboard)
 		end
 	end
 
-	locomotion.set_wanted_rotation(locomotion, blackboard.attack_rotation:unbox())
+	locomotion:set_wanted_rotation(blackboard.attack_rotation:unbox())
 end
 
 BTAttackAction.get_attack_cooldown_finished_at = function (self, unit, blackboard, t)
@@ -338,7 +338,7 @@ BTAttackAction.get_attack_cooldown_finished_at = function (self, unit, blackboar
 	end
 
 	local ai_slot_system = Managers.state.entity:system("ai_slot_system")
-	local slots_n = ai_slot_system.slots_count(ai_slot_system, attacking_target)
+	local slots_n = ai_slot_system:slots_count(attacking_target)
 
 	if slots_n == 0 then
 		return false, 0

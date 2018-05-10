@@ -27,7 +27,7 @@ ActionBulletSprayTargeting.client_owner_post_update = function (self, dt, t, wor
 	local player_rotation = Unit.world_rotation(owner_unit_1p, 0)
 	local player_direction = Vector3.normalize(Quaternion.forward(player_rotation))
 
-	self._draw_circle(self, player_position, player_direction)
+	self:_draw_circle(player_position, player_direction)
 
 	if script_data.debug_weapons then
 		local start_point = player_position + player_direction * POSITION_TWEAK

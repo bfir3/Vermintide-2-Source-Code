@@ -144,12 +144,12 @@ IkChain.solve = function (self, t, dt)
 		local dif = Vector3.length(joints[num_joints] - target_pos)
 
 		while self.tolerance < dif do
-			self.backward(self, joints, lengths, num_joints, target_pos)
+			self:backward(joints, lengths, num_joints, target_pos)
 
 			if self.constrain_angle then
-				self.forward_constrained(self, joints, lengths, num_joints, start_pos)
+				self:forward_constrained(joints, lengths, num_joints, start_pos)
 			else
-				self.forward(self, joints, lengths, num_joints, start_pos)
+				self:forward(joints, lengths, num_joints, start_pos)
 			end
 
 			dif = Vector3.length(joints[num_joints] - target_pos)
@@ -162,7 +162,7 @@ IkChain.solve = function (self, t, dt)
 	end
 
 	save_joints_in_boxed_array(joints, self.joints, num_joints)
-	self.debug_draw(self, joints, num_joints)
+	self:debug_draw(joints, num_joints)
 	Debug.text("Solving tentacle: %d iterations", count)
 end
 

@@ -289,7 +289,7 @@ LiquidAreaDamageTemplates = {
 							if num_times_bathed and QuestSettings.nurgle_bathed_all <= num_times_bathed then
 								local statistics_db = Managers.player:statistics_db()
 
-								statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+								statistics_db:increment_stat_and_sync_to_clients(stat_name)
 
 								completed_challenge = true
 
@@ -729,7 +729,7 @@ LiquidAreaDamageTemplates = {
 			local tongue_pos = Unit.world_position(troll_unit, tongue_node)
 			local vomit_unit_name = "units/weapons/enemy/wpn_troll_vomit/wpn_troll_vomit"
 			local unit_spawner = Managers.state.unit_spawner
-			local vomit_unit = unit_spawner.spawn_local_unit(unit_spawner, vomit_unit_name, tongue_pos, nil, nil)
+			local vomit_unit = unit_spawner:spawn_local_unit(vomit_unit_name, tongue_pos, nil, nil)
 
 			World.link_unit(world, vomit_unit, troll_unit, tongue_node)
 			Unit.flow_event(vomit_unit, "fade_in")
@@ -761,12 +761,12 @@ LiquidAreaDamageTemplates = {
 	bile_troll_vomit_ground_base_condition = function (unit)
 		local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
 
-		return not buff_extension.has_buff_type(buff_extension, "troll_bile_face")
+		return not buff_extension:has_buff_type("troll_bile_face")
 	end,
 	stormfiend_warpfire_ground_base_condition = function (unit)
 		local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
 
-		return not buff_extension.has_buff_type(buff_extension, "stormfiend_warpfire_face")
+		return not buff_extension:has_buff_type("stormfiend_warpfire_face")
 	end
 }
 

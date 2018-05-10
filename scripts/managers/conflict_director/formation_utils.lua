@@ -74,7 +74,7 @@ local FORMATION_COLORS = {
 FormationUtils.draw_encampment = function (encampment, pos, rot, drawer)
 	drawer = drawer or QuickDrawer
 
-	drawer.sphere(drawer, pos, 0.25, Color(0, 180, 0))
+	drawer:sphere(pos, 0.25, Color(0, 180, 0))
 
 	for i = 1, #encampment, 1 do
 		local formation = encampment[i]
@@ -88,7 +88,7 @@ FormationUtils.draw_encampment = function (encampment, pos, rot, drawer)
 end
 
 FormationUtils.draw_formation = function (formation, pos, rot, color, drawer)
-	drawer.line(drawer, pos, pos + Vector3(0, 0, 3), color)
+	drawer:line(pos, pos + Vector3(0, 0, 3), color)
 
 	local dir = formation.formation_template.dir
 	local formation_rot = (dir and Quaternion.look(Vector3(dir[1], dir[2], 0))) or Quaternion.look(Vector3(0, 1, 0))
@@ -99,7 +99,7 @@ FormationUtils.draw_formation = function (formation, pos, rot, color, drawer)
 		local arr = arrangement[i]
 		local spawn_pos = pos + Quaternion.rotate(formation_rot, Vector3(arr[1], arr[2], 0))
 
-		drawer.sphere(drawer, spawn_pos, 0.5, color)
+		drawer:sphere(spawn_pos, 0.5, color)
 	end
 end
 
@@ -123,7 +123,7 @@ FormationUtils.spawn_formation = function (formation, pos, rot, breed_name, grou
 			local spawn_category = "encampment"
 			local breed = Breeds[breed_name]
 
-			conflict_director.spawn_queued_unit(conflict_director, breed, Vector3Box(spawn_pos), QuaternionBox(formation_rot), spawn_category, nil, spawn_type, nil, group_template)
+			conflict_director:spawn_queued_unit(breed, Vector3Box(spawn_pos), QuaternionBox(formation_rot), spawn_category, nil, spawn_type, nil, group_template)
 		end
 	end
 end

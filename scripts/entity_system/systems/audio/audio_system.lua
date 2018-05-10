@@ -18,7 +18,7 @@ AudioSystem.init = function (self, entity_system_creation_context, system_name)
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.is_server = entity_system_creation_context.is_server
 	self.global_parameter_data = {}
@@ -32,7 +32,7 @@ end
 AudioSystem.update = function (self, context, t)
 	local dt = context.dt
 
-	self._update_global_parameters(self, dt)
+	self:_update_global_parameters(dt)
 end
 
 local LERP_PROGRESS_PER_SECOND = 0.125
@@ -96,10 +96,10 @@ AudioSystem.play_audio_unit_event = function (self, event, unit, object)
 
 	local object_id = (object and Unit.node(unit, object)) or 0
 
-	self._play_event(self, event, unit, object_id)
+	self:_play_event(event, unit, object_id)
 
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 	local sound_event_id = NetworkLookup.sound_events[event]
 
 	if self.is_server then
@@ -118,7 +118,7 @@ AudioSystem.play_audio_position_event = function (self, event, position)
 		return
 	end
 
-	self._play_position_event(self, event, position)
+	self:_play_position_event(event, position)
 
 	local network_manager = Managers.state.network
 	local sound_event_id = NetworkLookup.sound_events[event]
@@ -139,16 +139,16 @@ AudioSystem._play_position_event = function (self, event, position)
 end
 
 AudioSystem._play_event_with_source = function (self, wwise_world, event, source)
-	wwise_world.trigger_event(wwise_world, event, source)
+	wwise_world:trigger_event(event, source)
 end
 
 AudioSystem.play_audio_unit_param_string_event = function (self, event, param, value, unit, object)
 	local object_id = (object and Unit.node(unit, object)) or 0
 
-	self._play_param_event(self, event, param, value, unit, object_id)
+	self:_play_param_event(event, param, value, unit, object_id)
 
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 	local sound_event_id = NetworkLookup.sound_events[event]
 	local name_id = NetworkLookup.sound_event_param_names[param]
 	local value_id = NetworkLookup.sound_event_param_string_values[value]
@@ -163,10 +163,10 @@ end
 AudioSystem.play_audio_unit_param_int_event = function (self, event, param, value, unit, object)
 	local object_id = (object and Unit.node(unit, object)) or 0
 
-	self._play_param_event(self, event, param, value, unit, object_id)
+	self:_play_param_event(event, param, value, unit, object_id)
 
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 	local sound_event_id = NetworkLookup.sound_events[event]
 	local name_id = NetworkLookup.sound_event_param_names[param]
 
@@ -191,10 +191,10 @@ end
 AudioSystem.play_audio_unit_param_float_event = function (self, event, param, value, unit, object)
 	local object_id = (object and Unit.node(unit, object)) or 0
 
-	self._play_param_event(self, event, param, value, unit, object_id)
+	self:_play_param_event(event, param, value, unit, object_id)
 
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 	local sound_event_id = NetworkLookup.sound_events[event]
 	local name_id = NetworkLookup.sound_event_param_names[param]
 
@@ -227,12 +227,12 @@ AudioSystem.rpc_server_audio_event = function (self, sender, sound_id)
 	local wwise_world = Managers.world:wwise_world(self.world)
 	local sound_event = NetworkLookup.sound_events[sound_id]
 	local entity_manager = Managers.state.entity
-	local surrounding_aware_system = entity_manager.system(entity_manager, "surrounding_aware_system")
+	local surrounding_aware_system = entity_manager:system("surrounding_aware_system")
 	local unit = nil
 	local event_name = "heard_sound"
 	local distance = math.huge
 
-	surrounding_aware_system.add_system_event(surrounding_aware_system, unit, event_name, distance, "heard_event", sound_event)
+	surrounding_aware_system:add_system_event(unit, event_name, distance, "heard_event", sound_event)
 
 	local wwise_playing_id, wwise_source_id = WwiseWorld.trigger_event(wwise_world, sound_event)
 end
@@ -241,12 +241,12 @@ AudioSystem.rpc_server_audio_event_at_pos = function (self, sender, sound_id, po
 	local wwise_world = Managers.world:wwise_world(self.world)
 	local sound_event = NetworkLookup.sound_events[sound_id]
 	local entity_manager = Managers.state.entity
-	local surrounding_aware_system = entity_manager.system(entity_manager, "surrounding_aware_system")
+	local surrounding_aware_system = entity_manager:system("surrounding_aware_system")
 	local unit = nil
 	local event_name = "heard_sound"
 	local distance = math.huge
 
-	surrounding_aware_system.add_system_event(surrounding_aware_system, unit, event_name, distance, "heard_event", sound_event)
+	surrounding_aware_system:add_system_event(unit, event_name, distance, "heard_event", sound_event)
 
 	local wwise_playing_id, wwise_source_id = WwiseWorld.trigger_event(wwise_world, sound_event, position)
 end
@@ -260,7 +260,7 @@ AudioSystem.rpc_server_audio_unit_event = function (self, sender, sound_id, unit
 	local event = NetworkLookup.sound_events[sound_id]
 	local unit = self.unit_storage:unit(unit_id)
 
-	self._play_event(self, event, unit, object_id)
+	self:_play_event(event, unit, object_id)
 end
 
 AudioSystem.rpc_server_audio_position_event = function (self, sender, sound_id, position)
@@ -270,7 +270,7 @@ AudioSystem.rpc_server_audio_position_event = function (self, sender, sound_id, 
 
 	local event = NetworkLookup.sound_events[sound_id]
 
-	self._play_position_event(self, event, position)
+	self:_play_position_event(event, position)
 end
 
 AudioSystem.rpc_server_audio_unit_dialogue_event = function (self, sender, sound_id, unit_id)
@@ -293,7 +293,7 @@ AudioSystem.rpc_server_audio_unit_dialogue_event = function (self, sender, sound
 			WwiseWorld.set_switch(wwise_world, switch_group, switch_value, wwise_source)
 		end
 
-		self._play_event_with_source(self, wwise_world, event, wwise_source)
+		self:_play_event_with_source(wwise_world, event, wwise_source)
 	end
 end
 
@@ -307,7 +307,7 @@ AudioSystem.rpc_server_audio_unit_param_string_event = function (self, sender, s
 	local param = NetworkLookup.sound_event_param_names[name_id]
 	local value = NetworkLookup.sound_event_param_string_values[value_id]
 
-	self._play_param_event(self, event, param, value, unit, object_id)
+	self:_play_param_event(event, param, value, unit, object_id)
 end
 
 AudioSystem.rpc_server_audio_unit_param_int_event = function (self, sender, sound_event_id, unit_id, object_id, name_id, value)
@@ -320,7 +320,7 @@ AudioSystem.rpc_server_audio_unit_param_int_event = function (self, sender, soun
 	local unit = self.unit_storage:unit(unit_id)
 	local param = NetworkLookup.sound_event_param_names[name_id]
 
-	self._play_param_event(self, event, param, value, unit, object_id)
+	self:_play_param_event(event, param, value, unit, object_id)
 end
 
 AudioSystem.rpc_server_audio_unit_param_float_event = function (self, sender, sound_event_id, unit_id, object_id, name_id, value)
@@ -333,20 +333,20 @@ AudioSystem.rpc_server_audio_unit_param_float_event = function (self, sender, so
 	local unit = self.unit_storage:unit(unit_id)
 	local param = NetworkLookup.sound_event_param_names[name_id]
 
-	self._play_param_event(self, event, param, value, unit, object_id)
+	self:_play_param_event(event, param, value, unit, object_id)
 end
 
 AudioSystem.rpc_client_audio_set_global_parameter_with_lerp = function (self, sender, parameter_id, value)
 	local name = NetworkLookup.global_parameter_names[parameter_id]
 	local percentage = value * 100
 
-	self.set_global_parameter_with_lerp(self, name, percentage)
+	self:set_global_parameter_with_lerp(name, percentage)
 end
 
 AudioSystem.rpc_client_audio_set_global_parameter = function (self, sender, parameter_id, value)
 	local name = NetworkLookup.global_parameter_names[parameter_id]
 
-	self.set_global_parameter(self, name, value)
+	self:set_global_parameter(name, value)
 end
 
 return

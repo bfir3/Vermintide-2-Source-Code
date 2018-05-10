@@ -61,7 +61,7 @@ AIDebugger.destroy = function (self)
 end
 
 AIDebugger.update = function (self, t, dt)
-	self.lazy_create_drawer(self)
+	self:lazy_create_drawer()
 
 	if Unit.alive(script_data.debug_unit) then
 		local unit = script_data.debug_unit
@@ -86,10 +86,10 @@ AIDebugger.update = function (self, t, dt)
 	if in_free_flight then
 		local input_service = self.free_flight_manager.input_manager:get_service("FreeFlight")
 
-		self.update_selection(self, input_service, dt)
-		self.update_mouse_input(self, input_service)
-		self.draw_reticule(self)
-		self.draw_hint(self, t)
+		self:update_selection(input_service, dt)
+		self:update_mouse_input(input_service)
+		self:draw_reticule()
+		self:draw_hint(t)
 
 		if self.follow_active and Unit.alive(self.active_unit) then
 			local viewport = ScriptWorld.global_free_flight_viewport(self.world)
@@ -108,9 +108,9 @@ AIDebugger.update = function (self, t, dt)
 			ScriptCamera.set_local_pose(cam, cm)
 		end
 
-		self.update_ingame_selection(self, true)
+		self:update_ingame_selection(true)
 	else
-		self.update_ingame_selection(self, false)
+		self:update_ingame_selection(false)
 
 		self.hint_time_when_key_handle_visible = t
 		self.key_handler_visible = nil
@@ -138,7 +138,7 @@ AIDebugger.update = function (self, t, dt)
 	elseif DebugKeyHandler.key_pressed("j", "kill selected AI", "ai") then
 		local kill_unit = self.active_unit
 
-		if not AiUtils.unit_alive(kill_unit) and self.closest_unit_in_aim_dir(self, in_free_flight) then
+		if not AiUtils.unit_alive(kill_unit) and self:closest_unit_in_aim_dir(in_free_flight) then
 			kill_unit = self.hot_unit
 		end
 
@@ -146,7 +146,7 @@ AIDebugger.update = function (self, t, dt)
 			local health_extension = ScriptUnit.has_extension(kill_unit, "health_system")
 
 			if health_extension then
-				if health_extension.is_alive(health_extension) then
+				if health_extension:is_alive() then
 					local damage_amount = 255
 					local hit_zone_name = "full"
 					local damage_type = "forced"
@@ -163,11 +163,11 @@ AIDebugger.update = function (self, t, dt)
 	end
 
 	if Unit.alive(self.hot_unit) then
-		self.draw_hot_unit(self)
+		self:draw_hot_unit()
 	end
 
 	if Unit.alive(self.active_unit) then
-		self.draw_active_unit(self, t)
+		self:draw_active_unit(t)
 
 		if DebugKeyHandler.key_pressed("comma", "go to unit", "ai debugger", nil, "FreeFlight") then
 			self.follow_active = not self.follow_active
@@ -212,9 +212,9 @@ AIDebugger.update = function (self, t, dt)
 		local active_unit = self.active_unit
 
 		if Unit.alive(active_unit) then
-			self.draw_blackboard(self, active_unit)
-			self.draw_extensions(self, active_unit)
-			self.draw_behavior_tree(self, active_unit, t, dt)
+			self:draw_blackboard(active_unit)
+			self:draw_extensions(active_unit)
+			self:draw_behavior_tree(active_unit, t, dt)
 		end
 	end
 
@@ -239,11 +239,11 @@ AIDebugger.update = function (self, t, dt)
 	end
 
 	if script_data.debug_ai_pacing then
-		self.debug_pacing(self, t, dt)
+		self:debug_pacing(t, dt)
 	end
 
 	if self.is_server and script_data.debug_player_intensity then
-		self.debug_player_intensity(self, t, dt)
+		self:debug_player_intensity(t, dt)
 	end
 
 	if DebugKeyHandler.key_pressed("c", "spawn bot player", "ai debugger", nil, "FreeFlight") then
@@ -297,13 +297,13 @@ AIDebugger.perlin_path = function (self, t, x, y, xsize, ysize)
 end
 
 AIDebugger.update_selection = function (self, input, dt)
-	self.mouse_raycast(self, input)
+	self:mouse_raycast(input)
 
 	if not Unit.alive(self.active_unit) then
 		self.active_unit = nil
 	end
 
-	local mouse_released = input.get(input, "action_one")
+	local mouse_released = input:get("action_one")
 
 	if mouse_released then
 		self.active_unit = self.hot_unit
@@ -323,7 +323,7 @@ AIDebugger.update_ingame_selection = function (self, in_free_flight)
 
 	local select_target = DebugKeyHandler.key_pressed("right_thumb_pressed", "select target", "ai")
 
-	if (select_target or DebugKeyHandler.key_pressed("v", "select bot", "ai debugger")) and self.closest_unit_in_aim_dir(self, in_free_flight) then
+	if (select_target or DebugKeyHandler.key_pressed("v", "select bot", "ai debugger")) and self:closest_unit_in_aim_dir(in_free_flight) then
 		if Unit.alive(self.active_unit) and script_data.anim_debug_ai_debug_target then
 			Unit.set_animation_logging(self.active_unit, false)
 		end
@@ -344,7 +344,7 @@ AIDebugger.closest_unit_in_aim_dir = function (self, in_free_flight)
 	end
 
 	local player_manager = Managers.player
-	local player = player_manager.player_from_peer_id(player_manager, Network.peer_id())
+	local player = player_manager:player_from_peer_id(Network.peer_id())
 	local player_unit = player.player_unit
 
 	if not player_unit then
@@ -352,15 +352,15 @@ AIDebugger.closest_unit_in_aim_dir = function (self, in_free_flight)
 	end
 
 	local first_person_extension = ScriptUnit.extension(player_unit, "first_person_system")
-	local first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
-	local camera_position = first_person_extension.current_position(first_person_extension)
-	local camera_rotation = first_person_extension.current_rotation(first_person_extension)
+	local first_person_unit = first_person_extension:get_first_person_unit()
+	local camera_position = first_person_extension:current_position()
+	local camera_rotation = first_person_extension:current_rotation()
 	local camera_direction = Quaternion.forward(camera_rotation)
 	local min_dot = 999
 	local best_unit = nil
 	local units = {}
 	local entity_manager = Managers.state.entity
-	local ai_units = (self.is_server and entity_manager.get_entities(entity_manager, "AISimpleExtension")) or entity_manager.get_entities(entity_manager, "AiHuskBaseExtension")
+	local ai_units = (self.is_server and entity_manager:get_entities("AISimpleExtension")) or entity_manager:get_entities("AiHuskBaseExtension")
 	local player_bots = Managers.state.entity:get_entities("PlayerBotBase")
 
 	table.merge(units, ai_units)
@@ -399,7 +399,7 @@ AIDebugger.mouse_raycast = function (self, input)
 	local physics_world = World.get_data(world, "physics_world")
 	local viewport = ScriptWorld.global_free_flight_viewport(world)
 	local camera = data.frustum_freeze_camera or ScriptViewport.camera(viewport)
-	local mouse = input.get(input, "cursor")
+	local mouse = input:get("cursor")
 	local position = Camera.screen_to_world(camera, Vector3(mouse.x, mouse.y, 0), 0)
 	local direction = Camera.screen_to_world(camera, Vector3(mouse.x, mouse.y, 0), 1) - position
 	local raycast_dir = Vector3.normalize(direction)
@@ -411,7 +411,7 @@ AIDebugger.mouse_raycast = function (self, input)
 		local unit = Actor.unit(actor)
 		local breed = Unit.get_data(unit, "breed")
 		local player_manager = Managers.player
-		local is_bot = player_manager.is_player_unit(player_manager, unit) and player_manager.owner(player_manager, unit).bot_player
+		local is_bot = player_manager:is_player_unit(unit) and player_manager:owner(unit).bot_player
 
 		if breed or is_bot then
 			self.hot_unit = unit
@@ -431,7 +431,7 @@ AIDebugger.update_mouse_input = function (self, input)
 		return
 	end
 
-	local mouse_released = input.get(input, "action_two")
+	local mouse_released = input:get("action_two")
 
 	if mouse_released then
 		local breed = Unit.get_data(self.hot_unit, "breed")
@@ -450,8 +450,8 @@ AIDebugger.draw_active_unit = function (self, t)
 	local drawer = self.drawer
 	local position = Unit.local_position(self.active_unit, 0)
 
-	drawer.sphere(drawer, position + Vector3.up() * 2, 0.1, Color(255, 255, 255, 0))
-	self.draw_nearby_navmesh(self, self.active_unit)
+	drawer:sphere(position + Vector3.up() * 2, 0.1, Color(255, 255, 255, 0))
+	self:draw_nearby_navmesh(self.active_unit)
 end
 
 local color_table = {}
@@ -582,7 +582,7 @@ AIDebugger.draw_blackboard = function (self, ai_unit)
 
 				Gui.text(gui, "[hidden fields]", font_mtrl, font_size_blackboard, font, pos + indent_offset, Color(255, 100, 100, 100))
 				Gui.text(gui, tostring(count_subtree - 1), font_mtrl, font_size_blackboard, font, pos + value_offset, Color(255, 100, 100, 0))
-			elseif key.find(key, "_extension") ~= nil then
+			elseif key:find("_extension") ~= nil then
 				pos.y = pos.y - font_size_blackboard
 
 				Gui.text(gui, "[hidden fields]", font_mtrl, font_size_blackboard, font, pos + indent_offset, Color(255, 100, 100, 100))
@@ -632,8 +632,8 @@ AIDebugger.draw_behavior_tree = function (self, ai_unit, t, dt)
 	local ai_extension = ScriptUnit.has_extension(ai_unit, "ai_system")
 
 	if ai_extension then
-		local bt = ai_extension.brain(ai_extension):bt()
-		local root_node = bt.root(bt)
+		local bt = ai_extension:brain():bt()
+		local root_node = bt:root()
 
 		DrawAiBehaviour.tree_width(self.screen_gui, root_node)
 
@@ -655,7 +655,7 @@ AIDebugger.draw_behavior_tree = function (self, ai_unit, t, dt)
 
 		if mouse_middle_held or pan_mouse_vertical then
 			local input_service = self.free_flight_manager.input_manager:get_service("Debug")
-			local look = input_service.get(input_service, "look")
+			local look = input_service:get("look")
 			self.tree_x = self.tree_x - look.x * 0.001
 
 			if pan_mouse_vertical then
@@ -663,7 +663,7 @@ AIDebugger.draw_behavior_tree = function (self, ai_unit, t, dt)
 			end
 		elseif right_shoulder_held then
 			local input_service = self.free_flight_manager.input_manager:get_service("Debug")
-			local look = input_service.get(input_service, "look_raw")
+			local look = input_service:get("look_raw")
 			self.tree_x = self.tree_x - look.x * 0.1
 			self.tree_y = self.tree_y - look.y * 0.1
 		end
@@ -709,7 +709,7 @@ AIDebugger.debug_player_intensity = function (self, t, dt)
 	local row = win_y
 	local conflict_director = Managers.state.conflict
 	local pacing = conflict_director.pacing
-	local sum_intensity, player_intensity = pacing.get_intensity(pacing)
+	local sum_intensity, player_intensity = pacing:get_intensity()
 
 	for k = 1, #player_intensity, 1 do
 		local int = player_intensity[k] * 0.01
@@ -736,11 +736,11 @@ AIDebugger.debug_player_intensity = function (self, t, dt)
 	ScriptGUI.irect(gui, res_x, res_y, win_x, row + bar_height, win_x + bar_width * sum_intensity * 0.01, row, 2, Color(200, 130, 10, 10))
 
 	local decay_text = ""
-	local frozen = conflict_director.intensity_decay_frozen(conflict_director)
+	local frozen = conflict_director:intensity_decay_frozen()
 
 	if frozen then
 		decay_text = string.format("decay delay frozen: %.1f", math.clamp(conflict_director.frozen_intensity_decay_until - t, 0, 100))
-	elseif pacing.ignore_intensity_decay_delay(pacing) then
+	elseif pacing:ignore_intensity_decay_delay() then
 		decay_text = "decay delay: ignored"
 	else
 		local player = Managers.player:local_player(1)
@@ -801,13 +801,13 @@ AIDebugger.debug_pacing = function (self, t, dt)
 	if script_data.ai_horde_spawning_disabled then
 		s1 = string.format("Horde spawning is disabled")
 	else
-		local next_horde_time, hordes, multiple_horde_count = cm.get_horde_data(cm)
+		local next_horde_time, hordes, multiple_horde_count = cm:get_horde_data()
 
 		if 0 < #hordes then
-			s1 = string.format("Number of hordes active: %d  horde size:%d", #hordes, cm.horde_size(cm))
+			s1 = string.format("Number of hordes active: %d  horde size:%d", #hordes, cm:horde_size())
 		elseif 0 < horde_population then
 			if next_horde_time then
-				s1 = string.format("Next horde in: %.1fs horde size:%d", next_horde_time - t, cm.horde_size(cm))
+				s1 = string.format("Next horde in: %.1fs horde size:%d", next_horde_time - t, cm:horde_size())
 			else
 				s1 = "Next horde in: N/A"
 			end
@@ -880,7 +880,7 @@ end
 
 AIDebugger.create_fake_players = function (self)
 	local player_manager = Managers.player
-	local player = player_manager.player_from_peer_id(player_manager, Network.peer_id())
+	local player = player_manager:player_from_peer_id(Network.peer_id())
 	local player_unit = player.player_unit
 	local center_position = POSITION_LOOKUP[player_unit]
 	local nav_world = Managers.state.entity:system("ai_system"):nav_world()

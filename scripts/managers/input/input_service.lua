@@ -41,9 +41,9 @@ InputService.unmap_device = function (self, input_device_type, input_device)
 end
 
 InputService.get = function (self, input_data_name, consume)
-	local keymaps, default_data_types = self.get_active_keymaps(self)
+	local keymaps, default_data_types = self:get_active_keymaps()
 	local keymap_binding = keymaps[input_data_name]
-	local input_filters = self.get_active_filters(self)
+	local input_filters = self:get_active_filters()
 	local filter_binding = input_filters and input_filters[input_data_name]
 
 	if keymap_binding then
@@ -67,7 +67,7 @@ InputService.get = function (self, input_data_name, consume)
 							local input_device = device_list[k]
 							local input_device_data = input_devices_data[input_device]
 
-							if input_device.active(input_device) and not input_device_data.blocked_access[name] then
+							if input_device:active() and not input_device_data.blocked_access[name] then
 								action_value = action_value or input_device_data[key_action_type][key_index]
 
 								if action_value == true then
@@ -77,7 +77,7 @@ InputService.get = function (self, input_data_name, consume)
 										input_device_data.consumed_input[key_index] = true
 									end
 								end
-							elseif input_device.active(input_device) then
+							elseif input_device:active() then
 								action_value = nil
 
 								break
@@ -149,13 +149,13 @@ InputService.get_active_filters = function (self, optional_platform)
 end
 
 InputService.get_keymapping = function (self, keymap_name, optional_platform)
-	local keymaps = self.get_active_keymaps(self, optional_platform)
+	local keymaps = self:get_active_keymaps(optional_platform)
 
 	return keymaps[keymap_name]
 end
 
 InputService.add_keymap = function (self, keymap_name)
-	local keymaps = self.get_active_keymaps(self)
+	local keymaps = self:get_active_keymaps()
 	local keymapping = not keymaps[keymap_name]
 
 	assert(keymapping, "Keymap already exists: name %s in service %s", keymap_name, input_service_name)
@@ -168,7 +168,7 @@ InputService.add_keymap = function (self, keymap_name)
 end
 
 InputService.remove_keymap = function (self, keymap_name)
-	local keymaps = self.get_active_keymaps(self)
+	local keymaps = self:get_active_keymaps()
 	local keymapping = keymaps[keymap_name]
 
 	assert(keymapping, "No such keymap name %s in service %s", keymap_name, self.name)
@@ -178,7 +178,7 @@ end
 
 InputService.generate_keybinding_setting = function (self)
 	local new_keymaps = {}
-	local keymaps = self.get_active_keymaps(self)
+	local keymaps = self:get_active_keymaps()
 
 	for keymap_name, keymap_data in pairs(keymaps) do
 		local new_keymap_data = {}
@@ -217,7 +217,7 @@ end
 
 InputService.generate_filters_setting = function (self)
 	local new_filters = {}
-	local input_filters = self.get_active_filters(self)
+	local input_filters = self:get_active_filters()
 
 	if input_filters then
 		for filter_output, filter_data in pairs(input_filters) do
@@ -231,8 +231,8 @@ InputService.generate_filters_setting = function (self)
 end
 
 InputService.has = function (self, keymap_name)
-	local keymaps = self.get_active_keymaps(self)
-	local input_filters = self.get_active_filters(self)
+	local keymaps = self:get_active_keymaps()
+	local input_filters = self:get_active_filters()
 
 	return keymaps[keymap_name] or (input_filters and input_filters[keymap_name] and true) or false
 end

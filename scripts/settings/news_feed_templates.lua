@@ -72,7 +72,7 @@ NewsFeedTemplates = {
 			local hero_name = params.hero_name
 			local career_name = params.career_name
 			local talent_interface = Managers.backend:get_interface("talents")
-			local current_talents = talent_interface.get_talents(talent_interface, career_name)
+			local current_talents = talent_interface:get_talents(career_name)
 			local num_spent_talents = 0
 
 			for _, value in ipairs(current_talents) do

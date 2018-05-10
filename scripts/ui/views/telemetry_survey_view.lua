@@ -21,16 +21,16 @@ TelemetrySurveyView.init = function (self, ingame_ui_context)
 	self.survey_context = nil
 	self.end_time = nil
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	local world = self.world_manager:world("level_world")
 	self.wwise_world = Managers.world:wwise_world(world)
 	local input_manager = self.input_manager
 
-	input_manager.create_input_service(input_manager, "telemetry_survey", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "telemetry_survey", "keyboard")
-	input_manager.map_device_to_service(input_manager, "telemetry_survey", "mouse")
-	input_manager.map_device_to_service(input_manager, "telemetry_survey", "gamepad")
+	input_manager:create_input_service("telemetry_survey", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("telemetry_survey", "keyboard")
+	input_manager:map_device_to_service("telemetry_survey", "mouse")
+	input_manager:map_device_to_service("telemetry_survey", "gamepad")
 end
 
 TelemetrySurveyView.input_service = function (self)
@@ -74,7 +74,7 @@ end
 
 TelemetrySurveyView.destroy = function (self)
 	if self.active then
-		self.set_active(self, false)
+		self:set_active(false)
 	end
 end
 
@@ -86,17 +86,17 @@ TelemetrySurveyView.on_enter = function (self)
 	self.timed_out = false
 	self.survey_confirmed = false
 
-	self.set_active(self, not self.active)
+	self:set_active(not self.active)
 end
 
 TelemetrySurveyView.on_exit = function (self)
-	self.set_active(self, not self.active)
-	self.play_sound(self, "Play_hud_button_close")
+	self:set_active(not self.active)
+	self:play_sound("Play_hud_button_close")
 
 	self.opened = false
 
 	if self.survey_answered and self.survey_confirmed then
-		self.record_telemetry_survey(self)
+		self:record_telemetry_survey()
 	end
 
 	self.session_rating = 0
@@ -125,16 +125,16 @@ TelemetrySurveyView.update = function (self, dt)
 	local curr_time = self.time_manager:time("game")
 	local time_left = self.end_time - curr_time
 
-	self.update_rating_buttons(self)
-	self.update_time_text(self, time_left)
-	self.update_button_disabled(self)
-	self.handle_interaction(self, dt)
-	self.draw(self, dt)
+	self:update_rating_buttons()
+	self:update_time_text(time_left)
+	self:update_button_disabled()
+	self:handle_interaction(dt)
+	self:draw(dt)
 
 	if self.end_time <= curr_time then
 		self.timed_out = true
 
-		self.transition(self)
+		self:transition()
 	end
 end
 
@@ -174,16 +174,16 @@ TelemetrySurveyView.set_active = function (self, active)
 
 	if active then
 		ShowCursorStack.push()
-		input_manager.block_device_except_service(input_manager, "telemetry_survey", "keyboard")
-		input_manager.block_device_except_service(input_manager, "telemetry_survey", "mouse")
-		input_manager.block_device_except_service(input_manager, "telemetry_survey", "gamepad")
+		input_manager:block_device_except_service("telemetry_survey", "keyboard")
+		input_manager:block_device_except_service("telemetry_survey", "mouse")
+		input_manager:block_device_except_service("telemetry_survey", "gamepad")
 
 		self.end_time = self.time_manager:time("game") + SURVEY_TIMEOUT
 	else
 		ShowCursorStack.pop()
-		input_manager.device_unblock_all_services(input_manager, "keyboard")
-		input_manager.device_unblock_all_services(input_manager, "mouse")
-		input_manager.device_unblock_all_services(input_manager, "gamepad")
+		input_manager:device_unblock_all_services("keyboard")
+		input_manager:device_unblock_all_services("mouse")
+		input_manager:device_unblock_all_services("gamepad")
 	end
 end
 
@@ -197,13 +197,13 @@ TelemetrySurveyView.handle_interaction = function (self, dt)
 			local input_service = self.input_manager:get_service("telemetry_survey")
 
 			if self.continue_button.content.button_hotspot.on_hover_enter then
-				self.play_sound(self, "Play_hud_hover")
+				self:play_sound("Play_hud_hover")
 			end
 
-			if input_service.get(input_service, "confirm") or on_release then
+			if input_service:get("confirm") or on_release then
 				self.survey_confirmed = true
 
-				self.transition(self)
+				self:transition()
 			end
 		end
 	else

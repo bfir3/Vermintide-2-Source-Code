@@ -49,11 +49,11 @@ VisualStateMachine.destroy = function (self)
 
 	if state ~= nil then
 		if state.leave ~= nil then
-			state.leave(state)
+			state:leave()
 		end
 
 		if state.destroy ~= nil then
-			state.destroy(state)
+			state:destroy()
 		end
 	end
 
@@ -99,7 +99,7 @@ end
 VisualStateMachine.set_initial_state = function (self, state_class, ...)
 	assert(self._current_state == nil, "it is not allowed to set initial state twice")
 
-	self._current_state = self._enter_state(self, state_class, {
+	self._current_state = self:_enter_state(state_class, {
 		...
 	})
 end
@@ -142,7 +142,7 @@ VisualStateMachine.update = function (self, dt)
 			end
 
 			if event_name ~= nil then
-				local state_machine_index = self._received_event(self, event_name, args)
+				local state_machine_index = self:_received_event(event_name, args)
 
 				if state_machine_index <= ii then
 					break
@@ -170,7 +170,7 @@ VisualStateMachine.state_report = function (self)
 	for ii = start_index, #stack, 1 do
 		local state_machine = stack[ii]
 		s = s .. string.format("State %q waits for:\n", self._current_state_name(state_machine))
-		local transitions = state_machine._transitions_from_state(state_machine)
+		local transitions = state_machine:_transitions_from_state()
 		local had_transitions = false
 
 		for kk, vv in pairs(transitions) do
@@ -225,8 +225,8 @@ VisualStateMachine._handle_event = function (self, event_name, args)
 			local target_class = transitions[event_name]
 
 			if target_class ~= nil then
-				self._leave_state(self)
-				self._enter_state(self, target_class, args)
+				self:_leave_state()
+				self:_enter_state(target_class, args)
 
 				return true
 			end
@@ -242,7 +242,7 @@ VisualStateMachine._received_event = function (self, event_name, args)
 	for ii = #stack, 1, -1 do
 		local state_machine = stack[ii]
 
-		if state_machine._handle_event(state_machine, event_name, args) then
+		if state_machine:_handle_event(event_name, args) then
 			return ii
 		end
 	end
@@ -278,13 +278,13 @@ VisualStateMachine._leave_state = function (self)
 		local state = state_machine._current_state
 
 		if state.leave then
-			state.leave(state)
+			state:leave()
 		end
 
 		state_machine._current_state = nil
 
 		if state.destroy ~= nil then
-			state.destroy(state)
+			state:destroy()
 		end
 	end
 end
@@ -293,11 +293,11 @@ VisualStateMachine._enter_state = function (self, state_class, args)
 	assert(self._current_state == nil, "entering a state twice is not allowed")
 	assert(type(state_class.NAME) == "string", "States must have a class variable NAME set to a string value")
 
-	local state = state_class.new(state_class, self, unpack(self._global_args))
+	local state = state_class:new(self, unpack(self._global_args))
 	self._current_state = state
 
 	if state.enter then
-		state.enter(state, unpack(args))
+		state:enter(unpack(args))
 	end
 
 	return state

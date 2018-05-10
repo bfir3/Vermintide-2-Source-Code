@@ -36,11 +36,11 @@ PlayerUnitAttachmentExtension.extensions_ready = function (self, world, unit)
 			local item_data = table.clone(item.data)
 			item_data.backend_id = item.backend_id
 
-			self.create_attachment(self, slot_name, item_data)
+			self:create_attachment(slot_name, item_data)
 		end
 	end
 
-	self.show_attachments(self, false)
+	self:show_attachments(false)
 end
 
 PlayerUnitAttachmentExtension.game_object_initialized = function (self, unit, unit_go_id)
@@ -60,7 +60,7 @@ PlayerUnitAttachmentExtension.game_object_initialized = function (self, unit, un
 
 			local backend_id = slot_data.item_data.backend_id
 
-			self._send_rpc_add_attachment_buffs(self, unit_go_id, slot_id, item_id, backend_id)
+			self:_send_rpc_add_attachment_buffs(unit_go_id, slot_id, item_id, backend_id)
 		end
 	end
 end
@@ -74,7 +74,7 @@ PlayerUnitAttachmentExtension.destroy = function (self)
 end
 
 PlayerUnitAttachmentExtension.update = function (self, unit, input, dt, context, t)
-	self.update_resync_loadout(self)
+	self:update_resync_loadout()
 end
 
 PlayerUnitAttachmentExtension.hot_join_sync = function (self, sender)
@@ -98,9 +98,9 @@ PlayerUnitAttachmentExtension.create_attachment = function (self, slot_name, ite
 	end
 
 	local backend_id = item_data.backend_id
-	local buffs = self._get_property_and_trait_buffs(self, backend_id)
+	local buffs = self:_get_property_and_trait_buffs(backend_id)
 
-	self._apply_buffs(self, buffs, item_data.name, slot_name, item_data.name)
+	self:_apply_buffs(buffs, item_data.name, slot_name, item_data.name)
 end
 
 PlayerUnitAttachmentExtension.remove_attachment = function (self, slot_name)
@@ -111,12 +111,12 @@ PlayerUnitAttachmentExtension.remove_attachment = function (self, slot_name)
 	end
 
 	AttachmentUtils.destroy_attachment(self._world, self._unit, slot_data)
-	self._remove_buffs(self, slot_name)
+	self:_remove_buffs(slot_name)
 
 	local item_data = slot_data.item_data
 	self._attachments.slots[slot_name] = nil
 	local network_manager = Managers.state.network
-	local unit_go_id = network_manager.unit_game_object_id(network_manager, self._unit)
+	local unit_go_id = network_manager:unit_game_object_id(self._unit)
 	local slot_id = NetworkLookup.equipment_slots[slot_name]
 
 	if self._is_server then
@@ -169,7 +169,7 @@ PlayerUnitAttachmentExtension.show_attachments = function (self, show)
 
 	for slot_name, slot_data in pairs(slots) do
 		if slot_data.unit then
-			self._show_attachment(self, slot_name, slot_data, show)
+			self:_show_attachment(slot_name, slot_data, show)
 		end
 	end
 end
@@ -184,7 +184,7 @@ PlayerUnitAttachmentExtension.create_attachment_in_slot = function (self, slot_n
 		return
 	end
 
-	self.remove_attachment(self, slot_name)
+	self:remove_attachment(slot_name)
 
 	self._item_to_spawn = {
 		slot_id = slot_name,
@@ -201,14 +201,14 @@ PlayerUnitAttachmentExtension.update_resync_loadout = function (self)
 	end
 
 	if self.resync_loadout_needed then
-		self.resync_id = self.resync_loadout(self, equipment_to_spawn)
+		self.resync_id = self:resync_loadout(equipment_to_spawn)
 		self.resync_loadout_needed = false
 	end
 
 	local resync_id = self.resync_id
 
-	if resync_id and self.all_clients_loaded_resource(self, resync_id) then
-		self.spawn_resynced_loadout(self, equipment_to_spawn)
+	if resync_id and self:all_clients_loaded_resource(resync_id) then
+		self:spawn_resynced_loadout(equipment_to_spawn)
 
 		self._item_to_spawn = nil
 		self.resync_id = nil
@@ -229,7 +229,7 @@ end
 
 PlayerUnitAttachmentExtension.all_clients_loaded_resource = function (self, resync_id)
 	local profile_synchronizer = Managers.state.network.profile_synchronizer
-	local all_clients_have_loaded_resources = profile_synchronizer.all_clients_have_loaded_sync_id(profile_synchronizer, resync_id)
+	local all_clients_have_loaded_resources = profile_synchronizer:all_clients_have_loaded_sync_id(resync_id)
 
 	return all_clients_have_loaded_resources
 end
@@ -250,14 +250,14 @@ PlayerUnitAttachmentExtension.spawn_resynced_loadout = function (self, item_to_s
 
 		local backend_id = item_data.backend_id
 
-		self._send_rpc_add_attachment_buffs(self, unit_object_id, slot_id, item_id, backend_id)
+		self:_send_rpc_add_attachment_buffs(unit_object_id, slot_id, item_id, backend_id)
 	end
 
-	self.create_attachment(self, slot_name, item_data)
+	self:create_attachment(slot_name, item_data)
 end
 
 PlayerUnitAttachmentExtension._send_rpc_add_attachment_buffs = function (self, unit_go_id, slot_id, item_id, backend_id)
-	local buffs = self._get_property_and_trait_buffs(self, backend_id)
+	local buffs = self:_get_property_and_trait_buffs(backend_id)
 	local server_buffs = {}
 	server_buffs = table.merge(server_buffs, buffs.server)
 	server_buffs = table.merge(server_buffs, buffs.both)
@@ -298,7 +298,7 @@ PlayerUnitAttachmentExtension._send_rpc_add_attachment_buffs = function (self, u
 		local network_manager = Managers.state.network
 		local network_transmit = network_manager.network_transmit
 
-		network_transmit.send_rpc_server(network_transmit, "rpc_add_attachment_buffs", unit_go_id, slot_id, buff_1_id, buff_data_type_1_id, buff_value_1 or 1, buff_2_id, buff_data_type_2_id, buff_value_2 or 1, buff_3_id, buff_data_type_3_id, buff_value_3 or 1, buff_4_id, buff_data_type_4_id, buff_value_4 or 1)
+		network_transmit:send_rpc_server("rpc_add_attachment_buffs", unit_go_id, slot_id, buff_1_id, buff_data_type_1_id, buff_value_1 or 1, buff_2_id, buff_data_type_2_id, buff_value_2 or 1, buff_3_id, buff_data_type_3_id, buff_value_3 or 1, buff_4_id, buff_data_type_4_id, buff_value_4 or 1)
 	end
 end
 
@@ -337,7 +337,7 @@ PlayerUnitAttachmentExtension._apply_buffs = function (self, buffs_by_buffer, it
 					params[data_type] = data_value
 				end
 
-				current_item_buffs[index] = buff_extension.add_buff(buff_extension, buff_name, params)
+				current_item_buffs[index] = buff_extension:add_buff(buff_name, params)
 				index = index + 1
 			end
 		end
@@ -354,7 +354,7 @@ PlayerUnitAttachmentExtension._remove_buffs = function (self, slot_name)
 		for i = 1, #current_item_buffs, 1 do
 			local buff_id = current_item_buffs[i]
 
-			buff_extension.remove_buff(buff_extension, buff_id)
+			buff_extension:remove_buff(buff_id)
 		end
 
 		table.clear(current_item_buffs)

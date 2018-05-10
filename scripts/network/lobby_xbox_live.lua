@@ -49,7 +49,7 @@ LobbyInternal.network_initialized = function ()
 end
 
 LobbyInternal.leave_lobby = function (xboxlive_lobby)
-	xboxlive_lobby.leave(xboxlive_lobby)
+	xboxlive_lobby:leave()
 end
 
 LobbyInternal.join_lobby = function (lobby_data)
@@ -88,7 +88,7 @@ end
 
 LobbyInternal.get_lobby = function (lobby_browser, index)
 	local lobby_data = {}
-	local xbox_lobby_data = table.clone(lobby_browser.lobby(lobby_browser, index))
+	local xbox_lobby_data = table.clone(lobby_browser:lobby(index))
 	lobby_data.name = xbox_lobby_data.name
 	lobby_data.template_name = xbox_lobby_data.template_name
 
@@ -123,11 +123,11 @@ LobbyInternal.add_filter_requirements = function (requirements)
 end
 
 LobbyInternal.lobby_id = function (lobby)
-	return lobby.id(lobby)
+	return lobby:id()
 end
 
 LobbyInternal.session_id = function (lobby)
-	return lobby.id(lobby)
+	return lobby:id()
 end
 
 LobbyInternal.is_friend = function (peer_id)
@@ -220,7 +220,7 @@ XboxLiveLobby.enable_smartmatch = function (self, enable, params, timeout)
 	self._smartmatch_ticket_params = params
 	self._timeout = timeout
 
-	self._cancel_matchmaking(self)
+	self:_cancel_matchmaking()
 end
 
 XboxLiveLobby.reissue_smartmatch_ticket = function (self, params, timeout)
@@ -377,8 +377,8 @@ XboxLiveLobby.update_host_matchmaking = function (self, dt)
 		return
 	end
 
-	self._update_smartmatching(self, dt)
-	self._handle_smartmatching_tickets(self, dt)
+	self:_update_smartmatching(dt)
+	self:_handle_smartmatching_tickets(dt)
 end
 
 XboxLiveLobby._update_smartmatching = function (self, dt)
@@ -469,7 +469,7 @@ XboxLiveLobby._handle_smartmatching_tickets = function (self, dt)
 		self._prev_smartmatch_state = self._smartmatch_state
 	end
 
-	self._create_smartmatch_broadcast(self, 600)
+	self:_create_smartmatch_broadcast(600)
 
 	self._smartmatch_in_progress = true
 	self._reissue_host_smartmatch_ticket = false
@@ -529,7 +529,7 @@ XboxLiveLobby._create_smartmatch_broadcast = function (self, timeout)
 	local ticket_param_str = nil
 
 	if self._smartmatch_ticket_params then
-		ticket_param_str = self._convert_to_json(self, self._hopper_name, self._smartmatch_ticket_params)
+		ticket_param_str = self:_convert_to_json(self._hopper_name, self._smartmatch_ticket_params)
 
 		dprintf("Ticket Params: %s Hopper Name: %s", ticket_param_str, self._hopper_name)
 	end

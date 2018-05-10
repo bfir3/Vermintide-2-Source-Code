@@ -24,14 +24,14 @@ HeroWindowTalents.on_enter = function (self, params, offset)
 		snap_pixel_positions = true
 	}
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.player = local_player
 	self.peer_id = ingame_ui_context.peer_id
 	self._animations = {}
 
-	self.create_ui_elements(self, params, offset)
+	self:create_ui_elements(params, offset)
 
 	self.hero_name = params.hero_name
 	self.career_index = params.career_index
@@ -40,7 +40,7 @@ HeroWindowTalents.on_enter = function (self, params, offset)
 	local experience = ExperienceSettings.get_experience(self.hero_name)
 	self.hero_level = ExperienceSettings.get_level(experience)
 
-	self._initialize_talents(self)
+	self:_initialize_talents()
 end
 
 HeroWindowTalents.on_exit = function (self, params)
@@ -50,7 +50,7 @@ HeroWindowTalents.on_exit = function (self, params)
 	local talent_interface = self._talent_interface
 	local career_name = self._career_name
 
-	talent_interface.set_talents(talent_interface, career_name, self._selected_talents)
+	talent_interface:set_talents(career_name, self._selected_talents)
 
 	local player = self.player
 	local player_unit = player.player_unit
@@ -58,11 +58,11 @@ HeroWindowTalents.on_exit = function (self, params)
 	if Unit.alive(player_unit) then
 		local talent_extension = ScriptUnit.extension(player_unit, "talent_system")
 
-		talent_extension.talents_changed(talent_extension)
+		talent_extension:talents_changed()
 
 		local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
 
-		inventory_extension.apply_buffs_to_ammo(inventory_extension)
+		inventory_extension:apply_buffs_to_ammo()
 	end
 end
 
@@ -99,11 +99,11 @@ end
 HeroWindowTalents._initialize_talents = function (self)
 	local career_name = self._career_name
 	local talent_interface = Managers.backend:get_interface("talents")
-	local current_talents = talent_interface.get_talents(talent_interface, career_name)
+	local current_talents = talent_interface:get_talents(career_name)
 	self._selected_talents = table.clone(current_talents)
 	self._talent_interface = talent_interface
 
-	self._update_talent_sync(self, true)
+	self:_update_talent_sync(true)
 
 	self._initialized = true
 end
@@ -112,12 +112,12 @@ HeroWindowTalents.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self._update_animations(self, dt)
-	self._handle_input(self, dt, t)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:_handle_input(dt, t)
+	self:draw(dt)
 end
 
 HeroWindowTalents.post_update = function (self, dt, t)
@@ -125,8 +125,8 @@ HeroWindowTalents.post_update = function (self, dt, t)
 end
 
 HeroWindowTalents._update_talent_sync = function (self, initialize)
-	self._populate_talents_by_hero(self, initialize)
-	self._populate_career_info(self, initialize)
+	self:_populate_talents_by_hero(initialize)
+	self:_populate_career_info(initialize)
 end
 
 HeroWindowTalents._update_animations = function (self, dt)
@@ -136,8 +136,8 @@ HeroWindowTalents._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -193,31 +193,31 @@ HeroWindowTalents._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local widgets_by_name = self._widgets_by_name
 
-	if self._is_button_hover_enter(self, widgets_by_name.career_perk_1) or self._is_button_hover_enter(self, widgets_by_name.career_perk_2) or self._is_button_hover_enter(self, widgets_by_name.career_perk_3) then
-		self._play_sound(self, "play_gui_equipment_button_hover")
+	if self:_is_button_hover_enter(widgets_by_name.career_perk_1) or self:_is_button_hover_enter(widgets_by_name.career_perk_2) or self:_is_button_hover_enter(widgets_by_name.career_perk_3) then
+		self:_play_sound("play_gui_equipment_button_hover")
 	end
 
-	if self._is_talent_hovered(self) then
-		self._play_sound(self, "play_gui_talents_selection_hover")
+	if self:_is_talent_hovered() then
+		self:_play_sound("play_gui_talents_selection_hover")
 	end
 
-	if self._is_disabled_talent_hovered(self) then
-		self._play_sound(self, "play_gui_talents_selection_hover_disabled")
+	if self:_is_disabled_talent_hovered() then
+		self:_play_sound("play_gui_talents_selection_hover_disabled")
 	end
 
-	local row, column = self._is_talent_pressed(self)
+	local row, column = self:_is_talent_pressed()
 
 	if row and column then
 		if self._selected_talents[row] == 0 then
-			self._play_sound(self, "play_gui_talent_unlock")
+			self:_play_sound("play_gui_talent_unlock")
 		else
-			self._play_sound(self, "play_gui_talents_selection_click")
+			self:_play_sound("play_gui_talents_selection_click")
 		end
 
 		self._selected_talents[row] = column
 
-		self._update_talent_sync(self)
-		parent.update_talent_sync(parent)
+		self:_update_talent_sync()
+		parent:update_talent_sync()
 	end
 end
 
@@ -294,7 +294,7 @@ HeroWindowTalents._get_text_height = function (self, ui_renderer, size, ui_style
 end
 
 HeroWindowTalents._populate_talents_by_hero = function (self, initialize)
-	self._clear_talents(self)
+	self:_clear_talents()
 
 	local widgets_by_name = self._widgets_by_name
 	local hero_name = self.hero_name
@@ -330,7 +330,7 @@ HeroWindowTalents._populate_talents_by_hero = function (self, initialize)
 		glow_frame_style.color[1] = 0
 
 		if initialize and row_unlocked and no_talent_selected then
-			local anim = self._animate_pulse(self, glow_frame_style.color, 1, 255, 100, 2)
+			local anim = self:_animate_pulse(glow_frame_style.color, 1, 255, 100, 2)
 
 			UIWidget.animate(widget, anim)
 		end

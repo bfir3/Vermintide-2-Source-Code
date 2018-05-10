@@ -49,7 +49,7 @@ AILocomotionExtension.init = function (self, extension_init_context, unit, exten
 	end
 
 	MoverHelper.set_active_mover(unit, self._mover_state, "mover")
-	self.set_movement_type(self, "snap_to_navmesh")
+	self:set_movement_type("snap_to_navmesh")
 end
 
 AILocomotionExtension.destroy = function (self)
@@ -103,10 +103,10 @@ AILocomotionExtension.teleport_to = function (self, position, rotation)
 	end
 
 	local network_manager = Managers.state.network
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 
 	if game then
-		local game_object_id = network_manager.unit_game_object_id(network_manager, unit)
+		local game_object_id = network_manager:unit_game_object_id(unit)
 		local has_teleported_value = GameSession.game_object_field(game, game_object_id, "has_teleported")
 		has_teleported_value = has_teleported_value % NetworkConstants.teleports.max + 1
 
@@ -127,11 +127,11 @@ AILocomotionExtension.set_animation_driven = function (self, is_animation_driven
 	local was_animation_driven_script_rot = old_func_name == ANIMATION_DRIVEN_SCRIPT_DRIVEN_ROTATION_FUNCTION_NAME
 	local was_script_driven = old_func_name == SCRIPT_DRIVEN_FUNCTION_NAME
 
-	self.set_affected_by_gravity(self, is_affected_by_gravity)
+	self:set_affected_by_gravity(is_affected_by_gravity)
 
 	local network_manager = Managers.state.network
 	local network_transmit = network_manager.network_transmit
-	local game_object_id = network_manager.game(network_manager) and network_manager.unit_game_object_id(network_manager, unit)
+	local game_object_id = network_manager:game() and network_manager:unit_game_object_id(unit)
 	local changed = false
 	local system_data = self._system_data
 
@@ -144,7 +144,7 @@ AILocomotionExtension.set_animation_driven = function (self, is_animation_driven
 			local position = Unit.local_position(unit, 0)
 			local rotation = Unit.local_rotation(unit, 0)
 
-			network_transmit.send_rpc_clients(network_transmit, "rpc_set_animation_driven_script_movement", game_object_id, position, rotation, is_affected_by_gravity)
+			network_transmit:send_rpc_clients("rpc_set_animation_driven_script_movement", game_object_id, position, rotation, is_affected_by_gravity)
 		end
 
 		changed = true
@@ -157,7 +157,7 @@ AILocomotionExtension.set_animation_driven = function (self, is_animation_driven
 			local position = Unit.local_position(unit, 0)
 			local rotation = Unit.local_rotation(unit, 0)
 
-			network_transmit.send_rpc_clients(network_transmit, "rpc_set_animation_driven", game_object_id, position, rotation, is_affected_by_gravity)
+			network_transmit:send_rpc_clients("rpc_set_animation_driven", game_object_id, position, rotation, is_affected_by_gravity)
 		end
 
 		changed = true
@@ -167,14 +167,14 @@ AILocomotionExtension.set_animation_driven = function (self, is_animation_driven
 		system_data.animation_and_script_update_units[unit] = nil
 
 		if game_object_id then
-			network_transmit.send_rpc_clients(network_transmit, "rpc_set_script_driven", game_object_id, is_affected_by_gravity)
+			network_transmit:send_rpc_clients("rpc_set_script_driven", game_object_id, is_affected_by_gravity)
 		end
 
 		changed = true
 	end
 
 	if game_object_id and not changed and was_affected_by_gravity ~= is_affected_by_gravity then
-		network_transmit.send_rpc_clients(network_transmit, "rpc_set_affected_by_gravity", game_object_id, is_affected_by_gravity)
+		network_transmit:send_rpc_clients("rpc_set_affected_by_gravity", game_object_id, is_affected_by_gravity)
 	end
 end
 

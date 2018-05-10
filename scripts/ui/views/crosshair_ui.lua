@@ -29,8 +29,8 @@ CrosshairUI.init = function (self, ingame_ui_context)
 	}
 	self.local_player = Managers.player:local_player()
 
-	self.create_ui_elements(self)
-	self.update_enabled_crosshair_styles(self)
+	self:create_ui_elements()
+	self:update_enabled_crosshair_styles()
 	rawset(_G, "crosshair_ui", self)
 end
 
@@ -69,12 +69,12 @@ end
 CrosshairUI.update = function (self, dt)
 	local player_unit = self.local_player.player_unit
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 
-	self.update_enabled_crosshair_styles(self)
-	self.update_crosshair_style(self, equipment)
-	self.update_hit_markers(self, dt)
-	self.update_spread(self, dt, equipment)
+	self:update_enabled_crosshair_styles()
+	self:update_crosshair_style(equipment)
+	self:update_hit_markers(dt)
+	self:update_spread(dt, equipment)
 end
 
 local crosshairs = {}
@@ -118,9 +118,9 @@ CrosshairUI.update_crosshair_style = function (self, equipment)
 	if Unit.alive(weapon_unit) then
 		local weapon_extension = ScriptUnit.extension(weapon_unit, "weapon_system")
 
-		if weapon_extension.has_current_action(weapon_extension) then
-			local action_settings = weapon_extension.get_current_action_settings(weapon_extension)
-			local current_action = weapon_extension.get_current_action(weapon_extension)
+		if weapon_extension:has_current_action() then
+			local action_settings = weapon_extension:get_current_action_settings()
+			local current_action = weapon_extension:get_current_action()
 
 			if current_action and current_action.crosshair_style then
 				crosshair_style = current_action.crosshair_style
@@ -167,18 +167,18 @@ CrosshairUI.update_hit_markers = function (self, dt)
 	if hit_marker_data.hit_enemy then
 		hit_marker_data.hit_enemy = nil
 
-		self.set_hit_marker_animation(self, hit_markers, hit_markers_n, hit_marker_animations, hit_marker_data)
+		self:set_hit_marker_animation(hit_markers, hit_markers_n, hit_marker_animations, hit_marker_data)
 	end
 
 	if hit_marker_animations[1] then
-		self.update_hit_marker_animation(self, hit_markers, hit_markers_n, hit_marker_animations, hit_marker_data, dt)
+		self:update_hit_marker_animation(hit_markers, hit_markers_n, hit_marker_animations, hit_marker_data, dt)
 	end
 end
 
 CrosshairUI.set_hit_marker_animation = function (self, hit_markers, hit_markers_n, hit_marker_animations, hit_marker_data)
 	for i = 1, hit_markers_n, 1 do
 		local hit_marker = hit_markers[i]
-		local additional_hit_icon = self.configure_hit_marker_color_and_size(self, hit_marker, hit_marker_data)
+		local additional_hit_icon = self:configure_hit_marker_color_and_size(hit_marker, hit_marker_data)
 		hit_marker_animations[i] = UIAnimation.init(UIAnimation.function_by_time, hit_marker.style.rotating_texture.color, 1, 255, 0, UISettings.crosshair.hit_marker_fade, math.easeInCubic)
 
 		if i == hit_markers_n and additional_hit_icon then
@@ -287,7 +287,7 @@ CrosshairUI.update_spread = function (self, dt, equipment)
 
 		if weapon_unit and ScriptUnit.has_extension(weapon_unit, "spread_system") then
 			local spread_extension = ScriptUnit.extension(weapon_unit, "spread_system")
-			pitch, yaw = spread_extension.get_current_pitch_and_yaw(spread_extension)
+			pitch, yaw = spread_extension:get_current_pitch_and_yaw()
 		end
 	end
 
@@ -298,7 +298,7 @@ CrosshairUI.update_spread = function (self, dt, equipment)
 	local pitch_offset = math.lerp(0, definitions.max_spread_pitch, pitch_percentage)
 	local yaw_offset = math.lerp(0, definitions.max_spread_yaw, yaw_percentage)
 
-	self.draw(self, dt, pitch_percentage, yaw_percentage)
+	self:draw(dt, pitch_percentage, yaw_percentage)
 end
 
 CrosshairUI.draw = function (self, dt, pitch_percentage, yaw_percentage)
@@ -344,7 +344,7 @@ CrosshairUI.draw_default_style_crosshair = function (self, ui_renderer, pitch_pe
 	yaw_percentage = math.max(0.0001, yaw_percentage)
 
 	for i = 1, num_points, 1 do
-		self._set_widget_point_offset(self, self.crosshair_line, i, num_points, pitch_percentage, yaw_percentage, start_degrees, pitch_offset, yaw_offset)
+		self:_set_widget_point_offset(self.crosshair_line, i, num_points, pitch_percentage, yaw_percentage, start_degrees, pitch_offset, yaw_offset)
 		UIRenderer.draw_widget(ui_renderer, self.crosshair_line)
 	end
 end
@@ -360,7 +360,7 @@ CrosshairUI.draw_arrows_style_crosshair = function (self, ui_renderer, pitch_per
 	yaw_percentage = math.max(0.0001, yaw_percentage)
 
 	for i = 1, num_points, 1 do
-		self._set_widget_point_offset(self, self.crosshair_arrow, i, num_points, pitch_percentage, yaw_percentage, start_degrees, pitch_offset, yaw_offset)
+		self:_set_widget_point_offset(self.crosshair_arrow, i, num_points, pitch_percentage, yaw_percentage, start_degrees, pitch_offset, yaw_offset)
 		UIRenderer.draw_widget(ui_renderer, self.crosshair_arrow)
 	end
 end
@@ -376,7 +376,7 @@ CrosshairUI.draw_shotgun_style_crosshair = function (self, ui_renderer, pitch_pe
 	yaw_percentage = math.max(0.0001, yaw_percentage)
 
 	for i = 1, num_points, 1 do
-		self._set_widget_point_offset(self, self.crosshair_shotgun, i, num_points, pitch_percentage, yaw_percentage, start_degrees, pitch_offset, yaw_offset)
+		self:_set_widget_point_offset(self.crosshair_shotgun, i, num_points, pitch_percentage, yaw_percentage, start_degrees, pitch_offset, yaw_offset)
 		UIRenderer.draw_widget(ui_renderer, self.crosshair_shotgun)
 	end
 end
@@ -393,7 +393,7 @@ CrosshairUI.draw_projectile_style_crosshair = function (self, ui_renderer, pitch
 	yaw_percentage = math.max(0.0001, yaw_percentage)
 
 	for i = 1, num_points, 1 do
-		self._set_widget_point_offset(self, self.crosshair_line, i, num_points, pitch_percentage, yaw_percentage, start_degrees, pitch_offset, yaw_offset)
+		self:_set_widget_point_offset(self.crosshair_line, i, num_points, pitch_percentage, yaw_percentage, start_degrees, pitch_offset, yaw_offset)
 		UIRenderer.draw_widget(ui_renderer, self.crosshair_line)
 	end
 end
@@ -407,7 +407,7 @@ CrosshairUI.draw_circle_style_crosshair = function (self, ui_renderer, pitch_per
 end
 
 CrosshairUI._set_widget_point_offset = function (self, widget, point_index, max_points, pitch_percentage, yaw_percentage, start_degrees, pitch_offset, yaw_offset)
-	local ptx, pty, angle = self._get_point_offset(self, point_index, max_points, pitch_percentage, yaw_percentage, start_degrees)
+	local ptx, pty, angle = self:_get_point_offset(point_index, max_points, pitch_percentage, yaw_percentage, start_degrees)
 	local widget_style = widget.style
 	local offset = widget_style.offset
 	local pivot = widget_style.pivot

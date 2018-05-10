@@ -50,7 +50,7 @@ BTBotTeleportToAllyAction.run = function (self, unit, blackboard, t, dt)
 			local destination = GwNavAStar.node_at_index(a_star, node_count)
 			local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-			locomotion_extension.teleport_to(locomotion_extension, destination)
+			locomotion_extension:teleport_to(destination)
 
 			tp_bb.state = "done"
 			blackboard.has_teleported = true

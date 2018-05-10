@@ -28,7 +28,7 @@ AreaDamageSystem.init = function (self, entity_system_creation_context, system_n
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.liquid_extensions = {}
 	self.liquid_extension_indexes = {}
@@ -89,10 +89,10 @@ AreaDamageSystem.create_explosion = function (self, attacker_unit, position, rot
 	DamageUtils.create_explosion(self.world, attacker_unit, position, rotation, explosion_template, scale, damage_source, self.is_server, is_husk, attacker_unit, attacker_power_level)
 
 	local network_manager = Managers.state.network
-	local attacker_unit_id, attacker_is_level_unit = network_manager.game_object_or_level_id(network_manager, attacker_unit)
+	local attacker_unit_id, attacker_is_level_unit = network_manager:game_object_or_level_id(attacker_unit)
 	local explosion_template_id = NetworkLookup.explosion_templates[explosion_template_name]
 	local damage_source_id = NetworkLookup.damage_sources[damage_source]
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 
 	if game then
 		if self.is_server then
@@ -108,7 +108,7 @@ AreaDamageSystem.enable_area_damage = function (self, unit, enable)
 
 	local area_damage_extension = ScriptUnit.extension(unit, "area_damage_system")
 
-	area_damage_extension.enable(area_damage_extension, enable)
+	area_damage_extension:enable(enable)
 
 	local level_index = Managers.state.network:level_object_id(unit)
 
@@ -122,7 +122,7 @@ AreaDamageSystem.is_position_in_liquid = function (self, position, nav_cost_map_
 
 	for i = 1, num_liquid_extensions, 1 do
 		local extension = liquid_extensions[i]
-		result = extension.is_position_inside(extension, position, nav_cost_map_table)
+		result = extension:is_position_inside(position, nav_cost_map_table)
 
 		if result then
 			break
@@ -137,7 +137,7 @@ AreaDamageSystem.rpc_area_damage = function (self, sender, go_id, position)
 	local area_damage_system = ScriptUnit.extension(unit, "area_damage_system")
 
 	if area_damage_system then
-		area_damage_system.start(area_damage_system)
+		area_damage_system:start()
 	end
 end
 
@@ -166,7 +166,7 @@ AreaDamageSystem.rpc_enable_area_damage = function (self, sender, level_index, e
 	local unit = Managers.state.network:game_object_or_level_unit(level_index, true)
 	local area_damage_extension = ScriptUnit.extension(unit, "area_damage_system")
 
-	area_damage_extension.enable(area_damage_extension, enable)
+	area_damage_extension:enable(enable)
 end
 
 AreaDamageSystem.rpc_create_liquid_damage_area = function (self, sender, source_unit_go_id, position, flow_direction, liquid_template_id)
@@ -185,7 +185,7 @@ AreaDamageSystem.rpc_create_liquid_damage_area = function (self, sender, source_
 	local liquid_aoe_unit = Managers.state.unit_spawner:spawn_network_unit(aoe_unit_name, "liquid_aoe_unit", extension_init_data, position)
 	local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 
-	liquid_area_damage_extension.ready(liquid_area_damage_extension)
+	liquid_area_damage_extension:ready()
 end
 
 AreaDamageSystem.rpc_add_liquid_damage_blob = function (self, sender, liquid_unit_id, blob_id, position, is_filled)
@@ -194,7 +194,7 @@ AreaDamageSystem.rpc_add_liquid_damage_blob = function (self, sender, liquid_uni
 	if unit then
 		local liquid_area_damage_extension = ScriptUnit.extension(unit, "area_damage_system")
 
-		liquid_area_damage_extension.add_damage_blob(liquid_area_damage_extension, blob_id, position, is_filled)
+		liquid_area_damage_extension:add_damage_blob(blob_id, position, is_filled)
 	end
 end
 
@@ -209,11 +209,11 @@ AreaDamageSystem.rpc_update_liquid_damage_blob = function (self, sender, liquid_
 	local state = NetworkLookup.liquid_damage_blob_states[state]
 
 	if state == "filled" then
-		liquid_area_damage_extension.set_damage_blob_filled(liquid_area_damage_extension, blob_id)
+		liquid_area_damage_extension:set_damage_blob_filled(blob_id)
 	elseif state == "remove" then
-		liquid_area_damage_extension.remove_damage_blob(liquid_area_damage_extension, blob_id)
+		liquid_area_damage_extension:remove_damage_blob(blob_id)
 	elseif state == "destroy" then
-		liquid_area_damage_extension.destroy(liquid_area_damage_extension, blob_id)
+		liquid_area_damage_extension:destroy(blob_id)
 	end
 end
 
@@ -228,13 +228,13 @@ AreaDamageSystem.rpc_damage_wave_set_state = function (self, sender, unit_id, st
 	local state = NetworkLookup.damage_wave_states[state]
 
 	if state == "impact" then
-		damage_wave_extension.on_wavefront_impact(damage_wave_extension, unit)
+		damage_wave_extension:on_wavefront_impact(unit)
 	elseif state == "running" then
-		damage_wave_extension.set_running_wave(damage_wave_extension, unit)
+		damage_wave_extension:set_running_wave(unit)
 	elseif state == "arrived" then
-		damage_wave_extension.set_wave_arrived(damage_wave_extension, unit)
+		damage_wave_extension:set_wave_arrived(unit)
 	elseif state == "hide" then
-		damage_wave_extension.hide_wave(damage_wave_extension, unit)
+		damage_wave_extension:hide_wave(unit)
 	end
 end
 
@@ -253,7 +253,7 @@ AreaDamageSystem.rpc_create_damage_wave = function (self, sender, source_unit_go
 	local damage_wave_unit = Managers.state.unit_spawner:spawn_network_unit(unit_name, "damage_wave_unit", extension_init_data, position)
 	local damage_wave_extension = ScriptUnit.extension(damage_wave_unit, "area_damage_system")
 
-	damage_wave_extension.launch_wave(damage_wave_extension, nil, optional_target_position)
+	damage_wave_extension:launch_wave(nil, optional_target_position)
 end
 
 AreaDamageSystem.rpc_add_damage_wave_fx = function (self, sender, damage_wave_unit_id, position)
@@ -262,7 +262,7 @@ AreaDamageSystem.rpc_add_damage_wave_fx = function (self, sender, damage_wave_un
 	if unit then
 		local damage_wave_extension = ScriptUnit.extension(unit, "area_damage_system")
 
-		damage_wave_extension.add_damage_wave_fx(damage_wave_extension, position)
+		damage_wave_extension:add_damage_wave_fx(position)
 	end
 end
 
@@ -272,7 +272,7 @@ AreaDamageSystem.rpc_add_damage_blob_fx = function (self, sender, damage_blob_un
 	if unit then
 		local damage_blob_extension = ScriptUnit.extension(unit, "area_damage_system")
 
-		damage_blob_extension.add_damage_blob_fx(damage_blob_extension, position, life_time_percentage)
+		damage_blob_extension:add_damage_blob_fx(position, life_time_percentage)
 	end
 end
 
@@ -282,7 +282,7 @@ AreaDamageSystem.rpc_abort_damage_blob = function (self, sender, damage_blob_uni
 	if unit then
 		local damage_blob_extension = ScriptUnit.extension(unit, "area_damage_system")
 
-		damage_blob_extension.abort(damage_blob_extension)
+		damage_blob_extension:abort()
 	end
 end
 

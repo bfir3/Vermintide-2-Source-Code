@@ -64,7 +64,7 @@ ActionHammerLeap.update_is_finished = function (self, dt, t, world, reason)
 		local direction = Quaternion.rotate(Quaternion.axis_angle(Vector3.cross(target_vector_flat, Vector3.up()), angle), target_vector_flat)
 		local velocity = direction * speed
 
-		status_extension.set_hammer_leaping(status_extension, true, velocity)
+		status_extension:set_hammer_leaping(true, velocity)
 
 		self.started_hammer_leap = true
 	end
@@ -98,7 +98,7 @@ ActionHammerLeap.landing_overlap_callback = function (self, actors)
 	local num_actors = #actors
 	local network_manager = Managers.state.network
 	local owner_unit = self.owner_unit
-	local attacker_unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+	local attacker_unit_id = network_manager:unit_game_object_id(owner_unit)
 
 	for i = 1, num_actors, 1 do
 		local hit_actor = actors[i]
@@ -111,13 +111,13 @@ ActionHammerLeap.landing_overlap_callback = function (self, actors)
 			local hit_zone = breed.hit_zones_lookup[node]
 			local hit_zone_name = hit_zone.name
 			local attack_direction = Vector3.normalize(Unit.world_position(hit_unit, 0) - POSITION_LOOKUP[owner_unit])
-			local hit_unit_id = network_manager.unit_game_object_id(network_manager, hit_unit)
+			local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
 			local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
 			local attack_template_id = 2
 			local damage_source_id = NetworkLookup.damage_sources[self.item_name]
 			local weapon_system = Managers.state.entity:system("weapon_system")
 
-			weapon_system.send_rpc_attack_hit(weapon_system, damage_source_id, attacker_unit_id, hit_unit_id, attack_template_id, hit_zone_id, attack_direction)
+			weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, attack_template_id, hit_zone_id, attack_direction)
 		end
 	end
 

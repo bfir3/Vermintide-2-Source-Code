@@ -20,13 +20,13 @@ HeroWindowInventory.on_enter = function (self, params, offset)
 		snap_pixel_positions = true
 	}
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self._animations = {}
 
-	self.create_ui_elements(self, params, offset)
+	self:create_ui_elements(params, offset)
 
 	self.hero_name = params.hero_name
 	self.career_index = params.career_index
@@ -34,10 +34,10 @@ HeroWindowInventory.on_enter = function (self, params, offset)
 	local item_grid = ItemGridUI:new(crafting_recipes, self._widgets_by_name.item_grid, self.hero_name, self.career_index)
 	self._item_grid = item_grid
 
-	item_grid.mark_equipped_items(item_grid, true)
-	item_grid.mark_locked_items(item_grid, true)
-	item_grid.disable_locked_items(item_grid, true)
-	item_grid.disable_item_drag(item_grid)
+	item_grid:mark_equipped_items(true)
+	item_grid:mark_locked_items(true)
+	item_grid:disable_locked_items(true)
+	item_grid:disable_item_drag()
 
 	local inventory_sync_id = self.parent.inventory_sync_id
 	self._inventory_sync_id = inventory_sync_id
@@ -83,16 +83,16 @@ HeroWindowInventory.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	self._item_grid:update(dt, t)
-	self._update_animations(self, dt)
-	self._handle_input(self, dt, t)
-	self._update_inventory_items(self)
-	self._update_disabled_backend_ids(self)
-	self._update_page_info(self)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:_handle_input(dt, t)
+	self:_update_inventory_items()
+	self:_update_disabled_backend_ids()
+	self:_update_page_info()
+	self:draw(dt)
 end
 
 HeroWindowInventory.post_update = function (self, dt, t)
@@ -106,8 +106,8 @@ HeroWindowInventory._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -141,19 +141,19 @@ HeroWindowInventory._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local item_grid = self._item_grid
 	local allow_single_press = false
-	local item_pressed = item_grid.is_item_pressed(item_grid, allow_single_press)
-	local item_dragged = item_grid.is_item_dragged(item_grid)
+	local item_pressed = item_grid:is_item_pressed(allow_single_press)
+	local item_dragged = item_grid:is_item_dragged()
 	local item = item_pressed or item_dragged
 
-	if item_grid.is_item_hovered(item_grid) then
-		self._play_sound(self, "play_gui_inventory_item_hover")
+	if item_grid:is_item_hovered() then
+		self:_play_sound("play_gui_inventory_item_hover")
 	end
 
 	for i = 1, 6, 1 do
 		local widget = widgets_by_name["material_text_" .. i]
 
-		if self._is_button_hovered(self, widget) then
-			self._play_sound(self, "play_gui_equipment_button_hover")
+		if self:_is_button_hovered(widget) then
+			self:_play_sound("play_gui_equipment_button_hover")
 		end
 	end
 
@@ -162,10 +162,10 @@ HeroWindowInventory._handle_input = function (self, dt, t)
 		self._pressed_backend_id = backend_id
 		local is_drag_item = item_dragged ~= nil
 
-		parent.set_pressed_item_backend_id(parent, backend_id, is_drag_item)
+		parent:set_pressed_item_backend_id(backend_id, is_drag_item)
 	elseif self._pressed_backend_id then
-		if parent.get_pressed_item_backend_id(parent) == self._pressed_backend_id then
-			parent.set_pressed_item_backend_id(parent, nil)
+		if parent:get_pressed_item_backend_id() == self._pressed_backend_id then
+			parent:set_pressed_item_backend_id(nil)
 		end
 
 		self._pressed_backend_id = nil
@@ -177,20 +177,20 @@ HeroWindowInventory._handle_input = function (self, dt, t)
 	UIWidgetUtils.animate_default_button(page_button_next, dt)
 	UIWidgetUtils.animate_default_button(page_button_previous, dt)
 
-	if self._is_button_hovered(self, page_button_next) or self._is_button_hovered(self, page_button_previous) then
-		self._play_sound(self, "play_gui_inventory_next_hover")
+	if self:_is_button_hovered(page_button_next) or self:_is_button_hovered(page_button_previous) then
+		self:_play_sound("play_gui_inventory_next_hover")
 	end
 
-	if self._is_button_pressed(self, page_button_next) then
+	if self:_is_button_pressed(page_button_next) then
 		local next_page_index = self._current_page + 1
 
-		item_grid.set_item_page(item_grid, next_page_index)
-		self._play_sound(self, "play_gui_craft_inventory_next_click")
-	elseif self._is_button_pressed(self, page_button_previous) then
+		item_grid:set_item_page(next_page_index)
+		self:_play_sound("play_gui_craft_inventory_next_click")
+	elseif self:_is_button_pressed(page_button_previous) then
 		local next_page_index = self._current_page - 1
 
-		item_grid.set_item_page(item_grid, next_page_index)
-		self._play_sound(self, "play_gui_craft_inventory_next_click")
+		item_grid:set_item_page(next_page_index)
+		self:_play_sound("play_gui_craft_inventory_next_click")
 	end
 end
 
@@ -220,10 +220,10 @@ HeroWindowInventory._update_crafting_material_panel = function (self)
 	for index, item_key in ipairs(material_order) do
 		local texture = material_textures[item_key]
 		local item_filter = "item_key == " .. item_key
-		local items = backend_items.get_filtered_items(backend_items, item_filter)
+		local items = backend_items:get_filtered_items(item_filter)
 		local item = items and items[1]
 		local backend_id = item and item.backend_id
-		local amount = (backend_id and backend_items.get_item_amount(backend_items, backend_id)) or 0
+		local amount = (backend_id and backend_items:get_item_amount(backend_id)) or 0
 		local widget = widgets_by_name["material_text_" .. index]
 		local content = widget.content
 		local amount_text = nil
@@ -249,23 +249,23 @@ HeroWindowInventory._update_inventory_items = function (self)
 	local item_grid = self._item_grid
 	local parent = self.parent
 	local inventory_sync_id = parent.inventory_sync_id
-	local selected_craft_page_name = parent.get_selected_craft_page(parent)
-	local optional_craft_item_filter = parent.get_craft_optional_item_filter(parent)
+	local selected_craft_page_name = parent:get_selected_craft_page()
+	local optional_craft_item_filter = parent:get_craft_optional_item_filter()
 
 	if inventory_sync_id ~= self._inventory_sync_id or selected_craft_page_name ~= self._selected_craft_page_name or self._optional_craft_item_filter ~= optional_craft_item_filter then
 		if selected_craft_page_name ~= self._selected_craft_page_name then
-			self._change_category_by_name(self, selected_craft_page_name)
+			self:_change_category_by_name(selected_craft_page_name)
 		elseif optional_craft_item_filter then
-			self.change_item_filter(self, optional_craft_item_filter, true)
+			self:change_item_filter(optional_craft_item_filter, true)
 		else
-			self._change_category_by_index(self, nil, true)
+			self:_change_category_by_index(nil, true)
 		end
 
 		self._inventory_sync_id = inventory_sync_id
 		self._selected_craft_page_name = selected_craft_page_name
 		self._optional_craft_item_filter = optional_craft_item_filter
 
-		self._update_crafting_material_panel(self)
+		self:_update_crafting_material_panel()
 	end
 end
 
@@ -277,15 +277,15 @@ HeroWindowInventory._update_disabled_backend_ids = function (self)
 	if disabled_backend_ids_sync_id ~= self._disabled_backend_ids_sync_id then
 		self._disabled_backend_ids_sync_id = disabled_backend_ids_sync_id
 
-		item_grid.clear_locked_items(item_grid)
+		item_grid:clear_locked_items()
 
 		local disabled_backend_ids = self.parent:get_disabled_backend_ids()
 
 		for backend_id, _ in pairs(disabled_backend_ids) do
-			item_grid.lock_item_by_id(item_grid, backend_id, true)
+			item_grid:lock_item_by_id(backend_id, true)
 		end
 
-		item_grid.update_items_status(item_grid)
+		item_grid:update_items_status()
 	end
 end
 
@@ -316,7 +316,7 @@ end
 HeroWindowInventory._change_category_by_name = function (self, name)
 	for i, recipe in ipairs(crafting_recipes) do
 		if recipe.name == name then
-			self._change_category_by_index(self, i)
+			self:_change_category_by_index(i)
 
 			break
 		end

@@ -239,8 +239,8 @@ MainPathUtils.resolve_node_in_door = function (nav_world, node_position, door_un
 	end
 
 	local nav_graph_system = Managers.state.entity:system("nav_graph_system")
-	local smart_object_id = nav_graph_system.get_smart_object_id(nav_graph_system, door_unit)
-	local smart_object_unit_data = nav_graph_system.get_smart_objects(nav_graph_system, smart_object_id)
+	local smart_object_id = nav_graph_system:get_smart_object_id(door_unit)
+	local smart_object_unit_data = nav_graph_system:get_smart_objects(smart_object_id)
 
 	for _, smart_object_data in pairs(smart_object_unit_data) do
 		local entrance_position = Vector3Aux.unbox(smart_object_data.pos1)
@@ -297,7 +297,7 @@ MainPathUtils.node_list_from_main_paths = function (nav_world, main_paths, max_n
 				local next_node = path_nodes[j + 1]
 
 				if next_node then
-					local segment = next_node.unbox(next_node) - node.unbox(node)
+					local segment = next_node:unbox() - node:unbox()
 					local segment_length = Vector3.length(segment)
 
 					if max_node_distance < segment_length then
@@ -305,8 +305,8 @@ MainPathUtils.node_list_from_main_paths = function (nav_world, main_paths, max_n
 						local num_insert_nodes = math.floor(segment_length / max_node_distance)
 
 						for k = 1, num_insert_nodes, 1 do
-							local wanted_node_position = node.unbox(node) + segment_direction * k * max_node_distance
-							local num_doors = door_system.get_doors(door_system, wanted_node_position, DOOR_SEARCH_RADIUS, door_broadphase_query_result)
+							local wanted_node_position = node:unbox() + segment_direction * k * max_node_distance
+							local num_doors = door_system:get_doors(wanted_node_position, DOOR_SEARCH_RADIUS, door_broadphase_query_result)
 
 							if 0 < num_doors then
 								local door_unit = door_broadphase_query_result[1]
@@ -391,8 +391,8 @@ MainPathUtils.ray_along_node_list = function (nav_world, node_list, start_node_i
 		end
 
 		local from_node = node_list[i]
-		local from_position = from_node.unbox(from_node)
-		local to_position = to_node.unbox(to_node)
+		local from_position = from_node:unbox()
+		local to_position = to_node:unbox()
 		local success, hit_position = GwNavQueries.raycast(nav_world, from_position, to_position)
 
 		if success then
@@ -428,7 +428,7 @@ MainPathUtils.find_equidistant_points_in_node_list = function (node_list, start_
 		end
 
 		local segment_start = node_list[node_index]:unbox()
-		local segment_end = to_node.unbox(to_node)
+		local segment_end = to_node:unbox()
 		local segment = segment_end - segment_start
 		local segment_length = Vector3.length(segment)
 		local segment_direction = Vector3.normalize(segment)

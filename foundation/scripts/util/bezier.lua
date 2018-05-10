@@ -23,12 +23,12 @@ Bezier.draw = function (segments, script_drawer, tangent_scale, color, p1, c1, c
 		t = segment_increment * segment
 		local point_b = Bezier.calc_point(t, p1, c1, c2, p2)
 
-		script_drawer.line(script_drawer, point_a, point_b, color)
+		script_drawer:line(point_a, point_b, color)
 
 		if tangent_scale then
 			local tangent = Bezier.calc_tangent(t, p1, c1, c2, p2)
 
-			script_drawer.vector(script_drawer, point_b, tangent * tangent_scale, color)
+			script_drawer:vector(point_b, tangent * tangent_scale, color)
 		end
 
 		point_a = point_b

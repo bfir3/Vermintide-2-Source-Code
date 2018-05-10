@@ -14,17 +14,17 @@ TwitchView.init = function (self, ingame_ui_context)
 	self._network_server = ingame_ui_context.network_server
 	local input_manager = ingame_ui_context.input_manager
 
-	input_manager.create_input_service(input_manager, "twitch_view", "TwitchControllerSettings", "TwitchControllerFilters")
-	input_manager.map_device_to_service(input_manager, "twitch_view", "keyboard")
-	input_manager.map_device_to_service(input_manager, "twitch_view", "mouse")
-	input_manager.map_device_to_service(input_manager, "twitch_view", "gamepad")
+	input_manager:create_input_service("twitch_view", "TwitchControllerSettings", "TwitchControllerFilters")
+	input_manager:map_device_to_service("twitch_view", "keyboard")
+	input_manager:map_device_to_service("twitch_view", "mouse")
+	input_manager:map_device_to_service("twitch_view", "gamepad")
 
 	self._input_manager = input_manager
 	local world_manager = ingame_ui_context.world_manager
-	local world = world_manager.world(world_manager, "level_world")
+	local world = world_manager:world("level_world")
 	self._wwise_world = Managers.world:wwise_world(world)
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 end
 
 TwitchView._create_ui_elements = function (self)
@@ -52,7 +52,7 @@ end
 
 TwitchView.on_enter = function (self)
 	ShowCursorStack.push()
-	self.set_active(self, true)
+	self:set_active(true)
 end
 
 local DO_RELOAD = true
@@ -61,7 +61,7 @@ TwitchView.update = function (self, dt, t, is_sub_menu)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 	end
 
 	if self._suspended or not self._active then
@@ -70,9 +70,9 @@ TwitchView.update = function (self, dt, t, is_sub_menu)
 
 	script_data.twitch_view = self
 
-	self._draw(self, dt, t)
-	self._update_input(self, dt, t)
-	self._update_error(self, dt, t)
+	self:_draw(dt, t)
+	self:_update_input(dt, t)
+	self:_update_error(dt, t)
 end
 
 TwitchView.cb_on_message_received = function (self, key, message_type, user_name, message, parameter)
@@ -103,11 +103,11 @@ TwitchView._update_input = function (self, dt, t)
 	local frame_widget_content = frame_widget.content
 	local input_service = self._input_manager:get_service("twitch_view")
 
-	if input_service.get(input_service, "back", true) then
+	if input_service:get("back", true) then
 		if frame_widget_content.text_field_active then
 			frame_widget_content.text_field_active = false
 		else
-			self.set_active(self, false)
+			self:set_active(false)
 
 			return
 		end
@@ -132,7 +132,7 @@ TwitchView._update_input = function (self, dt, t)
 			frame_widget_content.text_field_active = true
 		elseif screen_hotspot.on_pressed or is_connected then
 			if screen_hotspot.on_pressed and not frame_widget_content.text_field_active and not frame_hotspot.on_pressed then
-				self.set_active(self, false)
+				self:set_active(false)
 
 				return
 			end
@@ -144,7 +144,7 @@ TwitchView._update_input = function (self, dt, t)
 			local keystrokes = Keyboard.keystrokes()
 			frame_widget_content.twitch_name, frame_widget_content.caret_index = KeystrokeHelper.parse_strokes(frame_widget_content.twitch_name, frame_widget_content.caret_index, "insert", keystrokes)
 
-			if input_service.get(input_service, "execute_login") then
+			if input_service:get("execute_login") then
 				frame_widget_content.text_field_active = false
 				local user_name = string.gsub(frame_widget_content.twitch_name, " ", "")
 
@@ -156,7 +156,7 @@ TwitchView._update_input = function (self, dt, t)
 		local close_widget_content = close_widget.content
 
 		if close_widget_content.button_hotspot.on_pressed then
-			self.set_active(self, false)
+			self:set_active(false)
 
 			return
 		end
@@ -274,7 +274,7 @@ end
 
 TwitchView.on_exit = function (self)
 	ShowCursorStack.pop()
-	self.set_active(self, false)
+	self:set_active(false)
 end
 
 TwitchView.destroy = function (self)

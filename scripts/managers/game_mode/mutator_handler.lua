@@ -22,14 +22,14 @@ MutatorHandler.init = function (self, mutators, is_server, has_local_client)
 	self._is_server = is_server
 	self._has_local_client = has_local_client
 
-	self._activate_mutators(self, mutators)
+	self:_activate_mutators(mutators)
 end
 
 MutatorHandler.destroy = function (self)
 	local active_mutators = self._active_mutators
 
 	for name, mutator_data in pairs(active_mutators) do
-		self._deactivate_mutator(self, name, active_mutators, self._mutator_context)
+		self:_deactivate_mutator(name, active_mutators, self._mutator_context)
 	end
 
 	self._active_mutators = nil
@@ -81,7 +81,7 @@ MutatorHandler._activate_mutators = function (self, mutators)
 	local active_mutators = self._active_mutators
 
 	for i, name in ipairs(mutators) do
-		self._activate_mutator(self, name, active_mutators, mutator_context)
+		self:_activate_mutator(name, active_mutators, mutator_context)
 	end
 end
 

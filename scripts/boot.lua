@@ -97,7 +97,7 @@ Boot.setup = function (self)
 	end
 
 	print(Application.sysinfo())
-	self._init_localizer(self)
+	self:_init_localizer()
 
 	Boot.startup_packages = {
 		"resource_packages/boot_assets",
@@ -291,7 +291,7 @@ Boot.booting_update = function (self, dt)
 
 		local require_start = os.clock()
 
-		self._require_scripts(self)
+		self:_require_scripts()
 
 		local require_end = os.clock()
 		local frame_table_start = os.clock()
@@ -301,7 +301,7 @@ Boot.booting_update = function (self, dt)
 		local frame_table_end = os.clock()
 		local managers_start = os.clock()
 
-		self._init_managers(self)
+		self:_init_managers()
 
 		local managers_end = os.clock()
 		local project_setup_start = os.clock()
@@ -309,7 +309,7 @@ Boot.booting_update = function (self, dt)
 		local project_setup_end = os.clock()
 		local state_machine_start = os.clock()
 
-		self._setup_statemachine(self, start_state, params)
+		self:_setup_statemachine(start_state, params)
 
 		local state_machine_end = os.clock()
 		local script_init_end_time = os.clock()
@@ -438,8 +438,8 @@ ReplayBoot.init = function (self)
 
 		local package = Application.resource_package(name)
 
-		package.load(package)
-		package.flush(package)
+		package:load()
+		package:flush()
 		table.insert(self._packages, package)
 	end
 
@@ -474,7 +474,7 @@ ReplayBoot.shutdown = function (self)
 	Application.release_world(self._world)
 
 	for _, package in ipairs(self._packages) do
-		package.unload(package)
+		package:unload()
 		Application.release_resource_package(package)
 	end
 end
@@ -633,7 +633,7 @@ Bulldozer.setup = function (self)
 	end
 
 	profile(p, "handle rev info")
-	self._handle_revision_info(self)
+	self:_handle_revision_info()
 	profile(p, "handle rev info")
 	profile(p, "dlc")
 
@@ -654,11 +654,11 @@ Bulldozer.setup = function (self)
 
 	profile(p, "dlc")
 	profile(p, "require")
-	self._require_scripts(self)
+	self:_require_scripts()
 	profile(p, "require")
 
 	if script_data.honduras_demo then
-		self._demo_setup(self)
+		self:_demo_setup()
 	end
 
 	local user_settings_time = nil
@@ -668,7 +668,7 @@ Bulldozer.setup = function (self)
 
 		if not non_rendering_dedicated_server then
 			profile(p, "handle gfx quality")
-			self._handle_win32_graphics_quality(self)
+			self:_handle_win32_graphics_quality()
 			profile(p, "handle gfx quality")
 		end
 
@@ -680,9 +680,9 @@ Bulldozer.setup = function (self)
 		DefaultUserSettings.set_default_user_settings()
 		profile(p, "default settings")
 		profile(p, "user settings")
-		self._load_win32_user_settings(self)
+		self:_load_win32_user_settings()
 		profile(p, "user settings")
-		self._init_mouse(self)
+		self:_init_mouse()
 
 		if is_dev_debug then
 			Window.set_resizable(true)
@@ -695,7 +695,7 @@ Bulldozer.setup = function (self)
 		profile(p, "default settings")
 
 		if PLATFORM == "ps4" then
-			self._set_ps4_content_restrictions(self)
+			self:_set_ps4_content_restrictions()
 		end
 	end
 
@@ -724,7 +724,7 @@ Bulldozer.setup = function (self)
 	end
 
 	profile(p, "init random")
-	self._init_random(self)
+	self:_init_random()
 	profile(p, "init random")
 
 	if PLATFORM == "win32" and rawget(_G, "Steam") then
@@ -736,7 +736,7 @@ Bulldozer.setup = function (self)
 	end
 
 	profile(p, "managers")
-	self._init_managers(self)
+	self:_init_managers()
 	profile(p, "managers")
 	profile_end(p)
 end
@@ -1085,10 +1085,10 @@ Bulldozer._handle_revision_info = function (self)
 						break
 					end
 
-					local find_start, find_end = svn_info_line.find(svn_info_line, "Revision: ")
+					local find_start, find_end = svn_info_line:find("Revision: ")
 
 					if find_start and find_end then
-						local svn_revision = svn_info_line.sub(svn_info_line, find_end + 1)
+						local svn_revision = svn_info_line:sub(find_end + 1)
 						script_data.settings.content_revision = svn_revision
 
 						break
@@ -1295,7 +1295,7 @@ Bulldozer._init_mouse = function (self)
 end
 
 Bulldozer._init_managers = function (self)
-	self._init_localization_manager(self)
+	self:_init_localization_manager()
 	require("scripts/ui/views/ingame_ui")
 	require("scripts/ui/views/level_end/level_end_view")
 	require("scripts/ui/views/title_loading_ui")
@@ -1305,9 +1305,9 @@ Bulldozer._init_managers = function (self)
 	Managers.save = SaveManager:new(script_data.settings.disable_cloud_save)
 
 	if PLATFORM == "xb1" then
-		self._init_backend_xbox(self)
+		self:_init_backend_xbox()
 	else
-		self._init_backend(self)
+		self:_init_backend()
 	end
 
 	Managers.admin = AdminManager:new()
@@ -1413,7 +1413,7 @@ Bulldozer._init_localization_manager = function (self)
 
 		fassert(input_service, "[key_parser] No input service with the name %s", input_service_name)
 
-		local key = input_service.get_keymapping(input_service, key_name)
+		local key = input_service:get_keymapping(key_name)
 
 		fassert(key, "[key_parser] There is no such key: %s in input service: %s", key_name, input_service_name)
 

@@ -131,7 +131,7 @@ BTBotSmoketestTeleportToNextMainpathSegmentAction.run = function (self, unit, bl
 			local destination = GwNavAStar.node_at_index(a_star, node_count)
 			local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-			locomotion_extension.teleport_to(locomotion_extension, destination)
+			locomotion_extension:teleport_to(destination)
 
 			tp_bb.state = "done"
 			blackboard.has_teleported = true
@@ -202,7 +202,7 @@ Mods.hook.set(mod_name, SmoketestManager, "update", function (func, self, dt)
 	end
 
 	local level_transition_handler = game_mode_manager.level_transition_handler
-	local packages_loaded = level_transition_handler.all_packages_loaded(level_transition_handler)
+	local packages_loaded = level_transition_handler:all_packages_loaded()
 
 	if not packages_loaded then
 		func(self, dt)
@@ -374,7 +374,7 @@ function smoketest_change_items()
 			local career_melee_weapon_slots = {}
 			local career_ranged_weapon_slots = {}
 			local backend_items_interface = Managers.backend:get_interface("items")
-			local backend_items = backend_items_interface.get_all_backend_items(backend_items_interface)
+			local backend_items = backend_items_interface:get_all_backend_items()
 
 			for _, item in pairs(backend_items) do
 				local item_key = item.key
@@ -400,8 +400,8 @@ function smoketest_change_items()
 
 			print(career_melee_weapon, career_ranged_weapon)
 			print(career_melee_weapon.key, career_ranged_weapon.key)
-			backend_items_interface.set_loadout_item(backend_items_interface, career_melee_weapon.backend_id, career, "slot_melee")
-			backend_items_interface.set_loadout_item(backend_items_interface, career_ranged_weapon.backend_id, career, "slot_ranged")
+			backend_items_interface:set_loadout_item(career_melee_weapon.backend_id, career, "slot_melee")
+			backend_items_interface:set_loadout_item(career_ranged_weapon.backend_id, career, "slot_ranged")
 			print(career)
 			print("-------------")
 		end
@@ -424,7 +424,7 @@ function smoketest_get_items(chosen_slot)
 	local items_hack_string = ""
 	local player_career = ScriptUnit.extension(Managers.player:local_player().player_unit, "career_system")._career_name
 	local backend_items_interface = Managers.backend:get_interface("items")
-	local backend_items = backend_items_interface.get_all_backend_items(backend_items_interface)
+	local backend_items = backend_items_interface:get_all_backend_items()
 
 	for id, item in pairs(backend_items) do
 		local item_key = item.key
@@ -443,18 +443,18 @@ function smoketest_give_hero_all_weapons()
 	local item_master_list = ItemMasterList
 	local item_interface = Managers.backend:get_interface("items")
 	local player_manager = Managers.player
-	local player = player_manager.local_player(player_manager, 1)
-	local profile_index = player.profile_index(player)
+	local player = player_manager:local_player(1)
+	local profile_index = player:profile_index()
 	local profile_settings = SPProfiles[profile_index]
 	local profile_name = profile_settings.display_name
-	local career_index = hero_attributes.get(hero_attributes, profile_name, "career")
+	local career_index = hero_attributes:get(profile_name, "career")
 	local specializations = profile_settings.specializations
 	local career_settings = specializations[career_index]
 	local name = career_settings.name
 
 	for key, item in pairs(item_master_list) do
-		if (item.slot_type == "melee" or item.slot_type == "ranged") and table.contains(item.can_wield, name) and not item_interface.has_item(item_interface, key) then
-			item_interface.award_item(item_interface, key)
+		if (item.slot_type == "melee" or item.slot_type == "ranged") and table.contains(item.can_wield, name) and not item_interface:has_item(key) then
+			item_interface:award_item(key)
 		end
 	end
 end

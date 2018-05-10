@@ -87,9 +87,9 @@ ScriptBackendPlayFab.login_request_cb = function (self, result)
 		local read_only_data = info_result_payload.UserReadOnlyData
 
 		if result.NewlyCreated or not read_only_data.account_set_up then
-			self._set_up_initial_account(self)
+			self:_set_up_initial_account()
 		elseif not read_only_data.account_data_set_up then
-			self._set_up_initial_account_data(self)
+			self:_set_up_initial_account_data()
 		end
 
 		self._signed_in = true
@@ -111,7 +111,7 @@ ScriptBackendPlayFab.initial_setup_request_cb = function (self, result)
 	if result.Error then
 		self._initial_set_up_result_error = result
 	else
-		self._set_up_initial_account_data(self)
+		self:_set_up_initial_account_data()
 
 		self._setting_up_initial_account = false
 	end

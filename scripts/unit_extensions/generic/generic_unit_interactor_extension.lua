@@ -50,7 +50,7 @@ end
 
 GenericUnitInteractorExtension.destroy = function (self)
 	if Managers.state.network:game() and Managers.state.unit_storage:go_id(self.unit) then
-		self.abort_interaction(self)
+		self:abort_interaction()
 	end
 
 	local interactable_unit = self.interaction_context.interactable_unit
@@ -85,11 +85,11 @@ GenericUnitInteractorExtension.update = function (self, unit, input, dt, context
 
 	if self.state ~= "waiting_to_interact" and not Unit.alive(self.interaction_context.interactable_unit) then
 		InteractionHelper.printf("[GenericUnitInteractorExtension] not Unit.alive(self.interaction_context.interactable_unit)")
-		self.abort_interaction(self)
+		self:abort_interaction()
 	end
 
 	if self.state ~= "waiting_to_interact" and (self.status_extension:is_disabled() or self.status_extension:is_catapulted()) then
-		self.abort_interaction(self)
+		self:abort_interaction()
 	end
 
 	if self.state ~= "waiting_to_interact" then
@@ -112,15 +112,15 @@ GenericUnitInteractorExtension.update = function (self, unit, input, dt, context
 			local buff_extension = self.buff_extension
 
 			if interaction_type == "heal" then
-				abort = not buff_extension.has_buff_type(buff_extension, "no_interruption_bandage")
+				abort = not buff_extension:has_buff_type("no_interruption_bandage")
 			end
 
 			if abort and interaction_type == "revive" then
-				abort = not buff_extension.has_buff_perk(buff_extension, "uninterruptible_revive")
+				abort = not buff_extension:has_buff_perk("uninterruptible_revive")
 			end
 
 			if abort then
-				self.abort_interaction(self)
+				self:abort_interaction()
 			end
 		end
 	end
@@ -141,7 +141,7 @@ GenericUnitInteractorExtension.update = function (self, unit, input, dt, context
 
 				if target_extension then
 					interaction_context.interactable_unit = exl_unit
-					interaction_context.interaction_type = target_extension.interaction_type(target_extension)
+					interaction_context.interaction_type = target_extension:interaction_type()
 
 					return
 				end
@@ -153,12 +153,12 @@ GenericUnitInteractorExtension.update = function (self, unit, input, dt, context
 			local center_y = res_h * 0.5
 			self.ray_casted = true
 			local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
-			local camera_position = first_person_extension.current_position(first_person_extension)
-			local camera_rotation = first_person_extension.current_rotation(first_person_extension)
+			local camera_position = first_person_extension:current_position()
+			local camera_rotation = first_person_extension:current_rotation()
 			local camera_forward = Quaternion.forward(camera_rotation)
 			local hits, hits_n = self.physics_world:immediate_raycast(camera_position, camera_forward, INTERACT_RAY_DISTANCE, "all", "collision_filter", "filter_ray_interaction")
 			local hit_non_interaction_unit = false
-			local camera = self._get_player_camera(self)
+			local camera = self:_get_player_camera()
 			local distance_score = math.huge
 			local selected_interaction_unit, selected_interaction_type = nil
 
@@ -175,15 +175,15 @@ GenericUnitInteractorExtension.update = function (self, unit, input, dt, context
 
 							if not interact_actor or Unit.actor(hit_unit, interact_actor) == actor then
 								local target_extension = ScriptUnit.extension(hit_unit, "interactable_system")
-								local target_interaction_type = target_extension.interaction_type(target_extension)
-								local can_interact, fail_reason, interaction_type = self.can_interact(self, hit_unit, target_interaction_type)
-								local is_in_chest = self._check_if_interactable_in_chest(self, hit_unit, camera_position)
+								local target_interaction_type = target_extension:interaction_type()
+								local can_interact, fail_reason, interaction_type = self:can_interact(hit_unit, target_interaction_type)
+								local is_in_chest = self:_check_if_interactable_in_chest(hit_unit, camera_position)
 
 								if (can_interact or fail_reason) and not is_in_chest then
 									local interaction_template = InteractionDefinitions[interaction_type]
 									local config = interaction_template.config or interaction_template.get_config()
 									local does_not_require_line_of_sight = config.does_not_require_line_of_sight
-									local score = self._claculate_interaction_distance_score(self, hit_unit, camera_position, center_x, center_y, camera)
+									local score = self:_claculate_interaction_distance_score(hit_unit, camera_position, center_x, center_y, camera)
 									local block_other_interactions = config.block_other_interactions
 
 									if (hit_non_interaction_unit and does_not_require_line_of_sight) or not hit_non_interaction_unit then
@@ -228,7 +228,7 @@ GenericUnitInteractorExtension.update = function (self, unit, input, dt, context
 					local hit_unit = Actor.unit(actor)
 
 					if hit_unit and hit_unit ~= self.unit then
-						local is_in_chest = self._check_if_interactable_in_chest(self, hit_unit, camera_position)
+						local is_in_chest = self:_check_if_interactable_in_chest(hit_unit, camera_position)
 
 						if ScriptUnit.has_extension(hit_unit, "interactable_system") and not is_in_chest then
 							local pos = POSITION_LOOKUP[hit_unit] or Unit.local_position(hit_unit, 0)
@@ -245,8 +245,8 @@ GenericUnitInteractorExtension.update = function (self, unit, input, dt, context
 
 			if best_unit then
 				local target_extension = ScriptUnit.extension(best_unit, "interactable_system")
-				local target_interaction_type = target_extension.interaction_type(target_extension)
-				local can_interact, fail_reason, interaction_type = self.can_interact(self, best_unit, target_interaction_type)
+				local target_interaction_type = target_extension:interaction_type()
+				local can_interact, fail_reason, interaction_type = self:can_interact(best_unit, target_interaction_type)
 
 				if can_interact then
 					interaction_context.interactable_unit = best_unit
@@ -286,7 +286,7 @@ GenericUnitInteractorExtension.update = function (self, unit, input, dt, context
 
 			if interaction_result ~= InteractionResult.ONGOING then
 				InteractionHelper:complete_interaction(unit, interactable_unit, interaction_result)
-				self.stop_interaction(self, t)
+				self:stop_interaction(t)
 			end
 		end
 	end
@@ -385,7 +385,7 @@ GenericUnitInteractorExtension.stop_interaction = function (self, t)
 	local interaction_context = self.interaction_context
 	local interactable_unit = interaction_context.interactable_unit
 
-	self._stop_interaction(self, interactable_unit, t)
+	self:_stop_interaction(interactable_unit, t)
 	Managers.state.unit_spawner:remove_destroy_listener(interactable_unit, "interactable_unit")
 end
 
@@ -483,7 +483,7 @@ GenericUnitInteractorExtension.interactable_unit = function (self)
 end
 
 GenericUnitInteractorExtension.get_progress = function (self, t)
-	fassert(self.is_interacting(self), "Attempted to get interaction progress when interactor unit wasn't interacting.")
+	fassert(self:is_interacting(), "Attempted to get interaction progress when interactor unit wasn't interacting.")
 
 	local interaction_context = self.interaction_context
 	local interaction_data = interaction_context.data
@@ -502,14 +502,14 @@ GenericUnitInteractorExtension.start_interaction = function (self, hold_input, i
 	interaction_context.interactable_unit = interactable_unit or interaction_context.interactable_unit
 	interaction_context.interaction_type = interaction_type or interaction_context.interaction_type
 
-	fassert(self.can_interact(self, interaction_context.interactable_unit, interaction_type), "Attempted to start interaction even though the interaction wasn't allowed.")
+	fassert(self:can_interact(interaction_context.interactable_unit, interaction_type), "Attempted to start interaction even though the interaction wasn't allowed.")
 
 	interaction_context.interaction_type = InteractionHelper.player_modify_interaction_type(self.unit, interaction_context.interactable_unit, interaction_context.interaction_type)
 	local unit = self.unit
 	local interaction_type = interaction_context.interaction_type
 	local network_manager = Managers.state.network
 	local interactor_go_id = Managers.state.unit_storage:go_id(unit)
-	local interactable_go_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, interaction_context.interactable_unit)
+	local interactable_go_id, is_level_unit = network_manager:game_object_or_level_id(interaction_context.interactable_unit)
 
 	if interactor_go_id == nil or interactable_go_id == nil then
 		InteractionHelper.printf("[GenericUnitInteractorExtension] start_interaction failed due to no id for interactor=%s or interactable=%s", tostring(self.unit), tostring(self.interaction_context.interactable_unit))
@@ -572,11 +572,11 @@ GenericUnitInteractorExtension.interaction_completed = function (self, interacti
 	self.interaction_context.result = interaction_result
 	local t = Managers.time:time("game")
 
-	self.stop_interaction(self, t)
+	self:stop_interaction(t)
 end
 
 GenericUnitInteractorExtension.hot_join_sync = function (self, sender)
-	if not self.is_interacting(self) and self.state ~= "waiting_for_confirmation" then
+	if not self:is_interacting() and self.state ~= "waiting_for_confirmation" then
 		return
 	end
 
@@ -584,11 +584,11 @@ GenericUnitInteractorExtension.hot_join_sync = function (self, sender)
 	local context = self.interaction_context
 	local state_id = NetworkLookup.interaction_states[self.state]
 	local interaction_type_id = NetworkLookup.interactions[context.interaction_type]
-	local interactable_unit_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, context.interactable_unit)
+	local interactable_unit_id, is_level_unit = network_manager:game_object_or_level_id(context.interactable_unit)
 	local data = context.data
 	local start_time = data.start_time
 	local duration = data.duration
-	local unit_id = network_manager.unit_game_object_id(network_manager, self.unit)
+	local unit_id = network_manager:unit_game_object_id(self.unit)
 
 	RPC.rpc_sync_interaction_state(sender, unit_id, state_id, interaction_type_id, interactable_unit_id, start_time, duration, is_level_unit)
 end

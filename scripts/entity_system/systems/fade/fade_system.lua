@@ -86,13 +86,13 @@ FadeSystem.update = function (self, context, t)
 	end
 
 	local local_player = self.player
-	local local_player_id = local_player.local_player_id(local_player)
+	local local_player_id = local_player:local_player_id()
 	local viewport_name = local_player.viewport_name
 	local camera_position = nil
 	local freeflight_manager = Managers.free_flight
 
-	if freeflight_manager.active(freeflight_manager, local_player_id) then
-		camera_position = freeflight_manager.camera_position_rotation(freeflight_manager, local_player_id)
+	if freeflight_manager:active(local_player_id) then
+		camera_position = freeflight_manager:camera_position_rotation(local_player_id)
 	else
 		camera_position = Managers.state.camera:camera_position(viewport_name)
 	end
@@ -107,11 +107,11 @@ FadeSystem.update = function (self, context, t)
 		local fade_unit = fade_unit_list[i]
 		local extension = unit_extension_data[fade_unit]
 		local cached_value = extension.cached_value
-		local value = self.calculate_and_set_jitter_alpha(self, camera_position_flat, camera_position_height, fade_unit, nil, extension.min_value)
+		local value = self:calculate_and_set_jitter_alpha(camera_position_flat, camera_position_height, fade_unit, nil, extension.min_value)
 		extension.cached_value = value
 	end
 
-	self.update_ai_units(self, camera_position, camera_position_flat, camera_position_height)
+	self:update_ai_units(camera_position, camera_position_flat, camera_position_height)
 end
 
 local ai_units = {}
@@ -126,7 +126,7 @@ FadeSystem.update_ai_units = function (self, camera_position, camera_position_fl
 		else
 			local health_extension = script_unit_extension(unit, "health_system")
 
-			if not health_extension.is_alive(health_extension) then
+			if not health_extension:is_alive() then
 				Unit.set_scalar_for_materials_in_unit_and_childs(unit, "inv_jitter_alpha", 0)
 
 				unit_extension_data[unit].cached_value = 0
@@ -143,7 +143,7 @@ FadeSystem.update_ai_units = function (self, camera_position, camera_position_fl
 
 		if extension then
 			local cached_value = extension.cached_value
-			local value = self.calculate_and_set_jitter_alpha(self, camera_position_flat, camera_position_height, unit, cached_value, 0)
+			local value = self:calculate_and_set_jitter_alpha(camera_position_flat, camera_position_height, unit, cached_value, 0)
 			extension.cached_value = value
 
 			if 0 < value then
@@ -177,7 +177,7 @@ FadeSystem.calculate_and_set_jitter_alpha = function (self, camera_position_flat
 	local to_vec = fade_unit_position_flat - camera_position_flat
 	local value = 0
 
-	if self._verify_length(self, to_vec, unit) then
+	if self:_verify_length(to_vec, unit) then
 		local to_vec_length = vector3_length(to_vec)
 		local height_difference = math.abs(camera_height - fade_unit_position_height)
 

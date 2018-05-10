@@ -11,7 +11,7 @@ end
 BTSequence.name = "BTSequence"
 
 BTSequence.leave = function (self, unit, blackboard, t)
-	self.set_running_child(self, unit, blackboard, t, nil, "aborted")
+	self:set_running_child(unit, blackboard, t, nil, "aborted")
 
 	blackboard.node_data[self._identifier] = nil
 end
@@ -24,22 +24,22 @@ BTSequence.run = function (self, unit, blackboard, t, dt)
 	for i = child_to_run_index, num_children, 1 do
 		local child = self._children[i]
 
-		if not child.condition(child, blackboard) then
-			self.set_running_child(self, unit, blackboard, t, nil, "failed")
+		if not child:condition(blackboard) then
+			self:set_running_child(unit, blackboard, t, nil, "failed")
 
 			return "failed"
 		end
 
-		self.set_running_child(self, unit, blackboard, t, child, "aborted")
+		self:set_running_child(unit, blackboard, t, child, "aborted")
 
-		local result = child.run(child, unit, blackboard, t, dt)
+		local result = child:run(unit, blackboard, t, dt)
 
 		if result == "running" then
 			blackboard.node_data[self._identifier] = i
 
 			return result
 		else
-			self.set_running_child(self, unit, blackboard, t, nil, result)
+			self:set_running_child(unit, blackboard, t, nil, result)
 
 			if result == "failed" then
 				return "failed"
@@ -47,7 +47,7 @@ BTSequence.run = function (self, unit, blackboard, t, dt)
 		end
 	end
 
-	assert(self.current_running_child(self, blackboard) == nil)
+	assert(self:current_running_child(blackboard) == nil)
 
 	return "done"
 end

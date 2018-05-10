@@ -27,7 +27,7 @@ ActionHammerSlam.client_owner_start_action = function (self, new_action, t)
 end
 
 ActionHammerSlam.client_owner_post_update = function (self, dt, t, world, can_damage)
-	self._draw_targeting_decal(self, world)
+	self:_draw_targeting_decal(world)
 end
 
 ActionHammerSlam.update_is_finished = function (self, dt, t, world, reason)
@@ -38,33 +38,33 @@ ActionHammerSlam.update_is_finished = function (self, dt, t, world, reason)
 	end
 
 	if t < self.minimum_charge_time then
-		self._draw_targeting_decal(self, world)
+		self:_draw_targeting_decal(world)
 
 		return false
 	end
 
 	if not self.started_hammer_slam then
-		self._play_slamming_animation(self, self.current_action)
+		self:_play_slamming_animation(self.current_action)
 
 		self.slam_time = t + SLAM_TIME
 		self.slam_hit_time = t + SLAM_HIT_TIME
 		self.started_hammer_slam = true
 	else
 		local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-		local rot = first_person_extension.current_rotation(first_person_extension)
+		local rot = first_person_extension:current_rotation()
 		local direction = Quaternion.forward(rot)
 		local flat_direction = Vector3.flat(direction)
 		local new_rot = Quaternion.look(flat_direction)
 
-		first_person_extension.force_look_rotation(first_person_extension, new_rot)
+		first_person_extension:force_look_rotation(new_rot)
 	end
 
 	if self.slam_hit_time <= t then
 		local locomotion_extension = ScriptUnit.extension(owner_unit, "locomotion_system")
-		local current_velocity = locomotion_extension.current_velocity(locomotion_extension)
+		local current_velocity = locomotion_extension:current_velocity()
 
-		locomotion_extension.set_forced_velocity(locomotion_extension, Vector3.zero())
-		locomotion_extension.set_wanted_velocity(locomotion_extension, Vector3.zero())
+		locomotion_extension:set_forced_velocity(Vector3.zero())
+		locomotion_extension:set_wanted_velocity(Vector3.zero())
 
 		if not self.dealt_damage then
 			World.destroy_unit(self.world, self.targeting_decal)
@@ -82,7 +82,7 @@ ActionHammerSlam.update_is_finished = function (self, dt, t, world, reason)
 			self.dealt_damage = true
 		end
 	else
-		self._draw_targeting_decal(self, world)
+		self:_draw_targeting_decal(world)
 	end
 
 	if self.slam_time <= t then
@@ -114,8 +114,8 @@ ActionHammerSlam.slam_overlap_callback = function (self, actors)
 			local player_position = POSITION_LOOKUP[self.owner_unit]
 			local attack_direction = Vector3.normalize(Unit.world_position(hit_unit, 0) - player_position)
 			local network_manager = Managers.state.network
-			local hit_unit_id = network_manager.unit_game_object_id(network_manager, hit_unit)
-			local attacker_unit_id = network_manager.unit_game_object_id(network_manager, self.owner_unit)
+			local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
+			local attacker_unit_id = network_manager:unit_game_object_id(self.owner_unit)
 			local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
 			local player_rotation = Unit.world_rotation(self.owner_unit_first_person, 0)
 			local direction = Vector3.normalize(Vector3.flat(Quaternion.forward(player_rotation)))

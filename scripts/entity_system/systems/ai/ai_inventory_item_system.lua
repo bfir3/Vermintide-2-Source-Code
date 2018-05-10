@@ -7,7 +7,7 @@ AIInventoryItemSystem = class(AIInventoryItemSystem, ExtensionSystemBase)
 AIInventoryItemSystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self.entity_manager = entity_manager
 	self.is_server = context.is_server
@@ -16,7 +16,7 @@ AIInventoryItemSystem.init = function (self, context, system_name)
 	local network_event_delegate = context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.entities = {}
 end

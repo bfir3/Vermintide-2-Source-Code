@@ -21,7 +21,7 @@ InteractionSystem.init = function (self, entity_system_creation_context, system_
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.extension_init_context.dice_keeper = entity_system_creation_context.dice_keeper
 end
@@ -68,7 +68,7 @@ InteractionSystem.rpc_interaction_completed = function (self, sender, interactor
 	end
 
 	local interactor_extension = ScriptUnit.extension(interactor_unit, "interactor_system")
-	local is_interacting = interactor_extension.is_interacting(interactor_extension)
+	local is_interacting = interactor_extension:is_interacting()
 
 	if not is_interacting then
 		InteractionHelper.printf("got rpc_interaction_completed but wasnt interacting (%s, %s, %s)", sender, tostring(interactor_go_id), InteractionResult[interaction_result])
@@ -76,7 +76,7 @@ InteractionSystem.rpc_interaction_completed = function (self, sender, interactor
 		return
 	end
 
-	local interactable_unit = interactor_extension.interactable_unit(interactor_extension)
+	local interactable_unit = interactor_extension:interactable_unit()
 
 	InteractionHelper:interaction_completed(interactor_unit, interactable_unit, interaction_result)
 end
@@ -90,17 +90,17 @@ InteractionSystem.rpc_interaction_abort = function (self, sender, interactor_go_
 	if Unit.alive(interactor_unit) then
 		local interactor_extension = ScriptUnit.extension(interactor_unit, "interactor_system")
 
-		if not interactor_extension.is_interacting(interactor_extension) or interactor_extension.is_stopping(interactor_extension) then
+		if not interactor_extension:is_interacting() or interactor_extension:is_stopping() then
 			InteractionHelper.printf("Got abort when interaction had already finished, ignore request")
 
 			return
 		end
 
-		local interactable_unit = interactor_extension.interactable_unit(interactor_extension)
+		local interactable_unit = interactor_extension:interactable_unit()
 
 		if Unit.alive(interactable_unit) then
 			InteractionHelper:complete_interaction(interactor_unit, interactable_unit, InteractionResult.USER_ENDED)
-			interactor_extension.interaction_completed(interactor_extension, InteractionResult.USER_ENDED)
+			interactor_extension:interaction_completed(InteractionResult.USER_ENDED)
 		end
 	end
 end
@@ -112,7 +112,7 @@ InteractionSystem.rpc_sync_interaction_state = function (self, sender, unit_id, 
 	local interactable_unit = Managers.state.network:game_object_or_level_unit(interactable_unit_id, is_level_unit)
 	local interactor_extension = ScriptUnit.extension(unit, "interactor_system")
 
-	interactor_extension.set_interaction_context(interactor_extension, state, interaction_type, interactable_unit, start_time, duration)
+	interactor_extension:set_interaction_context(state, interaction_type, interactable_unit, start_time, duration)
 end
 
 InteractionSystem.rpc_sync_interactable_used_state = function (self, sender, interactable_unit_id, is_level_object, is_used)

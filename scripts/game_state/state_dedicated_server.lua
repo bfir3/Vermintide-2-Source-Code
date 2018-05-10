@@ -20,19 +20,19 @@ StateDedicatedServer.packages_to_load = {}
 
 StateDedicatedServer.on_enter = function (self, params)
 	VisualAssertLog.setup(nil)
-	self._setup_garbage_collection(self)
-	self._setup_level_transition(self)
-	self._setup_network(self)
-	self._setup_state_machine(self)
-	self._setup_popup_manager(self)
-	self._setup_chat_manager(self)
-	self._setup_account_manager(self)
+	self:_setup_garbage_collection()
+	self:_setup_level_transition()
+	self:_setup_network()
+	self:_setup_state_machine()
+	self:_setup_popup_manager()
+	self:_setup_chat_manager()
+	self:_setup_account_manager()
 
 	if self.parent.loading_context.reload_packages then
-		self._unload_packages(self)
+		self:_unload_packages()
 	end
 
-	self._load_packages(self)
+	self:_load_packages()
 end
 
 StateDedicatedServer._setup_garbage_collection = function (self)
@@ -59,9 +59,9 @@ StateDedicatedServer._init_input = function (self)
 	local input_manager = self._input_manager
 	Managers.input = input_manager
 
-	input_manager.initialize_device(input_manager, "keyboard", 1)
-	input_manager.initialize_device(input_manager, "mouse", 1)
-	input_manager.initialize_device(input_manager, "gamepad")
+	input_manager:initialize_device("keyboard", 1)
+	input_manager:initialize_device("mouse", 1)
+	input_manager:initialize_device("gamepad")
 end
 
 StateDedicatedServer._setup_network = function (self)
@@ -90,15 +90,15 @@ StateDedicatedServer._load_packages = function (self)
 	local package_manager = Managers.package
 
 	for i, name in ipairs(StateDedicatedServer.packages_to_load) do
-		if not package_manager.has_loaded(package_manager, name, "state_dedicated_server") then
-			package_manager.load(package_manager, name, "state_dedicated_server", nil, true)
+		if not package_manager:has_loaded(name, "state_dedicated_server") then
+			package_manager:load(name, "state_dedicated_server", nil, true)
 		end
 	end
 
 	if not GlobalResources.loaded then
 		for i, name in ipairs(GlobalResources) do
-			if not package_manager.has_loaded(package_manager, name) then
-				package_manager.load(package_manager, name, "global", nil, true)
+			if not package_manager:has_loaded(name) then
+				package_manager:load(name, "global", nil, true)
 			end
 		end
 
@@ -110,8 +110,8 @@ StateDedicatedServer._unload_packages = function (self)
 	local package_manager = Managers.package
 
 	for i, name in ipairs(StateDedicatedServer.packages_to_load) do
-		if package_manager.has_loaded(package_manager, name, "state_dedicated_server") then
-			package_manager.unload(package_manager, name, "state_dedicated_server")
+		if package_manager:has_loaded(name, "state_dedicated_server") then
+			package_manager:unload(name, "state_dedicated_server")
 		end
 	end
 
@@ -119,7 +119,7 @@ StateDedicatedServer._unload_packages = function (self)
 		GlobalResources.loaded = nil
 
 		for i, name in ipairs(GlobalResources) do
-			package_manager.unload(package_manager, name, "global")
+			package_manager:unload(name, "global")
 		end
 	end
 end
@@ -128,7 +128,7 @@ StateDedicatedServer._packages_loaded = function (self)
 	local package_manager = Managers.package
 
 	for i, name in ipairs(StateDedicatedServer.packages_to_load) do
-		if not package_manager.has_loaded(package_manager, name) then
+		if not package_manager:has_loaded(name) then
 			return false
 		end
 	end
@@ -139,7 +139,7 @@ end
 StateDedicatedServer.update = function (self, dt, t)
 	Network.update_receive(dt, self._network_event_delegate.event_table)
 	self._machine:update(dt, t)
-	self._update_network(self, dt)
+	self:_update_network(dt)
 
 	if script_data.debug_enabled then
 		VisualAssertLog.update(dt)
@@ -162,12 +162,12 @@ StateDedicatedServer.update = function (self, dt, t)
 			self._wanted_state = StateLoading
 		end
 
-		self._update_wanted_state(self)
+		self:_update_wanted_state()
 	end
 
 	Network.update_transmit(dt)
 
-	if self._packages_loaded(self) then
+	if self:_packages_loaded() then
 		return self._wanted_state
 	end
 end
@@ -319,7 +319,7 @@ StateDedicatedServer.on_exit = function (self, application_shutdown)
 	end
 
 	if application_shutdown then
-		self._destroy_network(self)
+		self:_destroy_network()
 	else
 		local loading_context = self.parent.loading_context
 		loading_context.network_server = self._network_server

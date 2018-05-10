@@ -421,7 +421,7 @@ DiceRoller.init = function (self, world, dice_keeper, rewards, hero_name)
 	self.dice_types = {}
 	self.dice_results = {}
 	self.rewards = rewards
-	local dice = dice_keeper.get_dice(dice_keeper)
+	local dice = dice_keeper:get_dice()
 	self.dice_data = table.clone(dice)
 	local units = World.units(world)
 	local num_units = #units
@@ -446,14 +446,14 @@ DiceRoller.init = function (self, world, dice_keeper, rewards, hero_name)
 	self.index = 1
 	self.timer = 0
 
-	self._request_from_backend(self, hero_name)
+	self:_request_from_backend(hero_name)
 
 	self._glow_dice = {}
 end
 
 DiceRoller.destroy = function (self)
 	if not self.post_cleanup_done then
-		self.cleanup_post_roll(self)
+		self:cleanup_post_roll()
 	end
 end
 
@@ -466,19 +466,19 @@ DiceRoller._request_from_backend = function (self, hero_name)
 	local dlc_name = level_settings.dlc_name
 	local backend_items = Managers.backend:get_interface("items")
 
-	backend_items.generate_item_server_loot(backend_items, dice, difficulty, level_start, level_end, hero_name, dlc_name)
+	backend_items:generate_item_server_loot(dice, difficulty, level_start, level_end, hero_name, dlc_name)
 end
 
 DiceRoller._check_for_achievement = function (self, reward_backend_id)
 	local backend_items = Managers.backend:get_interface("items")
-	local hero_trinkets = backend_items.get_filtered_items(backend_items, "trinket_as_hero and equipped_by == current_hero")
+	local hero_trinkets = backend_items:get_filtered_items("trinket_as_hero and equipped_by == current_hero")
 
 	fassert(#hero_trinkets < 2, "There are more than two items")
 
 	local trinket = hero_trinkets[1]
 
 	if trinket then
-		local item = backend_items.get_item_from_id(backend_items, reward_backend_id)
+		local item = backend_items:get_item_from_id(reward_backend_id)
 		local item_data = ItemMasterList[item.key]
 		local can_wield = item_data.can_wield
 
@@ -502,11 +502,11 @@ DiceRoller._check_for_achievement = function (self, reward_backend_id)
 
 		if table.find(can_wield, trinket_as_hero) then
 			local player_manager = Managers.player
-			local player = player_manager.local_player(player_manager)
-			local stats_id = player.stats_id(player)
-			local statistics_db = player_manager.statistics_db(player_manager)
+			local player = player_manager:local_player()
+			local stats_id = player:stats_id()
+			local statistics_db = player_manager:statistics_db()
 
-			statistics_db.set_stat(statistics_db, stats_id, "win_item_as_" .. trinket_as_hero, 1)
+			statistics_db:set_stat(stats_id, "win_item_as_" .. trinket_as_hero, 1)
 		end
 	end
 end
@@ -517,10 +517,10 @@ DiceRoller.poll_for_backend_result = function (self)
 	end
 
 	local backend_items = Managers.backend:get_interface("items")
-	local successes, win_list, reward_backend_id, level_rewards = backend_items.check_for_loot(backend_items)
+	local successes, win_list, reward_backend_id, level_rewards = backend_items:check_for_loot()
 
 	if successes then
-		self._check_for_achievement(self, reward_backend_id)
+		self:_check_for_achievement(reward_backend_id)
 
 		self._successes = successes
 		self._reward_backend_id = reward_backend_id
@@ -577,7 +577,7 @@ end
 DiceRoller.reward_item_key = function (self)
 	fassert(self._got_backend_result, "Trying to roll dice before response from backend")
 
-	local num_successes = self.num_successes(self)
+	local num_successes = self:num_successes()
 
 	return self._win_list[num_successes]
 end
@@ -710,7 +710,7 @@ DiceRoller.simulate_dice_rolls = function (self, success_list)
 	fassert(self._got_backend_result, "Trying to roll dice before response from backend")
 
 	if not self._success_table then
-		self._create_success_table(self, success_list)
+		self:_create_success_table(success_list)
 	end
 
 	local dice_simulation_settings = table.clone(self._success_table)
@@ -874,14 +874,14 @@ DiceRoller.simulate_dice_rolls = function (self, success_list)
 
 	end
 
-	local simulation_successful = self.run_simulation(self, dice_simulation_settings)
+	local simulation_successful = self:run_simulation(dice_simulation_settings)
 
 	if simulation_successful then
 
 		-- Decompilation error in this vicinity:
 		--- BLOCK #7 187-195, warpins: 1 ---
-		self.calculate_results(self, dice_simulation_settings)
-		self.alter_rotations(self, dice_simulation_settings)
+		self:calculate_results(dice_simulation_settings)
+		self:alter_rotations(dice_simulation_settings)
 
 		self._dice_simulation_settings = dice_simulation_settings
 		--- END OF BLOCK #7 ---
@@ -993,7 +993,7 @@ DiceRoller.run_simulation = function (self, dice_simulation_settings)
 			-- Decompilation error in this vicinity:
 			--- BLOCK #1 72-79, warpins: 1 ---
 			finished_dice = finished_dice + 1
-			local result = self.get_dice_result(self, unit, data.dice_type)
+			local result = self:get_dice_result(unit, data.dice_type)
 			--- END OF BLOCK #1 ---
 
 			if result == 0 then
@@ -1173,7 +1173,7 @@ DiceRoller.calculate_results = function (self, dice_simulation_settings)
 		--- BLOCK #0 6-14, warpins: 2 ---
 		local data = dice_simulation_settings[i]
 		local unit = data.unit
-		local dice_result = self.get_dice_result(self, unit, data.dice_type)
+		local dice_result = self:get_dice_result(unit, data.dice_type)
 		data.dice_result = dice_result
 		--- END OF BLOCK #0 ---
 
@@ -1585,7 +1585,7 @@ DiceRoller.update = function (self, dt)
 
 		-- Decompilation error in this vicinity:
 		--- BLOCK #3 105-110, warpins: 1 ---
-		self._add_to_glow_list(self, dice_unit)
+		self:_add_to_glow_list(dice_unit)
 
 		data.highlighted = true
 		--- END OF BLOCK #3 ---
@@ -1656,7 +1656,7 @@ DiceRoller.update = function (self, dt)
 
 	-- Decompilation error in this vicinity:
 	--- BLOCK #4 128-137, warpins: 1 ---
-	self._update_glow(self, dt)
+	self:_update_glow(dt)
 	--- END OF BLOCK #4 ---
 
 	if finished_dice == table.size(dice_units)
@@ -1705,7 +1705,7 @@ DiceRoller.update = function (self, dt)
 	-- Decompilation error in this vicinity:
 	--- BLOCK #8 148-156, warpins: 1 ---
 	self.rolling = false
-	self.rolling_finished = self.cleanup_post_roll(self)
+	self.rolling_finished = self:cleanup_post_roll()
 	self.grace_time = nil
 	--- END OF BLOCK #8 ---
 

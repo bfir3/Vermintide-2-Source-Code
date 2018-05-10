@@ -53,7 +53,7 @@ ActionStaff.client_owner_post_update = function (self, dt, t, world, can_damage)
 	end
 
 	if self.state == "shooting" then
-		self.fire(self)
+		self:fire()
 
 		self.state = "shot"
 	end
@@ -71,18 +71,18 @@ ActionStaff.fire = function (self, reason)
 	local current_action = self.current_action
 	local owner_unit = self.owner_unit
 	local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-	local rotation = first_person_extension.current_rotation(first_person_extension)
+	local rotation = first_person_extension:current_rotation()
 	local spread_extension = self.spread_extension
 
 	if spread_extension then
-		rotation = spread_extension.get_randomised_spread(spread_extension, rotation)
+		rotation = spread_extension:get_randomised_spread(rotation)
 
-		spread_extension.set_shooting(spread_extension)
+		spread_extension:set_shooting()
 	end
 
 	local angle = ActionUtils.pitch_from_rotation(rotation)
 	local speed = current_action.speed
-	local position = first_person_extension.current_position(first_person_extension)
+	local position = first_person_extension:current_position()
 	local target_vector = Vector3.normalize(Vector3.flat(Quaternion.forward(rotation)))
 	local projectile_info = current_action.projectile_info
 	local lookup_data = current_action.lookup_data

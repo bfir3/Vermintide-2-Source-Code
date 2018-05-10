@@ -11,7 +11,7 @@ RoomManagerClient.init = function (self, world, network_event_delegate)
 	self._room_order = {}
 	self._room_handler = RoomHandler:new(world)
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self._network_event_delegate = network_event_delegate
 end
@@ -57,11 +57,11 @@ RoomManagerClient.destroy = function (self)
 end
 
 RoomManagerClient.rpc_inn_room_created = function (self, sender, peer_id, room_id, profile_index)
-	self.create_room(self, peer_id, room_id, profile_index)
+	self:create_room(peer_id, room_id, profile_index)
 end
 
 RoomManagerClient.rpc_inn_room_destroyed = function (self, sender, peer_id)
-	self.destroy_room(self, peer_id)
+	self:destroy_room(peer_id)
 end
 
 RoomManagerClient.get_spawn_point_by_peer = function (self, peer_id)

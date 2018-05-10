@@ -31,9 +31,9 @@ Session.register_rpcs = function (self, network_event_delegate)
 	self._network_event_delegate = network_event_delegate
 
 	if Managers.state.network.is_server then
-		network_event_delegate.register(network_event_delegate, self, "rpc_backend_session_done")
+		network_event_delegate:register(self, "rpc_backend_session_done")
 	else
-		network_event_delegate.register(network_event_delegate, self, "rpc_backend_session_join")
+		network_event_delegate:register(self, "rpc_backend_session_join")
 	end
 end
 
@@ -43,7 +43,7 @@ end
 
 Session.rpc_backend_session_done = function (self, sender)
 	if not self._debug_backend_session_done_timeout then
-		self._dice_player_done(self, sender)
+		self:_dice_player_done(sender)
 	end
 end
 
@@ -70,7 +70,7 @@ Session.reset = function (self)
 
 		self._post_dice_timeout = nil
 
-		self._unregister_rpcs(self)
+		self:_unregister_rpcs()
 
 		self._peers = {}
 		self._peer_queue = {}
@@ -115,7 +115,7 @@ Session.update = function (self, dt)
 
 	if dice_data and dice_data.timeout < Managers.time:time("main") then
 		for peer_id, _ in pairs(dice_data.players) do
-			self._dice_player_done(self, peer_id)
+			self:_dice_player_done(peer_id)
 		end
 
 		self._error_data = {
@@ -187,8 +187,8 @@ end
 BackendInterfaceSession.update = function (self)
 	local backend_session = self._backend_session
 
-	if backend_session.enabled(backend_session) then
-		backend_session.update(backend_session)
+	if backend_session:enabled() then
+		backend_session:update()
 	end
 end
 
@@ -199,8 +199,8 @@ end
 BackendInterfaceSession.add_peer = function (self, peer_id)
 	local backend_session = self._backend_session
 
-	if backend_session.enabled(backend_session) then
-		backend_session.add_peer(backend_session, peer_id)
+	if backend_session:enabled() then
+		backend_session:add_peer(peer_id)
 	end
 end
 
@@ -213,16 +213,16 @@ end
 BackendInterfaceSession.end_of_round = function (self)
 	local backend_session = self._backend_session
 
-	if backend_session.enabled(backend_session) then
-		backend_session.end_of_round(backend_session)
+	if backend_session:enabled() then
+		backend_session:end_of_round()
 	end
 end
 
 BackendInterfaceSession.received_dice_game_loot = function (self)
 	local backend_session = self._backend_session
 
-	if backend_session.enabled(backend_session) then
-		backend_session.received_dice_game_loot(backend_session)
+	if backend_session:enabled() then
+		backend_session:received_dice_game_loot()
 	end
 end
 

@@ -308,7 +308,7 @@ ProcFunctions = {
 		local buff_to_add = buff.template.buff_to_add
 
 		if Unit.alive(player_unit) and Unit.alive(revived_unit) and Managers.player.is_server then
-			buff_system.add_buff(buff_system, revived_unit, buff_to_add, player_unit, false)
+			buff_system:add_buff(revived_unit, buff_to_add, player_unit, false)
 		end
 	end,
 	on_hit_debuff_enemy_defence = function (player, buff, params)
@@ -319,7 +319,7 @@ ProcFunctions = {
 			local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
 			if buff_extension then
-				buff_extension.add_buff(buff_extension, "defence_debuff_enemies")
+				buff_extension:add_buff("defence_debuff_enemies")
 			end
 		end
 	end,
@@ -329,7 +329,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "bw_kill_stacks")
+			buff_extension:add_buff("bw_kill_stacks")
 		end
 	end,
 	add_stacking_damage_from_melee_headshot = function (player, buff, params)
@@ -348,7 +348,7 @@ ProcFunctions = {
 			buff_params.external_optional_multiplier = damage_increase
 			buff_params.external_optional_duration = duration
 
-			buff_extension.add_buff(buff_extension, "stacking_melee_damage", buff_params)
+			buff_extension:add_buff("stacking_melee_damage", buff_params)
 		end
 	end,
 	heal_on_melee_headshot = function (player, buff, params)
@@ -393,7 +393,7 @@ ProcFunctions = {
 
 		if Unit.alive(player_unit) then
 			local health_extension = ScriptUnit.extension(player_unit, "health_system")
-			local heal_amount = health_extension.current_temporary_health(health_extension)
+			local heal_amount = health_extension:current_temporary_health()
 
 			DamageUtils.heal_network(player_unit, player_unit, heal_amount, "bandage")
 		end
@@ -409,7 +409,7 @@ ProcFunctions = {
 
 			buff_params.attacker_unit = player_unit
 
-			buff_extension.add_buff(buff_extension, "flaming_shield_burning_dot", buff_params)
+			buff_extension:add_buff("flaming_shield_burning_dot", buff_params)
 		end
 	end,
 	regen_stamina_on_charged_attacks = function (player, buff, params)
@@ -424,7 +424,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "stamina_regen", buff_params)
+			buff_extension:add_buff("stamina_regen", buff_params)
 		end
 	end,
 	sienna_unchained_regen_stamina_on_charged_attacks = function (player, buff, params)
@@ -439,7 +439,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "sienna_unchained_stamina_regen", buff_params)
+			buff_extension:add_buff("sienna_unchained_stamina_regen", buff_params)
 		end
 	end,
 	markus_mercenary_regen_stamina_on_charged_attacks = function (player, buff, params)
@@ -454,7 +454,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "markus_mercenary_stamina_regen_buff", buff_params)
+			buff_extension:add_buff("markus_mercenary_stamina_regen_buff", buff_params)
 		end
 	end,
 	markus_knight_regen_stamina_on_charged_attacks = function (player, buff, params)
@@ -469,7 +469,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "markus_knight_stamina_regen_buff", buff_params)
+			buff_extension:add_buff("markus_knight_stamina_regen_buff", buff_params)
 		end
 	end,
 	bardin_ironbreaker_regen_stamina_on_charged_attacks = function (player, buff, params)
@@ -484,7 +484,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "bardin_ironbreaker_regen_stamina_on_charged_attacks_buff", buff_params)
+			buff_extension:add_buff("bardin_ironbreaker_regen_stamina_on_charged_attacks_buff", buff_params)
 		end
 	end,
 	increased_melee_damage = function (player, buff, params)
@@ -501,7 +501,7 @@ ProcFunctions = {
 			buff_params.external_optional_multiplier = damage_increase
 			buff_params.external_optional_duration = duration
 
-			buff_extension.add_buff(buff_extension, "increased_melee_damage_from_proc", buff_params)
+			buff_extension:add_buff("increased_melee_damage_from_proc", buff_params)
 		end
 	end,
 	add_gromril_delay = function (player, buff, params)
@@ -513,10 +513,10 @@ ProcFunctions = {
 			if talent_extension then
 				local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-				if talent_extension.has_talent(talent_extension, "bardin_ironbreaker_max_gromril_delay", "dwarf_ranger", true) then
-					buff_extension.add_buff(buff_extension, "bardin_ironbreaker_gromril_delay_short")
+				if talent_extension:has_talent("bardin_ironbreaker_max_gromril_delay", "dwarf_ranger", true) then
+					buff_extension:add_buff("bardin_ironbreaker_gromril_delay_short")
 				else
-					buff_extension.add_buff(buff_extension, "bardin_ironbreaker_gromril_delay")
+					buff_extension:add_buff("bardin_ironbreaker_gromril_delay")
 				end
 			end
 		end
@@ -528,23 +528,23 @@ ProcFunctions = {
 		if Unit.alive(player_unit) and Unit.alive(revived_unit) then
 			local buff_extension = ScriptUnit.extension(revived_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "bardin_ironbreaker_reduce_damage_taken_on_revive")
+			buff_extension:add_buff("bardin_ironbreaker_reduce_damage_taken_on_revive")
 		end
 	end,
 	victor_zealot_gain_invulnerability = function (player, buff, params)
 		local player_unit = player.player_unit
 		local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-		if Unit.alive(player_unit) and not status_extension.is_knocked_down(status_extension) then
+		if Unit.alive(player_unit) and not status_extension:is_knocked_down() then
 			local health_extension = ScriptUnit.extension(player_unit, "health_system")
 			local damage = params[2]
-			local current_health = health_extension.current_health(health_extension)
+			local current_health = health_extension:current_health()
 			local killing_blow = current_health <= damage
 
 			if killing_blow then
 				local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-				buff_extension.add_buff(buff_extension, "victor_zealot_invulnerability_on_lethal_damage_taken")
+				buff_extension:add_buff("victor_zealot_invulnerability_on_lethal_damage_taken")
 
 				if Managers.state.network.is_server then
 					local heal_amount = (current_health - damage) * -1 + 1
@@ -562,7 +562,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "passive_career_wh_2_proc")
+			buff_extension:add_buff("passive_career_wh_2_proc")
 		end
 	end,
 	ww_melee_kills_stack_ranged_damage = function (player, buff, params)
@@ -571,7 +571,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "ww_increased_ranged_damage_from_proc")
+			buff_extension:add_buff("ww_increased_ranged_damage_from_proc")
 		end
 	end,
 	wh_stack_kills_to_be_uninterruptible = function (player, buff, params)
@@ -580,7 +580,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "wh_kill_stack_from_proc")
+			buff_extension:add_buff("wh_kill_stack_from_proc")
 		end
 	end,
 	ww_melee_attacks_apply_damage_taken = function (player, buff, params)
@@ -590,7 +590,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) and Unit.alive(hit_unit) then
 			local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "ww_applied_damage_taken")
+			buff_extension:add_buff("ww_applied_damage_taken")
 		end
 	end,
 	es_legshots_cripple = function (player, buff, params)
@@ -602,7 +602,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) and Unit.alive(hit_unit) and (attack_type == "instant_projectile" or attack_type == "projectile") and (hit_zone_name == "left_leg" or hit_zone_name == "right_leg") then
 			local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "es_movement_speed_debuff")
+			buff_extension:add_buff("es_movement_speed_debuff")
 		end
 	end,
 	ranged_crits_increase_dmg_vs_armour_type = function (player, buff, params)
@@ -617,13 +617,13 @@ ProcFunctions = {
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
 			if armor_type == 1 then
-				buff_extension.add_buff(buff_extension, "ranged_power_vs_unarmored")
+				buff_extension:add_buff("ranged_power_vs_unarmored")
 			elseif armor_type == 2 then
-				buff_extension.add_buff(buff_extension, "ranged_power_vs_armored")
+				buff_extension:add_buff("ranged_power_vs_armored")
 			elseif armor_type == 3 then
-				buff_extension.add_buff(buff_extension, "ranged_power_vs_large")
+				buff_extension:add_buff("ranged_power_vs_large")
 			elseif armor_type == 5 then
-				buff_extension.add_buff(buff_extension, "ranged_power_vs_frenzy")
+				buff_extension:add_buff("ranged_power_vs_frenzy")
 			end
 		end
 	end,
@@ -634,7 +634,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) and Unit.alive(hit_unit) then
 			local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "defence_debuff")
+			buff_extension:add_buff("defence_debuff")
 		end
 	end,
 	victor_witchhunter_debuff_defence_on_crit = function (player, buff, params)
@@ -644,7 +644,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) and Unit.alive(hit_unit) then
 			local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "defence_debuff_enemies")
+			buff_extension:add_buff("defence_debuff_enemies")
 		end
 	end,
 	kerillian_shade_debuff_defence_on_crit = function (player, buff, params)
@@ -654,7 +654,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) and Unit.alive(hit_unit) then
 			local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "defence_debuff_enemies")
+			buff_extension:add_buff("defence_debuff_enemies")
 		end
 	end,
 	buff_defence_on_heal = function (player, buff, params)
@@ -665,7 +665,7 @@ ProcFunctions = {
 		if player_unit == healer_unit and (heal_type == "healing_draught" or heal_type == "bandage") then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "trait_necklace_damage_taken_reduction_buff")
+			buff_extension:add_buff("trait_necklace_damage_taken_reduction_buff")
 		end
 	end,
 	bardin_ranger_scavenge_proc = function (player, buff, params)
@@ -686,26 +686,26 @@ ProcFunctions = {
 				local raycast_down = true
 				local pickup_system = Managers.state.entity:system("pickup_system")
 
-				if talent_extension.has_talent(talent_extension, "bardin_ranger_passive_spawn_healing_draught", "dwarf_ranger", true) then
+				if talent_extension:has_talent("bardin_ranger_passive_spawn_healing_draught", "dwarf_ranger", true) then
 					if 1 < math.random(1, 4) then
-						pickup_system.buff_spawn_pickup(pickup_system, "ammo_ranger", enemy_pos, raycast_down)
+						pickup_system:buff_spawn_pickup("ammo_ranger", enemy_pos, raycast_down)
 					else
-						pickup_system.buff_spawn_pickup(pickup_system, "frag_grenade_t1", enemy_pos, raycast_down)
+						pickup_system:buff_spawn_pickup("frag_grenade_t1", enemy_pos, raycast_down)
 					end
-				elseif talent_extension.has_talent(talent_extension, "bardin_ranger_passive_spawn_potions", "dwarf_ranger", true) then
+				elseif talent_extension:has_talent("bardin_ranger_passive_spawn_potions", "dwarf_ranger", true) then
 					local drop_result = math.random(1, 6)
 
 					if drop_result == 1 then
-						pickup_system.buff_spawn_pickup(pickup_system, "damage_boost_potion", enemy_pos, raycast_down)
+						pickup_system:buff_spawn_pickup("damage_boost_potion", enemy_pos, raycast_down)
 					elseif drop_result == 2 then
-						pickup_system.buff_spawn_pickup(pickup_system, "speed_boost_potion", enemy_pos, raycast_down)
+						pickup_system:buff_spawn_pickup("speed_boost_potion", enemy_pos, raycast_down)
 					else
-						pickup_system.buff_spawn_pickup(pickup_system, "ammo_ranger", enemy_pos, raycast_down)
+						pickup_system:buff_spawn_pickup("ammo_ranger", enemy_pos, raycast_down)
 					end
-				elseif talent_extension.has_talent(talent_extension, "bardin_ranger_passive_improved_ammo") then
-					pickup_system.buff_spawn_pickup(pickup_system, "ammo_ranger_improved", enemy_pos, raycast_down)
+				elseif talent_extension:has_talent("bardin_ranger_passive_improved_ammo") then
+					pickup_system:buff_spawn_pickup("ammo_ranger_improved", enemy_pos, raycast_down)
 				else
-					pickup_system.buff_spawn_pickup(pickup_system, "ammo_ranger", enemy_pos, raycast_down)
+					pickup_system:buff_spawn_pickup("ammo_ranger", enemy_pos, raycast_down)
 				end
 			end
 		end
@@ -719,18 +719,18 @@ ProcFunctions = {
 		if attack_type == "grenade" and breed then
 			local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "trait_trinket_grenade_damage_taken_buff")
+			buff_extension:add_buff("trait_trinket_grenade_damage_taken_buff")
 		end
 	end,
 	activate_buff_on_disabler = function (player, buff, params)
 		local unit = player.player_unit
 		local template = buff.template
 		local status_extension = ScriptUnit.extension(unit, "status_system")
-		local is_disabled = status_extension.is_disabled(status_extension)
+		local is_disabled = status_extension:is_disabled()
 		local buff_to_add = template.buff_to_add
 
 		if is_disabled then
-			local disabler_unit = status_extension.get_disabler_unit(status_extension)
+			local disabler_unit = status_extension:get_disabler_unit()
 
 			if Unit.alive(disabler_unit) then
 				local disabler_breed = disabler_unit and Unit.get_data(disabler_unit, "breed")
@@ -738,7 +738,7 @@ ProcFunctions = {
 				if not disabler_breed or not disabler_breed.boss then
 					local buff_extension = ScriptUnit.extension(disabler_unit, "buff_system")
 
-					buff_extension.add_buff(buff_extension, buff_to_add)
+					buff_extension:add_buff(buff_to_add)
 				end
 			end
 		end
@@ -749,10 +749,10 @@ ProcFunctions = {
 		local hit_unit_buff_extension = ScriptUnit.has_extension(hit_unit, "buff_system")
 		local player_unit_buff_extension = ScriptUnit.has_extension(player_unit, "buff_system")
 
-		if not hit_unit_buff_extension.has_buff_type(hit_unit_buff_extension, "consecutive_shot_debuff") then
-			hit_unit_buff_extension.add_buff(hit_unit_buff_extension, "consecutive_shot_debuff")
+		if not hit_unit_buff_extension:has_buff_type("consecutive_shot_debuff") then
+			hit_unit_buff_extension:add_buff("consecutive_shot_debuff")
 		else
-			player_unit_buff_extension.add_buff(player_unit_buff_extension, "consecutive_shot_buff")
+			player_unit_buff_extension:add_buff("consecutive_shot_buff")
 		end
 	end,
 	block_increase_enemy_damage_taken = function (player, buff, params)
@@ -762,7 +762,7 @@ ProcFunctions = {
 		if Unit.alive(attacking_unit) then
 			local buff_extension = ScriptUnit.extension(attacking_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "defence_debuff_enemies")
+			buff_extension:add_buff("defence_debuff_enemies")
 		end
 	end,
 	add_buff = function (player, buff, params)
@@ -773,7 +773,7 @@ ProcFunctions = {
 			local buff_name = buff_template.buff_to_add
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, buff_name)
+			buff_extension:add_buff(buff_name)
 		end
 	end,
 	add_bardin_slayer_passive_buff = function (player, buff, params)
@@ -788,23 +788,23 @@ ProcFunctions = {
 			local buff_name = "bardin_slayer_passive_stacking_damage_buff"
 			local talent_extension = ScriptUnit.extension(player_unit, "talent_system")
 
-			if talent_extension.has_talent(talent_extension, "bardin_slayer_passive_stacking_damage_buff_increased_duration", "dwarf_ranger", true) then
+			if talent_extension:has_talent("bardin_slayer_passive_stacking_damage_buff_increased_duration", "dwarf_ranger", true) then
 				buff_name = "bardin_slayer_passive_stacking_damage_buff_increased_duration"
 			end
 
-			if talent_extension.has_talent(talent_extension, "bardin_slayer_passive_stacking_damage_buff_grants_defence", "dwarf_ranger", true) then
-				buff_system.add_buff(buff_system, player_unit, "bardin_slayer_passive_stacking_defence_buff", player_unit, false)
+			if talent_extension:has_talent("bardin_slayer_passive_stacking_damage_buff_grants_defence", "dwarf_ranger", true) then
+				buff_system:add_buff(player_unit, "bardin_slayer_passive_stacking_defence_buff", player_unit, false)
 			end
 
-			buff_system.add_buff(buff_system, player_unit, buff_name, player_unit, false)
+			buff_system:add_buff(player_unit, buff_name, player_unit, false)
 
-			if talent_extension.has_talent(talent_extension, "bardin_slayer_passive_cooldown_reduction_on_max_stacks", "dwarf_ranger", true) then
+			if talent_extension:has_talent("bardin_slayer_passive_cooldown_reduction_on_max_stacks", "dwarf_ranger", true) then
 				local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-				local num_stacks = buff_extension.num_buff_type(buff_extension, buff_name)
+				local num_stacks = buff_extension:num_buff_type(buff_name)
 				local max_stacks = buff.template.max_stacks
 
 				if num_stacks == max_stacks then
-					buff_system.add_buff(buff_system, player_unit, "bardin_slayer_passive_cooldown_reduction_on_max_stacks", player_unit, false)
+					buff_system:add_buff(player_unit, "bardin_slayer_passive_cooldown_reduction_on_max_stacks", player_unit, false)
 				end
 			end
 		end
@@ -816,7 +816,7 @@ ProcFunctions = {
 			local fatigue_amount = buff.bonus
 			local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-			status_extension.remove_fatigue_points(status_extension, fatigue_amount)
+			status_extension:remove_fatigue_points(fatigue_amount)
 		end
 	end,
 	increase_attack_speed = function (player, buff, params)
@@ -833,7 +833,7 @@ ProcFunctions = {
 			buff_params.external_optional_multiplier = speed_increase
 			buff_params.external_optional_duration = duration
 
-			buff_extension.add_buff(buff_extension, "increased_attack_speed", buff_params)
+			buff_extension:add_buff("increased_attack_speed", buff_params)
 		end
 	end,
 	increase_critical_hit_chance = function (player, buff, params)
@@ -850,7 +850,7 @@ ProcFunctions = {
 			buff_params.external_optional_bonus = crit_chance_increase
 			buff_params.external_optional_duration = duration
 
-			buff_extension.add_buff(buff_extension, "increased_critical_hit_chance", buff_params)
+			buff_extension:add_buff("increased_critical_hit_chance", buff_params)
 		end
 	end,
 	remove_overcharge = function (player, buff, params)
@@ -865,7 +865,7 @@ ProcFunctions = {
 			local overcharge_extension = ScriptUnit.extension(player_unit, "overcharge_system")
 
 			if overcharge_extension then
-				overcharge_extension.remove_charge(overcharge_extension, overcharge_amount)
+				overcharge_extension:remove_charge(overcharge_amount)
 			end
 		end
 	end,
@@ -874,22 +874,22 @@ ProcFunctions = {
 
 		if Unit.alive(player_unit) then
 			local talent_extension = ScriptUnit.extension(player_unit, "talent_system")
-			local ranged_stealth = talent_extension.has_talent(talent_extension, "kerillian_shade_activated_ability_no_break_on_ranged", "wood_elf", true)
+			local ranged_stealth = talent_extension:has_talent("kerillian_shade_activated_ability_no_break_on_ranged", "wood_elf", true)
 			local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-			local wielded_slot = inventory_extension.get_wielded_slot_name(inventory_extension)
+			local wielded_slot = inventory_extension:get_wielded_slot_name()
 
 			if wielded_slot == "slot_melee" or (wielded_slot == "slot_ranged" and not ranged_stealth) then
 				local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 				local shade_activated_ability_buff = nil
 
-				if talent_extension.has_talent(talent_extension, "kerillian_shade_activated_ability_duration", "wood_elf", true) then
-					shade_activated_ability_buff = buff_extension.get_non_stacking_buff(buff_extension, "kerillian_shade_activated_ability_duration")
+				if talent_extension:has_talent("kerillian_shade_activated_ability_duration", "wood_elf", true) then
+					shade_activated_ability_buff = buff_extension:get_non_stacking_buff("kerillian_shade_activated_ability_duration")
 				else
-					shade_activated_ability_buff = buff_extension.get_non_stacking_buff(buff_extension, "kerillian_shade_activated_ability")
+					shade_activated_ability_buff = buff_extension:get_non_stacking_buff("kerillian_shade_activated_ability")
 				end
 
 				if shade_activated_ability_buff then
-					buff_extension.remove_buff(buff_extension, shade_activated_ability_buff.id)
+					buff_extension:remove_buff(shade_activated_ability_buff.id)
 				end
 			end
 		end
@@ -906,13 +906,13 @@ ProcFunctions = {
 			if is_local(player_unit) or (is_server() and is_bot(player_unit)) then
 				local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-				if status_extension.is_invisible(status_extension) then
-					status_extension.set_invisible(status_extension, false)
+				if status_extension:is_invisible() then
+					status_extension:set_invisible(false)
 
 					local first_person_extension = ScriptUnit.extension(player_unit, "first_person_system")
 
-					first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_markus_huntsman_exit")
-					first_person_extension.play_hud_sound_event(first_person_extension, "Stop_career_ability_markus_huntsman_loop")
+					first_person_extension:play_hud_sound_event("Play_career_ability_markus_huntsman_exit")
+					first_person_extension:play_hud_sound_event("Stop_career_ability_markus_huntsman_loop")
 
 					local events = {
 						"Play_career_ability_markus_huntsman_exit",
@@ -921,16 +921,16 @@ ProcFunctions = {
 					local network_manager = Managers.state.network
 					local network_transmit = network_manager.network_transmit
 					local is_server = Managers.player.is_server
-					local unit_id = network_manager.unit_game_object_id(network_manager, player_unit)
+					local unit_id = network_manager:unit_game_object_id(player_unit)
 					local node_id = 0
 
 					for _, event in ipairs(events) do
 						local event_id = NetworkLookup.sound_events[event]
 
 						if is_server then
-							network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+							network_transmit:send_rpc_clients("rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
 						else
-							network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+							network_transmit:send_rpc_server("rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
 						end
 					end
 				end
@@ -942,12 +942,12 @@ ProcFunctions = {
 
 		if Unit.alive(player_unit) then
 			local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-			local wielded_slot = inventory_extension.get_wielded_slot_name(inventory_extension)
+			local wielded_slot = inventory_extension:get_wielded_slot_name()
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-			local huntsman_activated_ability_buff = buff_extension.get_non_stacking_buff(buff_extension, "markus_huntsman_activated_ability")
+			local huntsman_activated_ability_buff = buff_extension:get_non_stacking_buff("markus_huntsman_activated_ability")
 
 			if huntsman_activated_ability_buff then
-				buff_extension.remove_buff(buff_extension, huntsman_activated_ability_buff.id)
+				buff_extension:remove_buff(huntsman_activated_ability_buff.id)
 			end
 		end
 	end,
@@ -956,12 +956,12 @@ ProcFunctions = {
 
 		if Unit.alive(player_unit) then
 			local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-			local wielded_slot = inventory_extension.get_wielded_slot_name(inventory_extension)
+			local wielded_slot = inventory_extension:get_wielded_slot_name()
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-			local ranger_activated_ability_buff = buff_extension.get_non_stacking_buff(buff_extension, "bardin_ranger_activated_ability")
+			local ranger_activated_ability_buff = buff_extension:get_non_stacking_buff("bardin_ranger_activated_ability")
 
 			if ranger_activated_ability_buff then
-				buff_extension.remove_buff(buff_extension, ranger_activated_ability_buff.id)
+				buff_extension:remove_buff(ranger_activated_ability_buff.id)
 			end
 		end
 	end,
@@ -979,7 +979,7 @@ ProcFunctions = {
 			buff_params.external_optional_multiplier = speed_increase
 			buff_params.external_optional_duration = duration
 
-			buff_extension.add_buff(buff_extension, "increased_movement_speed_from_proc", buff_params)
+			buff_extension:add_buff("increased_movement_speed_from_proc", buff_params)
 		end
 	end,
 	ammo_gain = function (player, buff, params)
@@ -989,7 +989,7 @@ ProcFunctions = {
 			local weapon_slot = "slot_ranged"
 			local ammo_amount = buff.bonus
 			local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-			local slot_data = inventory_extension.get_slot_data(inventory_extension, weapon_slot)
+			local slot_data = inventory_extension:get_slot_data(weapon_slot)
 			local right_unit_1p = slot_data.right_unit_1p
 			local left_unit_1p = slot_data.left_unit_1p
 			local right_hand_ammo_extension = ScriptUnit.has_extension(right_unit_1p, "ammo_system")
@@ -997,7 +997,7 @@ ProcFunctions = {
 			local ammo_extension = right_hand_ammo_extension or left_hand_ammo_extension
 
 			if ammo_extension then
-				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
+				ammo_extension:add_ammo_to_reserve(ammo_amount)
 			end
 		end
 	end,
@@ -1013,18 +1013,18 @@ ProcFunctions = {
 			local buff_template = buff.template
 			local weapon_slot = "slot_ranged"
 			local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-			local slot_data = inventory_extension.get_slot_data(inventory_extension, weapon_slot)
+			local slot_data = inventory_extension:get_slot_data(weapon_slot)
 			local right_unit_1p = slot_data.right_unit_1p
 			local left_unit_1p = slot_data.left_unit_1p
 			local right_hand_ammo_extension = ScriptUnit.has_extension(right_unit_1p, "ammo_system")
 			local left_hand_ammo_extension = ScriptUnit.has_extension(left_unit_1p, "ammo_system")
 			local ammo_extension = right_hand_ammo_extension or left_hand_ammo_extension
-			local ammo_percent = ammo_extension.total_ammo_fraction(ammo_extension)
+			local ammo_percent = ammo_extension:total_ammo_fraction()
 			local ammo_bonus_fraction = buff_template.ammo_bonus_fraction
-			local ammo_amount = math.max(math.round(ammo_extension.get_max_ammo(ammo_extension) * ammo_bonus_fraction), 1)
+			local ammo_amount = math.max(math.round(ammo_extension:get_max_ammo() * ammo_bonus_fraction), 1)
 
 			if ammo_extension then
-				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
+				ammo_extension:add_ammo_to_reserve(ammo_amount)
 			end
 		end
 	end,
@@ -1040,19 +1040,19 @@ ProcFunctions = {
 			local buff_template = buff.template
 			local weapon_slot = "slot_ranged"
 			local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-			local slot_data = inventory_extension.get_slot_data(inventory_extension, weapon_slot)
+			local slot_data = inventory_extension:get_slot_data(weapon_slot)
 			local right_unit_1p = slot_data.right_unit_1p
 			local left_unit_1p = slot_data.left_unit_1p
 			local right_hand_ammo_extension = ScriptUnit.has_extension(right_unit_1p, "ammo_system")
 			local left_hand_ammo_extension = ScriptUnit.has_extension(left_unit_1p, "ammo_system")
 			local ammo_extension = right_hand_ammo_extension or left_hand_ammo_extension
-			local ammo_percent = ammo_extension.total_ammo_fraction(ammo_extension)
+			local ammo_percent = ammo_extension:total_ammo_fraction()
 			local activate_bonus = ammo_percent < buff_template.activation_ammo
 			local ammo_bonus_fraction = buff_template.ammo_bonus_fraction
-			local ammo_amount = math.max(math.round(ammo_extension.get_max_ammo(ammo_extension) * ammo_bonus_fraction), 1)
+			local ammo_amount = math.max(math.round(ammo_extension:get_max_ammo() * ammo_bonus_fraction), 1)
 
 			if ammo_extension and activate_bonus then
-				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
+				ammo_extension:add_ammo_to_reserve(ammo_amount)
 			end
 		end
 	end,
@@ -1067,17 +1067,17 @@ ProcFunctions = {
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 			local talent_extension = ScriptUnit.extension(player_unit, "talent_system")
 
-			if talent_extension.has_talent(talent_extension, "markus_huntsman_passive_improved", "empire_soldier", true) then
+			if talent_extension:has_talent("markus_huntsman_passive_improved", "empire_soldier", true) then
 				ammo_amount = ammo_amount * 2
 			end
 
-			if talent_extension.has_talent(talent_extension, "markus_huntsman_passive_crit_buff_on_headshot", "empire_soldier", true) then
-				buff_extension.add_buff(buff_extension, "markus_huntsman_passive_crit_buff")
-				buff_extension.add_buff(buff_extension, "markus_huntsman_passive_crit_buff_removal")
+			if talent_extension:has_talent("markus_huntsman_passive_crit_buff_on_headshot", "empire_soldier", true) then
+				buff_extension:add_buff("markus_huntsman_passive_crit_buff")
+				buff_extension:add_buff("markus_huntsman_passive_crit_buff_removal")
 			end
 
 			local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-			local slot_data = inventory_extension.get_slot_data(inventory_extension, weapon_slot)
+			local slot_data = inventory_extension:get_slot_data(weapon_slot)
 			local right_unit_1p = slot_data.right_unit_1p
 			local left_unit_1p = slot_data.left_unit_1p
 			local right_hand_ammo_extension = ScriptUnit.has_extension(right_unit_1p, "ammo_system")
@@ -1085,7 +1085,7 @@ ProcFunctions = {
 			local ammo_extension = right_hand_ammo_extension or left_hand_ammo_extension
 
 			if ammo_extension then
-				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
+				ammo_extension:add_ammo_to_reserve(ammo_amount)
 			end
 		end
 	end,
@@ -1096,7 +1096,7 @@ ProcFunctions = {
 		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
 		if Unit.alive(player_unit) and hit_zone_name == "head" and (attack_type == "instant_projectile" or attack_type == "projectile") then
-			buff_extension.add_buff(buff_extension, "markus_huntsman_headshots_increase_reload_speed_buff")
+			buff_extension:add_buff("markus_huntsman_headshots_increase_reload_speed_buff")
 		end
 	end,
 	replenish_ammo_on_headshot_ranged = function (player, buff, params)
@@ -1108,7 +1108,7 @@ ProcFunctions = {
 			local weapon_slot = "slot_ranged"
 			local ammo_amount = buff.bonus
 			local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-			local slot_data = inventory_extension.get_slot_data(inventory_extension, weapon_slot)
+			local slot_data = inventory_extension:get_slot_data(weapon_slot)
 			local right_unit_1p = slot_data.right_unit_1p
 			local left_unit_1p = slot_data.left_unit_1p
 			local right_hand_ammo_extension = ScriptUnit.has_extension(right_unit_1p, "ammo_system")
@@ -1116,7 +1116,7 @@ ProcFunctions = {
 			local ammo_extension = right_hand_ammo_extension or left_hand_ammo_extension
 
 			if ammo_extension then
-				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
+				ammo_extension:add_ammo_to_reserve(ammo_amount)
 			end
 		end
 	end,
@@ -1126,13 +1126,13 @@ ProcFunctions = {
 
 		if Unit.alive(player_unit) and attacker_unit ~= player_unit then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-			local tranquility_buff = buff_extension.get_non_stacking_buff(buff_extension, "tranquility")
+			local tranquility_buff = buff_extension:get_non_stacking_buff("tranquility")
 
 			if tranquility_buff then
-				buff_extension.remove_buff(buff_extension, tranquility_buff.id)
+				buff_extension:remove_buff(tranquility_buff.id)
 			end
 
-			buff_extension.add_buff(buff_extension, "sienna_adept_passive")
+			buff_extension:add_buff("sienna_adept_passive")
 		end
 	end,
 	gain_markus_mercenary_passive_proc = function (player, buff, params)
@@ -1151,7 +1151,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) and target_number and buff_template.targets <= target_number and (attack_type == "light_attack" or attack_type == "heavy_attack") then
 			local talent_extension = ScriptUnit.extension(player_unit, "talent_system")
 
-			if talent_extension.has_talent(talent_extension, "markus_mercenary_passive_group_proc", "empire_soldier", true) then
+			if talent_extension:has_talent("markus_mercenary_passive_group_proc", "empire_soldier", true) then
 				local player_and_bot_units = PLAYER_AND_BOT_UNITS
 				local num_units = #player_and_bot_units
 
@@ -1159,11 +1159,11 @@ ProcFunctions = {
 					local unit = player_and_bot_units[i]
 
 					if Unit.alive(unit) then
-						buff_system.add_buff(buff_system, unit, buff_to_add, owner_unit, false)
+						buff_system:add_buff(unit, buff_to_add, owner_unit, false)
 					end
 				end
 			else
-				buff_system.add_buff(buff_system, player_unit, buff_to_add, owner_unit, false)
+				buff_system:add_buff(player_unit, buff_to_add, owner_unit, false)
 			end
 		end
 	end,
@@ -1173,7 +1173,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local career_extension = ScriptUnit.extension(player_unit, "career_system")
 
-			career_extension.reduce_activated_ability_cooldown(career_extension, buff.bonus)
+			career_extension:reduce_activated_ability_cooldown(buff.bonus)
 		end
 	end,
 	reduce_activated_ability_cooldown_on_damage_taken = function (player, buff, params)
@@ -1185,7 +1185,7 @@ ProcFunctions = {
 			local career_extension = ScriptUnit.extension(player_unit, "career_system")
 			local cooldown_removed = buff.bonus * damage_taken
 
-			career_extension.reduce_activated_ability_cooldown(career_extension, cooldown_removed)
+			career_extension:reduce_activated_ability_cooldown(cooldown_removed)
 		end
 	end,
 	remove_victor_bountyhunter_passive_crit_buff = function (player, buff, params)
@@ -1195,17 +1195,17 @@ ProcFunctions = {
 
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-			local crit_buff = buff_extension.get_non_stacking_buff(buff_extension, "victor_bountyhunter_passive_crit_buff")
+			local crit_buff = buff_extension:get_non_stacking_buff("victor_bountyhunter_passive_crit_buff")
 
 			if crit_buff and not melee_action then
-				buff_extension.remove_buff(buff_extension, crit_buff.id)
+				buff_extension:remove_buff(crit_buff.id)
 
 				local talent_extension = ScriptUnit.extension(player_unit, "talent_system")
 
-				if talent_extension.has_talent(talent_extension, "victor_bountyhunter_passive_reduced_cooldown", "witch_hunter", true) then
-					buff_extension.add_buff(buff_extension, "victor_bountyhunter_passive_reduced_cooldown")
+				if talent_extension:has_talent("victor_bountyhunter_passive_reduced_cooldown", "witch_hunter", true) then
+					buff_extension:add_buff("victor_bountyhunter_passive_reduced_cooldown")
 				else
-					buff_extension.add_buff(buff_extension, "victor_bountyhunter_passive_crit_cooldown")
+					buff_extension:add_buff("victor_bountyhunter_passive_crit_cooldown")
 				end
 			end
 		end
@@ -1215,10 +1215,10 @@ ProcFunctions = {
 
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-			local crit_buff = buff_extension.get_non_stacking_buff(buff_extension, "markus_huntsman_passive_crit_buff")
+			local crit_buff = buff_extension:get_non_stacking_buff("markus_huntsman_passive_crit_buff")
 
 			if crit_buff then
-				buff_extension.remove_buff(buff_extension, crit_buff.id)
+				buff_extension:remove_buff(crit_buff.id)
 			end
 		end
 	end,
@@ -1228,7 +1228,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "uninterruptible")
+			buff_extension:add_buff("uninterruptible")
 		end
 	end,
 	gain_bardin_slayer_uninterruptible_on_block_broken_buff = function (player, buff, params)
@@ -1237,7 +1237,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "bardin_slayer_uninterruptible_on_block_broken_buff")
+			buff_extension:add_buff("bardin_slayer_uninterruptible_on_block_broken_buff")
 		end
 	end,
 	gain_markus_knight_uninterruptible_on_block_broken_buff = function (player, buff, params)
@@ -1246,7 +1246,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "markus_knight_uninterruptible_on_block_broken_buff")
+			buff_extension:add_buff("markus_knight_uninterruptible_on_block_broken_buff")
 		end
 	end,
 	gain_kerillian_maidenguard_uninterruptible_on_block_broken_buff = function (player, buff, params)
@@ -1255,7 +1255,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "kerillian_maidenguard_uninterruptible_on_block_broken_buff")
+			buff_extension:add_buff("kerillian_maidenguard_uninterruptible_on_block_broken_buff")
 		end
 	end,
 	gain_victor_zealot_uninterruptible_on_block_broken_buff = function (player, buff, params)
@@ -1264,7 +1264,7 @@ ProcFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "victor_zealot_uninterruptible_on_block_broken_buff")
+			buff_extension:add_buff("victor_zealot_uninterruptible_on_block_broken_buff")
 		end
 	end,
 	victor_bountyhunter_activate_passive_on_melee_kill = function (player, buff, params)
@@ -1297,11 +1297,11 @@ ProcFunctions = {
 
 		if melee_weapon and Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-			local cooldown_buff = buff_extension.get_non_stacking_buff(buff_extension, "victor_bountyhunter_passive_crit_cooldown")
+			local cooldown_buff = buff_extension:get_non_stacking_buff("victor_bountyhunter_passive_crit_cooldown")
 			local talent_extension = ScriptUnit.extension(player_unit, "talent_system")
 
-			if talent_extension.has_talent(talent_extension, "victor_bountyhunter_passive_reduced_cooldown", "witch_hunter", true) then
-				cooldown_buff = buff_extension.get_non_stacking_buff(buff_extension, "victor_bountyhunter_passive_reduced_cooldown")
+			if talent_extension:has_talent("victor_bountyhunter_passive_reduced_cooldown", "witch_hunter", true) then
+				cooldown_buff = buff_extension:get_non_stacking_buff("victor_bountyhunter_passive_reduced_cooldown")
 			end
 
 			if cooldown_buff then
@@ -1317,7 +1317,7 @@ MaxStackFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "bw_push_applies_burn")
+			buff_extension:add_buff("bw_push_applies_burn")
 		end
 	end,
 	gain_assassinate = function (player, sub_buff_template)
@@ -1326,7 +1326,7 @@ MaxStackFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-			buff_extension.add_buff(buff_extension, "assassinate")
+			buff_extension:add_buff("assassinate")
 		end
 	end,
 	gain_health_and_ammo = function (player, sub_buff_template)
@@ -1342,7 +1342,7 @@ MaxStackFunctions = {
 			local weapon_slot = "slot_ranged"
 			local ammo_amount = sub_buff_template.ammo_amount
 			local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-			local slot_data = inventory_extension.get_slot_data(inventory_extension, weapon_slot)
+			local slot_data = inventory_extension:get_slot_data(weapon_slot)
 			local right_unit_1p = slot_data.right_unit_1p
 			local left_unit_1p = slot_data.left_unit_1p
 			local right_hand_ammo_extension = right_unit_1p and ScriptUnit.has_extension(right_unit_1p, "ammo_system")
@@ -1350,7 +1350,7 @@ MaxStackFunctions = {
 			local ammo_extension = right_hand_ammo_extension or left_hand_ammo_extension
 
 			if ammo_extension then
-				ammo_extension.add_ammo_to_reserve(ammo_extension, ammo_amount)
+				ammo_extension:add_ammo_to_reserve(ammo_amount)
 			end
 		end
 	end,
@@ -1360,10 +1360,10 @@ MaxStackFunctions = {
 		if Unit.alive(player_unit) then
 			local buff_to_remove = sub_buff_template.buff_to_remove
 			local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-			local buff = buff_extension.get_non_stacking_buff(buff_extension, buff_to_remove)
+			local buff = buff_extension:get_non_stacking_buff(buff_to_remove)
 
 			if buff then
-				buff_extension.remove_buff(buff_extension, buff.id)
+				buff_extension:remove_buff(buff.id)
 			end
 		end
 	end

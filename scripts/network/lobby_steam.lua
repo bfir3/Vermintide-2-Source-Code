@@ -74,8 +74,8 @@ LobbyInternal.shutdown_client = function ()
 end
 
 LobbyInternal.get_lobby = function (lobby_browser, index)
-	local lobby_data = lobby_browser.lobby(lobby_browser, index)
-	local lobby_data_all = lobby_browser.data_all(lobby_browser, index)
+	local lobby_data = lobby_browser:lobby(index)
+	local lobby_data_all = lobby_browser:data_all(index)
 	lobby_data_all.id = lobby_data.id
 
 	if lobby_data_all.Host then
@@ -145,7 +145,7 @@ LobbyInternal.user_name = function (user)
 end
 
 LobbyInternal.lobby_id = function (lobby)
-	return lobby.id(lobby)
+	return lobby:id()
 end
 
 LobbyInternal.is_friend = function (peer_id)

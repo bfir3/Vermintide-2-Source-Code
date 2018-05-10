@@ -8,7 +8,7 @@ CameraTransitionPositionLinear.init = function (self, node_1, node_2, duration, 
 	self._freeze_node_1 = settings.freeze_start_node
 
 	if self._freeze_node_1 then
-		local node_1_pos = node_1.position(node_1)
+		local node_1_pos = node_1:position()
 		self._node_1_pos_table = Vector3Box(node_1_pos)
 	end
 

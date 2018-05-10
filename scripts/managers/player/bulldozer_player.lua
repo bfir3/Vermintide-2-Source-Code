@@ -12,7 +12,7 @@ BulldozerPlayer.init = function (self, network_manager, input_source, viewport_n
 	self.player_unit = nil
 	local peer_id = Network.peer_id()
 	self.peer_id = peer_id
-	self._debug_name = "Local #" .. peer_id.sub(peer_id, 1, 3)
+	self._debug_name = "Local #" .. peer_id:sub(1, 3)
 	self._local_player_id = local_player_id
 	self._unique_id = unique_id
 	self.is_server = is_server
@@ -29,7 +29,7 @@ BulldozerPlayer.profile_index = function (self)
 	end
 
 	local profile_synchronizer = self.network_manager.profile_synchronizer
-	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, self.peer_id, self._local_player_id)
+	local profile_index = profile_synchronizer:profile_by_peer(self.peer_id, self._local_player_id)
 
 	return profile_index
 end
@@ -43,7 +43,7 @@ BulldozerPlayer.type = function (self)
 end
 
 BulldozerPlayer.profile_display_name = function (self)
-	local profile_index = self.profile_index(self)
+	local profile_index = self:profile_index()
 	local profile = SPProfiles[profile_index]
 	local display_name = profile and profile.display_name
 
@@ -68,20 +68,20 @@ BulldozerPlayer.despawn = function (self)
 end
 
 BulldozerPlayer.career_index = function (self)
-	local hero_name = self.profile_display_name(self)
+	local hero_name = self:profile_display_name()
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
-	local career_index = hero_attributes.get(hero_attributes, hero_name, "career") or 1
+	local career_index = hero_attributes:get(hero_name, "career") or 1
 
 	return career_index
 end
 
 BulldozerPlayer.career_name = function (self)
-	local profile_index = self.profile_index(self)
+	local profile_index = self:profile_index()
 	local profile = SPProfiles[profile_index]
 	local display_name = profile and profile.display_name
 
 	if display_name then
-		local career_index = self.career_index(self)
+		local career_index = self:career_index()
 
 		return profile.careers[career_index].name
 	end
@@ -93,16 +93,16 @@ BulldozerPlayer.set_spawn_position_rotation = function (self, position, rotation
 end
 
 BulldozerPlayer.spawn = function (self, optional_position, optional_rotation, is_initial_spawn, ammo_melee, ammo_ranged, healthkit, potion, grenade)
-	local profile_index = self.profile_index(self)
+	local profile_index = self:profile_index()
 	local profile = SPProfiles[profile_index]
 	local careers = profile.careers
-	local career_index = self.career_index(self)
+	local career_index = self:career_index()
 
 	fassert(profile, "[SpawnManager] Trying to spawn with profile %q that doesn't exist in %q.", profile_index, "SPProfiles")
 
 	local nav_world = Managers.state.entity:system("ai_system"):nav_world()
 	local difficulty_manager = Managers.state.difficulty
-	local difficulty_settings = difficulty_manager.get_difficulty_settings(difficulty_manager)
+	local difficulty_settings = difficulty_manager:get_difficulty_settings()
 	local player_wounds = difficulty_settings.wounds
 
 	if Managers.state.game_mode:has_mutator("instant_death") then
@@ -151,7 +151,7 @@ BulldozerPlayer.spawn = function (self, optional_position, optional_rotation, is
 		PlayerCharacterStateInHangingCage,
 		PlayerCharacterStateGrabbedByCorruptor
 	}
-	local initial_inventory = self._get_initial_inventory(self, healthkit, potion, grenade)
+	local initial_inventory = self:_get_initial_inventory(healthkit, potion, grenade)
 	local hero_name = profile.display_name
 	local career = profile.careers[career_index]
 	local base_skin = career.base_skin
@@ -241,7 +241,7 @@ BulldozerPlayer.spawn = function (self, optional_position, optional_rotation, is
 		},
 		statistics_system = {
 			template = "player",
-			statistics_id = self.telemetry_id(self)
+			statistics_id = self:telemetry_id()
 		},
 		ai_slot_system = {
 			profile_index = profile_index
@@ -269,7 +269,7 @@ BulldozerPlayer.spawn = function (self, optional_position, optional_rotation, is
 		unit_template_name = profile.unit_template_name
 	}
 	local spawn_manager = Managers.state.spawn
-	local unit = spawn_manager.spawn_unit(spawn_manager, spawn_data, optional_position, optional_rotation)
+	local unit = spawn_manager:spawn_unit(spawn_data, optional_position, optional_rotation)
 	local player_manager = Managers.player
 	local world = spawn_manager.world
 
@@ -291,14 +291,14 @@ BulldozerPlayer.spawn = function (self, optional_position, optional_rotation, is
 
 	local is_player_unit = true
 
-	player_manager.assign_unit_ownership(player_manager, unit, self, is_player_unit)
+	player_manager:assign_unit_ownership(unit, self, is_player_unit)
 	Managers.state.event:trigger("level_start_local_player_spawned", is_initial_spawn)
 	Managers.telemetry.events:player_spawned(self)
 
 	if self.is_server then
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
-		health_extension.create_health_game_object(health_extension)
+		health_extension:create_health_game_object()
 	end
 
 	Managers.state.event:trigger("camera_teleported")
@@ -341,8 +341,8 @@ BulldozerPlayer.create_game_object = function (self)
 		boon_10_remaining_duration = 0,
 		player_controlled = true,
 		go_type = NetworkLookup.go_types.player,
-		network_id = self.network_id(self),
-		local_player_id = self.local_player_id(self),
+		network_id = self:network_id(),
+		local_player_id = self:local_player_id(),
 		clan_tag = Application.user_setting("clan_tag") or "0",
 		boon_1_id = empty_boon_id,
 		boon_2_id = empty_boon_id,
@@ -359,7 +359,7 @@ BulldozerPlayer.create_game_object = function (self)
 	local game_object_id = self.network_manager:create_player_game_object("player", game_object_data_table, callback)
 	self.game_object_id = game_object_id
 
-	self.create_sync_data(self)
+	self:create_sync_data()
 end
 
 BulldozerPlayer.create_sync_data = function (self)
@@ -438,7 +438,7 @@ BulldozerPlayer.name = function (self)
 				clan_tag = tostring(Clans.clan_tag(clan_tag_id)) .. "|"
 			end
 
-			local name = clan_tag .. Steam.user_name(self.network_id(self))
+			local name = clan_tag .. Steam.user_name(self:network_id())
 			self._cached_name = name
 
 			return name
@@ -448,7 +448,7 @@ BulldozerPlayer.name = function (self)
 			return self._cached_name
 		end
 
-		local name = Managers.state.network:lobby():user_name(self.network_id(self)) or "Remote #" .. tostring(self.peer_id:sub(1, 3))
+		local name = Managers.state.network:lobby():user_name(self:network_id()) or "Remote #" .. tostring(self.peer_id:sub(1, 3))
 		self._cached_name = name
 
 		return name
@@ -466,7 +466,7 @@ BulldozerPlayer.destroy = function (self)
 		self.network_manager:destroy_game_object(self.game_object_id)
 	end
 
-	Managers.free_flight:unregister_player(self.local_player_id(self))
+	Managers.free_flight:unregister_player(self:local_player_id())
 	Managers.music:unregister_active_player(self._local_player_id)
 end
 

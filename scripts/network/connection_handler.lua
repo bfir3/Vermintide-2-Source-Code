@@ -61,7 +61,7 @@ ConnectionHandler.update = function (self, dt)
 			pending_connects[peer_id] = nil
 			current_connections[peer_id] = connected_value
 
-			self.update_peer(self, peer_id, PeerConnectionState.Connected)
+			self:update_peer(peer_id, PeerConnectionState.Connected)
 		end
 	end
 
@@ -76,7 +76,7 @@ ConnectionHandler.update = function (self, dt)
 			pending_disconnects[peer_id] = nil
 			current_connections[peer_id] = nil
 
-			self.update_peer(self, peer_id, PeerConnectionState.Disconnected)
+			self:update_peer(peer_id, PeerConnectionState.Disconnected)
 		end
 	end
 
@@ -88,7 +88,7 @@ ConnectionHandler.update = function (self, dt)
 				num_new_connections = num_new_connections + 1
 				new_connections[num_new_connections] = peer_id
 
-				self.update_peer(self, peer_id, PeerConnectionState.Connecting)
+				self:update_peer(peer_id, PeerConnectionState.Connecting)
 
 				pending_connects[peer_id] = connected_value
 			else
@@ -114,7 +114,7 @@ ConnectionHandler.update = function (self, dt)
 		if Network.is_broken(peer_id) then
 			if peer_states[peer_id] ~= PeerConnectionState.Broken then
 				ch_printf("Peer %q is now broken.", peer_id)
-				self.update_peer(self, peer_id, PeerConnectionState.Broken)
+				self:update_peer(peer_id, PeerConnectionState.Broken)
 			end
 
 			num_broken_connections = num_broken_connections + 1
@@ -150,7 +150,7 @@ ConnectionHandler.disconnect_all = function (self)
 		temp_table[#temp_table + 1] = peer_id
 	end
 
-	self.disconnect_peers(self, unpack(current_connections))
+	self:disconnect_peers(unpack(current_connections))
 	table.clear(current_connections)
 end
 
@@ -172,9 +172,9 @@ ConnectionHandler.connect_peers = function (self, ...)
 
 			self.pending_connects[peer_id] = true
 
-			self.update_peer(self, peer_id, PeerConnectionState.Connecting)
+			self:update_peer(peer_id, PeerConnectionState.Connecting)
 		else
-			self.update_peer(self, peer_id, PeerConnectionState.Connected)
+			self:update_peer(peer_id, PeerConnectionState.Connected)
 		end
 	end
 end
@@ -198,13 +198,13 @@ ConnectionHandler.disconnect_peers = function (self, ...)
 			if Network.is_used(peer_id) then
 				pending_disconnects[peer_id] = true
 
-				self.update_peer(self, peer_id, PeerConnectionState.Disconnecting)
+				self:update_peer(peer_id, PeerConnectionState.Disconnecting)
 			else
 				Network.destroy_connection(peer_id)
 
 				current_connections[peer_id] = nil
 
-				self.update_peer(self, peer_id, PeerConnectionState.Disconnected)
+				self:update_peer(peer_id, PeerConnectionState.Disconnected)
 			end
 		end
 	end

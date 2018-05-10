@@ -9,7 +9,7 @@ EnduranceBadgeUI.init = function (self, ingame_ui_context)
 	self.mission_system = Managers.state.entity:system("mission_system")
 	self.ui_animations = {}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 	rawset(_G, "endurance_badge_ui", self)
 end
 
@@ -25,7 +25,7 @@ EnduranceBadgeUI.create_ui_elements = function (self)
 	self.badge_widgets = badge_widgets
 
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
-	self.align_badge_widgets(self)
+	self:align_badge_widgets()
 end
 
 EnduranceBadgeUI.align_badge_widgets = function (self)
@@ -46,7 +46,7 @@ EnduranceBadgeUI.align_badge_widgets = function (self)
 end
 
 EnduranceBadgeUI.destroy = function (self)
-	self.set_visible(self, false)
+	self:set_visible(false)
 	rawset(_G, "endurance_badge_ui", nil)
 end
 
@@ -69,13 +69,13 @@ EnduranceBadgeUI.update_mission_data = function (self, dt)
 		for index, widget in ipairs(badge_widgets) do
 			local widget_content = widget.content
 			local mission_name = widget_content.mission_name
-			local mission_data = mission_system.get_level_end_mission_data(mission_system, mission_name)
+			local mission_data = mission_system:get_level_end_mission_data(mission_name)
 
 			if mission_data then
 				local current_amount = mission_data.current_amount
 
 				if widget_content.amount ~= current_amount then
-					self.set_badge_amount(self, widget, current_amount)
+					self:set_badge_amount(widget, current_amount)
 				end
 			end
 		end
@@ -83,7 +83,7 @@ EnduranceBadgeUI.update_mission_data = function (self, dt)
 end
 
 EnduranceBadgeUI.update = function (self, dt)
-	self.update_mission_data(self, dt)
+	self:update_mission_data(dt)
 
 	local is_dirty = nil
 	local ui_animations = self.ui_animations
@@ -118,7 +118,7 @@ EnduranceBadgeUI.update = function (self, dt)
 		end
 	end
 
-	self.draw(self, dt)
+	self:draw(dt)
 end
 
 EnduranceBadgeUI.draw = function (self, dt)

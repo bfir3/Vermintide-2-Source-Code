@@ -81,7 +81,7 @@ DamageIndicatorGui.init = function (self, ingame_ui_context)
 	self.ui_renderer = ingame_ui_context.ui_renderer
 	self.input_manager = ingame_ui_context.input_manager
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.player_manager = ingame_ui_context.player_manager
 	self.peer_id = ingame_ui_context.peer_id
@@ -112,7 +112,7 @@ DamageIndicatorGui.update = function (self, dt)
 	end
 
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "ingame_menu")
+	local input_service = input_manager:get_service("ingame_menu")
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
 	local indicator_widgets = self.indicator_widgets
@@ -127,7 +127,7 @@ DamageIndicatorGui.update = function (self, dt)
 	UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt, "damage_indicator_center")
 
 	local health_extension = ScriptUnit.extension(player_unit, "health_system")
-	local strided_array, array_length = health_extension.recent_damages(health_extension)
+	local strided_array, array_length = health_extension:recent_damages()
 	local indicator_positions = self.indicator_positions
 
 	if 0 < array_length then
@@ -161,7 +161,7 @@ DamageIndicatorGui.update = function (self, dt)
 
 	local first_person_extension = ScriptUnit.extension(player_unit, "first_person_system")
 	local my_pos = Vector3.copy(POSITION_LOOKUP[player_unit])
-	local my_rotation = first_person_extension.current_rotation(first_person_extension)
+	local my_rotation = first_person_extension:current_rotation()
 	local my_direction = Quaternion.forward(my_rotation)
 	my_direction.z = 0
 	my_direction = Vector3.normalize(my_direction)

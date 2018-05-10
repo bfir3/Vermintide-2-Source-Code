@@ -10,15 +10,15 @@ local placeholder_icon_textures = {
 
 BackendUtils.get_loadout_item = function (career_name, slot)
 	local backend_items = Managers.backend:get_interface("items")
-	local backend_id = backend_items.get_loadout_item_id(backend_items, career_name, slot)
-	local item = backend_items.get_item_from_id(backend_items, backend_id)
+	local backend_id = backend_items:get_loadout_item_id(career_name, slot)
+	local item = backend_items:get_item_from_id(backend_id)
 
 	return item
 end
 
 BackendUtils.get_item_from_masterlist = function (backend_id)
 	local backend_items = Managers.backend:get_interface("items")
-	local item_master_list_data = backend_items.get_item_masterlist_data(backend_items, backend_id)
+	local item_master_list_data = backend_items:get_item_masterlist_data(backend_id)
 	local item_data = table.clone(item_master_list_data)
 	item_data.backend_id = backend_id
 
@@ -53,7 +53,7 @@ BackendUtils.get_average_item_power_level = function (career_name)
 
 		if item then
 			local backend_id = item.backend_id
-			local power_level = backend_items.get_item_power_level(backend_items, backend_id)
+			local power_level = backend_items:get_item_power_level(backend_id)
 
 			if power_level then
 				total_item_power_level = total_item_power_level + power_level
@@ -78,7 +78,7 @@ end
 BackendUtils.get_item_template = function (item_data, backend_id)
 	local backend_items = Managers.backend:get_interface("items")
 	local backend_id = item_data.backend_id or backend_id
-	local template = backend_items.get_item_template(backend_items, item_data, backend_id)
+	local template = backend_items:get_item_template(item_data, backend_id)
 
 	return template
 end
@@ -95,7 +95,7 @@ BackendUtils.get_item_units = function (item_data, backend_id, skin)
 	if backend_id or skin then
 		if not skin then
 			local backend_items = Managers.backend:get_interface("items")
-			skin = backend_items.get_skin(backend_items, backend_id)
+			skin = backend_items:get_skin(backend_id)
 		end
 
 		if skin then
@@ -146,7 +146,7 @@ end
 BackendUtils.has_loot_chest = function ()
 	local backend_items = Managers.backend:get_interface("items")
 	local item_filter = "slot_type == " .. ItemType.LOOT_CHEST
-	local items = backend_items.get_filtered_items(backend_items, item_filter)
+	local items = backend_items:get_filtered_items(item_filter)
 	local has_chest = 0 < #items
 
 	return has_chest

@@ -66,9 +66,9 @@ SPLITSCREEN_RES_X = 1920 * SPLITSCREEN_WIDTH
 SPLITSCREEN_RES_Y = 1080 * SPLITSCREEN_HEIGHT
 
 SplitscreenTester.init = function (self)
-	self._setup_names(self)
-	self._setup_background(self)
-	self._setup_input(self)
+	self:_setup_names()
+	self:_setup_background()
+	self:_setup_input()
 
 	self._splitscreen_active = false
 	UISettings.use_hud_screen_fit = true
@@ -126,11 +126,11 @@ SplitscreenTester.remove_splitscreen_viewport = function (self)
 end
 
 SplitscreenTester.update = function (self, dt, t)
-	self._update_input(self, dt, t)
+	self:_update_input(dt, t)
 
 	if self._splitscreen_active then
-		self._fill_background(self, dt, t)
-		self._update_splitscreen_camera(self, dt, t)
+		self:_fill_background(dt, t)
+		self:_update_splitscreen_camera(dt, t)
 	elseif self._splitscreen_viewport and self._splitscreen_world then
 		ScriptWorld.deactivate_viewport(self._splitscreen_world, self._splitscreen_viewport)
 		ScriptWorld.deactivate_viewport(self._world, self._viewport)
@@ -182,10 +182,10 @@ SplitscreenTester._update_input = function (self, dt, t)
 
 	local input_service = self.input_manager:get_service("splitscreen_tester")
 
-	if input_service and input_service.get(input_service, "toggle_splitscreen") then
+	if input_service and input_service:get("toggle_splitscreen") then
 		self._splitscreen_active = not self._splitscreen_active
 
-		self._resize_viewports(self)
+		self:_resize_viewports()
 	end
 end
 

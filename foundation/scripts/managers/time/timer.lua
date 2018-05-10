@@ -17,8 +17,8 @@ Timer.update = function (self, dt, global_scale)
 	global_scale = global_scale * local_scale
 
 	for name, child in pairs(self._children) do
-		if child.active(child) then
-			child.update(child, dt, global_scale)
+		if child:active() then
+			child:update(dt, global_scale)
 		end
 	end
 
@@ -60,11 +60,11 @@ Timer.global_scale = function (self)
 end
 
 Timer.add_child = function (self, timer)
-	self._children[timer.name(timer)] = timer
+	self._children[timer:name()] = timer
 end
 
 Timer.remove_child = function (self, timer)
-	self._children[timer.name(timer)] = nil
+	self._children[timer:name()] = nil
 end
 
 Timer.children = function (self)

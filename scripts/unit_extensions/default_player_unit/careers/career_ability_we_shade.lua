@@ -26,14 +26,14 @@ CareerAbilityWEShade.destroy = function (self)
 end
 
 CareerAbilityWEShade.update = function (self, unit, input, dt, context, t)
-	if not self._ability_available(self) then
+	if not self:_ability_available() then
 		return
 	end
 
 	local input_extension = self._input_extension
 
-	if input_extension and input_extension.get(input_extension, "action_career") then
-		self._run_ability(self)
+	if input_extension and input_extension:get("action_career") then
+		self:_run_ability()
 	end
 end
 
@@ -41,7 +41,7 @@ CareerAbilityWEShade._ability_available = function (self)
 	local career_extension = self._career_extension
 	local status_extension = self._status_extension
 
-	return career_extension.can_use_activated_ability(career_extension) and not status_extension.is_disabled(status_extension)
+	return career_extension:can_use_activated_ability() and not status_extension:is_disabled()
 end
 
 CareerAbilityWEShade._run_ability = function (self)
@@ -56,29 +56,29 @@ CareerAbilityWEShade._run_ability = function (self)
 	local talent_extension = ScriptUnit.extension(owner_unit, "talent_system")
 	local buff_name = "kerillian_shade_activated_ability"
 
-	if talent_extension.has_talent(talent_extension, "kerillian_shade_activated_ability_duration", "wood_elf", true) then
+	if talent_extension:has_talent("kerillian_shade_activated_ability_duration", "wood_elf", true) then
 		buff_name = "kerillian_shade_activated_ability_duration"
 	end
 
 	local buff_template_name_id = NetworkLookup.buff_templates[buff_name]
-	local unit_object_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+	local unit_object_id = network_manager:unit_game_object_id(owner_unit)
 
 	if is_server then
-		buff_extension.add_buff(buff_extension, buff_name, {
+		buff_extension:add_buff(buff_name, {
 			attacker_unit = owner_unit
 		})
-		network_transmit.send_rpc_clients(network_transmit, "rpc_add_buff", unit_object_id, buff_template_name_id, unit_object_id, 0, false)
+		network_transmit:send_rpc_clients("rpc_add_buff", unit_object_id, buff_template_name_id, unit_object_id, 0, false)
 	else
-		network_transmit.send_rpc_server(network_transmit, "rpc_add_buff", unit_object_id, buff_template_name_id, unit_object_id, 0, true)
+		network_transmit:send_rpc_server("rpc_add_buff", unit_object_id, buff_template_name_id, unit_object_id, 0, true)
 	end
 
 	if local_player then
 		local first_person_extension = self._first_person_extension
 
-		first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_kerillian_shade_enter")
-		first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_kerillian_shade_loop")
-		first_person_extension.animation_event(first_person_extension, "shade_stealth_ability")
-		career_extension.set_state(career_extension, "kerillian_activate_shade")
+		first_person_extension:play_hud_sound_event("Play_career_ability_kerillian_shade_enter")
+		first_person_extension:play_hud_sound_event("Play_career_ability_kerillian_shade_loop")
+		first_person_extension:animation_event("shade_stealth_ability")
+		career_extension:set_state("kerillian_activate_shade")
 
 		MOOD_BLACKBOARD.skill_shade = true
 	end
@@ -86,8 +86,8 @@ CareerAbilityWEShade._run_ability = function (self)
 	if local_player or (is_server and bot_player) then
 		local status_extension = self._status_extension
 
-		status_extension.set_invisible(status_extension, true)
-		status_extension.set_noclip(status_extension, true)
+		status_extension:set_invisible(true)
+		status_extension:set_noclip(true)
 
 		local events = {
 			"Play_career_ability_kerillian_shade_enter",
@@ -96,22 +96,22 @@ CareerAbilityWEShade._run_ability = function (self)
 		local network_manager = Managers.state.network
 		local network_transmit = network_manager.network_transmit
 		local is_server = Managers.player.is_server
-		local unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+		local unit_id = network_manager:unit_game_object_id(owner_unit)
 		local node_id = 0
 
 		for _, event in ipairs(events) do
 			local event_id = NetworkLookup.sound_events[event]
 
 			if is_server then
-				network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+				network_transmit:send_rpc_clients("rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
 			else
-				network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+				network_transmit:send_rpc_server("rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
 			end
 		end
 	end
 
-	career_extension.start_activated_ability_cooldown(career_extension)
-	self._play_vo(self)
+	career_extension:start_activated_ability_cooldown()
+	self:_play_vo()
 end
 
 CareerAbilityWEShade._play_vo = function (self)
@@ -119,7 +119,7 @@ CareerAbilityWEShade._play_vo = function (self)
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
+	dialogue_input:trigger_networked_dialogue_event("activate_ability", event_data)
 end
 
 return

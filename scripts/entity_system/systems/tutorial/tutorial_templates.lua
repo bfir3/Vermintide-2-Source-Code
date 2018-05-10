@@ -4,8 +4,8 @@ end
 
 local function has_melee_weapon_equipped(unit)
 	local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
-	local slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
-	local slot_data = inventory_extension.get_slot_data(inventory_extension, slot_name)
+	local slot_name = inventory_extension:get_wielded_slot_name()
+	local slot_data = inventory_extension:get_slot_data(slot_name)
 
 	if slot_data == nil then
 		return false
@@ -51,7 +51,7 @@ TutorialTemplates = {
 				if Unit.alive(player_unit) and unit ~= player_unit then
 					local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-					if status_extension.is_pounced_down(status_extension) or status_extension.get_is_ledge_hanging(status_extension) or status_extension.is_grabbed_by_pack_master(status_extension) then
+					if status_extension:is_pounced_down() or status_extension:get_is_ledge_hanging() or status_extension:is_grabbed_by_pack_master() then
 						local player_position = POSITION_LOOKUP[player_unit]
 						local distance_sq = Vector3.distance_squared(unit_position, player_position)
 
@@ -111,7 +111,7 @@ TutorialTemplates = {
 				if Unit.alive(player_unit) and unit ~= player_unit then
 					local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-					if status_extension.is_knocked_down(status_extension) then
+					if status_extension:is_knocked_down() then
 						local player_position = POSITION_LOOKUP[player_unit]
 						local distance_sq = Vector3.distance_squared(unit_position, player_position)
 
@@ -237,7 +237,7 @@ TutorialTemplates = {
 		end,
 		can_show = function (t, unit, data, raycast_unit, world)
 			local mission_system = Managers.state.entity:system("mission_system")
-			local active_missions, completed_missions = mission_system.get_missions(mission_system)
+			local active_missions, completed_missions = mission_system:get_missions()
 
 			for mission_name, mission_data in pairs(active_missions) do
 				if active_missions[mission_name].mission_data.tooltip_text ~= nil then
@@ -292,7 +292,7 @@ TutorialTemplates = {
 				if Unit.alive(player_unit) and unit ~= player_unit then
 					local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-					if status_extension.is_ready_for_assisted_respawn(status_extension) then
+					if status_extension:is_ready_for_assisted_respawn() then
 						local player_position = POSITION_LOOKUP[player_unit]
 						local distance_sq = Vector3.distance_squared(unit_position, player_position)
 
@@ -365,8 +365,8 @@ TutorialTemplates.objective_pickup = {
 	end,
 	can_show = function (t, unit, data, raycast_unit, world)
 		local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
-		local slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
-		local slot_data = inventory_extension.get_slot_data(inventory_extension, slot_name)
+		local slot_name = inventory_extension:get_wielded_slot_name()
+		local slot_data = inventory_extension:get_slot_data(slot_name)
 
 		if slot_name == "slot_level_event" and slot_data ~= nil then
 			return false
@@ -384,7 +384,7 @@ TutorialTemplates.objective_pickup = {
 				if ScriptUnit.has_extension(pickup_unit, "death_system") then
 					local death_extension = ScriptUnit.extension(pickup_unit, "death_system")
 
-					if death_extension.has_death_started(death_extension) then
+					if death_extension:has_death_started() then
 						disregard = true
 					end
 				end
@@ -454,8 +454,8 @@ TutorialTemplates.objective_socket = {
 	can_show = function (t, unit, data, raycast_unit, world)
 		local unit_position = POSITION_LOOKUP[unit]
 		local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
-		local slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
-		local slot_data = inventory_extension.get_slot_data(inventory_extension, slot_name)
+		local slot_name = inventory_extension:get_wielded_slot_name()
+		local slot_data = inventory_extension:get_slot_data(slot_name)
 
 		if slot_name == "slot_level_event" and slot_data ~= nil then
 			local best_distance_sq = 10000

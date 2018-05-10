@@ -14,7 +14,7 @@ string.split = function (str, sep)
 	local fields = {}
 	local pattern = string.format("([^%s]+)", sep or " ")
 
-	str.gsub(str, pattern, function (part)
+	str:gsub(pattern, function (part)
 		fields[#fields + 1] = part
 	end)
 

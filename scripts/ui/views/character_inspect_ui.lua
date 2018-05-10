@@ -11,7 +11,7 @@ CharacterInspectUI.init = function (self, ingame_ui_context)
 	self.wwise_world = Managers.world:wwise_world(world)
 	self._animations = {}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 	rawset(_G, "character_inspect_ui", self)
 end
 
@@ -44,11 +44,11 @@ end
 
 CharacterInspectUI.update = function (self, dt)
 	if DO_RELOAD then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self._update_animations(self, dt)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:draw(dt)
 end
 
 CharacterInspectUI._update_animations = function (self, dt)

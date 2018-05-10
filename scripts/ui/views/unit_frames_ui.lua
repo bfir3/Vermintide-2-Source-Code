@@ -28,7 +28,7 @@ UnitFramesUI.init = function (self, ingame_ui_context)
 	self.slot_equip_animations = {}
 
 	rawset(_G, "unit_frame_pointer", self)
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	local player_portrait = self.player_portrait
 	local portrait_content = player_portrait.content
@@ -57,7 +57,7 @@ UnitFramesUI.create_ui_elements = function (self)
 	}
 
 	for i = 1, #self.other_player_inventories, 1 do
-		self.init_player_inventory_list(self, self.other_player_inventories[i], 3)
+		self:init_player_inventory_list(self.other_player_inventories[i], 3)
 	end
 
 	reload = false
@@ -144,7 +144,7 @@ UnitFramesUI.init_player_inventory_list = function (self, widget, num_elements)
 end
 
 UnitFramesUI.destroy = function (self)
-	self.set_visible(self, false)
+	self:set_visible(false)
 	rawset(_G, "unit_frame_pointer", nil)
 	GarbageLeakDetector.register_object(self, "unit_frame_gui")
 end
@@ -171,26 +171,26 @@ UnitFramesUI.update = function (self, dt, t, my_player)
 		return
 	end
 
-	self.update_portrait_frames(self, dt, my_player)
+	self:update_portrait_frames(dt, my_player)
 	UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt)
 
 	self.overlay_time = (self.overlay_time or 0) + dt * 1.4
 
-	self.update_player_unit_frame(self, dt, t, ui_scenegraph, ui_renderer, peer_id, local_player_id, my_player)
-	self.update_teammates_unit_frames(self, dt, t, ui_scenegraph, ui_renderer, my_player)
-	self.update_health_animations(self, dt)
-	self.update_slot_equip_animations(self, dt)
+	self:update_player_unit_frame(dt, t, ui_scenegraph, ui_renderer, peer_id, local_player_id, my_player)
+	self:update_teammates_unit_frames(dt, t, ui_scenegraph, ui_renderer, my_player)
+	self:update_health_animations(dt)
+	self:update_slot_equip_animations(dt)
 	UIRenderer.end_pass(ui_renderer)
 end
 
 local function get_portrait_frame_by_unit(network_manager, player_manager, unit_storage, unit)
 	local player_portrait_frame = "unit_frame_01"
 	local dead_portrait_frame = "unit_frame_death"
-	local network_game = network_manager.game(network_manager)
+	local network_game = network_manager:game()
 
 	if network_game and not LEVEL_EDITOR_TEST then
 		if Unit.alive(unit) then
-			local go_id = unit_storage.go_id(unit_storage, unit)
+			local go_id = unit_storage:go_id(unit)
 			local prestige_level = GameSession.game_object_field(network_game, go_id, "prestige_level")
 
 			if 0 < prestige_level then
@@ -210,7 +210,7 @@ UnitFramesUI.update_portrait_frames = function (self, dt, my_player)
 	local unit_storage = Managers.state.unit_storage
 	local player_unit = my_player.player_unit
 	self.player_portrait.content.portrait_frame = "unit_frame_01"
-	local human_players = player_manager.human_and_bot_players(player_manager)
+	local human_players = player_manager:human_and_bot_players()
 	local i = 0
 	local other_player_portraits = self.other_player_portraits
 
@@ -260,17 +260,17 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 			i = i + 1
 			local player_inventory_widget = other_player_inventories[i]
 			local player_portrait_widget = other_player_portraits[i]
-			local player_peer_id = player.network_id(player)
+			local player_peer_id = player:network_id()
 			local is_player_server = self.host_peer_id == player_peer_id
-			local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, player_peer_id, player.local_player_id(player))
+			local profile_index = profile_synchronizer:profile_by_peer(player_peer_id, player:local_player_id())
 
 			if not profile_index then
 			else
 				tmp_peer_ids[player_peer_id] = true
 				tmp_peer_ids_by_index[i] = player_peer_id
-				local ingame_display_name = UIRenderer.crop_text(player.name(player), 26)
+				local ingame_display_name = UIRenderer.crop_text(player:name(), 26)
 				local level = nil
-				local is_player_controlled = player.is_player_controlled(player)
+				local is_player_controlled = player:is_player_controlled()
 
 				if is_player_controlled then
 					level = ExperienceSettings.get_player_level(player) or ""
@@ -293,9 +293,9 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 					local status_extension = ScriptUnit.extension(player_unit, "status_system")
 					inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
 					dialogue_extension = ScriptUnit.extension(player_unit, "dialogue_system")
-					health_percent = health_extension.current_health_percent(health_extension)
+					health_percent = health_extension:current_health_percent()
 					local max_health = health_extension.unmodified_max_health
-					local has_shield, shield_amount = health_extension.has_assist_shield(health_extension)
+					local has_shield, shield_amount = health_extension:has_assist_shield()
 
 					if has_shield then
 						shield_percent = shield_amount / max_health
@@ -319,10 +319,10 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 						self.shielded_players[i + 1] = false
 					end
 
-					is_wounded = status_extension.is_wounded(status_extension)
-					is_knocked_down = status_extension.is_knocked_down(status_extension) and 0 < health_percent
-					is_ready_for_assisted_respawn = status_extension.is_ready_for_assisted_respawn(status_extension)
-					needs_help = status_extension.is_grabbed_by_pack_master(status_extension) or is_ready_for_assisted_respawn or status_extension.is_hanging_from_hook(status_extension) or status_extension.is_pounced_down(status_extension) or status_extension.get_is_ledge_hanging(status_extension)
+					is_wounded = status_extension:is_wounded()
+					is_knocked_down = status_extension:is_knocked_down() and 0 < health_percent
+					is_ready_for_assisted_respawn = status_extension:is_ready_for_assisted_respawn()
+					needs_help = status_extension:is_grabbed_by_pack_master() or is_ready_for_assisted_respawn or status_extension:is_hanging_from_hook() or status_extension:is_pounced_down() or status_extension:get_is_ledge_hanging()
 				else
 					health_percent = 0
 					is_knocked_down = false
@@ -393,17 +393,17 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 
 				if player_unit then
 					local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-					local num_grimoires = buff_extension.num_buff_perk(buff_extension, "skaven_grimoire")
-					local multiplier = buff_extension.apply_buffs_to_value(buff_extension, PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF, StatBuffIndex.CURSE_PROTECTION)
-					local num_twitch_grimoires = buff_extension.num_buff_perk(buff_extension, "twitch_grimoire")
+					local num_grimoires = buff_extension:num_buff_perk("skaven_grimoire")
+					local multiplier = buff_extension:apply_buffs_to_value(PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF, StatBuffIndex.CURSE_PROTECTION)
+					local num_twitch_grimoires = buff_extension:num_buff_perk("twitch_grimoire")
 					local twitch_multiplier = PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF
 					active_percentage = 1 + num_grimoires * multiplier + num_twitch_grimoires * twitch_multiplier
 				end
 
 				fassert(health_percent * active_percentage <= 1, "Health was greater then 1. %s , %s", health_percent, active_percentage)
 
-				local health_changed = self.on_player_health_changed(self, "player_" .. index, player_portrait_widget, health_percent * active_percentage)
-				local grims_changed = self.on_num_grimoires_changed(self, "player_" .. index .. "_grimoires", player_portrait_widget, 1 - active_percentage)
+				local health_changed = self:on_player_health_changed("player_" .. index, player_portrait_widget, health_percent * active_percentage)
+				local grims_changed = self:on_num_grimoires_changed("player_" .. index .. "_grimoires", player_portrait_widget, 1 - active_percentage)
 				modified_teammate[i] = modified_teammate[i] or health_changed or grims_changed
 				local hp_bar_value = player_portrait_widget.content.hp_bar.bar_value
 				local grimoire_value = player_portrait_widget.content.hp_bar_grimoire_debuff.bar_value
@@ -439,7 +439,7 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 
 				if inventory_extension then
 					local inventory_widgets = self.inventory_widgets
-					local equipment = inventory_extension.equipment(inventory_extension)
+					local equipment = inventory_extension:equipment()
 					local inventory_slots = InventorySettings.slots
 					local player_inventory_list_content = player_inventory_widget.content.list_content
 					local player_inventory_item_styles = player_inventory_widget.style.list_style.item_styles
@@ -453,7 +453,7 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 							local slot_visible = (slot_data and true) or false
 
 							if slot_visible and not player_inventory_list_content[widget_slot_index].occupied then
-								self.add_slot_equip_animation(self, "player_" .. index .. "_" .. slot_name .. "_equip_anim", player_inventory_item_styles[widget_slot_index].item_highlight)
+								self:add_slot_equip_animation("player_" .. index .. "_" .. slot_name .. "_equip_anim", player_inventory_item_styles[widget_slot_index].item_highlight)
 
 								modified_teammate[i] = true
 							end
@@ -502,7 +502,7 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 		local members = self.lobby:members()
 
 		if members then
-			local lobby_members = members.get_members(members)
+			local lobby_members = members:get_members()
 
 			for idx, peer_id in ipairs(lobby_members) do
 				if not tmp_peer_ids[peer_id] then
@@ -576,9 +576,9 @@ UnitFramesUI.update_player_unit_frame = function (self, dt, t, ui_scenegraph, ui
 		local status_extension = ScriptUnit.extension(player_unit, "status_system")
 		inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
 		dialogue_extension = ScriptUnit.extension(player_unit, "dialogue_system")
-		health_percent = health_extension.current_health_percent(health_extension)
+		health_percent = health_extension:current_health_percent()
 		local max_health = health_extension.unmodified_max_health
-		local has_shield, shield_amount = health_extension.has_assist_shield(health_extension)
+		local has_shield, shield_amount = health_extension:has_assist_shield()
 
 		if has_shield then
 			shield_percent = shield_amount / max_health
@@ -603,15 +603,15 @@ UnitFramesUI.update_player_unit_frame = function (self, dt, t, ui_scenegraph, ui
 		end
 
 		total_health = health_extension.health
-		is_wounded = status_extension.is_wounded(status_extension)
-		is_knocked_down = status_extension.is_knocked_down(status_extension) and 0 < health_percent
-		is_ready_for_assisted_respawn = status_extension.is_ready_for_assisted_respawn(status_extension)
-		needs_help = status_extension.is_pounced_down(status_extension) or status_extension.get_is_ledge_hanging(status_extension) or status_extension.is_grabbed_by_pack_master(status_extension) or is_ready_for_assisted_respawn or status_extension.is_hanging_from_hook(status_extension)
+		is_wounded = status_extension:is_wounded()
+		is_knocked_down = status_extension:is_knocked_down() and 0 < health_percent
+		is_ready_for_assisted_respawn = status_extension:is_ready_for_assisted_respawn()
+		needs_help = status_extension:is_pounced_down() or status_extension:get_is_ledge_hanging() or status_extension:is_grabbed_by_pack_master() or is_ready_for_assisted_respawn or status_extension:is_hanging_from_hook()
 		level = ExperienceSettings.get_player_level(my_player) or ""
 		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-		local num_grimoires = buff_extension.num_buff_perk(buff_extension, "skaven_grimoire")
-		local multiplier = buff_extension.apply_buffs_to_value(buff_extension, PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF, StatBuffIndex.CURSE_PROTECTION)
-		local num_twitch_grimoires = buff_extension.num_buff_perk(buff_extension, "twitch_grimoire")
+		local num_grimoires = buff_extension:num_buff_perk("skaven_grimoire")
+		local multiplier = buff_extension:apply_buffs_to_value(PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF, StatBuffIndex.CURSE_PROTECTION)
+		local num_twitch_grimoires = buff_extension:num_buff_perk("twitch_grimoire")
 		local twitch_multiplier = PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF
 		active_percentage = 1 + num_grimoires * multiplier + num_twitch_grimoires * twitch_multiplier
 	else
@@ -627,8 +627,8 @@ UnitFramesUI.update_player_unit_frame = function (self, dt, t, ui_scenegraph, ui
 
 	fassert(health_percent * active_percentage <= 1, "Health was greater then 1. %s , %s", health_percent, active_percentage)
 
-	local health_changed = self.on_player_health_changed(self, "my_player", player_portrait, health_percent * active_percentage)
-	local grims_changed = self.on_num_grimoires_changed(self, "my_player_grimoires", player_portrait, 1 - active_percentage)
+	local health_changed = self:on_player_health_changed("my_player", player_portrait, health_percent * active_percentage)
+	local grims_changed = self:on_num_grimoires_changed("my_player_grimoires", player_portrait, 1 - active_percentage)
 	modified_portrait = modified_portrait or health_changed or grims_changed
 	local hp_bar_value = player_portrait.content.hp_bar.bar_value
 	local grimoire_value = player_portrait.content.hp_bar_grimoire_debuff.bar_value
@@ -654,7 +654,7 @@ UnitFramesUI.update_player_unit_frame = function (self, dt, t, ui_scenegraph, ui
 
 	local show_overlay = false
 	local show_icon = false
-	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, peer_id, local_player_id)
+	local profile_index = profile_synchronizer:profile_by_peer(peer_id, local_player_id)
 
 	if profile_index then
 		local character_portrait = nil
@@ -899,7 +899,7 @@ UnitFramesUI.update_health_animations = function (self, dt)
 			end
 
 			if animation_data.animate_highlight and not self.shielded_players[1] then
-				animation_data.animate_highlight = self.update_damage_highlight(self, widget, animation_data.animate_highlight, dt)
+				animation_data.animate_highlight = self:update_damage_highlight(widget, animation_data.animate_highlight, dt)
 			end
 
 			if animation_data.animate then
@@ -907,7 +907,7 @@ UnitFramesUI.update_health_animations = function (self, dt)
 				local total_time = animation_data.total_time
 				local new_health = animation_data.new_health
 				local previous_health = animation_data.previous_health
-				local time_left = self.update_player_bar_animation(self, widget, bar, time, total_time, previous_health, new_health, dt)
+				local time_left = self:update_player_bar_animation(widget, bar, time, total_time, previous_health, new_health, dt)
 
 				if time_left then
 					animation_data.time = time_left
@@ -954,7 +954,7 @@ UnitFramesUI.update_slot_equip_animations = function (self, dt)
 	local animations = self.slot_equip_animations
 
 	for scenegraph_id, animation_data in pairs(animations) do
-		animations[scenegraph_id] = self.animate_slot_equip(self, animation_data, dt)
+		animations[scenegraph_id] = self:animate_slot_equip(animation_data, dt)
 	end
 end
 

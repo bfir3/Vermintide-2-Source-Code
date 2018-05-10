@@ -111,17 +111,17 @@ EditAiUtility.use_breed = function (self, breed)
 end
 
 EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
-	local mouse_pos = input_service.get(input_service, "cursor")
-	status.left_pressed = input_service.get(input_service, "mouse_left_held")
+	local mouse_pos = input_service:get("cursor")
+	status.left_pressed = input_service:get("mouse_left_held")
 
 	if not status.selected_drag_point then
-		status.hover_win_name, status.win_pos = self.hover_win(self, t, mouse_pos, window_list, spline_window_size)
+		status.hover_win_name, status.win_pos = self:hover_win(t, mouse_pos, window_list, spline_window_size)
 		local spline = status.hover_win_name and considerations[status.hover_win_name].spline
 		local spline_id = nil
 
 		if spline and spline == status.last_hover_spline then
 			local spline_window_pos = status.win_pos
-			status.hover_point = self.hover_spline_point(self, t, spline, spline_window_pos, spline_window_size, mouse_pos)
+			status.hover_point = self:hover_spline_point(t, spline, spline_window_pos, spline_window_size, mouse_pos)
 
 			if status.hover_point and status.left_pressed and not status.selected_point then
 				status.selected_point = status.hover_point
@@ -131,14 +131,14 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 			end
 
 			if status.selected_point then
-				self.move_spline_point(self, t, spline, spline_window_pos, spline_window_size, status.selected_point, mouse_pos)
-				self.draw_mouse_selection(self, t, spline, spline_window_pos, spline_window_size, status.selected_point, "selected", considerations[status.hover_win_name].max_value)
+				self:move_spline_point(t, spline, spline_window_pos, spline_window_size, status.selected_point, mouse_pos)
+				self:draw_mouse_selection(t, spline, spline_window_pos, spline_window_size, status.selected_point, "selected", considerations[status.hover_win_name].max_value)
 			elseif status.hover_point then
-				self.draw_mouse_selection(self, t, spline, spline_window_pos, spline_window_size, status.hover_point, "hover", considerations[status.hover_win_name].max_value)
+				self:draw_mouse_selection(t, spline, spline_window_pos, spline_window_size, status.hover_point, "hover", considerations[status.hover_win_name].max_value)
 			end
 
 			if status.hover_point and DebugKeyHandler.key_pressed("d", "remove selected point", "ai editor", "left ctrl") then
-				self.remove_spline_point(self, spline, status.hover_point)
+				self:remove_spline_point(spline, status.hover_point)
 
 				status.last_selected_point = nil
 				status.hover_point = nil
@@ -153,11 +153,11 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 		status.last_hover_spline = spline
 
 		if not status.hover_point and status.hover_win_name and DebugKeyHandler.key_pressed("a", "insert spline point", "ai editor", "left ctrl") then
-			self.insert_spline_point(self, spline, status.win_pos, spline_window_size, mouse_pos)
+			self:insert_spline_point(spline, status.win_pos, spline_window_size, mouse_pos)
 		end
 	end
 
-	status.hover_drag_point = self.hover_drag_points(self, t, drag_point_list, mouse_pos)
+	status.hover_drag_point = self:hover_drag_points(t, drag_point_list, mouse_pos)
 
 	if status.hover_drag_point and status.left_pressed and not status.selected_drag_point then
 		status.selected_drag_point = status.hover_drag_point
@@ -165,7 +165,7 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 		local point = status.selected_drag_point
 		local safe_drag_lane = 16
 
-		self.draw_safe_drag_lane(self, point, safe_drag_lane)
+		self:draw_safe_drag_lane(point, safe_drag_lane)
 
 		local con = considerations[cons_lookup[point.index]]
 
@@ -225,7 +225,7 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 				EditAiUtility.draw_utility_info(gui, data, nil, name, pos, win_size, fade_factor)
 			end
 
-			self.draw_utility_ruler(self, gui, data, pos, win_size, 1)
+			self:draw_utility_ruler(gui, data, pos, win_size, 1)
 
 			if blackboard then
 				local action = status.selected_action and action_list[status.selected_action]
@@ -265,10 +265,10 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 	end
 
 	if DebugKeyHandler.key_pressed("s", "save to disk", "ai editor", "left ctrl") then
-		self.save_considerations(self)
+		self:save_considerations()
 	end
 
-	status.hover_action_window, status.hover_action = self.hover_action(self, t, action_list_layout, action_list, mouse_pos)
+	status.hover_action_window, status.hover_action = self:hover_action(t, action_list_layout, action_list, mouse_pos)
 
 	if status.hover_action_window and status.left_pressed and status.hover_action then
 		status.selected_action = status.hover_action
@@ -278,7 +278,7 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 
 	local bk_color = (status.hover_action_window and Color(164, 28, 44, 100)) or Color(92, 28, 44, 100)
 
-	self.draw_action_list(self, unit, t, "Actions", action_list_layout, action_list, bk_color, status.selected_action, blackboard)
+	self:draw_action_list(unit, t, "Actions", action_list_layout, action_list, bk_color, status.selected_action, blackboard)
 end
 
 EditAiUtility.insert_spline_point = function (self, spline, win_pos, win_size, mouse_pos)
@@ -484,7 +484,7 @@ EditAiUtility.draw_action_list = function (self, unit, t, name, layout, action_l
 
 		if active_ai then
 			local ai_extension = ScriptUnit.extension(unit, "ai_system")
-			local action_data = ai_extension.brain(ai_extension):bt():action_data()
+			local action_data = ai_extension:brain():bt():action_data()
 			local breed_action = action_data[text]
 			utility = math.floor(Utility.get_action_utility(breed_action, text, blackboard, t) * 10) / 10
 
@@ -664,7 +664,7 @@ EditAiUtility.save_considerations = function (self)
 	local filehandle = io.open(file_path, "w+")
 
 	assert(filehandle)
-	filehandle.write(filehandle, write_string)
+	filehandle:write(write_string)
 	io.close(filehandle)
 end
 

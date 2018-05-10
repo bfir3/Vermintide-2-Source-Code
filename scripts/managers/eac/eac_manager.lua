@@ -22,7 +22,7 @@ end
 EacManager.update = function (self, dt, t)
 	local popup_manager = Managers.popup
 
-	if self._popup_id ~= nil and popup_manager.query_result(popup_manager, self._popup_id) == "quit" then
+	if self._popup_id ~= nil and popup_manager:query_result(self._popup_id) == "quit" then
 		self._popup_id = nil
 
 		Application.quit()
@@ -43,7 +43,7 @@ EacManager.update = function (self, dt, t)
 
 		local topic = Localize("eac_file_corruption_topic")
 		local quit_button_text = Localize("menu_quit")
-		self._popup_id = popup_manager.queue_popup(popup_manager, text, topic, "quit", quit_button_text)
+		self._popup_id = popup_manager:queue_popup(text, topic, "quit", quit_button_text)
 		self._suppress_popup = true
 	end
 end
@@ -72,7 +72,7 @@ EacManager.draw_panel = function (self, gui, dt)
 			explanation = Localize("eac_untrusted_explanation")
 		end
 
-		self._draw_indicator(self, gui, dt, state_text, violation_text, cause_text, explanation, reason)
+		self:_draw_indicator(gui, dt, state_text, violation_text, cause_text, explanation, reason)
 	end
 end
 

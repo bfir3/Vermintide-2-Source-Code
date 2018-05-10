@@ -69,7 +69,7 @@ end
 
 GearUtils.apply_properties_to_item_template = function (template, backend_id)
 	local backend_items = Managers.backend:get_interface("items")
-	local properties = backend_items.get_properties(backend_items, backend_id)
+	local properties = backend_items:get_properties(backend_id)
 
 	if properties then
 		local template_clone = table.clone(template)
@@ -242,7 +242,7 @@ GearUtils.destroy_wielded = function (world, wielded_unit)
 
 	local unit_spawner = Managers.state.unit_spawner
 
-	unit_spawner.mark_for_deletion(unit_spawner, wielded_unit)
+	unit_spawner:mark_for_deletion(wielded_unit)
 end
 
 GearUtils.get_ammo_extension = function (right_hand_unit, left_hand_unit)
@@ -261,7 +261,7 @@ GearUtils.destroy_equipment = function (world, equipment)
 	end
 
 	if equipment.right_hand_ammo_unit_3p and Unit.alive(equipment.right_hand_ammo_unit_3p) then
-		unit_spawner.mark_for_deletion(unit_spawner, equipment.right_hand_ammo_unit_3p)
+		unit_spawner:mark_for_deletion(equipment.right_hand_ammo_unit_3p)
 	end
 
 	if equipment.right_hand_wielded_unit and Unit.alive(equipment.right_hand_wielded_unit) then
@@ -269,7 +269,7 @@ GearUtils.destroy_equipment = function (world, equipment)
 	end
 
 	if equipment.right_hand_ammo_unit_1p and Unit.alive(equipment.right_hand_ammo_unit_1p) then
-		unit_spawner.mark_for_deletion(unit_spawner, equipment.right_hand_ammo_unit_1p)
+		unit_spawner:mark_for_deletion(equipment.right_hand_ammo_unit_1p)
 	end
 
 	if equipment.left_hand_wielded_unit_3p and Unit.alive(equipment.left_hand_wielded_unit_3p) then
@@ -277,7 +277,7 @@ GearUtils.destroy_equipment = function (world, equipment)
 	end
 
 	if equipment.left_hand_ammo_unit_3p and Unit.alive(equipment.left_hand_ammo_unit_3p) then
-		unit_spawner.mark_for_deletion(unit_spawner, equipment.left_hand_ammo_unit_3p)
+		unit_spawner:mark_for_deletion(equipment.left_hand_ammo_unit_3p)
 	end
 
 	if equipment.left_hand_wielded_unit and Unit.alive(equipment.left_hand_wielded_unit) then
@@ -285,7 +285,7 @@ GearUtils.destroy_equipment = function (world, equipment)
 	end
 
 	if equipment.left_hand_ammo_unit_1p and Unit.alive(equipment.left_hand_ammo_unit_1p) then
-		unit_spawner.mark_for_deletion(unit_spawner, equipment.left_hand_ammo_unit_1p)
+		unit_spawner:mark_for_deletion(equipment.left_hand_ammo_unit_1p)
 	end
 
 	equipment.right_hand_wielded_unit_3p = nil
@@ -318,35 +318,35 @@ GearUtils.destroy_slot = function (world, unit, slot_data, equipment, allow_dest
 		local unit_spawner = Managers.state.unit_spawner
 
 		if right_hand_weapon_unit_3p then
-			unit_spawner.mark_for_deletion(unit_spawner, right_hand_weapon_unit_3p)
+			unit_spawner:mark_for_deletion(right_hand_weapon_unit_3p)
 		end
 
 		if right_hand_ammo_unit_3p then
-			unit_spawner.mark_for_deletion(unit_spawner, right_hand_ammo_unit_3p)
+			unit_spawner:mark_for_deletion(right_hand_ammo_unit_3p)
 		end
 
 		if right_hand_weapon_unit_1p then
-			unit_spawner.mark_for_deletion(unit_spawner, right_hand_weapon_unit_1p)
+			unit_spawner:mark_for_deletion(right_hand_weapon_unit_1p)
 		end
 
 		if right_hand_ammo_unit_1p then
-			unit_spawner.mark_for_deletion(unit_spawner, right_hand_ammo_unit_1p)
+			unit_spawner:mark_for_deletion(right_hand_ammo_unit_1p)
 		end
 
 		if left_hand_weapon_unit_3p then
-			unit_spawner.mark_for_deletion(unit_spawner, left_hand_weapon_unit_3p)
+			unit_spawner:mark_for_deletion(left_hand_weapon_unit_3p)
 		end
 
 		if left_hand_ammo_unit_3p then
-			unit_spawner.mark_for_deletion(unit_spawner, left_hand_ammo_unit_3p)
+			unit_spawner:mark_for_deletion(left_hand_ammo_unit_3p)
 		end
 
 		if left_hand_weapon_unit_1p then
-			unit_spawner.mark_for_deletion(unit_spawner, left_hand_weapon_unit_1p)
+			unit_spawner:mark_for_deletion(left_hand_weapon_unit_1p)
 		end
 
 		if left_hand_ammo_unit_1p then
-			unit_spawner.mark_for_deletion(unit_spawner, left_hand_ammo_unit_1p)
+			unit_spawner:mark_for_deletion(left_hand_ammo_unit_1p)
 		end
 	end
 
@@ -457,7 +457,7 @@ GearUtils.create_grenade_extension_init_data = function (owner_unit, item_name, 
 end
 
 GearUtils.get_property_and_trait_buffs = function (backend_items, backend_id, buffs_table)
-	local properties = backend_items.get_properties(backend_items, backend_id)
+	local properties = backend_items:get_properties(backend_id)
 
 	if properties then
 		for property_key, property_value in pairs(properties) do
@@ -473,7 +473,7 @@ GearUtils.get_property_and_trait_buffs = function (backend_items, backend_id, bu
 		end
 	end
 
-	local traits = backend_items.get_traits(backend_items, backend_id)
+	local traits = backend_items:get_traits(backend_id)
 
 	if traits then
 		for _, trait_key in pairs(traits) do

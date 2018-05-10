@@ -33,9 +33,9 @@ PlayFabMirror.init = function (self, signin_result)
 	self._read_only_data_mirror = table.clone(read_only_data_values)
 	self._commit_limit_timer = REDUCTION_INTERVAL
 	self._commit_limit_total = 1
-	self._claimed_achievements = self._parse_claimed_achievements(self, read_only_data_values)
+	self._claimed_achievements = self:_parse_claimed_achievements(read_only_data_values)
 
-	self._request_best_power_levels(self)
+	self:_request_best_power_levels()
 end
 
 PlayFabMirror._parse_claimed_achievements = function (self, read_only_data_values)
@@ -85,7 +85,7 @@ PlayFabMirror.best_power_levels_request_cb = function (self, result)
 
 		self.sum_best_power_levels = sum
 
-		self._request_signin_reward(self)
+		self:_request_signin_reward()
 	end
 end
 
@@ -125,7 +125,7 @@ PlayFabMirror.sign_in_reward_request_cb = function (self, result)
 			end
 		end
 
-		self._request_fix_inventory_data_1(self)
+		self:_request_fix_inventory_data_1()
 	end
 end
 
@@ -153,8 +153,8 @@ PlayFabMirror.get_quests_cb = function (self, result)
 		local refresh_available = function_result.daily_quest_refresh_available
 		local daily_quest_update_time = function_result.daily_quest_update_time
 
-		self.set_quest_data(self, current_quests, refresh_available, daily_quest_update_time)
-		self._request_fix_inventory_data_1(self)
+		self:set_quest_data(current_quests, refresh_available, daily_quest_update_time)
+		self:_request_fix_inventory_data_1()
 	end
 end
 
@@ -177,7 +177,7 @@ PlayFabMirror.fix_inventory_data_1_request_cb = function (self, result)
 		table.dump(result, nil, 6)
 		fassert(false, "fix_inventory_data_1_request_cb: it failed!")
 	else
-		self._request_user_inventory(self)
+		self:_request_user_inventory()
 	end
 end
 
@@ -211,13 +211,13 @@ PlayFabMirror.inventory_request_cb = function (self, result)
 			if not item.BundleContents then
 				local backend_id = item.ItemInstanceId
 
-				self._update_data(self, item, backend_id)
+				self:_update_data(item, backend_id)
 
 				self._inventory_items[backend_id] = item
 			end
 		end
 
-		self._request_all_users_characters(self)
+		self:_request_all_users_characters()
 	end
 end
 
@@ -243,7 +243,7 @@ PlayFabMirror.character_request_cb = function (self, result)
 		local characters = result.Characters
 		self._num_items_to_load = self._num_items_to_load + #characters
 
-		self._request_character_readonly_data(self, characters, 1)
+		self:_request_character_readonly_data(characters, 1)
 	end
 end
 
@@ -275,7 +275,7 @@ PlayFabMirror.character_data_request_cb = function (self, characters, i, result)
 		local character_id = result.CharacterId
 		local character_name = self._career_lookup[character_id]
 		local character_data = result.Data
-		local broken_slots = self._set_inital_career_data(self, character_id, character_data)
+		local broken_slots = self:_set_inital_career_data(character_id, character_data)
 
 		if broken_slots then
 			self._num_items_to_load = self._num_items_to_load + 1
@@ -296,7 +296,7 @@ PlayFabMirror.character_data_request_cb = function (self, characters, i, result)
 			PlayFabClientApi.ExecuteCloudScript(request, fix_career_data_request_cb, fix_career_data_request_cb)
 		elseif i < #characters then
 			print("Requesting character data for index", i + 1, #characters)
-			self._request_character_readonly_data(self, characters, i + 1)
+			self:_request_character_readonly_data(characters, i + 1)
 		end
 	end
 end
@@ -322,7 +322,7 @@ PlayFabMirror.fix_career_data_request_cb = function (self, characters, i, result
 
 		if i < #characters then
 			print("Requesting character data for index", i + 1, #characters)
-			self._request_character_readonly_data(self, characters, i + 1)
+			self:_request_character_readonly_data(characters, i + 1)
 		end
 	end
 end
@@ -429,7 +429,7 @@ end
 
 PlayFabMirror.update = function (self, dt)
 	if self._commit_current_id then
-		self._check_current_commit(self)
+		self:_check_current_commit()
 	end
 
 	local queued_commit = self._queued_commit
@@ -438,7 +438,7 @@ PlayFabMirror.update = function (self, dt)
 		queued_commit.timer = queued_commit.timer - dt
 
 		if queued_commit.timer <= 0 and not self._commit_current_id then
-			self._commit_internal(self, queued_commit.id)
+			self:_commit_internal(queued_commit.id)
 		end
 	end
 
@@ -453,7 +453,7 @@ PlayFabMirror.update = function (self, dt)
 end
 
 PlayFabMirror._check_current_commit = function (self)
-	local status = self._commit_status(self, self._commit_current_id)
+	local status = self:_commit_status(self._commit_current_id)
 
 	if status ~= "waiting" then
 		local commit_data = self._commits[self._commit_current_id]
@@ -467,7 +467,7 @@ PlayFabMirror._check_current_commit = function (self)
 		else
 			local backend_manager = Managers.backend
 
-			backend_manager.dirtify_interfaces(backend_manager)
+			backend_manager:dirtify_interfaces()
 		end
 	end
 end
@@ -602,12 +602,12 @@ end
 PlayFabMirror.add_item = function (self, backend_id, item)
 	local inventory_items = self._inventory_items
 
-	self._update_data(self, item, backend_id)
+	self:_update_data(item, backend_id)
 
 	inventory_items[backend_id] = item
 
 	ItemHelper.mark_backend_id_as_new(backend_id)
-	self._re_evaluate_best_power_level(self, item)
+	self:_re_evaluate_best_power_level(item)
 end
 
 PlayFabMirror.remove_item = function (self, backend_id)
@@ -632,7 +632,7 @@ PlayFabMirror.update_item = function (self, backend_id, new_item)
 	inventory_items[backend_id] = new_item
 	local item = inventory_items[backend_id]
 
-	self._update_data(self, item, backend_id)
+	self:_update_data(item, backend_id)
 end
 
 PlayFabMirror.get_users_career_data = function (self, peer_id, career_name, callback_func)
@@ -665,12 +665,12 @@ PlayFabMirror.commit = function (self, skip_queue)
 			local id = queued_commit.id
 
 			print("FORCE COMMIT", id)
-			self._commit_internal(self, id, skip_queue)
+			self:_commit_internal(id, skip_queue)
 		else
-			id = self._commit_internal(self, nil, skip_queue)
+			id = self:_commit_internal(nil, skip_queue)
 		end
 	elseif not queued_commit.active then
-		id = self._queue_commit(self)
+		id = self:_queue_commit()
 	end
 
 	if id then
@@ -689,7 +689,7 @@ end
 PlayFabMirror._queue_commit = function (self)
 	local queued_commit = self._queued_commit
 	local timer = self._commit_limit_total * DELAY_MULTIPLIER
-	local id = self._new_id(self)
+	local id = self:_new_id()
 	queued_commit.timer = timer
 	queued_commit.id = id
 	queued_commit.active = true
@@ -725,7 +725,7 @@ PlayFabMirror._commit_internal = function (self, queue_id, skip_queue)
 
 	local career_data = self._career_data
 	local career_data_mirror = self._career_data_mirror
-	local commit_id = queue_id or self._new_id(self)
+	local commit_id = queue_id or self:_new_id()
 	local status = "success"
 	local num_updates = 0
 
@@ -777,7 +777,7 @@ PlayFabMirror._commit_internal = function (self, queue_id, skip_queue)
 				function_params.commit_id = commit_id
 				function_params.commit_limit_total = self._commit_limit_total
 
-				self._send_update_character_data_request(self, update_character_data_request, skip_queue)
+				self:_send_update_character_data_request(update_character_data_request, skip_queue)
 
 				status = "waiting"
 				num_updates = num_updates + 1
@@ -836,7 +836,7 @@ PlayFabMirror._commit_internal = function (self, queue_id, skip_queue)
 			}
 		}
 
-		self._send_update_read_only_data_request(self, commit_id, update_read_only_data_request, skip_queue)
+		self:_send_update_read_only_data_request(commit_id, update_read_only_data_request, skip_queue)
 
 		commit.status = "waiting"
 		commit.wait_for_hero_attributes = true

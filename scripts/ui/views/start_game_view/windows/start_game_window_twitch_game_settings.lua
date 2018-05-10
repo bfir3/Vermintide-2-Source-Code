@@ -30,19 +30,19 @@ StartGameWindowTwitchGameSettings.on_enter = function (self, params, offset)
 	}
 	self._network_lobby = ingame_ui_context.network_lobby
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self._enable_play = false
 	self._animations = {}
 	self._ui_animations = {}
 
-	self.create_ui_elements(self, params, offset)
+	self:create_ui_elements(params, offset)
 
 	self._twitch_active = nil
 
-	self._update_difficulty_option(self)
+	self:_update_difficulty_option()
 end
 
 StartGameWindowTwitchGameSettings.create_ui_elements = function (self, params, offset)
@@ -82,16 +82,16 @@ StartGameWindowTwitchGameSettings.create_ui_elements = function (self, params, o
 	widgets_by_name.play_button.content.button_hotspot.disable_button = true
 	widgets_by_name.game_option_2.content.button_hotspot.disable_button = true
 
-	self._set_additional_options_enabled_state(self, false)
-	self._update_additional_options(self, true)
+	self:_set_additional_options_enabled_state(false)
+	self:_update_additional_options(true)
 
 	local game_option_1 = widgets_by_name.game_option_1
-	local anim = self._animate_pulse(self, game_option_1.style.glow_frame.color, 1, 255, 100, 2)
+	local anim = self:_animate_pulse(game_option_1.style.glow_frame.color, 1, 255, 100, 2)
 
 	UIWidget.animate(game_option_1, anim)
 
 	local game_option_2 = widgets_by_name.game_option_2
-	local anim = self._animate_pulse(self, game_option_2.style.glow_frame.color, 1, 255, 100, 2)
+	local anim = self:_animate_pulse(game_option_2.style.glow_frame.color, 1, 255, 100, 2)
 
 	UIWidget.animate(game_option_2, anim)
 end
@@ -118,19 +118,19 @@ StartGameWindowTwitchGameSettings.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self._update_mission_selection(self)
+	self:_update_mission_selection()
 
 	if self._additional_option_enabled then
-		self._update_additional_options(self)
+		self:_update_additional_options()
 	end
 
-	self._update_difficulty_option(self)
-	self._update_animations(self, dt)
-	self._handle_input(self, dt, t)
-	self.draw(self, dt)
+	self:_update_difficulty_option()
+	self:_update_animations(dt)
+	self:_handle_input(dt, t)
+	self:draw(dt)
 end
 
 StartGameWindowTwitchGameSettings.post_update = function (self, dt, t)
@@ -138,7 +138,7 @@ StartGameWindowTwitchGameSettings.post_update = function (self, dt, t)
 end
 
 StartGameWindowTwitchGameSettings._update_animations = function (self, dt)
-	self._update_game_options_hover_effect(self)
+	self:_update_game_options_hover_effect()
 
 	local ui_animations = self._ui_animations
 	local animations = self._animations
@@ -152,11 +152,11 @@ StartGameWindowTwitchGameSettings._update_animations = function (self, dt)
 		end
 	end
 
-	ui_animator.update(ui_animator, dt)
+	ui_animator:update(dt)
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -252,13 +252,13 @@ StartGameWindowTwitchGameSettings._is_button_selected = function (self, widget)
 end
 
 StartGameWindowTwitchGameSettings._is_other_option_button_selected = function (self, widget, current_option)
-	if self._is_button_released(self, widget) then
+	if self:_is_button_released(widget) then
 		local is_selected = not current_option
 
 		if is_selected then
-			self._play_sound(self, "play_gui_lobby_button_03_private")
+			self:_play_sound("play_gui_lobby_button_03_private")
 		else
-			self._play_sound(self, "play_gui_lobby_button_03_public")
+			self:_play_sound("play_gui_lobby_button_03_public")
 		end
 
 		return is_selected
@@ -278,10 +278,10 @@ StartGameWindowTwitchGameSettings._handle_input = function (self, dt, t)
 
 		UIWidgetUtils.animate_default_checkbox_button(private_button, dt)
 
-		local changed_selection = self._is_other_option_button_selected(self, private_button, self._private_enabled)
+		local changed_selection = self:_is_other_option_button_selected(private_button, self._private_enabled)
 
 		if changed_selection ~= nil then
-			parent.set_private_option_enabled(parent, changed_selection)
+			parent:set_private_option_enabled(changed_selection)
 		end
 
 		local host_button = widgets_by_name.host_button
@@ -290,33 +290,33 @@ StartGameWindowTwitchGameSettings._handle_input = function (self, dt, t)
 		UIWidgetUtils.animate_default_checkbox_button(host_button, dt)
 		UIWidgetUtils.animate_default_checkbox_button(strict_matchmaking_button, dt)
 
-		if self._is_button_hover_enter(self, widgets_by_name.game_option_1) or self._is_button_hover_enter(self, widgets_by_name.game_option_2) or self._is_button_hover_enter(self, widgets_by_name.play_button) then
-			self._play_sound(self, "play_gui_lobby_button_01_difficulty_confirm_hover")
+		if self:_is_button_hover_enter(widgets_by_name.game_option_1) or self:_is_button_hover_enter(widgets_by_name.game_option_2) or self:_is_button_hover_enter(widgets_by_name.play_button) then
+			self:_play_sound("play_gui_lobby_button_01_difficulty_confirm_hover")
 		end
 
-		changed_selection = self._is_other_option_button_selected(self, host_button, self._always_host_enabled)
+		changed_selection = self:_is_other_option_button_selected(host_button, self._always_host_enabled)
 
 		if changed_selection ~= nil then
-			parent.set_always_host_option_enabled(parent, changed_selection)
+			parent:set_always_host_option_enabled(changed_selection)
 		end
 
-		changed_selection = self._is_other_option_button_selected(self, strict_matchmaking_button, self._strict_matchmaking_enabled)
+		changed_selection = self:_is_other_option_button_selected(strict_matchmaking_button, self._strict_matchmaking_enabled)
 
 		if changed_selection ~= nil then
-			parent.set_strict_matchmaking_option_enabled(parent, changed_selection)
+			parent:set_strict_matchmaking_option_enabled(changed_selection)
 		end
 	end
 
-	if self._is_button_released(self, widgets_by_name.game_option_2) then
-		parent.set_layout(parent, 10)
-	elseif self._is_button_released(self, widgets_by_name.game_option_1) then
-		parent.set_layout(parent, 11)
+	if self:_is_button_released(widgets_by_name.game_option_2) then
+		parent:set_layout(10)
+	elseif self:_is_button_released(widgets_by_name.game_option_1) then
+		parent:set_layout(11)
 	end
 
-	local play_pressed = gamepad_active and self._enable_play and input_service.get(input_service, "refresh_press")
+	local play_pressed = gamepad_active and self._enable_play and input_service:get("refresh_press")
 
-	if self._is_button_released(self, widgets_by_name.play_button) or play_pressed then
-		parent.play(parent, t)
+	if self:_is_button_released(widgets_by_name.play_button) or play_pressed then
+		parent:play(t)
 	end
 end
 
@@ -332,10 +332,10 @@ StartGameWindowTwitchGameSettings._update_game_options_hover_effect = function (
 		local widget_name = widget_prefix .. i
 		local widget = widgets_by_name[widget_name]
 
-		if self._is_button_hover_enter(self, widget) then
-			self._on_option_button_hover_enter(self, i)
-		elseif self._is_button_hover_exit(self, widget) then
-			self._on_option_button_hover_exit(self, i)
+		if self:_is_button_hover_enter(widget) then
+			self:_on_option_button_hover_enter(i)
+		elseif self:_is_button_hover_exit(widget) then
+			self:_on_option_button_hover_exit(i)
 		end
 	end
 end
@@ -345,9 +345,9 @@ StartGameWindowTwitchGameSettings._on_option_button_hover_enter = function (self
 	local widget_name = "game_option_" .. index
 	local widget = widgets_by_name[widget_name]
 
-	self._create_style_animation_enter(self, widget, 255, "glow", index, instant)
-	self._create_style_animation_enter(self, widget, 255, "icon_glow", index, instant)
-	self._create_style_animation_exit(self, widget, 0, "button_hover_rect", index, instant)
+	self:_create_style_animation_enter(widget, 255, "glow", index, instant)
+	self:_create_style_animation_enter(widget, 255, "icon_glow", index, instant)
+	self:_create_style_animation_exit(widget, 0, "button_hover_rect", index, instant)
 end
 
 StartGameWindowTwitchGameSettings._on_option_button_hover_exit = function (self, index, instant)
@@ -355,9 +355,9 @@ StartGameWindowTwitchGameSettings._on_option_button_hover_exit = function (self,
 	local widget_name = "game_option_" .. index
 	local widget = widgets_by_name[widget_name]
 
-	self._create_style_animation_exit(self, widget, 0, "glow", index, instant)
-	self._create_style_animation_exit(self, widget, 0, "icon_glow", index, instant)
-	self._create_style_animation_enter(self, widget, 30, "button_hover_rect", index, instant)
+	self:_create_style_animation_exit(widget, 0, "glow", index, instant)
+	self:_create_style_animation_exit(widget, 0, "icon_glow", index, instant)
+	self:_create_style_animation_enter(widget, 30, "button_hover_rect", index, instant)
 end
 
 StartGameWindowTwitchGameSettings._update_additional_options = function (self, force_update)
@@ -367,7 +367,7 @@ StartGameWindowTwitchGameSettings._update_additional_options = function (self, f
 	local strict_matchmaking_enabled = false
 	local twitch_active = Managers.twitch and Managers.twitch:is_connected()
 	local lobby = self._network_lobby
-	local num_members = #lobby.members(lobby):get_members()
+	local num_members = #lobby:members():get_members()
 	local is_alone = num_members == 1
 
 	if force_update or is_alone ~= self._is_alone or private_enabled ~= self._private_enabled or always_host_enabled ~= self._always_host_enabled or strict_matchmaking_enabled ~= self._strict_matchmaking_enabled or twitch_active ~= self._twitch_active then
@@ -397,11 +397,11 @@ end
 
 StartGameWindowTwitchGameSettings._update_difficulty_option = function (self)
 	local parent = self.parent
-	local difficulty_key = parent.get_difficulty_option(parent)
+	local difficulty_key = parent:get_difficulty_option()
 	local twitch_active = Managers.twitch and Managers.twitch:is_connected()
 
 	if difficulty_key ~= self._difficulty_key or twitch_active ~= self._twitch_active then
-		self._set_difficulty_option(self, difficulty_key)
+		self:_set_difficulty_option(difficulty_key)
 
 		self._difficulty_key = difficulty_key
 		local enable_play = DifficultySettings[difficulty_key] ~= nil
@@ -429,10 +429,10 @@ end
 
 StartGameWindowTwitchGameSettings._update_mission_selection = function (self)
 	local parent = self.parent
-	local selected_level_id = parent.get_selected_level_id(parent)
+	local selected_level_id = parent:get_selected_level_id()
 
 	if selected_level_id ~= self._selected_level_id then
-		self._set_selected_level(self, selected_level_id)
+		self:_set_selected_level(selected_level_id)
 
 		self._selected_level_id = selected_level_id
 		local widgets_by_name = self._widgets_by_name
@@ -455,7 +455,7 @@ StartGameWindowTwitchGameSettings._set_selected_level = function (self, level_id
 		texture_size[2] = icon_texture_settings.size[2]
 		widget.content.icon = level_image
 		local completed_difficulty_index = LevelUnlockUtils.completed_level_difficulty_index(self.statistics_db, self._stats_id, level_id) or 0
-		local level_frame = self._get_selection_frame_by_difficulty_index(self, completed_difficulty_index)
+		local level_frame = self:_get_selection_frame_by_difficulty_index(completed_difficulty_index)
 		widget.content.icon_frame = level_frame
 	end
 
@@ -526,7 +526,7 @@ StartGameWindowTwitchGameSettings._create_style_animation_enter = function (self
 	local animation_duration = (1 - current_color_value / target_color_value) * total_time
 
 	if 0 < animation_duration and not instant then
-		ui_animations[animation_name .. "_hover_" .. widget_index] = self._animate_element_by_time(self, pass_style.color, 1, current_color_value, target_color_value, animation_duration)
+		ui_animations[animation_name .. "_hover_" .. widget_index] = self:_animate_element_by_time(pass_style.color, 1, current_color_value, target_color_value, animation_duration)
 	else
 		pass_style.color[1] = target_color_value
 	end
@@ -548,7 +548,7 @@ StartGameWindowTwitchGameSettings._create_style_animation_exit = function (self,
 	local animation_duration = current_color_value / 255 * total_time
 
 	if 0 < animation_duration and not instant then
-		ui_animations[animation_name .. "_hover_" .. widget_index] = self._animate_element_by_time(self, pass_style.color, 1, current_color_value, target_color_value, animation_duration)
+		ui_animations[animation_name .. "_hover_" .. widget_index] = self:_animate_element_by_time(pass_style.color, 1, current_color_value, target_color_value, animation_duration)
 	else
 		pass_style.color[1] = target_color_value
 	end

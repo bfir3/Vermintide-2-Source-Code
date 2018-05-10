@@ -49,7 +49,7 @@ WorldManager.create_world = function (self, name, shading_environment, shading_c
 	self._worlds[name] = world
 	self._wwise_worlds[world] = Wwise.wwise_world(world)
 
-	self._sort_update_queue(self)
+	self:_sort_update_queue()
 
 	return world
 end
@@ -97,7 +97,7 @@ WorldManager.destroy_world = function (self, world_or_name)
 	self._scene_update_callbacks[world] = nil
 	self._wwise_worlds[world] = nil
 
-	self._sort_update_queue(self)
+	self:_sort_update_queue()
 end
 
 WorldManager.has_world = function (self, name)
@@ -120,7 +120,7 @@ WorldManager.update = function (self, dt, t)
 	self.locked = false
 
 	for world_or_name, _ in pairs(self._queued_worlds_to_release) do
-		self.destroy_world(self, world_or_name)
+		self:destroy_world(world_or_name)
 
 		self._queued_worlds_to_release[world_or_name] = nil
 	end
@@ -149,12 +149,12 @@ WorldManager.enable_world = function (self, name, enabled)
 		self._worlds[name] = nil
 	end
 
-	self._sort_update_queue(self)
+	self:_sort_update_queue()
 end
 
 WorldManager.destroy = function (self)
 	for name, _ in pairs(self._worlds) do
-		self.destroy_world(self, name)
+		self:destroy_world(name)
 	end
 end
 

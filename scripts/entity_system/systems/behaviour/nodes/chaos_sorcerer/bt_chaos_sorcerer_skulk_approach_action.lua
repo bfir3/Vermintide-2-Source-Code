@@ -24,18 +24,18 @@ BTChaosSorcererSkulkApproachAction.enter = function (self, unit, blackboard, t)
 	blackboard.action = action
 
 	if blackboard.move_state ~= "idle" then
-		self.idle(self, unit, blackboard)
+		self:idle(unit, blackboard)
 	end
 
 	local ai_navigation = blackboard.navigation_extension
 
-	ai_navigation.set_max_speed(ai_navigation, breed.run_speed)
+	ai_navigation:set_max_speed(breed.run_speed)
 	LocomotionUtils.set_animation_driven_movement(unit, false)
 
 	if blackboard.move_pos then
 		local move_pos = blackboard.move_pos:unbox()
 
-		self.move_to(self, move_pos, unit, blackboard)
+		self:move_to(move_pos, unit, blackboard)
 	end
 
 	blackboard.ready_to_summon = false
@@ -56,7 +56,7 @@ BTChaosSorcererSkulkApproachAction.enter = function (self, unit, blackboard, t)
 			blackboard.spell = blackboard.portal_data
 		end
 	elseif action.sorcerer_type == "vortex" and not blackboard.vortex_data then
-		self._initialize_vortex_data(self, blackboard, action)
+		self:_initialize_vortex_data(blackboard, action)
 
 		blackboard.spell = blackboard.vortex_data
 	end
@@ -64,7 +64,7 @@ BTChaosSorcererSkulkApproachAction.enter = function (self, unit, blackboard, t)
 	if blackboard.teleport_health_percent == nil or blackboard.set_teleport_hp then
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 		blackboard.health_extension = health_extension
-		blackboard.teleport_health_percent = health_extension.current_health_percent(health_extension) - action.part_hp_lost_to_teleport
+		blackboard.teleport_health_percent = health_extension:current_health_percent() - action.part_hp_lost_to_teleport
 		blackboard.set_teleport_hp = nil
 	end
 
@@ -100,13 +100,13 @@ BTChaosSorcererSkulkApproachAction.leave = function (self, unit, blackboard, t, 
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 
 	if reason == "aborted" then
-		local path_found = navigation_extension.is_following_path(navigation_extension)
+		local path_found = navigation_extension:is_following_path()
 
 		if blackboard.move_pos and path_found and blackboard.move_state == "idle" then
-			self.start_move_animation(self, unit, blackboard)
+			self:start_move_animation(unit, blackboard)
 		end
 	end
 
@@ -116,8 +116,8 @@ end
 
 BTChaosSorcererSkulkApproachAction.run = function (self, unit, blackboard, t, dt)
 	local ai_navigation = blackboard.navigation_extension
-	local path_found = ai_navigation.is_following_path(ai_navigation)
-	local failed_attempts = ai_navigation.number_failed_move_attempts(ai_navigation)
+	local path_found = ai_navigation:is_following_path()
+	local failed_attempts = ai_navigation:number_failed_move_attempts()
 	local action = blackboard.action
 
 	if self[action.search_func_name](self, unit, blackboard, t, blackboard.spell) then
@@ -127,7 +127,7 @@ BTChaosSorcererSkulkApproachAction.run = function (self, unit, blackboard, t, dt
 	local skulk_data = blackboard.skulk_data
 
 	if blackboard.move_pos and path_found and blackboard.move_state == "idle" then
-		self.start_move_animation(self, unit, blackboard)
+		self:start_move_animation(unit, blackboard)
 	end
 
 	local current_health_percent = blackboard.health_extension:current_health_percent()
@@ -157,7 +157,7 @@ BTChaosSorcererSkulkApproachAction.run = function (self, unit, blackboard, t, dt
 			return "done"
 		end
 	elseif blackboard.travel_teleport_timer < t then
-		local teleport_pos = self.get_skulk_target(self, unit, blackboard, true)
+		local teleport_pos = self:get_skulk_target(unit, blackboard, true)
 
 		if teleport_pos then
 			blackboard.quick_teleport_exit_pos = Vector3Box(teleport_pos)
@@ -171,7 +171,7 @@ BTChaosSorcererSkulkApproachAction.run = function (self, unit, blackboard, t, dt
 	local position = blackboard.move_pos
 
 	if position then
-		local at_goal = self.at_goal(self, unit, blackboard)
+		local at_goal = self:at_goal(unit, blackboard)
 
 		if at_goal or 0 < failed_attempts then
 			blackboard.move_pos = nil
@@ -180,16 +180,16 @@ BTChaosSorcererSkulkApproachAction.run = function (self, unit, blackboard, t, dt
 		return "running"
 	end
 
-	local position = self.get_skulk_target(self, unit, blackboard)
+	local position = self:get_skulk_target(unit, blackboard)
 
 	if position then
-		self.move_to(self, position, unit, blackboard)
+		self:move_to(position, unit, blackboard)
 
 		return "running"
 	end
 
 	if blackboard.move_state ~= "idle" then
-		self.idle(self, unit, blackboard)
+		self:idle(unit, blackboard)
 	end
 
 	return "running"
@@ -203,7 +203,7 @@ BTChaosSorcererSkulkApproachAction.at_goal = function (self, unit, blackboard)
 		return false
 	end
 
-	local position = position_boxed.unbox(position_boxed)
+	local position = position_boxed:unbox()
 	local distance = Vector3.distance_squared(position, POSITION_LOOKUP[unit])
 
 	if distance < 0.25 then
@@ -214,13 +214,13 @@ end
 BTChaosSorcererSkulkApproachAction.move_to = function (self, position, unit, blackboard)
 	local ai_navigation = blackboard.navigation_extension
 
-	ai_navigation.move_to(ai_navigation, position)
+	ai_navigation:move_to(position)
 
 	blackboard.move_pos = Vector3Box(position)
 end
 
 BTChaosSorcererSkulkApproachAction.idle = function (self, unit, blackboard)
-	self.anim_event(self, unit, blackboard, "idle")
+	self:anim_event(unit, blackboard, "idle")
 
 	blackboard.move_state = "idle"
 end
@@ -228,7 +228,7 @@ end
 BTChaosSorcererSkulkApproachAction.start_move_animation = function (self, unit, blackboard)
 	local move_animation = blackboard.action.move_animation
 
-	self.anim_event(self, unit, blackboard, move_animation)
+	self:anim_event(unit, blackboard, move_animation)
 
 	blackboard.move_state = "moving"
 end
@@ -379,7 +379,7 @@ BTChaosSorcererSkulkApproachAction._get_vortex_cast_position = function (unit, b
 	local params = FrameTable.alloc_table()
 	local target_distance = blackboard.target_dist
 	local navigation_extension = blackboard.navigation_extension
-	local traverse_logic = navigation_extension.traverse_logic(navigation_extension)
+	local traverse_logic = navigation_extension:traverse_logic()
 	params.nav_world = blackboard.nav_world
 	params.physics_world = physics_world
 	params.from_unit = unit

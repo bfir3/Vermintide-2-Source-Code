@@ -10,7 +10,7 @@ NavigationGroup.init = function (self, nav_world, poly_hash, poly, poly_center, 
 	self._group_size = 0
 	self._group_neighbours = {}
 
-	self.add_polygon(self, poly, poly_center, poly_area, nav_world)
+	self:add_polygon(poly, poly_center, poly_area, nav_world)
 end
 
 NavigationGroup.make_string_of_group = function (self, write_string)
@@ -33,13 +33,13 @@ NavigationGroup.make_string_of_group = function (self, write_string)
 end
 
 NavigationGroup.add_polygon = function (self, poly, poly_center, poly_area, nav_world)
-	local poly_hash = self.get_poly_hash(self, poly, nav_world)
+	local poly_hash = self:get_poly_hash(poly, nav_world)
 	self._group_polygons[poly_hash] = poly
 	self._group_size = self._group_size + 1
 	self._area = self._area + poly_area
 
 	if poly_center ~= nil then
-		self.calculate_group_center(self, poly_center, poly_hash, nav_world)
+		self:calculate_group_center(poly_center, poly_hash, nav_world)
 	end
 end
 
@@ -61,7 +61,7 @@ end
 
 NavigationGroup.recalc_neighbour_distances = function (self)
 	for neighbour, data in pairs(self._group_neighbours) do
-		data = Vector3.distance(self._group_center:unbox(), neighbour.get_group_center(neighbour):unbox())
+		data = Vector3.distance(self._group_center:unbox(), neighbour:get_group_center():unbox())
 	end
 end
 
@@ -70,14 +70,14 @@ NavigationGroup.calculate_group_center = function (self, poly_center, poly_hash,
 	local curr_center = self._group_center:unbox()
 	local new_center = ((group_size - 1) * curr_center + poly_center) / group_size
 	local new_center_poly = GwNavTraversal.get_seed_triangle(nav_world, new_center)
-	local new_center_hash = new_center_poly and self.get_poly_hash(self, new_center_poly, nav_world)
+	local new_center_hash = new_center_poly and self:get_poly_hash(new_center_poly, nav_world)
 
 	if new_center_hash then
 		local a, b, c = Script.temp_count()
 		local group_polygons = self._group_polygons
 
 		if not group_polygons[new_center_hash] then
-			new_center, new_center_hash = self.breadth_first_find_nearest_group_triangle(self, new_center_poly, nav_world)
+			new_center, new_center_hash = self:breadth_first_find_nearest_group_triangle(new_center_poly, nav_world)
 
 			if new_center == nil then
 				print("Fallback: Will use", poly_center, "as center for nav group", self._group_number)
@@ -102,7 +102,7 @@ NavigationGroup.get_group_polygons_centers = function (self, list, nav_world)
 
 	for _, poly in pairs(self._group_polygons) do
 		local a, b, c = Script.temp_count()
-		poly_center = self.calc_polygon_center(self, poly, nav_world)
+		poly_center = self:calc_polygon_center(poly, nav_world)
 
 		table.insert(list, Vector3Box(poly_center))
 		Script.set_temp_count(a, b, c)
@@ -154,7 +154,7 @@ end
 
 NavigationGroup.get_poly_hash = function (self, poly, nav_world)
 	local a, b, c = Script.temp_count()
-	local poly_center = self.calc_polygon_center(self, poly, nav_world)
+	local poly_center = self:calc_polygon_center(poly, nav_world)
 	local poly_hash = poly_center.x * 0.0001 + poly_center.y + poly_center.z * 10000
 
 	Script.set_temp_count(a, b, c)
@@ -170,17 +170,17 @@ NavigationGroup.breadth_first_find_nearest_group_triangle = function (self, root
 	local b_current = 1
 	local b_last = 1
 	b_queue[1] = root_triangle
-	local root_hash = self.get_poly_hash(self, root_triangle, nav_world)
+	local root_hash = self:get_poly_hash(root_triangle, nav_world)
 	triangle_lookup[root_hash] = true
 	local group_polygons = self._group_polygons
 
 	while b_current <= b_last do
 		local node_tri = b_queue[b_current]
-		local node_hash = self.get_poly_hash(self, node_tri, nav_world)
+		local node_hash = self:get_poly_hash(node_tri, nav_world)
 		b_current = b_current + 1
 
 		if group_polygons[node_hash] then
-			local tri_center = self.calc_polygon_center(self, node_tri, nav_world)
+			local tri_center = self:calc_polygon_center(node_tri, nav_world)
 
 			return tri_center, node_hash
 		end
@@ -192,7 +192,7 @@ NavigationGroup.breadth_first_find_nearest_group_triangle = function (self, root
 		for i = 1, #neighbours, 1 do
 			local a, b, c = Script.temp_count()
 			local neighbour_tri = neighbours[i]
-			local neighbour_hash = self.get_poly_hash(self, neighbour_tri, nav_world)
+			local neighbour_hash = self:get_poly_hash(neighbour_tri, nav_world)
 
 			if not triangle_lookup[neighbour_hash] then
 				b_last = b_last + 1
@@ -226,7 +226,7 @@ NavigationGroup.print_group = function (self, world, nav_world, line_object, lin
 	end
 
 	for _, poly in pairs(self._group_polygons) do
-		self.draw_poly_lines(self, poly, color, nav_world, line_object, debug_world_gui)
+		self:draw_poly_lines(poly, color, nav_world, line_object, debug_world_gui)
 	end
 
 	local m = Matrix4x4.identity()
@@ -236,7 +236,7 @@ NavigationGroup.print_group = function (self, world, nav_world, line_object, lin
 	local group_center = self._group_center:unbox()
 	local text_pos = Vector3(group_center[1], group_center[3], group_center[2])
 
-	line_drawer.sphere(line_drawer, group_center, 0.07, Color(255, 255, 255))
+	line_drawer:sphere(group_center, 0.07, Color(255, 255, 255))
 	Gui.text_3d(debug_world_gui, "C", font_material, font_size, font, m, text_pos, 3, Color(255, 255, 255))
 	Gui.text_3d(debug_world_gui, "C", font_material, font_size + 0.1, font, m, text_pos - Vector3(0.05, 0, 0), 2, Color(0, 0, 0))
 	Gui.text_3d(debug_world_gui, "id=" .. self._group_number, font_material, font_size - 0.8, font, m, text_pos + Vector3(0, 1.5, 0), 3, Color(255, 255, 255))

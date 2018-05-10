@@ -13,7 +13,7 @@ RemotePlayer.init = function (self, network_manager, peer, player_controlled, is
 	self._clan_tag = clan_tag
 
 	if is_server then
-		self.create_game_object(self)
+		self:create_game_object()
 	end
 
 	self.index = self.game_object_id
@@ -42,7 +42,7 @@ end
 
 RemotePlayer.profile_index = function (self)
 	local profile_synchronizer = self.network_manager.profile_synchronizer
-	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, self.peer_id, self._local_player_id)
+	local profile_index = profile_synchronizer:profile_by_peer(self.peer_id, self._local_player_id)
 
 	return profile_index
 end
@@ -53,7 +53,7 @@ end
 
 RemotePlayer.character_name = function (self)
 	local profile_synchronizer = self.network_manager.profile_synchronizer
-	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, self.peer_id, self._local_player_id)
+	local profile_index = profile_synchronizer:profile_by_peer(self.peer_id, self._local_player_id)
 
 	if profile_index then
 		local profile = SPProfiles[profile_index]
@@ -67,7 +67,7 @@ end
 
 RemotePlayer.profile_display_name = function (self)
 	local profile_synchronizer = self.network_manager.profile_synchronizer
-	local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, self.peer_id, self._local_player_id)
+	local profile_index = profile_synchronizer:profile_by_peer(self.peer_id, self._local_player_id)
 
 	if profile_index then
 		local profile = SPProfiles[profile_index]
@@ -115,7 +115,7 @@ RemotePlayer.name = function (self)
 	local name = nil
 
 	if not self._player_controlled then
-		name = Localize(self.character_name(self))
+		name = Localize(self:character_name())
 	elseif rawget(_G, "Steam") then
 		if self._cached_name then
 			return self._cached_name
@@ -132,7 +132,7 @@ RemotePlayer.name = function (self)
 				end
 			end
 
-			name = clan_tag .. Steam.user_name(self.network_id(self))
+			name = clan_tag .. Steam.user_name(self:network_id())
 			self._cached_name = name
 		end
 	elseif PLATFORM == "xb1" or PLATFORM == "ps4" then
@@ -140,14 +140,14 @@ RemotePlayer.name = function (self)
 			return self._cached_name
 		end
 
-		name = Managers.state.network:lobby():user_name(self.network_id(self)) or "Remote #" .. tostring(self.peer_id:sub(1, 3))
+		name = Managers.state.network:lobby():user_name(self:network_id()) or "Remote #" .. tostring(self.peer_id:sub(1, 3))
 		self._cached_name = name
 	elseif Managers.game_server then
 		if self._cached_name then
 			return self._cached_name
 		end
 
-		name = Managers.game_server:peer_name(self.network_id(self)) or "Remote #" .. tostring(self.peer_id:sub(-3, -1))
+		name = Managers.game_server:peer_name(self:network_id()) or "Remote #" .. tostring(self.peer_id:sub(-3, -1))
 		self._cached_name = name
 	else
 		name = "Remote #" .. tostring(self.peer_id:sub(-3, -1))
@@ -182,8 +182,8 @@ RemotePlayer.create_game_object = function (self)
 		boon_7_remaining_duration = 0,
 		boon_10_remaining_duration = 0,
 		go_type = NetworkLookup.go_types.player,
-		network_id = self.network_id(self),
-		local_player_id = self.local_player_id(self),
+		network_id = self:network_id(),
+		local_player_id = self:local_player_id(),
 		player_controlled = self._player_controlled,
 		clan_tag = self._clan_tag,
 		boon_1_id = empty_boon_id,
@@ -200,7 +200,7 @@ RemotePlayer.create_game_object = function (self)
 	local callback = callback(self, "cb_game_session_disconnect")
 	self.game_object_id = self.network_manager:create_player_game_object("player", game_object_data_table, callback)
 
-	self.create_sync_data(self)
+	self:create_sync_data()
 
 	if script_data.network_debug then
 		print("RemotePlayer:create_game_object( )", self.game_object_id)

@@ -17,7 +17,7 @@ PingSystem.init = function (self, context, system_name)
 
 	local network_event_delegate = context.network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self._network_event_delegate = network_event_delegate
 	self._unit_storage = context.unit_storage
@@ -43,13 +43,13 @@ PingSystem.update = function (self, context, t)
 				local start_time = data.start_time
 
 				if start_time + PING_DURATION <= t then
-					self.remove_ping(self, pinger_unit)
+					self:remove_ping(pinger_unit)
 				end
 			else
-				self.remove_ping(self, pinger_unit)
+				self:remove_ping(pinger_unit)
 			end
 		else
-			self.remove_ping(self, pinger_unit)
+			self:remove_ping(pinger_unit)
 		end
 	end
 end
@@ -64,7 +64,7 @@ PingSystem.rpc_ping_unit = function (self, sender, pinger_unit_id, pinged_unit_i
 
 	if self.is_server then
 		if self._pinged_units[pinger_unit] then
-			self.remove_ping(self, pinger_unit)
+			self:remove_ping(pinger_unit)
 		end
 
 		local t = Managers.time:time("game")
@@ -74,10 +74,10 @@ PingSystem.rpc_ping_unit = function (self, sender, pinger_unit_id, pinged_unit_i
 		}
 
 		self.network_transmit:send_rpc_clients("rpc_ping_unit", pinger_unit_id, pinged_unit_id)
-		self.play_ping_vo(self, pinger_unit, pinged_unit)
+		self:play_ping_vo(pinger_unit, pinged_unit)
 	end
 
-	self.add_ping(self, pinger_unit, pinged_unit)
+	self:add_ping(pinger_unit, pinged_unit)
 end
 
 PingSystem.rpc_remove_unit_ping = function (self, sender, pinged_unit_id)
@@ -90,7 +90,7 @@ PingSystem.rpc_remove_unit_ping = function (self, sender, pinged_unit_id)
 	local ping_extension = ScriptUnit.extension(pinged_unit, "ping_system")
 
 	if ping_extension.set_pinged then
-		ping_extension.set_pinged(ping_extension, false)
+		ping_extension:set_pinged(false)
 	end
 end
 
@@ -98,7 +98,7 @@ PingSystem.add_ping = function (self, pinger_unit, pinged_unit)
 	local ping_extension = ScriptUnit.extension(pinged_unit, "ping_system")
 
 	if ping_extension.set_pinged then
-		ping_extension.set_pinged(ping_extension, true, pinger_unit)
+		ping_extension:set_pinged(true, pinger_unit)
 	end
 
 	local event = "hud_ping"
@@ -119,7 +119,7 @@ end
 PingSystem.remove_ping_from_unit = function (self, target_unit)
 	for pinger_unit, target in pairs(self._pinged_units) do
 		if target_unit == target.pinged_unit then
-			self.remove_ping(self, pinger_unit)
+			self:remove_ping(pinger_unit)
 
 			return
 		end
@@ -135,14 +135,14 @@ PingSystem.remove_ping = function (self, pinger_unit)
 
 	if Unit.alive(pinged_unit) then
 		local network_manager = Managers.state.network
-		local pinged_unit_id = network_manager.unit_game_object_id(network_manager, pinged_unit)
+		local pinged_unit_id = network_manager:unit_game_object_id(pinged_unit)
 
 		self.network_transmit:send_rpc_clients("rpc_remove_unit_ping", pinged_unit_id)
 
 		local ping_extension = ScriptUnit.extension(pinged_unit, "ping_system")
 
 		if ping_extension.set_pinged then
-			ping_extension.set_pinged(ping_extension, false)
+			ping_extension:set_pinged(false)
 		end
 	end
 end
@@ -158,23 +158,23 @@ PingSystem.play_ping_vo = function (self, pinger_unit, pinged_unit)
 		event_data.enemy_unit = pinged_unit
 		event_data.is_ping = true
 
-		dialogue_input.trigger_networked_dialogue_event(dialogue_input, "seen_enemy", event_data)
+		dialogue_input:trigger_networked_dialogue_event("seen_enemy", event_data)
 	elseif ScriptUnit.has_extension(pinged_unit, "status_system") then
 		local status_extension = ScriptUnit.extension(pinged_unit, "status_system")
-		local event = status_extension.disabled_vo_reason(status_extension)
+		local event = status_extension:disabled_vo_reason()
 
 		if event then
 			event_data.source_name = ScriptUnit.extension(pinger_unit, "dialogue_system").context.player_profile
 			event_data.target_name = ScriptUnit.extension(pinged_unit, "dialogue_system").context.player_profile
 			event_data.is_ping = true
 
-			dialogue_input.trigger_networked_dialogue_event(dialogue_input, event, event_data)
+			dialogue_input:trigger_networked_dialogue_event(event, event_data)
 		end
 	elseif Unit.get_data(pinged_unit, "lookat_tag") then
 		event_data.item_tag = Unit.get_data(pinged_unit, "lookat_tag") or Unit.debug_name(pinged_unit)
 		event_data.is_ping = true
 
-		dialogue_input.trigger_networked_dialogue_event(dialogue_input, "seen_item", event_data)
+		dialogue_input:trigger_networked_dialogue_event("seen_item", event_data)
 	elseif ScriptUnit.has_extension(pinged_unit, "interactable_system") then
 	end
 end
@@ -184,8 +184,8 @@ PingSystem.hot_join_sync = function (self, sender)
 	local network_manager = Managers.state.network
 
 	for pinger_unit, data in pairs(pinged_units) do
-		local pinger_unit_id = network_manager.unit_game_object_id(network_manager, pinger_unit)
-		local pinged_unit_id = network_manager.unit_game_object_id(network_manager, data.pinged_unit)
+		local pinger_unit_id = network_manager:unit_game_object_id(pinger_unit)
+		local pinged_unit_id = network_manager:unit_game_object_id(data.pinged_unit)
 
 		if pinger_unit_id and pinged_unit_id then
 			RPC.rpc_ping_unit(sender, pinger_unit_id, pinged_unit_id)

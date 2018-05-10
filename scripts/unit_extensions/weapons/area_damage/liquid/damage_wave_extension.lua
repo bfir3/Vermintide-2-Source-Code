@@ -7,13 +7,13 @@ local impact_hit_units = {}
 DamageWaveExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local world = extension_init_context.world
 	local entity_manager = Managers.state.entity
-	local ai_system = entity_manager.system(entity_manager, "ai_system")
+	local ai_system = entity_manager:system("ai_system")
 	self.world = world
 	self.game = Managers.state.network:game()
 	self.unit = unit
 	self.source_unit = extension_init_data.source_unit
 	self.displaced_units = {}
-	self.nav_world = ai_system.nav_world(ai_system)
+	self.nav_world = ai_system:nav_world()
 	self.network_manager = Managers.state.network
 	self.network_transmit = self.network_manager.network_transmit
 	self.ai_system = ai_system
@@ -24,7 +24,7 @@ DamageWaveExtension.init = function (self, extension_init_context, unit, extensi
 	self.ai_units_inside = {}
 	self.player_units_inside = {}
 	self.ai_hit_by_wavefront = {}
-	local buff_system = entity_manager.system(entity_manager, "buff_system")
+	local buff_system = entity_manager:system("buff_system")
 	self.buff_system = buff_system
 	local template_name = extension_init_data.damage_wave_template_name
 	local template = DamageWaveTemplates.templates[template_name]
@@ -110,7 +110,7 @@ DamageWaveExtension.launch_wave = function (self, target_unit, optional_target_p
 		local blob_separation_dist = self.blob_separation_dist
 		local num_volumes_guess = math.max(math.floor(initial_dist / blob_separation_dist), 1)
 		local ai_system = self.ai_system
-		self._nav_cost_map_id = ai_system.create_nav_cost_map(ai_system, nav_cost_map_cost_type, num_volumes_guess)
+		self._nav_cost_map_id = ai_system:create_nav_cost_map(nav_cost_map_cost_type, num_volumes_guess)
 	end
 
 	self.use_nav_cost_map_volumes = use_nav_cost_map_volumes
@@ -123,7 +123,7 @@ DamageWaveExtension.launch_wave = function (self, target_unit, optional_target_p
 		local height = self.wave_width
 		local offset_forward = 0
 		local offset_up = 0
-		local obstacle_position, obstacle_rotation, obstacle_size = self._calculate_oobb_collision(self, width, range, height, offset_forward, offset_up, position, effect_rotation)
+		local obstacle_position, obstacle_rotation, obstacle_size = self:_calculate_oobb_collision(width, range, height, offset_forward, offset_up, position, effect_rotation)
 
 		Managers.state.entity:system("ai_bot_group_system"):aoe_threat_created(obstacle_position, "oobb", obstacle_size, obstacle_rotation, threat_duration)
 	end
@@ -149,7 +149,7 @@ DamageWaveExtension.launch_wave = function (self, target_unit, optional_target_p
 
 	self.state = "running"
 	local network_manager = self.network_manager
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 
 	if unit_id then
 		self.network_transmit:send_rpc_clients("rpc_damage_wave_set_state", unit_id, NetworkLookup.damage_wave_states.running)
@@ -159,7 +159,7 @@ DamageWaveExtension.launch_wave = function (self, target_unit, optional_target_p
 	local launch_animation = self.launch_animation
 
 	if launch_animation and Unit.has_animation_state_machine(unit) then
-		network_manager.anim_event(network_manager, unit, launch_animation)
+		network_manager:anim_event(unit, launch_animation)
 	end
 
 	self.is_launched = true
@@ -178,7 +178,7 @@ DamageWaveExtension.destroy = function (self)
 				StatusUtils.set_in_liquid_network(target_unit, false)
 			end
 
-			buff_system.remove_server_controlled_buff(buff_system, target_unit, inside_id)
+			buff_system:remove_server_controlled_buff(target_unit, inside_id)
 		end
 	end
 
@@ -193,19 +193,19 @@ DamageWaveExtension.destroy = function (self)
 
 		for target_unit, inside_id in pairs(ai_units_inside_blob) do
 			if unit_alive(target_unit) then
-				buff_system.remove_server_controlled_buff(buff_system, target_unit, inside_id)
+				buff_system:remove_server_controlled_buff(target_unit, inside_id)
 			end
 		end
 
 		local volume_id = blob[6]
 
 		if volume_id then
-			ai_system.remove_nav_cost_map_volume(ai_system, volume_id, cost_map_id)
+			ai_system:remove_nav_cost_map_volume(volume_id, cost_map_id)
 		end
 	end
 
 	if cost_map_id then
-		ai_system.destroy_nav_cost_map(ai_system, cost_map_id)
+		ai_system:destroy_nav_cost_map(cost_map_id)
 	end
 
 	local world = self.world
@@ -241,7 +241,7 @@ DamageWaveExtension.abort = function (self)
 	local effect_name_id = NetworkLookup.effects[self.fx_name_arrived]
 	local node_id = 0
 
-	network_manager.rpc_play_particle_effect(network_manager, nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, position, rotation, false)
+	network_manager:rpc_play_particle_effect(nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, position, rotation, false)
 end
 
 DamageWaveExtension.move_wave = function (self, unit, t, dt, total_dist, grow)
@@ -274,7 +274,7 @@ DamageWaveExtension.move_wave = function (self, unit, t, dt, total_dist, grow)
 	local current_rotation = Unit.local_rotation(unit, 0)
 
 	if self.blob_separation_dist and self.blob_separation_dist <= self.last_dist - dist then
-		self.insert_blob(self, position, self.wave_width, current_rotation, nav_world)
+		self:insert_blob(position, self.wave_width, current_rotation, nav_world)
 
 		self.last_dist = dist
 	end
@@ -282,7 +282,7 @@ DamageWaveExtension.move_wave = function (self, unit, t, dt, total_dist, grow)
 	if self.fx_separation_dist <= self.last_fx_dist - dist and self.fx_name_filled then
 		local wave_rotation = Quaternion.look(wave_dir, Vector3(0, 0, 1))
 
-		self.insert_fx(self, position, wave_rotation, 2)
+		self:insert_fx(position, wave_rotation, 2)
 
 		self.last_fx_dist = dist
 	end
@@ -325,8 +325,8 @@ DamageWaveExtension.on_hit_by_wave = function (hit_unit, unit, parent)
 		local buff_system = Managers.state.entity:system("buff_system")
 		local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-		if not buff_extension.has_buff_type(buff_extension, parent.buff_wave_impact_impact_type) then
-			buff_system.add_buff(buff_system, hit_unit, parent.buff_wave_impact_template_name, unit)
+		if not buff_extension:has_buff_type(parent.buff_wave_impact_impact_type) then
+			buff_system:add_buff(hit_unit, parent.buff_wave_impact_template_name, unit)
 		end
 
 		if parent.template.trigger_dialogue_on_impact then
@@ -336,7 +336,7 @@ DamageWaveExtension.on_hit_by_wave = function (hit_unit, unit, parent)
 			event_data.target = hit_unit
 			event_data.target_name = ScriptUnit.extension(hit_unit, "dialogue_system").context.player_profile
 
-			dialogue_input.trigger_dialogue_event(dialogue_input, "on_plague_wave_hit", event_data)
+			dialogue_input:trigger_dialogue_event("on_plague_wave_hit", event_data)
 		end
 	end
 
@@ -429,7 +429,7 @@ DamageWaveExtension.wavefront_impact = function (self, t, impact_position, radiu
 
 		if not ai_hit_by_wavefront[hit_unit] then
 			local health_extension = ScriptUnit.extension(hit_unit, "health_system")
-			local is_alive = health_extension.is_alive(health_extension)
+			local is_alive = health_extension:is_alive()
 			local hit_unit_blackboard = BLACKBOARDS[hit_unit]
 			local breed_name = hit_unit_blackboard.breed.name
 			local should_stagger = is_alive and not immune_breeds[breed_name]
@@ -446,8 +446,8 @@ DamageWaveExtension.wavefront_impact = function (self, t, impact_position, radiu
 					if apply_impact_buff_to_ai then
 						local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-						if not buff_extension.has_buff_type(buff_extension, buff_wave_impact_impact_type) then
-							buff_system.add_buff(buff_system, hit_unit, buff_wave_impact_template_name, attacker_unit)
+						if not buff_extension:has_buff_type(buff_wave_impact_impact_type) then
+							buff_system:add_buff(hit_unit, buff_wave_impact_template_name, attacker_unit)
 						end
 					end
 				end
@@ -474,7 +474,7 @@ DamageWaveExtension.check_overlap = function (self, unit, target_unit, wave_radi
 				StatusUtils.set_in_liquid_network(target_unit, false)
 			end
 
-			buff_system.remove_server_controlled_buff(buff_system, target_unit, inside_id)
+			buff_system:remove_server_controlled_buff(target_unit, inside_id)
 
 			player_units_inside[target_unit] = nil
 		end
@@ -488,19 +488,19 @@ DamageWaveExtension.check_overlap = function (self, unit, target_unit, wave_radi
 		local buff_template_type = self.buff_template_type
 		local buff_extension = ScriptUnit.extension(target_unit, "buff_system")
 
-		if math.abs(test_pos.z - z) < wave_radius and not buff_extension.has_buff_type(buff_extension, buff_template_type) then
+		if math.abs(test_pos.z - z) < wave_radius and not buff_extension:has_buff_type(buff_template_type) then
 			if status_extension.in_liquid_unit ~= unit then
 				StatusUtils.set_in_liquid_network(target_unit, true, unit)
 			end
 
-			player_units_inside[target_unit] = buff_system.add_buff(buff_system, target_unit, buff_template_name, unit, true)
+			player_units_inside[target_unit] = buff_system:add_buff(target_unit, buff_template_name, unit, true)
 		end
 	end
 end
 
 DamageWaveExtension.update = function (self, unit, input, dt, context, t)
 	if not AiUtils.unit_alive(self.source_unit) and not self.is_launched then
-		self.abort(self)
+		self:abort()
 	end
 
 	if not self.is_launched then
@@ -513,10 +513,10 @@ DamageWaveExtension.update = function (self, unit, input, dt, context, t)
 
 	if state == "running" then
 		if self._update_func then
-			self._update_func(self, unit, position, t, dt)
+			self:_update_func(unit, position, t, dt)
 		end
 
-		local to_target_dir, dist, on_mesh = self.move_wave(self, unit, t, dt, self.initial_dist, true)
+		local to_target_dir, dist, on_mesh = self:move_wave(unit, t, dt, self.initial_dist, true)
 
 		if Vector3.dot(to_target_dir, wave_dir) < 0 or dist < 0.1 or not on_mesh then
 			local overflow_dist = self.overflow_dist
@@ -534,12 +534,12 @@ DamageWaveExtension.update = function (self, unit, input, dt, context, t)
 			AiUtils.push_intersecting_players(unit, self.displaced_units, player_push_data, t, dt, self.on_hit_by_wave, self)
 		end
 
-		self.wavefront_impact(self, t, position, self.wavefront_radius, self.template.ai_push_data, self.unit, wave_dir)
+		self:wavefront_impact(t, position, self.wavefront_radius, self.template.ai_push_data, self.unit, wave_dir)
 	elseif state == "arrived" then
-		local to_target_dir, dist = self.move_wave(self, unit, t, dt, self.overflow_dist)
+		local to_target_dir, dist = self:move_wave(unit, t, dt, self.overflow_dist)
 
 		if Vector3.dot(to_target_dir, wave_dir) < 0 or dist < 0.1 then
-			self.wave_arrived(self, t, unit)
+			self:wave_arrived(t, unit)
 		end
 
 		local player_push_data = self.template.player_push_data
@@ -552,7 +552,7 @@ DamageWaveExtension.update = function (self, unit, input, dt, context, t)
 	end
 
 	Unit.set_local_rotation(unit, 0, Quaternion.look(self.wave_direction:unbox()))
-	self.update_blob_overlaps(self)
+	self:update_blob_overlaps()
 end
 
 DamageWaveExtension.insert_blob = function (self, position, radius, rotation, nav_world)
@@ -561,7 +561,7 @@ DamageWaveExtension.insert_blob = function (self, position, radius, rotation, na
 	if self.use_nav_cost_map_volumes then
 		local ai_system = self.ai_system
 		local cost_map_id = self._nav_cost_map_id
-		nav_cost_map_volume_id = ai_system.add_nav_cost_map_sphere_volume(ai_system, position, radius, cost_map_id)
+		nav_cost_map_volume_id = ai_system:add_nav_cost_map_sphere_volume(position, radius, cost_map_id)
 	end
 
 	local blobs = self.blobs
@@ -641,7 +641,7 @@ DamageWaveExtension.update_blob_overlaps = function (self)
 		for i = 1, #player_and_bot_units, 1 do
 			local target_unit = player_and_bot_units[i]
 
-			self.check_overlap(self, unit, target_unit, wave_radius, first_blob_position, last_blob_position, buff_system, num_blobs)
+			self:check_overlap(unit, target_unit, wave_radius, first_blob_position, last_blob_position, buff_system, num_blobs)
 		end
 	end
 
@@ -682,8 +682,8 @@ DamageWaveExtension.update_blob_overlaps = function (self)
 					local breed_name = breed.name
 					local buff_extension = ScriptUnit.has_extension(target_unit, "buff_system")
 
-					if buff_extension and not immune_breeds[breed_name] and not buff_extension.has_buff_type(buff_extension, buff_template_type) then
-						ai_units_inside_blob[target_unit] = buff_system.add_buff(buff_system, target_unit, buff_template_name, unit, true)
+					if buff_extension and not immune_breeds[breed_name] and not buff_extension:has_buff_type(buff_template_type) then
+						ai_units_inside_blob[target_unit] = buff_system:add_buff(target_unit, buff_template_name, unit, true)
 					end
 
 					ai_units_inside[target_unit] = blob
@@ -695,7 +695,7 @@ DamageWaveExtension.update_blob_overlaps = function (self)
 		for target_unit, inside_id in pairs(ai_units_inside_blob) do
 			if not inside_this_frame[target_unit] then
 				if unit_alive(target_unit) then
-					buff_system.remove_server_controlled_buff(buff_system, target_unit, inside_id)
+					buff_system:remove_server_controlled_buff(target_unit, inside_id)
 				end
 
 				ai_units_inside[target_unit] = nil
@@ -758,15 +758,15 @@ DamageWaveExtension.hot_join_sync = function (self, sender)
 			local fx_entry = fx_list[i]
 			local position = fx_entry.position:unbox()
 
-			network_transmit.send_rpc(network_transmit, "rpc_add_damage_wave_fx", sender, unit_id, position)
+			network_transmit:send_rpc("rpc_add_damage_wave_fx", sender, unit_id, position)
 		end
 
 		local state = self.state
 
 		if state == "lingering" then
-			network_transmit.send_rpc(network_transmit, "rpc_damage_wave_set_state", sender, unit_id, NetworkLookup.damage_wave_states.hide)
+			network_transmit:send_rpc("rpc_damage_wave_set_state", sender, unit_id, NetworkLookup.damage_wave_states.hide)
 		else
-			network_transmit.send_rpc(network_transmit, "rpc_damage_wave_set_state", sender, unit_id, NetworkLookup.damage_wave_states.running)
+			network_transmit:send_rpc("rpc_damage_wave_set_state", sender, unit_id, NetworkLookup.damage_wave_states.running)
 		end
 	end
 end

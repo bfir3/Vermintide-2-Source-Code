@@ -54,7 +54,7 @@ AIGroupTemplates.encampment = {
 	pre_unit_init = function (unit, group)
 		local ai_simple = ScriptUnit.extension(unit, "ai_system")
 
-		ai_simple.set_perception(ai_simple, "perception_regular", "pick_encampment_target_idle")
+		ai_simple:set_perception("perception_regular", "pick_encampment_target_idle")
 
 		local blackboard = BLACKBOARDS[unit]
 		blackboard.ignore_interest_points = true
@@ -96,11 +96,11 @@ AIGroupTemplates.encampment = {
 	wake_up_unit = function (unit, group, prime_target_unit)
 		local ai_simple = ScriptUnit_extension(unit, "ai_system")
 
-		ai_simple.enemy_aggro(ai_simple, nil, prime_target_unit)
+		ai_simple:enemy_aggro(nil, prime_target_unit)
 
 		local breed = ai_simple._breed
 
-		ai_simple.set_perception(ai_simple, breed.perception, breed.target_selection)
+		ai_simple:set_perception(breed.perception, breed.target_selection)
 	end
 }
 AIGroupTemplates.spawn_test = {
@@ -120,7 +120,7 @@ AIGroupTemplates.spawn_test = {
 			for unit, extension in pairs(group.members) do
 				local heath_extension = ScriptUnit.has_extension(unit, "health_system")
 
-				if heath_extension and heath_extension.is_alive(heath_extension) then
+				if heath_extension and heath_extension:is_alive() then
 					Managers.state.conflict:destroy_unit(unit, BLACKBOARDS[unit], "test")
 
 					group.check_size = group.check_size - 1

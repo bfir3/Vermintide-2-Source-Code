@@ -16,7 +16,7 @@ ProjectileImpactSystem.init = function (self, entity_system_creation_context, sy
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.network_transmit = Managers.state.network.network_transmit
 end

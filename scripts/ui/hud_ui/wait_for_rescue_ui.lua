@@ -60,7 +60,7 @@ WaitForRescueUI.init = function (self, ingame_ui_context)
 	self.input_manager = ingame_ui_context.input_manager
 	self.local_player = Managers.player:local_player()
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 end
 
 WaitForRescueUI.create_ui_elements = function (self)
@@ -75,7 +75,7 @@ end
 
 WaitForRescueUI.update = function (self, dt, t)
 	if RELOAD_UI then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	local player_unit = self.local_player.player_unit
@@ -86,7 +86,7 @@ WaitForRescueUI.update = function (self, dt, t)
 
 	local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-	if not status_extension.is_ready_for_assisted_respawn(status_extension, player_unit) then
+	if not status_extension:is_ready_for_assisted_respawn(player_unit) then
 		return
 	end
 

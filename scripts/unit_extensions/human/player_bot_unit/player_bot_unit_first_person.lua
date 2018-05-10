@@ -13,9 +13,9 @@ PlayerBotUnitFirstPerson.init = function (self, extension_init_context, unit, ex
 	local attachment_unit_name = first_person_attachment.unit
 	local attachment_node_linking = first_person_attachment.attachment_node_linking
 	local unit_spawner = Managers.state.unit_spawner
-	local fp_unit = unit_spawner.spawn_local_unit(unit_spawner, unit_name)
+	local fp_unit = unit_spawner:spawn_local_unit(unit_name)
 	self.first_person_unit = fp_unit
-	self.first_person_attachment_unit = unit_spawner.spawn_local_unit(unit_spawner, attachment_unit_name)
+	self.first_person_attachment_unit = unit_spawner:spawn_local_unit(attachment_unit_name)
 
 	Unit.set_flow_variable(fp_unit, "character_vo", profile.character_vo)
 	Unit.set_flow_variable(fp_unit, "sound_character", career.sound_character)
@@ -35,7 +35,7 @@ PlayerBotUnitFirstPerson.init = function (self, extension_init_context, unit, ex
 	Unit.set_local_position(fp_unit, 0, Unit.local_position(unit, 0))
 	Unit.set_local_rotation(fp_unit, 0, Unit.local_rotation(unit, 0))
 
-	self.player_height_wanted = self._player_height_from_name(self, "stand")
+	self.player_height_wanted = self:_player_height_from_name("stand")
 	self.player_height_current = self.player_height_wanted
 	self.player_height_previous = self.player_height_wanted
 	self.player_height_time_to_change = 0
@@ -62,14 +62,14 @@ PlayerBotUnitFirstPerson.extensions_ready = function (self)
 	self.inventory_extension = ScriptUnit.extension(self.unit, "inventory_system")
 	self.attachment_extension = ScriptUnit.extension(self.unit, "attachment_system")
 
-	self.set_first_person_mode(self, true)
+	self:set_first_person_mode(true)
 end
 
 PlayerBotUnitFirstPerson.destroy = function (self)
 	local unit_spawner = Managers.state.unit_spawner
 
-	unit_spawner.mark_for_deletion(unit_spawner, self.first_person_unit)
-	unit_spawner.mark_for_deletion(unit_spawner, self.first_person_attachment_unit)
+	unit_spawner:mark_for_deletion(self.first_person_unit)
+	unit_spawner:mark_for_deletion(self.first_person_attachment_unit)
 end
 
 local function ease_out_quad(t, b, c, d)
@@ -105,9 +105,9 @@ PlayerBotUnitFirstPerson._player_height_from_name = function (self, name)
 end
 
 PlayerBotUnitFirstPerson.update = function (self, unit, input, dt, context, t)
-	self.update_player_height(self, t)
-	self.update_rotation(self, t, dt)
-	self.update_position(self)
+	self:update_player_height(t)
+	self:update_rotation(t, dt)
+	self:update_position()
 end
 
 PlayerBotUnitFirstPerson.update_rotation = function (self, t, dt)
@@ -188,7 +188,7 @@ PlayerBotUnitFirstPerson.set_wanted_player_height = function (self, state, t, ti
 end
 
 PlayerBotUnitFirstPerson.toggle_visibility = function (self)
-	self.set_first_person_mode(self, not self.first_person_mode)
+	self:set_first_person_mode(not self.first_person_mode)
 end
 
 PlayerBotUnitFirstPerson.set_first_person_mode = function (self, active)
@@ -221,7 +221,7 @@ PlayerBotUnitFirstPerson.debug_set_first_person_mode = function (self, active, o
 	else
 		self.first_person_debug = false
 
-		self.set_first_person_mode(self, self.first_person_mode)
+		self:set_first_person_mode(self.first_person_mode)
 	end
 end
 
@@ -277,19 +277,19 @@ end
 
 PlayerBotUnitFirstPerson.play_hud_sound_event = function (self, event, wwise_source_id, play_on_husk)
 	if play_on_husk and not LEVEL_EDITOR_TEST then
-		self.play_sound_event(self, event)
+		self:play_sound_event(event)
 
 		local network_manager = Managers.state.network
 		local network_transmit = network_manager.network_transmit
-		local unit_id = network_manager.unit_game_object_id(network_manager, self.unit)
+		local unit_id = network_manager:unit_game_object_id(self.unit)
 		local event_id = NetworkLookup.sound_events[event]
 
-		network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_sound_event", unit_id, event_id)
+		network_transmit:send_rpc_clients("rpc_play_husk_sound_event", unit_id, event_id)
 	end
 end
 
 PlayerBotUnitFirstPerson.play_sound_event = function (self, event, position)
-	local sound_position = position or self.current_position(self)
+	local sound_position = position or self:current_position()
 	local wwise_source_id, wwise_world = WwiseUtils.make_position_auto_source(self.world, sound_position)
 
 	WwiseWorld.set_switch(wwise_world, "husk", "true", wwise_source_id)

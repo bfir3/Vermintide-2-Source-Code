@@ -18,14 +18,14 @@ SoundSectorSystem.init = function (self, context, system_name)
 	local extensions = SoundSectorSystem.system_extensions
 	local entity_manager = context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self.world = context.world
 	self.wwise_world = Managers.world:wwise_world(self.world)
 	local network_event_delegate = context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.unit_input_data = {}
 	self.unit_extension_data = {}
@@ -64,7 +64,7 @@ SoundSectorSystem.on_add_extension = function (self, world, unit, extension_name
 
 		if self.camera_unit then
 			local camera_position = Unit.local_position(self.camera_unit, 0)
-			local sector_index = self.calc_unit_sector(self, camera_position, unit)
+			local sector_index = self:calc_unit_sector(camera_position, unit)
 
 			if sector_index then
 				self._sectors[sector_index][unit] = unit
@@ -90,7 +90,7 @@ SoundSectorSystem.extensions_ready = function (self, world, unit, extension_name
 end
 
 SoundSectorSystem.on_remove_extension = function (self, unit, extension_name)
-	self.on_freeze_extension(self, unit, extension_name)
+	self:on_freeze_extension(unit, extension_name)
 	ScriptUnit.remove_extension(unit, self.NAME)
 end
 
@@ -123,7 +123,7 @@ SoundSectorSystem.update = function (self, context, t, dt)
 	local camera_position = Unit.local_position(self.camera_unit, 0)
 	local sector_sound_source_ids = self._sector_sound_source_ids
 
-	self.update_sectors(self, camera_position)
+	self:update_sectors(camera_position)
 
 	local entities = self.entities
 	local sector_sound_source_units = self._sector_sound_source_units
@@ -142,7 +142,7 @@ SoundSectorSystem.update = function (self, context, t, dt)
 		local is_playing_sound = wwise_source_id ~= nil
 
 		if script_data.sound_sector_system_debug and should_play then
-			self.debug_draw(self, units_center, sector_index, camera_position)
+			self:debug_draw(units_center, sector_index, camera_position)
 		end
 
 		if should_play and WwiseWorld.has_source(wwise_world, wwise_source_id) then
@@ -155,21 +155,21 @@ SoundSectorSystem.update = function (self, context, t, dt)
 				local particle_effect = sound_event_template.particle_effect
 				local particle_value_name = sound_event_template.particle_value_name
 
-				self.play_sector_sound_event(self, sector_index, sector_sound_id, num_units, units_center, sound_event_template.sound_event_start, particle_effect, particle_value_name, particle_value)
+				self:play_sector_sound_event(sector_index, sector_sound_id, num_units, units_center, sound_event_template.sound_event_start, particle_effect, particle_value_name, particle_value)
 			end
 		elseif is_playing_sound then
-			self.stop_sector_sound_event(self, sector_index, sector_sound_id, sound_event_template.sound_event_stop)
+			self:stop_sector_sound_event(sector_index, sector_sound_id, sound_event_template.sound_event_stop)
 		end
 	end
 
 	if script_data.sound_sector_system_debug then
-		self.debug_draw_hud(self, camera_position)
+		self:debug_draw_hud(camera_position)
 	end
 end
 
 SoundSectorSystem.update_sectors = function (self, camera_position)
 	for unit, extension in pairs(self.entities) do
-		local sector_index = self.calc_unit_sector(self, camera_position, unit)
+		local sector_index = self:calc_unit_sector(camera_position, unit)
 		local unit_sector_index = extension.sector_index
 
 		if unit_sector_index ~= sector_index then

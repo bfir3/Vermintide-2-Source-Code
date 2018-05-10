@@ -39,7 +39,7 @@ LocomotionSystem.init = function (self, entity_system_creation_context, system_n
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.world = entity_system_creation_context.world
 	self.animation_lod_units = {}
@@ -142,7 +142,7 @@ LocomotionSystem.extensions_ready = function (self, world, unit, extension_name)
 end
 
 LocomotionSystem.on_remove_extension = function (self, unit, extension_name)
-	self.on_freeze_extension(self, unit, extension_name)
+	self:on_freeze_extension(unit, extension_name)
 	LocomotionSystem.super.on_remove_extension(self, unit, extension_name)
 end
 
@@ -159,16 +159,16 @@ LocomotionSystem.on_freeze_extension = function (self, unit, extension_name)
 end
 
 LocomotionSystem.update = function (self, context, t)
-	self.update_extensions(self, context, t)
-	self.update_animation_lods(self)
-	self.update_actor_proximity_shapes(self)
+	self:update_extensions(context, t)
+	self:update_animation_lods()
+	self:update_actor_proximity_shapes()
 end
 
 LocomotionSystem.update_extensions = function (self, context, t)
 	local dt = context.dt
 
-	self.update_extension(self, "PlayerHuskLocomotionExtension", dt, context, t)
-	self.update_extension(self, "PlayerUnitLocomotionExtension", dt, context, t)
+	self:update_extension("PlayerHuskLocomotionExtension", dt, context, t)
+	self:update_extension("PlayerUnitLocomotionExtension", dt, context, t)
 
 	if GameSettingsDevelopment.use_engine_optimized_ai_locomotion then
 		if self.is_server then
@@ -214,7 +214,7 @@ LocomotionSystem.update_actor_proximity_shapes = function (self)
 	local physics_world = World.get_data(self.world, "physics_world")
 	local default_insta_hit_cone_angle = math.degrees_to_radians(17)
 	local Quaternion_forward = Quaternion.forward
-	local human_and_bot_players = player_manager.human_and_bot_players(player_manager)
+	local human_and_bot_players = player_manager:human_and_bot_players()
 
 	for id, player in pairs(human_and_bot_players) do
 		local unit = player.player_unit
@@ -222,18 +222,18 @@ LocomotionSystem.update_actor_proximity_shapes = function (self)
 		if unit and not player.remote then
 			local first_persion_system = ScriptUnit.extension(unit, "first_person_system")
 			local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
-			local position = first_persion_system.current_position(first_persion_system)
-			local direction = Quaternion_forward(first_persion_system.current_rotation(first_persion_system))
+			local position = first_persion_system:current_position()
+			local direction = Quaternion_forward(first_persion_system:current_rotation())
 			local angle = nil
-			local slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
+			local slot_name = inventory_extension:get_wielded_slot_name()
 
 			if slot_name == "slot_ranged" then
-				local equipment = inventory_extension.equipment(inventory_extension)
+				local equipment = inventory_extension:equipment()
 				local weapon_unit = equipment.right_hand_wielded_unit or equipment.left_hand_wielded_unit
 
 				if weapon_unit and ScriptUnit.has_extension(weapon_unit, "spread_system") then
 					local spread_extension = ScriptUnit.extension(weapon_unit, "spread_system")
-					local pitch, yaw = spread_extension.get_current_pitch_and_yaw(spread_extension)
+					local pitch, yaw = spread_extension:get_current_pitch_and_yaw()
 					angle = math.degrees_to_radians(math.max(pitch, yaw))
 				end
 			end
@@ -289,8 +289,8 @@ LocomotionSystem.debug_draw = function (self)
 
 	Debug.text("AI LOCOMOTION DEBUG")
 	Debug.text("  movement_type = %s", locomotion_extension.movement_type)
-	Debug.text("  is_falling = %s", tostring((locomotion_extension.is_falling == nil and "?") or locomotion_extension.is_falling(locomotion_extension)))
-	Debug.text("  current_velocity = %s", tostring(locomotion_extension.current_velocity(locomotion_extension)))
+	Debug.text("  is_falling = %s", tostring((locomotion_extension.is_falling == nil and "?") or locomotion_extension:is_falling()))
+	Debug.text("  current_velocity = %s", tostring(locomotion_extension:current_velocity()))
 end
 
 LocomotionSystem.rpc_set_affected_by_gravity = function (self, sender, game_object_id, affected)
@@ -304,7 +304,7 @@ LocomotionSystem.rpc_set_affected_by_gravity = function (self, sender, game_obje
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_affected_by_gravity(locomotion_extension, affected)
+	locomotion_extension:set_affected_by_gravity(affected)
 end
 
 LocomotionSystem.rpc_set_animation_driven_movement = function (self, sender, game_object_id, animation_driven, script_driven_rotation, is_affected_by_gravity, position, rotation)
@@ -318,23 +318,23 @@ LocomotionSystem.rpc_set_animation_driven_movement = function (self, sender, gam
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_animation_driven(locomotion_extension, animation_driven, is_affected_by_gravity, script_driven_rotation)
+	locomotion_extension:set_animation_driven(animation_driven, is_affected_by_gravity, script_driven_rotation)
 
 	if animation_driven then
-		locomotion_extension.teleport_to(locomotion_extension, position, rotation, locomotion_extension.current_velocity(locomotion_extension))
+		locomotion_extension:teleport_to(position, rotation, locomotion_extension:current_velocity())
 	end
 end
 
 LocomotionSystem.rpc_set_animation_driven_script_movement = function (self, sender, game_object_id, position, rotation, is_affected_by_gravity)
-	self.rpc_set_animation_driven_movement(self, sender, game_object_id, true, true, is_affected_by_gravity, position, rotation)
+	self:rpc_set_animation_driven_movement(sender, game_object_id, true, true, is_affected_by_gravity, position, rotation)
 end
 
 LocomotionSystem.rpc_set_animation_driven = function (self, sender, game_object_id, position, rotation, is_affected_by_gravity)
-	self.rpc_set_animation_driven_movement(self, sender, game_object_id, true, false, is_affected_by_gravity, position, rotation)
+	self:rpc_set_animation_driven_movement(sender, game_object_id, true, false, is_affected_by_gravity, position, rotation)
 end
 
 LocomotionSystem.rpc_set_script_driven = function (self, sender, game_object_id, position, rotation, is_affected_by_gravity)
-	self.rpc_set_animation_driven_movement(self, sender, game_object_id, false, true, is_affected_by_gravity, nil)
+	self:rpc_set_animation_driven_movement(sender, game_object_id, false, true, is_affected_by_gravity, nil)
 end
 
 LocomotionSystem.rpc_set_animation_translation_scale = function (self, sender, game_object_id, animation_translation_scale)
@@ -348,7 +348,7 @@ LocomotionSystem.rpc_set_animation_translation_scale = function (self, sender, g
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_animation_translation_scale(locomotion_extension, animation_translation_scale)
+	locomotion_extension:set_animation_translation_scale(animation_translation_scale)
 end
 
 LocomotionSystem.rpc_set_animation_rotation_scale = function (self, sender, game_object_id, animation_rotation_scale)
@@ -362,7 +362,7 @@ LocomotionSystem.rpc_set_animation_rotation_scale = function (self, sender, game
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_animation_rotation_scale(locomotion_extension, animation_rotation_scale)
+	locomotion_extension:set_animation_rotation_scale(animation_rotation_scale)
 end
 
 LocomotionSystem.rpc_disable_locomotion = function (self, sender, game_object_id, disabled, update_func_id)
@@ -377,7 +377,7 @@ LocomotionSystem.rpc_disable_locomotion = function (self, sender, game_object_id
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 	local func = LocomotionUtils[NetworkLookup.movement_funcs[update_func_id]]
 
-	locomotion_extension.set_disabled(locomotion_extension, disabled, func)
+	locomotion_extension:set_disabled(disabled, func)
 
 	if self.is_server then
 		self.network_transmit:send_rpc_clients_except("rpc_disable_locomotion", sender, game_object_id, disabled, update_func_id)
@@ -395,7 +395,7 @@ LocomotionSystem.rpc_teleport_unit_to = function (self, sender, game_object_id, 
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.teleport_to(locomotion_extension, position, rotation)
+	locomotion_extension:teleport_to(position, rotation)
 end
 
 LocomotionSystem.rpc_enable_linked_movement = function (self, sender, game_object_id, parent_level_unit_index, parent_node_index, offset)
@@ -411,7 +411,7 @@ LocomotionSystem.rpc_enable_linked_movement = function (self, sender, game_objec
 	local level = LevelHelper:current_level(self.world)
 	local parent_unit = Level.unit_by_index(level, parent_level_unit_index)
 
-	locomotion_extension.enable_linked_movement(locomotion_extension, parent_unit, parent_node_index, offset)
+	locomotion_extension:enable_linked_movement(parent_unit, parent_node_index, offset)
 end
 
 LocomotionSystem.rpc_disable_linked_movement = function (self, sender, game_object_id)
@@ -425,7 +425,7 @@ LocomotionSystem.rpc_disable_linked_movement = function (self, sender, game_obje
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.disable_linked_movement(locomotion_extension)
+	locomotion_extension:disable_linked_movement()
 end
 
 LocomotionSystem.rpc_add_external_velocity = function (self, sender, game_object_id, velocity)
@@ -439,7 +439,7 @@ LocomotionSystem.rpc_add_external_velocity = function (self, sender, game_object
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.add_external_velocity(locomotion_extension, velocity)
+	locomotion_extension:add_external_velocity(velocity)
 end
 
 LocomotionSystem.rpc_add_external_velocity_with_upper_limit = function (self, sender, game_object_id, velocity, upper_limit)
@@ -453,7 +453,7 @@ LocomotionSystem.rpc_add_external_velocity_with_upper_limit = function (self, se
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.add_external_velocity(locomotion_extension, velocity, upper_limit)
+	locomotion_extension:add_external_velocity(velocity, upper_limit)
 end
 
 LocomotionSystem.rpc_set_forced_velocity = function (self, sender, game_object_id, velocity)
@@ -467,7 +467,7 @@ LocomotionSystem.rpc_set_forced_velocity = function (self, sender, game_object_i
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_forced_velocity(locomotion_extension, velocity)
+	locomotion_extension:set_forced_velocity(velocity)
 end
 
 LocomotionSystem.rpc_constrain_ai = function (self, sender, game_object_id, constrain, min, max)
@@ -481,7 +481,7 @@ LocomotionSystem.rpc_constrain_ai = function (self, sender, game_object_id, cons
 
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_constrained(locomotion_extension, constrain, min, max)
+	locomotion_extension:set_constrained(constrain, min, max)
 end
 
 LocomotionSystem.rpc_set_on_moving_platform = function (self, sender, game_object_id, unit_index)
@@ -497,7 +497,7 @@ LocomotionSystem.rpc_set_on_moving_platform = function (self, sender, game_objec
 	local platform_unit = Level.unit_by_index(level, unit_index)
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_on_moving_platform(locomotion_extension, platform_unit)
+	locomotion_extension:set_on_moving_platform(platform_unit)
 end
 
 LocomotionSystem.rpc_hot_join_nail_to_wall_fix = function (self, sender, game_object_id)

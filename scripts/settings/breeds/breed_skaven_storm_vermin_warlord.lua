@@ -166,7 +166,7 @@ local breed_data = {
 			stagger = 0
 			local ai_shield_extension = ScriptUnit.extension(blackboard.unit, "ai_shield_system")
 
-			ai_shield_extension.set_is_blocking(ai_shield_extension, false)
+			ai_shield_extension:set_is_blocking(false)
 		end
 
 		return stagger, duration, length
@@ -754,7 +754,7 @@ local action_data = {
 				if QuestSettings.storm_vermin_warlord_kills_enemies <= blackboard.num_times_hit_skaven then
 					local statistics_db = Managers.player:statistics_db()
 
-					statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+					statistics_db:increment_stat_and_sync_to_clients(stat_name)
 
 					blackboard.kill_skaven_challenge_completed = true
 				end
@@ -910,7 +910,7 @@ local action_data = {
 					local stat_name = "storm_vermin_warlord_kills_enemies"
 					local statistics_db = Managers.player:statistics_db()
 
-					statistics_db.increment_stat_and_sync_to_clients(statistics_db, stat_name)
+					statistics_db:increment_stat_and_sync_to_clients(stat_name)
 
 					blackboard.kill_skaven_challenge_completed = true
 				end
@@ -1442,11 +1442,11 @@ local action_data = {
 					blackboard.stagger_time = blackboard.stagger_time + 0.35
 
 					if should_dodge_next_attack then
-						ai_shield_extension.set_is_dodging(ai_shield_extension, true)
-						ai_shield_extension.set_is_blocking(ai_shield_extension, false)
+						ai_shield_extension:set_is_dodging(true)
+						ai_shield_extension:set_is_blocking(false)
 					else
-						ai_shield_extension.set_is_blocking(ai_shield_extension, true)
-						ai_shield_extension.set_is_dodging(ai_shield_extension, false)
+						ai_shield_extension:set_is_blocking(true)
+						ai_shield_extension:set_is_dodging(false)
 					end
 
 					is_blocking = ai_shield_extension.is_blocking
@@ -1463,8 +1463,8 @@ local action_data = {
 					stagger_anims = action.stagger_anims[stagger_type]
 					idle_event = "idle_guard_up"
 
-					ai_shield_extension.set_is_dodging(ai_shield_extension, false)
-					ai_shield_extension.set_is_blocking(ai_shield_extension, false)
+					ai_shield_extension:set_is_dodging(false)
+					ai_shield_extension:set_is_blocking(false)
 				end
 
 				blackboard.stagger_ignore_anim_cb = true
@@ -1473,8 +1473,8 @@ local action_data = {
 				stagger_anims = action.stagger_anims[stagger_type]
 				idle_event = "idle_guard_down"
 
-				ai_shield_extension.set_is_dodging(ai_shield_extension, false)
-				ai_shield_extension.set_is_blocking(ai_shield_extension, false)
+				ai_shield_extension:set_is_dodging(false)
+				ai_shield_extension:set_is_blocking(false)
 			end
 
 			idle_event = "idle"

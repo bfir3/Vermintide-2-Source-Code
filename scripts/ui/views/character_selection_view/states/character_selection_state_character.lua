@@ -37,8 +37,8 @@ CharacterSelectionStateCharacter.on_enter = function (self, params)
 	self.platform = PLATFORM
 	self.allow_back_button = params.allow_back_button
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self.local_player_id = ingame_ui_context.local_player_id
@@ -47,23 +47,23 @@ CharacterSelectionStateCharacter.on_enter = function (self, params)
 	self._ui_animations = {}
 	self._available_profiles = {}
 	local parent = self.parent
-	local input_service = self.input_service(self)
+	local input_service = self:input_service()
 	local gui_layer = UILayer.default + 30
 	self.menu_input_description = MenuInputDescriptionUI:new(ingame_ui_context, self.ui_top_renderer, input_service, 3, gui_layer, (params.allow_back_button and generic_input_actions.default_back) or generic_input_actions.default)
 
 	self.menu_input_description:set_input_description(nil)
-	self.create_ui_elements(self, params)
-	self._start_transition_animation(self, "on_enter", "on_enter")
+	self:create_ui_elements(params)
+	self:_start_transition_animation("on_enter", "on_enter")
 
 	self._hero_preview_skin = nil
 	local profile_index = self.profile_synchronizer:profile_by_peer(self.peer_id, self.local_player_id)
 
-	self._select_hero_tab_by_profile_index(self, profile_index)
+	self:_select_hero_tab_by_profile_index(profile_index)
 	self.parent:set_input_blocked(false)
 end
 
 CharacterSelectionStateCharacter._setup_video_player = function (self, material_name, resource)
-	self._destroy_video_player(self)
+	self:_destroy_video_player()
 
 	local ui_top_renderer = self.ui_top_renderer
 	local set_loop = true
@@ -115,7 +115,7 @@ CharacterSelectionStateCharacter.create_ui_elements = function (self, params)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
 
-	self._assign_hero_portraits(self)
+	self:_assign_hero_portraits()
 end
 
 CharacterSelectionStateCharacter._get_skin_item_data = function (self, index, career_index)
@@ -182,7 +182,7 @@ CharacterSelectionStateCharacter._assign_career_data_by_hero = function (self, h
 	local selection_texture_settings = UIAtlasHelper.get_atlas_settings_by_texture_name(selection_texture)
 	local selection_texture_size = selection_texture_settings.size
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
-	local hero_experience = hero_attributes.get(hero_attributes, hero_name, "experience") or 0
+	local hero_experience = hero_attributes:get(hero_name, "experience") or 0
 	local hero_level = ExperienceSettings.get_level(hero_experience)
 
 	for i = 1, amount, 1 do
@@ -226,8 +226,8 @@ CharacterSelectionStateCharacter.on_exit = function (self, params)
 		self.menu_input_description = nil
 	end
 
-	self._destroy_video_player(self)
-	self._respawn_player(self)
+	self:_destroy_video_player()
+	self:_respawn_player()
 
 	self.ui_animator = nil
 
@@ -263,7 +263,7 @@ CharacterSelectionStateCharacter.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	for name, animation in pairs(self._ui_animations) do
@@ -274,16 +274,16 @@ CharacterSelectionStateCharacter.update = function (self, dt, t)
 		end
 	end
 
-	self._update_available_profiles(self)
-	self._update_profile_request(self)
+	self:_update_available_profiles()
+	self:_update_profile_request()
 
 	if not self._prepare_exit then
-		self._handle_input(self, dt, t)
+		self:_handle_input(dt, t)
 	end
 
-	local wanted_state = self._wanted_state(self)
+	local wanted_state = self:_wanted_state()
 
-	if not self._transition_timer and not self.pending_profile_request(self) and (wanted_state or self._new_state) then
+	if not self._transition_timer and not self:pending_profile_request() and (wanted_state or self._new_state) then
 		if self.world_previewer:has_units_spawned() then
 			self._prepare_exit = true
 		elseif not self._prepare_exit then
@@ -291,12 +291,12 @@ CharacterSelectionStateCharacter.update = function (self, dt, t)
 		end
 	end
 
-	self.draw(self, dt)
+	self:draw(dt)
 end
 
 CharacterSelectionStateCharacter.post_update = function (self, dt, t)
 	self.ui_animator:update(dt)
-	self._update_animations(self, dt)
+	self:_update_animations(dt)
 
 	local transitioning = self.parent:transitioning()
 
@@ -309,18 +309,18 @@ CharacterSelectionStateCharacter.post_update = function (self, dt, t)
 			self._spawn_hero = nil
 			local hero_name = self._selected_hero_name or self._hero_name
 
-			self._spawn_hero_unit(self, hero_name)
+			self:_spawn_hero_unit(hero_name)
 		end
 	end
 
 	if self._despawning_player_unit_career_change and not Unit.alive(self._despawning_player_unit_career_change) and self.profile_synchronizer:all_clients_have_loaded_sync_id(self._resync_id) then
 		local player_manager = self.player_manager
 		local peer_id = self.peer_id
-		local player = player_manager.player_from_peer_id(player_manager, peer_id)
+		local player = player_manager:player_from_peer_id(peer_id)
 		local position = self._respawn_position:unbox()
 		local rotation = self._respawn_rotation:unbox()
 
-		player.spawn(player, position, rotation)
+		player:spawn(position, rotation)
 
 		self._despawning_player_unit_career_change = nil
 		self._resync_id = nil
@@ -334,7 +334,7 @@ CharacterSelectionStateCharacter.draw = function (self, dt)
 	local ui_scenegraph = self.ui_scenegraph
 	local input_manager = self.input_manager
 	local parent = self.parent
-	local input_service = self.input_service(self)
+	local input_service = self:input_service()
 	local render_settings = self.render_settings
 	local gamepad_active = Managers.input:is_device_active("gamepad")
 
@@ -368,8 +368,8 @@ CharacterSelectionStateCharacter._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -381,7 +381,7 @@ CharacterSelectionStateCharacter._spawn_hero_unit = function (self, hero_name)
 	local career_index = self.career_index
 	local callback = callback(self, "cb_hero_unit_spawned", hero_name)
 
-	world_previewer.request_spawn_hero_unit(world_previewer, hero_name, career_index, true, callback, nil, 0.5)
+	world_previewer:request_spawn_hero_unit(hero_name, career_index, true, callback, nil, 0.5)
 end
 
 CharacterSelectionStateCharacter.cb_hero_unit_spawned = function (self, hero_name)
@@ -403,11 +403,11 @@ CharacterSelectionStateCharacter.cb_hero_unit_spawned = function (self, hero_nam
 			local slot_name = slot_names[1]
 			local slot = InventorySettings.slots_by_name[slot_name]
 
-			world_previewer.equip_item(world_previewer, item_name, slot)
+			world_previewer:equip_item(item_name, slot)
 		end
 
 		if preview_wield_slot then
-			world_previewer.wield_weapon_slot(world_previewer, preview_wield_slot)
+			world_previewer:wield_weapon_slot(preview_wield_slot)
 		end
 	end
 
@@ -504,7 +504,7 @@ CharacterSelectionStateCharacter._is_career_tab_selected = function (self)
 end
 
 CharacterSelectionStateCharacter._select_hero_tab_by_profile_index = function (self, profile_index)
-	self._select_hero_tab_by_index(self, ProfileIndexToPriorityIndex[profile_index])
+	self:_select_hero_tab_by_index(ProfileIndexToPriorityIndex[profile_index])
 end
 
 CharacterSelectionStateCharacter._select_hero_tab_by_index = function (self, index, play_sound)
@@ -513,7 +513,7 @@ CharacterSelectionStateCharacter._select_hero_tab_by_index = function (self, ind
 	end
 
 	if play_sound then
-		self._play_sound(self, "play_gui_hero_select_hero_click")
+		self:_play_sound("play_gui_hero_select_hero_click")
 	end
 
 	local gui = self.ui_top_renderer.gui
@@ -543,15 +543,15 @@ CharacterSelectionStateCharacter._select_hero_tab_by_index = function (self, ind
 	self._selected_hero_name = hero_name
 	self._selected_profile_index = profile_index
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
-	local exp = hero_attributes.get(hero_attributes, hero_name, "experience") or 0
+	local exp = hero_attributes:get(hero_name, "experience") or 0
 	local level = ExperienceSettings.get_level(exp)
 
-	self._set_hero_info(self, Localize(character_name), level)
+	self:_set_hero_info(Localize(character_name), level)
 
-	local career_index = hero_attributes.get(hero_attributes, hero_name, "career") or 1
+	local career_index = hero_attributes:get(hero_name, "career") or 1
 	self._hero_tab_index = index
 
-	self._select_career_tab_by_index(self, career_index, true)
+	self:_select_career_tab_by_index(career_index, true)
 end
 
 CharacterSelectionStateCharacter._select_career_tab_by_index = function (self, career_index, force_set, play_sound)
@@ -560,7 +560,7 @@ CharacterSelectionStateCharacter._select_career_tab_by_index = function (self, c
 	end
 
 	if play_sound then
-		self._play_sound(self, "play_gui_hero_select_career_click")
+		self:_play_sound("play_gui_hero_select_career_click")
 	end
 
 	local gui = self.ui_top_renderer.gui
@@ -571,8 +571,8 @@ CharacterSelectionStateCharacter._select_career_tab_by_index = function (self, c
 	local amount = widget_content.amount
 	local hero_name = self._selected_hero_name or self._hero_name
 
-	self._populate_career_page(self, hero_name, career_index)
-	self._assign_career_data_by_hero(self, hero_name)
+	self:_populate_career_page(hero_name, career_index)
+	self:_assign_career_data_by_hero(hero_name)
 
 	local is_career_locked = false
 
@@ -639,44 +639,44 @@ CharacterSelectionStateCharacter._populate_career_page = function (self, hero_na
 	local material_name = video.material_name
 	local resource = video.resource
 
-	self._setup_video_player(self, material_name, resource)
+	self:_setup_video_player(material_name, resource)
 
 	self._draw_video_next_frame = true
 end
 
 CharacterSelectionStateCharacter._handle_tab_hover = function (self, widget, style_prefix)
-	local hover_index = self._is_tab_hovered(self, widget)
+	local hover_index = self:_is_tab_hovered(widget)
 
 	if hover_index then
-		self._on_option_button_hover(self, widget, style_prefix .. "_" .. hover_index)
+		self:_on_option_button_hover(widget, style_prefix .. "_" .. hover_index)
 	end
 
-	local dehover_index = self._is_tab_dehovered(self, widget)
+	local dehover_index = self:_is_tab_dehovered(widget)
 
 	if dehover_index then
-		self._on_option_button_dehover(self, widget, style_prefix .. "_" .. dehover_index)
+		self:_on_option_button_dehover(widget, style_prefix .. "_" .. dehover_index)
 	end
 end
 
 CharacterSelectionStateCharacter._handle_input = function (self, dt, t)
-	if self._is_tab_hovered(self, self._widgets_by_name.hero_tabs) then
-		self._play_sound(self, "play_gui_hero_select_hero_hover")
+	if self:_is_tab_hovered(self._widgets_by_name.hero_tabs) then
+		self:_play_sound("play_gui_hero_select_hero_hover")
 	end
 
-	if self._is_tab_hovered(self, self._widgets_by_name.career_tabs) then
-		self._play_sound(self, "play_gui_hero_select_career_hover")
+	if self:_is_tab_hovered(self._widgets_by_name.career_tabs) then
+		self:_play_sound("play_gui_hero_select_career_hover")
 	end
 
-	local hero_index = self._is_hero_tab_selected(self)
+	local hero_index = self:_is_hero_tab_selected()
 
 	if hero_index then
-		self._select_hero_tab_by_index(self, hero_index, true)
+		self:_select_hero_tab_by_index(hero_index, true)
 	end
 
-	local career_index = self._is_career_tab_selected(self)
+	local career_index = self:_is_career_tab_selected()
 
 	if career_index then
-		self._select_career_tab_by_index(self, career_index, nil, true)
+		self:_select_career_tab_by_index(career_index, nil, true)
 	end
 
 	local current_profile_index = self.profile_synchronizer:profile_by_peer(self.peer_id, self.local_player_id)
@@ -684,23 +684,23 @@ CharacterSelectionStateCharacter._handle_input = function (self, dt, t)
 
 	UIWidgetUtils.animate_default_button(select_button, dt)
 
-	if self._is_button_hover_enter(self, select_button) then
-		self._play_sound(self, "play_gui_start_menu_button_hover")
+	if self:_is_button_hover_enter(select_button) then
+		self:_play_sound("play_gui_start_menu_button_hover")
 	end
 
 	local gamepad_active = Managers.input:is_device_active("gamepad")
 	local confirm_available = not select_button.content.button_hotspot.disable_button
-	local input_service = self.input_service(self)
-	local confirm_pressed = gamepad_active and confirm_available and input_service.get(input_service, "refresh_press", true)
-	local back_pressed = gamepad_active and self.allow_back_button and input_service.get(input_service, "back_menu", true)
+	local input_service = self:input_service()
+	local confirm_pressed = gamepad_active and confirm_available and input_service:get("refresh_press", true)
+	local back_pressed = gamepad_active and self.allow_back_button and input_service:get("back_menu", true)
 
-	if self._is_button_pressed(self, select_button) or confirm_pressed then
-		self._play_sound(self, "play_gui_start_menu_button_click")
+	if self:_is_button_pressed(select_button) or confirm_pressed then
+		self:_play_sound("play_gui_start_menu_button_click")
 
 		if current_profile_index ~= self._selected_profile_index then
-			self._change_profile(self, self._selected_profile_index, self.career_index)
+			self:_change_profile(self._selected_profile_index, self.career_index)
 		else
-			self._change_career(self, self._selected_profile_index, self.career_index)
+			self:_change_career(self._selected_profile_index, self.career_index)
 		end
 
 		self.parent:set_input_blocked(true)
@@ -710,8 +710,8 @@ CharacterSelectionStateCharacter._handle_input = function (self, dt, t)
 
 	local widgets_by_name = self._widgets_by_name
 
-	self._handle_tab_hover(self, widgets_by_name.hero_tabs, "icon")
-	self._handle_tab_hover(self, widgets_by_name.career_tabs, "icon")
+	self:_handle_tab_hover(widgets_by_name.hero_tabs, "icon")
+	self:_handle_tab_hover(widgets_by_name.career_tabs, "icon")
 end
 
 CharacterSelectionStateCharacter._set_hero_info = function (self, name, level)
@@ -769,7 +769,7 @@ end
 CharacterSelectionStateCharacter._change_profile = function (self, profile_index, career_index)
 	local profile_synchronizer = self.profile_synchronizer
 
-	if profile_synchronizer.has_pending_request(profile_synchronizer) then
+	if profile_synchronizer:has_pending_request() then
 		return
 	end
 
@@ -781,13 +781,13 @@ CharacterSelectionStateCharacter._change_profile = function (self, profile_index
 
 		Managers.state.spawn:delayed_despawn(player)
 	else
-		profile_synchronizer.request_select_profile(profile_synchronizer, profile_index, self.local_player_id)
+		profile_synchronizer:request_select_profile(profile_index, self.local_player_id)
 	end
 
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 	local hero_name = self._selected_hero_name
 
-	hero_attributes.set(hero_attributes, hero_name, "career", career_index)
+	hero_attributes:set(hero_name, "career", career_index)
 
 	self._pending_profile_request = true
 	self._requested_profile_index = profile_index
@@ -811,8 +811,8 @@ CharacterSelectionStateCharacter._change_career = function (self, profile_index,
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 	local hero_name = profile_settings.display_name
 
-	hero_attributes.set(hero_attributes, hero_name, "career", career_index)
-	self._save_selected_profile(self, profile_index)
+	hero_attributes:set(hero_name, "career", career_index)
+	self:_save_selected_profile(profile_index)
 
 	self._resync_id = self.profile_synchronizer:resync_loadout(self._selected_profile_index, career_index, player)
 end
@@ -837,7 +837,7 @@ CharacterSelectionStateCharacter._update_profile_request = function (self)
 
 		if self._despawning_player_unit_profile_change then
 			if not Unit.alive(self._despawning_player_unit_profile_change) then
-				synchronizer.request_select_profile(synchronizer, self._requested_profile_index, self.local_player_id)
+				synchronizer:request_select_profile(self._requested_profile_index, self.local_player_id)
 
 				self._requested_profile_index = nil
 				self._despawning_player_unit_profile_change = nil
@@ -847,19 +847,19 @@ CharacterSelectionStateCharacter._update_profile_request = function (self)
 				end
 			end
 		else
-			local result, result_local_player_id = synchronizer.profile_request_result(synchronizer)
+			local result, result_local_player_id = synchronizer:profile_request_result()
 			local local_player_id = self.local_player_id
 
 			assert(not result or local_player_id == result_local_player_id, "Local player id mismatch between ui and request.")
 
 			if result == "success" then
 				local peer_id = self.peer_id
-				local profile_index = synchronizer.profile_by_peer(synchronizer, peer_id, local_player_id)
+				local profile_index = synchronizer:profile_by_peer(peer_id, local_player_id)
 				local player = self.player_manager:player(peer_id, local_player_id)
 
-				player.set_profile_index(player, profile_index)
-				synchronizer.clear_profile_request_result(synchronizer)
-				self._save_selected_profile(self, profile_index)
+				player:set_profile_index(profile_index)
+				synchronizer:clear_profile_request_result()
+				self:_save_selected_profile(profile_index)
 
 				self._respawn_player_unit = nil
 				self._pending_profile_request = nil
@@ -876,11 +876,11 @@ CharacterSelectionStateCharacter._update_available_profiles = function (self)
 	local available_profiles = self._available_profiles
 	local player = Managers.player:local_player()
 	local profile_synchronizer = self.profile_synchronizer
-	local own_player_profile_index = player ~= nil and player.profile_index(player)
-	local own_player_career_index = player ~= nil and player.career_index(player)
+	local own_player_profile_index = player ~= nil and player:profile_index()
+	local own_player_career_index = player ~= nil and player:career_index()
 
 	for _, profile_index in ipairs(ProfilePriority) do
-		local is_profile_available = not profile_synchronizer.owner(profile_synchronizer, profile_index)
+		local is_profile_available = not profile_synchronizer:owner(profile_index)
 		available_profiles[profile_index] = is_profile_available
 
 		if profile_index == self._selected_profile_index then
@@ -890,12 +890,12 @@ CharacterSelectionStateCharacter._update_available_profiles = function (self)
 			local selected_career_settings = careers[selected_career_index]
 			local hero_name = profile.display_name
 			local hero_attributes = Managers.backend:get_interface("hero_attributes")
-			local hero_experience = hero_attributes.get(hero_attributes, hero_name, "experience") or 0
+			local hero_experience = hero_attributes:get(hero_name, "experience") or 0
 			local hero_level = ExperienceSettings.get_level(hero_experience)
 			local is_career_unlocked = selected_career_settings.is_unlocked_function(hero_name, hero_level)
 			local button_enabled = (own_player_profile_index == profile_index or is_profile_available) and is_career_unlocked
 
-			self._set_select_button_enabled(self, button_enabled)
+			self:_set_select_button_enabled(button_enabled)
 		end
 	end
 end
@@ -912,7 +912,7 @@ CharacterSelectionStateCharacter._on_option_button_hover = function (self, widge
 
 	for i = 2, 4, 1 do
 		if 0 < animation_duration then
-			ui_animations[animation_name .. "_hover_" .. i] = self._animate_element_by_time(self, pass_style.color, i, current_color_value, target_color_value, animation_duration)
+			ui_animations[animation_name .. "_hover_" .. i] = self:_animate_element_by_time(pass_style.color, i, current_color_value, target_color_value, animation_duration)
 		else
 			pass_style.color[i] = target_color_value
 		end
@@ -931,7 +931,7 @@ CharacterSelectionStateCharacter._on_option_button_dehover = function (self, wid
 
 	for i = 2, 4, 1 do
 		if 0 < animation_duration then
-			ui_animations[animation_name .. "_hover_" .. i] = self._animate_element_by_time(self, pass_style.color, i, current_color_value, target_color_value, animation_duration)
+			ui_animations[animation_name .. "_hover_" .. i] = self:_animate_element_by_time(pass_style.color, i, current_color_value, target_color_value, animation_duration)
 		else
 			pass_style.color[1] = target_color_value
 		end

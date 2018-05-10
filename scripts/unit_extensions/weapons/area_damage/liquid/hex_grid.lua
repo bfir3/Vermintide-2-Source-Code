@@ -107,7 +107,7 @@ end
 HexGrid.sample_grid = function (self, samples, z, multiplier)
 	local drawer = QuickDrawerStay
 
-	drawer.reset(drawer)
+	drawer:reset()
 
 	local xy_extents = self._xy_extents
 	local min_i = 1
@@ -132,7 +132,7 @@ HexGrid.sample_grid = function (self, samples, z, multiplier)
 
 	for index = 1, samples, 1 do
 		local point = Vector3(rnd(min_x, max_x), rnd(min_y, max_y), z)
-		local i, j, k = self.find_index(self, point)
+		local i, j, k = self:find_index(point)
 		local color = nil
 
 		if i < min_i or max_i < i or j < min_j or max_j < j then
@@ -147,7 +147,7 @@ HexGrid.sample_grid = function (self, samples, z, multiplier)
 		end
 
 		if color then
-			drawer.sphere(drawer, point, 0.05, color)
+			drawer:sphere(point, 0.05, color)
 		end
 	end
 end

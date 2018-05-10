@@ -4,7 +4,7 @@ require("scripts/network/lobby_members")
 GameServer = class(GameServer)
 
 local function dprintf(string, ...)
-	local s = string.format(string, ...)
+	local s = string:format(...)
 
 	printf("[GameServer]: %s", s)
 end
@@ -39,7 +39,7 @@ end
 
 GameServer.update = function (self, dt, t)
 	local game_server = self._game_server
-	local game_server_state = game_server.state(game_server)
+	local game_server_state = game_server:state()
 	local new_state = GameServerInternal.state_map[game_server_state]
 	local old_state = self._state
 
@@ -53,7 +53,7 @@ GameServer.update = function (self, dt, t)
 			data_table.network_hash = self._network_hash
 
 			for key, value in pairs(data_table) do
-				game_server.set_data(game_server, key, value)
+				game_server:set_data(key, value)
 			end
 
 			self._members = self._members or LobbyMembers:new(game_server)
@@ -67,7 +67,7 @@ GameServer.update = function (self, dt, t)
 	local members = self._members
 
 	if members then
-		members.update(members)
+		members:update()
 	end
 
 	return self._state
@@ -92,7 +92,7 @@ GameServer.set_lobby_data = function (self, data)
 
 		internal_data_table[key] = value
 
-		game_server.set_data(game_server, key, value)
+		game_server:set_data(key, value)
 	end
 
 	print("Set lobby end.")

@@ -16,18 +16,18 @@ BTCombatStepAction.enter = function (self, unit, blackboard, t)
 	local target_unit = blackboard.target_unit
 	local locomotion_extension = blackboard.locomotion_extension
 	local rotation_to_target = LocomotionUtils.rotation_towards_unit_flat(unit, target_unit)
-	local direction = navigation_extension.desired_velocity(navigation_extension)
-	local move_animation = self._get_animation(self, rotation_to_target, direction)
+	local direction = navigation_extension:desired_velocity()
+	local move_animation = self:_get_animation(rotation_to_target, direction)
 	local new_speed = blackboard.action.move_speed
 
 	if new_speed then
-		navigation_extension.set_max_speed(navigation_extension, new_speed)
+		navigation_extension:set_max_speed(new_speed)
 	end
 
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
-	network_manager.anim_event(network_manager, unit, move_animation)
+	network_manager:anim_event(unit, "to_combat")
+	network_manager:anim_event(unit, move_animation)
 
 	blackboard.move_state = "moving"
 end
@@ -36,13 +36,13 @@ BTCombatStepAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.start_finished = nil
 	local ai_slot_system = Managers.state.entity:system("ai_slot_system")
 
-	ai_slot_system.do_slot_search(ai_slot_system, unit, true)
+	ai_slot_system:do_slot_search(unit, true)
 
 	blackboard.active_node = nil
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 end
 
 BTCombatStepAction.run = function (self, unit, blackboard, t, dt)
@@ -56,13 +56,13 @@ end
 BTCombatStepAction.anim_cb_combat_step_stop = function (self, unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	if navigation_extension.is_following_path(navigation_extension) then
-		navigation_extension.stop(navigation_extension)
+	if navigation_extension:is_following_path() then
+		navigation_extension:stop()
 	end
 
 	local ai_slot_system = Managers.state.entity:system("ai_slot_system")
 
-	ai_slot_system.do_slot_search(ai_slot_system, unit, false)
+	ai_slot_system:do_slot_search(unit, false)
 end
 
 BTCombatStepAction._get_animation = function (self, rotation, direction)

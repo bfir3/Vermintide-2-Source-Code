@@ -106,7 +106,7 @@ ScriptUnit.add_extension = function (extension_init_context, unit, extension_nam
 	fassert(extension_class, "No class found for extension with name %q", extension_name)
 
 	local extension = nil
-	extension = extension_class.new(extension_class, extension_init_context, unit, extension_init_data)
+	extension = extension_class:new(extension_init_context, unit, extension_init_data)
 
 	fassert(not ScriptUnit.has_extension(unit, extension_alias), "An extension already exists with name %q belonging to unit %s", extension_alias, unit)
 	set_extension_script(unit, extension_alias, extension)
@@ -118,7 +118,7 @@ ScriptUnit.destroy_extension = function (unit, system_name)
 	local extension = ScriptUnit.extension(unit, system_name)
 
 	if extension.destroy then
-		extension.destroy(extension)
+		extension:destroy()
 	end
 end
 

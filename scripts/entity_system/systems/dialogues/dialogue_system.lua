@@ -26,7 +26,7 @@ DialogueSystem = class(DialogueSystem, ExtensionSystemBase)
 DialogueSystem.init = function (self, entity_system_creation_context, system_name)
 	local entity_manager = entity_system_creation_context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self.entity_manager = entity_manager
 	self.unit_input_data = {}
@@ -123,7 +123,7 @@ DialogueSystem.init = function (self, entity_system_creation_context, system_nam
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, "rpc_trigger_dialogue_event", "rpc_play_dialogue_event", "rpc_interrupt_dialogue_event")
+	network_event_delegate:register(self, "rpc_trigger_dialogue_event", "rpc_play_dialogue_event", "rpc_interrupt_dialogue_event")
 end
 
 DialogueSystem.destroy = function (self)
@@ -312,7 +312,7 @@ DialogueSystem.extensions_ready = function (self, world, unit)
 			local player = Managers.player:local_player()
 
 			if player then
-				local stats_id = player.stats_id(player)
+				local stats_id = player:stats_id()
 				completed_times = self.statistics_db:get_persistent_stat(stats_id, "completed_levels", current_level)
 			end
 		end
@@ -325,7 +325,7 @@ DialogueSystem.extensions_ready = function (self, world, unit)
 
 			if player then
 				for _, level_key in ipairs(act_levels) do
-					local stats_id = player.stats_id(player)
+					local stats_id = player:stats_id()
 					local completed_times_specific_level = self.statistics_db:get_persistent_stat(stats_id, "completed_levels", level_key)
 					self.global_context["completed_times_" .. level_key] = completed_times_specific_level
 				end
@@ -333,7 +333,7 @@ DialogueSystem.extensions_ready = function (self, world, unit)
 		end
 
 		local career_ext = ScriptUnit.extension(unit, "career_system")
-		local career_name = career_ext.career_name(career_ext)
+		local career_name = career_ext:career_name()
 		self.global_context[career_name] = true
 		context.player_career = career_name
 	elseif player_profile == nil then
@@ -366,7 +366,7 @@ DialogueSystem.extensions_ready = function (self, world, unit)
 end
 
 DialogueSystem.on_remove_extension = function (self, unit, extension_name)
-	self.on_freeze_extension(self, unit, extension_name)
+	self:on_freeze_extension(unit, extension_name)
 	ScriptUnit.remove_extension(unit, "dialogue_system")
 end
 
@@ -481,15 +481,15 @@ DialogueSystem.update_currently_playing_dialogues = function (self, dt)
 			end
 
 			if not is_currently_playing then
-				if player_manager.owner(player_manager, unit) ~= nil or Unit.has_data(unit, "dialogue_face_anim") then
-					function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, unit, "face_neutral")
-					function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, unit, "dialogue_end")
+				if player_manager:owner(unit) ~= nil or Unit.has_data(unit, "dialogue_face_anim") then
+					function_command_queue:queue_function_command(Unit.animation_event, unit, "face_neutral")
+					function_command_queue:queue_function_command(Unit.animation_event, unit, "dialogue_end")
 				elseif Unit.has_data(unit, "enemy_dialogue_face_anim") and Unit.has_animation_state_machine(unit) then
-					function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, unit, "talk_end")
+					function_command_queue:queue_function_command(Unit.animation_event, unit, "talk_end")
 				end
 
 				if Unit.has_data(unit, "enemy_dialogue_body_anim") and Unit.has_animation_state_machine(unit) then
-					function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, unit, "talk_body_end")
+					function_command_queue:queue_function_command(Unit.animation_event, unit, "talk_body_end")
 				end
 
 				local sound_distance = extension.currently_playing_dialogue and extension.currently_playing_dialogue.sound_distance
@@ -613,7 +613,7 @@ DialogueSystem._handle_wwise_markers = function (self, dt, t)
 			local marker_data = self._markers[marker_event.label]
 
 			if marker_data then
-				self._trigger_marker(self, marker_data)
+				self:_trigger_marker(marker_data)
 			end
 		end
 	end
@@ -664,7 +664,7 @@ DialogueSystem._trigger_marker = function (self, marker_data)
 				WwiseWorld.set_source_parameter(wwise_world, wwise_source_id, "vo_center_percent", extension.vo_center_percent)
 			end
 
-			local go_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, source_player)
+			local go_id, is_level_unit = network_manager:game_object_or_level_id(source_player)
 			local source_id = WwiseWorld.trigger_event(wwise_world, sound_event, wwise_source_id)
 
 			if source_id ~= 0 then
@@ -710,25 +710,25 @@ DialogueSystem.physics_async_update = function (self, context, t)
 	self.debug_state = RuleDatabase.get_debug and RuleDatabase.get_debug()
 	local dt = context.dt
 
-	self.update_currently_playing_dialogues(self, dt)
-	self.update_cutscene_subtitles(self, t)
+	self:update_currently_playing_dialogues(dt)
+	self:update_cutscene_subtitles(t)
 
 	if not self.is_server then
 		return
 	end
 
 	self.dialogue_state_handler:update(t)
-	self._handle_wwise_markers(self, dt, t)
+	self:_handle_wwise_markers(dt, t)
 
 	local player_manager = Managers.player
 	self.global_context.level_time = t
 	LOCAL_GAMETIME = t + 900
 
-	self.update_incapacitation(self, t)
+	self:update_incapacitation(t)
 
 	local tagquery_database = self.tagquery_database
 	local unit_extension_data = self.unit_extension_data
-	local query = tagquery_database.iterate_queries(tagquery_database, LOCAL_GAMETIME)
+	local query = tagquery_database:iterate_queries(LOCAL_GAMETIME)
 	local playing_units = self.playing_units
 
 	if enabled and (DialogueSettings.dialogue_level_start_delay < self.global_context.level_time or DialogueSystem:LocalPlayerHasMovedFromStartPos()) then
@@ -800,18 +800,18 @@ DialogueSystem.physics_async_update = function (self, context, t)
 							playing_units[playing_unit] = nil
 						end
 
-						if player_manager.owner(player_manager, dialogue_actor_unit) ~= nil or Unit.has_data(dialogue_actor_unit, "dialogue_face_anim") then
-							function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, dialogue_actor_unit, "face_neutral")
-							function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, dialogue_actor_unit, "dialogue_end")
+						if player_manager:owner(dialogue_actor_unit) ~= nil or Unit.has_data(dialogue_actor_unit, "dialogue_face_anim") then
+							function_command_queue:queue_function_command(Unit.animation_event, dialogue_actor_unit, "face_neutral")
+							function_command_queue:queue_function_command(Unit.animation_event, dialogue_actor_unit, "dialogue_end")
 						elseif Unit.has_data(dialogue_actor_unit, "enemy_dialogue_face_anim") and Unit.has_animation_state_machine(dialogue_actor_unit) then
-							function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, dialogue_actor_unit, "talk_end")
+							function_command_queue:queue_function_command(Unit.animation_event, dialogue_actor_unit, "talk_end")
 						end
 
 						if Unit.has_data(dialogue_actor_unit, "enemy_dialogue_body_anim") and Unit.has_animation_state_machine(dialogue_actor_unit) then
-							function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, dialogue_actor_unit, "talk_body_end")
+							function_command_queue:queue_function_command(Unit.animation_event, dialogue_actor_unit, "talk_body_end")
 						end
 
-						local go_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, playing_unit)
+						local go_id, is_level_unit = network_manager:game_object_or_level_id(playing_unit)
 
 						network_manager.network_transmit:send_rpc_clients("rpc_interrupt_dialogue_event", go_id, is_level_unit)
 					end
@@ -825,7 +825,7 @@ DialogueSystem.physics_async_update = function (self, context, t)
 						WwiseWorld.set_source_parameter(wwise_world, wwise_source_id, "vo_center_percent", extension.vo_center_percent)
 					end
 
-					local go_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, dialogue_actor_unit)
+					local go_id, is_level_unit = network_manager:game_object_or_level_id(dialogue_actor_unit)
 					local dialogue_index = get_dialogue_event_index(dialogue)
 					local sound_event, subtitles_event, anim_face_event, anim_dialogue_event = get_dialogue_event(dialogue, dialogue_index)
 					local source_id = WwiseWorld.trigger_event(wwise_world, sound_event, wwise_source_id)
@@ -902,17 +902,17 @@ DialogueSystem.physics_async_update = function (self, context, t)
 						Managers.telemetry.events:vo_event_played(sound_event, result, speaker_name)
 					end
 
-					if player_manager.owner(player_manager, dialogue_actor_unit) ~= nil or Unit.has_data(dialogue_actor_unit, "dialogue_face_anim") then
-						function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, dialogue_actor_unit, anim_face_event)
-						function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, dialogue_actor_unit, anim_dialogue_event)
+					if player_manager:owner(dialogue_actor_unit) ~= nil or Unit.has_data(dialogue_actor_unit, "dialogue_face_anim") then
+						function_command_queue:queue_function_command(Unit.animation_event, dialogue_actor_unit, anim_face_event)
+						function_command_queue:queue_function_command(Unit.animation_event, dialogue_actor_unit, anim_dialogue_event)
 					end
 
 					if Unit.has_data(dialogue_actor_unit, "enemy_dialogue_face_anim") and Unit.has_animation_state_machine(dialogue_actor_unit) then
-						function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, dialogue_actor_unit, "talk_loop")
+						function_command_queue:queue_function_command(Unit.animation_event, dialogue_actor_unit, "talk_loop")
 					end
 
 					if Unit.has_data(dialogue_actor_unit, "enemy_dialogue_body_anim") and Unit.has_animation_state_machine(dialogue_actor_unit) then
-						function_command_queue.queue_function_command(function_command_queue, Unit.flow_event, dialogue_actor_unit, "action_talk_body")
+						function_command_queue:queue_function_command(Unit.flow_event, dialogue_actor_unit, "action_talk_body")
 					end
 
 					if script_data.dialogue_debug_last_played_query then
@@ -930,7 +930,7 @@ DialogueSystem.physics_async_update = function (self, context, t)
 		update_story_lines(t)
 	end
 
-	self.update_new_events(self, t)
+	self:update_new_events(t)
 end
 
 DialogueSystem.post_update = function (self, entity_system_update_context, t)
@@ -942,11 +942,11 @@ DialogueSystem.update_incapacitation = function (self, t)
 		local status_extension = extension.status_extension
 
 		if status_extension then
-			local is_knocked_down = status_extension.is_knocked_down(status_extension)
-			local is_pounced_down = status_extension.is_pounced_down(status_extension)
-			local is_ready_for_assisted_respawn = status_extension.is_ready_for_assisted_respawn(status_extension)
-			local is_grabbed_by_pack_master = status_extension.is_grabbed_by_pack_master(status_extension)
-			local is_ledge_hanging = status_extension.get_is_ledge_hanging(status_extension)
+			local is_knocked_down = status_extension:is_knocked_down()
+			local is_pounced_down = status_extension:is_pounced_down()
+			local is_ready_for_assisted_respawn = status_extension:is_ready_for_assisted_respawn()
+			local is_grabbed_by_pack_master = status_extension:is_grabbed_by_pack_master()
+			local is_ledge_hanging = status_extension:get_is_ledge_hanging()
 			local is_incapacitated = is_knocked_down or is_pounced_down or is_grabbed_by_pack_master or is_ledge_hanging or is_ready_for_assisted_respawn
 
 			if not extension.is_incapacitated and is_incapacitated then
@@ -984,7 +984,7 @@ DialogueSystem.update_new_events = function (self, t)
 					local event_name = input_event_queue[i + 1]
 					local event_data = input_event_queue[i + 2]
 					local identifier = input_event_queue[i + 3]
-					local query = tagquery_database.create_query(tagquery_database)
+					local query = tagquery_database:create_query()
 					local temp_table = FrameTable.alloc_table()
 					local n_temp_table = 0
 
@@ -1004,8 +1004,8 @@ DialogueSystem.update_new_events = function (self, t)
 						source_name = extension_data.context.player_profile
 					end
 
-					query.add(query, "concept", event_name, "source", unit, "source_name", source_name, "identifier", identifier, unpack(temp_table))
-					query.finalize(query)
+					query:add("concept", event_name, "source", unit, "source_name", source_name, "identifier", identifier, unpack(temp_table))
+					query:finalize()
 
 					input_event_queue[i] = nil
 					input_event_queue[i + 1] = nil
@@ -1017,7 +1017,7 @@ DialogueSystem.update_new_events = function (self, t)
 
 	self.input_event_queue_n = 0
 
-	self.update_debug(self, t)
+	self:update_debug(t)
 end
 
 DialogueSystem.hot_join_sync = function (self, sender)
@@ -1188,7 +1188,7 @@ DialogueSystem.update_debug = function (self, t)
 
 		local player_input = Managers.input.input_services.Player
 
-		if player_input.get(player_input, "interact") then
+		if player_input:get("interact") then
 			if debug_vo_by_file then
 				DebugVo_pause()
 
@@ -1217,16 +1217,16 @@ end
 
 function DebugPlayVoice(profile_name, event_name, is_npc)
 	local player_manager = Managers.player
-	local human_and_bot_players = player_manager.human_and_bot_players(player_manager)
+	local human_and_bot_players = player_manager:human_and_bot_players()
 	local human_and_bot_players_n = 0
 
 	for index, player in pairs(human_and_bot_players) do
-		local profile_index = player.profile_index(player)
+		local profile_index = player:profile_index()
 		local profile = SPProfiles[profile_index]
 
 		if profile.display_name == profile_name and Unit.alive(player.player_unit) then
 			local dialogue_input = ScriptUnit.extension_input(player.player_unit, "dialogue_system")
-			local source_id = dialogue_input.play_voice_debug(dialogue_input, event_name)
+			local source_id = dialogue_input:play_voice_debug(event_name)
 
 			return source_id
 		end
@@ -1235,7 +1235,7 @@ function DebugPlayVoice(profile_name, event_name, is_npc)
 	if is_npc then
 		local dummy_unit = DialogueSystem:GetRandomPlayer()
 		local dialogue_input = ScriptUnit.extension_input(dummy_unit, "dialogue_system")
-		local source_id = dialogue_input.play_voice_debug(dialogue_input, event_name)
+		local source_id = dialogue_input:play_voice_debug(event_name)
 
 		return source_id
 	end
@@ -1268,11 +1268,11 @@ DialogueSystem.PlayerShieldCheck = function (self, unit, slot)
 
 	if Unit.alive(unit) and Managers.player:owner(unit) ~= nil then
 		local inventory_extension = ScriptUnit.extension(unit, "inventory_system")
-		local weapon_slot = inventory_extension.get_wielded_slot_name(inventory_extension)
-		local weapon_data = inventory_extension.get_slot_data(inventory_extension, weapon_slot)
+		local weapon_slot = inventory_extension:get_wielded_slot_name()
+		local weapon_data = inventory_extension:get_slot_data(weapon_slot)
 
 		if slot then
-			weapon_data = inventory_extension.get_slot_data(inventory_extension, slot)
+			weapon_data = inventory_extension:get_slot_data(slot)
 		end
 
 		if weapon_data then
@@ -1294,7 +1294,7 @@ DialogueSystem.TriggerGeneralUnitEvent = function (self, unit, event)
 	local unit_id = network_manager.unit_storage:go_id(unit)
 	local audio_system_extension = Managers.state.entity:system("audio_system")
 
-	audio_system_extension._play_event(audio_system_extension, event, unit, 0)
+	audio_system_extension:_play_event(event, unit, 0)
 
 	local general_event_id = NetworkLookup.sound_events[event]
 
@@ -1303,19 +1303,19 @@ end
 
 DialogueSystem.TriggerTargetedByRatling = function (self, player_unit)
 	local player_manager = Managers.player
-	local owner = player_manager.unit_owner(player_manager, player_unit)
+	local owner = player_manager:unit_owner(player_unit)
 
 	if player_unit and owner ~= nil then
 		local dialogue_input = ScriptUnit.extension_input(player_unit, "dialogue_system")
 		local event_data = FrameTable.alloc_table()
 
-		dialogue_input.trigger_dialogue_event(dialogue_input, "ratling_target", event_data)
+		dialogue_input:trigger_dialogue_event("ratling_target", event_data)
 	end
 end
 
 DialogueSystem.TriggerAttack = function (self, player_unit, enemy_unit, should_backstab, blackboard)
 	local player_manager = Managers.player
-	local owner = player_manager.unit_owner(player_manager, player_unit)
+	local owner = player_manager:unit_owner(player_unit)
 
 	if Unit.alive(player_unit) and owner and Unit.alive(enemy_unit) then
 		local event_data = FrameTable.alloc_table()
@@ -1348,7 +1348,7 @@ DialogueSystem.TriggerAttack = function (self, player_unit, enemy_unit, should_b
 			if player_data.local_player and sound_event then
 				local audio_system_extension = Managers.state.entity:system("audio_system")
 
-				audio_system_extension._play_event_with_source(audio_system_extension, wwise_world, sound_event, wwise_source)
+				audio_system_extension:_play_event_with_source(wwise_world, sound_event, wwise_source)
 			else
 				if sound_event then
 					local sound_event_id = NetworkLookup.sound_events[sound_event]
@@ -1358,7 +1358,7 @@ DialogueSystem.TriggerAttack = function (self, player_unit, enemy_unit, should_b
 
 				local audio_system_extension = Managers.state.entity:system("audio_system")
 
-				audio_system_extension._play_event(audio_system_extension, general_event, enemy_unit, 0)
+				audio_system_extension:_play_event(general_event, enemy_unit, 0)
 			end
 
 			local general_event_id = NetworkLookup.sound_events[general_event]
@@ -1370,7 +1370,7 @@ end
 
 DialogueSystem.TriggerBackstab = function (self, player_unit, enemy_unit, blackboard)
 	local player_manager = Managers.player
-	local owner = player_manager.unit_owner(player_manager, player_unit)
+	local owner = player_manager:unit_owner(player_unit)
 
 	if Unit.alive(player_unit) and owner and Unit.alive(enemy_unit) then
 		local event_data = FrameTable.alloc_table()
@@ -1396,7 +1396,7 @@ DialogueSystem.TriggerBackstab = function (self, player_unit, enemy_unit, blackb
 			if player_data.local_player and sound_event then
 				local audio_system_extension = Managers.state.entity:system("audio_system")
 
-				audio_system_extension._play_event_with_source(audio_system_extension, wwise_world, sound_event, wwise_source)
+				audio_system_extension:_play_event_with_source(wwise_world, sound_event, wwise_source)
 			elseif sound_event then
 				local sound_event_id = NetworkLookup.sound_events[sound_event]
 
@@ -1408,13 +1408,13 @@ end
 
 DialogueSystem.TriggerFlanking = function (self, player_unit, enemy_unit)
 	local player_manager = Managers.player
-	local owner = player_manager.unit_owner(player_manager, player_unit)
+	local owner = player_manager:unit_owner(player_unit)
 	local event_data = FrameTable.alloc_table()
 	event_data.target_name = ScriptUnit.extension(player_unit, "dialogue_system").context.player_profile
 
 	if Unit.alive(player_unit) and owner and Unit.alive(enemy_unit) then
 		local ai_base_extension = ScriptUnit.extension(enemy_unit, "ai_system")
-		local breed = ai_base_extension.breed(ai_base_extension)
+		local breed = ai_base_extension:breed()
 
 		if breed.flanking_sound_event then
 			local network_manager = Managers.state.network
@@ -1424,7 +1424,7 @@ DialogueSystem.TriggerFlanking = function (self, player_unit, enemy_unit)
 			if Managers.player:local_player().player_unit == player_unit then
 				local audio_system_extension = Managers.state.entity:system("audio_system")
 
-				audio_system_extension._play_event(audio_system_extension, flanking_event, enemy_unit, 0)
+				audio_system_extension:_play_event(flanking_event, enemy_unit, 0)
 			else
 				local flanking_event_id = NetworkLookup.sound_events[flanking_event]
 
@@ -1432,7 +1432,7 @@ DialogueSystem.TriggerFlanking = function (self, player_unit, enemy_unit)
 
 				local audio_system_extension = Managers.state.entity:system("audio_system")
 
-				audio_system_extension._play_event(audio_system_extension, flanking_event, enemy_unit, 0)
+				audio_system_extension:_play_event(flanking_event, enemy_unit, 0)
 			end
 		end
 	end
@@ -1440,7 +1440,7 @@ end
 
 DialogueSystem.TriggerBackstabHit = function (self, player_unit, enemy_unit)
 	local player_manager = Managers.player
-	local owner = player_manager.unit_owner(player_manager, player_unit)
+	local owner = player_manager:unit_owner(player_unit)
 	local game = Managers.state.network:game()
 
 	if Unit.alive(player_unit) and owner and Unit.alive(enemy_unit) and game and not owner.bot_player then
@@ -1460,7 +1460,7 @@ DialogueSystem.TriggerBackstabHit = function (self, player_unit, enemy_unit)
 			if player_data.local_player then
 				local first_person_extension = ScriptUnit.extension(player_unit, "first_person_system")
 
-				first_person_extension.play_hud_sound_event(first_person_extension, backstabhit_event, nil, false)
+				first_person_extension:play_hud_sound_event(backstabhit_event, nil, false)
 			else
 				local network_manager = Managers.state.network
 				local player_data = Managers.player:owner(player_unit)
@@ -1506,7 +1506,7 @@ function update_story_lines(t)
 			local dialogue_input = ScriptUnit.extension_input(DialogueSystem:GetRandomPlayer(), "dialogue_system")
 			local event_data = FrameTable.alloc_table()
 
-			dialogue_input.trigger_dialogue_event(dialogue_input, "story_trigger", event_data)
+			dialogue_input:trigger_dialogue_event("story_trigger", event_data)
 		end
 	end
 
@@ -1533,7 +1533,7 @@ DialogueSystem.update_cutscene_subtitles = function (self, t)
 
 	for k, value in pairs(current_cutscene_subs) do
 		if value < t then
-			hud_system.add_subtitle(hud_system, cutscene_speaker, k)
+			hud_system:add_subtitle(cutscene_speaker, k)
 
 			current_cutscene_subs[k] = nil
 		end
@@ -1542,7 +1542,7 @@ DialogueSystem.update_cutscene_subtitles = function (self, t)
 	end
 
 	if end_time < t and cutscene_speaker ~= nil then
-		hud_system.remove_subtitle(hud_system, cutscene_speaker)
+		hud_system:remove_subtitle(cutscene_speaker)
 
 		enabled = true
 	end
@@ -1574,7 +1574,7 @@ DialogueSystem.TriggerStoryDialogue = function (self, unit)
 		local event_data = FrameTable.alloc_table()
 		event_data.is_forced = true
 
-		dialogue_input.trigger_dialogue_event(dialogue_input, "story_trigger", event_data)
+		dialogue_input:trigger_dialogue_event("story_trigger", event_data)
 	end
 end
 
@@ -1592,7 +1592,7 @@ function update_PlayerJumping(t)
 	if Unit.alive(local_player_unit) then
 		local locomotion_extension = ScriptUnit.extension(local_player_unit, "locomotion_system")
 
-		if (player_input.get(player_input, "jump") or player_input.get(player_input, "jump_only")) and locomotion_extension.jump_allowed(locomotion_extension) then
+		if (player_input:get("jump") or player_input:get("jump_only")) and locomotion_extension:jump_allowed() then
 			num_of_jumps = num_of_jumps + 1
 
 			if num_of_jumps == 1 then
@@ -1664,9 +1664,9 @@ DialogueSystem.rpc_play_dialogue_event = function (self, sender, go_id, is_level
 	local function_command_queue = self.function_command_queue
 	local player_manager = Managers.player
 
-	if player_manager.owner(player_manager, dialogue_actor_unit) ~= nil or Unit.has_data(dialogue_actor_unit, "dialogue_face_anim") then
-		function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, dialogue_actor_unit, anim_face_event)
-		function_command_queue.queue_function_command(function_command_queue, Unit.animation_event, dialogue_actor_unit, anim_dialogue_event)
+	if player_manager:owner(dialogue_actor_unit) ~= nil or Unit.has_data(dialogue_actor_unit, "dialogue_face_anim") then
+		function_command_queue:queue_function_command(Unit.animation_event, dialogue_actor_unit, anim_face_event)
+		function_command_queue:queue_function_command(Unit.animation_event, dialogue_actor_unit, anim_dialogue_event)
 	end
 
 	if Unit.has_data(dialogue_actor_unit, "enemy_dialogue_face_anim") and Unit.has_animation_state_machine(dialogue_actor_unit) then
@@ -1707,7 +1707,7 @@ DialogueSystem.rpc_interrupt_dialogue_event = function (self, sender, go_id, is_
 		self.playing_units[dialogue_actor_unit] = nil
 		local player_manager = Managers.player
 
-		if player_manager.owner(player_manager, dialogue_actor_unit) ~= nil or Unit.has_data(dialogue_actor_unit, "dialogue_face_anim") then
+		if player_manager:owner(dialogue_actor_unit) ~= nil or Unit.has_data(dialogue_actor_unit, "dialogue_face_anim") then
 			Unit.animation_event(dialogue_actor_unit, "face_neutral")
 			Unit.animation_event(dialogue_actor_unit, "dialogue_end")
 		elseif Unit.has_data(dialogue_actor_unit, "enemy_dialogue_face_anim") and Unit.has_animation_state_machine(dialogue_actor_unit) then
@@ -1741,7 +1741,7 @@ DialogueSystem.DebugPlayDialogue = function (self)
 	local dialogue_input = ScriptUnit.extension_input(local_player_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_dialogue_event(dialogue_input, "story_trigger", event_data)
+	dialogue_input:trigger_dialogue_event("story_trigger", event_data)
 end
 
 function DebugVo_pause()
@@ -1774,11 +1774,11 @@ function DebugVoByFile(file_name, quick)
 		if cl < #current_file.sound_events then
 			local is_npc = true
 			local player_manager = Managers.player
-			local human_and_bot_players = player_manager.human_and_bot_players(player_manager)
+			local human_and_bot_players = player_manager:human_and_bot_players()
 			local human_and_bot_players_n = 0
 
 			for index, player in pairs(human_and_bot_players) do
-				local profile_index = player.profile_index(player)
+				local profile_index = player:profile_index()
 				local profile = SPProfiles[profile_index]
 
 				if profile == nil then
@@ -1821,11 +1821,11 @@ function DebugVoByFile(file_name, quick)
 				currently_playing_id = nil
 				cl = cl + 1
 
-				if player_manager.owner(player_manager, actor_unit) ~= nil then
+				if player_manager:owner(actor_unit) ~= nil then
 					Unit.animation_event(actor_unit, "face_neutral")
 					Unit.animation_event(actor_unit, "dialogue_end")
 				end
-			elseif current_file.face_animations[cl] ~= nil and current_file.dialogue_animations[cl] ~= nil and player_manager.owner(player_manager, actor_unit) ~= nil then
+			elseif current_file.face_animations[cl] ~= nil and current_file.dialogue_animations[cl] ~= nil and player_manager:owner(actor_unit) ~= nil then
 				Unit.animation_event(actor_unit, current_file.face_animations[cl])
 				Unit.animation_event(actor_unit, current_file.dialogue_animations[cl])
 			end

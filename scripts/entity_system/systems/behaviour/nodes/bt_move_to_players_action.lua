@@ -16,18 +16,18 @@ BTMoveToPlayersAction.enter = function (self, unit, blackboard, t)
 	LocomotionUtils.set_animation_driven_movement(unit, false)
 
 	if blackboard.move_state ~= "idle" then
-		self.start_idle_animation(self, unit, blackboard)
+		self:start_idle_animation(unit, blackboard)
 	end
 
 	local ai_navigation_extension = blackboard.navigation_extension
 	local walk_speed = blackboard.breed.walk_speed
 
-	ai_navigation_extension.set_max_speed(ai_navigation_extension, walk_speed)
+	ai_navigation_extension:set_max_speed(walk_speed)
 
 	if blackboard.move_to_players_position then
 		local move_to_players_position = blackboard.move_to_players_position:unbox()
 
-		ai_navigation_extension.move_to(ai_navigation_extension, move_to_players_position)
+		ai_navigation_extension:move_to(move_to_players_position)
 	end
 
 	local target_units = {}
@@ -36,7 +36,7 @@ BTMoveToPlayersAction.enter = function (self, unit, blackboard, t)
 	}
 	blackboard.move_to_players = move_to_players
 
-	self._init_targets(self, move_to_players, t)
+	self:_init_targets(move_to_players, t)
 end
 
 BTMoveToPlayersAction._init_targets = function (self, data, t)
@@ -53,10 +53,10 @@ BTMoveToPlayersAction.leave = function (self, unit, blackboard, t, reason, destr
 	local navigation_extension = blackboard.navigation_extension
 
 	if reason == "aborted" then
-		local path_found = navigation_extension.is_following_path(navigation_extension)
+		local path_found = navigation_extension:is_following_path()
 
 		if blackboard.move_to_players_position and path_found and blackboard.move_state == "idle" then
-			self.start_move_animation(self, unit, blackboard)
+			self:start_move_animation(unit, blackboard)
 		end
 
 		blackboard.move_to_players_position = nil
@@ -64,7 +64,7 @@ BTMoveToPlayersAction.leave = function (self, unit, blackboard, t, reason, destr
 
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 end
 
 BTMoveToPlayersAction.run = function (self, unit, blackboard, t, dt)
@@ -73,18 +73,18 @@ BTMoveToPlayersAction.run = function (self, unit, blackboard, t, dt)
 	local target_pos = POSITION_LOOKUP[blackboard.target_unit]
 
 	if not blackboard.move_to_players_position or 9 < Vector3.distance_squared(blackboard.move_to_players_position:unbox(), target_pos) then
-		self._update_move_to_players_position(self, blackboard, ai_navigation, target_pos, data)
+		self:_update_move_to_players_position(blackboard, ai_navigation, target_pos, data)
 
 		return "running"
 	end
 
-	local path_found = ai_navigation.is_following_path(ai_navigation)
+	local path_found = ai_navigation:is_following_path()
 
 	if blackboard.move_to_players_position and path_found and blackboard.move_state == "idle" then
-		self.start_move_animation(self, unit, blackboard)
+		self:start_move_animation(unit, blackboard)
 	end
 
-	local ret_value = self._evalute_targets(self, unit, blackboard, data, t)
+	local ret_value = self:_evalute_targets(unit, blackboard, data, t)
 
 	return ret_value
 end
@@ -108,7 +108,7 @@ BTMoveToPlayersAction._evalute_targets = function (self, unit, blackboard, data,
 
 	if not next_target_unit then
 		table.clear(data.target_units)
-		self._init_targets(self, data, t)
+		self:_init_targets(data, t)
 
 		return "running"
 	else
@@ -128,8 +128,8 @@ BTMoveToPlayersAction._find_target_globadier = function (self, unit, blackboard,
 		throw_globe_data.next_throw_at = -math.huge
 	end
 
-	if self._valid_globadier_target(self, next_target_unit, blackboard.target_dist, action) and self._has_line_of_sight(self, unit, next_target_unit, blackboard.world, t) then
-		local has_trajectory, angle, speed, throw_from_pos, target_vector = self._calculate_trajectory_to_target(self, unit, blackboard.world, next_target_unit, action.attack_throw_offset, blackboard.breed.max_globe_throw_speed)
+	if self:_valid_globadier_target(next_target_unit, blackboard.target_dist, action) and self:_has_line_of_sight(unit, next_target_unit, blackboard.world, t) then
+		local has_trajectory, angle, speed, throw_from_pos, target_vector = self:_calculate_trajectory_to_target(unit, blackboard.world, next_target_unit, action.attack_throw_offset, blackboard.breed.max_globe_throw_speed)
 
 		if has_trajectory then
 			blackboard.has_thrown = true
@@ -177,8 +177,8 @@ BTMoveToPlayersAction._update_move_to_players_position = function (self, blackbo
 	local above = 0.7 + attempts * 0.2
 	local below = 2 + attempts * 0.2
 	local goal_pos = nil
-	local traverse_logic = navigation_extension.traverse_logic(navigation_extension)
-	local nav_world = navigation_extension.nav_world(navigation_extension)
+	local traverse_logic = navigation_extension:traverse_logic()
+	local nav_world = navigation_extension:nav_world()
 	local found_nav_mesh, z = GwNavQueries.triangle_from_position(nav_world, wanted_position, above, below, traverse_logic)
 
 	if found_nav_mesh then
@@ -190,11 +190,11 @@ BTMoveToPlayersAction._update_move_to_players_position = function (self, blackbo
 	end
 
 	if goal_pos then
-		navigation_extension.move_to(navigation_extension, goal_pos)
+		navigation_extension:move_to(goal_pos)
 
 		local pos_box = blackboard.move_to_players_position or Vector3Box()
 
-		pos_box.store(pos_box, goal_pos)
+		pos_box:store(goal_pos)
 
 		blackboard.move_to_players_position = pos_box
 		data.find_move_position_attempts = 0
@@ -246,8 +246,8 @@ end
 BTMoveToPlayersAction.start_idle_animation = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_passive")
-	network_manager.anim_event(network_manager, unit, "idle")
+	network_manager:anim_event(unit, "to_passive")
+	network_manager:anim_event(unit, "idle")
 
 	blackboard.move_state = "idle"
 end
@@ -255,8 +255,8 @@ end
 BTMoveToPlayersAction.start_move_animation = function (self, unit, blackboard)
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
-	network_manager.anim_event(network_manager, unit, "move_fwd")
+	network_manager:anim_event(unit, "to_combat")
+	network_manager:anim_event(unit, "move_fwd")
 
 	blackboard.move_state = "moving"
 end

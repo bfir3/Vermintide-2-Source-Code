@@ -47,7 +47,7 @@ TutorialSystem.init = function (self, entity_system_creation_context, system_nam
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, "rpc_tutorial_message", "rpc_pacing_changed", "rpc_objective_unit_set_active", "rpc_prioritize_objective_tooltip")
+	network_event_delegate:register(self, "rpc_tutorial_message", "rpc_pacing_changed", "rpc_objective_unit_set_active", "rpc_prioritize_objective_tooltip")
 
 	DO_TUT_RELOAD = false
 end
@@ -117,7 +117,7 @@ TutorialSystem.on_add_extension = function (self, world, unit, extension_name, e
 				else
 					extension.active = active
 					local network_manager = Managers.state.network
-					local level_object_id = network_manager.level_object_id(network_manager, extension.unit)
+					local level_object_id = network_manager:level_object_id(extension.unit)
 
 					network_manager.network_transmit:send_rpc_clients("rpc_objective_unit_set_active", level_object_id, active)
 				end
@@ -173,7 +173,7 @@ TutorialSystem.physics_async_update = function (self, context, t)
 		local raycast_unit = raycast_units[unit]
 		raycast_units[unit] = nil
 		local interactor_extension = ScriptUnit.extension(unit, "interactor_system")
-		local is_looking_at_interactable = interactor_extension.is_looking_at_interactable(interactor_extension)
+		local is_looking_at_interactable = interactor_extension:is_looking_at_interactable()
 
 		if is_looking_at_interactable then
 			extension.tooltip_tutorial.active = false
@@ -181,14 +181,14 @@ TutorialSystem.physics_async_update = function (self, context, t)
 
 		local status_extension = ScriptUnit.extension(unit, "status_system")
 
-		if not is_looking_at_interactable and not status_extension.is_disabled(status_extension) then
-			self.iterate_tooltips(self, t, unit, extension, raycast_unit, world)
+		if not is_looking_at_interactable and not status_extension:is_disabled() then
+			self:iterate_tooltips(t, unit, extension, raycast_unit, world)
 		end
 
-		self.iterate_objective_tooltips(self, t, unit, extension, raycast_unit, world)
+		self:iterate_objective_tooltips(t, unit, extension, raycast_unit, world)
 
 		if (self.pacing == "pacing_peak_fade" or self.pacing == "pacing_relax") and not script_data.info_slates_disabled then
-			self.iterate_info_slates(self, t, unit, extension, raycast_unit, world)
+			self:iterate_info_slates(t, unit, extension, raycast_unit, world)
 		end
 
 		if extension.tooltip_tutorial.active then
@@ -253,8 +253,8 @@ TutorialSystem.physics_async_update = function (self, context, t)
 
 		if tutorial_ui_enabled then
 			local ingame_hud = ingame_ui.ingame_hud
-			local is_own_player_dead = ingame_hud.is_own_player_dead(ingame_hud)
-			local active_cutscene = ingame_hud.is_cutscene_active(ingame_hud)
+			local is_own_player_dead = ingame_hud:is_own_player_dead()
+			local active_cutscene = ingame_hud:is_cutscene_active()
 
 			if not is_own_player_dead and not active_cutscene then
 				local dt = context.dt or 0
@@ -275,8 +275,8 @@ TutorialSystem.pre_render_update = function (self, dt, t)
 
 		if tutorial_ui_enabled then
 			local ingame_hud = ingame_ui.ingame_hud
-			local is_own_player_dead = ingame_hud.is_own_player_dead(ingame_hud)
-			local active_cutscene = ingame_hud.is_cutscene_active(ingame_hud)
+			local is_own_player_dead = ingame_hud:is_own_player_dead()
+			local active_cutscene = ingame_hud:is_cutscene_active()
 
 			if not is_own_player_dead and not active_cutscene then
 				self.tutorial_ui:pre_render_update(dt, t)
@@ -290,7 +290,7 @@ TutorialSystem.iterate_tooltips = function (self, t, unit, extension, raycast_un
 	local tooltip_templates_n = TutorialTooltipTemplates_n
 	local in_play_go = Managers.state.entity:system("play_go_tutorial_system"):active()
 	local level_transition_handler = Managers.state.game_mode.level_transition_handler
-	local level_key = level_transition_handler.get_current_level_keys(level_transition_handler)
+	local level_key = level_transition_handler:get_current_level_keys()
 	local is_in_inn = level_key == "inn_level"
 
 	for i = 1, tooltip_templates_n, 1 do
@@ -470,27 +470,27 @@ TutorialSystem.rpc_objective_unit_set_active = function (self, sender, level_obj
 	local unit = Managers.state.network:game_object_or_level_unit(level_object_id, true)
 	local extension = ScriptUnit.extension(unit, "tutorial_system")
 
-	extension.set_active(extension, activate)
+	extension:set_active(activate)
 end
 
 TutorialSystem.rpc_prioritize_objective_tooltip = function (self, sender, prioritized_objective_tooltip_id)
 	local prioritized_objective_tooltip = NetworkLookup.objective_tooltips[prioritized_objective_tooltip_id]
 
-	self.prioritize_objective_tooltip(self, prioritized_objective_tooltip)
+	self:prioritize_objective_tooltip(prioritized_objective_tooltip)
 end
 
 TutorialSystem.set_ingame_ui = function (self, ingame_ui)
 	self.ingame_ui = ingame_ui
 	local tutorial_ui = ingame_ui.ingame_hud.tutorial_ui
 
-	self._set_tutorial_ui(self, tutorial_ui)
+	self:_set_tutorial_ui(tutorial_ui)
 end
 
 TutorialSystem._set_tutorial_ui = function (self, tutorial_ui)
 	self.tutorial_ui = tutorial_ui
 
 	for unit, extension in pairs(self.health_extensions) do
-		tutorial_ui.add_health_bar(tutorial_ui, unit)
+		tutorial_ui:add_health_bar(unit)
 	end
 end
 
@@ -498,7 +498,7 @@ TutorialSystem.flow_callback_show_health_bar = function (self, unit, show)
 	local tutorial_ui = self.tutorial_ui
 
 	if tutorial_ui then
-		tutorial_ui.show_health_bar(tutorial_ui, unit, show)
+		tutorial_ui:show_health_bar(unit, show)
 	end
 end
 
@@ -518,7 +518,7 @@ TutorialSystem.hot_join_sync = function (self, peer_id)
 
 	for objective_unit, extension in pairs(units) do
 		if extension.active and not extension.server_only then
-			local level_object_id = network_manager.level_object_id(network_manager, objective_unit)
+			local level_object_id = network_manager:level_object_id(objective_unit)
 
 			network_manager.network_transmit:send_rpc("rpc_objective_unit_set_active", peer_id, level_object_id, true)
 		end
@@ -559,8 +559,8 @@ TutorialSystem.update = function (self, context, t)
 		end
 
 		local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
-		local camera_position = first_person_extension.current_position(first_person_extension)
-		local camera_rotation = first_person_extension.current_rotation(first_person_extension)
+		local camera_position = first_person_extension:current_position()
+		local camera_rotation = first_person_extension:current_rotation()
 		local camera_forward = Quaternion.forward(camera_rotation)
 		local result, hit_position, hit_distance, normal, actor = PhysicsWorld.immediate_raycast(physics_world, camera_position + camera_forward, camera_forward, 30, "closest", "collision_filter", "filter_tutorial")
 		local raycast_unit = nil
@@ -571,7 +571,7 @@ TutorialSystem.update = function (self, context, t)
 			if raycast_unit and Unit.alive(raycast_unit) and ScriptUnit.has_extension(raycast_unit, "health_system") then
 				local health_extension = ScriptUnit.extension(raycast_unit, "health_system")
 
-				if not health_extension.is_alive(health_extension) then
+				if not health_extension:is_alive() then
 					raycast_unit = nil
 				end
 			end

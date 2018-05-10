@@ -15,7 +15,7 @@ end
 
 GameModeTutorial.evaluate_end_conditions = function (self, round_started, dt, t)
 	if COMPLETE_LEVEL_VAR then
-		self.complete_level(self)
+		self:complete_level()
 
 		COMPLETE_LEVEL_VAR = false
 	end

@@ -66,7 +66,7 @@ TutorialUI.init = function (self, ingame_ui_context)
 	local world = self.world_manager:world("level_world")
 	self.wwise_world = Managers.world:wwise_world(world)
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.tutorial_tooltip_ui = TutorialTooltipUI:new(ingame_ui_context)
 end
@@ -87,7 +87,7 @@ TutorialUI.create_ui_elements = function (self)
 	self.info_slate_widgets[INFO_SLATES.mission_goal].style.description_text.font_type = "hell_shark"
 	self.active_animations = {}
 
-	self.add_info_slate_entries(self)
+	self:add_info_slate_entries()
 
 	for i = 1, definitions.NUMBER_OF_OBJECTIVE_TOOLTIPS, 1 do
 		local scenegraph_root = "objective_tooltip_root_" .. i
@@ -151,14 +151,14 @@ TutorialUI.update = function (self, dt, t)
 	self._first_person_extension = nil
 
 	if RELOAD_TUTORIAL_UI then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "Player")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local input_service = input_manager:get_service("Player")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 	local resolution_modified = RESOLUTION_LOOKUP.modified
 
 	if resolution_modified then
@@ -214,7 +214,7 @@ TutorialUI.update = function (self, dt, t)
 
 		local objective_tooltips = tutorial_extension.objective_tooltips
 
-		self.update_objective_tooltip(self, objective_tooltips, player_unit, dt)
+		self:update_objective_tooltip(objective_tooltips, player_unit, dt)
 	elseif self.active_tooltip_name or self.active_tooltip_widget then
 		UIRenderer.set_element_visible(ui_renderer, self.active_tooltip_widget.element, false)
 
@@ -224,7 +224,7 @@ TutorialUI.update = function (self, dt, t)
 	end
 
 	self.ui_animator:update(dt)
-	self.update_info_slate_entries(self, dt, t)
+	self:update_info_slate_entries(dt, t)
 
 	if not script_data.disable_tutorial_ui and render_tooltip_ui then
 		self.tutorial_tooltip_ui:draw(dt, t)
@@ -243,28 +243,28 @@ TutorialUI.pre_render_update = function (self, dt, t)
 	end
 
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "Player")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local input_service = input_manager:get_service("Player")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 	local tutorial_extension = ScriptUnit.extension(player_unit, "tutorial_system")
 	local widgets_for_update = self.widgets_for_update
 
 	for i = 1, self.num_widgets_for_update, 1 do
 		local data = widgets_for_update[i]
 
-		self.update_objective_tooltip_widget(self, data[1], data[2], dt)
+		self:update_objective_tooltip_widget(data[1], data[2], dt)
 	end
 
-	self.update_health_bars(self, dt, player_unit)
+	self:update_health_bars(dt, player_unit)
 
 	local tooltip_tutorial = self.mission_tutorial_tooltip_to_update
 	self.mission_tutorial_tooltip_to_update = nil
 
 	if tooltip_tutorial then
-		self.update_mission_tooltip(self, tooltip_tutorial, player_unit, dt)
+		self:update_mission_tooltip(tooltip_tutorial, player_unit, dt)
 	end
 
 	if not script_data.disable_tutorial_ui then
-		local first_person_extension = self.get_player_first_person_extension(self)
+		local first_person_extension = self:get_player_first_person_extension()
 
 		UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt, nil, self.render_settings)
 
@@ -333,17 +333,17 @@ TutorialUI.update_mission_tooltip = function (self, tooltip_tutorial, player_uni
 			local world_name = "level_world"
 			local world_manager = self.world_manager
 
-			if world_manager.has_world(world_manager, world_name) then
-				local world = world_manager.world(world_manager, world_name)
+			if world_manager:has_world(world_name) then
+				local world = world_manager:world(world_name)
 				local viewport = ScriptWorld.viewport(world, viewport_name)
 				camera = ScriptViewport.camera(viewport)
 			end
 		end
 
 		local world_position = tooltip_tutorial.world_position:unbox()
-		local first_person_extension = self.get_player_first_person_extension(self)
+		local first_person_extension = self:get_player_first_person_extension()
 		local my_position = Vector3.copy(POSITION_LOOKUP[player_unit])
-		local my_rotation = first_person_extension.current_rotation(first_person_extension)
+		local my_rotation = first_person_extension:current_rotation()
 		local my_direction = Quaternion.forward(my_rotation)
 		my_direction = Vector3.normalize(Vector3.flat(my_direction))
 		local direction = Vector3.normalize(world_position - my_position)
@@ -353,15 +353,15 @@ TutorialUI.update_mission_tooltip = function (self, tooltip_tutorial, player_uni
 		right_vect = Vector3.flat(right_vect)
 		right_vect = Vector3.normalize(right_vect)
 		local right_vect_dot = Vector3.dot(right_vect, direction)
-		local x_pos, y_pos = self.convert_world_to_screen_position(self, camera, world_position)
-		local clamped_x_pos, clamped_y_pos, is_clamped, is_behind = self.get_floating_icon_position(self, x_pos, y_pos, my_forward_dot, right_vect_dot, mission_tooltip_settings)
+		local x_pos, y_pos = self:convert_world_to_screen_position(camera, world_position)
+		local clamped_x_pos, clamped_y_pos, is_clamped, is_behind = self:get_floating_icon_position(x_pos, y_pos, my_forward_dot, right_vect_dot, mission_tooltip_settings)
 
 		if is_clamped or is_behind then
 			if not self.mission_tooltip_animation_in_time then
 				local arrow_size = ui_scenegraph.tooltip_mission_arrow.size
 				local icon_size = ui_scenegraph.tooltip_mission_icon.size
 				local height_from_center = y_pos - center_position[2]
-				local arrow_angle, offset_x, offset_y, offset_z = self.get_arrow_angle_and_offset(self, my_forward_dot, right_vect_dot, arrow_size, icon_size, height_from_center)
+				local arrow_angle, offset_x, offset_y, offset_z = self:get_arrow_angle_and_offset(my_forward_dot, right_vect_dot, arrow_size, icon_size, height_from_center)
 
 				if offset_x ~= nil then
 					local offset = widget.style.arrow.offset
@@ -377,17 +377,17 @@ TutorialUI.update_mission_tooltip = function (self, tooltip_tutorial, player_uni
 		end
 
 		if not self.mission_tooltip_animation_in_time then
-			self.floating_icon_animations(self, widget, self.tooltip_animations, is_behind, is_clamped, mission_tooltip_settings)
+			self:floating_icon_animations(widget, self.tooltip_animations, is_behind, is_clamped, mission_tooltip_settings)
 		end
 
 		local use_screen_position = not is_clamped and not is_behind
 
 		if self.mission_tooltip_animation_in_time then
-			self.mission_tooltip_animation_in_time = self.animate_in_mission_tooltip(self, self.mission_tooltip_animation_in_time, use_screen_position, dt, widget, ui_scenegraph.tooltip_mission_icon.size)
+			self.mission_tooltip_animation_in_time = self:animate_in_mission_tooltip(self.mission_tooltip_animation_in_time, use_screen_position, dt, widget, ui_scenegraph.tooltip_mission_icon.size)
 		elseif use_screen_position then
 			local current_size = ui_scenegraph.tooltip_mission_icon.size[1]
 			local original_size = definitions.FLOATING_ICON_SIZE[1]
-			local new_icon_size = self.get_icon_size(self, world_position, my_position, current_size, original_size, mission_tooltip_settings)
+			local new_icon_size = self:get_icon_size(world_position, my_position, current_size, original_size, mission_tooltip_settings)
 			ui_scenegraph.tooltip_mission_icon.size[1] = new_icon_size
 			ui_scenegraph.tooltip_mission_icon.size[2] = new_icon_size
 		else
@@ -517,7 +517,7 @@ TutorialUI.update_objective_tooltip = function (self, objective_tooltips, player
 
 		widget_holder.unit = new_units[i]
 
-		self.setup_objective_tooltip_widget(self, widget_holder, objective_tooltips, player_unit, dt)
+		self:setup_objective_tooltip_widget(widget_holder, objective_tooltips, player_unit, dt)
 
 		num_widgets_for_update = num_widgets_for_update + 1
 		local data = widgets_for_update[num_widgets_for_update]
@@ -595,8 +595,8 @@ TutorialUI.update_objective_tooltip_widget = function (self, widget_holder, play
 		local world_name = "level_world"
 		local world_manager = self.world_manager
 
-		if world_manager.has_world(world_manager, world_name) then
-			local world = world_manager.world(world_manager, world_name)
+		if world_manager:has_world(world_name) then
+			local world = world_manager:world(world_name)
 			local viewport = ScriptWorld.viewport(world, viewport_name)
 			camera = ScriptViewport.camera(viewport)
 		end
@@ -609,9 +609,9 @@ TutorialUI.update_objective_tooltip_widget = function (self, widget_holder, play
 	end
 
 	local objective_unit_position = Unit.world_position(objective_unit, 0) + Vector3.up()
-	local first_person_extension = self.get_player_first_person_extension(self)
-	local player_position = first_person_extension.current_position(first_person_extension)
-	local player_rotation = first_person_extension.current_rotation(first_person_extension)
+	local first_person_extension = self:get_player_first_person_extension()
+	local player_position = first_person_extension:current_position()
+	local player_rotation = first_person_extension:current_rotation()
 	local player_direction_forward = Quaternion.forward(player_rotation)
 	player_direction_forward = Vector3.normalize(Vector3.flat(player_direction_forward))
 	local player_direction_right = Quaternion.right(player_rotation)
@@ -620,8 +620,8 @@ TutorialUI.update_objective_tooltip_widget = function (self, widget_holder, play
 	local direction = Vector3.normalize(Vector3.flat(offset))
 	local forward_dot = Vector3.dot(player_direction_forward, direction)
 	local right_dot = Vector3.dot(player_direction_right, direction)
-	local x_pos, y_pos = self.convert_world_to_screen_position(self, camera, objective_unit_position)
-	local x, y, is_clamped, is_behind = self.get_floating_icon_position(self, x_pos, y_pos, forward_dot, right_dot, objective_tooltip_settings)
+	local x_pos, y_pos = self:convert_world_to_screen_position(camera, objective_unit_position)
+	local x, y, is_clamped, is_behind = self:get_floating_icon_position(x_pos, y_pos, forward_dot, right_dot, objective_tooltip_settings)
 	local ui_scenegraph = self.floating_icons_ui_scene_graph
 	local widget = widget_holder.widget
 	local animation_in_time = widget_holder.animation_in_time
@@ -631,7 +631,7 @@ TutorialUI.update_objective_tooltip_widget = function (self, widget_holder, play
 			local arrow_size = ui_scenegraph[widget_holder.scenegraph_arrow].size
 			local icon_size = ui_scenegraph[widget_holder.scenegraph_icon].size
 			local height_from_center = y_pos - center_position[2]
-			local arrow_angle, offset_x, offset_y, offset_z = self.get_arrow_angle_and_offset(self, forward_dot, right_dot, arrow_size, icon_size, height_from_center)
+			local arrow_angle, offset_x, offset_y, offset_z = self:get_arrow_angle_and_offset(forward_dot, right_dot, arrow_size, icon_size, height_from_center)
 
 			if offset_x ~= nil then
 				local offset = widget.style.arrow.offset
@@ -647,18 +647,18 @@ TutorialUI.update_objective_tooltip_widget = function (self, widget_holder, play
 	end
 
 	if not animation_in_time then
-		self.floating_icon_animations(self, widget, widget_holder.animations, is_behind, is_clamped, objective_tooltip_settings)
+		self:floating_icon_animations(widget, widget_holder.animations, is_behind, is_clamped, objective_tooltip_settings)
 	end
 
 	local use_screen_position = not is_clamped and not is_behind
 
 	if animation_in_time then
 		local size = ui_scenegraph[widget_holder.scenegraph_icon].size
-		widget_holder.animation_in_time = self.animate_in_mission_tooltip(self, animation_in_time, use_screen_position, dt, widget, size)
+		widget_holder.animation_in_time = self:animate_in_mission_tooltip(animation_in_time, use_screen_position, dt, widget, size)
 	elseif use_screen_position then
 		local current_size = ui_scenegraph[widget_holder.scenegraph_icon].size[1]
 		local original_size = definitions.FLOATING_ICON_SIZE[1]
-		local new_icon_size, new_icon_scale = self.get_icon_size(self, objective_unit_position, player_position, current_size, original_size, objective_tooltip_settings)
+		local new_icon_size, new_icon_scale = self:get_icon_size(objective_unit_position, player_position, current_size, original_size, objective_tooltip_settings)
 		ui_scenegraph.tooltip_mission_icon.size[1] = new_icon_size
 		ui_scenegraph.tooltip_mission_icon.size[2] = new_icon_size
 		widget.style.texture_id.size[1] = new_icon_size
@@ -673,7 +673,7 @@ TutorialUI.update_objective_tooltip_widget = function (self, widget_holder, play
 
 		ui_scenegraph[widget_holder.scenegraph_icon].size[1] = new_icon_size
 		widget_holder.current_font_size = font_size
-		local overlap = self._floating_icon_overlap(self, widget_holder, x, y, new_icon_scale)
+		local overlap = self:_floating_icon_overlap(widget_holder, x, y, new_icon_scale)
 
 		if overlap then
 			y = y + overlap
@@ -839,7 +839,7 @@ TutorialUI.get_icon_size = function (self, position, player_position, current_si
 	local icon_scale = 1
 
 	if start_scale_distance < distance then
-		icon_scale = self.icon_scale_by_distance(self, distance - start_scale_distance, end_scale_distance)
+		icon_scale = self:icon_scale_by_distance(distance - start_scale_distance, end_scale_distance)
 		size = math.lerp(current_size, icon_scale * original_size, 0.2)
 	end
 
@@ -958,7 +958,7 @@ TutorialUI.clear_tutorials = function (self)
 	local scenegraph_definition = definitions.scenegraph[widget.scenegraph_id]
 
 	if self.tutorial_state ~= "animating_out" and self.tutorial_state ~= "invisible" then
-		self.tutorial_anim_id = ui_animator.start_animation(ui_animator, "info_slate_exit", widget, scenegraph_definition)
+		self.tutorial_anim_id = ui_animator:start_animation("info_slate_exit", widget, scenegraph_definition)
 		self.tutorial_state = "animating_out"
 	end
 end
@@ -968,7 +968,7 @@ TutorialUI.complete_mission_info_slate = function (self, info_slate_type, entry_
 		return
 	end
 
-	self.play_sound(self, "hud_info_slate_mission_complete")
+	self:play_sound("hud_info_slate_mission_complete")
 
 	local queue = self.queued_info_slate_entries[info_slate_type]
 
@@ -990,7 +990,7 @@ TutorialUI.update_info_slate_entry_text = function (self, info_slate_type, entry
 			entry.updated = true
 			entry.text = text
 
-			self.play_sound(self, "hud_info_slate_mission_update")
+			self:play_sound("hud_info_slate_mission_update")
 
 			return
 		end
@@ -1029,36 +1029,36 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 				local text = entry.text
 				self.mission_goal_entry = entry
 				widget.content.description_text = text
-				self.mission_goal_anim_id = ui_animator.start_animation(ui_animator, "info_slate_enter", widget, scenegraph_definition, anim_params.slot_1)
+				self.mission_goal_anim_id = ui_animator:start_animation("info_slate_enter", widget, scenegraph_definition, anim_params.slot_1)
 
-				self.play_sound(self, "hud_info_slate_mission_entry")
+				self:play_sound("hud_info_slate_mission_entry")
 
 				self.mission_goal_state = "animating_in"
 			end
 		elseif self.mission_goal_state == "animating_in" then
-			if ui_animator.is_animation_completed(ui_animator, self.mission_goal_anim_id) then
-				self.mission_goal_anim_id = ui_animator.start_animation(ui_animator, "mission_goal_wait", widget, scenegraph_definition)
+			if ui_animator:is_animation_completed(self.mission_goal_anim_id) then
+				self.mission_goal_anim_id = ui_animator:start_animation("mission_goal_wait", widget, scenegraph_definition)
 				self.mission_goal_state = "waiting"
 			end
 		elseif self.mission_goal_state == "waiting" then
-			if ui_animator.is_animation_completed(ui_animator, self.mission_goal_anim_id) then
-				self.mission_goal_anim_id = ui_animator.start_animation(ui_animator, "mission_goal_move_up", widget, scenegraph_definition)
+			if ui_animator:is_animation_completed(self.mission_goal_anim_id) then
+				self.mission_goal_anim_id = ui_animator:start_animation("mission_goal_move_up", widget, scenegraph_definition)
 				self.mission_goal_state = "animating_up"
 			end
 		elseif self.mission_goal_state == "animating_up" then
-			if ui_animator.is_animation_completed(ui_animator, self.mission_goal_anim_id) then
+			if ui_animator:is_animation_completed(self.mission_goal_anim_id) then
 				self.mission_goal_anim_id = nil
 				self.mission_goal_state = "visible"
 			end
 		elseif self.mission_goal_state == "visible" then
 			if queue[self.mission_goal_entry.entry_id] == nil then
-				self.mission_goal_anim_id = ui_animator.start_animation(ui_animator, "info_slate_exit", widget, scenegraph_definition)
+				self.mission_goal_anim_id = ui_animator:start_animation("info_slate_exit", widget, scenegraph_definition)
 				self.mission_goal_state = "animating_out"
 			elseif next(self.queued_info_slate_entries.mission_objective) ~= nil then
-				self.mission_goal_anim_id = ui_animator.start_animation(ui_animator, "info_slate_exit", widget, scenegraph_definition)
+				self.mission_goal_anim_id = ui_animator:start_animation("info_slate_exit", widget, scenegraph_definition)
 				self.mission_goal_state = "animating_out"
 			end
-		elseif self.mission_goal_state == "animating_out" and ui_animator.is_animation_completed(ui_animator, self.mission_goal_anim_id) then
+		elseif self.mission_goal_state == "animating_out" and ui_animator:is_animation_completed(self.mission_goal_anim_id) then
 			UIRenderer.set_element_visible(self.ui_renderer, widget.element, false)
 
 			self.info_slate_slots_taken[1] = false
@@ -1083,12 +1083,12 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 						local text = entry.text
 						self.mission_objective_entry = entry
 						widget.content.description_text = text
-						self.mission_objective_anim_id = ui_animator.start_animation(ui_animator, "info_slate_enter", widget, scenegraph_definition, anim_params[(i == 1 and "slot_1") or "slot_2"])
+						self.mission_objective_anim_id = ui_animator:start_animation("info_slate_enter", widget, scenegraph_definition, anim_params[(i == 1 and "slot_1") or "slot_2"])
 						local entry_size = definitions.INFO_SLATE_ENTRY_SIZE
 						local text_scenegraph_id = info_slate.text_scenegraph_id
 						local icon_scenegraph_id = info_slate.icon_scenegraph_id
 						local text_style = widget.style.description_text
-						local text_height, num_texts = self.info_slate_text_height(self, text, text_style)
+						local text_height, num_texts = self:info_slate_text_height(text, text_style)
 						local entry_height = math.max(entry_size[2], text_height)
 						ui_scenegraph[text_scenegraph_id].size[2] = entry_height
 						local std_height = ui_scenegraph[widget.scenegraph_id].size[2]
@@ -1097,7 +1097,7 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 						ui_scenegraph[info_slate.icon_root_scenegraph_id].vertical_alignment = (1 < num_texts and "top") or "center"
 						ui_scenegraph[info_slate.icon_root_scenegraph_id].position[2] = (1 < num_texts and -10) or 0
 
-						self.play_sound(self, "hud_info_slate_mission_entry")
+						self:play_sound("hud_info_slate_mission_entry")
 
 						self.mission_objective_state = "animating_in"
 
@@ -1106,29 +1106,29 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 				end
 			end
 		elseif self.mission_objective_state == "animating_in" then
-			if ui_animator.is_animation_completed(ui_animator, self.mission_objective_anim_id) then
-				self.mission_objective_anim_id = ui_animator.start_animation(ui_animator, "mission_goal_wait", widget, scenegraph_definition)
+			if ui_animator:is_animation_completed(self.mission_objective_anim_id) then
+				self.mission_objective_anim_id = ui_animator:start_animation("mission_goal_wait", widget, scenegraph_definition)
 				self.mission_objective_state = "visible"
 			end
 		elseif self.mission_objective_state == "visible" then
 			if self.mission_objective_entry.updated then
 				self.mission_objective_entry.updated = nil
-				self.mission_objective_anim_id = ui_animator.start_animation(ui_animator, "info_slate_flash", widget, scenegraph_definition)
+				self.mission_objective_anim_id = ui_animator:start_animation("info_slate_flash", widget, scenegraph_definition)
 				self.mission_objective_state = "flashing"
 				widget.content.description_text = self.mission_objective_entry.text
 			elseif queue[self.mission_objective_entry.entry_id] == nil then
-				self.mission_objective_anim_id = ui_animator.start_animation(ui_animator, "info_slate_exit", widget, scenegraph_definition)
+				self.mission_objective_anim_id = ui_animator:start_animation("info_slate_exit", widget, scenegraph_definition)
 				self.mission_objective_state = "animating_out"
 			end
 		elseif self.mission_objective_state == "moving" then
-			if ui_animator.is_animation_completed(ui_animator, self.mission_objective_anim_id) then
+			if ui_animator:is_animation_completed(self.mission_objective_anim_id) then
 				self.mission_objective_state = "visible"
 			end
 		elseif self.mission_objective_state == "flashing" then
-			if ui_animator.is_animation_completed(ui_animator, self.mission_objective_anim_id) then
+			if ui_animator:is_animation_completed(self.mission_objective_anim_id) then
 				self.mission_objective_state = "visible"
 			end
-		elseif self.mission_objective_state == "animating_out" and ui_animator.is_animation_completed(ui_animator, self.mission_objective_anim_id) then
+		elseif self.mission_objective_state == "animating_out" and ui_animator:is_animation_completed(self.mission_objective_anim_id) then
 			UIRenderer.set_element_visible(self.ui_renderer, widget.element, false)
 
 			self.info_slate_slots_taken[self.mission_objective_entry.slot] = false
@@ -1159,15 +1159,15 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 					self.side_mission_entry = entry
 					widget.content.description_text = text
 					local anim_param_name = (i == 1 and "slot_1") or (i == 2 and "slot_2") or "slot_3"
-					self.side_mission_anim_id = ui_animator.start_animation(ui_animator, "info_slate_enter", widget, scenegraph_definition, anim_params[anim_param_name])
+					self.side_mission_anim_id = ui_animator:start_animation("info_slate_enter", widget, scenegraph_definition, anim_params[anim_param_name])
 					self.side_mission_state = "animating_in"
 
 					break
 				end
 			end
 		elseif self.side_mission_state == "animating_in" then
-			if ui_animator.is_animation_completed(ui_animator, self.side_mission_anim_id) then
-				self.side_mission_anim_id = ui_animator.start_animation(ui_animator, "mission_goal_wait", widget, scenegraph_definition)
+			if ui_animator:is_animation_completed(self.side_mission_anim_id) then
+				self.side_mission_anim_id = ui_animator:start_animation("mission_goal_wait", widget, scenegraph_definition)
 				self.side_mission_visible_timer = 0
 				self.side_mission_state = "visible"
 			end
@@ -1177,28 +1177,28 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 			if 1 < self.side_mission_visible_timer then
 				local slot = self.side_mission_entry.slot
 				local anim_param_name = (slot == 1 and "slot_1") or (slot == 2 and "slot_2") or "slot_3"
-				self.side_mission_anim_id = ui_animator.start_animation(ui_animator, "info_slate_exit", widget, scenegraph_definition, anim_params[anim_param_name])
+				self.side_mission_anim_id = ui_animator:start_animation("info_slate_exit", widget, scenegraph_definition, anim_params[anim_param_name])
 				self.side_mission_state = "animating_out"
 			elseif self.side_mission_entry.updated then
 				self.side_mission_entry.updated = nil
-				self.side_mission_anim_id = ui_animator.start_animation(ui_animator, "info_slate_flash", widget, scenegraph_definition)
+				self.side_mission_anim_id = ui_animator:start_animation("info_slate_flash", widget, scenegraph_definition)
 				self.side_mission_state = "flashing"
 				widget.content.description_text = self.side_mission_entry.text
 			elseif queue[self.side_mission_entry.entry_id] == nil then
-				self.side_mission_anim_id = ui_animator.start_animation(ui_animator, "info_slate_exit", widget, scenegraph_definition)
+				self.side_mission_anim_id = ui_animator:start_animation("info_slate_exit", widget, scenegraph_definition)
 				self.side_mission_state = "animating_out"
 			end
 		elseif self.side_mission_state == "moving" then
-			if ui_animator.is_animation_completed(ui_animator, self.side_mission_anim_id) then
+			if ui_animator:is_animation_completed(self.side_mission_anim_id) then
 				self.side_mission_visible_timer = 0
 				self.side_mission_state = "visible"
 			end
 		elseif self.side_mission_state == "flashing" then
-			if ui_animator.is_animation_completed(ui_animator, self.side_mission_anim_id) then
+			if ui_animator:is_animation_completed(self.side_mission_anim_id) then
 				self.side_mission_visible_timer = 0
 				self.side_mission_state = "visible"
 			end
-		elseif self.side_mission_state == "animating_out" and ui_animator.is_animation_completed(ui_animator, self.side_mission_anim_id) then
+		elseif self.side_mission_state == "animating_out" and ui_animator:is_animation_completed(self.side_mission_anim_id) then
 			UIRenderer.set_element_visible(self.ui_renderer, widget.element, false)
 
 			self.info_slate_slots_taken[self.side_mission_entry.slot] = false
@@ -1210,7 +1210,7 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 		local widget = info_slate.widget
 		local scenegraph_definition = definitions.scenegraph[widget.scenegraph_id]
 		self.tutorial_state = self.tutorial_state or "invisible"
-		local entry_id = self._get_next_verified(self, queue, t)
+		local entry_id = self:_get_next_verified(queue, t)
 
 		if self.tutorial_state == "invisible" and self.side_mission_state == "invisible" then
 			if entry_id then
@@ -1222,12 +1222,12 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 						local text = entry.text
 						self.tutorial_entry = entry
 						widget.content.description_text = text
-						self.tutorial_anim_id = ui_animator.start_animation(ui_animator, "info_slate_enter", widget, scenegraph_definition, anim_params[(i == 1 and "slot_1") or "slot_2"])
+						self.tutorial_anim_id = ui_animator:start_animation("info_slate_enter", widget, scenegraph_definition, anim_params[(i == 1 and "slot_1") or "slot_2"])
 						local entry_size = definitions.INFO_SLATE_ENTRY_SIZE
 						local text_scenegraph_id = info_slate.text_scenegraph_id
 						local icon_scenegraph_id = info_slate.icon_scenegraph_id
 						local text_style = widget.style.description_text
-						local text_height, num_texts = self.info_slate_text_height(self, text, text_style)
+						local text_height, num_texts = self:info_slate_text_height(text, text_style)
 						local entry_height = math.max(entry_size[2], text_height)
 						ui_scenegraph[text_scenegraph_id].size[2] = entry_height
 						local std_height = ui_scenegraph[widget.scenegraph_id].size[2]
@@ -1242,8 +1242,8 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 				end
 			end
 		elseif self.tutorial_state == "animating_in" then
-			if ui_animator.is_animation_completed(ui_animator, self.tutorial_anim_id) then
-				self.tutorial_anim_id = ui_animator.start_animation(ui_animator, "mission_goal_wait", widget, scenegraph_definition)
+			if ui_animator:is_animation_completed(self.tutorial_anim_id) then
+				self.tutorial_anim_id = ui_animator:start_animation("mission_goal_wait", widget, scenegraph_definition)
 				self.tutorial_visible_timer = 0
 				self.tutorial_state = "visible"
 			end
@@ -1253,27 +1253,27 @@ TutorialUI.update_info_slate_entries = function (self, dt, t)
 			if 10 < self.tutorial_visible_timer then
 				local slot = self.tutorial_entry.slot
 				local anim_param_name = (slot == 1 and "slot_1") or (slot == 2 and "slot_2") or "slot_3"
-				self.tutorial_anim_id = ui_animator.start_animation(ui_animator, "info_slate_exit", widget, scenegraph_definition, anim_params[anim_param_name])
+				self.tutorial_anim_id = ui_animator:start_animation("info_slate_exit", widget, scenegraph_definition, anim_params[anim_param_name])
 				self.tutorial_state = "animating_out"
 			elseif self.tutorial_entry.updated then
 				self.tutorial_entry.updated = nil
-				self.tutorial_anim_id = ui_animator.start_animation(ui_animator, "info_slate_flash", widget, scenegraph_definition)
+				self.tutorial_anim_id = ui_animator:start_animation("info_slate_flash", widget, scenegraph_definition)
 				self.tutorial_state = "flashing"
 				widget.content.description_text = self.tutorial_entry.text
 			elseif self.side_mission_state == "waiting_for_tutorial" then
-				self.tutorial_anim_id = ui_animator.start_animation(ui_animator, "info_slate_exit", widget, scenegraph_definition)
+				self.tutorial_anim_id = ui_animator:start_animation("info_slate_exit", widget, scenegraph_definition)
 				self.tutorial_state = "animating_out"
 			end
 		elseif self.tutorial_state == "moving" then
-			if ui_animator.is_animation_completed(ui_animator, self.tutorial_anim_id) then
+			if ui_animator:is_animation_completed(self.tutorial_anim_id) then
 				self.info_slate_slots_taken[3 - self.tutorial_entry.slot] = false
 				self.tutorial_state = "visible"
 			end
 		elseif self.tutorial_state == "flashing" then
-			if ui_animator.is_animation_completed(ui_animator, self.tutorial_anim_id) then
+			if ui_animator:is_animation_completed(self.tutorial_anim_id) then
 				self.tutorial_state = "visible"
 			end
-		elseif self.tutorial_state == "animating_out" and ui_animator.is_animation_completed(ui_animator, self.tutorial_anim_id) then
+		elseif self.tutorial_state == "animating_out" and ui_animator:is_animation_completed(self.tutorial_anim_id) then
 			UIRenderer.set_element_visible(self.ui_renderer, widget.element, false)
 
 			self.info_slate_slots_taken[self.tutorial_entry.slot] = false
@@ -1374,9 +1374,9 @@ TutorialUI.show_health_bar = function (self, unit, visible)
 end
 
 TutorialUI.update_health_bars = function (self, dt, player_unit)
-	local first_person_extension = self.get_player_first_person_extension(self)
-	local camera_position = first_person_extension.current_position(first_person_extension)
-	local camera_rotation = first_person_extension.current_rotation(first_person_extension)
+	local first_person_extension = self:get_player_first_person_extension()
+	local camera_position = first_person_extension:current_position()
+	local camera_rotation = first_person_extension:current_rotation()
 	local camera_forward = Quaternion.forward(camera_rotation)
 	local viewport_name = "player_1"
 	local camera = nil
@@ -1385,8 +1385,8 @@ TutorialUI.update_health_bars = function (self, dt, player_unit)
 		local world_name = "level_world"
 		local world_manager = self.world_manager
 
-		if world_manager.has_world(world_manager, world_name) then
-			local world = world_manager.world(world_manager, world_name)
+		if world_manager:has_world(world_name) then
+			local world = world_manager:world(world_name)
 			local viewport = ScriptWorld.viewport(world, viewport_name)
 			camera = ScriptViewport.camera(viewport)
 		end
@@ -1430,7 +1430,7 @@ TutorialUI.update_health_bars = function (self, dt, player_unit)
 
 				health_percent = health_percent_current
 				health_bar.health_percent = health_percent
-				local x_pos, y_pos = self.convert_world_to_screen_position(self, camera, world_position)
+				local x_pos, y_pos = self:convert_world_to_screen_position(camera, world_position)
 				local scenegraph_definition = health_bar.scenegraph_definition
 				local ui_local_position = scenegraph_definition.local_position
 				ui_local_position[1] = x_pos * inverse_scale

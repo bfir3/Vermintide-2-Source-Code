@@ -18,7 +18,7 @@ MissionObjectiveUI.init = function (self, ingame_ui_context)
 		snap_pixel_positions = true
 	}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 	rawset(_G, "mission_objective_ui", self)
 end
 
@@ -43,14 +43,14 @@ end
 
 MissionObjectiveUI.update = function (self, dt)
 	if DO_RELOAD then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self.update_animations(self, dt)
-	self.next_mission_objective(self, dt)
+	self:update_animations(dt)
+	self:next_mission_objective(dt)
 
 	if self.current_mission_objective or self._animations.mission_animation then
-		self.draw(self, dt)
+		self:draw(dt)
 	end
 end
 
@@ -79,12 +79,12 @@ end
 
 MissionObjectiveUI.complete_mission = function (self, mission_name, remove_immediately)
 	if remove_immediately then
-		self._clear_animations(self)
-		self._remove_mission_objective(self, mission_name)
+		self:_clear_animations()
+		self:_remove_mission_objective(mission_name)
 	else
-		self._remove_mission_objective(self, mission_name)
-		self._clear_animations(self)
-		self._start_animation(self, "mission_animation", "mission_end")
+		self:_remove_mission_objective(mission_name)
+		self:_clear_animations()
+		self:_start_animation("mission_animation", "mission_end")
 	end
 end
 
@@ -129,7 +129,7 @@ MissionObjectiveUI.update_mission = function (self, mission_name, text)
 		if mission_data.mission_name == self.current_mission_objective then
 			local widget = self._mission_widget
 
-			self._set_mission_text(self, text)
+			self:_set_mission_text(text)
 		end
 	end
 end
@@ -140,8 +140,8 @@ MissionObjectiveUI.next_mission_objective = function (self, dt)
 		self.current_mission_objective = current_mission_data.mission_name
 		local widget = self._mission_widget
 
-		self._set_mission_text(self, current_mission_data.text)
-		self._start_animation(self, "mission_animation", "mission_start")
+		self:_set_mission_text(current_mission_data.text)
+		self:_start_animation("mission_animation", "mission_start")
 	end
 end
 
@@ -149,11 +149,11 @@ MissionObjectiveUI.update_animations = function (self, dt)
 	local animations = self._animations
 	local ui_animator = self.ui_animator
 
-	ui_animator.update(ui_animator, dt)
+	ui_animator:update(dt)
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end

@@ -23,7 +23,7 @@ BTVomitAction.enter = function (self, unit, blackboard, t)
 	blackboard.rotation_time = t + action.rotation_time
 	blackboard.check_puke_time = nil
 
-	if self.init_attack(self, unit, blackboard, action, t) then
+	if self:init_attack(unit, blackboard, action, t) then
 		blackboard.anim_locked = t + action.attack_time
 		blackboard.move_state = "attacking"
 		blackboard.attack_aborted = false
@@ -68,7 +68,7 @@ BTVomitAction._get_vomit_position = function (self, unit, blackboard)
 		pos_to_test = target_pos
 	end
 
-	local puke_pos = self._position_on_navmesh(self, pos_to_test, blackboard)
+	local puke_pos = self:_position_on_navmesh(pos_to_test, blackboard)
 
 	if puke_pos then
 		local to_puke_pos = puke_pos - troll_head_pos
@@ -80,7 +80,7 @@ BTVomitAction._get_vomit_position = function (self, unit, blackboard)
 end
 
 BTVomitAction.init_attack = function (self, unit, blackboard, action, t)
-	local puke_position, puke_distance_sq, puke_direction = self._get_vomit_position(self, unit, blackboard)
+	local puke_position, puke_distance_sq, puke_direction = self:_get_vomit_position(unit, blackboard)
 
 	if not puke_position then
 		return false
@@ -124,7 +124,7 @@ BTVomitAction.init_attack = function (self, unit, blackboard, action, t)
 	blackboard.attack_rotation = QuaternionBox(to_vomit_rotation)
 	local locomotion = blackboard.locomotion_extension
 
-	locomotion.set_wanted_rotation(locomotion, to_vomit_rotation)
+	locomotion:set_wanted_rotation(to_vomit_rotation)
 
 	return true
 end
@@ -181,10 +181,10 @@ BTVomitAction.run = function (self, unit, blackboard, t, dt)
 			end
 
 			if blackboard.check_puke_time < t then
-				self.player_vomit_hit_check(self, unit, blackboard)
+				self:player_vomit_hit_check(unit, blackboard)
 			end
-		elseif t < blackboard.rotation_time and not target_unit_status_extension.get_is_dodging(target_unit_status_extension) and not target_unit_status_extension.is_invisible(target_unit_status_extension) and blackboard.update_puke_pos_at_t < t then
-			local puke_position, puke_distance_sq, puke_direction = self._get_vomit_position(self, unit, blackboard)
+		elseif t < blackboard.rotation_time and not target_unit_status_extension:get_is_dodging() and not target_unit_status_extension:is_invisible() and blackboard.update_puke_pos_at_t < t then
+			local puke_position, puke_distance_sq, puke_direction = self:_get_vomit_position(unit, blackboard)
 
 			if puke_position and puke_direction then
 				blackboard.puke_position:store(puke_position)
@@ -200,7 +200,7 @@ BTVomitAction.run = function (self, unit, blackboard, t, dt)
 			local rotation = Quaternion.look(puke_direction_flat)
 			local locomotion = blackboard.locomotion_extension
 
-			locomotion.set_wanted_rotation(locomotion, rotation)
+			locomotion:set_wanted_rotation(rotation)
 		end
 
 		local create_bot_threat_at_t = blackboard.create_bot_threat_at_t
@@ -213,7 +213,7 @@ BTVomitAction.run = function (self, unit, blackboard, t, dt)
 			local bot_threat_duration = blackboard.bot_threat_duration
 			local unit_position = POSITION_LOOKUP[unit]
 			local attack_rotation = blackboard.attack_rotation:unbox()
-			local obstacle_position, obstacle_rotation, obstacle_size = self._calculate_oobb_collision(self, current_bot_threat, unit_position, attack_rotation)
+			local obstacle_position, obstacle_rotation, obstacle_size = self:_calculate_oobb_collision(current_bot_threat, unit_position, attack_rotation)
 
 			Managers.state.entity:system("ai_bot_group_system"):aoe_threat_created(obstacle_position, "oobb", obstacle_size, obstacle_rotation, bot_threat_duration)
 
@@ -263,8 +263,8 @@ BTVomitAction.player_vomit_hit_check = function (self, unit, blackboard)
 			if unit_hit_is_player then
 				local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-				if not buff_extension.has_buff_type(buff_extension, "troll_bile_face") then
-					buff_system.add_buff(buff_system, hit_unit, "bile_troll_vomit_face_base", unit)
+				if not buff_extension:has_buff_type("troll_bile_face") then
+					buff_system:add_buff(hit_unit, "bile_troll_vomit_face_base", unit)
 				end
 			end
 		end
@@ -273,7 +273,7 @@ end
 
 BTVomitAction.create_aoe = function (self, unit, blackboard, action)
 	local puke_pos = blackboard.puke_position:unbox()
-	puke_pos = self._position_on_navmesh(self, puke_pos, blackboard)
+	puke_pos = self:_position_on_navmesh(puke_pos, blackboard)
 
 	if puke_pos then
 		local dir = blackboard.puke_direction:unbox()
@@ -288,7 +288,7 @@ BTVomitAction.create_aoe = function (self, unit, blackboard, action)
 		local liquid_aoe_unit = Managers.state.unit_spawner:spawn_network_unit(aoe_unit_name, "liquid_aoe_unit", extension_init_data, puke_pos)
 		local liquid_area_damage_extension = ScriptUnit.extension(liquid_aoe_unit, "area_damage_system")
 
-		liquid_area_damage_extension.ready(liquid_area_damage_extension)
+		liquid_area_damage_extension:ready()
 	end
 end
 

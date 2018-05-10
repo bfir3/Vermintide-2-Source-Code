@@ -979,7 +979,7 @@ Test.init = function (self)
 	self.levels = LEVELS
 	self.stage = self.test_units
 
-	self.init_world(self)
+	self:init_world()
 end
 
 Test.init_world = function (self)
@@ -1049,8 +1049,8 @@ Test.test_levels = function (self)
 			return true
 		end
 
-		self.shutdown(self)
-		self.init_world(self)
+		self:shutdown()
+		self:init_world()
 		print("Testing level " .. self.levels[#self.levels])
 		World.load_level(self.world, self.levels[#self.levels])
 
@@ -1077,8 +1077,8 @@ Test.next_stage = function (self)
 end
 
 Test.update = function (self, dt)
-	if self.stage(self) then
-		self.next_stage(self)
+	if self:stage() then
+		self:next_stage()
 	end
 
 	World.update(self.world, dt)

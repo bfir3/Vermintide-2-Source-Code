@@ -60,7 +60,7 @@ TwitchManager.connect = function (self, twitch_user_name, optional_connection_fa
 end
 
 TwitchManager.cb_on_user_info_received = function (self, success, code, headers, data, userdata)
-	self._show_result_info(self, success, code, headers, data, userdata)
+	self:_show_result_info(success, code, headers, data, userdata)
 
 	local result_data = cjson.decode(data)
 
@@ -127,7 +127,7 @@ TwitchManager.cb_on_user_info_received = function (self, success, code, headers,
 end
 
 TwitchManager.cb_on_user_streams_received = function (self, success, code, headers, data, userdata)
-	self._show_result_info(self, success, code, headers, data, userdata)
+	self:_show_result_info(success, code, headers, data, userdata)
 
 	local result_data = cjson.decode(data)
 
@@ -239,7 +239,7 @@ TwitchManager.add_game_object_id = function (self, game_object_id)
 		self._game_object_ids[vote_key] = game_object_id
 		self._vote_key_to_go_id[game_object_id] = vote_key
 
-		self._register_networked_vote(self, game_object_id)
+		self:_register_networked_vote(game_object_id)
 	end
 end
 
@@ -251,13 +251,13 @@ TwitchManager.remove_game_object_id = function (self, game_object_id)
 		self._game_object_ids[vote_key] = nil
 		self._vote_key_to_go_id[game_object_id] = nil
 
-		self.unregister_vote(self, vote_key)
+		self:unregister_vote(vote_key)
 	end
 end
 
 TwitchManager._update_game_object = function (self, vote_key, vote_data)
 	local network_manager = Managers.state.network
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 	local time = math.ceil(vote_data.timer)
 
 	if game then
@@ -272,7 +272,7 @@ end
 
 TwitchManager._register_networked_vote = function (self, game_object_id)
 	local network_manager = Managers.state.network
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 	local vote_key = GameSession.game_object_field(game, game_object_id, "vote_key")
 	local vote_type = NetworkLookup.twitch_vote_types[GameSession.game_object_field(game, game_object_id, "vote_type")]
 	local option_strings = {
@@ -315,7 +315,7 @@ TwitchManager.register_vote = function (self, time, vote_type, validation_func, 
 	local network_manager = Managers.state.network
 
 	fassert(self._connected, "[TwitchManager] You need to be connected to be able to trigger twitch votes")
-	fassert(network_manager and network_manager.game(network_manager), "[TwitchManager] You need to have an active game session to be able to register votes")
+	fassert(network_manager and network_manager:game(), "[TwitchManager] You need to have an active game session to be able to register votes")
 
 	local option_strings = {
 		TwitchSettings[vote_type].default_vote_a_str,
@@ -360,7 +360,7 @@ TwitchManager.register_vote = function (self, time, vote_type, validation_func, 
 	Managers.irc:register_message_callback(vote_key, Irc.CHANNEL_MSG, callback(self, "on_message_received"))
 
 	if not self._current_vote then
-		self._activate_next_vote(self)
+		self:_activate_next_vote()
 	end
 
 	self._vote_key_index = 1 + self._vote_key_index % 255
@@ -388,7 +388,7 @@ TwitchManager.unregister_vote = function (self, vote_key)
 		local go_id = self._game_object_ids[vote_key]
 
 		if go_id then
-			local game = network_manager.game(network_manager)
+			local game = network_manager:game()
 
 			if game then
 				GameSession.destroy_game_object(game, go_id)
@@ -400,7 +400,7 @@ TwitchManager.unregister_vote = function (self, vote_key)
 		if not self._current_vote or self._current_vote.vote_key == vote_key then
 			self._current_vote = nil
 
-			self._activate_next_vote(self)
+			self:_activate_next_vote()
 		end
 	end
 end
@@ -416,7 +416,7 @@ TwitchManager._activate_next_vote = function (self)
 		self._current_vote.activated = true
 		local network_manager = Managers.state.network
 
-		if network_manager and network_manager.is_server and network_manager.game(network_manager) then
+		if network_manager and network_manager.is_server and network_manager:game() then
 			local networked_vote_templates = {}
 
 			for idx, vote_template in ipairs(self._current_vote.vote_templates) do
@@ -433,7 +433,7 @@ TwitchManager._activate_next_vote = function (self)
 				show_vote_ui = self._current_vote.show_vote_ui
 			}
 			local callback = callback(self, "cb_game_session_disconnect")
-			self._game_object_ids[self._current_vote.vote_key] = network_manager.create_game_object(network_manager, "twitch_vote", game_object_data_table, callback)
+			self._game_object_ids[self._current_vote.vote_key] = network_manager:create_game_object("twitch_vote", game_object_data_table, callback)
 		end
 	end
 end
@@ -451,7 +451,7 @@ TwitchManager.on_client_message_received = function (self, vote_key, message_typ
 
 	if not vote_data then
 		Application.error("TwitchManager] Something went wrong. There is no vote with the vote_key: " .. tostring(vote_key))
-		self.unregister_vote(self, vote_key)
+		self:unregister_vote(vote_key)
 
 		return
 	elseif not vote_data.activated then
@@ -486,7 +486,7 @@ TwitchManager.rpc_add_client_twitch_vote = function (self, sender, vote_key, use
 
 	if not vote_data then
 		Application.error("TwitchManager] Something went wrong. There is no vote with the vote_key: " .. tostring(vote_key))
-		self.unregister_vote(self, vote_key)
+		self:unregister_vote(vote_key)
 
 		return
 	elseif not vote_data.activated then
@@ -508,7 +508,7 @@ TwitchManager.rpc_add_client_twitch_vote = function (self, sender, vote_key, use
 		vote_data.options[vote_index] = vote_data.options[vote_index] + 1
 	end
 
-	self._update_game_object(self, vote_key, vote_data)
+	self:_update_game_object(vote_key, vote_data)
 end
 
 TwitchManager.rpc_finish_twitch_vote = function (self, sender, vote_key, user_name, vote_index, vote_template_id)
@@ -521,7 +521,7 @@ TwitchManager.rpc_finish_twitch_vote = function (self, sender, vote_key, user_na
 
 	if not vote_data then
 		Application.error("TwitchManager] Something went wrong. There is no vote with the vote_key: " .. tostring(vote_key))
-		self.unregister_vote(self, vote_key)
+		self:unregister_vote(vote_key)
 
 		return
 	end
@@ -569,7 +569,7 @@ TwitchManager.on_message_received = function (self, vote_key, message_type, user
 
 	if not vote_data then
 		Application.error("TwitchManager] Something went wrong. There is no vote with the vote_key: " .. tostring(vote_key))
-		self.unregister_vote(self, vote_key)
+		self:unregister_vote(vote_key)
 
 		return
 	elseif not vote_data.activated then
@@ -599,7 +599,7 @@ TwitchManager.on_message_received = function (self, vote_key, message_type, user
 		end
 	end
 
-	self._update_game_object(self, vote_key, vote_data)
+	self:_update_game_object(vote_key, vote_data)
 end
 
 TwitchManager.disconnect = function (self)
@@ -618,10 +618,10 @@ TwitchManager.disconnect = function (self)
 end
 
 TwitchManager.update = function (self, dt, t)
-	self._handle_popup(self)
-	self._validate_data(self, dt, t)
-	self._update_vote_data(self, dt, t)
-	self._update_twitch_game_mode(self, dt, t)
+	self:_handle_popup()
+	self:_validate_data(dt, t)
+	self:_update_vote_data(dt, t)
+	self:_update_twitch_game_mode(dt, t)
 end
 
 TwitchManager._handle_popup = function (self)
@@ -654,10 +654,10 @@ TwitchManager._update_vote_data = function (self, dt, t)
 		if current_vote then
 			current_vote.timer = current_vote.timer - dt
 
-			self._update_game_object(self, current_vote.vote_key, current_vote)
+			self:_update_game_object(current_vote.vote_key, current_vote)
 
 			if current_vote.timer <= 0 then
-				self._handle_results(self, current_vote)
+				self:_handle_results(current_vote)
 
 				local cb = current_vote.cb
 
@@ -665,7 +665,7 @@ TwitchManager._update_vote_data = function (self, dt, t)
 					cb(current_vote)
 				end
 
-				self.unregister_vote(self, current_vote.vote_key)
+				self:unregister_vote(current_vote.vote_key)
 			end
 		end
 	else
@@ -699,7 +699,7 @@ TwitchManager._handle_results = function (self, vote_results)
 
 	for i = 1, num_options, 1 do
 		if vote_type == "multiple_choice" then
-			local valid_player_index = self._valid_player_index(self, i)
+			local valid_player_index = self:_valid_player_index(i)
 		else
 			local option = options[i]
 
@@ -738,7 +738,7 @@ TwitchManager._valid_player_index = function (self, index)
 	local players = Managers.player:human_and_bot_players()
 
 	for peer_id, player in pairs(players) do
-		local profile_index = player.profile_index(player)
+		local profile_index = player:profile_index()
 
 		if index == profile_index then
 			return true
@@ -769,7 +769,7 @@ TwitchManager.destroy = function (self)
 		Managers.state.event:trigger("reset_vote_ui")
 	end
 
-	self.disconnect(self)
+	self:disconnect()
 end
 
 TwitchManager.activate_twitch_game_mode = function (self, network_event_delegate, game_mode_key)
@@ -785,14 +785,14 @@ TwitchManager.activate_twitch_game_mode = function (self, network_event_delegate
 
 		self._network_event_delegate = network_event_delegate
 
-		network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+		network_event_delegate:register(self, unpack(RPCS))
 
 		if is_server and self._connected then
 			self._twitch_game_mode = TwitchGameMode:new(self)
 		end
 
-		local lobby = network_manager.lobby(network_manager)
-		self._activated = (lobby.lobby_data(lobby, "twitch_enabled") == "true" and true) or false
+		local lobby = network_manager:lobby()
+		self._activated = (lobby:lobby_data("twitch_enabled") == "true" and true) or false
 
 		if Development.parameter("twitch_debug_voting") then
 			self._activated = true
@@ -810,7 +810,7 @@ TwitchManager.debug_activate_twitch_game_mode = function (self)
 		self._activated = true
 		self._connected = true
 	else
-		self.deactivate_twitch_game_mode(self)
+		self:deactivate_twitch_game_mode()
 	end
 end
 
@@ -838,7 +838,7 @@ TwitchManager._update_twitch_game_mode = function (self, dt, t)
 	self._twitch_game_mode:update(dt, t)
 
 	if Development.parameter("twitch_debug_voting") then
-		self._update_debug_voting(self, dt)
+		self:_update_debug_voting(dt)
 	end
 end
 
@@ -871,7 +871,7 @@ TwitchManager._update_debug_voting = function (self, dt)
 		message_index = debug_messages[debug_result]
 	else
 		local debug_result = math.random(5)
-		local valid_player_index = self._valid_player_index(self, debug_result)
+		local valid_player_index = self:_valid_player_index(debug_result)
 
 		if not valid_player_index then
 			return
@@ -894,7 +894,7 @@ TwitchManager._update_debug_voting = function (self, dt)
 
 	local vote_key = current_vote.vote_key
 
-	self._update_game_object(self, vote_key, current_vote)
+	self:_update_game_object(vote_key, current_vote)
 
 	self._debug_vote_timer = 0.25
 end
@@ -921,15 +921,15 @@ TwitchGameMode.update = function (self, dt, t)
 	local game = Managers.state.network and Managers.state.network:game()
 
 	if game then
-		self._trigger_new_vote(self)
+		self:_trigger_new_vote()
 	end
 end
 
 TwitchGameMode._decide_next_vote_templates = function (self)
 	if math.random(3) % 3 == 0 then
-		return self._next_multiple_choice_vote(self)
+		return self:_next_multiple_choice_vote()
 	else
-		return self._next_standard_vote(self)
+		return self:_next_standard_vote()
 	end
 end
 
@@ -969,7 +969,7 @@ end
 TwitchGameMode._next_standard_vote = function (self)
 	self._selected_templates = self._selected_templates or {}
 	local selected_templates = self._selected_templates
-	local first_vote_info, first_template_name = self._get_first_option(self)
+	local first_vote_info, first_template_name = self:_get_first_option()
 	local first_vote_cost = first_vote_info.cost
 	local first_is_positive = first_vote_cost < 0
 	local sign = math.sign(first_vote_cost)
@@ -999,7 +999,7 @@ TwitchGameMode._next_standard_vote = function (self)
 	if not best_template_name or self._max_diff < best_template_diff then
 		table.clear(selected_templates)
 
-		return self._next_standard_vote(self)
+		return self:_next_standard_vote()
 	else
 		self._funds = self._funds - total_cost
 		selected_templates[best_template_name] = true
@@ -1013,7 +1013,7 @@ TwitchGameMode._next_standard_vote = function (self)
 end
 
 TwitchGameMode._trigger_new_vote = function (self)
-	local vote_type, vote_templates, validation_func = self._decide_next_vote_templates(self)
+	local vote_type, vote_templates, validation_func = self:_decide_next_vote_templates()
 	local time = TwitchSettings.default_vote_time
 	local vote_key = self._parent:register_vote(time, vote_type, validation_func, vote_templates, true, callback(self, "cb_on_vote_complete"))
 	self._vote_keys[vote_key] = true

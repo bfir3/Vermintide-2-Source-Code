@@ -71,9 +71,9 @@ PlayerBot.telemetry_id = function (self)
 end
 
 PlayerBot.career_index = function (self)
-	local hero_name = self.profile_display_name(self)
+	local hero_name = self:profile_display_name()
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
-	local career_index = hero_attributes.get(hero_attributes, hero_name, "career") or 1
+	local career_index = hero_attributes:get(hero_name, "career") or 1
 
 	return career_index
 end
@@ -81,13 +81,13 @@ end
 PlayerBot.spawn = function (self, position, rotation, is_initial_spawn, ammo_melee, ammo_ranged, healthkit, potion, grenade)
 	local profile_index = self._profile_index
 	local profile = SPProfiles[profile_index]
-	local career_index = self.career_index(self)
+	local career_index = self:career_index()
 
 	fassert(profile, "[SpawnManager] Trying to spawn with profile %q that doesn't exist in %q.", profile_index, "SPProfiles")
 
 	local nav_world = Managers.state.entity:system("ai_system"):nav_world()
 	local difficulty_manager = Managers.state.difficulty
-	local difficulty_settings = difficulty_manager.get_difficulty_settings(difficulty_manager)
+	local difficulty_settings = difficulty_manager:get_difficulty_settings()
 	local player_health = difficulty_settings.max_hp
 	local player_wounds = difficulty_settings.wounds
 
@@ -126,7 +126,7 @@ PlayerBot.spawn = function (self, position, rotation, is_initial_spawn, ammo_mel
 		PlayerCharacterStateInHangingCage,
 		PlayerCharacterStateGrabbedByCorruptor
 	}
-	local initial_inventory = self._get_initial_inventory(self, healthkit, potion, grenade)
+	local initial_inventory = self:_get_initial_inventory(healthkit, potion, grenade)
 	local hero_name = profile.display_name
 	local career = profile.careers[career_index]
 	local base_skin = career.base_skin
@@ -261,7 +261,7 @@ PlayerBot.spawn = function (self, position, rotation, is_initial_spawn, ammo_mel
 	if self.is_server then
 		local health_extension = ScriptUnit.extension(unit, "health_system")
 
-		health_extension.create_health_game_object(health_extension)
+		health_extension:create_health_game_object()
 	end
 
 	return unit
@@ -272,8 +272,8 @@ PlayerBot.create_game_object = function (self)
 		ping = 0,
 		player_controlled = false,
 		go_type = NetworkLookup.go_types.player,
-		network_id = self.network_id(self),
-		local_player_id = self.local_player_id(self)
+		network_id = self:network_id(),
+		local_player_id = self:local_player_id()
 	}
 	local callback = callback(self, "cb_game_session_disconnect")
 	local game_object_id = Managers.state.network:create_player_game_object("bot_player", game_object_data_table, callback)

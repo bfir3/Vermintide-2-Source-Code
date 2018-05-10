@@ -17,12 +17,12 @@ ObjectiveSocketUnitExtension.init = function (self, extension_init_context, unit
 	self.num_open_sockets = 0
 	self.num_closed_sockets = 0
 
-	self.setup_sockets(self, unit)
+	self:setup_sockets(unit)
 
 	self.pick_config = Unit.get_data(unit, "pick_config") or "ordered"
 	POSITION_LOOKUP[unit] = Unit.world_position(unit, 0)
 
-	self._handle_optional_slots(self, unit)
+	self:_handle_optional_slots(unit)
 end
 
 ObjectiveSocketUnitExtension._handle_optional_slots = function (self, unit)
@@ -122,9 +122,9 @@ ObjectiveSocketUnitExtension.pick_socket = function (self, unit)
 	local pick_config = self.pick_config
 
 	if pick_config == "ordered" then
-		socket, i = self.pick_socket_ordered(self, self.sockets)
+		socket, i = self:pick_socket_ordered(self.sockets)
 	elseif pick_config == "closest" then
-		socket, i = self.pick_socket_closest(self, self.sockets, unit)
+		socket, i = self:pick_socket_closest(self.sockets, unit)
 	else
 		fassert(false, "[ObjectiveSocketSystem] Unknown pick_config %q in unit %q", pick_config, self.unit)
 	end

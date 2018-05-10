@@ -73,18 +73,18 @@ DamageNumbersUI.init = function (self, ingame_ui_context)
 	local world_manager = Managers.world
 	local viewport_name = "player_1"
 	local world_name = "level_world"
-	local world = world_manager.world(world_manager, world_name)
+	local world = world_manager:world(world_name)
 	local viewport = ScriptWorld.viewport(world, viewport_name)
 	self.camera = ScriptViewport.camera(viewport)
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 	Managers.state.event:register(self, "add_damage_number", "event_add_damage_number")
 end
 
 DamageNumbersUI.update = function (self, dt, viewport_name)
 	self._time = self._time + dt
 
-	self.draw(self, dt)
+	self:draw(dt)
 end
 
 DamageNumbersUI.event_add_damage_number = function (self, damage, size, unit, time, color, is_critical_strike)
@@ -122,7 +122,7 @@ end
 
 DamageNumbersUI.destroy = function (self)
 	for unit, categories in pairs(self._unit_texts) do
-		self._destroy_unit_texts(self, unit)
+		self:_destroy_unit_texts(unit)
 	end
 
 	if Managers.state.event then
@@ -200,7 +200,7 @@ DamageNumbersUI.draw = function (self, dt)
 				end
 			end
 		else
-			self._destroy_unit_texts(self, unit)
+			self:_destroy_unit_texts(unit)
 		end
 	end
 

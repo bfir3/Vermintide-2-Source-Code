@@ -45,7 +45,7 @@ BTCastMissileAction.run = function (self, unit, blackboard, t, dt)
 	if Unit.alive(cast_target_unit) then
 		local status_ext = ScriptUnit.extension(cast_target_unit, "status_system")
 
-		if not status_ext.is_invisible(status_ext) and not status_ext.get_is_dodging(status_ext) then
+		if not status_ext:is_invisible() and not status_ext:get_is_dodging() then
 			blackboard.target_position:store(POSITION_LOOKUP[cast_target_unit])
 		end
 	else
@@ -88,12 +88,12 @@ BTCastMissileAction.run = function (self, unit, blackboard, t, dt)
 			local right = Vector3.cross(target_dir, Vector3.right()) * (1 - 2 * math.random()) * 0.25
 			local target_dir = Vector3.normalize(target_dir + up + right)
 
-			self.launch_magic_missile(self, blackboard, action, throw_pos, target_dir, angle, speed, unit, blackboard.target_unit, nil, missile_data)
+			self:launch_magic_missile(blackboard, action, throw_pos, target_dir, angle, speed, unit, blackboard.target_unit, nil, missile_data)
 		else
 			local angle = missile_data.angle
 			local speed = missile_data.speed
 
-			self.launch_projectile(self, blackboard, action, throw_pos, target_dir, angle, speed, unit, blackboard.target_unit, missile_data)
+			self:launch_projectile(blackboard, action, throw_pos, target_dir, angle, speed, unit, blackboard.target_unit, missile_data)
 		end
 
 		blackboard.spell_count = blackboard.spell_count + 1

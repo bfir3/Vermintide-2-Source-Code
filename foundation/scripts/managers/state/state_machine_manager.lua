@@ -22,7 +22,7 @@ StateMachineManager.update = function (self, dt)
 		end
 
 		if self._gui then
-			self._draw_panel(self)
+			self:_draw_panel()
 		end
 	end
 end
@@ -74,8 +74,8 @@ StateMachineManager._draw_panel = function (self)
 	local width, height = Gui.resolution()
 	local column_margin = 16
 	local text_margin = 4
-	local root_state_machines = self._root_state_machines(self)
-	local column1_width = self._state_machines_column_width(self, root_state_machines) + 2 * text_margin
+	local root_state_machines = self:_root_state_machines()
+	local column1_width = self:_state_machines_column_width(root_state_machines) + 2 * text_margin
 	self._column1_width = math.max(column1_width, self._column1_width)
 
 	Gui.rect(self._gui, Vector2(column_margin, column_margin), Vector2(self._column1_width, height - 2 * column_margin), Color(64, 0, 0, 0))

@@ -23,7 +23,7 @@ MissionSystem.init = function (self, entity_system_creation_context, system_name
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.statistics_db = entity_system_creation_context.statistics_db
 	local network_manager = Managers.state.network
@@ -77,15 +77,15 @@ MissionSystem.load_checkpoint_data = function (self, checkpoint_data)
 		local unit_index = data.unit_index
 		local unit = (unit_index and LevelHelper:unit_by_index(world, unit_index)) or nil
 
-		self.start_mission(self, name, unit)
-		self.end_mission(self, name, true)
+		self:start_mission(name, unit)
+		self:end_mission(name, true)
 	end
 
 	for name, data in pairs(checkpoint_data.active_missions) do
 		local unit_index = data.unit_index
 		local unit = (unit_index and LevelHelper:unit_by_index(world, unit_index)) or nil
 
-		self.start_mission(self, name, unit)
+		self:start_mission(name, unit)
 	end
 end
 
@@ -103,14 +103,14 @@ MissionSystem.update = function (self, context, t)
 
 	for name, data in pairs(active_missions) do
 		if not data.manual_update then
-			self.update_mission(self, name, nil, dt)
+			self:update_mission(name, nil, dt)
 		end
 	end
 
-	self._update_level_progress(self, dt)
+	self:_update_level_progress(dt)
 
 	if script_data.debug_mission_system then
-		self.debug_draw(self, dt)
+		self:debug_draw(dt)
 	end
 end
 
@@ -130,9 +130,9 @@ MissionSystem.request_mission = function (self, mission_name, unit)
 		end
 
 		if level_unit_id then
-			self.start_mission(self, mission_name, unit)
+			self:start_mission(mission_name, unit)
 		else
-			self.start_mission(self, mission_name)
+			self:start_mission(mission_name)
 		end
 
 		local data = self.active_missions[mission_name]
@@ -258,7 +258,7 @@ MissionSystem.update_mission = function (self, mission_name, positive, dt, sync)
 	end
 
 	if done then
-		self.end_mission(self, mission_name, sync)
+		self:end_mission(mission_name, sync)
 	end
 end
 
@@ -270,7 +270,7 @@ MissionSystem.evaluate_level_end_missions = function (self)
 		local completed = template.evaluate_mission(data)
 
 		if completed then
-			self.end_mission(self, mission_name, false)
+			self:end_mission(mission_name, false)
 		end
 	end
 end
@@ -304,7 +304,7 @@ MissionSystem.flow_callback_start_mission = function (self, mission_name, unit)
 		return
 	end
 
-	self.request_mission(self, mission_name, unit)
+	self:request_mission(mission_name, unit)
 end
 
 MissionSystem.flow_callback_update_mission = function (self, mission_name)
@@ -317,7 +317,7 @@ MissionSystem.flow_callback_update_mission = function (self, mission_name)
 	local data = self.active_missions[mission_name]
 
 	fassert(data.manual_update, "MissionSystem:flow_callback_update_mission() Trying to update mission %q from flow", mission_name)
-	self.update_mission(self, mission_name, true, nil, true)
+	self:update_mission(mission_name, true, nil, true)
 end
 
 MissionSystem.flow_callback_end_mission = function (self, mission_name)
@@ -325,20 +325,20 @@ MissionSystem.flow_callback_end_mission = function (self, mission_name)
 		return
 	end
 
-	self.end_mission(self, mission_name, true)
+	self:end_mission(mission_name, true)
 end
 
 MissionSystem.rpc_start_mission = function (self, peer_id, mission_name_id, sync_data)
 	local mission_name = NetworkLookup.mission_names[mission_name_id]
 
-	self.start_mission(self, mission_name, nil, sync_data)
+	self:start_mission(mission_name, nil, sync_data)
 end
 
 MissionSystem.rpc_start_mission_with_unit = function (self, peer_id, mission_name_id, level_unit_id, sync_data)
 	local mission_name = NetworkLookup.mission_names[mission_name_id]
 	local unit = Level.unit_by_index(LevelHelper:current_level(self.world), level_unit_id)
 
-	self.start_mission(self, mission_name, unit, sync_data)
+	self:start_mission(mission_name, unit, sync_data)
 end
 
 MissionSystem.rpc_request_mission = function (self, peer_id, mission_name_id)
@@ -346,7 +346,7 @@ MissionSystem.rpc_request_mission = function (self, peer_id, mission_name_id)
 
 	local mission_name = NetworkLookup.mission_names[mission_name_id]
 
-	self.request_mission(self, mission_name)
+	self:request_mission(mission_name)
 end
 
 MissionSystem.rpc_request_mission_with_unit = function (self, peer_id, mission_name_id, level_unit_id)
@@ -355,7 +355,7 @@ MissionSystem.rpc_request_mission_with_unit = function (self, peer_id, mission_n
 	local mission_name = NetworkLookup.mission_names[mission_name_id]
 	local unit = Level.unit_by_index(LevelHelper:current_level(self.world), level_unit_id)
 
-	self.request_mission(self, mission_name, unit)
+	self:request_mission(mission_name, unit)
 end
 
 MissionSystem.rpc_request_mission_update = function (self, peer_id, mission_name_id, positive)
@@ -367,14 +367,14 @@ MissionSystem.rpc_request_mission_update = function (self, peer_id, mission_name
 		local data = self.active_missions[mission_name]
 
 		fassert(data.manual_update, "[MissionSystem] Requested an update on a mission not using manual updates", mission_name)
-		self.update_mission(self, mission_name, positive, nil, true)
+		self:update_mission(mission_name, positive, nil, true)
 	end
 end
 
 MissionSystem.rpc_end_mission = function (self, peer_id, mission_name_id)
 	local mission_name = NetworkLookup.mission_names[mission_name_id]
 
-	self.end_mission(self, mission_name)
+	self:end_mission(mission_name)
 end
 
 MissionSystem.rpc_update_mission = function (self, peer_id, mission_name_id, sync_data)

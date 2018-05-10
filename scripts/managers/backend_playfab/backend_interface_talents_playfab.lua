@@ -4,7 +4,7 @@ BackendInterfaceTalentsPlayfab.init = function (self, backend_mirror)
 	self._backend_mirror = backend_mirror
 	self._talents = {}
 
-	self._refresh(self)
+	self:_refresh()
 end
 
 BackendInterfaceTalentsPlayfab._refresh = function (self)
@@ -13,7 +13,7 @@ BackendInterfaceTalentsPlayfab._refresh = function (self)
 
 	for career_name, settings in pairs(CareerSettings) do
 		if settings.playfab_name then
-			local talent_string = backend_mirror.get_character_data(backend_mirror, career_name, "talents")
+			local talent_string = backend_mirror:get_character_data(career_name, "talents")
 			local career_talents = string.split(talent_string, ",")
 
 			for i = 1, #career_talents, 1 do
@@ -59,7 +59,7 @@ end
 
 BackendInterfaceTalentsPlayfab.get_talents = function (self, career_name)
 	if self._dirty then
-		self._refresh(self)
+		self:_refresh()
 	end
 
 	local talents = self._talents[career_name]

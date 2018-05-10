@@ -61,20 +61,20 @@ MissionVotingUI.init = function (self, ingame_ui_context)
 	}
 	self.platform = PLATFORM
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 	rawset(_G, "ingame_voting_ui", self)
 
 	self.unblocked_services = {}
 	self.unblocked_services_n = 0
 	local input_manager = self.input_manager
 
-	input_manager.create_input_service(input_manager, "mission_voting", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "mission_voting", "keyboard")
-	input_manager.map_device_to_service(input_manager, "mission_voting", "mouse")
-	input_manager.map_device_to_service(input_manager, "mission_voting", "gamepad")
+	input_manager:create_input_service("mission_voting", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("mission_voting", "keyboard")
+	input_manager:map_device_to_service("mission_voting", "mouse")
+	input_manager:map_device_to_service("mission_voting", "gamepad")
 end
 
 MissionVotingUI.create_ui_elements = function (self)
@@ -138,7 +138,7 @@ end
 
 MissionVotingUI.destroy = function (self)
 	if self.vote_started then
-		self.on_vote_ended(self)
+		self:on_vote_ended()
 	end
 
 	rawset(_G, "ingame_voting_ui", nil)
@@ -161,7 +161,7 @@ MissionVotingUI.setup_option_input = function (self, option_widget, option)
 	local text = option.text
 	local input_action = option.input
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "mission_voting")
+	local input_service = input_manager:get_service("mission_voting")
 	local gamepad_active = false
 	local button_texture_data, input_text = UISettings.get_gamepad_input_texture_data(input_service, input_action, gamepad_active)
 
@@ -198,14 +198,14 @@ MissionVotingUI.start_vote = function (self, active_voting)
 		local level_key = vote_data.level_key
 		local difficulty = vote_data.difficulty
 
-		self._set_deed_presentation(self, item_name, level_key, difficulty)
+		self:_set_deed_presentation(item_name, level_key, difficulty)
 	else
 		local quick_game = vote_data.quick_game
 
 		if quick_game then
 			local difficulty = vote_data.difficulty
 
-			self._set_adventure_presentation(self, difficulty)
+			self:_set_adventure_presentation(difficulty)
 		else
 			local level_key = vote_data.level_key
 			local difficulty = vote_data.difficulty
@@ -213,7 +213,7 @@ MissionVotingUI.start_vote = function (self, active_voting)
 			local always_host = vote_data.always_host
 			local strict_matchmaking = vote_data.strict_matchmaking
 
-			self._set_custom_game_presentation(self, difficulty, level_key, private_game, always_host, strict_matchmaking)
+			self:_set_custom_game_presentation(difficulty, level_key, private_game, always_host, strict_matchmaking)
 		end
 	end
 
@@ -236,12 +236,12 @@ MissionVotingUI.start_vote = function (self, active_voting)
 	local gamepad_active = self.input_manager:is_device_active("gamepad")
 	local vote_options = vote_template.vote_options
 
-	self.setup_option_input(self, widgets_by_name.button_confirm, vote_options[1])
-	self.setup_option_input(self, widgets_by_name.button_abort, vote_options[2])
+	self:setup_option_input(widgets_by_name.button_confirm, vote_options[1])
+	self:setup_option_input(widgets_by_name.button_abort, vote_options[2])
 
 	self.gamepad_active = self.input_manager:is_device_active("gamepad")
 
-	self.acquire_input(self)
+	self:acquire_input()
 
 	local world = self.ui_renderer.world
 	local shading_env = World.get_data(world, "shading_environment")
@@ -252,14 +252,14 @@ MissionVotingUI.start_vote = function (self, active_voting)
 		ShadingEnvironment.apply(shading_env)
 	end
 
-	self._check_initial_votes(self)
+	self:_check_initial_votes()
 end
 
 MissionVotingUI._check_initial_votes = function (self)
 	local has_voted = self.voting_manager:has_voted(Network.peer_id())
 
 	if has_voted then
-		self.on_vote_casted(self)
+		self:on_vote_casted()
 	end
 end
 
@@ -267,7 +267,7 @@ MissionVotingUI.on_vote_casted = function (self)
 	self.has_voted = true
 
 	self.voting_manager:allow_vote_input(false)
-	self.release_input(self)
+	self:release_input()
 
 	local world = self.ui_renderer.world
 	local shading_env = World.get_data(world, "shading_environment")
@@ -282,7 +282,7 @@ end
 MissionVotingUI.on_vote_ended = function (self)
 	if not self.has_voted then
 		self.voting_manager:allow_vote_input(false)
-		self.release_input(self)
+		self:release_input()
 
 		local world = self.ui_renderer.world
 		local shading_env = World.get_data(world, "shading_environment")
@@ -296,8 +296,8 @@ MissionVotingUI.on_vote_ended = function (self)
 
 	local ingame_ui = self.ingame_ui
 
-	if ingame_ui.is_local_player_ready_for_game(ingame_ui) then
-		ingame_ui.suspend_active_view(ingame_ui)
+	if ingame_ui:is_local_player_ready_for_game() then
+		ingame_ui:suspend_active_view()
 	end
 
 	self.has_voted = nil
@@ -339,7 +339,7 @@ MissionVotingUI._set_custom_game_presentation = function (self, difficulty, leve
 	local level_display_name = level_settings.display_name
 	local level_image = level_settings.level_image
 	local completed_difficulty_index = LevelUnlockUtils.completed_level_difficulty_index(self.statistics_db, self._stats_id, level_key) or 0
-	local level_frame = self._get_selection_frame_by_difficulty_index(self, completed_difficulty_index)
+	local level_frame = self:_get_selection_frame_by_difficulty_index(completed_difficulty_index)
 	local custom_game_widgets_by_name = self._custom_game_widgets_by_name
 	local game_option_1 = custom_game_widgets_by_name.game_option_1
 	game_option_1.content.option_text = Localize(level_display_name)
@@ -391,12 +391,12 @@ end
 
 MissionVotingUI.update_vote_timer = function (self)
 	local voting_manager = self.voting_manager
-	local vote_template = voting_manager.active_vote_template(voting_manager)
+	local vote_template = voting_manager:active_vote_template()
 	local duration = vote_template.duration
-	local vote_time_left = voting_manager.vote_time_left(voting_manager)
+	local vote_time_left = voting_manager:vote_time_left()
 	local time_progress = math.max(vote_time_left / duration, 0)
 
-	self._set_vote_time_progress(self, time_progress)
+	self:_set_vote_time_progress(time_progress)
 end
 
 MissionVotingUI._set_vote_time_progress = function (self, progress)
@@ -436,20 +436,20 @@ MissionVotingUI.update = function (self, menu_active, dt, t)
 	self.menu_active = menu_active
 
 	if RELOAD_UI then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	local voting_manager = self.voting_manager
-	local active_vote_name = voting_manager.vote_in_progress(voting_manager)
+	local active_vote_name = voting_manager:vote_in_progress()
 	local is_mission_vote = active_vote_name == "game_settings_vote" or active_vote_name == "game_settings_deed_vote"
 
 	if is_mission_vote then
 		if not menu_active then
 			if not self.vote_started then
-				self.start_vote(self, voting_manager.active_voting)
+				self:start_vote(voting_manager.active_voting)
 			end
 
-			self.update_vote_timer(self)
+			self:update_vote_timer()
 			UIWidgetUtils.animate_default_button(widgets_by_name.button_abort, dt)
 
 			if not self.has_voted then
@@ -459,12 +459,12 @@ MissionVotingUI.update = function (self, menu_active, dt, t)
 				if vote_template then
 					local vote_options = vote_template.vote_options
 
-					if self._is_button_pressed(self, widgets_by_name.button_confirm) then
-						voting_manager.vote(voting_manager, 1)
-						self.on_vote_casted(self)
-					elseif self._is_button_pressed(self, widgets_by_name.button_abort) then
-						voting_manager.vote(voting_manager, 2)
-						self.on_vote_casted(self)
+					if self:_is_button_pressed(widgets_by_name.button_confirm) then
+						voting_manager:vote(1)
+						self:on_vote_casted()
+					elseif self:_is_button_pressed(widgets_by_name.button_abort) then
+						voting_manager:vote(2)
+						self:on_vote_casted()
 					end
 				end
 
@@ -473,22 +473,22 @@ MissionVotingUI.update = function (self, menu_active, dt, t)
 				if self.gamepad_active ~= gamepad_active and vote_template then
 					local vote_options = vote_template.vote_options
 
-					self.setup_option_input(self, widgets_by_name.button_confirm, vote_options[1])
-					self.setup_option_input(self, widgets_by_name.button_abort, vote_options[2])
+					self:setup_option_input(widgets_by_name.button_confirm, vote_options[1])
+					self:setup_option_input(widgets_by_name.button_abort, vote_options[2])
 
 					self.gamepad_active = gamepad_active
 				end
 			end
 		end
 	elseif self.vote_started then
-		self.on_vote_ended(self)
+		self:on_vote_ended()
 	end
 
 	if self.vote_started and not self.has_voted then
 		local input_manager = self.input_manager
-		local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+		local gamepad_active = input_manager:is_device_active("gamepad")
 
-		self.draw(self, dt)
+		self:draw(dt)
 	end
 end
 
@@ -500,7 +500,7 @@ MissionVotingUI.draw = function (self, dt)
 	local input_service = self.input_manager:get_service("mission_voting")
 	local gamepad_active = self.input_manager:is_device_active("gamepad")
 
-	self.update_pulse_animations(self, dt)
+	self:update_pulse_animations(dt)
 
 	local alpha_multiplier = render_settings.alpha_multiplier
 	alpha_multiplier = 1
@@ -587,16 +587,16 @@ end
 MissionVotingUI.acquire_input = function (self, ignore_cursor_stack)
 	local input_manager = self.input_manager
 
-	self.release_input(self, true)
+	self:release_input(true)
 
-	self.unblocked_services_n = input_manager.get_unblocked_services(input_manager, nil, nil, self.unblocked_services)
+	self.unblocked_services_n = input_manager:get_unblocked_services(nil, nil, self.unblocked_services)
 
-	input_manager.device_block_services(input_manager, "keyboard", 1, self.unblocked_services, self.unblocked_services_n, "mission_voting")
-	input_manager.device_block_services(input_manager, "gamepad", 1, self.unblocked_services, self.unblocked_services_n, "mission_voting")
-	input_manager.device_block_services(input_manager, "mouse", 1, self.unblocked_services, self.unblocked_services_n, "mission_voting")
-	input_manager.device_unblock_service(input_manager, "keyboard", 1, "mission_voting")
-	input_manager.device_unblock_service(input_manager, "gamepad", 1, "mission_voting")
-	input_manager.device_unblock_service(input_manager, "mouse", 1, "mission_voting")
+	input_manager:device_block_services("keyboard", 1, self.unblocked_services, self.unblocked_services_n, "mission_voting")
+	input_manager:device_block_services("gamepad", 1, self.unblocked_services, self.unblocked_services_n, "mission_voting")
+	input_manager:device_block_services("mouse", 1, self.unblocked_services, self.unblocked_services_n, "mission_voting")
+	input_manager:device_unblock_service("keyboard", 1, "mission_voting")
+	input_manager:device_unblock_service("gamepad", 1, "mission_voting")
+	input_manager:device_unblock_service("mouse", 1, "mission_voting")
 
 	if not ignore_cursor_stack then
 		ShowCursorStack.push()
@@ -606,12 +606,12 @@ end
 MissionVotingUI.release_input = function (self, ignore_cursor_stack)
 	local input_manager = self.input_manager
 
-	input_manager.device_block_service(input_manager, "keyboard", 1, "mission_voting")
-	input_manager.device_block_service(input_manager, "gamepad", 1, "mission_voting")
-	input_manager.device_block_service(input_manager, "mouse", 1, "mission_voting")
-	input_manager.device_unblock_services(input_manager, "keyboard", 1, self.unblocked_services, self.unblocked_services_n)
-	input_manager.device_unblock_services(input_manager, "gamepad", 1, self.unblocked_services, self.unblocked_services_n)
-	input_manager.device_unblock_services(input_manager, "mouse", 1, self.unblocked_services, self.unblocked_services_n)
+	input_manager:device_block_service("keyboard", 1, "mission_voting")
+	input_manager:device_block_service("gamepad", 1, "mission_voting")
+	input_manager:device_block_service("mouse", 1, "mission_voting")
+	input_manager:device_unblock_services("keyboard", 1, self.unblocked_services, self.unblocked_services_n)
+	input_manager:device_unblock_services("gamepad", 1, self.unblocked_services, self.unblocked_services_n)
+	input_manager:device_unblock_services("mouse", 1, self.unblocked_services, self.unblocked_services_n)
 	table.clear(self.unblocked_services)
 
 	self.unblocked_services_n = 0
@@ -624,7 +624,7 @@ end
 MissionVotingUI.active_input_service = function (self)
 	local input_manager = self.input_manager
 	local service_name = "mission_voting"
-	local input_service = input_manager.get_service(input_manager, service_name)
+	local input_service = input_manager:get_service(service_name)
 
 	return input_service
 end

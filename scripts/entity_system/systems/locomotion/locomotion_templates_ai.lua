@@ -301,7 +301,7 @@ LocomotionTemplates.AILocomotionExtension = {
 				local blackboard = ai_extension._blackboard
 				data.all_update_units[unit] = nil
 
-				conflict_director.destroy_unit(conflict_director, unit, blackboard, "out_of_range")
+				conflict_director:destroy_unit(unit, blackboard, "out_of_range")
 			end
 		end
 	end,
@@ -325,7 +325,7 @@ LocomotionTemplates.AILocomotionExtension = {
 		local vel_max_v3 = Vector3(vel_max, vel_max, vel_max)
 
 		for unit, extension in pairs(data.all_update_units) do
-			local go_id = unit_storage.go_id(unit_storage, unit)
+			local go_id = unit_storage:go_id(unit)
 			local pos = Unit_local_position(unit, 0)
 			local rot = Unit_local_rotation(unit, 0)
 			local yaw = Quaternion.yaw(rot)

@@ -21,7 +21,7 @@ local extensions = {
 ProximitySystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self.world = context.world
 	self.physics_world = World.get_data(context.world, "physics_world")
@@ -116,7 +116,7 @@ ProximitySystem.on_add_extension = function (self, world, unit, extension_name)
 end
 
 ProximitySystem.on_remove_extension = function (self, unit, extension_name)
-	self.on_freeze_extension(self, unit, extension_name)
+	self:on_freeze_extension(unit, extension_name)
 	ScriptUnit.remove_extension(unit, "proximity_system")
 end
 
@@ -197,11 +197,11 @@ ProximitySystem.update = function (self, context, t)
 	local unit_forwards = self.unit_forwards
 	local Unit_world_forward = unit_world_forward
 	local network_manager = Managers.state.network
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 
 	if game and not LEVEL_EDITOR_TEST then
 		for unit, extension in pairs(player_unit_extensions_map) do
-			local game_object_id = network_manager.unit_game_object_id(network_manager, unit)
+			local game_object_id = network_manager:unit_game_object_id(unit)
 			local my_direction = GameSession.game_object_field(game, game_object_id, "aim_direction")
 			unit_forwards[unit] = my_direction
 		end
@@ -295,7 +295,7 @@ ProximitySystem.physics_async_update = function (self, context, t)
 					end
 				end
 
-				dialogue_input.trigger_dialogue_event(dialogue_input, proximity_type, event_data)
+				dialogue_input:trigger_dialogue_event(proximity_type, event_data)
 			end
 
 			table.clear(nearby_units)
@@ -338,7 +338,7 @@ ProximitySystem.physics_async_update = function (self, context, t)
 							event_data.distance = Vector3.distance(nearby_unit_pos_flat, my_pos_flat)
 							event_data.height_distance = position.z - nearby_unit_pos.z
 
-							dialogue_input.trigger_dialogue_event(dialogue_input, "heard_enemy", event_data)
+							dialogue_input:trigger_dialogue_event("heard_enemy", event_data)
 
 							heard = true
 						end
@@ -375,8 +375,8 @@ ProximitySystem.physics_async_update = function (self, context, t)
 		unit_forwards[unit] = nil
 	end
 
-	self._update_nearby_boss(self)
-	self._update_nearby_enemies(self)
+	self:_update_nearby_boss()
+	self:_update_nearby_enemies()
 end
 
 local MAX_ALLOWED_FX = 10
@@ -481,7 +481,7 @@ ProximitySystem._update_nearby_enemies = function (self)
 
 	for _, player in pairs(local_players) do
 		if not player.bot_player then
-			player_pos = camera_manager.camera_position(camera_manager, player.viewport_name)
+			player_pos = camera_manager:camera_position(player.viewport_name)
 			num_players = num_players + 1
 		end
 	end
@@ -561,8 +561,8 @@ ProximitySystem._update_nearby_enemies = function (self)
 				end
 			end
 
-			self._clear_old_enabled_fx(self, old_enabled_fx)
-			self._nearby_enemies_debug(self, list, new_nearby, new_enabled_fx)
+			self:_clear_old_enabled_fx(old_enabled_fx)
+			self:_nearby_enemies_debug(list, new_nearby, new_enabled_fx)
 
 			self._old_enabled_fx = new_enabled_fx
 			self._new_enabled_fx = old_enabled_fx
@@ -627,7 +627,7 @@ ProximitySystem.post_update = function (self, context, t)
 
 		if Unit_alive(unit) and Unit_alive(nearby_unit) then
 			local nearby_unit_pos = POSITION_LOOKUP[nearby_unit] or Unit.world_position(nearby_unit, 0)
-			local did_hit = not darkness_system.is_in_darkness(darkness_system, nearby_unit_pos) and check_raycast_center(physics_world, unit, nearby_unit)
+			local did_hit = not darkness_system:is_in_darkness(nearby_unit_pos) and check_raycast_center(physics_world, unit, nearby_unit)
 
 			if did_hit then
 				local nearby_unit_pos_flat = Vector3.flat(nearby_unit_pos)
@@ -645,7 +645,7 @@ ProximitySystem.post_update = function (self, context, t)
 				local proximity_ext = ScriptUnit.extension(nearby_unit, "proximity_system")
 				proximity_ext.has_been_seen = true
 
-				dialogue_input.trigger_dialogue_event(dialogue_input, "seen_enemy", event_data)
+				dialogue_input:trigger_dialogue_event("seen_enemy", event_data)
 			end
 		end
 	end

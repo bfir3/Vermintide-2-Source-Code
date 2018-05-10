@@ -14,7 +14,7 @@ ProjectilePhysicsUnitLocomotionExtension.init = function (self, extension_init_c
 	self.stopped = false
 	self.dropped = false
 	local network_manager = Managers.state.network
-	self.game = network_manager.game(network_manager)
+	self.game = network_manager:game()
 	self.network_manager = network_manager
 	local position = AiAnimUtils.position_network_scale(self.network_position)
 	local rotation = AiAnimUtils.rotation_network_scale(self.network_rotation)
@@ -53,8 +53,8 @@ ProjectilePhysicsUnitLocomotionExtension.update = function (self, unit, input, d
 
 	if script_data.debug_projectiles then
 		local network_manager = self.network_manager
-		local go_id = network_manager.unit_game_object_id(network_manager, unit)
-		local game = network_manager.game(network_manager)
+		local go_id = network_manager:unit_game_object_id(unit)
+		local game = network_manager:game()
 
 		GameSession.set_game_object_field(game, go_id, "debug_pos", Unit.local_position(unit, 0))
 	end
@@ -74,7 +74,7 @@ ProjectilePhysicsUnitLocomotionExtension.update = function (self, unit, input, d
 	self.stop_time = stop_time
 
 	if STOP_TIME_THRESHOLD <= stop_time then
-		self.stop(self)
+		self:stop()
 	end
 end
 
@@ -93,7 +93,7 @@ ProjectilePhysicsUnitLocomotionExtension.stop = function (self)
 	Actor.put_to_sleep(self.physics_actor)
 
 	local network_manager = self.network_manager
-	local go_id = network_manager.unit_game_object_id(network_manager, self.unit)
+	local go_id = network_manager:unit_game_object_id(self.unit)
 
 	network_manager.network_transmit:send_rpc_clients("rpc_projectile_stopped", go_id)
 end
@@ -104,7 +104,7 @@ ProjectilePhysicsUnitLocomotionExtension.drop = function (self)
 	Actor.set_velocity(self.physics_actor, Vector3(0, 0, 0))
 
 	local network_manager = self.network_manager
-	local go_id = network_manager.unit_game_object_id(network_manager, self.unit)
+	local go_id = network_manager:unit_game_object_id(self.unit)
 
 	network_manager.network_transmit:send_rpc_clients("rpc_drop_projectile", go_id)
 end

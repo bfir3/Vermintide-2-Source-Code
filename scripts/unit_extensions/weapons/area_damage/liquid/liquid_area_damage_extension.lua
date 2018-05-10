@@ -11,19 +11,19 @@ end
 
 LiquidAreaDamageExtension.init = function (self, extension_init_context, unit, extension_init_data)
 	local entity_manager = extension_init_context.entity_manager
-	local ai_system = entity_manager.system(entity_manager, "ai_system")
+	local ai_system = entity_manager:system("ai_system")
 	local world = extension_init_context.world
 	self._world = world
 	self._unit = unit
 	self._network_transmit = extension_init_context.network_transmit
 	self._ai_system = ai_system
-	self._nav_world = ai_system.nav_world(ai_system)
-	self._audio_system = entity_manager.system(entity_manager, "audio_system")
+	self._nav_world = ai_system:nav_world()
+	self._audio_system = entity_manager:system("audio_system")
 	local template_name = extension_init_data.liquid_template
 	local template = LiquidAreaDamageTemplates.templates[template_name]
 	self._liquid_area_damage_template = template_name
 	local max_liquid = extension_init_data.max_liquid or template.max_liquid or 50
-	local position = self._find_point(self, Unit.world_position(unit, 0))
+	local position = self:_find_point(Unit.world_position(unit, 0))
 	local cell_size = template.cell_size
 	local xy_extents = math.min(max_liquid + 10, 50)
 	self._grid = HexGrid:new(position, xy_extents, 10, cell_size, 1)
@@ -31,7 +31,7 @@ LiquidAreaDamageExtension.init = function (self, extension_init_context, unit, e
 	self._next_pulse = t
 	self._time_to_remove = t + template.time_of_life
 	self._spread_function = LiquidAreaDamageTemplates[template.liquid_spread_function]
-	local buff_system = entity_manager.system(entity_manager, "buff_system")
+	local buff_system = entity_manager:system("buff_system")
 	self._buff_system = buff_system
 	self._flow = {}
 	self._active_flow = {}
@@ -80,7 +80,7 @@ LiquidAreaDamageExtension.init = function (self, extension_init_context, unit, e
 		local nav_cost_map_cost_type = template.nav_cost_map_cost_type
 		local num_volumes_guess = self._max_liquid
 		self._nav_cost_map_cost_type = nav_cost_map_cost_type
-		self._nav_cost_map_id = ai_system.create_nav_cost_map(ai_system, nav_cost_map_cost_type, num_volumes_guess)
+		self._nav_cost_map_id = ai_system:create_nav_cost_map(nav_cost_map_cost_type, num_volumes_guess)
 	end
 
 	local init_function = template.init_function
@@ -111,24 +111,24 @@ LiquidAreaDamageExtension.ready = function (self)
 	self._unit_id = Managers.state.unit_storage:go_id(unit)
 	local position = Unit.local_position(unit, 0)
 	local grid = self._grid
-	local i, j, k = grid.find_index(grid, position)
+	local i, j, k = grid:find_index(position)
 
 	debug_print("CREATING LIQUID AT: ", i, j, k)
 
-	local real_index = grid.real_index(grid, i, j, k)
-	local i1, j1, k1 = grid.ijk(grid, real_index)
+	local real_index = grid:real_index(i, j, k)
+	local i1, j1, k1 = grid:ijk(real_index)
 
 	fassert(i1 == i and j1 == j and k1 == k, "FAIL, %i:%i %i:%i %i:%i", i, i1, j, j1, k, k1)
 
-	local test_pos = grid.find_position(grid, i, j, k)
+	local test_pos = grid:find_position(i, j, k)
 	local test_dist_sq = Vector3.distance_squared(position, test_pos)
 
 	fassert(test_dist_sq < 1, "FAIL test_pos %s and pos %s too far apart %q", tostring(test_pos), tostring(position), test_dist_sq)
 
 	local starting_angle = self._starting_flow_angle
 
-	self._create_liquid(self, real_index, starting_angle)
-	self._set_active(self, real_index)
+	self:_create_liquid(real_index, starting_angle)
+	self:_set_active(real_index)
 
 	local flow_dir = self._flow_dir
 	self._damage_direction = flow_dir
@@ -156,7 +156,7 @@ LiquidAreaDamageExtension._set_active = function (self, real_index)
 
 	local network_transmit = self._network_transmit
 
-	network_transmit.send_rpc_clients(network_transmit, "rpc_update_liquid_damage_blob", self._unit_id, real_index, NetworkLookup.liquid_damage_blob_states.filled)
+	network_transmit:send_rpc_clients("rpc_update_liquid_damage_blob", self._unit_id, real_index, NetworkLookup.liquid_damage_blob_states.filled)
 
 	self._active_flow[real_index] = liquid
 	self._inactive_flow[real_index] = nil
@@ -165,7 +165,7 @@ LiquidAreaDamageExtension._set_active = function (self, real_index)
 	if self._use_nav_cost_map_volumes then
 		local ai_system = self._ai_system
 		local cost_map_id = self._nav_cost_map_id
-		local nav_cost_map_volume_id = ai_system.add_nav_cost_map_sphere_volume(ai_system, position, self._cell_radius, cost_map_id)
+		local nav_cost_map_volume_id = ai_system:add_nav_cost_map_sphere_volume(position, self._cell_radius, cost_map_id)
 		liquid.nav_cost_map_volume_id = nav_cost_map_volume_id
 	end
 
@@ -173,7 +173,7 @@ LiquidAreaDamageExtension._set_active = function (self, real_index)
 		local already_exists = flow[index]
 
 		if not already_exists then
-			self._create_liquid(self, index, liquid.angle)
+			self:_create_liquid(index, liquid.angle)
 		end
 	end
 end
@@ -192,10 +192,10 @@ end
 
 LiquidAreaDamageExtension._create_liquid = function (self, real_index, angle)
 	local grid = self._grid
-	local i, j, k = grid.ijk(grid, real_index)
-	local position = grid.find_position(grid, i, j, k)
+	local i, j, k = grid:ijk(real_index)
+	local position = grid:find_position(i, j, k)
 	local nav_world = self._nav_world
-	local dirs = grid.directions(grid)
+	local dirs = grid:directions()
 	local success, z, vertex_1, vertex_2, vertex_3 = GwNavQueries.triangle_from_position(nav_world, position, 2, 2)
 	local from, rotation = nil
 
@@ -217,11 +217,11 @@ LiquidAreaDamageExtension._create_liquid = function (self, real_index, angle)
 		local new_i = i + dir[1]
 		local new_j = j + dir[2]
 		local new_k = k
-		local point = grid.find_position(grid, new_i, new_j, new_k)
-		local to = self._find_point(self, point)
+		local point = grid:find_position(new_i, new_j, new_k)
+		local to = self:_find_point(point)
 
 		if to and GwNavQueries.raycango(nav_world, from, to) then
-			local neighbour_real_index = grid.real_index(grid, grid.find_index(grid, to))
+			local neighbour_real_index = grid:real_index(grid:find_index(to))
 			neighbours[index] = neighbour_real_index
 		end
 	end
@@ -236,7 +236,7 @@ LiquidAreaDamageExtension._create_liquid = function (self, real_index, angle)
 	local is_filled = false
 	local network_transmit = self._network_transmit
 
-	network_transmit.send_rpc_clients(network_transmit, "rpc_add_liquid_damage_blob", self._unit_id, real_index, from, is_filled)
+	network_transmit:send_rpc_clients("rpc_add_liquid_damage_blob", self._unit_id, real_index, from, is_filled)
 
 	local liquid = {
 		full = false,
@@ -278,7 +278,7 @@ LiquidAreaDamageExtension.destroy = function (self)
 		if Unit.alive(unit) then
 			local buff_system = self._buff_system
 
-			buff_system.remove_server_controlled_buff(buff_system, unit, server_buff_id)
+			buff_system:remove_server_controlled_buff(unit, server_buff_id)
 		end
 
 		self._buff_affected_units[unit] = nil
@@ -309,15 +309,15 @@ LiquidAreaDamageExtension.destroy = function (self)
 			local volume_id = liquid.nav_cost_map_volume_id
 
 			if volume_id then
-				ai_system.remove_nav_cost_map_volume(ai_system, volume_id, cost_map_id)
+				ai_system:remove_nav_cost_map_volume(volume_id, cost_map_id)
 			end
 		end
 
-		ai_system.destroy_nav_cost_map(ai_system, cost_map_id)
+		ai_system:destroy_nav_cost_map(cost_map_id)
 	end
 
 	table.clear(self._affected_player_units)
-	self.stop_fx(self)
+	self:stop_fx()
 end
 
 local remove_list = {}
@@ -460,7 +460,7 @@ LiquidAreaDamageExtension.update = function (self, unit, input, dt, context, t)
 		end
 
 		for real_index, _ in pairs(add_list) do
-			self._set_active(self, real_index)
+			self:_set_active(real_index)
 
 			if self._num_liquid == self._max_liquid then
 				self._done = true
@@ -470,18 +470,18 @@ LiquidAreaDamageExtension.update = function (self, unit, input, dt, context, t)
 		end
 	end
 
-	self._update_collision_detection(self, dt, t)
+	self:_update_collision_detection(dt, t)
 
 	while self._next_pulse < t do
 		self._next_pulse = self._next_pulse + 0.75
 
-		self._pulse_damage(self)
+		self:_pulse_damage()
 	end
 
 	local liquid_update_function = self._liquid_update_function
 
 	if liquid_update_function then
-		local result = self._liquid_update_function(self, t, dt)
+		local result = self:_liquid_update_function(t, dt)
 
 		if not result then
 			self._liquid_update_function = nil
@@ -500,12 +500,12 @@ LiquidAreaDamageExtension._add_buff_helper_function = function (self, unit, liqu
 
 	if self._buff_affected_units[unit] == nil then
 		if is_condition_fulfilled then
-			self._buff_affected_units[unit] = buff_system.add_buff(buff_system, unit, buff_name, liquid_unit, true)
+			self._buff_affected_units[unit] = buff_system:add_buff(unit, buff_name, liquid_unit, true)
 		end
 	elseif not is_condition_fulfilled then
 		local server_buff_id = self._buff_affected_units[unit]
 
-		buff_system.remove_server_controlled_buff(buff_system, unit, server_buff_id)
+		buff_system:remove_server_controlled_buff(unit, server_buff_id)
 
 		self._buff_affected_units[unit] = nil
 	end
@@ -532,7 +532,7 @@ LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 			local unit = PLAYER_AND_BOT_UNITS[i]
 			local status_extension = ScriptUnit.extension(unit, "status_system")
 
-			if self._is_unit_colliding(self, grid, unit) then
+			if self:_is_unit_colliding(grid, unit) then
 				self._colliding_units[unit] = 4
 
 				if status_extension.in_liquid_unit ~= liquid_unit then
@@ -547,8 +547,8 @@ LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 
 				local buff_extension = ScriptUnit.extension(unit, "buff_system")
 
-				if buff_name and apply_buff_to_player and not buff_extension.has_buff_type(buff_extension, buff_template_type) then
-					self._add_buff_helper_function(self, unit, liquid_unit, buff_name, buff_condition, buff_system)
+				if buff_name and apply_buff_to_player and not buff_extension:has_buff_type(buff_template_type) then
+					self:_add_buff_helper_function(unit, liquid_unit, buff_name, buff_condition, buff_system)
 				end
 			else
 				self._colliding_units[unit] = nil
@@ -560,7 +560,7 @@ LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 				if buff_name and self._buff_affected_units[unit] then
 					local server_buff_id = self._buff_affected_units[unit]
 
-					buff_system.remove_server_controlled_buff(buff_system, unit, server_buff_id)
+					buff_system:remove_server_controlled_buff(unit, server_buff_id)
 
 					self._buff_affected_units[unit] = nil
 				end
@@ -585,12 +585,12 @@ LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 		local breed = blackboard.breed
 
 		if breed and not immune_breeds[breed.name] then
-			if self._is_unit_colliding(self, grid, unit) then
+			if self:_is_unit_colliding(grid, unit) then
 				self._colliding_units[unit] = breed.armor_category or 1
 				local buff_extension = ScriptUnit.has_extension(unit, "buff_system")
 
-				if buff_name and apply_buff_to_ai and buff_extension and not buff_extension.has_buff_type(buff_extension, buff_template_type) then
-					self._add_buff_helper_function(self, unit, liquid_unit, buff_name, buff_condition, buff_system)
+				if buff_name and apply_buff_to_ai and buff_extension and not buff_extension:has_buff_type(buff_template_type) then
+					self:_add_buff_helper_function(unit, liquid_unit, buff_name, buff_condition, buff_system)
 				end
 			else
 				self._colliding_units[unit] = nil
@@ -598,7 +598,7 @@ LiquidAreaDamageExtension._update_collision_detection = function (self, dt, t)
 				if buff_name and self._buff_affected_units[unit] then
 					local server_buff_id = self._buff_affected_units[unit]
 
-					buff_system.remove_server_controlled_buff(buff_system, unit, server_buff_id)
+					buff_system:remove_server_controlled_buff(unit, server_buff_id)
 
 					self._buff_affected_units[unit] = nil
 				end
@@ -621,13 +621,13 @@ LiquidAreaDamageExtension._is_unit_colliding = function (self, grid, unit)
 
 	if unit_pos then
 		for i = 0, 1, 1 do
-			local i, j, k = grid.find_index(grid, unit_pos + i * Vector3.up())
+			local i, j, k = grid:find_index(unit_pos + i * Vector3.up())
 
-			if grid.is_out_of_bounds(grid, i, j, k) then
+			if grid:is_out_of_bounds(i, j, k) then
 				break
 			end
 
-			local real_index = grid.real_index(grid, i, j, k)
+			local real_index = grid:real_index(i, j, k)
 			local liquid = self._flow[real_index]
 
 			if liquid then
@@ -667,7 +667,7 @@ LiquidAreaDamageExtension._pulse_damage = function (self)
 				if damage_buff_template_name then
 					local buff_extension = ScriptUnit.extension(unit, "buff_system")
 
-					buff_extension.add_buff(buff_extension, damage_buff_template_name, buff_params)
+					buff_extension:add_buff(damage_buff_template_name, buff_params)
 				end
 			end
 		else
@@ -689,9 +689,9 @@ end
 
 LiquidAreaDamageExtension.is_position_inside = function (self, position, nav_cost_map_table)
 	local grid = self._grid
-	local i, j, k = grid.find_index(grid, position)
+	local i, j, k = grid:find_index(position)
 
-	if grid.is_out_of_bounds(grid, i, j, k) then
+	if grid:is_out_of_bounds(i, j, k) then
 		return false
 	end
 
@@ -701,7 +701,7 @@ LiquidAreaDamageExtension.is_position_inside = function (self, position, nav_cos
 		return false
 	end
 
-	local real_index = grid.real_index(grid, i, j, k)
+	local real_index = grid:real_index(i, j, k)
 	local liquid = self._flow[real_index]
 
 	if liquid and liquid.full then
@@ -724,7 +724,7 @@ LiquidAreaDamageExtension.hot_join_sync = function (self, sender)
 		local position = liquid.position:unbox()
 		local is_filled = liquid.full
 
-		network_transmit.send_rpc(network_transmit, "rpc_add_liquid_damage_blob", sender, liquid_unit_id, real_index, position, is_filled)
+		network_transmit:send_rpc("rpc_add_liquid_damage_blob", sender, liquid_unit_id, real_index, position, is_filled)
 	end
 end
 

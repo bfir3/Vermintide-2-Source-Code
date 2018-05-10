@@ -21,9 +21,9 @@ PlayerCharacterStateCatapulted.on_enter = function (self, unit, input, dt, conte
 	local velocity = status_extension.catapulted_velocity:unbox()
 	local locomotion_extension = self.locomotion_extension
 
-	locomotion_extension.set_maximum_upwards_velocity(locomotion_extension, velocity.z)
-	locomotion_extension.set_forced_velocity(locomotion_extension, velocity)
-	locomotion_extension.set_wanted_velocity(locomotion_extension, velocity)
+	locomotion_extension:set_maximum_upwards_velocity(velocity.z)
+	locomotion_extension:set_forced_velocity(velocity)
+	locomotion_extension:set_wanted_velocity(velocity)
 
 	self._direction = direction
 	local anim = DIRECTIONS[direction].start_animation
@@ -34,7 +34,7 @@ PlayerCharacterStateCatapulted.on_enter = function (self, unit, input, dt, conte
 
 	local first_person_extension = self.first_person_extension
 
-	first_person_extension.hide_weapons(first_person_extension, "catapulted")
+	first_person_extension:hide_weapons("catapulted")
 
 	local include_local_player = false
 
@@ -43,7 +43,7 @@ PlayerCharacterStateCatapulted.on_enter = function (self, unit, input, dt, conte
 	local sound_event = params.sound_event
 
 	if sound_event then
-		first_person_extension.play_hud_sound_event(first_person_extension, sound_event)
+		first_person_extension:play_hud_sound_event(sound_event)
 	end
 
 	self.start_catapulted_height = position_lookup[unit].z
@@ -83,25 +83,25 @@ PlayerCharacterStateCatapulted.update = function (self, unit, input, dt, context
 	end
 
 	if CharacterStateHelper.is_ledge_hanging(world, unit, self.temp_params) then
-		csm.change_state(csm, "ledge_hanging", self.temp_params)
+		csm:change_state("ledge_hanging", self.temp_params)
 
 		return
 	end
 
 	if CharacterStateHelper.is_dead(status_extension) then
-		csm.change_state(csm, "dead")
+		csm:change_state("dead")
 
 		return
 	end
 
 	if CharacterStateHelper.is_pounced_down(status_extension) then
-		csm.change_state(csm, "pounced_down")
+		csm:change_state("pounced_down")
 
 		return
 	end
 
 	if CharacterStateHelper.is_in_vortex(status_extension) then
-		csm.change_state(csm, "in_vortex")
+		csm:change_state("in_vortex")
 
 		return
 	end
@@ -112,9 +112,9 @@ PlayerCharacterStateCatapulted.update = function (self, unit, input, dt, context
 		CharacterStateHelper.play_animation_event(unit, anim)
 
 		if CharacterStateHelper.has_move_input(input_extension) then
-			csm.change_state(csm, "walking")
+			csm:change_state("walking")
 		else
-			csm.change_state(csm, "standing")
+			csm:change_state("standing")
 		end
 
 		return
@@ -124,7 +124,7 @@ PlayerCharacterStateCatapulted.update = function (self, unit, input, dt, context
 		local anim = DIRECTIONS[self._direction].wall_collide_animation
 
 		CharacterStateHelper.play_animation_event(unit, anim)
-		csm.change_state(csm, "standing")
+		csm:change_state("standing")
 
 		return
 	end

@@ -36,7 +36,7 @@ BTLootRatFleeAction.enter = function (self, unit, blackboard, t)
 	if not blackboard.flee_astar_data then
 		local astar = GwNavAStar.create()
 		local navigation_extension = blackboard.navigation_extension
-		local traverse_logic = navigation_extension.traverse_logic(navigation_extension)
+		local traverse_logic = navigation_extension:traverse_logic()
 		blackboard.flee_astar_data = {
 			doing_astar = false,
 			astar = astar,
@@ -44,7 +44,7 @@ BTLootRatFleeAction.enter = function (self, unit, blackboard, t)
 		}
 	end
 
-	self.enter_state_moving_to_level_end(self, unit, blackboard)
+	self:enter_state_moving_to_level_end(unit, blackboard)
 end
 
 BTLootRatFleeAction.run = function (self, unit, blackboard, t, dt)
@@ -54,7 +54,7 @@ BTLootRatFleeAction.run = function (self, unit, blackboard, t, dt)
 		blackboard.move_state = "moving"
 		blackboard.start_anim_locked = nil
 
-		self.toggle_start_move_animation_lock(self, unit, false, blackboard)
+		self:toggle_start_move_animation_lock(unit, false, blackboard)
 	elseif not blackboard.movement_inited then
 		blackboard.spawn_to_running = nil
 		blackboard.start_anim_done = true
@@ -63,19 +63,19 @@ BTLootRatFleeAction.run = function (self, unit, blackboard, t, dt)
 		blackboard.movement_inited = true
 		local network_manager = Managers.state.network
 
-		network_manager.anim_event(network_manager, unit, "move_fwd")
-		self.toggle_start_move_animation_lock(self, unit, false, blackboard)
+		network_manager:anim_event(unit, "move_fwd")
+		self:toggle_start_move_animation_lock(unit, false, blackboard)
 	end
 
 	local state = blackboard.flee_state
 
 	if state == "moving_to_level_end" then
-		self.update_state_moving_to_level_end(self, unit, blackboard, t)
+		self:update_state_moving_to_level_end(unit, blackboard, t)
 	end
 
 	if blackboard.check_escaped_players_time < t then
-		if self.has_escaped_players(self, unit, blackboard) then
-			self.despawn(self, unit, blackboard, "escaped_players")
+		if self:has_escaped_players(unit, blackboard) then
+			self:despawn(unit, blackboard, "escaped_players")
 		end
 
 		blackboard.check_escaped_players_time = t + CHECK_ESCAPED_PLAYERS_INTERVAL
@@ -94,7 +94,7 @@ BTLootRatFleeAction.leave = function (self, unit, blackboard, t, reason, destroy
 	blackboard.action = nil
 	blackboard.check_escaped_players_time = nil
 
-	self.toggle_start_move_animation_lock(self, unit, false, blackboard)
+	self:toggle_start_move_animation_lock(unit, false, blackboard)
 
 	blackboard.start_anim_locked = nil
 	blackboard.anim_cb_rotation_start = nil
@@ -104,7 +104,7 @@ BTLootRatFleeAction.leave = function (self, unit, blackboard, t, reason, destroy
 end
 
 BTLootRatFleeAction.enter_state_moving_to_level_end = function (self, unit, blackboard)
-	self.set_state(self, blackboard, "moving_to_level_end")
+	self:set_state(blackboard, "moving_to_level_end")
 
 	local unit_position = POSITION_LOOKUP[unit]
 	local node_data = blackboard.flee_node_data
@@ -117,7 +117,7 @@ BTLootRatFleeAction.enter_state_moving_to_level_end = function (self, unit, blac
 		node_index = MainPathUtils.closest_node_in_node_list(nodes, unit_position)
 	end
 
-	self.move_to_main_path_node(self, blackboard, node_index)
+	self:move_to_main_path_node(blackboard, node_index)
 end
 
 BTLootRatFleeAction.update_state_moving_to_level_end = function (self, unit, blackboard, t)
@@ -139,7 +139,7 @@ BTLootRatFleeAction.update_state_moving_to_level_end = function (self, unit, bla
 				next_node_index = #node_data.nodes[node_data.direction] - target_node_index + 2
 			end
 
-			self.move_to_main_path_node(self, blackboard, next_node_index)
+			self:move_to_main_path_node(blackboard, next_node_index)
 		else
 			return
 		end
@@ -153,10 +153,10 @@ BTLootRatFleeAction.update_state_moving_to_level_end = function (self, unit, bla
 	local target_node = nodes[target_node_index]
 
 	if script_data.ai_loot_rat_behavior then
-		self.debug_draw_path_nodes(self, blackboard.nav_world, nodes, break_nodes, target_node_index, t)
+		self:debug_draw_path_nodes(blackboard.nav_world, nodes, break_nodes, target_node_index, t)
 	end
 
-	local distance_to_target_node_sq = Vector3.length_squared(unit_position - target_node.unbox(target_node))
+	local distance_to_target_node_sq = Vector3.length_squared(unit_position - target_node:unbox())
 
 	if distance_to_target_node_sq < 0.25 then
 		local next_node_index = target_node_index + 1
@@ -164,11 +164,11 @@ BTLootRatFleeAction.update_state_moving_to_level_end = function (self, unit, bla
 
 		if next_node then
 			if break_nodes[target_node] then
-				local next_node_position = next_node.unbox(next_node)
+				local next_node_position = next_node:unbox()
 				local distance_to_next_node_sq = Vector3.length_squared(unit_position - next_node_position)
 
 				if distance_to_next_node_sq < BREAK_NODE_MAX_DISTANCE_SQ then
-					self.do_astar_to_between_main_path_nodes(self, blackboard, target_node_index)
+					self:do_astar_to_between_main_path_nodes(blackboard, target_node_index)
 
 					return
 				else
@@ -181,7 +181,7 @@ BTLootRatFleeAction.update_state_moving_to_level_end = function (self, unit, bla
 			next_node_index = 2
 		end
 
-		self.move_to_main_path_node(self, blackboard, next_node_index)
+		self:move_to_main_path_node(blackboard, next_node_index)
 	end
 end
 
@@ -191,7 +191,7 @@ BTLootRatFleeAction.move_to_main_path_node = function (self, blackboard, node_in
 	local node = nodes[node_index]
 	node_data.target_node_index = node_index
 
-	blackboard.navigation_extension:move_to(node.unbox(node))
+	blackboard.navigation_extension:move_to(node:unbox())
 end
 
 BTLootRatFleeAction.do_astar_to_between_main_path_nodes = function (self, blackboard, from_node_index)
@@ -226,7 +226,7 @@ end
 BTLootRatFleeAction.despawn = function (self, unit, blackboard, reason)
 	local conflict = Managers.state.conflict
 
-	conflict.destroy_unit(conflict, unit, blackboard, reason)
+	conflict:destroy_unit(unit, blackboard, reason)
 end
 
 BTLootRatFleeAction.set_state = function (self, blackboard, new_state)
@@ -237,10 +237,10 @@ BTLootRatFleeAction.toggle_start_move_animation_lock = function (self, unit, sho
 	local locomotion_extension = blackboard.locomotion_extension
 
 	if should_lock_ani then
-		locomotion_extension.use_lerp_rotation(locomotion_extension, false)
+		locomotion_extension:use_lerp_rotation(false)
 		LocomotionUtils.set_animation_driven_movement(unit, true, false, false)
 	else
-		locomotion_extension.use_lerp_rotation(locomotion_extension, true)
+		locomotion_extension:use_lerp_rotation(true)
 		LocomotionUtils.set_animation_driven_movement(unit, false)
 		LocomotionUtils.set_animation_rotation_scale(unit, 1)
 	end
@@ -249,7 +249,7 @@ end
 BTLootRatFleeAction.debug_draw_path_nodes = function (self, nav_world, nodes, break_nodes, target_node_index, t)
 	for i = 1, #nodes, 1 do
 		local node = nodes[i]
-		local node_position = node.unbox(node)
+		local node_position = node:unbox()
 
 		if i == target_node_index then
 			if break_nodes[node] then

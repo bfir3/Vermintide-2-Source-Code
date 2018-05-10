@@ -43,11 +43,11 @@ PerfhudManager.update = function (self, dt, t)
 
 	for hud_name, settings in pairs(PerfhudSettings) do
 		if Keyboard.pressed(Keyboard.button_index(settings.key)) then
-			self._toggle_hud(self, hud_name, shift_held)
+			self:_toggle_hud(hud_name, shift_held)
 		end
 	end
 
-	self._update_peer_index(self, dt, t)
+	self:_update_peer_index(dt, t)
 end
 
 PerfhudManager._update_peer_index = function (self, dt, t)
@@ -56,13 +56,13 @@ PerfhudManager._update_peer_index = function (self, dt, t)
 	if ctrl_pressed and not self._accumulated_index then
 		self._accumulated_index = ""
 	elseif ctrl_pressed then
-		self._set_peer_index(self, self._accumulated_index)
+		self:_set_peer_index(self._accumulated_index)
 
 		self._accumulated_index = nil
 	end
 
 	if self._accumulated_index then
-		self._parse_keystrokes(self, Keyboard.keystrokes())
+		self:_parse_keystrokes(Keyboard.keystrokes())
 	end
 end
 
@@ -82,19 +82,19 @@ PerfhudManager._toggle_hud = function (self, hud_name, shift_held)
 	local active = self._active_huds[hud_name]
 
 	if not shift_held then
-		self._close_all_huds(self)
+		self:_close_all_huds()
 	end
 
 	if shift_held and active then
-		self._close_hud(self, hud_name)
+		self:_close_hud(hud_name)
 	elseif not active then
-		self._open_hud(self, hud_name)
+		self:_open_hud(hud_name)
 	end
 end
 
 PerfhudManager._close_all_huds = function (self)
 	for hud_name, _ in pairs(self._active_huds) do
-		self._close_hud(self, hud_name)
+		self:_close_hud(hud_name)
 	end
 end
 
@@ -111,7 +111,7 @@ PerfhudManager._close_hud = function (self, hud_name)
 end
 
 PerfhudManager.destroy = function (self, dt, t)
-	self._close_all_huds(self)
+	self:_close_all_huds()
 end
 
 return

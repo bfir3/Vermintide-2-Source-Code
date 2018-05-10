@@ -356,7 +356,7 @@ ScriptWorld.load_level = function (world, name, object_sets, position, rotation,
 	levels[name] = level
 	local shading_env_name = Level.get_data(level, "shading_environment")
 
-	if 0 < shading_env_name.len(shading_env_name) then
+	if 0 < shading_env_name:len() then
 		local shading_env = World.get_data(world, "shading_environment")
 
 		if shading_env then

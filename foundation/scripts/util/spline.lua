@@ -49,13 +49,13 @@ Spline.draw = function (self, drawer, segments)
 	segments = segments or 20
 	local segment_increment = 1 / segments
 	local t = 0
-	local point_a = self.calc_point(self, t)
+	local point_a = self:calc_point(t)
 
 	while t < 1 do
 		t = t + segment_increment
-		local point_b = self.calc_point(self, t)
+		local point_b = self:calc_point(t)
 
-		drawer.line(drawer, point_a, point_b)
+		drawer:line(point_a, point_b)
 
 		point_a = point_b
 	end
@@ -66,7 +66,7 @@ Spline.length = function (self, segments)
 	local last_point = Vector3.from_table(self._P1)
 
 	for fraction = 1, segments, 1 do
-		local point = self.calc_point(self, fraction / segments)
+		local point = self:calc_point(fraction / segments)
 		length = length + Vector3.length(point - last_point)
 		last_point = point
 	end
@@ -78,8 +78,8 @@ Spline.tangent = function (self, t, segment_size)
 	segment_size = segment_size or 0.01
 	local min_t = math.max(t - segment_size, 0)
 	local max_t = math.min(t + segment_size, 1)
-	local min_v = self.calc_point(self, min_t)
-	local max_v = self.calc_point(self, max_t)
+	local min_v = self:calc_point(min_t)
+	local max_v = self:calc_point(max_t)
 
 	return Vector3.normalize(max_v - min_v)
 end

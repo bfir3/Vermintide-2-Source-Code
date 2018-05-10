@@ -22,7 +22,7 @@ end
 
 LobbyClient.update = function (self, dt)
 	local lobby = self.lobby
-	local lobby_state = lobby.state(lobby)
+	local lobby_state = lobby:state()
 	local new_state = LobbyInternal.state_map[lobby_state]
 	local old_state = self.state
 
@@ -34,7 +34,7 @@ LobbyClient.update = function (self, dt)
 		if new_state == LobbyState.JOINED then
 			self.lobby_members = self.lobby_members or LobbyMembers:new(lobby, self.client)
 
-			Managers.party:set_leader(lobby.lobby_host(lobby))
+			Managers.party:set_leader(lobby:lobby_host())
 		end
 
 		if old_state == LobbyState.JOINED then

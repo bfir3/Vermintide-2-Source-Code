@@ -26,25 +26,25 @@ PlayerCharacterStateLeavingLadderTop.on_enter = function (self, unit, input, dt,
 	self.finish_time = t + duration
 
 	self.wanted_forward_bonus_velocity:store(Quaternion.forward(Unit.local_rotation(ladder_unit, 0)))
-	self.on_enter_animation_event(self, 2 / duration)
+	self:on_enter_animation_event(2 / duration)
 
 	local loc_ext = self.locomotion_extension
 
-	loc_ext.enable_script_driven_ladder_transition_movement(loc_ext)
-	loc_ext.set_mover_filter_property(loc_ext, "ladder", true)
+	loc_ext:enable_script_driven_ladder_transition_movement()
+	loc_ext:set_mover_filter_property("ladder", true)
 end
 
 PlayerCharacterStateLeavingLadderTop.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, self.unit)
+	local unit_id = network_manager:unit_game_object_id(self.unit)
 	local include_local_player = false
 
 	CharacterStateHelper.show_inventory_3p(unit, true, include_local_player, self.is_server, self.inventory_extension)
 
 	local first_person_extension = self.first_person_extension
 
-	first_person_extension.unhide_weapons(first_person_extension, "climbing")
-	first_person_extension.play_animation_event(first_person_extension, "idle")
+	first_person_extension:unhide_weapons("climbing")
+	first_person_extension:play_animation_event("idle")
 
 	if next_state and Managers.state.network:game() then
 		CharacterStateHelper.play_animation_event(unit, "climb_end_ladder")
@@ -53,9 +53,9 @@ PlayerCharacterStateLeavingLadderTop.on_exit = function (self, unit, input, dt, 
 
 	local loc_ext = self.locomotion_extension
 
-	loc_ext.enable_script_driven_movement(loc_ext)
-	loc_ext.enable_rotation_towards_velocity(loc_ext, true)
-	loc_ext.set_mover_filter_property(loc_ext, "ladder", false)
+	loc_ext:enable_script_driven_movement()
+	loc_ext:enable_rotation_towards_velocity(true)
+	loc_ext:set_mover_filter_property("ladder", false)
 end
 
 PlayerCharacterStateLeavingLadderTop.update = function (self, unit, input, dt, context, t)
@@ -66,19 +66,19 @@ PlayerCharacterStateLeavingLadderTop.update = function (self, unit, input, dt, c
 	local locomotion_extension = self.locomotion_extension
 
 	if CharacterStateHelper.is_dead(status_extension) then
-		csm.change_state(csm, "dead")
+		csm:change_state("dead")
 
 		return
 	end
 
 	if CharacterStateHelper.is_knocked_down(status_extension) then
-		csm.change_state(csm, "knocked_down")
+		csm:change_state("knocked_down")
 
 		return
 	end
 
 	if CharacterStateHelper.is_pounced_down(status_extension) then
-		csm.change_state(csm, "pounced_down")
+		csm:change_state("pounced_down")
 
 		return
 	end
@@ -91,13 +91,13 @@ PlayerCharacterStateLeavingLadderTop.update = function (self, unit, input, dt, c
 			direction = direction
 		}
 
-		csm.change_state(csm, "catapulted", params)
+		csm:change_state("catapulted", params)
 
 		return
 	end
 
 	if self.finish_time < t then
-		csm.change_state(csm, "walking")
+		csm:change_state("walking")
 	end
 
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)

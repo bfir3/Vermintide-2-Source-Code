@@ -146,7 +146,7 @@ if not rawget(_G, "RuleDatabase") then
 		local best_query_value = 0
 
 		for i = 1, num_iterations, 1 do
-			local query = self.iterate_query(self, t)
+			local query = self:iterate_query(t)
 			local result = query.result
 
 			if result then
@@ -463,7 +463,7 @@ TagQueryDatabase.iterate_queries = function (self, t)
 	local best_query_value = 0
 
 	for i = 1, num_iterations, 1 do
-		local query = self.iterate_query(self, t)
+		local query = self:iterate_query(t)
 		local result = query.result
 
 		if result then
@@ -528,11 +528,11 @@ TagQueryDatabase.debug_test_query = function (self, concept, source, test_query,
 	print(concept, source, test_query, test_user_context_list, test_global_context)
 	table.dump(test_query.query_context)
 
-	local Q = self.create_query(self)
+	local Q = self:create_query()
 	local unit = Managers.player:local_player().player_unit
 
-	Q.add(Q, "concept", concept, "source", unit, "source_name", source)
-	Q.finalize(Q)
+	Q:add("concept", concept, "source", unit, "source_name", source)
+	Q:finalize()
 
 	local query = self.queries[1]
 

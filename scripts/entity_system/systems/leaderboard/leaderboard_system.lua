@@ -109,7 +109,7 @@ LeaderboardSystem.init = function (self, entity_system_creation_context, system_
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.world = entity_system_creation_context.world
 	self.is_server = entity_system_creation_context.is_server
@@ -201,7 +201,7 @@ LeaderboardSystem.debug_simulate_wave_score_enty = function (self, wave, time, n
 		human_players[#human_players + 1] = hero_ids[i]
 	end
 
-	self.register_score(self, "whitebox_ai", "normal", wave_score, human_players)
+	self:register_score("whitebox_ai", "normal", wave_score, human_players)
 end
 
 LeaderboardSystem.round_completed = function (self)
@@ -218,7 +218,7 @@ LeaderboardSystem.round_completed = function (self)
 	end
 
 	local time_manager = Managers.time
-	local end_t = time_manager.time(time_manager, "game")
+	local end_t = time_manager:time("game")
 	local nr_waves_completed = 1
 	local data = {
 		completed_time = end_t,
@@ -248,13 +248,13 @@ LeaderboardSystem.round_completed = function (self)
 	}
 	local player_index = 1
 	local player_manager = Managers.player
-	local human_players = player_manager.human_players(player_manager)
+	local human_players = player_manager:human_players()
 	local network_manager = Managers.state.network
 	local profile_synchronizer = network_manager.profile_synchronizer
 
 	for _, player in pairs(human_players) do
-		local network_id_64_bit = player.network_id(player)
-		local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, network_id_64_bit, player.local_player_id(player))
+		local network_id_64_bit = player:network_id()
+		local profile_index = profile_synchronizer:profile_by_peer(network_id_64_bit, player:local_player_id())
 		local network_id_32_bit = Steam.id_to_id_32bit(network_id_64_bit)
 		player_data[player_index] = network_id_32_bit
 		player_data[player_index + 1] = profile_index
@@ -270,7 +270,7 @@ LeaderboardSystem.round_completed = function (self)
 
 	if score then
 		self.network_transmit:send_rpc_clients("rpc_client_leaderboard_register_score", level_key_id, difficulty_id, score, unpack(player_data))
-		self.register_score(self, level_key, difficulty_name, score, player_data)
+		self:register_score(level_key, difficulty_name, score, player_data)
 	end
 
 	if script_data.debug_leaderboard then
@@ -283,8 +283,8 @@ end
 LeaderboardSystem.register_score = function (self, level_key, difficulty_name, score, human_players)
 	local board_name = get_board_name(level_key, difficulty_name)
 	local player_manager = Managers.player
-	local my_player = player_manager.local_player(player_manager)
-	local my_peer_id_64 = my_player.network_id(my_player)
+	local my_player = player_manager:local_player()
+	local my_peer_id_64 = my_player:network_id()
 	local my_peer_id_32 = Steam.id_to_id_32bit(my_peer_id_64)
 	local extra_data = {
 		0,
@@ -369,7 +369,7 @@ LeaderboardSystem.rpc_client_leaderboard_register_score = function (self, sender
 		...
 	}
 
-	self.register_score(self, level_key, difficulty_name, score, human_players)
+	self:register_score(level_key, difficulty_name, score, human_players)
 end
 
 return

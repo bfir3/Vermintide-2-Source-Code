@@ -26,7 +26,7 @@ ActionTrueFlightBowAim.client_owner_start_action = function (self, new_action, t
 	self.time_to_shoot = t
 	local owner_unit = self.owner_unit
 	local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
-	self.charge_time = buff_extension.apply_buffs_to_value(buff_extension, new_action.charge_time or 0, StatBuffIndex.REDUCED_RANGED_CHARGE_TIME)
+	self.charge_time = buff_extension:apply_buffs_to_value(new_action.charge_time or 0, StatBuffIndex.REDUCED_RANGED_CHARGE_TIME)
 	self.overcharge_timer = 0
 	self.zoom_condition_function = new_action.zoom_condition_function
 	self.played_aim_sound = false
@@ -37,7 +37,7 @@ ActionTrueFlightBowAim.client_owner_start_action = function (self, new_action, t
 	if loaded_projectile_settings then
 		local inventory_extension = ScriptUnit.extension(self.owner_unit, "inventory_system")
 
-		inventory_extension.set_loaded_projectile_override(inventory_extension, loaded_projectile_settings)
+		inventory_extension:set_loaded_projectile_override(loaded_projectile_settings)
 	end
 
 	self.charge_ready_sound_event = self.current_action.charge_ready_sound_event
@@ -104,14 +104,14 @@ ActionTrueFlightBowAim.client_owner_post_update = function (self, dt, t, world, 
 		local input_extension = ScriptUnit.extension(owner_unit, "input_system")
 		local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 
-		if not status_extension.is_zooming(status_extension) and self.aim_zoom_time <= t then
-			status_extension.set_zooming(status_extension, true, current_action.default_zoom)
+		if not status_extension:is_zooming() and self.aim_zoom_time <= t then
+			status_extension:set_zooming(true, current_action.default_zoom)
 		end
 
-		if buff_extension.has_buff_type(buff_extension, "increased_zoom") and status_extension.is_zooming(status_extension) and input_extension.get(input_extension, "action_three") then
-			status_extension.switch_variable_zoom(status_extension, current_action.buffed_zoom_thresholds)
-		elseif current_action.zoom_thresholds and status_extension.is_zooming(status_extension) and input_extension.get(input_extension, "action_three") then
-			status_extension.switch_variable_zoom(status_extension, current_action.zoom_thresholds)
+		if buff_extension:has_buff_type("increased_zoom") and status_extension:is_zooming() and input_extension:get("action_three") then
+			status_extension:switch_variable_zoom(current_action.buffed_zoom_thresholds)
+		elseif current_action.zoom_thresholds and status_extension:is_zooming() and input_extension:get("action_three") then
+			status_extension:switch_variable_zoom(current_action.zoom_thresholds)
 		end
 	end
 
@@ -133,8 +133,8 @@ ActionTrueFlightBowAim.client_owner_post_update = function (self, dt, t, world, 
 		local physics_world = World.get_data(world, "physics_world")
 		local owner_unit = self.owner_unit
 		local first_person_extension = self.first_person_extension
-		local player_rotation = first_person_extension.current_rotation(first_person_extension)
-		local player_position = first_person_extension.current_position(first_person_extension)
+		local player_rotation = first_person_extension:current_rotation()
+		local player_position = first_person_extension:current_position()
 		local direction = Vector3.normalize(Quaternion.forward(player_rotation))
 		local results = PhysicsWorld.immediate_raycast_actors(physics_world, player_position, direction, "dynamic_collision_filter", "filter_ray_true_flight_ai_only", "dynamic_collision_filter", "filter_ray_true_flight_hitbox_only")
 		local hit_unit = nil
@@ -155,7 +155,7 @@ ActionTrueFlightBowAim.client_owner_post_update = function (self, dt, t, world, 
 						if ScriptUnit.has_extension(unit, "health_system") then
 							local health_extension = ScriptUnit.extension(unit, "health_system")
 
-							if health_extension.is_alive(health_extension) then
+							if health_extension:is_alive() then
 								local breed = Unit.get_data(unit, "breed")
 
 								if breed and not breed.no_autoaim then
@@ -218,8 +218,8 @@ end
 
 ActionTrueFlightBowAim._get_visible_targets = function (self, aimed_target, num_targets, is_bot)
 	local first_person_extension = self.first_person_extension
-	local own_position = first_person_extension.current_position(first_person_extension)
-	local look_rotation = first_person_extension.current_rotation(first_person_extension)
+	local own_position = first_person_extension:current_position()
+	local look_rotation = first_person_extension:current_rotation()
 	local look_direction = Quaternion.forward(look_rotation)
 	local ai_system = Managers.state.entity:system("ai_system")
 	local ai_broadphase = ai_system.broadphase
@@ -269,7 +269,7 @@ ActionTrueFlightBowAim.finish = function (self, reason, data)
 	if not unzoom_condition_function or unzoom_condition_function(reason) then
 		local status_extension = ScriptUnit.extension(owner_unit, "status_system")
 
-		status_extension.set_zooming(status_extension, false)
+		status_extension:set_zooming(false)
 	end
 
 	local sound_event = current_action.unaim_sound_event
@@ -285,7 +285,7 @@ ActionTrueFlightBowAim.finish = function (self, reason, data)
 	if current_action.num_projectiles and 1 < current_action.num_projectiles then
 		local owner_player = Managers.player:owner(owner_unit)
 		local is_bot = owner_player and owner_player.bot_player
-		chain_action_data.targets = self._get_visible_targets(self, self.target, current_action.num_projectiles, is_bot)
+		chain_action_data.targets = self:_get_visible_targets(self.target, current_action.num_projectiles, is_bot)
 		chain_action_data.target = self.target
 	else
 		chain_action_data.target = self.target
@@ -318,7 +318,7 @@ ActionTrueFlightBowAim.finish = function (self, reason, data)
 	self.target = nil
 	local inventory_extension = ScriptUnit.extension(owner_unit, "inventory_system")
 
-	inventory_extension.set_loaded_projectile_override(inventory_extension, nil)
+	inventory_extension:set_loaded_projectile_override(nil)
 
 	return chain_action_data
 end

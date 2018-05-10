@@ -6,11 +6,11 @@ GameTimerUI.init = function (self, ingame_ui_context)
 	self.ingame_ui = ingame_ui_context.ingame_ui
 	self.input_manager = ingame_ui_context.input_manager
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	local event_manager = Managers.state.event
 
-	event_manager.register(event_manager, self, "start_game_time", "event_start_game_time")
+	event_manager:register(self, "start_game_time", "event_start_game_time")
 
 	self._disabled = Development.parameter("disable_ingame_timer")
 end
@@ -30,8 +30,8 @@ end
 GameTimerUI.destroy = function (self)
 	local event_manager = Managers.state.event
 
-	event_manager.unregister(event_manager, "start_game_time", self)
-	self.set_visible(self, false)
+	event_manager:unregister("start_game_time", self)
+	self:set_visible(false)
 end
 
 GameTimerUI.set_visible = function (self, visible)
@@ -49,8 +49,8 @@ GameTimerUI.update = function (self, dt)
 		local current_network_time = Managers.state.network:network_time()
 		local time = current_network_time - start_time
 
-		self.set_time(self, time)
-		self.draw(self, dt)
+		self:set_time(time)
+		self:draw(dt)
 	end
 end
 

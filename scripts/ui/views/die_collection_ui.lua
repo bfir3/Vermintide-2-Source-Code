@@ -13,7 +13,7 @@ DieCollectionUI.init = function (self, dice_roller, ui_renderer, input_manager, 
 	self.topic_text = topic_text
 	self.dies_enabled = dies_enabled
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.scenegraph_id = scenegraph_id
 	self.wwise_world = Managers.world:wwise_world(world)
@@ -37,7 +37,7 @@ DieCollectionUI.create_ui_elements = function (self)
 		local scenegraph_id = "die_category_" .. i
 		local category_widget_definition = create_category_widget(die_index_type[i], scenegraph_id, i)
 		category_widgets[i] = UIWidget.init(category_widget_definition)
-		local num_owned_die = dice_roller.max_num_dices(dice_roller, die_index_type[i])
+		local num_owned_die = dice_roller:max_num_dices(die_index_type[i])
 
 		for j = 1, num_owned_die, 1 do
 			category_widgets[i].content[button_name_index_list[j]].texture = "loot_screen_dice_" .. i
@@ -69,7 +69,7 @@ DieCollectionUI.update = function (self, dt)
 
 		if i <= 3 then
 			local category_type = die_index_type[i]
-			local num_owned_die = dice_roller.max_num_dices(dice_roller, category_type)
+			local num_owned_die = dice_roller:max_num_dices(category_type)
 
 			if not has_rolled then
 				for j = 1, num_owned_die, 1 do
@@ -82,7 +82,7 @@ DieCollectionUI.update = function (self, dt)
 						if widget.content[button_name].is_active then
 							new_color = MenuGuiSettings.button_disabled_dark
 
-							dice_roller.decrease_die(dice_roller, die_index_type[i])
+							dice_roller:decrease_die(die_index_type[i])
 
 							widget.content[button_name].is_active = false
 
@@ -90,7 +90,7 @@ DieCollectionUI.update = function (self, dt)
 						else
 							new_color = MenuGuiSettings.button_default
 
-							dice_roller.increase_die(dice_roller, die_index_type[i])
+							dice_roller:increase_die(die_index_type[i])
 
 							widget.content[button_name].is_active = true
 
@@ -109,7 +109,7 @@ DieCollectionUI.update = function (self, dt)
 
 					if widget.content[button_name].is_active then
 						num_rolled_type = num_rolled_type + 1
-						local die_result = dice_roller.is_dice_success(dice_roller, category_type, num_rolled_type)
+						local die_result = dice_roller:is_dice_success(category_type, num_rolled_type)
 
 						if die_result == "success" then
 							widget.content[button_name].is_highlighted = true

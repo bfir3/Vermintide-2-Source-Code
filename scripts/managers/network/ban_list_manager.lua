@@ -4,7 +4,7 @@ local SAVE_FILE = "ban_list"
 BanListManager.init = function (self)
 	self._bans = {}
 
-	self._load_bans(self)
+	self:_load_bans()
 end
 
 BanListManager.ban = function (self, peer_id, name, until_time_stamp)
@@ -98,7 +98,7 @@ BanListManager._load_done_callback = function (self, result)
 	end
 
 	table.merge(self._bans, result.data)
-	self._remove_old_bans(self)
+	self:_remove_old_bans()
 end
 
 BanListManager._save_done_callback = function (self, result, callback)

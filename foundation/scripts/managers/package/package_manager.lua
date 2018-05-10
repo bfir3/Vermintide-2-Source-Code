@@ -23,13 +23,13 @@ PackageManager.load = function (self, package_name, reference_name, callback, as
 		self._references[package_name][reference_name] = (self._references[package_name][reference_name] or 0) + 1
 
 		if not asynchronous and self._asynch_packages[package_name] then
-			self.force_load(self, package_name)
+			self:force_load(package_name)
 
 			if callback then
 				callback()
 			end
 		elseif not asynchronous and self._queued_async_packages[package_name] then
-			self.force_load_queued_package(self, package_name)
+			self:force_load_queued_package(package_name)
 
 			if callback then
 				callback()
@@ -114,7 +114,7 @@ PackageManager.force_load = function (self, package_name)
 		end
 	end
 
-	self._pop_queue(self)
+	self:_pop_queue()
 end
 
 PackageManager.force_load_queued_package = function (self, package_name)
@@ -142,7 +142,7 @@ PackageManager.force_load_queued_package = function (self, package_name)
 	local index = table.find(self._queue_order, package_name)
 
 	table.remove(self._queue_order, index)
-	self._pop_queue(self)
+	self:_pop_queue()
 end
 
 PackageManager._pop_queue = function (self)
@@ -213,7 +213,7 @@ PackageManager.unload = function (self, package_name, reference_name)
 		self._queued_async_packages[package_name] = nil
 
 		if table.is_empty(self._asynch_packages) then
-			self._pop_queue(self)
+			self:_pop_queue()
 		end
 
 		debug_print("Unload:  %s, %s", package_name, reference_name)
@@ -243,13 +243,13 @@ PackageManager.destroy = function (self)
 
 	for package_name, _ in pairs(self._packages) do
 		for reference_name, _ in pairs(self._references[package_name]) do
-			self.unload(self, package_name, reference_name)
+			self:unload(package_name, reference_name)
 		end
 	end
 
 	for package_name, _ in pairs(self._asynch_packages) do
 		for reference_name, _ in pairs(self._references[package_name]) do
-			self.unload(self, package_name, reference_name)
+			self:unload(package_name, reference_name)
 		end
 	end
 end
@@ -284,7 +284,7 @@ PackageManager.update = function (self)
 
 		if ResourcePackage.has_loaded(resource_handle) then
 			debug_print("Finished loading asynchronous package:  %s", package_name)
-			self.force_load(self, package_name)
+			self:force_load(package_name)
 
 			break
 		end
@@ -331,40 +331,40 @@ if PM_UNIT_TEST then
 
 	local pm = PackageManager
 
-	pm.init(pm)
-	pm.load(pm, "resource_packages/strings", "unit_test_1")
-	assert(pm.has_loaded(pm, "resource_packages/strings") == true)
-	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == true)
-	pm.unload(pm, "resource_packages/strings", "unit_test_1")
-	assert(pm.has_loaded(pm, "resource_packages/strings") == false)
-	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == false)
-	pm.load(pm, "resource_packages/strings", "unit_test_1")
-	pm.load(pm, "resource_packages/strings", "unit_test_2")
-	pm.unload(pm, "resource_packages/strings", "unit_test_1")
-	assert(pm.has_loaded(pm, "resource_packages/strings") == true)
-	pm.unload(pm, "resource_packages/strings", "unit_test_2")
-	assert(pm.has_loaded(pm, "resource_packages/strings") == false)
-	pm.load(pm, "resource_packages/strings", "unit_test_1")
-	pm.load(pm, "resource_packages/strings", "unit_test_1")
-	pm.load(pm, "resource_packages/strings", "unit_test_1")
-	pm.unload(pm, "resource_packages/strings", "unit_test_1")
-	assert(pm.has_loaded(pm, "resource_packages/strings") == true)
-	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == true)
-	assert(pm.reference_count(pm, "resource_packages/strings", "unit_test_1") == 2)
-	pm.unload(pm, "resource_packages/strings", "unit_test_1")
-	assert(pm.has_loaded(pm, "resource_packages/strings") == true)
-	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == true)
-	assert(pm.reference_count(pm, "resource_packages/strings", "unit_test_1") == 1)
-	pm.unload(pm, "resource_packages/strings", "unit_test_1")
-	assert(pm.has_loaded(pm, "resource_packages/strings") == false)
-	assert(pm.has_loaded(pm, "resource_packages/strings", "unit_test_1") == false)
-	assert(pm.reference_count(pm, "resource_packages/strings", "unit_test_1") == 0)
-	pm.load(pm, "resource_packages/strings", "unit_test_1")
-	pm.destroy(pm)
-	assert(pm.is_loading(pm, "resource_packages/strings") == false)
-	pm.load(pm, "resource_packages/strings", "unit_test_1", nil, true)
-	pm.destroy(pm)
-	assert(pm.is_loading(pm, "resource_packages/strings") == false)
+	pm:init()
+	pm:load("resource_packages/strings", "unit_test_1")
+	assert(pm:has_loaded("resource_packages/strings") == true)
+	assert(pm:has_loaded("resource_packages/strings", "unit_test_1") == true)
+	pm:unload("resource_packages/strings", "unit_test_1")
+	assert(pm:has_loaded("resource_packages/strings") == false)
+	assert(pm:has_loaded("resource_packages/strings", "unit_test_1") == false)
+	pm:load("resource_packages/strings", "unit_test_1")
+	pm:load("resource_packages/strings", "unit_test_2")
+	pm:unload("resource_packages/strings", "unit_test_1")
+	assert(pm:has_loaded("resource_packages/strings") == true)
+	pm:unload("resource_packages/strings", "unit_test_2")
+	assert(pm:has_loaded("resource_packages/strings") == false)
+	pm:load("resource_packages/strings", "unit_test_1")
+	pm:load("resource_packages/strings", "unit_test_1")
+	pm:load("resource_packages/strings", "unit_test_1")
+	pm:unload("resource_packages/strings", "unit_test_1")
+	assert(pm:has_loaded("resource_packages/strings") == true)
+	assert(pm:has_loaded("resource_packages/strings", "unit_test_1") == true)
+	assert(pm:reference_count("resource_packages/strings", "unit_test_1") == 2)
+	pm:unload("resource_packages/strings", "unit_test_1")
+	assert(pm:has_loaded("resource_packages/strings") == true)
+	assert(pm:has_loaded("resource_packages/strings", "unit_test_1") == true)
+	assert(pm:reference_count("resource_packages/strings", "unit_test_1") == 1)
+	pm:unload("resource_packages/strings", "unit_test_1")
+	assert(pm:has_loaded("resource_packages/strings") == false)
+	assert(pm:has_loaded("resource_packages/strings", "unit_test_1") == false)
+	assert(pm:reference_count("resource_packages/strings", "unit_test_1") == 0)
+	pm:load("resource_packages/strings", "unit_test_1")
+	pm:destroy()
+	assert(pm:is_loading("resource_packages/strings") == false)
+	pm:load("resource_packages/strings", "unit_test_1", nil, true)
+	pm:destroy()
+	assert(pm:is_loading("resource_packages/strings") == false)
 
 	table.is_empty = nil
 	table.clear = nil

@@ -70,28 +70,28 @@ BTNinjaVanishAction.vanish = function (unit, blackboard)
 	local network_manager = Managers.state.network
 
 	BTNinjaVanishAction.play_foff(unit, blackboard, network_manager, POSITION_LOOKUP[unit], vanish_pos)
-	network_manager.anim_event(network_manager, unit, "idle")
+	network_manager:anim_event(unit, "idle")
 	blackboard.locomotion_extension:teleport_to(vanish_pos)
 
 	local ai_navigation = blackboard.navigation_extension
 
-	ai_navigation.move_to(ai_navigation, vanish_pos)
+	ai_navigation:move_to(vanish_pos)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
 	Managers.state.entity:system("ai_bot_group_system"):enemy_teleported(unit, vanish_pos)
 
 	local ping_system = Managers.state.entity:system("ping_system")
 
-	ping_system.remove_ping_from_unit(ping_system, unit)
+	ping_system:remove_ping_from_unit(unit)
 end
 
 BTNinjaVanishAction.play_foff = function (unit, blackboard, network_manager, pos, pos2)
 	local effect_name_id = NetworkLookup.effects[blackboard.action.effect_name]
-	local owner_unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local owner_unit_id = network_manager:unit_game_object_id(unit)
 	local node_id = 0
 	local rotation_offset = Quaternion.identity()
 
-	network_manager.rpc_play_particle_effect(network_manager, nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, pos, rotation_offset, false)
-	network_manager.rpc_play_particle_effect(network_manager, nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, pos2, rotation_offset, false)
+	network_manager:rpc_play_particle_effect(nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, pos, rotation_offset, false)
+	network_manager:rpc_play_particle_effect(nil, effect_name_id, NetworkConstants.invalid_game_object_id, node_id, pos2, rotation_offset, false)
 end
 
 BTNinjaVanishAction.find_escape_position = function (unit, blackboard)

@@ -29,9 +29,9 @@ LocomotionUtils.follow_target = function (unit, blackboard, t, dt)
 		if is_position_on_navmesh then
 			goal_pos.z = altitude
 			local ai_extension = ScriptUnit.extension(unit, "ai_system")
-			local navigation = ai_extension.navigation(ai_extension)
+			local navigation = ai_extension:navigation()
 
-			navigation.move_to(navigation, goal_pos)
+			navigation:move_to(goal_pos)
 
 			blackboard.target_outside_navmesh = false
 		else
@@ -49,7 +49,7 @@ LocomotionUtils.follow_target_ogre = function (unit, blackboard, t, dt)
 
 	local pos = POSITION_LOOKUP[unit]
 	local status_extension = ScriptUnit.extension(target_unit, "status_system")
-	local is_on_ladder, ladder_unit = status_extension.get_is_on_ladder(status_extension)
+	local is_on_ladder, ladder_unit = status_extension:get_is_on_ladder()
 	local threat_position, goal_pos = nil
 
 	if is_on_ladder then
@@ -278,7 +278,7 @@ end
 LocomotionUtils.constrain_on_clients = function (unit, constrain, min, max)
 	local network_manager = Managers.state.network
 
-	if network_manager.game(network_manager) then
+	if network_manager:game() then
 		local realmin = Vector3(math.min(min.x, max.x), math.min(min.y, max.y), math.min(min.z, max.z))
 		local realmax = Vector3(math.max(min.x, max.x), math.max(min.y, max.y), math.max(min.z, max.z))
 		local go_id = Managers.state.unit_storage:go_id(unit)
@@ -290,17 +290,17 @@ end
 LocomotionUtils.set_animation_driven_movement = function (unit, animation_driven, is_affected_by_gravity, script_driven_rotation)
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_animation_driven(locomotion_extension, animation_driven, is_affected_by_gravity, script_driven_rotation)
+	locomotion_extension:set_animation_driven(animation_driven, is_affected_by_gravity, script_driven_rotation)
 end
 
 LocomotionUtils.set_animation_translation_scale = function (unit, animation_translation_scale)
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_animation_translation_scale(locomotion_extension, animation_translation_scale)
+	locomotion_extension:set_animation_translation_scale(animation_translation_scale)
 
 	local network_manager = Managers.state.network
 
-	if network_manager.game(network_manager) then
+	if network_manager:game() then
 		local go_id = Managers.state.unit_storage:go_id(unit)
 
 		network_manager.network_transmit:send_rpc_clients("rpc_set_animation_translation_scale", go_id, animation_translation_scale)
@@ -310,11 +310,11 @@ end
 LocomotionUtils.set_animation_rotation_scale = function (unit, animation_rotation_scale)
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.set_animation_rotation_scale(locomotion_extension, animation_rotation_scale)
+	locomotion_extension:set_animation_rotation_scale(animation_rotation_scale)
 
 	local network_manager = Managers.state.network
 
-	if network_manager.game(network_manager) then
+	if network_manager:game() then
 		local go_id = Managers.state.unit_storage:go_id(unit)
 
 		network_manager.network_transmit:send_rpc_clients("rpc_set_animation_rotation_scale", go_id, animation_rotation_scale)
@@ -498,7 +498,7 @@ LocomotionUtils.new_random_goal_in_front_of_unit = function (nav_world, unit, mi
 		local direction, speed = nil
 
 		if locomotion_ext then
-			local average_velocity = Vector3.flat(locomotion_ext.average_velocity(locomotion_ext))
+			local average_velocity = Vector3.flat(locomotion_ext:average_velocity())
 			speed = Vector3.length(average_velocity)
 
 			if 0.1 < speed then
@@ -545,11 +545,11 @@ end
 LocomotionUtils.new_goal_in_transport = function (nav_world, unit, ally_unit)
 	local tries = 0
 	local status_extension = ScriptUnit.extension(ally_unit, "status_system")
-	local transport_unit = status_extension.get_inside_transport_unit(status_extension)
+	local transport_unit = status_extension:get_inside_transport_unit()
 
 	if Unit.alive(transport_unit) then
 		local transport_extension = ScriptUnit.extension(transport_unit, "transportation_system")
-		local pos = transport_extension.assign_position_to_bot(transport_extension)
+		local pos = transport_extension:assign_position_to_bot()
 		local success, altitude = GwNavQueries.triangle_from_position(nav_world, pos, 30, 30)
 
 		if success then
@@ -985,43 +985,43 @@ end
 
 LocomotionUtils.enable_linked_movement = function (world, child_unit, parent_unit, parent_node_index, offset)
 	local player_manager = Managers.player
-	local player = player_manager.owner(player_manager, child_unit)
+	local player = player_manager:owner(child_unit)
 
 	if player.remote then
 		local unit_storage = Managers.state.unit_storage
-		local go_id = unit_storage.go_id(unit_storage, child_unit)
-		local owner_id = unit_storage.owner(unit_storage, go_id)
+		local go_id = unit_storage:go_id(child_unit)
+		local owner_id = unit_storage:owner(go_id)
 		local level = LevelHelper:current_level(world)
 		local parent_level_unit_index = Level.unit_index(level, parent_unit)
 		local network_manager = Managers.state.network
 
-		if network_manager.game(network_manager) then
+		if network_manager:game() then
 			network_manager.network_transmit:send_rpc("rpc_enable_linked_movement", owner_id, go_id, parent_level_unit_index, parent_node_index, offset)
 		end
 	else
 		local locomotion_extension = ScriptUnit.extension(child_unit, "locomotion_system")
 
-		locomotion_extension.enable_linked_movement(locomotion_extension, parent_unit, parent_node_index, offset)
+		locomotion_extension:enable_linked_movement(parent_unit, parent_node_index, offset)
 	end
 end
 
 LocomotionUtils.disable_linked_movement = function (unit)
 	local player_manager = Managers.player
-	local player = player_manager.owner(player_manager, unit)
+	local player = player_manager:owner(unit)
 
 	if player and player.remote then
 		local unit_storage = Managers.state.unit_storage
-		local go_id = unit_storage.go_id(unit_storage, unit)
-		local owner_id = unit_storage.owner(unit_storage, go_id)
+		local go_id = unit_storage:go_id(unit)
+		local owner_id = unit_storage:owner(go_id)
 		local network_manager = Managers.state.network
 
-		if network_manager.game(network_manager) then
+		if network_manager:game() then
 			network_manager.network_transmit:send_rpc("rpc_disable_linked_movement", owner_id, go_id)
 		end
 	else
 		local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-		locomotion_extension.disable_linked_movement(locomotion_extension)
+		locomotion_extension:disable_linked_movement()
 	end
 end
 
@@ -1043,8 +1043,8 @@ LocomotionUtils.in_crosshairs_dodge = function (unit, blackboard, t, radius, in_
 	for i = 1, #units, 1 do
 		local player_unit = units[i]
 		local player_inventory = ScriptUnit.extension(player_unit, "inventory_system")
-		local using_ranged_weapon = player_inventory.get_wielded_slot_name(player_inventory) == "slot_ranged"
-		local weapon_template = player_inventory.get_wielded_slot_item_template(player_inventory)
+		local using_ranged_weapon = player_inventory:get_wielded_slot_name() == "slot_ranged"
+		local weapon_template = player_inventory:get_wielded_slot_item_template()
 
 		if weapon_template and weapon_template.no_dodge then
 			using_ranged_weapon = false
@@ -1055,7 +1055,7 @@ LocomotionUtils.in_crosshairs_dodge = function (unit, blackboard, t, radius, in_
 			local player_pos = Unit.world_position(player_unit, Unit.node(player_unit, "camera_attach"))
 			local to_rat = pos - player_pos
 			local player_locomotion = ScriptUnit.extension(player_unit, "locomotion_system")
-			local rotation = player_locomotion.current_rotation(player_locomotion)
+			local rotation = player_locomotion:current_rotation()
 			local aim_direction = Quaternion.forward(rotation)
 			local dist = Vector3.length(to_rat)
 			local miss_vec = to_rat - aim_direction * dist
@@ -1120,7 +1120,7 @@ LocomotionUtils.on_alerted_dodge = function (unit, blackboard, alerting_unit, en
 	if DamageUtils.is_player_unit(real_attacker_unit) then
 		local locomotion_extension = ScriptUnit.has_extension(real_attacker_unit, "locomotion_system")
 		local node = Unit.has_node(real_attacker_unit, "camera_attach") and Unit.node(real_attacker_unit, "camera_attach")
-		rotation = locomotion_extension.current_rotation(locomotion_extension)
+		rotation = locomotion_extension:current_rotation()
 		enemy_pos = Unit.world_position(real_attacker_unit, node)
 	else
 		rotation = Unit.world_rotation(real_attacker_unit, 0)
@@ -1184,14 +1184,14 @@ LocomotionUtils.check_start_turning = function (unit, t, dt, blackboard)
 		return
 	end
 
-	local is_computing = navigation_extension.is_computing_path(navigation_extension)
-	local is_following_path = navigation_extension.is_following_path(navigation_extension)
+	local is_computing = navigation_extension:is_computing_path()
+	local is_following_path = navigation_extension:is_following_path()
 
 	if is_computing or not is_following_path then
 		return
 	end
 
-	local current_node_position, next_node_1_position, next_node_2_position = navigation_extension.get_current_and_next_node_positions_in_nav_path(navigation_extension)
+	local current_node_position, next_node_1_position, next_node_2_position = navigation_extension:get_current_and_next_node_positions_in_nav_path()
 
 	if current_node_position == nil or next_node_1_position == nil then
 		return
@@ -1202,7 +1202,7 @@ LocomotionUtils.check_start_turning = function (unit, t, dt, blackboard)
 	local rotation = Unit.world_rotation(unit, 0)
 	local forward = Quaternion.forward(rotation)
 	local right = Quaternion.right(rotation)
-	local navigation_velocity = Vector3.normalize(navigation_extension.desired_velocity(navigation_extension))
+	local navigation_velocity = Vector3.normalize(navigation_extension:desired_velocity())
 	local right_dot = Vector3.dot(right, nav_path_direction)
 	local fwd_dot = Vector3.dot(forward, nav_path_direction)
 	local abs_right_dot = math.abs(right_dot)
@@ -1231,7 +1231,7 @@ LocomotionUtils.check_start_turning = function (unit, t, dt, blackboard)
 
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, start_anim)
+	network_manager:anim_event(unit, start_anim)
 
 	blackboard.move_animation_name = start_anim
 	blackboard.rotate_towards_position = Vector3Box(next_node_1_position)
@@ -1270,7 +1270,7 @@ LocomotionUtils.update_turning = function (unit, t, dt, blackboard)
 			local rotate_towards_position = blackboard.rotate_towards_position:unbox()
 			local rot_scale = AiAnimUtils.get_animation_rotation_scale(unit, rotate_towards_position, blackboard.move_animation_name, blackboard.action.start_anims_data)
 
-			locomotion_extension.use_lerp_rotation(locomotion_extension, false)
+			locomotion_extension:use_lerp_rotation(false)
 			LocomotionUtils.set_animation_driven_movement(unit, true, false, false)
 			LocomotionUtils.set_animation_rotation_scale(unit, rot_scale)
 

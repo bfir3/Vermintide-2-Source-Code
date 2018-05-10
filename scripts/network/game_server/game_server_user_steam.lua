@@ -59,7 +59,7 @@ GameServerInternal.clear_filter_requirements = function ()
 
 	local server_browser = GameServerInternal._internal_server_browser
 
-	server_browser.clear_filters(server_browser)
+	server_browser:clear_filters()
 end
 
 GameServerInternal.add_filter_requirements = function (requirements)
@@ -69,8 +69,8 @@ GameServerInternal.add_filter_requirements = function (requirements)
 
 	local server_browser = GameServerInternal._internal_server_browser
 
-	server_browser.clear_filters(server_browser)
-	server_browser.add_filters(server_browser, requirements)
+	server_browser:clear_filters()
+	server_browser:add_filters(requirements)
 end
 
 GameServerInternal.forget_server_browser = function ()
@@ -231,7 +231,7 @@ SteamServerBrowserWrapper.update = function (self, dt, t)
 				local lobby_data = SteamServerBrowser.data_all(self._browser, i)
 				lobby_data.server_info = server
 
-				if self._filter_server(self, lobby_data) then
+				if self:_filter_server(lobby_data) then
 					cached_servers[#cached_servers + 1] = lobby_data
 				end
 			end

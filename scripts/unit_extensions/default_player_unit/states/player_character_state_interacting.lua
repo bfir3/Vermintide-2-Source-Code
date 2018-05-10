@@ -14,14 +14,14 @@ PlayerCharacterStateInteracting.on_enter = function (self, unit, input, dt, cont
 	if not self.locomotion_extension:is_on_ground() then
 		local status_extension = self.status_extension
 
-		status_extension.set_falling_height(status_extension)
+		status_extension:set_falling_height()
 	end
 
 	local first_person_extension = self.first_person_extension
 
 	if self.swap_to_3p then
 		CharacterStateHelper.change_camera_state(self.player, "follow_third_person")
-		first_person_extension.set_first_person_mode(first_person_extension, false)
+		first_person_extension:set_first_person_mode(false)
 	else
 		CharacterStateHelper.play_animation_event_first_person(first_person_extension, "idle")
 	end
@@ -36,7 +36,7 @@ PlayerCharacterStateInteracting.on_enter = function (self, unit, input, dt, cont
 
 	if params.activate_block then
 		local status_extension = self.status_extension
-		self.deactivate_block_on_exit = not status_extension.is_blocking(status_extension)
+		self.deactivate_block_on_exit = not status_extension:is_blocking()
 
 		if not LEVEL_EDITOR_TEST then
 			local game_object_id = Managers.state.unit_storage:go_id(unit)
@@ -48,7 +48,7 @@ PlayerCharacterStateInteracting.on_enter = function (self, unit, input, dt, cont
 			end
 		end
 
-		status_extension.set_blocking(status_extension, true)
+		status_extension:set_blocking(true)
 	end
 end
 
@@ -79,7 +79,7 @@ PlayerCharacterStateInteracting.on_exit = function (self, unit, input, dt, conte
 			end
 		end
 
-		status_extension.set_blocking(status_extension, false)
+		status_extension:set_blocking(false)
 	end
 end
 
@@ -95,19 +95,19 @@ PlayerCharacterStateInteracting.update = function (self, unit, input, dt, contex
 	end
 
 	if CharacterStateHelper.is_using_transport(status_extension) then
-		csm.change_state(csm, "using_transport")
+		csm:change_state("using_transport")
 
 		return
 	end
 
 	if not csm.state_next and status_extension.do_leap then
-		csm.change_state(csm, "leaping")
+		csm:change_state("leaping")
 
 		return
 	end
 
 	if not CharacterStateHelper.is_interacting(interactor_extension) then
-		csm.change_state(csm, "standing")
+		csm:change_state("standing")
 
 		return
 	end
@@ -118,33 +118,33 @@ PlayerCharacterStateInteracting.update = function (self, unit, input, dt, contex
 		end
 
 		if not CharacterStateHelper.interact(input_extension, interactor_extension) then
-			csm.change_state(csm, "standing")
+			csm:change_state("standing")
 
 			return
 		end
 	end
 
 	if CharacterStateHelper.is_pushed(status_extension) then
-		status_extension.set_pushed(status_extension, false)
+		status_extension:set_pushed(false)
 
 		local params = movement_settings_table.stun_settings.pushed
-		local hit_react_type = status_extension.hit_react_type(status_extension)
+		local hit_react_type = status_extension:hit_react_type()
 		params.hit_react_type = hit_react_type .. "_push"
 
-		csm.change_state(csm, "stunned", params)
-		interactor_extension.abort_interaction(interactor_extension)
+		csm:change_state("stunned", params)
+		interactor_extension:abort_interaction()
 
 		return
 	end
 
 	if CharacterStateHelper.is_block_broken(status_extension) then
-		status_extension.set_block_broken(status_extension, false)
+		status_extension:set_block_broken(false)
 
 		local params = movement_settings_table.stun_settings.parry_broken
 		params.hit_react_type = "medium_push"
 
-		csm.change_state(csm, "stunned", params)
-		interactor_extension.abort_interaction(interactor_extension)
+		csm:change_state("stunned", params)
+		interactor_extension:abort_interaction()
 
 		return
 	end

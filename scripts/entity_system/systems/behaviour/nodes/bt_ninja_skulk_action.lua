@@ -23,19 +23,19 @@ BTNinjaSkulkAction.enter = function (self, unit, blackboard, t)
 
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
-	network_manager.anim_event(network_manager, unit, "move_fwd")
+	network_manager:anim_event(unit, "to_combat")
+	network_manager:anim_event(unit, "move_fwd")
 
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, blackboard.breed.run_speed)
+	navigation_extension:set_max_speed(blackboard.breed.run_speed)
 
 	blackboard.target_skulk_time = t + 0.5
 	blackboard.skulk_jump_tries = blackboard.skulk_jump_tries or 0
 	local locomotion = blackboard.locomotion_extension
 
-	locomotion.set_rotation_speed(locomotion, 5)
-	locomotion.set_movement_type(locomotion, "snap_to_navmesh")
+	locomotion:set_rotation_speed(5)
+	locomotion:set_movement_type("snap_to_navmesh")
 
 	if not blackboard.skulk_data then
 		blackboard.skulk_data = {}
@@ -47,7 +47,7 @@ BTNinjaSkulkAction.enter = function (self, unit, blackboard, t)
 		local pos = blackboard.skulk_pos:unbox()
 		local ai_navigation = blackboard.navigation_extension
 
-		ai_navigation.move_to(ai_navigation, pos)
+		ai_navigation:move_to(pos)
 	end
 end
 
@@ -61,7 +61,7 @@ BTNinjaSkulkAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 end
 
 local test_points = {}
@@ -72,13 +72,13 @@ BTNinjaSkulkAction.run = function (self, unit, blackboard, t, dt)
 	local breed = blackboard.breed
 
 	if not blackboard.skulk_pos then
-		local success = self.get_new_goal(self, unit, blackboard)
+		local success = self:get_new_goal(unit, blackboard)
 
 		if not success then
 			aiprint("Tried to find new GR skulk goal, but could not")
 		end
 
-		local success = self.get_fallback_goal(self, unit, blackboard)
+		local success = self:get_fallback_goal(unit, blackboard)
 
 		if not success then
 			debug3d(unit, "SkulkAction 2nd fallback goal 1", "green")
@@ -96,11 +96,11 @@ BTNinjaSkulkAction.run = function (self, unit, blackboard, t, dt)
 		local dodge_vec, aim_vec = LocomotionUtils.in_crosshairs_dodge(unit, blackboard, t, 1, nil)
 
 		if dodge_vec then
-			self.dodge(self, unit, blackboard, dodge_vec, aim_vec)
+			self:dodge(unit, blackboard, dodge_vec, aim_vec)
 
 			local network_manager = Managers.state.network
 
-			network_manager.anim_event(network_manager, unit, "dodge_run_fwd")
+			network_manager:anim_event(unit, "dodge_run_fwd")
 
 			blackboard.dodging = t + 1.5
 		end
@@ -118,7 +118,7 @@ BTNinjaSkulkAction.run = function (self, unit, blackboard, t, dt)
 			blackboard.dodge_pos = nil
 			local ai_navigation = blackboard.navigation_extension
 
-			ai_navigation.move_to(ai_navigation, blackboard.skulk_pos:unbox())
+			ai_navigation:move_to(blackboard.skulk_pos:unbox())
 
 			if script_data.debug_ai_movement then
 				QuickDrawerStay:line(pos, pos + Vector3(0, 0, 3), Color(255, 0, 0))
@@ -161,7 +161,7 @@ BTNinjaSkulkAction.run = function (self, unit, blackboard, t, dt)
 						return "done"
 					end
 
-					self.get_new_goal(self, unit, blackboard)
+					self:get_new_goal(unit, blackboard)
 					debug3d(unit, "SkulkAction not in LOS", "yellow")
 				end
 			else
@@ -177,15 +177,15 @@ BTNinjaSkulkAction.run = function (self, unit, blackboard, t, dt)
 	end
 
 	if script_data.debug_ai_movement then
-		self.debug(self, unit, blackboard)
+		self:debug(unit, blackboard)
 	end
 
-	locomotion.set_wanted_rotation(locomotion, nil)
+	locomotion:set_wanted_rotation(nil)
 
 	local goal_pos = blackboard.skulk_pos:unbox()
 
 	if Vector3.distance(goal_pos, position_lookup[unit]) < 3 then
-		local success = self.get_new_goal(self, unit, blackboard)
+		local success = self:get_new_goal(unit, blackboard)
 
 		if success then
 			return "running"
@@ -199,7 +199,7 @@ BTNinjaSkulkAction.run = function (self, unit, blackboard, t, dt)
 			return "done"
 		end
 
-		local success = self.get_fallback_goal(self, unit, blackboard)
+		local success = self:get_fallback_goal(unit, blackboard)
 
 		if not success then
 			aiprint("Failed finding 2nd fallback goal")
@@ -215,7 +215,7 @@ BTNinjaSkulkAction.run = function (self, unit, blackboard, t, dt)
 
 	if is_path_recomputation_needed or not is_path_found then
 		Debug.text("NEED NEW GOAL")
-		self.set_goal_at_target(self, unit, blackboard)
+		self:set_goal_at_target(unit, blackboard)
 	end
 
 	if blackboard.waiting_for_path then
@@ -314,7 +314,7 @@ BTNinjaSkulkAction.dodge = function (self, unit, blackboard, dodge_vec, aim_vec)
 	local dodge_dir = left_right * 2 + normalized_velocity
 	local dodge_pos = pos + dodge_dir * dodge_dist
 
-	if self.try_dodge_pos(self, unit, blackboard, pos, dodge_pos) then
+	if self:try_dodge_pos(unit, blackboard, pos, dodge_pos) then
 		local pass_check_pos = pos + dodge_dir * dodge_dist_check
 		blackboard.dodge_pos = Vector3Box(pass_check_pos)
 
@@ -323,7 +323,7 @@ BTNinjaSkulkAction.dodge = function (self, unit, blackboard, dodge_vec, aim_vec)
 
 	dodge_pos = pos - dodge_dir * dodge_dist
 
-	if self.try_dodge_pos(self, unit, blackboard, pos, dodge_pos) then
+	if self:try_dodge_pos(unit, blackboard, pos, dodge_pos) then
 		local pass_check_pos = pos - dodge_dir * dodge_dist_check
 		blackboard.dodge_pos = Vector3Box(pass_check_pos)
 	end
@@ -364,7 +364,7 @@ BTNinjaSkulkAction.get_fallback_goal = function (self, unit, blackboard)
 		blackboard.skulk_pos = Vector3Box(pos)
 		local ai_navigation = blackboard.navigation_extension
 
-		ai_navigation.move_to(ai_navigation, pos)
+		ai_navigation:move_to(pos)
 
 		return true
 	end
@@ -401,7 +401,7 @@ BTNinjaSkulkAction.get_new_goal = function (self, unit, blackboard)
 			blackboard.skulk_pos = Vector3Box(pos)
 			local ai_navigation = blackboard.navigation_extension
 
-			ai_navigation.move_to(ai_navigation, pos)
+			ai_navigation:move_to(pos)
 
 			return true
 		end

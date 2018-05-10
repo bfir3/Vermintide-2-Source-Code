@@ -14,7 +14,7 @@ local ignored_damage_types = {
 local function trigger_player_friendly_fire_dialogue(player_unit, attacker_unit)
 	local player_manager = Managers.player
 
-	if player_unit ~= attacker_unit and player_manager.is_player_unit(player_manager, attacker_unit) then
+	if player_unit ~= attacker_unit and player_manager:is_player_unit(attacker_unit) then
 		local profile_name_victim = ScriptUnit.extension(player_unit, "dialogue_system").context.player_profile
 		local profile_name_attacker = ScriptUnit.extension(attacker_unit, "dialogue_system").context.player_profile
 		local dialogue_input = ScriptUnit.extension_input(player_unit, "dialogue_system")
@@ -22,18 +22,18 @@ local function trigger_player_friendly_fire_dialogue(player_unit, attacker_unit)
 		event_data.target = profile_name_victim
 		event_data.player_profile = profile_name_attacker
 
-		dialogue_input.trigger_dialogue_event(dialogue_input, "friendly_fire", event_data)
+		dialogue_input:trigger_dialogue_event("friendly_fire", event_data)
 	end
 end
 
 local function trigger_enemy_armor_hit_dialogue(enemy_unit, player_unit, damage_dealt, hit)
 	local player_manager = Managers.player
-	local owner = player_manager.unit_owner(player_manager, player_unit)
+	local owner = player_manager:unit_owner(player_unit)
 
-	if player_manager.is_player_unit(player_manager, player_unit) and not owner.remote and player_unit ~= enemy_unit and Unit.alive(enemy_unit) then
+	if player_manager:is_player_unit(player_unit) and not owner.remote and player_unit ~= enemy_unit and Unit.alive(enemy_unit) then
 		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-		if buff_extension.has_buff_type(buff_extension, "armor penetration") == false and damage_dealt < 0.5 then
+		if buff_extension:has_buff_type("armor penetration") == false and damage_dealt < 0.5 then
 			local breed_data = Unit.get_data(enemy_unit, "breed")
 
 			if breed_data and breed_data.armor_category == 2 and hit[4] ~= "head" and hit[4] ~= "neck" then
@@ -74,7 +74,7 @@ HitReactions.templates = {
 				local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
 
 				if 0 < hit[DamageDataIndex.DAMAGE_AMOUNT] and Development.parameter("screen_space_player_camera_reactions") ~= false then
-					first_person_extension.animation_event(first_person_extension, "shake_get_hit")
+					first_person_extension:animation_event("shake_get_hit")
 				end
 
 				local attacker = hit[DamageDataIndex.ATTACKER]
@@ -91,14 +91,14 @@ HitReactions.templates = {
 	level_object = {
 		unit = function (unit, dt, context, t, hit)
 			local health_extension = ScriptUnit.extension(unit, "health_system")
-			local current_health = health_extension.current_health(health_extension)
+			local current_health = health_extension:current_health()
 
 			Unit.set_flow_variable(unit, "current_health", current_health)
 			Unit.flow_event(unit, "lua_on_damage_taken")
 		end,
 		husk = function (unit, dt, context, t, hit)
 			local health_extension = ScriptUnit.extension(unit, "health_system")
-			local current_health = health_extension.current_health(health_extension)
+			local current_health = health_extension:current_health()
 
 			Unit.set_flow_variable(unit, "current_health", current_health)
 			Unit.flow_event(unit, "lua_on_damage_taken")
@@ -115,7 +115,7 @@ HitReactions.templates = {
 
 			if not ignore_damage_taken_flow_event then
 				local health_extension = ScriptUnit.extension(unit, "health_system")
-				local current_health = health_extension.current_health(health_extension)
+				local current_health = health_extension:current_health()
 
 				Unit.set_flow_variable(unit, "current_health", current_health)
 				Unit.flow_event(unit, "lua_on_damage_taken")
@@ -131,7 +131,7 @@ HitReactions.templates = {
 
 			if not ignore_damage_taken_flow_event then
 				local health_extension = ScriptUnit.extension(unit, "health_system")
-				local current_health = health_extension.current_health(health_extension)
+				local current_health = health_extension:current_health()
 
 				Unit.set_flow_variable(unit, "current_health", current_health)
 				Unit.flow_event(unit, "lua_on_damage_taken")

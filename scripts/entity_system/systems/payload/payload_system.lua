@@ -15,7 +15,7 @@ PayloadSystem.init = function (self, entity_system_creation_context, system_name
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self._payloads = {}
 	self._payload_gizmos = {}
@@ -60,7 +60,7 @@ PayloadSystem.init_payloads = function (self)
 		local extension = ScriptUnit.extension(payload, "payload_system")
 		local gizmos = payload_gizmos[spline_name]
 
-		extension.init_payload(extension, gizmos)
+		extension:init_payload(gizmos)
 	end
 end
 
@@ -69,7 +69,7 @@ PayloadSystem.rpc_payload_flow_event = function (self, sender, payload_unit_id, 
 	local unit = Level.unit_by_index(level, payload_unit_id)
 	local extension = ScriptUnit.extension(unit, "payload_system")
 
-	extension.payload_flow_event(extension, spline_index)
+	extension:payload_flow_event(spline_index)
 end
 
 PayloadSystem.hot_join_sync = function (self)

@@ -208,7 +208,7 @@ ProgressionUnlocks = {
 
 		local statistics_db = Managers.player:statistics_db()
 		local player = Managers.player:local_player()
-		local stats_id = player.stats_id(player)
+		local stats_id = player:stats_id()
 		local quests_unlocked = true
 
 		for _, act_levels in pairs(GameActs) do
@@ -216,7 +216,7 @@ ProgressionUnlocks = {
 
 			for i = 1, num_act_levels, 1 do
 				local act_level_key = act_levels[i]
-				local completed_times = statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_levels", act_level_key)
+				local completed_times = statistics_db:get_persistent_stat(stats_id, "completed_levels", act_level_key)
 
 				if completed_times == 0 or (level_key == act_level_key and 1 < completed_times) then
 					quests_unlocked = false
@@ -288,7 +288,7 @@ end
 
 ProgressionUnlocks.can_upgrade_prestige = function (hero_name)
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
-	local prestige = hero_attributes.get(hero_attributes, hero_name, "prestige")
+	local prestige = hero_attributes:get(hero_name, "prestige")
 	local experience = ExperienceSettings.get_experience(hero_name)
 	local level = ExperienceSettings.get_level(experience)
 	local can_unlock = ProgressionUnlocks.is_unlocked("prestige", level)
@@ -308,23 +308,23 @@ ProgressionUnlocks.upgrade_prestige = function (hero_name)
 
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 
-	hero_attributes.set(hero_attributes, hero_name, "experience", 0)
+	hero_attributes:set(hero_name, "experience", 0)
 
-	local prestige = hero_attributes.get(hero_attributes, hero_name, "prestige")
+	local prestige = hero_attributes:get(hero_name, "prestige")
 	local new_prestige = prestige + 1
 
-	hero_attributes.set(hero_attributes, hero_name, "prestige", new_prestige)
+	hero_attributes:set(hero_name, "prestige", new_prestige)
 
 	local reward = ProgressionUnlocks.prestige_reward_by_level(new_prestige, hero_name)
 	local item_interface = Managers.backend:get_interface("items")
 
-	item_interface.award_item(item_interface, reward)
+	item_interface:award_item(reward)
 end
 
 ProgressionUnlocks.get_prestige_level = function (hero_name)
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 
-	return hero_attributes.get(hero_attributes, hero_name, "prestige") or 0
+	return hero_attributes:get(hero_name, "prestige") or 0
 end
 
 ProgressionUnlocks.get_num_talent_points = function (hero_name)
@@ -348,8 +348,8 @@ ProgressionUnlocks.debug_use_hero_template = function (hero_template)
 		local item_interface = Managers.backend:get_interface("items")
 		local hero_attributes = Managers.backend:get_interface("hero_attributes")
 		local player_manager = Managers.player
-		local player = player_manager.local_player(player_manager, 1)
-		local profile_index = player.profile_index(player)
+		local player = player_manager:local_player(1)
+		local profile_index = player:profile_index()
 		local profile = SPProfiles[profile_index]
 		local profile_name = profile.display_name
 
@@ -360,11 +360,11 @@ ProgressionUnlocks.debug_use_hero_template = function (hero_template)
 		local items = hero_template.items
 		local experience = ExperienceSettings.get_total_experience_required_for_level(level)
 
-		hero_attributes.set(hero_attributes, profile_name, "experience", experience)
-		hero_attributes.set(hero_attributes, profile_name, "prestige", prestige_level)
+		hero_attributes:set(profile_name, "experience", experience)
+		hero_attributes:set(profile_name, "prestige", prestige_level)
 
 		for _, item in ipairs(items) do
-			item_interface.award_item(item_interface, item)
+			item_interface:award_item(item)
 		end
 
 		debug_current_hero_template = hero_template.name

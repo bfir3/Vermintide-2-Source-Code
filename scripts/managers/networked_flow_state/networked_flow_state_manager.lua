@@ -56,7 +56,7 @@ NetworkedFlowStateManager.init = function (self, world, is_server, network_event
 	else
 		self._is_client = true
 
-		network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+		network_event_delegate:register(self, unpack(RPCS))
 
 		self._network_event_delegate = network_event_delegate
 	end
@@ -77,7 +77,7 @@ NetworkedFlowStateManager.create_checkpoint_data = function (self)
 		local checkpoint_story_data = table.clone(story_data)
 
 		if not story_data.stopped then
-			checkpoint_story_data.current_time = storyteller.time(storyteller, story_data.id)
+			checkpoint_story_data.current_time = storyteller:time(story_data.id)
 		end
 
 		playing_stories[client_call_event_name] = checkpoint_story_data
@@ -99,7 +99,7 @@ NetworkedFlowStateManager.load_checkpoint_data = function (self, checkpoint_data
 			if value ~= state_table.default_value then
 				local state_network_id = unit_states.lookup[state_name]
 
-				self.client_flow_state_changed(self, unit_level_id, state_network_id, value, true)
+				self:client_flow_state_changed(unit_level_id, state_network_id, value, true)
 			end
 		end
 	end
@@ -291,8 +291,8 @@ NetworkedFlowStateManager.flow_cb_has_played_networked_story = function (self, p
 end
 
 NetworkedFlowStateManager.hot_join_sync = function (self, peer)
-	self._sync_states(self, peer)
-	self._sync_stories(self, peer)
+	self:_sync_states(peer)
+	self:_sync_stories(peer)
 end
 
 NetworkedFlowStateManager._sync_stories = function (self, peer)
@@ -308,7 +308,7 @@ NetworkedFlowStateManager._sync_stories = function (self, peer)
 		if stopped then
 			RPC.rpc_flow_state_story_stopped(peer, self._story_lookup[client_call_event_name], math.clamp(story_data.stop_time or story_data.length, story_time_constant.min, story_time_constant.max))
 		else
-			RPC.rpc_flow_state_story_played(peer, self._story_lookup[client_call_event_name], math.clamp(storyteller.time(storyteller, story_data.id), story_time_constant.min, story_time_constant.max))
+			RPC.rpc_flow_state_story_played(peer, self._story_lookup[client_call_event_name], math.clamp(storyteller:time(story_data.id), story_time_constant.min, story_time_constant.max))
 		end
 
 		debug_print("Story %q being hot join synced to peer %s (server).", client_call_event_name, peer)
@@ -327,7 +327,7 @@ NetworkedFlowStateManager._sync_states = function (self, peer)
 			if value ~= state_table.default_value then
 				local state_network_id = unit_states.lookup[state_name]
 				local type_data = FLOW_STATE_TYPES[type(value)]
-				value = self._clamp_state(self, state_name, type_data, value)
+				value = self:_clamp_state(state_name, type_data, value)
 
 				RPC[type_data.rpcs.change](peer, unit_level_id, state_network_id, value, true)
 			end
@@ -401,7 +401,7 @@ NetworkedFlowStateManager.flow_cb_change_state = function (self, unit, state_nam
 
 	if changed then
 		local type_data = FLOW_STATE_TYPES[type(new_state)]
-		new_state = self._clamp_state(self, state_name, type_data, new_state)
+		new_state = self:_clamp_state(state_name, type_data, new_state)
 
 		Managers.state.network.network_transmit:send_rpc_clients(type_data.rpcs.change, unit_level_id, state_network_id, new_state, false)
 	end
@@ -442,11 +442,11 @@ NetworkedFlowStateManager.client_flow_state_changed = function (self, unit_level
 end
 
 NetworkedFlowStateManager.rpc_flow_state_bool_changed = function (self, sender, unit_level_id, state_network_id, new_state, only_set)
-	self.client_flow_state_changed(self, unit_level_id, state_network_id, new_state, only_set)
+	self:client_flow_state_changed(unit_level_id, state_network_id, new_state, only_set)
 end
 
 NetworkedFlowStateManager.rpc_flow_state_number_changed = function (self, sender, unit_level_id, state_network_id, new_state, only_set)
-	self.client_flow_state_changed(self, unit_level_id, state_network_id, new_state, only_set)
+	self:client_flow_state_changed(unit_level_id, state_network_id, new_state, only_set)
 end
 
 return

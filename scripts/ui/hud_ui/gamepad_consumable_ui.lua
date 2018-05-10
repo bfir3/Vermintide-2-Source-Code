@@ -42,7 +42,7 @@ GamepadConsumableUI.init = function (self, ingame_ui_context)
 	}
 	self.ui_animations = {}
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 	rawset(_G, "gamepad_consumable_ui", self)
 end
 
@@ -67,20 +67,20 @@ GamepadConsumableUI._create_ui_elements = function (self)
 
 	self.ui_animator = UIAnimator:new(self.ui_scenegraph, animation_definitions)
 
-	self._align_widgets(self)
-	self._set_dirty(self)
+	self:_align_widgets()
+	self:_set_dirty()
 end
 
 GamepadConsumableUI.destroy = function (self)
 	self.ui_animator = nil
 
-	self.set_visible(self, false)
+	self:set_visible(false)
 	rawset(_G, "gamepad_consumable_ui", nil)
 end
 
 GamepadConsumableUI.set_visible = function (self, visible)
 	local input_manager = self.input_manager
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 
 	if visible and not gamepad_active then
 		return
@@ -98,47 +98,47 @@ end
 
 GamepadConsumableUI.update = function (self, dt, t, inventory_extension)
 	local input_manager = self.input_manager
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 
 	if gamepad_active then
 		if not self.gamepad_active_last_frame then
 			self.gamepad_active_last_frame = true
 
-			self.on_gamepad_activated(self)
+			self:on_gamepad_activated()
 		end
 	elseif self.gamepad_active_last_frame then
 		self.gamepad_active_last_frame = false
 
-		self.on_gamepad_deactivated(self)
+		self:on_gamepad_deactivated()
 	end
 
 	if RESOLUTION_LOOKUP.modified then
 		for _, widget in ipairs(self.slot_widgets) do
-			self._set_widget_dirty(self, widget)
+			self:_set_widget_dirty(widget)
 		end
 
-		self._set_dirty(self)
+		self:_set_dirty()
 	end
 
-	self._update_extension_changes(self, dt, inventory_extension)
+	self:_update_extension_changes(dt, inventory_extension)
 
 	local ui_animator = self.ui_animator
 
-	ui_animator.update(ui_animator, dt)
+	ui_animator:update(dt)
 
 	local ui_animations = self.ui_animations
 
 	for index, animation_id in ipairs(ui_animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			ui_animations[index] = nil
 		end
 
-		self._set_dirty(self)
+		self:_set_dirty()
 	end
 
-	self._draw(self, dt)
+	self:_draw(dt)
 
 	self._dirty = nil
 end
@@ -160,8 +160,8 @@ local function get_ammunition_count(left_hand_wielded_unit, right_hand_wielded_u
 		return
 	end
 
-	local ammo_count = ammo_extension.ammo_count(ammo_extension)
-	local remaining_ammo = ammo_extension.remaining_ammo(ammo_extension)
+	local ammo_count = ammo_extension:ammo_count()
+	local remaining_ammo = ammo_extension:remaining_ammo()
 
 	return ammo_count, remaining_ammo
 end
@@ -204,8 +204,8 @@ GamepadConsumableUI._update_extension_changes = function (self, dt, inventory_ex
 
 	local dirty = false
 	local slot_widgets_by_name = self.slot_widgets_by_name
-	local selected_consumable_slot_name = inventory_extension.get_selected_consumable_slot_name(inventory_extension)
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local selected_consumable_slot_name = inventory_extension:get_selected_consumable_slot_name()
+	local equipment = inventory_extension:equipment()
 
 	for i, slot in ipairs(SLOTS_LIST) do
 		local widget_dirty = false
@@ -217,7 +217,7 @@ GamepadConsumableUI._update_extension_changes = function (self, dt, inventory_ex
 			local widget_content = widget.content
 
 			if not slot_data then
-				local dirty_reset = self._reset_slot_widget(self, widget, slot_name, i)
+				local dirty_reset = self:_reset_slot_widget(widget, slot_name, i)
 
 				if dirty_reset then
 					widget_dirty = true
@@ -230,15 +230,15 @@ GamepadConsumableUI._update_extension_changes = function (self, dt, inventory_ex
 
 				local item_data = slot_data.item_data
 				local is_selected = selected_consumable_slot_name == slot_name
-				local dirty_icon = self._update_slot_icon(self, widget, item_data, is_selected)
-				local dirty_ammo = self._update_slot_ammo(self, widget, slot_data, item_data, is_selected)
+				local dirty_icon = self:_update_slot_icon(widget, item_data, is_selected)
+				local dirty_ammo = self:_update_slot_ammo(widget, slot_data, item_data, is_selected)
 
 				if widget_content.wielded ~= is_selected then
 					widget_content.wielded = is_selected
 					widget_dirty = true
 
 					if is_selected then
-						self._on_slot_selected(self, widget)
+						self:_on_slot_selected(widget)
 					end
 				end
 
@@ -250,17 +250,17 @@ GamepadConsumableUI._update_extension_changes = function (self, dt, inventory_ex
 			if widget_dirty then
 				dirty = true
 
-				self._set_widget_dirty(self, widget)
+				self:_set_widget_dirty(widget)
 			end
 		end
 	end
 
 	if not selected_consumable_slot_name then
-		self._clear_selection(self)
+		self:_clear_selection()
 	end
 
 	if dirty then
-		self._set_dirty(self)
+		self:_set_dirty()
 	end
 end
 
@@ -272,7 +272,7 @@ GamepadConsumableUI._on_slot_selected = function (self, widget)
 	selection_offset[1] = widget_offset[1]
 	selection_offset[2] = widget_offset[2]
 
-	self._set_widget_dirty(self, selection_widget)
+	self:_set_widget_dirty(selection_widget)
 
 	self._draw_selection = true
 
@@ -284,7 +284,7 @@ GamepadConsumableUI._clear_selection = function (self)
 	local selection_widget = self.selection_widget
 
 	UIRenderer.set_element_visible(ui_renderer, selection_widget.element, false)
-	self._set_widget_dirty(self, selection_widget)
+	self:_set_widget_dirty(selection_widget)
 
 	self._draw_selection = nil
 end
@@ -463,17 +463,17 @@ GamepadConsumableUI._update_slot_positions = function (self)
 		widget.element.dirty = true
 	end
 
-	self._set_dirty(self)
+	self:_set_dirty()
 end
 
 GamepadConsumableUI.on_gamepad_activated = function (self)
-	self.set_visible(self, true)
-	self._set_dirty(self)
+	self:set_visible(true)
+	self:_set_dirty()
 end
 
 GamepadConsumableUI.on_gamepad_deactivated = function (self)
-	self.set_visible(self, false)
-	self._set_dirty(self)
+	self:set_visible(false)
+	self:_set_dirty()
 end
 
 return

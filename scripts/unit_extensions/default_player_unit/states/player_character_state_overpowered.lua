@@ -28,7 +28,7 @@ PlayerCharacterStateOverpowered.on_exit = function (self, unit, input, dt, conte
 	local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
 
 	if first_person_extension and self.onscreen_particle_id then
-		first_person_extension.stop_spawning_screen_particles(first_person_extension, self.onscreen_particle_id)
+		first_person_extension:stop_spawning_screen_particles(self.onscreen_particle_id)
 	end
 
 	if next_state ~= "knocked_down" then
@@ -42,7 +42,7 @@ PlayerCharacterStateOverpowered.on_exit = function (self, unit, input, dt, conte
 
 	local inventory_extension = self.inventory_extension
 
-	inventory_extension.rewield_wielded_slot(inventory_extension)
+	inventory_extension:rewield_wielded_slot()
 	self.status_extension:set_overpowered(false)
 end
 
@@ -60,7 +60,7 @@ PlayerCharacterStateOverpowered.update = function (self, unit, input, dt, contex
 	if Unit.alive(attacking_unit) then
 		local health_ext = ScriptUnit.has_extension(attacking_unit, "health_system")
 
-		if not health_ext.is_alive(health_ext) then
+		if not health_ext:is_alive() then
 			is_free = true
 		end
 	else
@@ -69,13 +69,13 @@ PlayerCharacterStateOverpowered.update = function (self, unit, input, dt, contex
 
 	if is_free then
 		if CharacterStateHelper.is_waiting_for_assisted_respawn(status_extension) then
-			csm.change_state(csm, "waiting_for_assisted_respawn")
+			csm:change_state("waiting_for_assisted_respawn")
 		elseif CharacterStateHelper.is_knocked_down(status_extension) then
-			csm.change_state(csm, "knocked_down")
+			csm:change_state("knocked_down")
 		elseif CharacterStateHelper.is_dead(status_extension) then
-			csm.change_state(csm, "dead")
+			csm:change_state("dead")
 		else
-			csm.change_state(csm, "standing")
+			csm:change_state("standing")
 		end
 
 		return
@@ -86,18 +86,18 @@ PlayerCharacterStateOverpowered.update = function (self, unit, input, dt, contex
 	end
 
 	if CharacterStateHelper.is_ledge_hanging(world, unit, self.temp_params) then
-		csm.change_state(csm, "ledge_hanging", self.temp_params)
+		csm:change_state("ledge_hanging", self.temp_params)
 
 		return
 	end
 
-	if not csm.state_next and not locomotion_extension.is_on_ground(locomotion_extension) then
-		csm.change_state(csm, "falling")
+	if not csm.state_next and not locomotion_extension:is_on_ground() then
+		csm:change_state("falling")
 
 		return
 	end
 
-	locomotion_extension.set_disable_rotation_update(locomotion_extension)
+	locomotion_extension:set_disable_rotation_update()
 	CharacterStateHelper.look(input_extension, self.player.viewport_name, self.first_person_extension, status_extension, inventory_extension)
 end
 

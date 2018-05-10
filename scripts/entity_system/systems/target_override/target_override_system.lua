@@ -6,7 +6,7 @@ TargetOverrideSystem.init = function (self, entity_system_creation_context, syst
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self._network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, "rpc_taunt")
+	network_event_delegate:register(self, "rpc_taunt")
 end
 
 TargetOverrideSystem.destroy = function (self)

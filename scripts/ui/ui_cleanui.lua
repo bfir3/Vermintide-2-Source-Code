@@ -59,7 +59,7 @@ UICleanUI.update = function (self, dt, context)
 
 	if ScriptUnit.has_extension(context.player.player_unit, "eyetracking_system") then
 		local eyetracking_extension = ScriptUnit.extension(context.player.player_unit, "eyetracking_system")
-		tobii_active = eyetracking_extension.get_is_feature_enabled(eyetracking_extension, "tobii_clean_ui")
+		tobii_active = eyetracking_extension:get_is_feature_enabled("tobii_clean_ui")
 	end
 
 	local gaze_x, gaze_y = Tobii.get_gaze_point()

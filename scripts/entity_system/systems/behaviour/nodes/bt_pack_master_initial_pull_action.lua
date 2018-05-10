@@ -14,7 +14,7 @@ BTPackMasterInitialPullAction.enter = function (self, unit, blackboard, t)
 	local navigation_extension = blackboard.navigation_extension
 
 	AiUtils.allow_smart_object_layers(navigation_extension, false)
-	self._find_pull_position(self, unit, blackboard, t)
+	self:_find_pull_position(unit, blackboard, t)
 
 	if blackboard.pull_position_end then
 		Unit.set_local_rotation(unit, 0, Quaternion.look(blackboard.pull_position_start:unbox() - blackboard.pull_position_end:unbox(), Vector3.up()))
@@ -34,7 +34,7 @@ BTPackMasterInitialPullAction._find_pull_position = function (self, unit, blackb
 	local direction_to_pull = Vector3.normalize(position - position_target)
 	local angle_towards_pull = math.atan2(direction_to_pull.y, direction_to_pull.x, 0)
 	local navigation_extension = blackboard.navigation_extension
-	local traverse_logic = navigation_extension.traverse_logic(navigation_extension)
+	local traverse_logic = navigation_extension:traverse_logic()
 	local num_segments = 10
 
 	for i = 1, num_segments, 1 do
@@ -91,7 +91,7 @@ BTPackMasterInitialPullAction.leave = function (self, unit, blackboard, t, reaso
 
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.set_movement_type(locomotion_extension, "snap_to_navmesh")
+	locomotion_extension:set_movement_type("snap_to_navmesh")
 
 	blackboard.attack_cooldown = t + blackboard.action.cooldown
 end

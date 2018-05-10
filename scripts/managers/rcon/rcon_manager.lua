@@ -42,7 +42,7 @@ RconManager.init = function (self)
 	self._intercept_ids = {}
 
 	if PLATFORM == "win32" then
-		self._create_rcon_ui(self)
+		self:_create_rcon_ui()
 	end
 end
 
@@ -77,22 +77,22 @@ RconManager.authenticated_with_playing_server = function (self)
 		return false
 	end
 
-	local lobby = network_manager.lobby(network_manager)
+	local lobby = network_manager:lobby()
 
 	if lobby == nil then
 		return false
 	end
 
-	return lobby.lobby_host(lobby) == self._server_id
+	return lobby:lobby_host() == self._server_id
 end
 
 RconManager.send_command = function (self, command)
-	command = command.match(command, "^%s*(.-)%s*$")
+	command = command:match("^%s*(.-)%s*$")
 
-	if command.match(command, "/.*") then
-		self._meta_command(self, command)
+	if command:match("/.*") then
+		self:_meta_command(command)
 	else
-		self._server_command(self, command)
+		self:_server_command(command)
 	end
 end
 
@@ -212,7 +212,7 @@ RconManager._create_rcon_ui = function (self)
 end
 
 RconManager._id_reply = function (self, id_string)
-	self._server_id = id_string.match(id_string, "^%s*(.-)%s*$")
+	self._server_id = id_string:match("^%s*(.-)%s*$")
 end
 
 RconManager._meta_help = function (self)
@@ -239,18 +239,18 @@ end
 RconManager._meta_connect = function (self, ip, port, password)
 	self._rcon_ui:add_output(string.format("/connect %s %s ********", ip, port), RconUI.ECHO_MSG)
 
-	if ip.match(ip, "^%d+%.%d+%.%d+%.%d+$") == nil then
+	if ip:match("^%d+%.%d+%.%d+%.%d+$") == nil then
 		self._rcon_ui:add_output(tr("rcon_meta_command_error_invalid_ip"), RconUI.META_MSG)
 	end
 
-	if port.match(port, "^%d+$") == nil then
+	if port:match("^%d+$") == nil then
 		self._rcon_ui:add_output(tr("rcon_meta_command_error_invalid_port"), RconUI.META_MSG)
 	end
 
 	port = tonumber(port)
 
 	if self._connection_id ~= nil then
-		self._disconnect(self)
+		self:_disconnect()
 	end
 
 	self._connection_id = RConClient.connect(ip, port, password or "")
@@ -259,7 +259,7 @@ RconManager._meta_connect = function (self, ip, port, password)
 end
 
 RconManager._meta_disconnect = function (self)
-	self._disconnect(self)
+	self:_disconnect()
 	self._rcon_ui:set_header(tr("rcon_connection_status_disconnected"))
 end
 

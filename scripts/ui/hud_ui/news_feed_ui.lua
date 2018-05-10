@@ -23,7 +23,7 @@ NewsFeedUI.init = function (self, ingame_ui_context)
 	self.ui_animations = {}
 	self.is_in_inn = ingame_ui_context.is_in_inn
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 
 	self.conditions_params = {}
 	self.templates_on_cooldown = {}
@@ -47,7 +47,7 @@ NewsFeedUI._create_ui_elements = function (self)
 	self._active_news = {}
 
 	UIRenderer.clear_scenegraph_queue(self.ui_renderer)
-	self.set_visible(self, true)
+	self:set_visible(true)
 end
 
 local widgets_to_remove = {}
@@ -87,12 +87,12 @@ NewsFeedUI._sync_news = function (self, dt, t)
 	local conditions_params = self.conditions_params
 
 	if player_unit then
-		local hero_name = player.profile_display_name(player)
-		local career_name = player.career_name(player)
+		local hero_name = player:profile_display_name()
+		local career_name = player:career_name()
 
 		if conditions_params.hero_name ~= hero_name or conditions_params.career_name ~= career_name then
 			while 0 < #self._active_news do
-				self._remove_entry(self, 1)
+				self:_remove_entry(1)
 			end
 		end
 
@@ -153,7 +153,7 @@ NewsFeedUI._sync_news = function (self, dt, t)
 		for i = 1, #widgets_to_remove, 1 do
 			local index = widgets_to_remove[i]
 
-			self._mark_entry_for_removal(self, index)
+			self:_mark_entry_for_removal(index)
 		end
 
 		local entries_added = false
@@ -161,7 +161,7 @@ NewsFeedUI._sync_news = function (self, dt, t)
 		for i, template in ipairs(news_templates) do
 			for _, template_name in ipairs(news_to_add) do
 				if template_name == template.name then
-					local added = self._add_entry(self, template)
+					local added = self:_add_entry(template)
 
 					if added then
 						entries_added = true
@@ -171,7 +171,7 @@ NewsFeedUI._sync_news = function (self, dt, t)
 		end
 
 		if entries_added then
-			self._update_alignment_duration(self)
+			self:_update_alignment_duration()
 
 			self.feed_sync_delay = SYNC_WAIT_DURATION_TIME
 		else
@@ -247,7 +247,7 @@ NewsFeedUI._update_entries_expire_time = function (self, dt, t)
 			if duration == 0 then
 				data.duration = nil
 
-				self._mark_entry_for_removal(self, index)
+				self:_mark_entry_for_removal(index)
 			else
 				data.duration = duration
 			end
@@ -272,7 +272,7 @@ NewsFeedUI._remove_entry = function (self, index)
 	local unused_news_widgets = self._unused_news_widgets
 
 	table.insert(unused_news_widgets, #unused_news_widgets + 1, widget)
-	self._update_alignment_duration(self)
+	self:_update_alignment_duration()
 
 	local name = data.name
 	local cooldown = data.cooldown
@@ -350,7 +350,7 @@ NewsFeedUI._update_state_animations = function (self, dt)
 			if not delete then
 				local widget = data.widget
 
-				self._animate_widget(self, widget, state, progress)
+				self:_animate_widget(widget, state, progress)
 			else
 				data.delete = delete
 			end
@@ -359,7 +359,7 @@ NewsFeedUI._update_state_animations = function (self, dt)
 
 	for index, data in ripairs(active_news) do
 		if data.delete then
-			self._remove_entry(self, index)
+			self:_remove_entry(index)
 		end
 	end
 end
@@ -405,7 +405,7 @@ NewsFeedUI.set_position = function (self, x, y)
 end
 
 NewsFeedUI.destroy = function (self)
-	self.set_visible(self, false)
+	self:set_visible(false)
 	rawset(_G, "news_feed_ui", nil)
 end
 
@@ -419,17 +419,17 @@ NewsFeedUI.update = function (self, dt, t)
 		return
 	end
 
-	self._sync_news(self, dt, t)
-	self._update_state_animations(self, dt)
-	self._update_alignment(self, dt)
-	self._handle_resolution_modified(self)
-	self._update_entries_expire_time(self, dt, t)
-	self.draw(self, dt)
+	self:_sync_news(dt, t)
+	self:_update_state_animations(dt)
+	self:_update_alignment(dt)
+	self:_handle_resolution_modified()
+	self:_update_entries_expire_time(dt, t)
+	self:draw(dt)
 end
 
 NewsFeedUI._handle_resolution_modified = function (self)
 	if RESOLUTION_LOOKUP.modified then
-		self._on_resolution_modified(self)
+		self:_on_resolution_modified()
 	end
 end
 

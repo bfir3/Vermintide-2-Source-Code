@@ -38,7 +38,7 @@ RoomManagerServer.destroy_room = function (self, peer_id, move_other_players_fro
 	local room_id = self._peer_rooms[peer_id].room_id
 
 	if (move_other_players_from_room and move_other_players_from_room == true) or move_other_players_from_room == nil then
-		self.move_players_from_room(self, room_id)
+		self:move_players_from_room(room_id)
 	end
 
 	self._room_handler:destroy_room(room_id)
@@ -55,14 +55,14 @@ RoomManagerServer.move_players_from_room = function (self, room_id)
 	local network_manager = Managers.state.network
 	local spawn_points = Managers.state.spawn.spawn_points
 	local player_manager = Managers.player
-	local players = player_manager.human_players(player_manager)
+	local players = player_manager:human_players()
 
 	for _, player in pairs(players) do
 		local player_unit = player.player_unit
 
 		if not Unit.alive(player_unit) then
 		else
-			local unit_id = network_manager.unit_game_object_id(network_manager, player_unit)
+			local unit_id = network_manager:unit_game_object_id(player_unit)
 
 			if not unit_id then
 			else
@@ -70,7 +70,7 @@ RoomManagerServer.move_players_from_room = function (self, room_id)
 
 				if Level.is_point_inside_volume(level, "room_volume", position) then
 					local peer_id = player.peer_id
-					local spawn_point_id = self.get_spawn_point_by_peer(self, peer_id)
+					local spawn_point_id = self:get_spawn_point_by_peer(peer_id)
 					local spawn_point = spawn_points[spawn_point_id]
 					local spawn_pos = spawn_point.pos:unbox()
 					local spawn_rot = spawn_point.rot:unbox()
@@ -78,9 +78,9 @@ RoomManagerServer.move_players_from_room = function (self, room_id)
 					if player.local_player then
 						local locomotion_extension = ScriptUnit.extension(player_unit, "locomotion_system")
 
-						locomotion_extension.teleport_to(locomotion_extension, spawn_pos, spawn_rot)
+						locomotion_extension:teleport_to(spawn_pos, spawn_rot)
 					else
-						local unit_id = network_manager.unit_game_object_id(network_manager, player_unit)
+						local unit_id = network_manager:unit_game_object_id(player_unit)
 
 						RPC.rpc_teleport_unit_to(peer_id, unit_id, spawn_pos, spawn_rot)
 					end

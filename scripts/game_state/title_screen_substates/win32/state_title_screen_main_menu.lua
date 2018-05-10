@@ -31,14 +31,14 @@ else
 		function (this)
 			local input_manager = Managers.input
 
-			input_manager.block_device_except_service(input_manager, "options_menu", "keyboard", 1)
-			input_manager.block_device_except_service(input_manager, "options_menu", "mouse", 1)
-			input_manager.block_device_except_service(input_manager, "options_menu", "gamepad", 1)
-			this.activate_view(this, "options_view")
+			input_manager:block_device_except_service("options_menu", "keyboard", 1)
+			input_manager:block_device_except_service("options_menu", "mouse", 1)
+			input_manager:block_device_except_service("options_menu", "gamepad", 1)
+			this:activate_view("options_view")
 			Managers.music:trigger_event("play_hud_select")
 		end,
 		function (this)
-			this.activate_view(this, "credits_view")
+			this:activate_view("credits_view")
 			Managers.music:trigger_event("play_hud_select")
 		end,
 		function (this)
@@ -77,7 +77,7 @@ StateTitleScreenMainMenu.on_enter = function (self, params)
 	end
 
 	self._setup_sound()
-	self._init_menu_views(self)
+	self:_init_menu_views()
 	self.parent:show_menu(true)
 	Managers.transition:hide_loading_icon()
 end
@@ -150,12 +150,12 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 
 		local title_start_ui = self._title_start_ui
 
-		title_start_ui.update(title_start_ui, dt, t)
+		title_start_ui:update(dt, t)
 
-		local current_menu_index = title_start_ui.current_menu_index(title_start_ui)
-		local active_menu_selection = title_start_ui.active_menu_selection(title_start_ui)
+		local current_menu_index = title_start_ui:current_menu_index()
+		local active_menu_selection = title_start_ui:active_menu_selection()
 
-		if active_menu_selection and current_menu_index and input_service.get(input_service, "start") then
+		if active_menu_selection and current_menu_index and input_service:get("start") then
 			menu_functions[current_menu_index](self)
 		end
 
@@ -168,7 +168,7 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 			Managers.music:trigger_event("hud_menu_start_game")
 		end
 
-		if input_service.get(input_service, "back") or Managers.time:get_demo_transition() then
+		if input_service:get("back") or Managers.time:get_demo_transition() then
 			self.parent:show_menu(false)
 
 			if script_data.honduras_demo and not self._title_start_ui:in_transition() then
@@ -184,7 +184,7 @@ end
 StateTitleScreenMainMenu.on_exit = function (self)
 	for k, view in pairs(self._views) do
 		if view.destroy then
-			view.destroy(view)
+			view:destroy()
 		end
 	end
 
@@ -233,7 +233,7 @@ StateTitleScreenMainMenu.exit_current_view = function (self)
 	self._active_view = nil
 	local input_manager = Managers.input
 
-	input_manager.block_device_except_service(input_manager, "main_menu", "gamepad", 1)
+	input_manager:block_device_except_service("main_menu", "gamepad", 1)
 end
 
 return

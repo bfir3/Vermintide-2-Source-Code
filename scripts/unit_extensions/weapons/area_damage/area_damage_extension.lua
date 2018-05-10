@@ -88,7 +88,7 @@ AreaDamageExtension.destroy = function (self)
 	if self.nav_tag_volume_id then
 		local volume_system = Managers.state.entity:system("volume_system")
 
-		volume_system.destroy_nav_tag_volume(volume_system, self.nav_tag_volume_id)
+		volume_system:destroy_nav_tag_volume(self.nav_tag_volume_id)
 	end
 end
 
@@ -96,7 +96,7 @@ AreaDamageExtension.enable = function (self, enable)
 	if enable then
 		self.enabled = true
 
-		self.start(self)
+		self:start()
 	else
 		self.enabled = false
 		self.area_damage_started = false
@@ -135,7 +135,7 @@ AreaDamageExtension.start = function (self)
 		local updated, damage_buffer = area_damage.server.update(self.damage_source, self.unit, self.initial_radius, self.aoe_init_damage, 0, 0, 0, 0, self.damage_players, self.explosion_template_name)
 
 		if updated then
-			self._add_to_damage_buffer(self, damage_buffer)
+			self:_add_to_damage_buffer(damage_buffer)
 		end
 	end
 
@@ -231,7 +231,7 @@ AreaDamageExtension.start = function (self)
 		if self.nav_tag_volume_layer then
 			local volume_system = Managers.state.entity:system("volume_system")
 			local pos = Unit.world_position(self.unit, 0)
-			self.nav_tag_volume_id = volume_system.create_nav_tag_volume_from_data(volume_system, pos, self.radius, self.nav_tag_volume_layer)
+			self.nav_tag_volume_id = volume_system:create_nav_tag_volume_from_data(pos, self.radius, self.nav_tag_volume_layer)
 		else
 			Application.warning(string.format("[AreaDamageExtension] create_nav_tag_volume is set but there are no nav_tag_volume_template set for unit %s", self.unit))
 		end
@@ -239,7 +239,7 @@ AreaDamageExtension.start = function (self)
 end
 
 AreaDamageExtension.update = function (self, unit, input, dt, context, t)
-	self._update_damage_buffer(self)
+	self:_update_damage_buffer()
 
 	if not self.area_damage_started then
 		return
@@ -251,7 +251,7 @@ AreaDamageExtension.update = function (self, unit, input, dt, context, t)
 		local updated, damage_buffer = area_damage.server.update(self.damage_source, self.unit, self.radius, self.aoe_dot_damage, self.life_time, self.life_timer, self.aoe_dot_damage_interval, self.damage_timer, self.damage_players, self.explosion_template_name)
 
 		if updated then
-			self._add_to_damage_buffer(self, damage_buffer)
+			self:_add_to_damage_buffer(damage_buffer)
 		end
 
 		if self.area_ai_random_death_template then
@@ -259,7 +259,7 @@ AreaDamageExtension.update = function (self, unit, input, dt, context, t)
 			local updated, damage_buffer = ai_random_die.server.update(self.damage_source, self.unit, self.radius, self.aoe_dot_damage_interval, self.damage_timer)
 
 			if updated then
-				self._add_to_damage_buffer(self, damage_buffer)
+				self:_add_to_damage_buffer(damage_buffer)
 			end
 		end
 

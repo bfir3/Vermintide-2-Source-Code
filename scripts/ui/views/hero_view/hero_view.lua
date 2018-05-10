@@ -62,10 +62,10 @@ HeroView.init = function (self, ingame_ui_context)
 	local input_manager = ingame_ui_context.input_manager
 	self.input_manager = input_manager
 
-	input_manager.create_input_service(input_manager, "hero_view", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "hero_view", "keyboard")
-	input_manager.map_device_to_service(input_manager, "hero_view", "mouse")
-	input_manager.map_device_to_service(input_manager, "hero_view", "gamepad")
+	input_manager:create_input_service("hero_view", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("hero_view", "keyboard")
+	input_manager:map_device_to_service("hero_view", "mouse")
+	input_manager:map_device_to_service("hero_view", "gamepad")
 
 	local state_machine_params = {
 		wwise_world = self.wwise_world,
@@ -144,7 +144,7 @@ HeroView.draw = function (self, dt, input_service)
 	local ui_top_renderer = self.ui_top_renderer
 	local ui_scenegraph = self.ui_scenegraph
 	local input_manager = self.input_manager
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 
 	UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt)
 
@@ -190,18 +190,18 @@ HeroView.update = function (self, dt, t)
 		local screen_name = requested_screen_change_data.screen_name
 		local sub_screen_name = requested_screen_change_data.sub_screen_name
 
-		self._change_screen_by_name(self, screen_name, sub_screen_name)
+		self:_change_screen_by_name(screen_name, sub_screen_name)
 
 		self._requested_screen_change_data = nil
 	end
 
 	local is_sub_menu = true
 	local input_manager = self.input_manager
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
-	local input_blocked = self.input_blocked(self)
-	local input_service = (input_blocked and fake_input_service) or self.input_service(self)
+	local gamepad_active = input_manager:is_device_active("gamepad")
+	local input_blocked = self:input_blocked()
+	local input_service = (input_blocked and fake_input_service) or self:input_service()
 	self._state_machine_params.input_service = input_service
-	local transitioning = self.transitioning(self)
+	local transitioning = self:transitioning()
 
 	self.ui_animator:update(dt)
 
@@ -214,11 +214,11 @@ HeroView.update = function (self, dt, t)
 	end
 
 	if not transitioning then
-		self._handle_mouse_input(self, dt, t, input_service)
+		self:_handle_mouse_input(dt, t, input_service)
 	end
 
 	self._machine:update(dt, t)
-	self.draw(self, dt, input_service)
+	self:draw(dt, input_service)
 end
 
 HeroView.on_enter = function (self, menu_state_name, menu_sub_state_name)
@@ -226,18 +226,18 @@ HeroView.on_enter = function (self, menu_state_name, menu_sub_state_name)
 
 	local input_manager = self.input_manager
 
-	input_manager.block_device_except_service(input_manager, "hero_view", "keyboard", 1)
-	input_manager.block_device_except_service(input_manager, "hero_view", "mouse", 1)
-	input_manager.block_device_except_service(input_manager, "hero_view", "gamepad", 1)
+	input_manager:block_device_except_service("hero_view", "keyboard", 1)
+	input_manager:block_device_except_service("hero_view", "mouse", 1)
+	input_manager:block_device_except_service("hero_view", "gamepad", 1)
 
 	local params = self._state_machine_params
 	params.initial_state = true
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	local profile_index = self.profile_synchronizer:profile_by_peer(self.peer_id, self.local_player_id)
 
-	self.set_current_hero(self, profile_index)
+	self:set_current_hero(profile_index)
 
 	self.waiting_for_post_update_enter = true
 	self._on_enter_transition = {
@@ -245,7 +245,7 @@ HeroView.on_enter = function (self, menu_state_name, menu_sub_state_name)
 		menu_sub_state_name = menu_sub_state_name
 	}
 
-	self.play_sound(self, "hud_in_inventory_state_on")
+	self:play_sound("hud_in_inventory_state_on")
 
 	self._draw_loading = false
 end
@@ -293,7 +293,7 @@ HeroView._is_selection_widget_pressed = function (self, widget)
 end
 
 HeroView.hotkey_allowed = function (self, input, mapping_data)
-	if self.input_blocked(self) then
+	if self:input_blocked() then
 		return false
 	end
 
@@ -302,9 +302,9 @@ HeroView.hotkey_allowed = function (self, input, mapping_data)
 	local state_machine = self._machine
 
 	if state_machine then
-		local current_state = state_machine.state(state_machine)
+		local current_state = state_machine:state()
 		local current_state_name = current_state.NAME
-		local current_screen_settings = self._get_screen_settings_by_state_name(self, current_state_name)
+		local current_screen_settings = self:_get_screen_settings_by_state_name(current_state_name)
 		local name = current_screen_settings.name
 
 		if current_screen_settings.hotkey_disabled then
@@ -312,15 +312,15 @@ HeroView.hotkey_allowed = function (self, input, mapping_data)
 		end
 
 		if name == transition_state then
-			local active_sub_settings_name = current_state.active_settings_name and current_state.active_settings_name(current_state)
+			local active_sub_settings_name = current_state.active_settings_name and current_state:active_settings_name()
 
 			if not transition_sub_state or transition_sub_state == active_sub_settings_name then
 				return true
 			elseif transition_sub_state then
-				current_state.requested_screen_change_by_name(current_state, transition_sub_state)
+				current_state:requested_screen_change_by_name(transition_sub_state)
 			end
 		elseif transition_state then
-			self.requested_screen_change_by_name(self, transition_state, transition_sub_state)
+			self:requested_screen_change_by_name(transition_state, transition_sub_state)
 		else
 			return true
 		end
@@ -364,7 +364,7 @@ HeroView._change_screen_by_name = function (self, screen_name, sub_screen_name)
 	if self._machine and not sub_screen_name then
 		self._wanted_state = state
 	else
-		self._setup_state_machine(self, self._state_machine_params, state, sub_screen_name)
+		self:_setup_state_machine(self._state_machine_params, state, sub_screen_name)
 	end
 end
 
@@ -372,7 +372,7 @@ HeroView._change_screen_by_index = function (self, index)
 	local screen_settings = settings_by_screen[index]
 	local settings_name = screen_settings.name
 
-	self._change_screen_by_name(self, settings_name)
+	self:_change_screen_by_name(settings_name)
 end
 
 HeroView.post_update_on_enter = function (self)
@@ -380,11 +380,11 @@ HeroView.post_update_on_enter = function (self)
 	local on_enter_transition = self._on_enter_transition
 
 	if on_enter_transition and on_enter_transition.menu_state_name then
-		self._change_screen_by_name(self, on_enter_transition.menu_state_name, on_enter_transition.menu_sub_state_name)
+		self:_change_screen_by_name(on_enter_transition.menu_state_name, on_enter_transition.menu_sub_state_name)
 
 		self._on_enter_transition = nil
 	else
-		self._change_screen_by_index(self, 1)
+		self:_change_screen_by_index(1)
 	end
 end
 
@@ -406,7 +406,7 @@ HeroView.on_exit = function (self)
 
 	self.exiting = nil
 
-	self.play_sound(self, "hud_in_inventory_state_off")
+	self:play_sound("hud_in_inventory_state_off")
 
 	self._draw_loading = false
 end
@@ -417,7 +417,7 @@ HeroView.exit = function (self, return_to_game, ignore_sound)
 	self.ingame_ui:transition_with_fade(exit_transition)
 
 	if not ignore_sound then
-		self.play_sound(self, "Play_hud_button_close")
+		self:play_sound("Play_hud_button_close")
 	end
 
 	self.exiting = true
@@ -454,7 +454,7 @@ end
 HeroView.close_menu = function (self, return_to_main_screen, ignore_sound)
 	local return_to_game = not return_to_main_screen
 
-	self.exit(self, return_to_game, ignore_sound)
+	self:exit(return_to_game, ignore_sound)
 end
 
 HeroView.destroy = function (self)
@@ -480,10 +480,10 @@ end
 
 HeroView._has_active_level_vote = function (self)
 	local voting_manager = self.voting_manager
-	local active_vote_name = voting_manager.vote_in_progress(voting_manager)
+	local active_vote_name = voting_manager:vote_in_progress()
 	local is_mission_vote = active_vote_name == "game_settings_vote" or active_vote_name == "game_settings_deed_vote"
 
-	return is_mission_vote and not voting_manager.has_voted(voting_manager, Network.peer_id())
+	return is_mission_vote and not voting_manager:has_voted(Network.peer_id())
 end
 
 HeroView._set_loading_overlay_enabled = function (self, enabled, message)

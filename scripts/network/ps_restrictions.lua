@@ -42,13 +42,13 @@ PSRestrictions.add_user = function (self, user_id)
 		restrictions = table.clone(default_restrictions)
 	}
 
-	self._start_restriction_access_fetched(self, user_id)
+	self:_start_restriction_access_fetched(user_id)
 end
 
 PSRestrictions._start_restriction_access_fetched = function (self, user_id)
 	local user = self._current_users[user_id]
 
-	self._fetch_next_restriction_access(self, user_id)
+	self:_fetch_next_restriction_access(user_id)
 end
 
 PSRestrictions._fetch_next_restriction_access = function (self, user_id)
@@ -122,7 +122,7 @@ PSRestrictions.refetch_restriction_access = function (self, user_id, restriction
 		user[restriction] = nil
 	end
 
-	self._fetch_next_restriction_access(self, user_id)
+	self:_fetch_next_restriction_access(user_id)
 end
 
 PSRestrictions._set_restriction_fetched = function (self, user_id, restriction)
@@ -138,7 +138,7 @@ PSRestrictions._try_fetch_next_restriction_access = function (self, user_id)
 	local restrictions = user.restrictions
 
 	if 0 < #restrictions then
-		self._fetch_next_restriction_access(self, user_id)
+		self:_fetch_next_restriction_access(user_id)
 	end
 end
 
@@ -165,7 +165,7 @@ PSRestrictions.cb_network_availability = function (self, user_id, restriction, i
 			error = error
 		}
 
-		self._set_restriction_fetched(self, user_id, restriction)
+		self:_set_restriction_fetched(user_id, restriction)
 	else
 		local result = NpCheck.result(info.token)
 
@@ -176,10 +176,10 @@ PSRestrictions.cb_network_availability = function (self, user_id, restriction, i
 			access = result
 		}
 
-		self._set_restriction_fetched(self, user_id, restriction)
+		self:_set_restriction_fetched(user_id, restriction)
 
 		if result == true then
-			self._try_fetch_next_restriction_access(self, user_id)
+			self:_try_fetch_next_restriction_access(user_id)
 		end
 	end
 end
@@ -195,7 +195,7 @@ PSRestrictions.cb_playstation_plus = function (self, user_id, restriction, info)
 			error = error
 		}
 
-		self._set_restriction_fetched(self, user_id, restriction)
+		self:_set_restriction_fetched(user_id, restriction)
 	else
 		local result = NpCheck.result(info.token)
 
@@ -206,8 +206,8 @@ PSRestrictions.cb_playstation_plus = function (self, user_id, restriction, info)
 			access = result
 		}
 
-		self._set_restriction_fetched(self, user_id, restriction)
-		self._try_fetch_next_restriction_access(self, user_id)
+		self:_set_restriction_fetched(user_id, restriction)
+		self:_try_fetch_next_restriction_access(user_id)
 	end
 end
 
@@ -226,7 +226,7 @@ PSRestrictions.cb_parental_control = function (self, user_id, restriction, info)
 			error = error
 		}
 
-		self._set_restriction_fetched(self, user_id, restriction)
+		self:_set_restriction_fetched(user_id, restriction)
 	else
 		local result = NpCheck.parental_control_info_result(info.token)
 		local chat = result.chat_restriction == false
@@ -242,8 +242,8 @@ PSRestrictions.cb_parental_control = function (self, user_id, restriction, info)
 
 		dprint("\"chat\" access for user (%d) result (%s)", user_id, tostring(chat))
 		dprint("\"ugc\" access for user (%d) result (%s)", user_id, tostring(ugc))
-		self._set_restriction_fetched(self, user_id, restriction)
-		self._try_fetch_next_restriction_access(self, user_id)
+		self:_set_restriction_fetched(user_id, restriction)
+		self:_try_fetch_next_restriction_access(user_id)
 	end
 end
 

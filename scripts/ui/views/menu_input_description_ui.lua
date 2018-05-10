@@ -195,7 +195,7 @@ end
 MenuInputDescriptionUI = class(MenuInputDescriptionUI)
 
 MenuInputDescriptionUI.init = function (self, ingame_ui_context, ui_renderer, input_service, number_of_elements, layer, generic_actions)
-	self.clear_input_descriptions(self)
+	self:clear_input_descriptions()
 
 	self.input_service = input_service
 	self.ui_renderer = ui_renderer
@@ -205,7 +205,7 @@ MenuInputDescriptionUI.init = function (self, ingame_ui_context, ui_renderer, in
 	}
 	scenegraph_definition.root.position[3] = layer + 10 or UILayer.controller_description
 
-	self.create_ui_elements(self, ui_renderer, number_of_elements)
+	self:create_ui_elements(ui_renderer, number_of_elements)
 end
 
 MenuInputDescriptionUI.create_ui_elements = function (self, ui_renderer, number_of_elements)
@@ -244,7 +244,7 @@ end
 MenuInputDescriptionUI.change_generic_actions = function (self, new_generic_actions)
 	self.generic_actions = new_generic_actions
 
-	self.set_input_description(self, self.current_console_selection_data)
+	self:set_input_description(self.current_console_selection_data)
 end
 
 MenuInputDescriptionUI.setup_console_widget_selections = function (self)
@@ -331,7 +331,7 @@ MenuInputDescriptionUI.setup_console_widget_selections = function (self)
 end
 
 MenuInputDescriptionUI.set_input_description = function (self, console_selection_data)
-	self.clear_input_descriptions(self)
+	self:clear_input_descriptions()
 
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
@@ -365,7 +365,7 @@ MenuInputDescriptionUI.set_input_description = function (self, console_selection
 		if description_text then
 			widget_use_index = widget_use_index + 1
 			description_text = Localize(description_text)
-			local action_texture_data = self.get_gamepad_input_texture_data(self, input_action, ignore_keybinding)
+			local action_texture_data = self:get_gamepad_input_texture_data(input_action, ignore_keybinding)
 			local description_widget = console_input_description_widgets[widget_use_index]
 			local widget_content = description_widget.content
 			local widget_style = description_widget.style

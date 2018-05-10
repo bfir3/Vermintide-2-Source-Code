@@ -9,11 +9,11 @@ PlayerSyncData.init = function (self, player, network_manager)
 			power_level = 0,
 			best_aquired_power_level = 0,
 			go_type = NetworkLookup.go_types.player_sync_data,
-			network_id = player.network_id(player),
-			local_player_id = player.local_player_id(player)
+			network_id = player:network_id(),
+			local_player_id = player:local_player_id()
 		}
 		local callback = callback(self, "cb_game_session_disconnect")
-		local game_object_id = network_manager.create_game_object(network_manager, "player_sync_data", game_object_data_table, callback)
+		local game_object_id = network_manager:create_game_object("player_sync_data", game_object_data_table, callback)
 		self._game_object_id = game_object_id
 	end
 end

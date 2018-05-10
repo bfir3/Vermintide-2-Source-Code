@@ -28,15 +28,15 @@ MatchmakingStateJoinGame.on_enter = function (self, state_context)
 	self._lobby_data.selected_level_key = self._join_lobby_data.selected_level_key
 	self._lobby_data.difficulty = self._join_lobby_data.difficulty
 	local matchmaking_manager = self._matchmaking_manager
-	local hero_index, hero_name = self._current_hero(self)
+	local hero_index, hero_name = self:_current_hero()
 
 	assert(hero_index, "no hero index? this is wrong")
 
-	if matchmaking_manager.hero_available_in_lobby_data(matchmaking_manager, hero_index, self._lobby_data) then
+	if matchmaking_manager:hero_available_in_lobby_data(hero_index, self._lobby_data) then
 		local hero = SPProfiles[hero_index]
 		self._selected_hero_name = hero_name
 
-		self._request_profile_from_host(self, hero_index)
+		self:_request_profile_from_host(hero_index)
 	else
 		self._show_popup = true
 	end
@@ -60,11 +60,11 @@ MatchmakingStateJoinGame.update = function (self, dt, t)
 	local popup_join_lobby_handler = self._popup_join_lobby_handler
 
 	if popup_join_lobby_handler then
-		local popup_result = popup_join_lobby_handler.query_result(popup_join_lobby_handler)
+		local popup_result = popup_join_lobby_handler:query_result()
 
 		if popup_result then
 			self._selected_hero_at_t = t
-			local cancel_matchmaking = self._handle_popup_result(self, popup_result, t)
+			local cancel_matchmaking = self:_handle_popup_result(popup_result, t)
 
 			if cancel_matchmaking then
 				self._matchmaking_manager:cancel_matchmaking()
@@ -73,7 +73,7 @@ MatchmakingStateJoinGame.update = function (self, dt, t)
 			end
 		end
 
-		self._update_lobby_data(self, dt, t)
+		self:_update_lobby_data(dt, t)
 	end
 
 	if self._handshaker_client:is_timed_out_from_server(t) then
@@ -90,7 +90,7 @@ MatchmakingStateJoinGame.update = function (self, dt, t)
 		local matchmaking_manager = self._matchmaking_manager
 		local lobby_id = self.lobby_client:id()
 
-		matchmaking_manager.add_broken_lobby(matchmaking_manager, lobby_id, t, false)
+		matchmaking_manager:add_broken_lobby(lobby_id, t, false)
 
 		if self.lobby_client then
 			self.lobby_client:destroy()
@@ -107,7 +107,7 @@ MatchmakingStateJoinGame.update = function (self, dt, t)
 
 		if join_by_lobby_browser then
 			mm_printf_force("Abort from lobby browser or invite")
-			matchmaking_manager.cancel_join_lobby(matchmaking_manager, "user_cancel")
+			matchmaking_manager:cancel_join_lobby("user_cancel")
 
 			return MatchmakingStateIdle, self.state_context
 		else
@@ -119,14 +119,14 @@ MatchmakingStateJoinGame.update = function (self, dt, t)
 
 	if self._show_popup then
 		local backend_manager = Managers.backend
-		local waiting_user_input = backend_manager.is_waiting_for_user_input(backend_manager)
-		local backend_items = backend_manager.get_interface(backend_manager, "items")
-		local waiting_for_item_poll = backend_items.num_current_item_server_requests(backend_items) ~= 0
+		local waiting_user_input = backend_manager:is_waiting_for_user_input()
+		local backend_items = backend_manager:get_interface("items")
+		local waiting_for_item_poll = backend_items:num_current_item_server_requests() ~= 0
 
 		if not waiting_user_input and not waiting_for_item_poll then
 			self._show_popup = false
 
-			self._spawn_join_popup(self)
+			self:_spawn_join_popup()
 		end
 	end
 
@@ -140,13 +140,13 @@ MatchmakingStateJoinGame._update_lobby_data = function (self, dt, t)
 		self._update_lobby_data_timer = 0.5
 		local lobby_data = self._lobby_data
 		local lobby_client = self.lobby_client
-		local selected_level_key = lobby_client.lobby_data(lobby_client, "selected_level_key")
+		local selected_level_key = lobby_client:lobby_data("selected_level_key")
 
 		if lobby_data.selected_level_key ~= selected_level_key then
 			lobby_data.selected_level_key = selected_level_key
 		end
 
-		local difficulty = lobby_client.lobby_data(lobby_client, "difficulty")
+		local difficulty = lobby_client:lobby_data("difficulty")
 
 		if lobby_data.difficulty ~= difficulty then
 			lobby_data.difficulty = difficulty
@@ -170,7 +170,7 @@ MatchmakingStateJoinGame._handle_popup_result = function (self, result, t)
 		self._selected_hero_name = selected_hero_name
 		self._selected_career_name = result.selected_career_name
 
-		self._request_profile_from_host(self, hero_index)
+		self:_request_profile_from_host(hero_index)
 	else
 		mm_printf_force("Popup cancelled")
 
@@ -196,7 +196,7 @@ MatchmakingStateJoinGame._handle_popup_result = function (self, result, t)
 		self._matchmaking_manager:send_system_chat_message(status_message)
 	end
 
-	self._remove_join_popup(self)
+	self:_remove_join_popup()
 
 	return cancel
 end
@@ -206,10 +206,10 @@ MatchmakingStateJoinGame.rpc_matchmaking_update_profiles_data = function (self, 
 		return
 	end
 
-	self._update_profiles_data(self, profile_array, player_id_array)
+	self:_update_profiles_data(profile_array, player_id_array)
 
 	if self._popup_join_lobby_handler then
-		self._set_unavailable_heroes(self, self._lobby_data)
+		self:_set_unavailable_heroes(self._lobby_data)
 	end
 end
 
@@ -233,17 +233,17 @@ MatchmakingStateJoinGame._spawn_join_popup = function (self)
 	local state_context = self.state_context
 	local peer_id = Network.peer_id()
 	local player = Managers.player:player_from_peer_id(peer_id)
-	local profile_index = player.profile_index(player)
-	local career_index = player.career_index(player)
+	local profile_index = player:profile_index()
+	local career_index = player:career_index()
 	local auto_cancel_time = MatchmakingSettings.JOIN_LOBBY_TIME_UNTIL_AUTO_CANCEL
 	local join_by_lobby_browser = self.state_context.join_by_lobby_browser
 	local difficulty = self.lobby_client:lobby_data("difficulty")
 	self._popup_join_lobby_handler = self._ingame_ui:show_unavailable_hero_popup(profile_index, career_index, auto_cancel_time, join_by_lobby_browser, difficulty)
 
-	self._set_unavailable_heroes(self, self._lobby_data)
+	self:_set_unavailable_heroes(self._lobby_data)
 
 	local time_manager = Managers.time
-	self._hero_popup_at_t = time_manager.time(time_manager, "game")
+	self._hero_popup_at_t = time_manager:time("game")
 end
 
 MatchmakingStateJoinGame._remove_join_popup = function (self)
@@ -267,7 +267,7 @@ end
 
 MatchmakingStateJoinGame._request_profile_from_host = function (self, hero_index)
 	local lobby_client = self.lobby_client
-	local host = lobby_client.lobby_host(lobby_client)
+	local host = lobby_client:lobby_host()
 	self._matchmaking_manager.selected_profile_index = hero_index
 
 	self._handshaker_client:send_rpc_to_host("rpc_matchmaking_request_profile", hero_index)
@@ -280,7 +280,7 @@ MatchmakingStateJoinGame._request_profile_from_host = function (self, hero_index
 
 	self._matchmaking_manager.debug.text = "requesting_profile"
 	self._matchmaking_manager.debug.state = "hosted by: " .. (host_name or "unknown")
-	self._matchmaking_manager.debug.level = lobby_client.lobby_data(lobby_client, "selected_level_key")
+	self._matchmaking_manager.debug.level = lobby_client:lobby_data("selected_level_key")
 end
 
 MatchmakingStateJoinGame.rpc_matchmaking_request_profile_reply = function (self, sender, client_cookie, host_cookie, profile, reply)
@@ -302,10 +302,10 @@ MatchmakingStateJoinGame.rpc_matchmaking_request_profile_reply = function (self,
 			local hero_attributes = Managers.backend:get_interface("hero_attributes")
 			local career_index = career_index_from_name(selected_hero_index, self._selected_career_name)
 
-			hero_attributes.set(hero_attributes, selected_hero_name, "career", career_index)
+			hero_attributes:set(selected_hero_name, "career", career_index)
 		end
 
-		self._set_state_to_start_lobby(self)
+		self:_set_state_to_start_lobby()
 	else
 		reason = "profile_declined"
 		self._matchmaking_manager.debug.text = "profile_declined"
@@ -321,7 +321,7 @@ end
 MatchmakingStateJoinGame._current_hero = function (self)
 	local peer_id = Network.peer_id()
 	local player = Managers.player:player_from_peer_id(peer_id)
-	local profile_index = player.profile_index(player)
+	local profile_index = player:profile_index()
 	local profile = SPProfiles[profile_index]
 	local profile_name = profile.display_name
 
@@ -330,8 +330,8 @@ end
 
 MatchmakingStateJoinGame._level_started = function (self)
 	local lobby_client = self.lobby_client
-	local selected_level_key = lobby_client.lobby_data(lobby_client, "selected_level_key")
-	local level_key = lobby_client.lobby_data(lobby_client, "level_key")
+	local selected_level_key = lobby_client:lobby_data("selected_level_key")
+	local level_key = lobby_client:lobby_data("level_key")
 	local level_started = selected_level_key == level_key
 
 	return level_started, level_key
@@ -347,7 +347,7 @@ MatchmakingStateJoinGame.rpc_matchmaking_join_game = function (self, sender, cli
 	end
 
 	mm_printf_force("Transition from join due to rpc_matchmaking_join_game")
-	self._set_state_to_start_lobby(self)
+	self:_set_state_to_start_lobby()
 end
 
 MatchmakingStateJoinGame.active_lobby = function (self)

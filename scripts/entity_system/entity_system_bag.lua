@@ -15,7 +15,7 @@ EntitySystemBag.destroy = function (self)
 	for i = 1, #systems, 1 do
 		local system = systems[i]
 
-		system.destroy(system)
+		system:destroy()
 		table.clear(system)
 	end
 
@@ -68,7 +68,7 @@ end
 EntitySystemBag.hot_join_sync = function (self, sender)
 	for i, system in ipairs(self.systems) do
 		if system.hot_join_sync then
-			system.hot_join_sync(system, sender)
+			system:hot_join_sync(sender)
 		end
 	end
 end

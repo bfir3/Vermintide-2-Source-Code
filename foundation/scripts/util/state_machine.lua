@@ -35,7 +35,7 @@ StateMachine.init = function (self, parent, start_state, params, profiling_debug
 	self._params = params
 	self._profiling_debugging_enabled = profiling_debugging_enabled
 
-	self._change_state(self, start_state, params)
+	self:_change_state(start_state, params)
 end
 
 StateMachine._change_state = function (self, new_state, params)
@@ -51,9 +51,9 @@ StateMachine._change_state = function (self, new_state, params)
 
 	if self._profiling_debugging_enabled then
 		local scope_name = profiler_scope(new_state.NAME, "create")
-		self._state = new_state.new(new_state)
+		self._state = new_state:new()
 	else
-		self._state = new_state.new(new_state)
+		self._state = new_state:new()
 	end
 
 	self._state.parent = self._parent
@@ -75,7 +75,7 @@ StateMachine.update = function (self, dt, t)
 	local new_state = self._state:update(dt, t)
 
 	if new_state then
-		self._change_state(self, new_state, self._params)
+		self:_change_state(new_state, self._params)
 	end
 end
 

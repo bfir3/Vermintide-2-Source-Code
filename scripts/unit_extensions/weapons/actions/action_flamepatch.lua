@@ -107,12 +107,12 @@ ActionFlamepatch.client_owner_post_update = function (self, dt, t, world, can_da
 
 			if self.flamepatch_timer == 0 then
 				local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-				local current_position = first_person_extension.current_position(first_person_extension)
-				local current_rotation = first_person_extension.current_rotation(first_person_extension)
+				local current_position = first_person_extension:current_position()
+				local current_rotation = first_person_extension:current_rotation()
 				local direction = Quaternion.forward(current_rotation)
 				local end_point = current_position + direction * POSITION_TWEAK + direction * (SPRAY_RANGE - SPRAY_RADIUS)
 
-				self.spawn_liquid_area(self, current_action.liquid_area.liquid_template, current_position, direction)
+				self:spawn_liquid_area(current_action.liquid_area.liquid_template, current_position, direction)
 			end
 
 			self.flamepatch_timer = self.flamepatch_timer + dt
@@ -174,10 +174,10 @@ end
 ActionFlamepatch.finish = function (self, reason)
 	local ammo_extension = self.ammo_extension
 
-	if ammo_extension and self.current_action.reload_when_out_of_ammo and ammo_extension.ammo_count(ammo_extension) == 0 and ammo_extension.can_reload(ammo_extension) then
+	if ammo_extension and self.current_action.reload_when_out_of_ammo and ammo_extension:ammo_count() == 0 and ammo_extension:can_reload() then
 		local play_reload_animation = true
 
-		ammo_extension.start_reload(ammo_extension, play_reload_animation)
+		ammo_extension:start_reload(play_reload_animation)
 	end
 
 	World.stop_spawning_particles(self.world, self.flamethrower_effect)

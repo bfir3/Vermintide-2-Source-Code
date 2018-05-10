@@ -24,13 +24,13 @@ ReplayManager.update = function (self, dt)
 			self._frame = 0
 		end
 
-		self.move_to_current_frame(self)
+		self:move_to_current_frame()
 
 		world_dt = ExtendedReplay.delta_time()
 	end
 
 	if self._frame_needs_drawing then
-		self.move_to_current_frame(self)
+		self:move_to_current_frame()
 	end
 
 	return world_dt
@@ -41,7 +41,7 @@ ReplayManager.move_to_current_frame = function (self)
 
 	self._frame_needs_drawing = false
 
-	self.report_frame(self)
+	self:report_frame()
 
 	local new_story_index = nil
 
@@ -56,8 +56,8 @@ ReplayManager.move_to_current_frame = function (self)
 	local teller = self._world:storyteller()
 
 	if new_story_index ~= self._current_story_index then
-		if self._current_story_id ~= nil and teller.is_playing(teller, self._current_story_id) then
-			teller.stop(teller, self._current_story_id)
+		if self._current_story_id ~= nil and teller:is_playing(self._current_story_id) then
+			teller:stop(self._current_story_id)
 		end
 
 		self._current_story_index = new_story_index
@@ -85,13 +85,13 @@ ReplayManager.move_to_current_frame = function (self)
 		end
 
 		if level ~= nil then
-			if self._current_story_id == nil or not teller.is_playing(teller, self._current_story_id) then
-				self._current_story_id = teller.play_level_story(teller, level, self._stories[self._current_story_index].name)
+			if self._current_story_id == nil or not teller:is_playing(self._current_story_id) then
+				self._current_story_id = teller:play_level_story(level, self._stories[self._current_story_index].name)
 
-				teller.set_speed(teller, self._current_story_id, 0)
+				teller:set_speed(self._current_story_id, 0)
 			end
 
-			teller.set_time(teller, self._current_story_id, (self._frame - self._stories[self._current_story_index].framestart) * self._frame_time)
+			teller:set_time(self._current_story_id, (self._frame - self._stories[self._current_story_index].framestart) * self._frame_time)
 		end
 	end
 end
@@ -110,7 +110,7 @@ ReplayManager.overriding_camera = function (self)
 	if self._current_story_id ~= nil then
 		local teller = self._world:storyteller()
 
-		return teller.first_camera(teller, self._current_story_id)
+		return teller:first_camera(self._current_story_id)
 	end
 end
 

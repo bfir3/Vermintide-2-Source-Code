@@ -22,7 +22,7 @@ BTChewAttackAction.enter = function (self, unit, blackboard, t)
 	if blackboard.grabbed_state ~= "chew" then
 		local animation = "attack_grabbed_eat_start"
 
-		network_manager.anim_event(network_manager, unit, animation)
+		network_manager:anim_event(unit, animation)
 		blackboard.navigation_extension:set_enabled(false)
 		blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
 		StatusUtils.set_grabbed_by_chaos_spawn_status_network(blackboard.victim_grabbed, "chewed_on")
@@ -85,7 +85,7 @@ BTChewAttackAction.anim_cb_chew_attack = function (self, unit, blackboard)
 	heal_amount = DamageUtils.networkify_damage(heal_amount)
 	local health_extension = ScriptUnit.extension(unit, "health_system")
 
-	health_extension.add_heal(health_extension, unit, heal_amount, nil, heal_type)
+	health_extension:add_heal(unit, heal_amount, nil, heal_type)
 
 	if action.max_chew_attacks <= blackboard.chew_attacks_done then
 		blackboard.wants_to_throw = true

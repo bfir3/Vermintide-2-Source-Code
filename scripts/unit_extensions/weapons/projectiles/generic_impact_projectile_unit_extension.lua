@@ -32,13 +32,13 @@ GenericImpactProjectileUnitExtension.update = function (self, unit, input, _, co
 		return
 	end
 
-	local recent_impacts, num_impacts = impact_extension.recent_impacts(impact_extension)
+	local recent_impacts, num_impacts = impact_extension:recent_impacts()
 
 	if num_impacts == 0 then
 		return
 	end
 
-	self.impact(self, recent_impacts, num_impacts)
+	self:impact(recent_impacts, num_impacts)
 
 	local UNIT = ProjectileImpactDataIndex.UNIT
 	local POSITION = ProjectileImpactDataIndex.POSITION
@@ -47,7 +47,7 @@ GenericImpactProjectileUnitExtension.update = function (self, unit, input, _, co
 	local ACTOR_INDEX = ProjectileImpactDataIndex.ACTOR_INDEX
 	local STRIDE = ProjectileImpactDataIndex.STRIDE
 	local network_manager = self.network_manager
-	local self_unit_id = network_manager.unit_game_object_id(network_manager, self.unit)
+	local self_unit_id = network_manager:unit_game_object_id(self.unit)
 
 	for i = 1, num_impacts / STRIDE, 1 do
 		local j = (i - 1) * STRIDE
@@ -56,7 +56,7 @@ GenericImpactProjectileUnitExtension.update = function (self, unit, input, _, co
 		local direction = recent_impacts[j + DIRECTION]:unbox()
 		local normal = recent_impacts[j + NORMAL]:unbox()
 		local actor_index = recent_impacts[j + ACTOR_INDEX]
-		local unit_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, unit)
+		local unit_id, is_level_unit = network_manager:game_object_or_level_id(unit)
 		local game_object_id, level_unit_id = nil
 
 		if is_level_unit then
@@ -102,7 +102,7 @@ GenericImpactProjectileUnitExtension.rpc_impact = function (self, unit, position
 	rpc_dummy_impact[ProjectileImpactDataIndex.NORMAL] = normal
 	rpc_dummy_impact[ProjectileImpactDataIndex.ACTOR_INDEX] = actor_index
 
-	self.impact(self, rpc_dummy_impact, ProjectileImpactDataIndex.STRIDE)
+	self:impact(rpc_dummy_impact, ProjectileImpactDataIndex.STRIDE)
 end
 
 local dummy_impact = {}
@@ -121,7 +121,7 @@ GenericImpactProjectileUnitExtension.force_impact = function (self, unit, hit_po
 	local client_stop = impact.client.execute(self.world, self.damage_source, unit, dummy_impact, 1, self.owner_unit, explosion_template)
 
 	if server_stop or client_stop then
-		locomotion_extension.stop(locomotion_extension)
+		locomotion_extension:stop()
 	end
 end
 

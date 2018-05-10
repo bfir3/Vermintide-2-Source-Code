@@ -17,15 +17,15 @@ BTRatlingGunnerApproachAction.enter = function (self, unit, blackboard, t)
 	local move_speed = action.move_speed
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, move_speed)
-	navigation_extension.stop(navigation_extension)
+	navigation_extension:set_max_speed(move_speed)
+	navigation_extension:stop()
 
 	if blackboard.move_state == "moving" then
 		local move_animation = action.move_anim
 		local network_manager = Managers.state.network
 
-		network_manager.anim_event(network_manager, unit, "to_combat")
-		network_manager.anim_event(network_manager, unit, move_animation)
+		network_manager:anim_event(unit, "to_combat")
+		network_manager:anim_event(unit, move_animation)
 	end
 
 	local tutorial_message_template = action.tutorial_message_template
@@ -46,11 +46,11 @@ BTRatlingGunnerApproachAction.leave = function (self, unit, blackboard, t, reaso
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 end
 
 BTRatlingGunnerApproachAction.run = function (self, unit, blackboard, t, dt)
-	local is_within_check_distance = self.is_within_check_distance(self, unit, blackboard)
+	local is_within_check_distance = self:is_within_check_distance(unit, blackboard)
 
 	if is_within_check_distance then
 		return "done"
@@ -60,10 +60,10 @@ BTRatlingGunnerApproachAction.run = function (self, unit, blackboard, t, dt)
 	local at_goal = move_pos and blackboard.destination_dist < 0.5
 
 	if not move_pos or at_goal then
-		local position = self.calculate_move_position(self, unit, blackboard)
+		local position = self:calculate_move_position(unit, blackboard)
 
 		if position then
-			self.move_to(self, position, blackboard)
+			self:move_to(position, blackboard)
 
 			return "running"
 		else
@@ -84,8 +84,8 @@ BTRatlingGunnerApproachAction.run = function (self, unit, blackboard, t, dt)
 		local move_animation = action.move_anim
 		local network_manager = Managers.state.network
 
-		network_manager.anim_event(network_manager, unit, "to_combat")
-		network_manager.anim_event(network_manager, unit, move_animation)
+		network_manager:anim_event(unit, "to_combat")
+		network_manager:anim_event(unit, move_animation)
 
 		blackboard.move_state = "moving"
 	end
@@ -107,7 +107,7 @@ end
 BTRatlingGunnerApproachAction.move_to = function (self, position, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.move_to(navigation_extension, position)
+	navigation_extension:move_to(position)
 
 	blackboard.move_pos = Vector3Box(position)
 end

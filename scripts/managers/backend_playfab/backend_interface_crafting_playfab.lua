@@ -27,11 +27,11 @@ BackendInterfaceCraftingPlayfab._new_id = function (self)
 end
 
 BackendInterfaceCraftingPlayfab.craft = function (self, career_name, item_backend_ids, recipe_override)
-	local recipe, item_backend_ids_and_amounts = self._get_valid_recipe(self, item_backend_ids, recipe_override)
+	local recipe, item_backend_ids_and_amounts = self:_get_valid_recipe(item_backend_ids, recipe_override)
 	local hero_name = CareerSettings[career_name].profile_name
 
 	if recipe and recipe.result_function_playfab then
-		local id = self._new_id(self)
+		local id = self:_new_id()
 		local data = {
 			hero_name = hero_name,
 			item_backend_ids_and_amounts = item_backend_ids_and_amounts,
@@ -61,18 +61,18 @@ BackendInterfaceCraftingPlayfab.craft_challenge_request_cb = function (self, dat
 		local eac_response, response = nil
 
 		if challenge then
-			eac_response, response = self._get_eac_response(self, challenge)
+			eac_response, response = self:_get_eac_response(challenge)
 		end
 
 		if not challenge then
 			print("EAC disabled on backend")
-			self._craft(self, data)
+			self:_craft(data)
 		elseif not eac_response then
 			print("EAC disabled on client")
 			Managers.backend:playfab_eac_error()
 		else
 			print("EAC Enabled!")
-			self._craft(self, data, response)
+			self:_craft(data, response)
 		end
 	end
 end
@@ -99,7 +99,7 @@ BackendInterfaceCraftingPlayfab.craft_request_cb = function (self, id, result)
 		fassert(false, "craft_request_cb: it failed!")
 	else
 		local backend_manager = Managers.backend
-		local item_interface = backend_manager.get_interface(backend_manager, "items")
+		local item_interface = backend_manager:get_interface("items")
 		local backend_mirror = self._backend_mirror
 		local function_result = result.FunctionResult
 		local eac_failed = function_result.eac_failed_verification
@@ -121,7 +121,7 @@ BackendInterfaceCraftingPlayfab.craft_request_cb = function (self, id, result)
 				local backend_id = item.ItemInstanceId
 				local amount = item.UsesIncrementedBy or 1
 
-				backend_mirror.add_item(backend_mirror, backend_id, item)
+				backend_mirror:add_item(backend_id, item)
 
 				result[i] = {
 					backend_id,
@@ -137,9 +137,9 @@ BackendInterfaceCraftingPlayfab.craft_request_cb = function (self, id, result)
 				local remaining_uses = item.RemainingUses
 
 				if 0 < remaining_uses then
-					backend_mirror.update_item_field(backend_mirror, backend_id, "RemainingUses", remaining_uses)
+					backend_mirror:update_item_field(backend_id, "RemainingUses", remaining_uses)
 				else
-					backend_mirror.remove_item(backend_mirror, backend_id)
+					backend_mirror:remove_item(backend_id)
 				end
 			end
 		end
@@ -149,11 +149,11 @@ BackendInterfaceCraftingPlayfab.craft_request_cb = function (self, id, result)
 				local item = modified_items[i]
 				local backend_id = item.ItemInstanceId
 
-				backend_mirror.update_item(backend_mirror, backend_id, item)
+				backend_mirror:update_item(backend_id, item)
 			end
 		end
 
-		backend_manager.dirtify_interfaces(backend_manager)
+		backend_manager:dirtify_interfaces()
 
 		self._craft_requests[id] = result
 	end

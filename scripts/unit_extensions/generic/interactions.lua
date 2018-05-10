@@ -63,12 +63,12 @@ InteractionDefinitions.player_generic = {
 				local player_manager = Managers.player
 				local profile_synchronizer = Managers.state.network.profile_synchronizer
 				local display_name = ""
-				local player = player_manager.owner(player_manager, interactable_unit)
+				local player = player_manager:owner(interactable_unit)
 
 				if player then
-					local network_id = player.network_id(player)
-					local local_player_id = player.local_player_id(player)
-					local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, network_id, local_player_id)
+					local network_id = player:network_id()
+					local local_player_id = player:local_player_id()
+					local profile_index = profile_synchronizer:profile_by_peer(network_id, local_player_id)
 					local profile_settings = SPProfiles[profile_index]
 					display_name = profile_settings.ingame_display_name
 				end
@@ -101,8 +101,8 @@ end
 
 local function _drop_pickup(interactor_unit, pickup_name)
 	local first_person_extension = ScriptUnit.extension(interactor_unit, "first_person_system")
-	local position = first_person_extension.current_position(first_person_extension) + Vector3(math.random(-1, 1), math.random(-1, 1), 0) * 0.2
-	local rotation = first_person_extension.current_rotation(first_person_extension)
+	local position = first_person_extension:current_position() + Vector3(math.random(-1, 1), math.random(-1, 1), 0) * 0.2
+	local rotation = first_person_extension:current_rotation()
 	local direction = Vector3.normalize(Quaternion.forward(rotation))
 	local final_position = position + direction * 0.7
 	local pickup_spawn_type = "dropped"
@@ -126,10 +126,10 @@ InteractionDefinitions.revive = {
 		start = function (world, interactor_unit, interactable_unit, data, config, t)
 			local duration = config.duration
 			local buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
-			duration = buff_extension.apply_buffs_to_value(buff_extension, duration, StatBuffIndex.FASTER_REVIVE)
+			duration = buff_extension:apply_buffs_to_value(duration, StatBuffIndex.FASTER_REVIVE)
 			local revivee_status_extension = ScriptUnit.extension(interactable_unit, "status_system")
 
-			revivee_status_extension.set_knocked_down_bleed_buff_paused(revivee_status_extension, true)
+			revivee_status_extension:set_knocked_down_bleed_buff_paused(true)
 
 			data.done_time = t + duration
 		end,
@@ -137,14 +137,14 @@ InteractionDefinitions.revive = {
 			local health_extension = ScriptUnit.extension(interactor_unit, "health_system")
 			local status_extension = ScriptUnit.extension(interactor_unit, "status_system")
 
-			if status_extension.is_knocked_down(status_extension) or not health_extension.is_alive(health_extension) then
+			if status_extension:is_knocked_down() or not health_extension:is_alive() then
 				return InteractionResult.FAILURE
 			end
 
 			local revivee_health_extension = ScriptUnit.extension(interactable_unit, "health_system")
 			local revivee_status_extension = ScriptUnit.extension(interactable_unit, "status_system")
 
-			if not revivee_status_extension.is_knocked_down(revivee_status_extension) or not revivee_health_extension.is_alive(revivee_health_extension) then
+			if not revivee_status_extension:is_knocked_down() or not revivee_health_extension:is_alive() then
 				return InteractionResult.FAILURE
 			end
 
@@ -159,8 +159,8 @@ InteractionDefinitions.revive = {
 				StatusUtils.set_revived_network(interactable_unit, true, interactor_unit)
 
 				local player_manager = Managers.player
-				local interactor_player = player_manager.unit_owner(player_manager, interactor_unit)
-				local interactable_player = player_manager.unit_owner(player_manager, interactable_unit)
+				local interactor_player = player_manager:unit_owner(interactor_unit)
+				local interactable_player = player_manager:unit_owner(interactable_unit)
 
 				if not interactor_player or not interactable_player then
 					return
@@ -172,22 +172,22 @@ InteractionDefinitions.revive = {
 			elseif Unit.alive(interactable_unit) then
 				local health_extension = ScriptUnit.extension(interactable_unit, "health_system")
 
-				if health_extension.is_alive(health_extension) then
+				if health_extension:is_alive() then
 					local revivee_status_extension = ScriptUnit.extension(interactable_unit, "status_system")
 
-					revivee_status_extension.set_knocked_down_bleed_buff_paused(revivee_status_extension, false)
+					revivee_status_extension:set_knocked_down_bleed_buff_paused(false)
 				end
 			end
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
 			local health_extension = ScriptUnit.extension(interactable_unit, "health_system")
-			local knocked_down = status_extension.is_knocked_down(status_extension)
-			local pounced = status_extension.is_pounced_down(status_extension)
-			local alive = health_extension.is_alive(health_extension)
-			local grabbed = status_extension.is_grabbed_by_pack_master(status_extension)
-			local ledge_hanging = status_extension.get_is_ledge_hanging(status_extension)
-			local hanging_from_hook = status_extension.is_hanging_from_hook(status_extension)
+			local knocked_down = status_extension:is_knocked_down()
+			local pounced = status_extension:is_pounced_down()
+			local alive = health_extension:is_alive()
+			local grabbed = status_extension:is_grabbed_by_pack_master()
+			local ledge_hanging = status_extension:get_is_ledge_hanging()
+			local hanging_from_hook = status_extension:is_hanging_from_hook()
 
 			return knocked_down and alive and not pounced and not grabbed and not ledge_hanging and not hanging_from_hook
 		end
@@ -202,7 +202,7 @@ InteractionDefinitions.revive = {
 
 			if interactor_alive then
 				local buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
-				duration = buff_extension.apply_buffs_to_value(buff_extension, duration, StatBuffIndex.FASTER_REVIVE)
+				duration = buff_extension:apply_buffs_to_value(duration, StatBuffIndex.FASTER_REVIVE)
 				local interaction_duration_variable = Unit.animation_find_variable(interactor_unit, "interaction_duration")
 
 				Unit.animation_set_variable(interactor_unit, interaction_duration_variable, duration)
@@ -220,7 +220,7 @@ InteractionDefinitions.revive = {
 				if ScriptUnit.has_extension(interactable_unit, "first_person_system") then
 					local first_person_extension = ScriptUnit.extension(interactable_unit, "first_person_system")
 
-					first_person_extension.set_wanted_player_height(first_person_extension, "stand", t, duration)
+					first_person_extension:set_wanted_player_height("stand", t, duration)
 				end
 
 				event_data.target_name = ScriptUnit.extension(interactable_unit, "dialogue_system").context.player_profile
@@ -231,7 +231,7 @@ InteractionDefinitions.revive = {
 			if interactable_alive and interactor_alive then
 				local dialogue_input = ScriptUnit.extension_input(interactor_unit, "dialogue_system")
 
-				dialogue_input.trigger_dialogue_event(dialogue_input, "start_revive", event_data)
+				dialogue_input:trigger_dialogue_event("start_revive", event_data)
 			end
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
@@ -260,7 +260,7 @@ InteractionDefinitions.revive = {
 				if ScriptUnit.has_extension(interactable_unit, "first_person_system") then
 					local first_person_extension = ScriptUnit.extension(interactable_unit, "first_person_system")
 
-					first_person_extension.set_wanted_player_height(first_person_extension, "knocked_down", t)
+					first_person_extension:set_wanted_player_height("knocked_down", t)
 				end
 			end
 		end,
@@ -276,10 +276,10 @@ InteractionDefinitions.revive = {
 		can_interact = function (interactor_unit, interactable_unit, data, config)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
 			local health_extension = ScriptUnit.extension(interactable_unit, "health_system")
-			local grabbed = status_extension.is_grabbed_by_pack_master(status_extension)
-			local ledge_hanging = status_extension.get_is_ledge_hanging(status_extension)
-			local hanging_from_hook = status_extension.is_hanging_from_hook(status_extension)
-			local can_revive = not status_extension.is_pounced_down(status_extension) and not grabbed and not ledge_hanging and not hanging_from_hook and status_extension.is_knocked_down(status_extension) and health_extension.is_alive(health_extension)
+			local grabbed = status_extension:is_grabbed_by_pack_master()
+			local ledge_hanging = status_extension:get_is_ledge_hanging()
+			local hanging_from_hook = status_extension:is_hanging_from_hook()
+			local can_revive = not status_extension:is_pounced_down() and not grabbed and not ledge_hanging and not hanging_from_hook and status_extension:is_knocked_down() and health_extension:is_alive()
 
 			return can_revive
 		end,
@@ -288,12 +288,12 @@ InteractionDefinitions.revive = {
 				local player_manager = Managers.player
 				local profile_synchronizer = Managers.state.network.profile_synchronizer
 				local display_name = ""
-				local player = player_manager.owner(player_manager, interactable_unit)
+				local player = player_manager:owner(interactable_unit)
 
 				if player then
-					local network_id = player.network_id(player)
-					local local_player_id = player.local_player_id(player)
-					local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, network_id, local_player_id)
+					local network_id = player:network_id()
+					local local_player_id = player:local_player_id()
+					local profile_index = profile_synchronizer:profile_by_peer(network_id, local_player_id)
 					local profile_settings = SPProfiles[profile_index]
 					display_name = profile_settings.ingame_display_name
 				end
@@ -326,7 +326,7 @@ InteractionDefinitions.pull_up = {
 			local health_extension = ScriptUnit.extension(interactor_unit, "health_system")
 			local status_extension = ScriptUnit.extension(interactor_unit, "status_system")
 
-			if status_extension.get_is_ledge_hanging(status_extension) or not health_extension.is_alive(health_extension) then
+			if status_extension:get_is_ledge_hanging() or not health_extension:is_alive() then
 				return InteractionResult.FAILURE
 			end
 
@@ -343,8 +343,8 @@ InteractionDefinitions.pull_up = {
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
-			local is_hanging = status_extension.get_is_ledge_hanging(status_extension)
-			local is_pulled_up = status_extension.is_pulled_up(status_extension)
+			local is_hanging = status_extension:get_is_ledge_hanging()
+			local is_pulled_up = status_extension:is_pulled_up()
 
 			return is_hanging and not is_pulled_up
 		end
@@ -366,7 +366,7 @@ InteractionDefinitions.pull_up = {
 				if ScriptUnit.has_extension(interactable_unit, "first_person_system") then
 					local first_person_extension = ScriptUnit.extension(interactable_unit, "first_person_system")
 
-					first_person_extension.set_wanted_player_height(first_person_extension, "stand", t, config.duration)
+					first_person_extension:set_wanted_player_height("stand", t, config.duration)
 				end
 
 				local dialogue_input = ScriptUnit.extension_input(interactor_unit, "dialogue_system")
@@ -374,7 +374,7 @@ InteractionDefinitions.pull_up = {
 				event_data.target = interactable_unit
 				event_data.target_name = ScriptUnit.extension(interactable_unit, "dialogue_system").context.player_profile
 
-				dialogue_input.trigger_dialogue_event(dialogue_input, "start_revive", event_data)
+				dialogue_input:trigger_dialogue_event("start_revive", event_data)
 			end
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
@@ -396,7 +396,7 @@ InteractionDefinitions.pull_up = {
 				if ScriptUnit.has_extension(interactable_unit, "first_person_system") then
 					local first_person_extension = ScriptUnit.extension(interactable_unit, "first_person_system")
 
-					first_person_extension.set_wanted_player_height(first_person_extension, "knocked_down", t)
+					first_person_extension:set_wanted_player_height("knocked_down", t)
 				end
 			end
 		end,
@@ -409,7 +409,7 @@ InteractionDefinitions.pull_up = {
 		end,
 		can_interact = function (interactor_unit, interactable_unit, data, config)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
-			local can_pull_up = status_extension.get_is_ledge_hanging(status_extension) and not status_extension.is_pulled_up(status_extension)
+			local can_pull_up = status_extension:get_is_ledge_hanging() and not status_extension:is_pulled_up()
 
 			return can_pull_up
 		end,
@@ -418,12 +418,12 @@ InteractionDefinitions.pull_up = {
 				local player_manager = Managers.player
 				local profile_synchronizer = Managers.state.network.profile_synchronizer
 				local display_name = ""
-				local player = player_manager.owner(player_manager, interactable_unit)
+				local player = player_manager:owner(interactable_unit)
 
 				if player then
-					local network_id = player.network_id(player)
-					local local_player_id = player.local_player_id(player)
-					local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, network_id, local_player_id)
+					local network_id = player:network_id()
+					local local_player_id = player:local_player_id()
+					local profile_index = profile_synchronizer:profile_by_peer(network_id, local_player_id)
 					local profile_settings = SPProfiles[profile_index]
 					display_name = profile_settings.ingame_display_name
 				end
@@ -461,8 +461,8 @@ InteractionDefinitions.release_from_hook = {
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
 			local health_extension = ScriptUnit.extension(interactable_unit, "health_system")
-			local is_hooked = status_extension.is_hanging_from_hook(status_extension)
-			local alive = health_extension.is_alive(health_extension)
+			local is_hooked = status_extension:is_hanging_from_hook()
+			local alive = health_extension:is_alive()
 
 			return is_hooked and alive
 		end
@@ -480,7 +480,7 @@ InteractionDefinitions.release_from_hook = {
 			event_data.target = interactable_unit
 			event_data.target_name = ScriptUnit.extension(interactable_unit, "dialogue_system").context.player_profile
 
-			dialogue_input.trigger_dialogue_event(dialogue_input, "start_revive", event_data)
+			dialogue_input:trigger_dialogue_event("start_revive", event_data)
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			return
@@ -499,7 +499,7 @@ InteractionDefinitions.release_from_hook = {
 		end,
 		can_interact = function (interactor_unit, interactable_unit, data, config)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
-			local is_hanging = status_extension.is_hanging_from_hook(status_extension)
+			local is_hanging = status_extension:is_hanging_from_hook()
 			local alive = ScriptUnit.extension(interactable_unit, "health_system"):is_alive()
 
 			return is_hanging and alive
@@ -509,12 +509,12 @@ InteractionDefinitions.release_from_hook = {
 				local player_manager = Managers.player
 				local profile_synchronizer = Managers.state.network.profile_synchronizer
 				local display_name = ""
-				local player = player_manager.owner(player_manager, interactable_unit)
+				local player = player_manager:owner(interactable_unit)
 
 				if player then
-					local network_id = player.network_id(player)
-					local local_player_id = player.local_player_id(player)
-					local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, network_id, local_player_id)
+					local network_id = player:network_id()
+					local local_player_id = player:local_player_id()
+					local profile_index = profile_synchronizer:profile_by_peer(network_id, local_player_id)
 					local profile_settings = SPProfiles[profile_index]
 					display_name = profile_settings.ingame_display_name
 				end
@@ -551,7 +551,7 @@ InteractionDefinitions.assisted_respawn = {
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
-			local can_be_assisted = status_extension.is_ready_for_assisted_respawn(status_extension)
+			local can_be_assisted = status_extension:is_ready_for_assisted_respawn()
 
 			return can_be_assisted
 		end
@@ -594,7 +594,7 @@ InteractionDefinitions.assisted_respawn = {
 		end,
 		can_interact = function (interactor_unit, interactable_unit, data, config)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
-			local is_ready = status_extension.is_ready_for_assisted_respawn(status_extension)
+			local is_ready = status_extension:is_ready_for_assisted_respawn()
 
 			return is_ready
 		end,
@@ -603,12 +603,12 @@ InteractionDefinitions.assisted_respawn = {
 				local player_manager = Managers.player
 				local profile_synchronizer = Managers.state.network.profile_synchronizer
 				local display_name = ""
-				local player = player_manager.owner(player_manager, interactable_unit)
+				local player = player_manager:owner(interactable_unit)
 
 				if player then
-					local network_id = player.network_id(player)
-					local local_player_id = player.local_player_id(player)
-					local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, network_id, local_player_id)
+					local network_id = player:network_id()
+					local local_player_id = player:local_player_id()
+					local profile_index = profile_synchronizer:profile_by_peer(network_id, local_player_id)
 					local profile_settings = SPProfiles[profile_index]
 					display_name = profile_settings.ingame_display_name
 				end
@@ -643,7 +643,7 @@ InteractionDefinitions.smartobject = {
 			local health_extension = ScriptUnit.extension(interactor_unit, "health_system")
 			local status_extension = ScriptUnit.extension(interactor_unit, "status_system")
 
-			if status_extension.is_knocked_down(status_extension) or not health_extension.is_alive(health_extension) then
+			if status_extension:is_knocked_down() or not health_extension:is_alive() then
 				return InteractionResult.FAILURE
 			end
 
@@ -749,7 +749,7 @@ InteractionDefinitions.pickup_object = {
 			local health_extension = ScriptUnit.extension(interactor_unit, "health_system")
 			local status_extension = ScriptUnit.extension(interactor_unit, "status_system")
 
-			if status_extension.is_knocked_down(status_extension) or not health_extension.is_alive(health_extension) then
+			if status_extension:is_knocked_down() or not health_extension:is_alive() then
 				return InteractionResult.FAILURE
 			end
 
@@ -765,7 +765,7 @@ InteractionDefinitions.pickup_object = {
 					if ScriptUnit.has_extension(interactable_unit, "limited_item_track_system") then
 						local limited_item_extension = ScriptUnit.extension(interactable_unit, "limited_item_track_system")
 
-						limited_item_extension.mark_for_transformation(limited_item_extension)
+						limited_item_extension:mark_for_transformation()
 					end
 
 					Managers.state.unit_spawner:mark_for_deletion(interactable_unit)
@@ -773,10 +773,10 @@ InteractionDefinitions.pickup_object = {
 
 				local interactor_buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
 				local pickup_extension = ScriptUnit.extension(interactable_unit, "pickup_system")
-				local pickup_settings = pickup_extension.get_pickup_settings(pickup_extension)
+				local pickup_settings = pickup_extension:get_pickup_settings()
 
 				if pickup_settings.consumable_item then
-					interactor_buff_extension.trigger_procs(interactor_buff_extension, "on_consumable_picked_up", interactable_unit, pickup_settings)
+					interactor_buff_extension:trigger_procs("on_consumable_picked_up", interactable_unit, pickup_settings)
 				end
 			end
 		end,
@@ -807,38 +807,38 @@ InteractionDefinitions.pickup_object = {
 				local network_manager = Managers.state.network
 				local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
 				local pickup_extension = ScriptUnit.extension(interactable_unit, "pickup_system")
-				local pickup_settings = pickup_extension.get_pickup_settings(pickup_extension)
+				local pickup_settings = pickup_extension:get_pickup_settings()
 
 				if pickup_settings.type == "loot_die" then
-					Managers.state.event:trigger("add_coop_feedback", player.stats_id(player), local_human, "picked_up_loot_dice", player)
+					Managers.state.event:trigger("add_coop_feedback", player:stats_id(), local_human, "picked_up_loot_dice", player)
 
 					if local_bot_or_human then
-						Managers.chat:send_system_chat_message(1, "system_chat_player_picked_up_loot_die", player.name(player))
+						Managers.chat:send_system_chat_message(1, "system_chat_player_picked_up_loot_die", player:name())
 					end
 				elseif pickup_settings.type == "endurance_badge" then
-					Managers.state.event:trigger("add_coop_feedback", player.stats_id(player), local_human, "picked_up_endurance_badge", player)
+					Managers.state.event:trigger("add_coop_feedback", player:stats_id(), local_human, "picked_up_endurance_badge", player)
 
 					if local_bot_or_human then
-						Managers.chat:send_system_chat_message(1, "dlc1_2_system_chat_player_picked_up_endurance_badge", player.name(player))
+						Managers.chat:send_system_chat_message(1, "dlc1_2_system_chat_player_picked_up_endurance_badge", player:name())
 					end
 				elseif pickup_settings.type == "inventory_item" then
 					local slot_name = pickup_settings.slot_name
 					local item_name = pickup_settings.item_name
-					local slot_data = inventory_extension.get_slot_data(inventory_extension, slot_name)
+					local slot_data = inventory_extension:get_slot_data(slot_name)
 					local item_data = ItemMasterList[item_name]
 
 					if not slot_data or (slot_data and slot_data.item_data.name ~= item_data.name) then
 						if item_name == "wpn_side_objective_tome_01" then
-							Managers.state.event:trigger("add_coop_feedback", player.stats_id(player), local_human, "picked_up_tome", player)
+							Managers.state.event:trigger("add_coop_feedback", player:stats_id(), local_human, "picked_up_tome", player)
 
 							if local_bot_or_human then
-								Managers.chat:send_system_chat_message(1, "system_chat_player_picked_up_tome", player.name(player))
+								Managers.chat:send_system_chat_message(1, "system_chat_player_picked_up_tome", player:name())
 							end
 						elseif item_name == "wpn_grimoire_01" then
-							Managers.state.event:trigger("add_coop_feedback", player.stats_id(player), local_human, "picked_up_grimoire", player)
+							Managers.state.event:trigger("add_coop_feedback", player:stats_id(), local_human, "picked_up_grimoire", player)
 
 							if local_bot_or_human then
-								Managers.chat:send_system_chat_message(1, "system_chat_player_picked_up_grimoire", player.name(player))
+								Managers.chat:send_system_chat_message(1, "system_chat_player_picked_up_grimoire", player:name())
 							end
 						end
 					end
@@ -850,18 +850,18 @@ InteractionDefinitions.pickup_object = {
 						if item_name ~= "wpn_side_objective_tome_01" and item_template.name == "wpn_side_objective_tome_01" then
 							local local_human = not player.remote and not player.bot_player
 
-							Managers.state.event:trigger("add_coop_feedback", player.stats_id(player), local_human, "discarded_tome", player)
+							Managers.state.event:trigger("add_coop_feedback", player:stats_id(), local_human, "discarded_tome", player)
 
 							if local_bot_or_human then
-								Managers.chat:send_system_chat_message(1, "system_chat_player_discarded_tome", player.name(player))
+								Managers.chat:send_system_chat_message(1, "system_chat_player_discarded_tome", player:name())
 							end
 						elseif item_name ~= "wpn_grimoire_01" and item_template.name == "wpn_grimoire_01" then
 							local local_human = not player.remote and not player.bot_player
 
-							Managers.state.event:trigger("add_coop_feedback", player.stats_id(player), local_human, "discarded_grimoire", player)
+							Managers.state.event:trigger("add_coop_feedback", player:stats_id(), local_human, "discarded_grimoire", player)
 
 							if local_bot_or_human then
-								Managers.chat:send_system_chat_message(1, "system_chat_player_discarded_grimoire", player.name(player))
+								Managers.chat:send_system_chat_message(1, "system_chat_player_discarded_grimoire", player:name())
 							end
 						end
 					end
@@ -886,7 +886,7 @@ InteractionDefinitions.pickup_object = {
 					local event_data = FrameTable.alloc_table()
 					event_data.pickup_name = Unit.get_data(interactable_unit, "interaction_data", "hud_description")
 
-					dialogue_input.trigger_dialogue_event(dialogue_input, "on_pickup", event_data)
+					dialogue_input:trigger_dialogue_event("on_pickup", event_data)
 
 					local pickup_name = Unit.get_data(interactable_unit, "interaction_data", "hud_description")
 					local target_name = ScriptUnit.extension(interactor_unit, "dialogue_system").context.player_profile
@@ -909,7 +909,7 @@ InteractionDefinitions.pickup_object = {
 					end
 
 					if pickup_settings.hide_on_pickup then
-						pickup_extension.hide(pickup_extension)
+						pickup_extension:hide()
 					end
 
 					if pickup_settings.type == "inventory_item" then
@@ -930,17 +930,17 @@ InteractionDefinitions.pickup_object = {
 							}
 						end
 
-						local wielded_slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
+						local wielded_slot_name = inventory_extension:get_wielded_slot_name()
 
 						if pickup_settings.wield_on_pickup or wielded_slot_name == slot_name then
 							CharacterStateHelper.stop_weapon_actions(inventory_extension, "picked_up_object")
 						end
 
-						local slot_data = inventory_extension.get_slot_data(inventory_extension, slot_name)
+						local slot_data = inventory_extension:get_slot_data(slot_name)
 						local item_data = ItemMasterList[item_name]
 
-						inventory_extension.destroy_slot(inventory_extension, slot_name)
-						inventory_extension.add_equipment(inventory_extension, slot_name, item_data, unit_template, extra_extension_init_data)
+						inventory_extension:destroy_slot(slot_name)
+						inventory_extension:add_equipment(slot_name, item_data, unit_template, extra_extension_init_data)
 
 						if not LEVEL_EDITOR_TEST then
 							local unit_object_id = Managers.state.unit_storage:go_id(interactor_unit)
@@ -986,11 +986,11 @@ InteractionDefinitions.pickup_object = {
 							local buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
 
 							if pickup_settings.consumable_item and not data.is_server then
-								buff_extension.trigger_procs(buff_extension, "on_consumable_picked_up", interactable_unit, pickup_settings)
+								buff_extension:trigger_procs("on_consumable_picked_up", interactable_unit, pickup_settings)
 							end
 
 							if pickup_settings.dupable and pickup_extension.spawn_type ~= "dropped" then
-								local _, procced = buff_extension.apply_buffs_to_value(buff_extension, 0, StatBuffIndex.NOT_CONSUME_PICKUP)
+								local _, procced = buff_extension:apply_buffs_to_value(0, StatBuffIndex.NOT_CONSUME_PICKUP)
 
 								if procced then
 									local pickup_name = pickup_extension.pickup_name
@@ -1001,7 +1001,7 @@ InteractionDefinitions.pickup_object = {
 						end
 
 						if pickup_settings.wield_on_pickup or wielded_slot_name == slot_name then
-							inventory_extension.wield(inventory_extension, slot_name)
+							inventory_extension:wield(slot_name)
 						end
 					elseif pickup_settings.type == "explosive_inventory_item" then
 						local slot_name = pickup_settings.slot_name
@@ -1041,7 +1041,7 @@ InteractionDefinitions.pickup_object = {
 						}
 
 						if health_extension.ignited then
-							extra_extension_init_data.health_system.health_data = health_extension.health_data(health_extension)
+							extra_extension_init_data.health_system.health_data = health_extension:health_data()
 						end
 
 						local is_limited_item = ScriptUnit.has_extension(interactable_unit, "limited_item_track_system")
@@ -1059,7 +1059,7 @@ InteractionDefinitions.pickup_object = {
 
 						local item_data = ItemMasterList[item_name]
 
-						inventory_extension.add_equipment(inventory_extension, slot_name, item_data, unit_template, extra_extension_init_data)
+						inventory_extension:add_equipment(slot_name, item_data, unit_template, extra_extension_init_data)
 
 						if not LEVEL_EDITOR_TEST then
 							local unit_object_id = Managers.state.unit_storage:go_id(interactor_unit)
@@ -1092,23 +1092,23 @@ InteractionDefinitions.pickup_object = {
 
 						if pickup_settings.wield_on_pickup then
 							CharacterStateHelper.stop_weapon_actions(inventory_extension, "picked_up_object")
-							inventory_extension.wield(inventory_extension, slot_name)
+							inventory_extension:wield(slot_name)
 						end
 					elseif pickup_settings.type == "ammo" then
 						if local_human then
 							local hud_extension = ScriptUnit.extension(interactor_unit, "hud_system")
 
-							hud_extension.set_picked_up_ammo(hud_extension, true)
+							hud_extension:set_picked_up_ammo(true)
 						end
 
-						inventory_extension.add_ammo_from_pickup(inventory_extension, pickup_settings)
+						inventory_extension:add_ammo_from_pickup(pickup_settings)
 					elseif pickup_settings.mission_name then
 						local mission_name = pickup_settings.mission_name
 						local mission_name_id = NetworkLookup.mission_names[mission_name]
 						local network_transmit = network_manager.network_transmit
 
-						network_transmit.send_rpc_server(network_transmit, "rpc_request_mission", mission_name_id)
-						network_transmit.send_rpc_server(network_transmit, "rpc_request_mission_update", mission_name_id, true)
+						network_transmit:send_rpc_server("rpc_request_mission", mission_name_id)
+						network_transmit:send_rpc_server("rpc_request_mission_update", mission_name_id, true)
 					elseif pickup_settings.type == "lorebook_page" then
 						local level_key = Managers.state.game_mode:level_key()
 						local pages = table.clone(LorebookCollectablePages[level_key])
@@ -1117,16 +1117,16 @@ InteractionDefinitions.pickup_object = {
 
 						local num_pages = #pages
 						local local_player = Managers.player:local_player()
-						local stats_id = local_player.stats_id(local_player)
+						local stats_id = local_player:stats_id()
 
 						for i = 1, num_pages, 1 do
 							local category_name = pages[i]
 							local id = LorebookCategoryLookup[category_name]
-							local unlocked = statistics_db.get_persistent_array_stat(statistics_db, stats_id, "lorebook_unlocks", id)
+							local unlocked = statistics_db:get_persistent_array_stat(stats_id, "lorebook_unlocks", id)
 
 							if not unlocked then
 								StatisticsUtil.unlock_lorebook_page(id, statistics_db)
-								Managers.state.event:trigger("add_personal_feedback", player.stats_id(player) .. id, local_human, "picked_up_lorebook_page", category_name)
+								Managers.state.event:trigger("add_personal_feedback", player:stats_id() .. id, local_human, "picked_up_lorebook_page", category_name)
 
 								break
 							end
@@ -1145,12 +1145,12 @@ InteractionDefinitions.pickup_object = {
 		can_interact = function (interactor_unit, interactable_unit, data, config, world)
 			local return_value = not Unit.get_data(interactable_unit, "interaction_data", "used")
 			local pickup_extension = ScriptUnit.extension(interactable_unit, "pickup_system")
-			local pickup_settings = pickup_extension.get_pickup_settings(pickup_extension)
+			local pickup_settings = pickup_extension:get_pickup_settings()
 			local slot_name = pickup_settings.slot_name
 			local fail_reason = nil
 
 			if return_value and pickup_extension.can_interact then
-				return_value = pickup_extension.can_interact(pickup_extension)
+				return_value = pickup_extension:can_interact()
 			end
 
 			if return_value and pickup_settings.can_interact_func then
@@ -1169,15 +1169,15 @@ InteractionDefinitions.pickup_object = {
 			end
 
 			if return_value and slot_name == "slot_level_event" then
-				local wielded_slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
+				local wielded_slot_name = inventory_extension:get_wielded_slot_name()
 
 				if wielded_slot_name == "slot_level_event" then
 					return_value = false
 				end
 			end
 
-			slot_data = slot_name and inventory_extension.get_slot_data(inventory_extension, slot_name)
-			local item_template = slot_data and inventory_extension.get_item_template(inventory_extension, slot_data)
+			slot_data = slot_name and inventory_extension:get_slot_data(slot_name)
+			local item_template = slot_data and inventory_extension:get_item_template(slot_data)
 
 			if return_value and slot_name and item_template and slot_name == "slot_potion" and item_template.is_grimoire then
 				fail_reason = "grimoire_equipped"
@@ -1185,10 +1185,10 @@ InteractionDefinitions.pickup_object = {
 			end
 
 			local pickup_item_name = pickup_settings.item_name
-			local slot_item_name = inventory_extension.get_item_name(inventory_extension, slot_name)
+			local slot_item_name = inventory_extension:get_item_name(slot_name)
 			local buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
 
-			if return_value and pickup_item_name and slot_item_name and pickup_item_name == slot_item_name and (not buff_extension.has_buff_type(buff_extension, "not_consume_pickup") or not pickup_settings.dupable or pickup_extension.spawn_type == "dropped") then
+			if return_value and pickup_item_name and slot_item_name and pickup_item_name == slot_item_name and (not buff_extension:has_buff_type("not_consume_pickup") or not pickup_settings.dupable or pickup_extension.spawn_type == "dropped") then
 				fail_reason = "already_equipped"
 				return_value = false
 			end
@@ -1202,7 +1202,7 @@ InteractionDefinitions.pickup_object = {
 				end
 			end
 
-			if return_value and pickup_settings.type == "ammo" and inventory_extension.has_full_ammo(inventory_extension) then
+			if return_value and pickup_settings.type == "ammo" and inventory_extension:has_full_ammo() then
 				fail_reason = "ammo_full"
 				return_value = false
 			end
@@ -1216,7 +1216,7 @@ InteractionDefinitions.pickup_object = {
 				if fail_reason then
 					if fail_reason == "already_equipped" then
 						local pickup_extension = ScriptUnit.extension(interactable_unit, "pickup_system")
-						local pickup_settings = pickup_extension.get_pickup_settings(pickup_extension)
+						local pickup_settings = pickup_extension:get_pickup_settings()
 
 						if not pickup_settings.item_description then
 							table.dump(pickup_settings)
@@ -1230,14 +1230,14 @@ InteractionDefinitions.pickup_object = {
 					end
 				else
 					local pickup_extension = ScriptUnit.extension(interactable_unit, "pickup_system")
-					local pickup_settings = pickup_extension.get_pickup_settings(pickup_extension)
+					local pickup_settings = pickup_extension:get_pickup_settings()
 					local pickup_item_name = pickup_settings.item_name
 					local slot_name = pickup_settings.slot_name
 					local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
-					local slot_item_name = inventory_extension.get_item_name(inventory_extension, slot_name)
+					local slot_item_name = inventory_extension:get_item_name(slot_name)
 					local buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
 
-					if pickup_item_name and slot_item_name and pickup_item_name == slot_item_name and buff_extension.has_buff_type(buff_extension, "not_consume_pickup") and pickup_settings.dupable and pickup_extension.spawn_type ~= "dropped" then
+					if pickup_item_name and slot_item_name and pickup_item_name == slot_item_name and buff_extension:has_buff_type("not_consume_pickup") and pickup_settings.dupable and pickup_extension.spawn_type ~= "dropped" then
 						interaction_action_description = "trinket_not_consume_pickup_tier1"
 					end
 				end
@@ -1262,18 +1262,18 @@ InteractionDefinitions.give_item = {
 			local interactor_health_extension = ScriptUnit.extension(interactor_unit, "health_system")
 			local interactor_status_extension = ScriptUnit.extension(interactor_unit, "status_system")
 
-			if interactor_status_extension.is_knocked_down(interactor_status_extension) or not interactor_health_extension.is_alive(interactor_health_extension) then
+			if interactor_status_extension:is_knocked_down() or not interactor_health_extension:is_alive() then
 				return InteractionResult.FAILURE
 			end
 
-			if interactor_status_extension.is_disabled(interactor_status_extension) then
+			if interactor_status_extension:is_disabled() then
 				return InteractionResult.FAILURE
 			end
 
 			local interactable_health_extension = ScriptUnit.extension(interactable_unit, "health_system")
 			local interactable_status_extension = ScriptUnit.extension(interactor_unit, "status_system")
 
-			if interactable_status_extension.is_knocked_down(interactable_status_extension) or not interactable_health_extension.is_alive(interactable_health_extension) then
+			if interactable_status_extension:is_knocked_down() or not interactable_health_extension:is_alive() then
 				return InteractionResult.FAILURE
 			end
 
@@ -1288,7 +1288,7 @@ InteractionDefinitions.give_item = {
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
-			local can_receive_item = not status_extension.is_disabled(status_extension)
+			local can_receive_item = not status_extension:is_disabled()
 
 			return can_receive_item
 		end
@@ -1307,21 +1307,21 @@ InteractionDefinitions.give_item = {
 
 			if result == InteractionResult.SUCCESS then
 				local player_manager = Managers.player
-				local interactor_player = player_manager.owner(player_manager, interactor_unit)
+				local interactor_player = player_manager:owner(interactor_unit)
 
 				if interactor_player and not interactor_player.remote then
 					local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
 					local interactor_data = data.interactor_data
 					local item_slot_name = interactor_data.item_slot_name
-					local slot_data = inventory_extension.get_slot_data(inventory_extension, item_slot_name)
+					local slot_data = inventory_extension:get_slot_data(item_slot_name)
 
 					if slot_data then
-						local template = inventory_extension.get_item_template(inventory_extension, slot_data)
+						local template = inventory_extension:get_item_template(slot_data)
 
 						if template.can_give_other then
-							local ammo_extension = inventory_extension.get_item_slot_extension(inventory_extension, item_slot_name, "ammo_system")
+							local ammo_extension = inventory_extension:get_item_slot_extension(item_slot_name, "ammo_system")
 
-							ammo_extension.use_ammo(ammo_extension, 1)
+							ammo_extension:use_ammo(1)
 
 							if not LEVEL_EDITOR_TEST then
 								local interactor_game_object_id = Managers.state.unit_storage:go_id(interactor_unit)
@@ -1357,23 +1357,23 @@ InteractionDefinitions.give_item = {
 			local is_bot = owner_player and owner_player.bot_player
 			local health_extension = ScriptUnit.extension(interactable_unit, "health_system")
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
-			local is_alive = health_extension.is_alive(health_extension) and not status_extension.is_knocked_down(status_extension)
+			local is_alive = health_extension:is_alive() and not status_extension:is_knocked_down()
 			local interactor_inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
-			local item_template = interactor_inventory_extension.get_wielded_slot_item_template(interactor_inventory_extension)
+			local item_template = interactor_inventory_extension:get_wielded_slot_item_template()
 
 			if not item_template then
 				return false
 			end
 
 			local target_inventory_extension = ScriptUnit.extension(interactable_unit, "inventory_system")
-			local slot_name = (Managers.input:is_device_active("gamepad") and interactor_inventory_extension.get_selected_consumable_slot_name(interactor_inventory_extension)) or interactor_inventory_extension.get_wielded_slot_name(interactor_inventory_extension)
-			local slot_occupied = target_inventory_extension.get_slot_data(target_inventory_extension, slot_name)
+			local slot_name = (Managers.input:is_device_active("gamepad") and interactor_inventory_extension:get_selected_consumable_slot_name()) or interactor_inventory_extension:get_wielded_slot_name()
+			local slot_occupied = target_inventory_extension:get_slot_data(slot_name)
 
 			return is_alive and item_template.can_give_other and not slot_occupied
 		end,
 		set_interactor_data = function (interactor_unit, interactable_unit, interactor_data)
 			local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
-			local wielded_slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
+			local wielded_slot_name = inventory_extension:get_wielded_slot_name()
 			interactor_data.item_slot_name = wielded_slot_name
 		end,
 		hud_description = function (interactable_unit, data, config)
@@ -1381,12 +1381,12 @@ InteractionDefinitions.give_item = {
 				local player_manager = Managers.player
 				local profile_synchronizer = Managers.state.network.profile_synchronizer
 				local display_name = ""
-				local player = player_manager.owner(player_manager, interactable_unit)
+				local player = player_manager:owner(interactable_unit)
 
 				if player then
-					local network_id = player.network_id(player)
-					local local_player_id = player.local_player_id(player)
-					local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, network_id, local_player_id)
+					local network_id = player:network_id()
+					local local_player_id = player:local_player_id()
+					local profile_index = profile_synchronizer:profile_by_peer(network_id, local_player_id)
 					local profile_settings = SPProfiles[profile_index]
 					display_name = profile_settings.ingame_display_name
 				end
@@ -1412,18 +1412,18 @@ InteractionDefinitions.heal = {
 			local interactor_health_extension = ScriptUnit.extension(interactor_unit, "health_system")
 			local interactor_status_extension = ScriptUnit.extension(interactor_unit, "status_system")
 
-			if interactor_status_extension.is_knocked_down(interactor_status_extension) or not interactor_health_extension.is_alive(interactor_health_extension) then
+			if interactor_status_extension:is_knocked_down() or not interactor_health_extension:is_alive() then
 				return InteractionResult.FAILURE
 			end
 
-			if interactor_status_extension.is_disabled(interactor_status_extension) then
+			if interactor_status_extension:is_disabled() then
 				return InteractionResult.FAILURE
 			end
 
 			local interactable_health_extension = ScriptUnit.extension(interactable_unit, "health_system")
 			local interactable_status_extension = ScriptUnit.extension(interactor_unit, "status_system")
 
-			if interactable_status_extension.is_knocked_down(interactable_status_extension) or not interactable_health_extension.is_alive(interactable_health_extension) then
+			if interactable_status_extension:is_knocked_down() or not interactable_health_extension:is_alive() then
 				return InteractionResult.FAILURE
 			end
 
@@ -1439,12 +1439,12 @@ InteractionDefinitions.heal = {
 				local health_extension = ScriptUnit.extension(interactable_unit, "health_system")
 				local buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
 
-				if interactor_unit == interactable_unit and buff_extension.has_buff_type(buff_extension, "trait_necklace_no_healing_health_regen") then
+				if interactor_unit == interactable_unit and buff_extension:has_buff_type("trait_necklace_no_healing_health_regen") then
 					return
 				end
 
 				if attack_template.heal_type == "bandage" then
-					local damage_taken = health_extension.get_damage_taken(health_extension)
+					local damage_taken = health_extension:get_damage_taken()
 					local heal_amount = damage_taken * attack_template.heal_percent
 
 					DamageUtils.heal_network(interactable_unit, interactor_unit, heal_amount, attack_template.heal_type)
@@ -1454,16 +1454,16 @@ InteractionDefinitions.heal = {
 
 				if interactor_unit ~= interactable_unit then
 					local health_extension = ScriptUnit.extension(interactor_unit, "health_system")
-					local damage_taken = health_extension.get_damage_taken(health_extension)
-					local heal_amount_self = buff_extension.apply_buffs_to_value(buff_extension, damage_taken, StatBuffIndex.HEAL_SELF_ON_HEAL_OTHER)
+					local damage_taken = health_extension:get_damage_taken()
+					local heal_amount_self = buff_extension:apply_buffs_to_value(damage_taken, StatBuffIndex.HEAL_SELF_ON_HEAL_OTHER)
 					heal_amount_self = heal_amount_self - damage_taken
 
 					DamageUtils.heal_network(interactor_unit, interactor_unit, heal_amount_self, "bandage_trinket")
 				end
 
 				local player_manager = Managers.player
-				local interactor_player = player_manager.unit_owner(player_manager, interactor_unit)
-				local interactable_player = player_manager.unit_owner(player_manager, interactable_unit)
+				local interactor_player = player_manager:unit_owner(interactor_unit)
+				local interactable_player = player_manager:unit_owner(interactable_unit)
 				local interactable_pos = POSITION_LOOKUP[interactable_unit]
 
 				_add_heal_telemetry(interactor_player, interactable_player, interactable_pos)
@@ -1471,10 +1471,10 @@ InteractionDefinitions.heal = {
 		end,
 		can_interact = function (interactor_unit, interactable_unit)
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
-			local is_knocked_down = status_extension.is_knocked_down(status_extension)
-			local is_dead = status_extension.is_dead(status_extension)
+			local is_knocked_down = status_extension:is_knocked_down()
+			local is_dead = status_extension:is_dead()
 			local health_extension = ScriptUnit.extension(interactable_unit, "health_system")
-			local has_max_health = 1 <= health_extension.current_permanent_health_percent(health_extension)
+			local has_max_health = 1 <= health_extension:current_permanent_health_percent()
 
 			return not is_knocked_down and not is_dead and not has_max_health
 		end
@@ -1487,7 +1487,7 @@ InteractionDefinitions.heal = {
 			event_data.target = interactable_unit
 			event_data.target_name = ScriptUnit.extension(interactable_unit, "dialogue_system").context.player_profile
 
-			interactor_dialogue_input.trigger_dialogue_event(interactor_dialogue_input, "heal_start", event_data)
+			interactor_dialogue_input:trigger_dialogue_event("heal_start", event_data)
 		end,
 		update = function (world, interactor_unit, interactable_unit, data, config, dt, t)
 			return
@@ -1507,28 +1507,28 @@ InteractionDefinitions.heal = {
 				if not owner_player.remote then
 					local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
 					local buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
-					local _, procced = buff_extension.apply_buffs_to_value(buff_extension, 0, StatBuffIndex.NOT_CONSUME_MEDPACK)
+					local _, procced = buff_extension:apply_buffs_to_value(0, StatBuffIndex.NOT_CONSUME_MEDPACK)
 
-					if interactor_unit == interactable_unit and buff_extension.has_buff_type(buff_extension, "trait_necklace_no_healing_health_regen") then
+					if interactor_unit == interactable_unit and buff_extension:has_buff_type("trait_necklace_no_healing_health_regen") then
 						return
 					end
 
 					if not procced then
 						local interactor_data = data.interactor_data
 						local item_slot_name = interactor_data.item_slot_name
-						local slot_data = inventory_extension.get_slot_data(inventory_extension, item_slot_name)
+						local slot_data = inventory_extension:get_slot_data(item_slot_name)
 
 						if slot_data then
-							local template = inventory_extension.get_item_template(inventory_extension, slot_data)
+							local template = inventory_extension:get_item_template(slot_data)
 
 							if (template.can_heal_self and interactor_unit == interactable_unit) or (template.can_heal_other and interactor_unit ~= interactable_unit) then
-								local ammo_extension = inventory_extension.get_item_slot_extension(inventory_extension, item_slot_name, "ammo_system")
+								local ammo_extension = inventory_extension:get_item_slot_extension(item_slot_name, "ammo_system")
 
-								ammo_extension.use_ammo(ammo_extension, 1)
+								ammo_extension:use_ammo(1)
 							end
 						end
 					else
-						inventory_extension.wield_previous_weapon(inventory_extension)
+						inventory_extension:wield_previous_weapon()
 					end
 				end
 
@@ -1537,7 +1537,7 @@ InteractionDefinitions.heal = {
 				event_data.healer = interactor_unit
 				event_data.healer_name = ScriptUnit.extension(interactor_unit, "dialogue_system").context.player_profile
 
-				interactable_dialogue_input.trigger_dialogue_event(interactable_dialogue_input, "heal_completed", event_data)
+				interactable_dialogue_input:trigger_dialogue_event("heal_completed", event_data)
 				StatisticsUtil.register_heal(interactor_unit, interactable_unit, data.statistics_db)
 			end
 		end,
@@ -1561,10 +1561,10 @@ InteractionDefinitions.heal = {
 			local is_bot = owner_player and owner_player.bot_player
 			local health_extension = ScriptUnit.extension(interactable_unit, "health_system")
 			local status_extension = ScriptUnit.extension(interactable_unit, "status_system")
-			local is_alive = health_extension.is_alive(health_extension) and not status_extension.is_knocked_down(status_extension)
-			local has_max_health = 1 <= health_extension.current_permanent_health_percent(health_extension)
+			local is_alive = health_extension:is_alive() and not status_extension:is_knocked_down()
+			local has_max_health = 1 <= health_extension:current_permanent_health_percent()
 			local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
-			local item_template = inventory_extension.get_wielded_slot_item_template(inventory_extension)
+			local item_template = inventory_extension:get_wielded_slot_item_template()
 
 			if not item_template then
 				return false
@@ -1576,7 +1576,7 @@ InteractionDefinitions.heal = {
 		end,
 		set_interactor_data = function (interactor_unit, interactable_unit, interactor_data)
 			local inventory_extension = ScriptUnit.extension(interactor_unit, "inventory_system")
-			local wielded_slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
+			local wielded_slot_name = inventory_extension:get_wielded_slot_name()
 			interactor_data.item_slot_name = wielded_slot_name
 		end,
 		hud_description = function (interactable_unit, data, config)
@@ -1584,12 +1584,12 @@ InteractionDefinitions.heal = {
 				local player_manager = Managers.player
 				local profile_synchronizer = Managers.state.network.profile_synchronizer
 				local display_name = ""
-				local player = player_manager.owner(player_manager, interactable_unit)
+				local player = player_manager:owner(interactable_unit)
 
 				if player then
-					local network_id = player.network_id(player)
-					local local_player_id = player.local_player_id(player)
-					local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, network_id, local_player_id)
+					local network_id = player:network_id()
+					local local_player_id = player:local_player_id()
+					local profile_index = profile_synchronizer:profile_by_peer(network_id, local_player_id)
 					local profile_settings = SPProfiles[profile_index]
 					display_name = profile_settings.ingame_display_name
 				end
@@ -1638,7 +1638,7 @@ InteractionDefinitions.linker_transportation_unit.client.stop = function (world,
 
 		local transportation_extension = ScriptUnit.extension(interactable_unit, "transportation_system")
 
-		transportation_extension.interacted_with(transportation_extension, interactor_unit)
+		transportation_extension:interacted_with(interactor_unit)
 	end
 
 	Unit.set_data(interactable_unit, "interaction_data", "being_used", false)
@@ -1648,7 +1648,7 @@ local player_units = {}
 
 InteractionDefinitions.linker_transportation_unit.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	local transport_extension = ScriptUnit.extension(interactable_unit, "transportation_system")
-	local can_interact = transport_extension.can_interact(transport_extension, interactor_unit)
+	local can_interact = transport_extension:can_interact(interactor_unit)
 	local used = Unit.get_data(interactable_unit, "interaction_data", "used")
 
 	if used or not can_interact then
@@ -1672,8 +1672,8 @@ InteractionDefinitions.linker_transportation_unit.client.can_interact = function
 			local player_unit = PLAYER_UNITS[i]
 			local health_extension = ScriptUnit_extension(player_unit, "health_system")
 			local status_extension = ScriptUnit_extension(player_unit, "status_system")
-			local is_alive = health_extension.is_alive(health_extension)
-			local is_ready_for_assisted_respawn = status_extension.is_ready_for_assisted_respawn(status_extension)
+			local is_alive = health_extension:is_alive()
+			local is_ready_for_assisted_respawn = status_extension:is_ready_for_assisted_respawn()
 
 			if is_alive and not is_ready_for_assisted_respawn then
 				alive_players = alive_players + 1
@@ -1699,7 +1699,7 @@ InteractionDefinitions.door.client.stop = function (world, interactor_unit, inte
 	if result == InteractionResult.SUCCESS then
 		local door_extension = ScriptUnit.extension(interactable_unit, "door_system")
 
-		door_extension.interacted_with(door_extension, interactor_unit)
+		door_extension:interacted_with(interactor_unit)
 	end
 
 	Unit.set_data(interactable_unit, "interaction_data", "being_used", false)
@@ -1707,7 +1707,7 @@ end
 
 InteractionDefinitions.door.client.hud_description = function (interactable_unit, data, config)
 	local door_extension = ScriptUnit.extension(interactable_unit, "door_system")
-	local is_open = door_extension.is_open(door_extension)
+	local is_open = door_extension:is_open()
 	local interaction_action_description = (is_open and "interaction_action_close") or "interaction_action_open"
 
 	return Unit.get_data(interactable_unit, "interaction_data", "hud_description"), interaction_action_description
@@ -1766,8 +1766,8 @@ InteractionDefinitions.chest.server.stop = function (world, interactor_unit, int
 	if success and pickup_settings.can_spawn_func(pickup_params) then
 		local buff_extension = ScriptUnit.extension(interactor_unit, "buff_system")
 		local rand = math.random()
-		local chance = dice_keeper.chest_loot_dice_chance(dice_keeper)
-		chance = buff_extension.apply_buffs_to_value(buff_extension, chance, StatBuffIndex.INCREASE_LUCK)
+		local chance = dice_keeper:chest_loot_dice_chance()
+		chance = buff_extension:apply_buffs_to_value(chance, StatBuffIndex.INCREASE_LUCK)
 
 		if rand < chance then
 			local extension_init_data = {
@@ -1783,7 +1783,7 @@ InteractionDefinitions.chest.server.stop = function (world, interactor_unit, int
 			local rotation = Unit.local_rotation(interactable_unit, 0)
 
 			Managers.state.unit_spawner:spawn_network_unit(unit_name, unit_template_name, extension_init_data, position, rotation)
-			dice_keeper.bonus_dice_spawned(dice_keeper)
+			dice_keeper:bonus_dice_spawned()
 		end
 	end
 
@@ -2067,13 +2067,13 @@ InteractionDefinitions.pictureframe.client.stop = function (world, interactor_un
 	if result == InteractionResult.SUCCESS and not data.is_husk then
 		local decoration_system = Managers.state.entity:system("keep_decoration_system")
 
-		decoration_system.interacted_with(decoration_system, interactable_unit)
+		decoration_system:interacted_with(interactable_unit)
 	end
 end
 
 InteractionDefinitions.pictureframe.client.can_interact = function (interactor_unit, interactable_unit, data, config)
 	local decoration_system = Managers.state.entity:system("keep_decoration_system")
-	local can_interact = decoration_system.can_interact(decoration_system, interactable_unit)
+	local can_interact = decoration_system:can_interact(interactable_unit)
 
 	return can_interact
 end

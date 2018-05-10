@@ -222,7 +222,7 @@ AchievementManager.init = function (self, world, statistics_db, is_in_inn)
 			if Managers.account:user_detached() then
 				self._xbox_achievements_initialized = false
 			else
-				self._initialize_xbox_achivements(self)
+				self:_initialize_xbox_achivements()
 			end
 		end
 
@@ -318,14 +318,14 @@ AchievementManager.update = function (self, dt)
 
 	if platform == "xb1" and not self._xbox_achievements_initialized then
 		if not Managers.account:user_detached() then
-			self._initialize_xbox_achivements(self)
+			self:_initialize_xbox_achivements()
 		end
 
 		return
 	end
 
 	local player_manager = Managers.player
-	local player = player_manager.local_player(player_manager)
+	local player = player_manager:local_player()
 
 	if player ~= nil then
 		local statistics_db = self.statistics_db
@@ -334,10 +334,10 @@ AchievementManager.update = function (self, dt)
 		local unlock_tasks = self.unlock_tasks
 		local completed_achievements = self.completed_achievements
 		local platform_functions = platform_functions[platform]
-		local platform_id = player.platform_id(player)
-		local stats_id = player.stats_id(player)
+		local platform_id = player:platform_id()
+		local stats_id = player:stats_id()
 
-		self.debug_draw(self)
+		self:debug_draw()
 
 		if not self.checked_version_number then
 			if not self.version_token then

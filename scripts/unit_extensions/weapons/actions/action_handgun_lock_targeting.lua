@@ -19,7 +19,7 @@ ActionHandgunLockTargeting.client_owner_start_action = function (self, new_actio
 	local ammo_extension = self.ammo_extension
 
 	if ammo_extension then
-		self.max_targets = math.min(ammo_extension.ammo_count(ammo_extension), new_action.max_targets)
+		self.max_targets = math.min(ammo_extension:ammo_count(), new_action.max_targets)
 	else
 		self.max_targets = new_action.max_targets
 	end
@@ -32,7 +32,7 @@ ActionHandgunLockTargeting.client_owner_post_update = function (self, dt, t, wor
 	local player_rotation = Unit.world_rotation(owner_unit_1p, 0)
 	local direction = Vector3.normalize(Quaternion.forward(player_rotation))
 	local smart_tageting_extension = ScriptUnit.extension(self.owner_unit, "smart_targeting_system")
-	local data = smart_tageting_extension.get_targeting_data(smart_tageting_extension)
+	local data = smart_tageting_extension:get_targeting_data()
 	local target = data.unit
 
 	if target ~= self.target then

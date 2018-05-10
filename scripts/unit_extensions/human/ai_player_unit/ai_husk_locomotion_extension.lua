@@ -14,8 +14,8 @@ AiHuskLocomotionExtension.init = function (self, extension_init_context, unit, e
 	self._velocity = Vector3Box(0, 0, 0)
 	self._breed = extension_init_data.breed
 	local ai_system = Managers.state.entity:system("ai_system")
-	local client_traverse_logic = ai_system.client_traverse_logic(ai_system)
-	self._nav_world = ai_system.nav_world(ai_system)
+	local client_traverse_logic = ai_system:client_traverse_logic()
+	self._nav_world = ai_system:nav_world()
 	self._world = extension_init_context.world
 	self._traverse_logic = client_traverse_logic
 	self._move_speed_anim_var = Unit.animation_find_variable(unit, "move_speed")
@@ -56,7 +56,7 @@ AiHuskLocomotionExtension.init = function (self, extension_init_context, unit, e
 	end
 
 	MoverHelper.set_active_mover(unit, self._mover_state, "mover")
-	self.set_mover_disable_reason(self, "not_constrained_by_mover", true)
+	self:set_mover_disable_reason("not_constrained_by_mover", true)
 
 	self._system_data.all_update_units[unit] = self
 	self._system_data.pure_network_update_units[unit] = self
@@ -121,7 +121,7 @@ AiHuskLocomotionExtension.set_animation_driven = function (self, is_animation_dr
 	local network_driven = not is_animation_driven or not is_affected_by_gravity
 	self.is_network_driven = network_driven
 
-	self.set_mover_disable_reason(self, "not_constrained_by_mover", true)
+	self:set_mover_disable_reason("not_constrained_by_mover", true)
 
 	local system_data = self._system_data
 

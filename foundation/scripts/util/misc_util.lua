@@ -78,7 +78,7 @@ end
 function split_string(s)
 	local parts = {}
 
-	for part in s.gmatch(s, "(%S+)") do
+	for part in s:gmatch("(%S+)") do
 		parts[#parts + 1] = part
 	end
 

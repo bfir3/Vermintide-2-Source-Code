@@ -22,7 +22,7 @@ PerformanceTitleManager.init = function (self, network_transmit, statistics_db, 
 end
 
 PerformanceTitleManager.register_rpcs = function (self, network_event_delegate)
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self._network_event_delegate = network_event_delegate
 end
@@ -44,7 +44,7 @@ end
 
 PerformanceTitleManager._evaluate_player_titles = function (self, player, eligible_titles)
 	local statistics_db = self._statistics_db
-	local stats_id = player.stats_id(player)
+	local stats_id = player:stats_id()
 	local titles = PerformanceTitles.titles
 	local title_templates = PerformanceTitles.templates
 	local found_any_title = false
@@ -97,8 +97,8 @@ end
 PerformanceTitleManager._assign_title = function (self, assigned_titles, player_titles, player, title_name)
 	local achieved_titles = player_titles[player]
 	local amount = achieved_titles[title_name]
-	local peer_id = player.network_id(player)
-	local local_player_id = player.local_player_id(player)
+	local peer_id = player:network_id()
+	local local_player_id = player:local_player_id()
 	assigned_titles[#assigned_titles + 1] = {
 		peer_id = peer_id,
 		local_player_id = local_player_id,
@@ -114,19 +114,19 @@ PerformanceTitleManager._remove_title_from_player_titles = function (self, playe
 end
 
 PerformanceTitleManager._assign_individual_titles = function (self, player_titles, assigned_titles)
-	local title_list = self._get_title_list_from_player_titles(self, player_titles)
+	local title_list = self:_get_title_list_from_player_titles(player_titles)
 	local i = 1
 
 	while title_list[i] ~= nil do
 		local title_name = title_list[i]
-		local player = self._find_individually_achieved_title(self, player_titles, title_name)
+		local player = self:_find_individually_achieved_title(player_titles, title_name)
 
 		if player then
-			self._assign_title(self, assigned_titles, player_titles, player, title_name)
+			self:_assign_title(assigned_titles, player_titles, player, title_name)
 
 			player_titles[player] = nil
 
-			self._remove_title_from_player_titles(self, player_titles, title_name)
+			self:_remove_title_from_player_titles(player_titles, title_name)
 
 			i = 1
 		else
@@ -136,7 +136,7 @@ PerformanceTitleManager._assign_individual_titles = function (self, player_title
 end
 
 PerformanceTitleManager._assign_compared_titles = function (self, player_titles, assigned_titles)
-	local title_list = self._get_title_list_from_player_titles(self, player_titles)
+	local title_list = self:_get_title_list_from_player_titles(player_titles)
 	local title_settings = PerformanceTitles.titles
 	local title_templates = PerformanceTitles.templates
 
@@ -156,7 +156,7 @@ PerformanceTitleManager._assign_compared_titles = function (self, player_titles,
 		end
 
 		if winner_player then
-			self._assign_title(self, assigned_titles, player_titles, winner_player, title_name)
+			self:_assign_title(assigned_titles, player_titles, winner_player, title_name)
 
 			player_titles[winner_player] = nil
 		end
@@ -195,7 +195,7 @@ PerformanceTitleManager.evaluate_titles = function (self, players)
 
 	for unique_id, player in pairs(players) do
 		local eligible_titles = {}
-		local success = self._evaluate_player_titles(self, player, eligible_titles)
+		local success = self:_evaluate_player_titles(player, eligible_titles)
 
 		if success then
 			player_titles[player] = eligible_titles
@@ -204,15 +204,15 @@ PerformanceTitleManager.evaluate_titles = function (self, players)
 
 	local assigned_titles = {}
 
-	self._assign_individual_titles(self, player_titles, assigned_titles)
+	self:_assign_individual_titles(player_titles, assigned_titles)
 
 	if 0 < table.size(player_titles) then
-		self._assign_compared_titles(self, player_titles, assigned_titles)
+		self:_assign_compared_titles(player_titles, assigned_titles)
 	end
 
 	self._assigned_titles = assigned_titles
 
-	self._sync_assigned_titles(self, assigned_titles)
+	self:_sync_assigned_titles(assigned_titles)
 end
 
 PerformanceTitleManager._translate_title_assignment = function (self, peer_id, local_player_id, title_id, amount)

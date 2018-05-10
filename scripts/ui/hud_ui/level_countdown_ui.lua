@@ -16,7 +16,7 @@ LevelCountdownUI.init = function (self, ingame_ui_context)
 	local world = self.world_manager:world("level_world")
 	self.wwise_world = Managers.world:wwise_world(world)
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.colors = {
 		normal = Colors.get_table("font_default"),
@@ -36,7 +36,7 @@ end
 
 LevelCountdownUI.update = function (self, dt)
 	if DO_RELOAD then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 
 		self.colors = {
 			normal = Colors.get_table("font_default"),
@@ -54,11 +54,11 @@ LevelCountdownUI.update = function (self, dt)
 		return
 	end
 
-	local start_time, max_start_time = self._get_start_time(self)
+	local start_time, max_start_time = self:_get_start_time()
 
 	if start_time and max_start_time then
-		if self.update_enter_game_counter(self, start_time, max_start_time, dt) then
-			self.draw(self, dt)
+		if self:update_enter_game_counter(start_time, max_start_time, dt) then
+			self:draw(dt)
 
 			if not self._timer_active then
 				self.ingame_ui:handle_transition("close_active")
@@ -92,11 +92,11 @@ end
 
 LevelCountdownUI.rpc_start_game_countdown = function (self, sender)
 	self.ingame_ui:handle_transition("close_active")
-	self.start_enter_game_counter(self)
+	self:start_enter_game_counter()
 end
 
 LevelCountdownUI.rpc_stop_enter_game_countdown = function (self, sender)
-	self.stop_enter_game_countdown(self)
+	self:stop_enter_game_countdown()
 end
 
 LevelCountdownUI.start_enter_game_counter = function (self)
@@ -109,7 +109,7 @@ LevelCountdownUI.start_enter_game_counter = function (self)
 	widget_content.timer_text = 0
 	local input_manager = self.input_manager
 
-	self.play_sound(self, "Play_hud_matchmaking_countdown_enter")
+	self:play_sound("Play_hud_matchmaking_countdown_enter")
 end
 
 LevelCountdownUI.stop_enter_game_countdown = function (self)
@@ -129,12 +129,12 @@ LevelCountdownUI.update_enter_game_counter = function (self, start_time, max_sta
 
 	if new_timer_value ~= self.last_timer_value then
 		if new_timer_value ~= 0 then
-			self.play_sound(self, "Play_hud_matchmaking_countdown")
+			self:play_sound("Play_hud_matchmaking_countdown")
 
 			widget_content.timer_text = new_timer_value
 			self.color_timer = 0
 		else
-			self.play_sound(self, "Play_hud_matchmaking_countdown_final")
+			self:play_sound("Play_hud_matchmaking_countdown_final")
 
 			widget_content.timer_text = ""
 		end
@@ -168,7 +168,7 @@ end
 
 LevelCountdownUI.destroy = function (self)
 	self.network_event_delegate:unregister(self)
-	self.stop_enter_game_countdown(self)
+	self:stop_enter_game_countdown()
 end
 
 LevelCountdownUI.set_waystone_activation = function (enable)
@@ -194,8 +194,8 @@ LevelCountdownUI._get_start_time = function (self)
 		local status_extension = ScriptUnit.extension(unit, "props_system")
 
 		if status_extension then
-			local max_start_time = status_extension.end_time(status_extension)
-			local current_start_time = status_extension.end_time_left(status_extension)
+			local max_start_time = status_extension:end_time()
+			local current_start_time = status_extension:end_time_left()
 
 			return current_start_time, max_start_time
 		end
@@ -205,9 +205,9 @@ end
 LevelCountdownUI._get_waystone_unit = function ()
 	local world_manager = Managers.world
 
-	if world_manager.has_world(world_manager, "level_world") then
+	if world_manager:has_world("level_world") then
 		local map_unit = nil
-		local world = world_manager.world(world_manager, "level_world")
+		local world = world_manager:world("level_world")
 		local level_name = "levels/inn/world"
 		local level = ScriptWorld.level(world, level_name)
 

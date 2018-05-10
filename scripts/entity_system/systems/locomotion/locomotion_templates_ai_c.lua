@@ -32,10 +32,10 @@ LocomotionTemplates.AILocomotionExtensionC = {
 
 				StatisticsUtil.register_kill(unit, killing_blow, statistics_db, true)
 
-				local unit_game_object_id = network_manager.unit_game_object_id(network_manager, unit)
+				local unit_game_object_id = network_manager:unit_game_object_id(unit)
 
-				network_transmit.send_rpc_clients(network_transmit, "rpc_register_kill", unit_game_object_id)
-				conflict_director.destroy_unit(conflict_director, unit, blackboard, "out_of_range")
+				network_transmit:send_rpc_clients("rpc_register_kill", unit_game_object_id)
+				conflict_director:destroy_unit(unit, blackboard, "out_of_range")
 			end
 		end
 	end

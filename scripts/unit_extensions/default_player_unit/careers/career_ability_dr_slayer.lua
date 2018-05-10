@@ -65,18 +65,18 @@ CareerAbilityDRSlayer.update = function (self, unit, input, dt, context, t)
 	end
 
 	if not self._is_priming then
-		if not self._ability_available(self) then
+		if not self:_ability_available() then
 			return
 		end
 
-		if input_extension.get(input_extension, "action_career") then
-			self._start_priming(self)
+		if input_extension:get("action_career") then
+			self:_start_priming()
 		end
 	elseif self._is_priming then
-		local landing_position = self._update_priming(self)
+		local landing_position = self:_update_priming()
 
-		if input_extension.get(input_extension, "action_two") or input_extension.get(input_extension, "jump") or input_extension.get(input_extension, "jump_only") then
-			self._stop_priming(self)
+		if input_extension:get("action_two") or input_extension:get("jump") or input_extension:get("jump_only") then
+			self:_stop_priming()
 
 			return
 		end
@@ -85,8 +85,8 @@ CareerAbilityDRSlayer.update = function (self, unit, input, dt, context, t)
 			self._last_valid_landing_position = Vector3Box(landing_position)
 		end
 
-		if input_extension.get(input_extension, "action_career_release") then
-			self._run_ability(self)
+		if input_extension:get("action_career_release") then
+			self:_run_ability()
 		end
 	end
 end
@@ -96,7 +96,7 @@ CareerAbilityDRSlayer._ability_available = function (self)
 	local status_extension = self._status_extension
 	local locomotion_extension = self._locomotion_extension
 
-	return career_extension.can_use_activated_ability(career_extension) and not status_extension.is_disabled(status_extension) and locomotion_extension.is_on_ground(locomotion_extension)
+	return career_extension:can_use_activated_ability() and not status_extension:is_disabled() and locomotion_extension:is_on_ground()
 end
 
 CareerAbilityDRSlayer._start_priming = function (self)
@@ -117,10 +117,10 @@ CareerAbilityDRSlayer._update_priming = function (self)
 	local network_manager = Managers.state.network
 	local network_transmit = network_manager.network_transmit
 	local physics_world = World.get_data(world, "physics_world")
-	local unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+	local unit_id = network_manager:unit_game_object_id(owner_unit)
 	local first_person_extension = self._first_person_extension
-	local player_position = first_person_extension.current_position(first_person_extension)
-	local player_rotation = first_person_extension.current_rotation(first_person_extension)
+	local player_position = first_person_extension:current_position()
+	local player_rotation = first_person_extension:current_rotation()
 	local player_direction = Vector3.normalize(Quaternion.forward(player_rotation))
 	local player_direction_flat = Vector3.normalize(Vector3.flat(player_direction))
 	local cross = Vector3.cross(player_direction, Vector3.forward())
@@ -171,7 +171,7 @@ CareerAbilityDRSlayer._stop_priming = function (self)
 end
 
 CareerAbilityDRSlayer._run_ability = function (self)
-	self._stop_priming(self)
+	self:_stop_priming()
 
 	if not self._locomotion_extension:is_on_ground() then
 		return
@@ -188,17 +188,17 @@ CareerAbilityDRSlayer._run_ability = function (self)
 	local buff_name_1 = "bardin_slayer_activated_ability"
 	local buff_name_2 = nil
 	local talent_extension = ScriptUnit.extension(owner_unit, "talent_system")
-	local buff_2 = talent_extension.has_talent(talent_extension, "bardin_slayer_activated_ability_uninterruptible", "dwarf_ranger", true) or talent_extension.has_talent(talent_extension, "bardin_slayer_activated_ability_movement", "dwarf_ranger", true)
+	local buff_2 = talent_extension:has_talent("bardin_slayer_activated_ability_uninterruptible", "dwarf_ranger", true) or talent_extension:has_talent("bardin_slayer_activated_ability_movement", "dwarf_ranger", true)
 
-	if talent_extension.has_talent(talent_extension, "bardin_slayer_activated_ability_uninterruptible", "dwarf_ranger", true) then
+	if talent_extension:has_talent("bardin_slayer_activated_ability_uninterruptible", "dwarf_ranger", true) then
 		buff_name_2 = "bardin_slayer_activated_ability_uninterruptible"
 	end
 
-	if talent_extension.has_talent(talent_extension, "bardin_slayer_activated_ability_movement", "dwarf_ranger", true) then
+	if talent_extension:has_talent("bardin_slayer_activated_ability_movement", "dwarf_ranger", true) then
 		buff_name_2 = "bardin_slayer_activated_ability_movement"
 	end
 
-	local unit_object_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+	local unit_object_id = network_manager:unit_game_object_id(owner_unit)
 	local buff_template_name_id_1 = NetworkLookup.buff_templates[buff_name_1]
 	local buff_template_name_id_2 = nil
 
@@ -209,39 +209,39 @@ CareerAbilityDRSlayer._run_ability = function (self)
 	if is_server then
 		local buff_extension = self._buff_extension
 
-		buff_extension.add_buff(buff_extension, buff_name_1, {
+		buff_extension:add_buff(buff_name_1, {
 			attacker_unit = owner_unit
 		})
-		network_transmit.send_rpc_clients(network_transmit, "rpc_add_buff", unit_object_id, buff_template_name_id_1, unit_object_id, 0, false)
+		network_transmit:send_rpc_clients("rpc_add_buff", unit_object_id, buff_template_name_id_1, unit_object_id, 0, false)
 
 		if buff_2 then
-			buff_extension.add_buff(buff_extension, buff_name_2, {
+			buff_extension:add_buff(buff_name_2, {
 				attacker_unit = owner_unit
 			})
-			network_transmit.send_rpc_clients(network_transmit, "rpc_add_buff", unit_object_id, buff_template_name_id_2, unit_object_id, 0, false)
+			network_transmit:send_rpc_clients("rpc_add_buff", unit_object_id, buff_template_name_id_2, unit_object_id, 0, false)
 		end
 	else
-		network_transmit.send_rpc_server(network_transmit, "rpc_add_buff", unit_object_id, buff_template_name_id_1, unit_object_id, 0, true)
+		network_transmit:send_rpc_server("rpc_add_buff", unit_object_id, buff_template_name_id_1, unit_object_id, 0, true)
 
 		if buff_2 then
-			network_transmit.send_rpc_server(network_transmit, "rpc_add_buff", unit_object_id, buff_template_name_id_2, unit_object_id, 0, true)
+			network_transmit:send_rpc_server("rpc_add_buff", unit_object_id, buff_template_name_id_2, unit_object_id, 0, true)
 		end
 	end
 
 	if local_player then
 		local first_person_extension = self._first_person_extension
 
-		first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_bardin_slayer_enter", nil, true)
-		first_person_extension.play_hud_sound_event(first_person_extension, "Play_career_ability_bardin_slayer_loop")
+		first_person_extension:play_hud_sound_event("Play_career_ability_bardin_slayer_enter", nil, true)
+		first_person_extension:play_hud_sound_event("Play_career_ability_bardin_slayer_loop")
 
 		MOOD_BLACKBOARD.skill_slayer = true
 
-		career_extension.set_state(career_extension, "bardin_activate_slayer")
+		career_extension:set_state("bardin_activate_slayer")
 	end
 
-	status_extension.set_noclip(status_extension, true)
+	status_extension:set_noclip(true)
 
-	local has_impact_damage_buff = talent_extension.has_talent(talent_extension, "bardin_slayer_activated_ability_impact_damage", "dwarf_ranger", true)
+	local has_impact_damage_buff = talent_extension:has_talent("bardin_slayer_activated_ability_impact_damage", "dwarf_ranger", true)
 	local landing_position = self._last_valid_landing_position:unbox()
 	local physics_world = World.get_data(world, "physics_world")
 	local velocity, time_of_flight, hit_pos = get_leap_data(physics_world, POSITION_LOOKUP[owner_unit], landing_position)
@@ -259,13 +259,13 @@ CareerAbilityDRSlayer._run_ability = function (self)
 			local career_power_level = career_extension:get_career_power_level() * ((has_impact_damage_buff and 2) or 1)
 			local area_damage_system = Managers.state.entity:system("area_damage_system")
 
-			area_damage_system.create_explosion(area_damage_system, owner_unit, position, rotation, explosion_template, scale, "career_ability", career_power_level)
+			area_damage_system:create_explosion(owner_unit, position, rotation, explosion_template, scale, "career_ability", career_power_level)
 			ScriptUnit.extension(owner_unit, "status_system"):set_noclip(false)
 		end
 	}
 
-	career_extension.start_activated_ability_cooldown(career_extension)
-	self._play_vo(self)
+	career_extension:start_activated_ability_cooldown()
+	self:_play_vo()
 end
 
 CareerAbilityDRSlayer._play_vo = function (self)
@@ -273,7 +273,7 @@ CareerAbilityDRSlayer._play_vo = function (self)
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
+	dialogue_input:trigger_networked_dialogue_event("activate_ability", event_data)
 end
 
 return

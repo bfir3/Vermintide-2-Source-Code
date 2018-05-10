@@ -16,7 +16,7 @@ BTVictimGrabbedIdleAction.enter = function (self, unit, blackboard, t)
 	blackboard.action = action
 
 	if blackboard.move_state ~= "idle" then
-		network_manager.anim_event(network_manager, unit, animation)
+		network_manager:anim_event(unit, animation)
 
 		blackboard.move_state = "idle"
 	end

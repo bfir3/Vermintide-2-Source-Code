@@ -7,7 +7,7 @@ local menu_functions = {
 		Managers.transition:show_loading_icon(false)
 		Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done"))
 		Managers.music:trigger_event("hud_menu_start_game")
-		this._fetch_restrictions(this)
+		this:_fetch_restrictions()
 	end,
 	function (this)
 		this._input_disabled = true
@@ -15,16 +15,16 @@ local menu_functions = {
 		Managers.transition:show_loading_icon(false)
 		Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(this, "cb_fade_in_done", "tutorial"))
 		Managers.music:trigger_event("hud_menu_start_game")
-		this._fetch_restrictions(this)
+		this:_fetch_restrictions()
 	end,
 	function (this)
 		local input_manager = Managers.input
 
-		input_manager.block_device_except_service(input_manager, "options_menu", "gamepad")
-		this.activate_view(this, "options_view")
+		input_manager:block_device_except_service("options_menu", "gamepad")
+		this:activate_view("options_view")
 	end,
 	function (this)
-		this.activate_view(this, "credits_view")
+		this:activate_view("credits_view")
 	end,
 	function (this)
 		this._input_disabled = true
@@ -55,8 +55,8 @@ StateTitleScreenMainMenu.on_enter = function (self, params)
 	self._auto_start = params.auto_start
 
 	self._setup_sound()
-	self._setup_input(self)
-	self._init_menu_views(self)
+	self:_setup_input()
+	self:_init_menu_views()
 	self.parent:show_menu(true)
 	Managers.transition:hide_loading_icon()
 
@@ -125,7 +125,7 @@ local BACKGROUND_ONLY = BACKGROUND_ONLY or true
 StateTitleScreenMainMenu.update = function (self, dt, t)
 	local title_start_ui = self._title_start_ui
 
-	self._update_play_go(self, dt, t)
+	self:_update_play_go(dt, t)
 
 	if Managers.invite:has_invitation() and not self._handled_invite and not self._input_disabled then
 		if self._is_installed then
@@ -133,7 +133,7 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 
 			Managers.transition:show_loading_icon(false)
 			Managers.transition:fade_in(GameSettings.transition_fade_out_speed, callback(self, "cb_fade_in_done", nil, true))
-			self._fetch_restrictions(self)
+			self:_fetch_restrictions()
 		else
 			self._popup_id = Managers.popup:queue_popup(Localize("popup_invite_not_installed"), Localize("popup_invite_not_installed_header"), "not_installed", Localize("menu_ok"))
 		end
@@ -145,7 +145,7 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 
 	if active_view then
 		self._views[active_view]:update(dt, t)
-		title_start_ui.update(title_start_ui, dt, t, BACKGROUND_ONLY)
+		title_start_ui:update(dt, t, BACKGROUND_ONLY)
 	else
 		local input_service = self.input_manager:get_service("main_menu")
 
@@ -157,16 +157,16 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 			return
 		end
 
-		title_start_ui.update(title_start_ui, dt, t)
+		title_start_ui:update(dt, t)
 
-		local current_menu_index = title_start_ui.current_menu_index(title_start_ui)
-		local active_menu_selection = title_start_ui.active_menu_selection(title_start_ui)
+		local current_menu_index = title_start_ui:current_menu_index()
+		local active_menu_selection = title_start_ui:active_menu_selection()
 		local has_popup = Managers.popup:has_popup()
 
 		if active_menu_selection and not self._input_disabled and not has_popup then
-			if current_menu_index and input_service.get(input_service, "start") then
+			if current_menu_index and input_service:get("start") then
 				menu_functions[current_menu_index](self)
-			elseif input_service.get(input_service, "back") then
+			elseif input_service:get("back") then
 				self.parent:show_menu(false)
 
 				self._new_state = StateTitleScreenMain
@@ -174,7 +174,7 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 		end
 	end
 
-	self._update_start_game(self, dt, t)
+	self:_update_start_game(dt, t)
 
 	if self._popup_id then
 		local result = Managers.popup:query_result(self._popup_id)
@@ -192,7 +192,7 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 		return
 	end
 
-	return self._next_state(self)
+	return self:_next_state()
 end
 
 StateTitleScreenMainMenu._fetch_restrictions = function (self)
@@ -260,7 +260,7 @@ StateTitleScreenMainMenu._update_start_game = function (self, dt, t)
 
 			Managers.system_dialog:open_error_dialog(error_code, callback(self, "cb_error_message_done"))
 		elseif not has_access then
-			self._setup_playstation_plus_dialog(self)
+			self:_setup_playstation_plus_dialog()
 		else
 			self._playstation_plus_available = true
 		end
@@ -300,7 +300,7 @@ StateTitleScreenMainMenu._update_start_game = function (self, dt, t)
 
 	if start_game then
 		if self._network_available and self._playstation_plus_available then
-			self._start_game(self, self._level_key)
+			self:_start_game(self._level_key)
 		else
 			self.parent:show_menu(false)
 
@@ -321,7 +321,7 @@ end
 StateTitleScreenMainMenu.on_exit = function (self)
 	for k, view in pairs(self._views) do
 		if view.destroy then
-			view.destroy(view)
+			view:destroy()
 		end
 	end
 
@@ -380,7 +380,7 @@ StateTitleScreenMainMenu.exit_current_view = function (self)
 	self._active_view = nil
 	local input_manager = Managers.input
 
-	input_manager.block_device_except_service(input_manager, "main_menu", "gamepad")
+	input_manager:block_device_except_service("main_menu", "gamepad")
 end
 
 StateTitleScreenMainMenu._next_state = function (self)

@@ -49,7 +49,7 @@ end
 
 LobbyHost.update = function (self, dt)
 	local lobby = self.lobby
-	local lobby_state = lobby.state(lobby)
+	local lobby_state = lobby:state()
 	local new_state = LobbyInternal.state_map[lobby_state]
 	local old_state = self.state or 0
 
@@ -63,22 +63,22 @@ LobbyHost.update = function (self, dt)
 				local lobby_data_table = self.lobby_data_table or {}
 				lobby_data_table.network_hash = self.network_hash
 
-				lobby.set_data_table(lobby, lobby_data_table)
+				lobby:set_data_table(lobby_data_table)
 			else
-				lobby.set_data(lobby, "network_hash", self.network_hash)
+				lobby:set_data("network_hash", self.network_hash)
 
 				local lobby_data_table = self.lobby_data_table
 
 				if lobby_data_table then
 					for key, value in pairs(lobby_data_table) do
-						lobby.set_data(lobby, key, value)
+						lobby:set_data(key, value)
 					end
 				end
 			end
 
 			self.lobby_members = self.lobby_members or LobbyMembers:new(lobby)
 
-			Managers.party:set_leader(lobby.lobby_host(lobby))
+			Managers.party:set_leader(lobby:lobby_host())
 		elseif old_state == LobbyState.JOINED then
 			Managers.party:set_leader(nil)
 
@@ -89,7 +89,7 @@ LobbyHost.update = function (self, dt)
 	end
 
 	if PLATFORM == "ps4" then
-		lobby.update(lobby, dt)
+		lobby:update(dt)
 	end
 
 	if self.lobby_members then
@@ -107,11 +107,11 @@ LobbyHost.set_lobby_data = function (self, lobby_data_table)
 		local lobby = self.lobby
 
 		if PLATFORM == "ps4" then
-			lobby.set_data_table(lobby, lobby_data_table)
+			lobby:set_data_table(lobby_data_table)
 		else
 			for key, value in pairs(lobby_data_table) do
 				dprintf("\tLobby data %s = %s", key, tostring(value))
-				lobby.set_data(lobby, key, value)
+				lobby:set_data(key, value)
 			end
 		end
 	end
@@ -170,7 +170,7 @@ LobbyHost.set_lobby = function (self, lobby)
 	self.lobby = lobby
 	local lobby_data_table = self.lobby_data_table or {}
 
-	self.set_lobby_data(self, lobby_data_table)
+	self:set_lobby_data(lobby_data_table)
 
 	self.lobby_members = LobbyMembers:new(lobby)
 end

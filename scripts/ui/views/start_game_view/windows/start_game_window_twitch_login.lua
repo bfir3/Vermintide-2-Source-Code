@@ -18,16 +18,16 @@ StartGameWindowTwitchLogin.on_enter = function (self, params, offset)
 		snap_pixel_positions = true
 	}
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self._animations = {}
 	self._ui_animations = {}
 
-	self.create_ui_elements(self, params, offset)
-	self.set_active(self, true)
-	self._set_disconnect_button_text(self)
+	self:create_ui_elements(params, offset)
+	self:set_active(true)
+	self:_set_disconnect_button_text()
 end
 
 StartGameWindowTwitchLogin.create_ui_elements = function (self, params, offset)
@@ -61,21 +61,21 @@ StartGameWindowTwitchLogin.on_exit = function (self, params)
 
 	self.ui_animator = nil
 
-	self.set_active(self, false)
+	self:set_active(false)
 end
 
 StartGameWindowTwitchLogin.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self._update_popup(self)
-	self._update_animations(self, dt)
-	self._handle_input(self, dt, t)
-	self._update_game_options(self, dt, t)
-	self.draw(self, dt)
+	self:_update_popup()
+	self:_update_animations(dt)
+	self:_handle_input(dt, t)
+	self:_update_game_options(dt, t)
+	self:draw(dt)
 end
 
 StartGameWindowTwitchLogin.set_active = function (self, active, skip_block)
@@ -118,7 +118,7 @@ StartGameWindowTwitchLogin._handle_input = function (self, dt, t)
 			frame_widget_content.text_field_active = true
 		elseif screen_hotspot.on_pressed or is_connected then
 			if screen_hotspot.on_pressed and not frame_widget_content.text_field_active and not frame_hotspot.on_pressed then
-				self.set_active(self, false)
+				self:set_active(false)
 
 				frame_widget_content.text_field_active = false
 
@@ -136,7 +136,7 @@ StartGameWindowTwitchLogin._handle_input = function (self, dt, t)
 			local keystrokes = Keyboard.keystrokes()
 			frame_widget_content.twitch_name, frame_widget_content.caret_index = KeystrokeHelper.parse_strokes(frame_widget_content.twitch_name, frame_widget_content.caret_index, "insert", keystrokes)
 
-			if input_service.get(input_service, "execute_login", true) then
+			if input_service:get("execute_login", true) then
 				frame_widget_content.text_field_active = false
 				local user_name = string.gsub(frame_widget_content.twitch_name, " ", "")
 
@@ -147,29 +147,29 @@ StartGameWindowTwitchLogin._handle_input = function (self, dt, t)
 		if not is_connected then
 			local connect_button_widget = self._widgets_by_name.button_1
 
-			if self._is_button_hover_enter(self, connect_button_widget) then
-				self._play_sound(self, "Play_hud_hover")
+			if self:_is_button_hover_enter(connect_button_widget) then
+				self:_play_sound("Play_hud_hover")
 			end
 
-			local button_pressed = self._is_button_pressed(self, connect_button_widget)
+			local button_pressed = self:_is_button_pressed(connect_button_widget)
 
 			if button_pressed then
 				local user_name = string.gsub(frame_widget_content.twitch_name, " ", "")
 
 				Managers.twitch:connect(user_name, callback(self, "cb_connection_error_callback"), callback(self, "cb_connection_success_callback"))
-				self._play_sound(self, "Play_hud_select")
+				self:_play_sound("Play_hud_select")
 			end
 		else
 			local disconnect_button_widget = self._widgets_by_name.button_2
 
-			if self._is_button_hover_enter(self, disconnect_button_widget) then
-				self._play_sound(self, "Play_hud_hover")
+			if self:_is_button_hover_enter(disconnect_button_widget) then
+				self:_play_sound("Play_hud_hover")
 			end
 
-			local button_pressed = self._is_button_pressed(self, disconnect_button_widget)
+			local button_pressed = self:_is_button_pressed(disconnect_button_widget)
 
 			if button_pressed then
-				self._play_sound(self, "Play_hud_select")
+				self:_play_sound("Play_hud_select")
 				Managers.twitch:disconnect()
 
 				local chat_output_widget = self._widgets_by_name.chat_output_widget
@@ -203,7 +203,7 @@ StartGameWindowTwitchLogin.cb_connection_error_callback = function (self, messag
 end
 
 StartGameWindowTwitchLogin.cb_connection_success_callback = function (self, user_data)
-	self._set_disconnect_button_text(self)
+	self:_set_disconnect_button_text()
 end
 
 StartGameWindowTwitchLogin._set_disconnect_button_text = function (self)
@@ -254,7 +254,7 @@ StartGameWindowTwitchLogin.post_update = function (self, dt, t)
 end
 
 StartGameWindowTwitchLogin._update_animations = function (self, dt)
-	self._update_button_animations(self, dt)
+	self:_update_button_animations(dt)
 
 	local ui_animations = self._ui_animations
 	local animations = self._animations
@@ -268,11 +268,11 @@ StartGameWindowTwitchLogin._update_animations = function (self, dt)
 		end
 	end
 
-	ui_animator.update(ui_animator, dt)
+	ui_animator:update(dt)
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -289,7 +289,7 @@ StartGameWindowTwitchLogin._update_button_animations = function (self, dt)
 		local widget_name = widget_prefix .. i
 		local widget = widgets_by_name[widget_name]
 
-		self._animate_button(self, widget, dt)
+		self:_animate_button(widget, dt)
 	end
 end
 
@@ -357,7 +357,7 @@ end
 
 StartGameWindowTwitchLogin._update_private_option = function (self)
 	local parent = self.parent
-	local private_enabled = parent.is_private_option_enabled(parent)
+	local private_enabled = parent:is_private_option_enabled()
 
 	if private_enabled ~= self._private_enabled then
 		local widgets_by_name = self._widgets_by_name
@@ -368,10 +368,10 @@ end
 
 StartGameWindowTwitchLogin._update_difficulty_option = function (self)
 	local parent = self.parent
-	local difficulty_key = parent.get_difficulty_option(parent)
+	local difficulty_key = parent:get_difficulty_option()
 
 	if difficulty_key ~= self._difficulty_key then
-		self._set_difficulty_option(self, difficulty_key)
+		self:_set_difficulty_option(difficulty_key)
 
 		self._difficulty_key = difficulty_key
 	end

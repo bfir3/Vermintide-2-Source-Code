@@ -9,7 +9,7 @@ local function check_level_list(statistics_db, stats_id, levels_to_complete)
 
 	for i = 1, #levels_to_complete, 1 do
 		local level_id = levels_to_complete[i]
-		local level_stat = statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_levels", level_id)
+		local level_stat = statistics_db:get_persistent_stat(stats_id, "completed_levels", level_id)
 
 		if not level_stat or level_stat == 0 then
 			return false
@@ -34,7 +34,7 @@ local function check_level_list_difficulty(statistics_db, stats_id, levels_to_co
 
 	for i = 1, #levels_to_complete, 1 do
 		local level_id = levels_to_complete[i]
-		local difficulties = difficulty_manager.get_level_difficulties(difficulty_manager, level_id)
+		local difficulties = difficulty_manager:get_level_difficulties(level_id)
 		local difficulty_index = LevelUnlockUtils.completed_level_difficulty_index(statistics_db, stats_id, level_id)
 		local difficulty_key = difficulties[difficulty_index]
 
@@ -83,14 +83,14 @@ local function equipped_items_of_rarity(required_rarity)
 		return false
 	end
 
-	local backend_items = backend.get_interface(backend, "items")
+	local backend_items = backend:get_interface("items")
 
 	if not backend_items then
 		return false
 	end
 
 	local filter = "equipped_by_current_career and is_equipment_slot"
-	local items = backend_items.get_filtered_items(backend_items, filter)
+	local items = backend_items:get_filtered_items(filter)
 	local ret = {}
 
 	for _, item in ipairs(items) do
@@ -284,7 +284,7 @@ AchievementTemplates = {
 		ID_PS4 = "TROP017",
 		context = "in_inn",
 		evaluate = function (statistics_db, stats_id)
-			local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "crafted_items")
+			local crafted_items = statistics_db:get_persistent_stat(stats_id, "crafted_items")
 
 			return 1 <= crafted_items
 		end
@@ -294,7 +294,7 @@ AchievementTemplates = {
 		ID_PS4 = "TROP018",
 		context = "in_inn",
 		evaluate = function (statistics_db, stats_id)
-			local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "crafted_items")
+			local crafted_items = statistics_db:get_persistent_stat(stats_id, "crafted_items")
 
 			return 50 <= crafted_items
 		end
@@ -304,7 +304,7 @@ AchievementTemplates = {
 		ID_PS4 = "TROP019",
 		context = "in_inn",
 		evaluate = function (statistics_db, stats_id)
-			local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "salvaged_items")
+			local crafted_items = statistics_db:get_persistent_stat(stats_id, "salvaged_items")
 
 			return 1 <= crafted_items
 		end
@@ -314,7 +314,7 @@ AchievementTemplates = {
 		ID_PS4 = "TROP020",
 		context = "in_inn",
 		evaluate = function (statistics_db, stats_id)
-			local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "salvaged_items")
+			local crafted_items = statistics_db:get_persistent_stat(stats_id, "salvaged_items")
 
 			return 100 <= crafted_items
 		end
@@ -387,7 +387,7 @@ AchievementTemplates = {
 					local all_completed = true
 
 					for _, hero in ipairs(heroes) do
-						local completed = statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_levels_" .. hero, level_key)
+						local completed = statistics_db:get_persistent_stat(stats_id, "completed_levels_" .. hero, level_key)
 
 						if completed == 0 then
 							all_completed = false
@@ -421,7 +421,7 @@ end
 
 local function collected_tomes(statistics_db, stats_id)
 	local mission_system = Managers.state.entity:system("mission_system")
-	local tome_mission_data = mission_system.get_level_end_mission_data(mission_system, "tome_bonus_mission")
+	local tome_mission_data = mission_system:get_level_end_mission_data("tome_bonus_mission")
 
 	if not tome_mission_data then
 		return 0
@@ -432,7 +432,7 @@ end
 
 local function collected_grimoires(statistics_db, stats_id)
 	local mission_system = Managers.state.entity:system("mission_system")
-	local grimoire_mission_data = mission_system.get_level_end_mission_data(mission_system, "grimoire_hidden_mission")
+	local grimoire_mission_data = mission_system:get_level_end_mission_data("grimoire_hidden_mission")
 
 	if not grimoire_mission_data then
 		return 0
@@ -453,14 +453,14 @@ HeroStats = {
 		persistent = false,
 		stat_name = "HeroSkavenKilled",
 		evaluate = function (statistics_db, stats_id)
-			return statistics_db.get_stat(statistics_db, stats_id, "kills_total")
+			return statistics_db:get_stat(stats_id, "kills_total")
 		end
 	},
 	rat_ogres_killed = {
 		persistent = false,
 		stat_name = "HeroOgresKilled",
 		evaluate = function (statistics_db, stats_id)
-			return statistics_db.get_stat(statistics_db, stats_id, "kills_per_breed", "skaven_rat_ogre")
+			return statistics_db:get_stat(stats_id, "kills_per_breed", "skaven_rat_ogre")
 		end
 	},
 	tomes_collected = {

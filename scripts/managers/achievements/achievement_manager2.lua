@@ -50,7 +50,7 @@ AchievementManager.init = function (self, world, statistics_db)
 	assert(self._platform_functions, "Can't load platform functions for platform %s", self.platform)
 	self._platform_functions.init(self)
 	printf("[AchievementManager] Achievements using the %s platform", self.platform)
-	self.event_enable_achievements(self, true)
+	self:event_enable_achievements(true)
 	Managers.state.event:register(self, "event_enable_achievements", "event_enable_achievements")
 
 	self.initialized = true
@@ -71,9 +71,9 @@ AchievementManager.event_enable_achievements = function (self, enable)
 end
 
 AchievementManager.update = function (self, dt, t)
-	self.debug_draw(self)
+	self:debug_draw()
 
-	if not self._enabled or not self._check_version_number(self) or not self._check_initialized_achievements(self) then
+	if not self._enabled or not self:_check_version_number() or not self:_check_initialized_achievements() then
 		return
 	end
 
@@ -89,7 +89,7 @@ AchievementManager.update = function (self, dt, t)
 
 	local template = self._templates[self._curr_template_idx]
 	local player_manager = Managers.player
-	local player = player_manager.local_player(player_manager)
+	local player = player_manager:local_player()
 
 	if not player then
 		return
@@ -98,7 +98,7 @@ AchievementManager.update = function (self, dt, t)
 	local should_process = not self._unlocked_achievements[template.id] and not self._unlock_tasks[template.id]
 
 	if should_process then
-		local result = template.completed(self._statistics_db, player.stats_id(player))
+		local result = template.completed(self._statistics_db, player:stats_id())
 
 		if result then
 			local token, error_msg = self._platform_functions.unlock(template)
@@ -133,7 +133,7 @@ AchievementManager.update = function (self, dt, t)
 		end
 	end
 
-	self._update_reward_polling(self, dt, t)
+	self:_update_reward_polling(dt, t)
 end
 
 AchievementManager.reset = function (self)
@@ -171,7 +171,7 @@ AchievementManager.setup_achievement_data = function (self)
 			end
 
 			if category.entries then
-				achievement_manager.setup_achievement_data_from_list(achievement_manager, category.entries)
+				achievement_manager:setup_achievement_data_from_list(category.entries)
 			end
 		end
 	end
@@ -181,7 +181,7 @@ end
 
 AchievementManager.setup_achievement_data_from_list = function (self, achievement_ids)
 	for i, achievement_id in ipairs(achievement_ids) do
-		self._setup_achievement_data(self, achievement_id)
+		self:_setup_achievement_data(achievement_id)
 	end
 end
 
@@ -191,7 +191,7 @@ AchievementManager.can_claim_achievement_rewards = function (self, achievement_i
 	end
 
 	local backend_interface_loot = self._backend_interface_loot
-	local can_claim = backend_interface_loot.can_claim_achievement_rewards(backend_interface_loot, achievement_id)
+	local can_claim = backend_interface_loot:can_claim_achievement_rewards(achievement_id)
 
 	if not can_claim then
 		return nil, "Achievement already claimed."
@@ -206,7 +206,7 @@ end
 
 AchievementManager.claim_reward = function (self, achievement_id)
 	local backend_interface_loot = self._backend_interface_loot
-	local reward_poll_id = backend_interface_loot.claim_achievement_rewards(backend_interface_loot, achievement_id)
+	local reward_poll_id = backend_interface_loot:claim_achievement_rewards(achievement_id)
 	self._reward_poll_id = reward_poll_id
 
 	return reward_poll_id
@@ -231,7 +231,7 @@ AchievementManager._update_reward_polling = function (self)
 
 	if reward_poll_id then
 		local backend_interface_loot = self._backend_interface_loot
-		local poll_completed = backend_interface_loot.is_loot_generated(backend_interface_loot, reward_poll_id)
+		local poll_completed = backend_interface_loot:is_loot_generated(reward_poll_id)
 
 		if poll_completed then
 			self._reward_poll_id = nil
@@ -296,13 +296,13 @@ AchievementManager._setup_achievement_data = function (self, achievement_id)
 
 	local name, desc, completed, progress, requirements, claimed = nil
 	local player_manager = Managers.player
-	local player = player_manager.local_player(player_manager)
+	local player = player_manager:local_player()
 
 	if not player then
 		return nil, "Missing player"
 	end
 
-	local stats_id = player.stats_id(player)
+	local stats_id = player:stats_id()
 
 	if type(achievement_data.name) == "function" then
 		local status, result = pcall(achievement_data.name)
@@ -369,7 +369,7 @@ AchievementManager._setup_achievement_data = function (self, achievement_id)
 	end
 
 	local backend_interface_loot = self._backend_interface_loot
-	claimed = backend_interface_loot.achievement_rewards_claimed(backend_interface_loot, achievement_id)
+	claimed = backend_interface_loot:achievement_rewards_claimed(achievement_id)
 	local achievement_data = {
 		id = achievement_id,
 		name = name,

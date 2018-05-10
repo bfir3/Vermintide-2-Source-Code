@@ -35,7 +35,7 @@ CameraStateFollow.update = function (self, unit, input, dt, context, t)
 	local follow_node = self._follow_node
 
 	if not Unit.alive(follow_unit) then
-		csm.change_state(csm, "idle")
+		csm:change_state("idle")
 
 		return
 	end
@@ -43,8 +43,8 @@ CameraStateFollow.update = function (self, unit, input, dt, context, t)
 	local external_state_change = camera_extension.external_state_change
 
 	if external_state_change and external_state_change ~= self.name then
-		csm.change_state(csm, external_state_change)
-		camera_extension.set_external_state_change(camera_extension, nil)
+		csm:change_state(external_state_change)
+		camera_extension:set_external_state_change(nil)
 
 		return
 	end

@@ -23,7 +23,7 @@ local function look_at_target_unit(unit, data, dt, target_unit, target_distance,
 	local first_person_extension = ScriptUnit.has_extension(target_unit, "first_person_system")
 
 	if first_person_extension ~= nil then
-		look_target = first_person_extension.current_position(first_person_extension)
+		look_target = first_person_extension:current_position()
 	else
 		local head_index = Unit.node(target_unit, "j_head")
 		look_target = Unit.world_position(target_unit, head_index)
@@ -111,7 +111,7 @@ AimTemplates.player = {
 
 			if game and go_id then
 				local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
-				local aim_position = first_person_extension.current_position(first_person_extension)
+				local aim_position = first_person_extension:current_position()
 				local network_aim_position = NetworkUtils.network_clamp_position(aim_position)
 
 				GameSession.set_game_object_field(game, go_id, "aim_direction", aim_direction)
@@ -288,7 +288,7 @@ AimTemplates.warpfire_thrower = {
 
 			local game = Managers.state.network:game()
 			local unit_storage = Managers.state.unit_storage
-			local go_id = unit_storage.go_id(unit_storage, unit)
+			local go_id = unit_storage:go_id(unit)
 
 			if game and go_id then
 				GameSession.set_game_object_field(game, go_id, "aim_target", aim_target)
@@ -296,12 +296,12 @@ AimTemplates.warpfire_thrower = {
 				local target_unit = blackboard.target_unit
 				local previous_target_unit = blackboard.previous_target_unit
 				local have_new_target = target_unit ~= previous_target_unit
-				local target_go_id = unit_storage.go_id(unit_storage, target_unit)
+				local target_go_id = unit_storage:go_id(target_unit)
 
 				if have_new_target and target_go_id then
 					local warpfire_data = blackboard.warpfire_data
 					local blob_unit = warpfire_data and warpfire_data.blob_unit
-					local blob_id = blob_unit and unit_storage.go_id(unit_storage, blob_unit)
+					local blob_id = blob_unit and unit_storage:go_id(blob_unit)
 
 					if blob_id then
 						target_go_id = blob_id
@@ -367,7 +367,7 @@ AimTemplates.chaos_warrior = {
 
 			if ScriptUnit.has_extension(target_unit, "first_person_system") then
 				local first_person_extension = ScriptUnit.extension(target_unit, "first_person_system")
-				aim_target = first_person_extension.current_position(first_person_extension)
+				aim_target = first_person_extension:current_position()
 			else
 				local head_index = Unit.node(target_unit, "j_head")
 				aim_target = Unit.world_position(target_unit, head_index)
@@ -430,7 +430,7 @@ AimTemplates.chaos_warrior = {
 
 				if ScriptUnit.has_extension(target_unit, "first_person_system") then
 					local first_person_extension = ScriptUnit.extension(target_unit, "first_person_system")
-					aim_target = first_person_extension.current_position(first_person_extension)
+					aim_target = first_person_extension:current_position()
 				else
 					local head_index = Unit.node(target_unit, "j_head")
 					aim_target = Unit.world_position(target_unit, head_index)
@@ -471,7 +471,7 @@ AimTemplates.chaos_marauder = {
 		update = function (unit, t, dt, data)
 			local blackboard = data.blackboard
 			local ai_extension = data.ai_extension
-			local current_action = ai_extension.current_action_name(ai_extension)
+			local current_action = ai_extension:current_action_name()
 			local game = Managers.state.network:game()
 			local go_id = Managers.state.unit_storage:go_id(unit)
 			local use_head_constraint = false
@@ -485,7 +485,7 @@ AimTemplates.chaos_marauder = {
 
 			local death_extension = ScriptUnit.has_extension(unit, "death_system")
 
-			if death_extension and death_extension.has_death_started(death_extension) then
+			if death_extension and death_extension:has_death_started() then
 				use_head_constraint = false
 			end
 
@@ -530,7 +530,7 @@ AimTemplates.chaos_marauder = {
 		update = function (unit, t, dt, data)
 			local game = Managers.state.network:game()
 			local unit_storage = Managers.state.unit_storage
-			local go_id = unit_storage.go_id(unit_storage, unit)
+			local go_id = unit_storage:go_id(unit)
 
 			if game and go_id then
 				local action_name_id = GameSession.game_object_field(game, go_id, "bt_action_name")
@@ -545,7 +545,7 @@ AimTemplates.chaos_marauder = {
 					local target_unit_id = GameSession.game_object_field(game, go_id, "target_unit_id")
 
 					if 0 < target_unit_id then
-						local target_unit = unit_storage.unit(unit_storage, target_unit_id)
+						local target_unit = unit_storage:unit(target_unit_id)
 						local target_distance = target_unit and Vector3.distance(POSITION_LOOKUP[unit], POSITION_LOOKUP[target_unit])
 						local head_constraint_target = data.head_constraint_target
 						data.lerp_aiming_disabled = true
@@ -580,7 +580,7 @@ AimTemplates.stormfiend = {
 		update = function (unit, t, dt, data)
 			local blackboard = data.blackboard
 			local ai_extension = data.ai_extension
-			local current_action = ai_extension.current_action_name(ai_extension)
+			local current_action = ai_extension:current_action_name()
 			local game = Managers.state.network:game()
 			local go_id = Managers.state.unit_storage:go_id(unit)
 			local use_head_constraint = false
@@ -669,7 +669,7 @@ AimTemplates.stormfiend = {
 		update = function (unit, t, dt, data)
 			local game = Managers.state.network:game()
 			local unit_storage = Managers.state.unit_storage
-			local go_id = unit_storage.go_id(unit_storage, unit)
+			local go_id = unit_storage:go_id(unit)
 
 			if game and go_id then
 				local action_name_id = GameSession.game_object_field(game, go_id, "bt_action_name")
@@ -713,7 +713,7 @@ AimTemplates.stormfiend = {
 					local target_unit_id = GameSession.game_object_field(game, go_id, "target_unit_id")
 
 					if 0 < target_unit_id then
-						local target_unit = unit_storage.unit(unit_storage, target_unit_id)
+						local target_unit = unit_storage:unit(target_unit_id)
 						local target_distance = target_unit and Vector3.distance(POSITION_LOOKUP[unit], POSITION_LOOKUP[target_unit])
 						local head_constraint_target = data.head_constraint_target
 

@@ -33,17 +33,17 @@ NavigationGroupManagerNewArea.form_groups = function (self, start_polygon_index,
 
 	for poly = 0, num_polygons - 1, 1 do
 		if self._registered_polygons[poly] == nil then
-			local poly_area = self.calc_polygon_area(self, navmesh, poly)
-			local poly_center = self.calc_polygon_center(self, navmesh, poly)
-			local neighbours = self.get_neighbours(self, navmesh, poly)
+			local poly_area = self:calc_polygon_area(navmesh, poly)
+			local poly_center = self:calc_polygon_center(navmesh, poly)
+			local neighbours = self:get_neighbours(navmesh, poly)
 			local shortest_distance, closest_group = nil
 
 			for _, poly_neighbour in ipairs(neighbours) do
 				local group = self._registered_polygons[poly_neighbour]
 
 				if group ~= nil then
-					local group_area = group.group_area(group)
-					local group_center = group.group_center(group)
+					local group_area = group:group_area()
+					local group_center = group:group_center()
 					local distance = Vector3.distance(poly_center, group_center)
 
 					if group_area + poly_area <= group_area_cap then
@@ -60,12 +60,12 @@ NavigationGroupManagerNewArea.form_groups = function (self, start_polygon_index,
 				end
 			end
 
-			if closest_group and self.in_range(self, navmesh, shortest_distance, closest_group) then
-				self.join_group(self, navmesh, poly, poly_area, closest_group)
+			if closest_group and self:in_range(navmesh, shortest_distance, closest_group) then
+				self:join_group(navmesh, poly, poly_area, closest_group)
 			end
 
 			if self._registered_polygons[poly] == nil then
-				local navigation_group = self.create_group(self, self._world, self._nav_world, navmesh, poly, poly_area, radius)
+				local navigation_group = self:create_group(self._world, self._nav_world, navmesh, poly, poly_area, radius)
 				self._navigation_groups[navigation_group] = true
 				self._registered_polygons[poly] = navigation_group
 			end
@@ -95,7 +95,7 @@ NavigationGroupManagerNewArea.get_neighbours = function (self, navmesh, polygon_
 end
 
 NavigationGroupManagerNewArea.create_group = function (self, world, nav_world, navmesh, poly, poly_area, radius)
-	local poly_center = self.calc_polygon_center(self, navmesh, poly)
+	local poly_center = self:calc_polygon_center(navmesh, poly)
 	local navigation_group = NavigationGroup:new(world, nav_world, poly, radius, poly_center, poly_area)
 
 	return navigation_group
@@ -104,7 +104,7 @@ end
 NavigationGroupManagerNewArea.join_group = function (self, navmesh, poly, poly_area, group)
 	self._registered_polygons[poly] = group
 
-	group.add_polygon(group, poly, poly_area)
+	group:add_polygon(poly, poly_area)
 end
 
 NavigationGroupManagerNewArea.get_polygon_group = function (self, poly)
@@ -112,14 +112,14 @@ NavigationGroupManagerNewArea.get_polygon_group = function (self, poly)
 end
 
 NavigationGroupManagerNewArea.get_group_polygons = function (self, poly)
-	local poly_group = self.get_polygon_group(self, poly)
+	local poly_group = self:get_polygon_group(poly)
 
-	return poly_group.get_group_polygons(poly_group)
+	return poly_group:get_group_polygons()
 end
 
 NavigationGroupManagerNewArea.in_range = function (self, navmesh, distance, group)
-	local group_center = group.group_center(group)
-	local radius = group.radius(group)
+	local group_center = group:group_center()
+	local radius = group:radius()
 
 	return distance <= radius
 end
@@ -143,7 +143,7 @@ NavigationGroupManagerNewArea.calc_polygon_center = function (self, navmesh, pol
 end
 
 NavigationGroupManagerNewArea.calc_polygon_area = function (self, navmesh, poly)
-	local sides = self.get_polygon_sides(self, navmesh, poly)
+	local sides = self:get_polygon_sides(navmesh, poly)
 	local perimeter = 0
 
 	for i = 1, 3, 1 do
@@ -192,11 +192,11 @@ NavigationGroupManagerNewArea.print_groups = function (self)
 ]])
 
 		for group, _ in pairs(self._navigation_groups) do
-			group.print_group(group, self._navmesh)
+			group:print_group(self._navmesh)
 		end
 	else
 		for group, _ in pairs(self._navigation_groups) do
-			group.destroy_gui(group)
+			group:destroy_gui()
 		end
 	end
 

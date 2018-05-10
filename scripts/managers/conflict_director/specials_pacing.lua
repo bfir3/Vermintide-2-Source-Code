@@ -10,7 +10,7 @@ SpecialsPacing.init = function (self, nav_world)
 	self._specials_slots = {}
 	self.method_name = CurrentSpecialsSettings.spawn_method
 
-	self.remove_unwanted_breeds(self)
+	self:remove_unwanted_breeds()
 end
 
 SpecialsPacing.remove_unwanted_breeds = function (self)
@@ -337,7 +337,7 @@ SpecialsPacing.update = function (self, t, alive_specials, specials_population, 
 		if 0 < #specials_spawn_queue then
 			local slot = specials_spawn_queue[#specials_spawn_queue]
 			local breed = Breeds[slot.breed]
-			local spawn_pos = self.get_special_spawn_pos(self, breed.spawning_rule)
+			local spawn_pos = self:get_special_spawn_pos(breed.spawning_rule)
 
 			if spawn_pos then
 				Managers.state.conflict:spawn_queued_unit(breed, Vector3Box(spawn_pos), QuaternionBox(Vector3.up(), 0), "specials_pacing", nil, nil, {
@@ -377,7 +377,7 @@ SpecialsPacing.debug_spawn = function (self)
 	local breeds = CurrentSpecialsSettings.breeds
 	local breed_name = breeds[math.random(#breeds)]
 	local breed = Breeds[breed_name]
-	local spawn_pos = self.get_special_spawn_pos(self, breed.spawning_rule)
+	local spawn_pos = self:get_special_spawn_pos(breed.spawning_rule)
 
 	if spawn_pos then
 		QuickDrawerStay:sphere(spawn_pos, 4, Color(125, 255, 47))
@@ -393,7 +393,7 @@ SpecialsPacing.get_special_spawn_pos = function (self, spawning_rule)
 	local main_path_info = conflict_director.main_path_info
 	local main_path_player_info = conflict_director.main_path_player_info
 	local main_paths = conflict_director.level_analysis:get_main_paths()
-	local _, _, loneliness_value, loneliest_player_unit = conflict_director.get_cluster_and_loneliness(conflict_director, 10)
+	local _, _, loneliness_value, loneliest_player_unit = conflict_director:get_cluster_and_loneliness(10)
 	local ahead_unit = main_path_info.ahead_unit
 	local behind_unit = main_path_info.behind_unit
 	local epicenter = nil
@@ -404,11 +404,11 @@ SpecialsPacing.get_special_spawn_pos = function (self, spawning_rule)
 		epicenter = POSITION_LOOKUP[loneliest_player_unit]
 		debug_string = "specialspawn: loneliest -->"
 	elseif spawning_rule == "always_ahead" then
-		epicenter = self.get_relative_main_path_pos(self, main_paths, main_path_player_info[ahead_unit], 20)
+		epicenter = self:get_relative_main_path_pos(main_paths, main_path_player_info[ahead_unit], 20)
 		debug_string = "specialspawn: rule: only_ahead -->"
 	elseif 10 < loneliness_value then
 		if ahead_unit == loneliest_player_unit then
-			epicenter = self.get_relative_main_path_pos(self, main_paths, main_path_player_info[ahead_unit], 20)
+			epicenter = self:get_relative_main_path_pos(main_paths, main_path_player_info[ahead_unit], 20)
 			debug_string = "specialspawn: ahead == lonliest -->"
 		elseif behind_unit == loneliest_player_unit then
 			epicenter = POSITION_LOOKUP[behind_unit]
@@ -425,7 +425,7 @@ SpecialsPacing.get_special_spawn_pos = function (self, spawning_rule)
 		local infront = Math.random() < 0.75
 
 		if infront then
-			epicenter = self.get_relative_main_path_pos(self, main_paths, main_path_player_info[ahead_unit], 10)
+			epicenter = self:get_relative_main_path_pos(main_paths, main_path_player_info[ahead_unit], 10)
 			debug_string = "specialspawn: random infront"
 		else
 			epicenter = POSITION_LOOKUP[behind_unit]
@@ -523,7 +523,7 @@ SpecialsPacing.request_rushing_intervention = function (self, t, player_unit, ma
 
 	local status_extension = ScriptUnit.extension(player_unit, "status_system")
 
-	if status_extension.is_disabled(status_extension) then
+	if status_extension:is_disabled() then
 		return false, "no intervention, since ahead unit is disabled"
 	end
 
@@ -552,7 +552,7 @@ SpecialsPacing.request_rushing_intervention = function (self, t, player_unit, ma
 		local nav_world = self.nav_world
 		local avoid_dist_sqr = 25
 		local player_pos = POSITION_LOOKUP[main_path_info.ahead_unit]
-		local epicenter = self.get_relative_main_path_pos(self, main_paths, main_path_player_info[main_path_info.ahead_unit], 20)
+		local epicenter = self:get_relative_main_path_pos(main_paths, main_path_player_info[main_path_info.ahead_unit], 20)
 		local forward_path_dir = epicenter - player_pos
 		local spawn_pos, description = find_suitable_intervention_spawn_position(world, nav_world, epicenter, avoid_dist_sqr)
 
@@ -574,7 +574,7 @@ end
 
 local function cb_outside_navmesh_intervention_unit_spawned(special_unit, breed, optional_data)
 	local ai_extension = ScriptUnit.extension(special_unit, "ai_system")
-	local blackboard = ai_extension.blackboard(ai_extension)
+	local blackboard = ai_extension:blackboard()
 	blackboard.target_unit = optional_data.player_unit
 	local slot = optional_data.slot
 	slot.breed = breed.name
@@ -627,7 +627,7 @@ SpecialsPacing.request_outside_navmesh_intervention = function (self, player_uni
 		}
 		local rotation = Quaternion(Vector3.up(), 0)
 
-		conflict_director.spawn_queued_unit(conflict_director, breed, Vector3Box(spawn_pos), QuaternionBox(rotation), "outside_navmesh_intervention", nil, nil, optional_data)
+		conflict_director:spawn_queued_unit(breed, Vector3Box(spawn_pos), QuaternionBox(rotation), "outside_navmesh_intervention", nil, nil, optional_data)
 
 		slot.state = "wants_to_spawn"
 

@@ -23,7 +23,7 @@ TimeManager.register_timer = function (self, name, parent_name, start_time)
 	local parent_timer = timers[parent_name]
 	local new_timer = Timer:new(name, parent_timer, start_time)
 
-	parent_timer.add_child(parent_timer, new_timer)
+	parent_timer:add_child(new_timer)
 
 	timers[name] = new_timer
 end
@@ -32,15 +32,15 @@ TimeManager.unregister_timer = function (self, name)
 	local timer = self._timers[name]
 
 	fassert(timer, "[TimeManager] Tried to remove unregistered timer %q", name)
-	fassert(table.size(timer.children(timer)) == 0, "[TimeManager] Not allowed to remove timer %q with children", name)
+	fassert(table.size(timer:children()) == 0, "[TimeManager] Not allowed to remove timer %q with children", name)
 
-	local parent = timer.parent(timer)
+	local parent = timer:parent()
 
 	if parent then
-		parent.remove_child(parent, timer)
+		parent:remove_child(timer)
 	end
 
-	timer.destroy(timer)
+	timer:destroy()
 
 	self._timers[name] = nil
 end
@@ -52,19 +52,19 @@ end
 TimeManager.update = function (self, dt)
 	local main_timer = self._timers.main
 
-	if main_timer.active(main_timer) then
-		main_timer.update(main_timer, dt, 1)
+	if main_timer:active() then
+		main_timer:update(dt, 1)
 	end
 
 	if self._lerp_global_time_scale then
-		self._update_global_time_scale_lerp(self, dt)
+		self:_update_global_time_scale_lerp(dt)
 	end
 
 	if script_data.honduras_demo then
-		self._update_demo_timer(self, dt)
+		self:_update_demo_timer(dt)
 	end
 
-	self._update_mean_dt(self, dt)
+	self:_update_mean_dt(dt)
 end
 
 TimeManager._update_demo_timer = function (self, dt)
@@ -186,7 +186,7 @@ end
 
 TimeManager.destroy = function (self)
 	for name, timer in pairs(self._timers) do
-		timer.destroy(timer)
+		timer:destroy()
 	end
 
 	self._timers = nil

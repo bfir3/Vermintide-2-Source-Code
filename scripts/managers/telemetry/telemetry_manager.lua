@@ -9,7 +9,7 @@ local SAVE_DATA = {
 TelemetryManager = class(TelemetryManager)
 
 TelemetryManager.init = function (self)
-	self.reset(self)
+	self:reset()
 
 	self.events = TelemetryEvents:new(self)
 	self.rpc_listener = TelemetryRPCListener:new(self.events)
@@ -59,7 +59,7 @@ TelemetryManager.register_event = function (self, event_type, event_params)
 end
 
 TelemetryManager.send = function (self)
-	self.register_event(self, "upload_attempts", SAVE_DATA)
+	self:register_event("upload_attempts", SAVE_DATA)
 
 	local events_as_string = "[" .. table.concat(self._events_json, ", \n") .. "]"
 	local file_name = sprintf("%s_%s.json", TelemetrySettings.title_id, math.uuid())

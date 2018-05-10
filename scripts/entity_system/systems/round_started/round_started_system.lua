@@ -15,7 +15,7 @@ end
 RoundStartedSystem.init = function (self, context, system_name)
 	local entity_manager = context.entity_manager
 
-	entity_manager.register_system(entity_manager, self, system_name, extensions)
+	entity_manager:register_system(self, system_name, extensions)
 
 	self._is_server = context.is_server
 	self._world = context.world
@@ -62,7 +62,7 @@ RoundStartedSystem.update = function (self, context, t)
 		return
 	end
 
-	local started = self._players_left_start_area(self)
+	local started = self:_players_left_start_area()
 
 	if started then
 		Managers.state.game_mode:round_started()
@@ -76,7 +76,7 @@ RoundStartedSystem.update = function (self, context, t)
 			}
 			local leaderboard_system = Managers.state.entity:system("leaderboard_system")
 
-			leaderboard_system.round_started(leaderboard_system, score_type, start_data)
+			leaderboard_system:round_started(score_type, start_data)
 		end
 
 		self._round_started = true

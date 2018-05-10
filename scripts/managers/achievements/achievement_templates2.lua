@@ -13,7 +13,7 @@ local function check_level_list(statistics_db, stats_id, levels_to_complete)
 
 	for i = 1, #levels_to_complete, 1 do
 		local level_id = levels_to_complete[i]
-		local level_stat = statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_levels", level_id)
+		local level_stat = statistics_db:get_persistent_stat(stats_id, "completed_levels", level_id)
 
 		if not level_stat or level_stat == 0 then
 			return false
@@ -34,12 +34,12 @@ local function check_level_list_difficulty(statistics_db, stats_id, levels_to_co
 
 	for i = 1, #levels_to_complete, 1 do
 		local level_id = levels_to_complete[i]
-		local difficulties = difficulty_manager.get_level_difficulties(difficulty_manager, level_id)
+		local difficulties = difficulty_manager:get_level_difficulties(level_id)
 		local difficulty_index = nil
 
 		if career then
 			for i, r in ipairs(difficulties) do
-				local wins = statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_career_levels", career, level_id, r)
+				local wins = statistics_db:get_persistent_stat(stats_id, "completed_career_levels", career, level_id, r)
 
 				if 0 < wins then
 					difficulty_index = i
@@ -98,7 +98,7 @@ local function equipped_items_of_rarity(statistics_db, stats_id, required_rarity
 	local count = 0
 
 	for _, slot in ipairs(equipment_slots) do
-		local slot_rarity = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", slot)
+		local slot_rarity = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", slot)
 
 		if required_rarity_index <= slot_rarity then
 			count = count + 1
@@ -826,7 +826,7 @@ achievement_templates.achievements.craft_item = {
 	icon = "achievement_trophy_17",
 	desc = "achv_craft_item_desc",
 	completed = function (statistics_db, stats_id)
-		local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "crafted_items")
+		local crafted_items = statistics_db:get_persistent_stat(stats_id, "crafted_items")
 
 		return 1 <= crafted_items
 	end
@@ -839,12 +839,12 @@ achievement_templates.achievements.craft_fifty_items = {
 	reward = "level_chest",
 	desc = "achv_craft_fifty_items_desc",
 	completed = function (statistics_db, stats_id)
-		local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "crafted_items")
+		local crafted_items = statistics_db:get_persistent_stat(stats_id, "crafted_items")
 
 		return 50 <= crafted_items
 	end,
 	progress = function (statistics_db, stats_id)
-		local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "crafted_items")
+		local crafted_items = statistics_db:get_persistent_stat(stats_id, "crafted_items")
 
 		if 50 < crafted_items then
 			crafted_items = 50
@@ -864,7 +864,7 @@ achievement_templates.achievements.salvage_item = {
 	icon = "achievement_trophy_19",
 	desc = "achv_salvage_item_desc",
 	completed = function (statistics_db, stats_id)
-		local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "salvaged_items")
+		local crafted_items = statistics_db:get_persistent_stat(stats_id, "salvaged_items")
 
 		return 1 <= crafted_items
 	end
@@ -877,12 +877,12 @@ achievement_templates.achievements.salvage_hundred_items = {
 	reward = "level_chest",
 	desc = "achv_salvage_hundred_items_desc",
 	completed = function (statistics_db, stats_id)
-		local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "salvaged_items")
+		local crafted_items = statistics_db:get_persistent_stat(stats_id, "salvaged_items")
 
 		return 100 <= crafted_items
 	end,
 	progress = function (statistics_db, stats_id)
-		local crafted_items = statistics_db.get_persistent_stat(statistics_db, stats_id, "salvaged_items")
+		local crafted_items = statistics_db:get_persistent_stat(stats_id, "salvaged_items")
 
 		if 100 < crafted_items then
 			crafted_items = 100
@@ -954,11 +954,11 @@ achievement_templates.achievements.equip_all_exotic_quality = {
 		}
 	end,
 	requirements = function (statistics_db, stats_id)
-		local melee = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "melee")
-		local ranged = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "ranged")
-		local necklace = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "necklace")
-		local ring = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "ring")
-		local trinket = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "trinket")
+		local melee = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "melee")
+		local ranged = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "ranged")
+		local necklace = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "necklace")
+		local ring = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "ring")
+		local trinket = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "trinket")
 		local required_rarity = rarity_index.exotic
 
 		return {
@@ -1016,11 +1016,11 @@ achievement_templates.achievements.equip_all_veteran_quality = {
 		}
 	end,
 	requirements = function (statistics_db, stats_id)
-		local melee = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "melee")
-		local ranged = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "ranged")
-		local necklace = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "necklace")
-		local ring = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "ring")
-		local trinket = statistics_db.get_persistent_stat(statistics_db, stats_id, "highest_equipped_rarity", "trinket")
+		local melee = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "melee")
+		local ranged = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "ranged")
+		local necklace = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "necklace")
+		local ring = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "ring")
+		local trinket = statistics_db:get_persistent_stat(stats_id, "highest_equipped_rarity", "trinket")
 		local required_rarity = rarity_index.unique
 
 		return {
@@ -1068,7 +1068,7 @@ achievement_templates.achievements.complete_level_all = {
 				local all_completed = true
 
 				for _, hero in ipairs(heroes) do
-					local completed = statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_levels_" .. hero, level_key)
+					local completed = statistics_db:get_persistent_stat(stats_id, "completed_levels_" .. hero, level_key)
 
 					if completed == 0 then
 						all_completed = false
@@ -1106,10 +1106,10 @@ for i, limit in ipairs(achievement_templates.completed_deed_limits) do
 		end,
 		reward = rewards_lookup[id],
 		completed = function (statistics_db, stats_id)
-			return limit <= statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_heroic_deeds")
+			return limit <= statistics_db:get_persistent_stat(stats_id, "completed_heroic_deeds")
 		end,
 		progress = function (statistics_db, stats_id)
-			local deeds = statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_heroic_deeds")
+			local deeds = statistics_db:get_persistent_stat(stats_id, "completed_heroic_deeds")
 			deeds = math.min(deeds, limit)
 
 			return {
@@ -1246,8 +1246,8 @@ for career, _ in pairs(CareerSettings) do
 				local wins = 0
 
 				for _, level in ipairs(main_game_levels) do
-					wins = wins + statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_career_levels", career, level, "harder")
-					wins = wins + statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_career_levels", career, level, "hardest")
+					wins = wins + statistics_db:get_persistent_stat(stats_id, "completed_career_levels", career, level, "harder")
+					wins = wins + statistics_db:get_persistent_stat(stats_id, "completed_career_levels", career, level, "hardest")
 				end
 
 				return 100 <= wins
@@ -1256,8 +1256,8 @@ for career, _ in pairs(CareerSettings) do
 				local wins = 0
 
 				for _, level in ipairs(main_game_levels) do
-					wins = wins + statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_career_levels", career, level, "harder")
-					wins = wins + statistics_db.get_persistent_stat(statistics_db, stats_id, "completed_career_levels", career, level, "hardest")
+					wins = wins + statistics_db:get_persistent_stat(stats_id, "completed_career_levels", career, level, "harder")
+					wins = wins + statistics_db:get_persistent_stat(stats_id, "completed_career_levels", career, level, "hardest")
 				end
 
 				if 100 < wins then
@@ -1280,7 +1280,7 @@ achievement_templates.achievements.elven_ruins_align_leylines_timed = {
 	end,
 	reward = rewards_lookup.elven_ruins_align_leylines_timed,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "elven_ruins_speed_event")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "elven_ruins_speed_event")
 	end
 }
 achievement_templates.achievements.farmlands_rescue_prisoners_timed = {
@@ -1290,7 +1290,7 @@ achievement_templates.achievements.farmlands_rescue_prisoners_timed = {
 	end,
 	reward = rewards_lookup.farmlands_rescue_prisoners_timed,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "farmlands_speed_event")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "farmlands_speed_event")
 	end
 }
 achievement_templates.achievements.military_kill_chaos_warriors_in_event = {
@@ -1300,7 +1300,7 @@ achievement_templates.achievements.military_kill_chaos_warriors_in_event = {
 	end,
 	reward = rewards_lookup.military_kill_chaos_warriors_in_event,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "military_statue_kill_chaos_warriors")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "military_statue_kill_chaos_warriors")
 	end
 }
 achievement_templates.achievements.ground_zero_burblespew_tornado_enemies = {
@@ -1310,7 +1310,7 @@ achievement_templates.achievements.ground_zero_burblespew_tornado_enemies = {
 	end,
 	reward = rewards_lookup.ground_zero_burblespew_tornado_enemies,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "halescourge_tornado_enemies")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "halescourge_tornado_enemies")
 	end
 }
 achievement_templates.achievements.fort_kill_enemies_cannonball = {
@@ -1320,7 +1320,7 @@ achievement_templates.achievements.fort_kill_enemies_cannonball = {
 	end,
 	reward = rewards_lookup.fort_kill_enemies_cannonball,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "forest_fort_kill_cannonball")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "forest_fort_kill_cannonball")
 	end
 }
 achievement_templates.achievements.nurgle_player_showered_in_pus = {
@@ -1330,7 +1330,7 @@ achievement_templates.achievements.nurgle_player_showered_in_pus = {
 	end,
 	reward = rewards_lookup.nurgle_player_showered_in_pus,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "nurgle_bathed_all")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "nurgle_bathed_all")
 	end
 }
 achievement_templates.achievements.bell_destroy_bell_flee_timed = {
@@ -1340,7 +1340,7 @@ achievement_templates.achievements.bell_destroy_bell_flee_timed = {
 	end,
 	reward = rewards_lookup.bell_destroy_bell_flee_timed,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "bell_speed_event")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "bell_speed_event")
 	end
 }
 achievement_templates.achievements.catacombs_stay_inside_ritual_pool = {
@@ -1350,7 +1350,7 @@ achievement_templates.achievements.catacombs_stay_inside_ritual_pool = {
 	end,
 	reward = rewards_lookup.catacombs_stay_inside_ritual_pool,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "catacombs_added_souls")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "catacombs_added_souls")
 	end
 }
 achievement_templates.achievements.mines_kill_final_troll_timed = {
@@ -1360,7 +1360,7 @@ achievement_templates.achievements.mines_kill_final_troll_timed = {
 	end,
 	reward = rewards_lookup.mines_kill_final_troll_timed,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "mines_speed_event")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "mines_speed_event")
 	end
 }
 achievement_templates.achievements.warcamp_bodvarr_charge_warriors = {
@@ -1370,7 +1370,7 @@ achievement_templates.achievements.warcamp_bodvarr_charge_warriors = {
 	end,
 	reward = rewards_lookup.warcamp_bodvarr_charge_warriors,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "exalted_champion_charge_chaos_warrior")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "exalted_champion_charge_chaos_warrior")
 	end
 }
 achievement_templates.achievements.skaven_stronghold_skarrik_kill_skaven = {
@@ -1380,7 +1380,7 @@ achievement_templates.achievements.skaven_stronghold_skarrik_kill_skaven = {
 	end,
 	reward = rewards_lookup.skaven_stronghold_skarrik_kill_skaven,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "storm_vermin_warlord_kills_enemies")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "storm_vermin_warlord_kills_enemies")
 	end
 }
 achievement_templates.achievements.ussingen_no_event_barrels = {
@@ -1388,7 +1388,7 @@ achievement_templates.achievements.ussingen_no_event_barrels = {
 	desc = "achv_ussingen_no_event_barrels_desc",
 	reward = rewards_lookup.ussingen_no_event_barrels,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "ussingen_used_no_barrels")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "ussingen_used_no_barrels")
 	end
 }
 achievement_templates.achievements.skittergate_deathrattler_rasknitt_timed = {
@@ -1398,7 +1398,7 @@ achievement_templates.achievements.skittergate_deathrattler_rasknitt_timed = {
 	end,
 	reward = rewards_lookup.skittergate_deathrattler_rasknitt_timed,
 	completed = function (statistics_db, stats_id)
-		return 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, "skittergate_speed_event")
+		return 0 < statistics_db:get_persistent_stat(stats_id, "skittergate_speed_event")
 	end
 }
 local helmgart_level_name_stats = {
@@ -1422,7 +1422,7 @@ achievement_templates.achievements.complete_all_helmgart_level_achievements = {
 	reward = rewards_lookup.complete_all_helmgart_level_achievements,
 	completed = function (statistics_db, stats_id)
 		for _, stat_name in pairs(helmgart_level_name_stats) do
-			local completed = 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, stat_name)
+			local completed = 0 < statistics_db:get_persistent_stat(stats_id, stat_name)
 
 			if not completed then
 				return false
@@ -1437,7 +1437,7 @@ achievement_templates.achievements.complete_all_helmgart_level_achievements = {
 
 		for _, stat_name in pairs(helmgart_level_name_stats) do
 			total = total + 1
-			local completed = 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, stat_name)
+			local completed = 0 < statistics_db:get_persistent_stat(stats_id, stat_name)
 
 			if completed then
 				count = count + 1
@@ -1453,7 +1453,7 @@ achievement_templates.achievements.complete_all_helmgart_level_achievements = {
 		local reqs = {}
 
 		for achv_name, stat_name in pairs(helmgart_level_name_stats) do
-			local completed = 0 < statistics_db.get_persistent_stat(statistics_db, stats_id, stat_name)
+			local completed = 0 < statistics_db:get_persistent_stat(stats_id, stat_name)
 
 			table.insert(reqs, {
 				name = achv_name,
@@ -1473,14 +1473,14 @@ for difficulty_id, difficulty_name in pairs(achievement_templates.difficulties) 
 		desc = "achv_kill_bodvarr_burblespew_" .. difficulty_name .. "_desc",
 		reward = rewards_lookup[id],
 		completed = function (statistics_db, stats_id)
-			local champion_completed = difficulty_rank <= statistics_db.get_persistent_stat(statistics_db, stats_id, "kill_chaos_exalted_champion_difficulty_rank")
-			local sorcerer_completed = difficulty_rank <= statistics_db.get_persistent_stat(statistics_db, stats_id, "kill_chaos_exalted_sorcerer_difficulty_rank")
+			local champion_completed = difficulty_rank <= statistics_db:get_persistent_stat(stats_id, "kill_chaos_exalted_champion_difficulty_rank")
+			local sorcerer_completed = difficulty_rank <= statistics_db:get_persistent_stat(stats_id, "kill_chaos_exalted_sorcerer_difficulty_rank")
 
 			return champion_completed and sorcerer_completed
 		end,
 		requirements = function (statistics_db, stats_id)
-			local champion_completed = difficulty_rank <= statistics_db.get_persistent_stat(statistics_db, stats_id, "kill_chaos_exalted_champion_difficulty_rank")
-			local sorcerer_completed = difficulty_rank <= statistics_db.get_persistent_stat(statistics_db, stats_id, "kill_chaos_exalted_sorcerer_difficulty_rank")
+			local champion_completed = difficulty_rank <= statistics_db:get_persistent_stat(stats_id, "kill_chaos_exalted_champion_difficulty_rank")
+			local sorcerer_completed = difficulty_rank <= statistics_db:get_persistent_stat(stats_id, "kill_chaos_exalted_sorcerer_difficulty_rank")
 
 			return {
 				{
@@ -1500,14 +1500,14 @@ for difficulty_id, difficulty_name in pairs(achievement_templates.difficulties) 
 		desc = "achv_kill_skarrik_rasknitt_" .. difficulty_name .. "_desc",
 		reward = rewards_lookup[id],
 		completed = function (statistics_db, stats_id)
-			local gray_seer_completed = difficulty_rank <= statistics_db.get_persistent_stat(statistics_db, stats_id, "kill_skaven_grey_seer_difficulty_rank")
-			local storm_vermin_completed = difficulty_rank <= statistics_db.get_persistent_stat(statistics_db, stats_id, "kill_skaven_storm_vermin_warlord_difficulty_rank")
+			local gray_seer_completed = difficulty_rank <= statistics_db:get_persistent_stat(stats_id, "kill_skaven_grey_seer_difficulty_rank")
+			local storm_vermin_completed = difficulty_rank <= statistics_db:get_persistent_stat(stats_id, "kill_skaven_storm_vermin_warlord_difficulty_rank")
 
 			return gray_seer_completed and storm_vermin_completed
 		end,
 		requirements = function (statistics_db, stats_id)
-			local gray_seer_completed = difficulty_rank <= statistics_db.get_persistent_stat(statistics_db, stats_id, "kill_skaven_grey_seer_difficulty_rank")
-			local storm_vermin_completed = difficulty_rank <= statistics_db.get_persistent_stat(statistics_db, stats_id, "kill_skaven_storm_vermin_warlord_difficulty_rank")
+			local gray_seer_completed = difficulty_rank <= statistics_db:get_persistent_stat(stats_id, "kill_skaven_grey_seer_difficulty_rank")
+			local storm_vermin_completed = difficulty_rank <= statistics_db:get_persistent_stat(stats_id, "kill_skaven_storm_vermin_warlord_difficulty_rank")
 
 			return {
 				{

@@ -39,10 +39,10 @@ PlayerBotNavigation.update = function (self, unit, input, dt, context, t)
 	end
 
 	if self._running_astar then
-		self._update_astar(self, t)
+		self:_update_astar(t)
 	end
 
-	self._update_path(self, t)
+	self:_update_path(t)
 end
 
 local SAME_DIRECTION_THRESHOLD = math.cos(math.pi / 8)
@@ -137,7 +137,7 @@ end
 PlayerBotNavigation.stop = function (self)
 	local current_position = POSITION_LOOKUP[self._unit]
 
-	self.teleport(self, current_position)
+	self:teleport(current_position)
 end
 
 PlayerBotNavigation.is_path_safe_from_vortex = function (self, path_check_distance, min_allowed_vortex_distance)
@@ -148,7 +148,7 @@ PlayerBotNavigation.is_path_safe_from_vortex = function (self, path_check_distan
 	end
 
 	local conflict_director = Managers.state.conflict
-	local vortex_units = conflict_director.spawned_units_by_breed(conflict_director, "chaos_vortex")
+	local vortex_units = conflict_director:spawned_units_by_breed("chaos_vortex")
 	local heading_node_index = self._path_index
 	local num_nodes = #path
 	local self_unit = self._unit
@@ -186,11 +186,11 @@ PlayerBotNavigation.is_path_safe_from_vortex = function (self, path_check_distan
 			check_intermediate = check_intermediate and distance_to_intermediate_position <= path_check_distance
 
 			if check_intermediate then
-				result = vortex_extension.is_position_inside(vortex_extension, intermediate_position, min_allowed_vortex_distance)
+				result = vortex_extension:is_position_inside(intermediate_position, min_allowed_vortex_distance)
 			end
 
 			if not result and check_node then
-				result = vortex_extension.is_position_inside(vortex_extension, current_node, min_allowed_vortex_distance)
+				result = vortex_extension:is_position_inside(current_node, min_allowed_vortex_distance)
 			end
 
 			if result then
@@ -235,7 +235,7 @@ PlayerBotNavigation._update_path = function (self, t)
 	local position = POSITION_LOOKUP[unit]
 	local current_goal = path[self._path_index]:unbox()
 	local previous_goal = path[self._path_index - 1]:unbox()
-	local goal_reached = self._goal_reached(self, position, current_goal, previous_goal, t)
+	local goal_reached = self:_goal_reached(position, current_goal, previous_goal, t)
 
 	if goal_reached then
 		self._path_index = self._path_index + 1
@@ -249,7 +249,7 @@ PlayerBotNavigation._update_path = function (self, t)
 		else
 			local new_goal = path[self._path_index]:unbox()
 
-			self._reevaluate_current_nav_transition(self, unit, position, current_goal, new_goal)
+			self:_reevaluate_current_nav_transition(unit, position, current_goal, new_goal)
 		end
 	end
 end
@@ -412,11 +412,11 @@ PlayerBotNavigation._update_astar = function (self, t)
 			end
 
 			if not found_nav_mesh and num_nodes <= 2 then
-				self._path_failed(self, t)
+				self:_path_failed(t)
 			else
 				self._path = Script.new_array(num_nodes)
 
-				self._path_successful(self, t)
+				self:_path_successful(t)
 
 				for i = 1, num_nodes - 1, 1 do
 					local pos = GwNavAStar.node_at_index(astar, i)
@@ -428,7 +428,7 @@ PlayerBotNavigation._update_astar = function (self, t)
 				self._close_to_goal_time = nil
 			end
 		else
-			self._path_failed(self, t)
+			self:_path_failed(t)
 		end
 
 		self._running_astar = false
@@ -438,7 +438,7 @@ PlayerBotNavigation._update_astar = function (self, t)
 		if self._has_queued_target then
 			self._has_queued_target = false
 
-			self.move_to(self, self._queued_target_position:unbox(), self._queued_path_callback)
+			self:move_to(self._queued_target_position:unbox(), self._queued_path_callback)
 
 			self._queued_path_callback = nil
 		end
@@ -497,8 +497,8 @@ PlayerBotNavigation._debug_draw_path = function (self, position, previous_goal, 
 		local color = self._player.color:unbox()
 		local drawer = Managers.state.debug:drawer(debug_drawer_info)
 
-		drawer.vector(drawer, previous_goal, position - previous_goal, color)
-		drawer.vector(drawer, position, current_goal - position, color)
+		drawer:vector(previous_goal, position - previous_goal, color)
+		drawer:vector(position, current_goal - position, color)
 
 		local path = self._path
 		local num_nodes = #path
@@ -507,17 +507,17 @@ PlayerBotNavigation._debug_draw_path = function (self, position, previous_goal, 
 			local current_node = path[i]:unbox()
 			local next_node = path[i + 1]:unbox()
 
-			drawer.vector(drawer, current_node, next_node - current_node, color)
+			drawer:vector(current_node, next_node - current_node, color)
 
 			local size = math.lerp(0.15, 0.3, (i - 1) / (num_nodes - 1))
 
-			drawer.sphere(drawer, current_node, size, color)
+			drawer:sphere(current_node, size, color)
 		end
 
 		local last_node = path[num_nodes]:unbox()
 		local size = math.lerp(0.15, 0.3, (num_nodes - 1) / (num_nodes - 1))
 
-		drawer.sphere(drawer, last_node, size, color)
+		drawer:sphere(last_node, size, color)
 	end
 end
 
@@ -532,7 +532,7 @@ PlayerBotNavigation.transition_type = function (self)
 end
 
 PlayerBotNavigation.transition_requires_jump = function (self, position, direction)
-	local current_goal = self.current_goal(self)
+	local current_goal = self:current_goal()
 
 	fassert(self._current_transition, "Trying to check if transition requires jump with no active transition")
 	fassert(current_goal, "Current transition but no current goal?")

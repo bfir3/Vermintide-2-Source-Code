@@ -6,7 +6,7 @@ NewsTickerToken.init = function (self, loader, job)
 end
 
 NewsTickerToken.info = function (self)
-	if self.done(self) and UrlLoader.success(self._loader, self._job) then
+	if self:done() and UrlLoader.success(self._loader, self._job) then
 		return UrlLoader.text(self._loader, self._job)
 	else
 		return "Failed loading news ticker"

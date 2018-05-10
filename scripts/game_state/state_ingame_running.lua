@@ -42,16 +42,16 @@ StateInGameRunning.on_enter = function (self, params)
 	self._booted_eac_untrusted = script_data["eac-untrusted"]
 
 	if self.is_in_tutorial then
-		input_manager.create_input_service(input_manager, "Tutorial", "TutorialPlayerControllerKeymaps", "TutorialPlayerControllerFilters")
-		input_manager.map_device_to_service(input_manager, "Tutorial", "keyboard")
-		input_manager.map_device_to_service(input_manager, "Tutorial", "mouse")
-		input_manager.map_device_to_service(input_manager, "Tutorial", "gamepad")
+		input_manager:create_input_service("Tutorial", "TutorialPlayerControllerKeymaps", "TutorialPlayerControllerFilters")
+		input_manager:map_device_to_service("Tutorial", "keyboard")
+		input_manager:map_device_to_service("Tutorial", "mouse")
+		input_manager:map_device_to_service("Tutorial", "gamepad")
 	end
 
-	input_manager.create_input_service(input_manager, "Player", "PlayerControllerKeymaps", "PlayerControllerFilters")
-	input_manager.map_device_to_service(input_manager, "Player", "keyboard")
-	input_manager.map_device_to_service(input_manager, "Player", "mouse")
-	input_manager.map_device_to_service(input_manager, "Player", "gamepad")
+	input_manager:create_input_service("Player", "PlayerControllerKeymaps", "PlayerControllerFilters")
+	input_manager:map_device_to_service("Player", "keyboard")
+	input_manager:map_device_to_service("Player", "mouse")
+	input_manager:map_device_to_service("Player", "gamepad")
 
 	self.player_index = params.player
 	local input_source = self.input_manager:get_service("Player")
@@ -59,14 +59,14 @@ StateInGameRunning.on_enter = function (self, params)
 	local peer_id = Network.peer_id()
 	local local_player_id = params.local_player_id
 	local player = Managers.player:player(peer_id, local_player_id)
-	local stats_id = player.stats_id(player)
+	local stats_id = player:stats_id()
 	player.input_source = input_source
 	self.local_player_id = local_player_id
 	self.player = player
 
 	if self.is_server then
-		player.create_game_object(player)
-		player.create_boon_handler(player, self.world)
+		player:create_game_object()
+		player:create_boon_handler(self.world)
 	end
 
 	if self.is_server and Managers.state.room and not Managers.state.room:has_room(peer_id) then
@@ -74,28 +74,28 @@ StateInGameRunning.on_enter = function (self, params)
 	end
 
 	local entity_manager = Managers.state.entity
-	local camera_system = entity_manager.system(entity_manager, "camera_system")
-	local outline_system = entity_manager.system(entity_manager, "outline_system")
-	local fade_system = entity_manager.system(entity_manager, "fade_system")
-	local sound_sector_system = entity_manager.system(entity_manager, "sound_sector_system")
-	local sound_environment_system = entity_manager.system(entity_manager, "sound_environment_system")
+	local camera_system = entity_manager:system("camera_system")
+	local outline_system = entity_manager:system("outline_system")
+	local fade_system = entity_manager:system("fade_system")
+	local sound_sector_system = entity_manager:system("sound_sector_system")
+	local sound_environment_system = entity_manager:system("sound_environment_system")
 
-	camera_system.local_player_created(camera_system, player)
-	outline_system.local_player_created(outline_system, player)
-	fade_system.local_player_created(fade_system, player)
-	sound_sector_system.local_player_created(sound_sector_system, player)
-	sound_environment_system.local_player_created(sound_environment_system, player)
+	camera_system:local_player_created(player)
+	outline_system:local_player_created(player)
+	fade_system:local_player_created(player)
+	sound_sector_system:local_player_created(player)
+	sound_environment_system:local_player_created(player)
 
 	local event_manager = Managers.state.event
 
-	event_manager.register(event_manager, self, "game_started", "event_game_started")
-	event_manager.register(event_manager, self, "level_start_local_player_spawned", "event_local_player_spawned")
-	event_manager.register(event_manager, self, "checkpoint_vote_cancelled", "on_checkpoint_vote_cancelled")
-	event_manager.register(event_manager, self, "conflict_director_setup_done", "event_conflict_director_setup_done")
-	event_manager.register(event_manager, self, "close_ingame_menu", "event_close_ingame_menu")
+	event_manager:register(self, "game_started", "event_game_started")
+	event_manager:register(self, "level_start_local_player_spawned", "event_local_player_spawned")
+	event_manager:register(self, "checkpoint_vote_cancelled", "on_checkpoint_vote_cancelled")
+	event_manager:register(self, "conflict_director_setup_done", "event_conflict_director_setup_done")
+	event_manager:register(self, "close_ingame_menu", "event_close_ingame_menu")
 
 	if PLATFORM == "xb1" then
-		event_manager.register(event_manager, self, "trigger_xbox_round_end", "event_trigger_xbox_round_end")
+		event_manager:register(self, "trigger_xbox_round_end", "event_trigger_xbox_round_end")
 	end
 
 	if self.is_server then
@@ -112,7 +112,7 @@ StateInGameRunning.on_enter = function (self, params)
 			if ScriptUnit.has_extension(unit, "input_system") then
 				local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-				locomotion_extension.teleport_to(locomotion_extension, pos, rot)
+				locomotion_extension:teleport_to(pos, rot)
 			end
 		end
 	end)
@@ -134,7 +134,7 @@ StateInGameRunning.on_enter = function (self, params)
 		peer_id = peer_id,
 		player = player,
 		local_player_id = local_player_id,
-		dialogue_system = entity_manager.system(entity_manager, "dialogue_system"),
+		dialogue_system = entity_manager:system("dialogue_system"),
 		dice_keeper = params.dice_keeper,
 		voting_manager = Managers.state.voting,
 		time_manager = Managers.time,
@@ -148,7 +148,7 @@ StateInGameRunning.on_enter = function (self, params)
 	DamageUtils.is_in_inn = params.is_in_inn
 	self.ingame_ui_context = ingame_ui_context
 
-	self.create_ingame_ui(self, ingame_ui_context)
+	self:create_ingame_ui(ingame_ui_context)
 
 	local loading_context = self.parent.parent.loading_context
 	loading_context.play_end_of_level_game = nil
@@ -181,7 +181,7 @@ StateInGameRunning.on_enter = function (self, params)
 
 	self.mood_timers = {}
 
-	self.setup_mood_blackboard(self)
+	self:setup_mood_blackboard()
 
 	if loading_context.loading_view then
 		self.loading_view = loading_context.loading_view
@@ -227,8 +227,8 @@ StateInGameRunning.create_ingame_ui = function (self, ingame_ui_context)
 	local matchmaking = Managers.matchmaking
 
 	if not matchmaking.popup_handler then
-		matchmaking.set_popup_join_lobby_handler(matchmaking, self.ingame_ui.popup_join_lobby_handler)
-		matchmaking.set_popup_handler(matchmaking, self.ingame_ui.popup_handler)
+		matchmaking:set_popup_join_lobby_handler(self.ingame_ui.popup_join_lobby_handler)
+		matchmaking:set_popup_handler(self.ingame_ui.popup_handler)
 	end
 end
 
@@ -260,9 +260,9 @@ StateInGameRunning._setup_end_of_level_UI = function (self)
 
 		local mission_system = Managers.state.entity:system("mission_system")
 		level_end_view_context.mission_system_data = {
-			tome_mission_data = mission_system.get_level_end_mission_data(mission_system, "tome_bonus_mission"),
-			grimoire_mission_data = mission_system.get_level_end_mission_data(mission_system, "grimoire_hidden_mission"),
-			loot_dice_mission_data = mission_system.get_level_end_mission_data(mission_system, "bonus_dice_hidden_mission")
+			tome_mission_data = mission_system:get_level_end_mission_data("tome_bonus_mission"),
+			grimoire_mission_data = mission_system:get_level_end_mission_data("grimoire_hidden_mission"),
+			loot_dice_mission_data = mission_system:get_level_end_mission_data("bonus_dice_hidden_mission")
 		}
 		self.parent.parent.loading_context.level_end_view_context = level_end_view_context
 
@@ -295,7 +295,7 @@ end
 StateInGameRunning.handle_end_conditions = function (self)
 	local game_mode_manager = Managers.state.game_mode
 
-	if game_mode_manager and game_mode_manager.is_game_mode_ended(game_mode_manager) and game_mode_manager.is_game_mode_ended(game_mode_manager) then
+	if game_mode_manager and game_mode_manager:is_game_mode_ended() and game_mode_manager:is_game_mode_ended() then
 	end
 end
 
@@ -411,7 +411,7 @@ StateInGameRunning.wanted_transition = function (self)
 		if Development.parameter("auto-host-level") ~= nil then
 		elseif not self._xbox_event_end_triggered then
 			Application.warning("MultiplyerRoundStart was triggered without end conditions met")
-			self._xbone_end_of_round_events(self, self.statistics_db)
+			self:_xbone_end_of_round_events(self.statistics_db)
 		end
 	end
 
@@ -443,16 +443,16 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 	local game_won = reason and reason == "won"
 	local game_lost = reason and reason == "lost"
 	local ingame_ui = self.ingame_ui
-	local stats_id = player.stats_id(player)
+	local stats_id = player:stats_id()
 	local statistics_db = self.statistics_db
 	local previous_completed_difficulty_index = LevelUnlockUtils.completed_level_difficulty_index(statistics_db, stats_id, level_key) or 0
 
-	ingame_ui.handle_transition(ingame_ui, "close_active")
+	ingame_ui:handle_transition("close_active")
 	LoreBookHelper.save_new_pages()
 
 	local mission_system = Managers.state.entity:system("mission_system")
 
-	mission_system.set_percentage_completed(mission_system, percentage_completed)
+	mission_system:set_percentage_completed(percentage_completed)
 
 	if Managers.twitch then
 		Managers.twitch:deactivate_twitch_game_mode()
@@ -461,7 +461,7 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 	if game_mode_key == "survival" then
 		if game_won then
 			print("Game won")
-			mission_system.evaluate_level_end_missions(mission_system)
+			mission_system:evaluate_level_end_missions()
 			StatisticsUtil.register_complete_survival_level(statistics_db)
 			Managers.player:set_stats_backend(player)
 		end
@@ -481,7 +481,7 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 		local profile_synchronizer = self.profile_synchronizer
 		local peer_id = Network.peer_id()
 		local local_player_id = self.local_player_id
-		local profile_index = profile_synchronizer.profile_by_peer(profile_synchronizer, peer_id, local_player_id)
+		local profile_index = profile_synchronizer:profile_by_peer(peer_id, local_player_id)
 		local profile = SPProfiles[profile_index]
 		local hero_name = profile.display_name
 
@@ -489,7 +489,7 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 			self.rewards:award_end_of_level_rewards(game_won, hero_name)
 		end
 
-		ingame_ui.activate_end_screen_ui(ingame_ui, game_won, checkpoint_available, level_key, previous_completed_difficulty_index)
+		ingame_ui:activate_end_screen_ui(game_won, checkpoint_available, level_key, previous_completed_difficulty_index)
 
 		if not is_booted_unstrusted then
 			local difficulty_key = Managers.state.difficulty:get_difficulty()
@@ -511,7 +511,7 @@ StateInGameRunning.gm_event_end_conditions_met = function (self, reason, checkpo
 
 	if PLATFORM == "xb1" then
 		if not self._xbox_event_end_triggered then
-			self._xbone_end_of_round_events(self, statistics_db)
+			self:_xbone_end_of_round_events(statistics_db)
 		end
 
 		if not self.is_in_inn and not self.is_in_tutorial then
@@ -539,13 +539,13 @@ StateInGameRunning._debug_update_rooms = function (self, dt, t)
 			local tapped_player = settings.tapped_players[i]
 
 			if not tapped_player and DebugKeyHandler.key_pressed(button .. tostring(i), "create room", category) then
-				room_manager.create_room(room_manager, i)
+				room_manager:create_room(i)
 
 				settings.tapped_players[i] = {
 					button = button .. tostring(i)
 				}
 			elseif tapped_player and DebugKeyHandler.key_pressed(tapped_player.button, "destroy room", category) then
-				room_manager.destroy_room(room_manager, i)
+				room_manager:destroy_room(i)
 
 				settings.tapped_players[i] = nil
 			end
@@ -573,11 +573,11 @@ end
 
 StateInGameRunning.update = function (self, dt, t)
 	if DebugKeyHandler.key_pressed("f5", "reload_ui", "ui") then
-		self.create_ingame_ui(self, self.ingame_ui_context)
+		self:create_ingame_ui(self.ingame_ui_context)
 	end
 
 	if script_data.debug_rooms then
-		self._debug_update_rooms(self, dt, t)
+		self:_debug_update_rooms(dt, t)
 	end
 
 	if Development.parameter("auto_host_dedicated") and self._spawn_initialized then
@@ -597,7 +597,7 @@ StateInGameRunning.update = function (self, dt, t)
 	end
 
 	Managers.state.debug_text:update(dt, self.viewport_name)
-	self.update_mood(self, dt, t)
+	self:update_mood(dt, t)
 
 	if self.checkpoint_vote_cancelled then
 		self.checkpoint_available = nil
@@ -605,11 +605,11 @@ StateInGameRunning.update = function (self, dt, t)
 	end
 
 	local ingame_ui = self.ingame_ui
-	local ui_ready = not ingame_ui.survey_active and not self.has_setup_end_of_level and ingame_ui.end_screen_active(ingame_ui) and ingame_ui.end_screen_fade_in_complete(ingame_ui)
+	local ui_ready = not ingame_ui.survey_active and not self.has_setup_end_of_level and ingame_ui:end_screen_active() and ingame_ui:end_screen_fade_in_complete()
 	local rewards_ready = self._booted_eac_untrusted or (self.rewards:rewards_generated() and not self.rewards:consuming_deed() and self.chests_package_name and Managers.package:has_loaded(self.chests_package_name, "global"))
 
 	if ui_ready and rewards_ready then
-		self._setup_end_of_level_UI(self)
+		self:_setup_end_of_level_UI()
 	end
 
 	if self.popup_id then
@@ -626,7 +626,7 @@ StateInGameRunning.update = function (self, dt, t)
 
 	local main_t = Managers.time:time("main")
 
-	self.update_player_afk_check(self, dt, main_t)
+	self:update_player_afk_check(dt, main_t)
 
 	if self._benchmark_handler then
 		self._benchmark_handler:update(dt, t)
@@ -639,7 +639,7 @@ StateInGameRunning.check_for_new_quests_or_contracts = function (self, dt)
 	if self._quest_expire_check_cooldown <= 0 then
 		local quest_manager = Managers.state.quest
 
-		if quest_manager.has_quests_expired(quest_manager) or quest_manager.has_contracts_expired(quest_manager) then
+		if quest_manager:has_quests_expired() or quest_manager:has_contracts_expired() then
 			Managers.chat:add_local_system_message(1, Localize("dlc1_3_1_new_quests_and_contracts_available_text"), true)
 
 			self._quest_expire_check_cooldown = QuestSettings.EXPIRE_CHECK_COOLDOWN
@@ -651,7 +651,7 @@ StateInGameRunning.disable_ui = function (self)
 	local ingame_ui = self.ingame_ui
 
 	if ingame_ui then
-		ingame_ui.suspend_active_view(ingame_ui)
+		ingame_ui:suspend_active_view()
 	end
 
 	self._disable_ui = true
@@ -661,7 +661,7 @@ StateInGameRunning.event_close_ingame_menu = function (self)
 	local ingame_ui = self.ingame_ui
 
 	if ingame_ui then
-		ingame_ui.suspend_active_view(ingame_ui)
+		ingame_ui:suspend_active_view()
 	end
 end
 
@@ -682,17 +682,17 @@ StateInGameRunning.update_ui = function (self)
 	local disable_ingame_ui = script_data.disable_ui or (self.waiting_for_transition and Managers.state.network:game_session_host() ~= nil)
 	local ingame_ui = self.ingame_ui
 	local level_end_view_wrapper = self._level_end_view_wrapper
-	local level_end_view = level_end_view_wrapper and level_end_view_wrapper.level_end_view(level_end_view_wrapper)
+	local level_end_view = level_end_view_wrapper and level_end_view_wrapper:level_end_view()
 
-	ingame_ui.update(ingame_ui, dt, t, disable_ingame_ui, level_end_view)
+	ingame_ui:update(dt, t, disable_ingame_ui, level_end_view)
 
-	local end_screen_active = ingame_ui.end_screen_active(ingame_ui)
-	local end_screen_completed = ingame_ui.end_screen_completed(ingame_ui)
+	local end_screen_active = ingame_ui:end_screen_active()
+	local end_screen_completed = ingame_ui:end_screen_completed()
 	local checkpoint_available = self.checkpoint_available
 	local end_screen_closed = self.end_screen_ui_done
 
 	if end_screen_active and end_screen_completed and not checkpoint_available and not end_screen_closed then
-		self.on_end_screen_ui_complete(self)
+		self:on_end_screen_ui_complete()
 	end
 
 	self._t = Application.time_since_launch()
@@ -732,7 +732,7 @@ StateInGameRunning.update_mood = function (self, dt, t)
 	wanted_mood = wanted_mood or "default"
 
 	if wanted_mood ~= mood_handler.current_mood then
-		mood_handler.set_mood(mood_handler, wanted_mood)
+		mood_handler:set_mood(wanted_mood)
 
 		if wanted_mood ~= "default" then
 			local hold_time = mood_settings[wanted_mood].hold_time
@@ -751,10 +751,10 @@ StateInGameRunning.post_update = function (self, dt, t)
 	self.ingame_ui:post_update(dt, t, disable_ingame_ui)
 
 	if level_end_view_wrapper then
-		level_end_view_wrapper.update(level_end_view_wrapper, dt, t)
+		level_end_view_wrapper:update(dt, t)
 
-		if level_end_view_wrapper.done(level_end_view_wrapper) then
-			level_end_view_wrapper.destroy(level_end_view_wrapper)
+		if level_end_view_wrapper:done() then
+			level_end_view_wrapper:destroy()
 
 			self._level_end_view_wrapper = nil
 		end
@@ -766,7 +766,7 @@ StateInGameRunning.trigger_xbox_multiplayer_round_end_events = function (self)
 		return
 	end
 
-	self._xbone_end_of_round_events(self, self.statistics_db)
+	self:_xbone_end_of_round_events(self.statistics_db)
 end
 
 StateInGameRunning.on_exit = function (self)
@@ -811,7 +811,7 @@ StateInGameRunning.on_exit = function (self)
 	self.level_end_view_context = nil
 	self.player = nil
 
-	self._cancel_afk_warning(self)
+	self:_cancel_afk_warning()
 end
 
 StateInGameRunning.event_game_started = function (self)
@@ -831,13 +831,13 @@ StateInGameRunning.event_game_started = function (self)
 	end
 
 	if PLATFORM == "xb1" then
-		self._xbone_round_start_events(self)
+		self:_xbone_round_start_events()
 	end
 end
 
 if PLATFORM == "xb1" then
 	StateInGameRunning.event_trigger_xbox_round_end = function (self)
-		self._xbone_end_of_round_events(self, self.statistics_db)
+		self:_xbone_end_of_round_events(self.statistics_db)
 	end
 
 	StateInGameRunning._xbone_round_start_events = function (self)
@@ -927,14 +927,14 @@ end
 StateInGameRunning.event_conflict_director_setup_done = function (self)
 	self._conflict_directory_is_ready = true
 
-	self.game_actually_starts(self)
+	self:game_actually_starts()
 end
 
 StateInGameRunning.event_local_player_spawned = function (self, is_initial_spawn)
 	self._player_has_spawned = true
 	self._is_initial_spawn = is_initial_spawn
 
-	self.game_actually_starts(self)
+	self:game_actually_starts()
 end
 
 StateInGameRunning.game_actually_starts = function (self)
@@ -996,7 +996,7 @@ StateInGameRunning.update_player_afk_check = function (self, dt, t)
 
 	if afk_kick_disabled then
 		if self.afk_popup_id then
-			self._cancel_afk_warning(self)
+			self:_cancel_afk_warning()
 		end
 
 		self.last_active_time = nil
@@ -1022,14 +1022,14 @@ StateInGameRunning.update_player_afk_check = function (self, dt, t)
 			local should_kick = afk_force_kick_timer < time_since_active
 
 			if should_warn and not self.afk_popup_id then
-				self._show_afk_warning(self)
+				self:_show_afk_warning()
 			elseif should_kick then
-				self._kick_afk_player(self)
+				self:_kick_afk_player()
 			end
 		end
 	end
 
-	self._handle_afk_warning_result(self)
+	self:_handle_afk_warning_result()
 end
 
 StateInGameRunning._show_afk_warning = function (self)
@@ -1042,7 +1042,7 @@ StateInGameRunning._show_afk_warning = function (self)
 
 	local player = Managers.player:local_player(1)
 
-	self._send_system_chat_message(self, "chat_afk_kick_warning", player.name(player))
+	self:_send_system_chat_message("chat_afk_kick_warning", player:name())
 end
 
 StateInGameRunning._send_system_chat_message = function (self, message, localization_param)
@@ -1071,11 +1071,11 @@ StateInGameRunning._handle_afk_warning_result = function (self)
 end
 
 StateInGameRunning._kick_afk_player = function (self)
-	self._cancel_afk_warning(self)
+	self:_cancel_afk_warning()
 
 	local player = Managers.player:local_player(1)
 
-	self._send_system_chat_message(self, "chat_afk_kick", player.name(player))
+	self:_send_system_chat_message("chat_afk_kick", player:name())
 
 	self.afk_kick = true
 end

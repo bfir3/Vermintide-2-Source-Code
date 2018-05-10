@@ -33,11 +33,11 @@ NavBoxObstacle.init = function (self, navworld, unit)
 	self.nav_boxobstacle = GwNavBoxObstacle.create(self.navworld.gwnavworld, unitPos, local_center, half_extents, is_exclusive, color, layer_id, smartobject_id, user_data_id)
 	self.does_trigger_tag_volume = NavHelpers.unit_script_data(unit, false, "GwNavBoxObstacle", "does_trigger_tag_volume")
 
-	self.set_does_trigger_tagvolume(self, trigger_tag_volume)
+	self:set_does_trigger_tagvolume(trigger_tag_volume)
 
 	self.rotation_mode = NavHelpers.unit_script_data(unit, "free", "GwNavBoxObstacle", "rotation_mode") == "yaw"
 
-	self.set_rotation_mode_around_yaw(self, self.rotation_mode)
+	self:set_rotation_mode_around_yaw(self.rotation_mode)
 
 	_navboxstacles[self.unit] = self
 end
@@ -62,7 +62,7 @@ NavBoxObstacle.update = function (self, dt)
 	local linear_velocity = (pos - self.lastpos:unbox()) / dt
 	local rotation = Unit.local_rotation(self.unit, 1)
 
-	self.set_does_trigger_tagvolume(self, self.does_trigger_tag_volume and Vector3.length(linear_velocity) == 0)
+	self:set_does_trigger_tagvolume(self.does_trigger_tag_volume and Vector3.length(linear_velocity) == 0)
 
 	local angular_velocity = Vector3(0, 0, 0)
 	local last_rot = self.last_rotation:unbox()
@@ -73,7 +73,7 @@ NavBoxObstacle.update = function (self, dt)
 		angular_velocity = (angular_velocity_vector * angular_delta) / dt
 	end
 
-	self.set_next_update_config(self, transform, linear_velocity, angular_velocity)
+	self:set_next_update_config(transform, linear_velocity, angular_velocity)
 	self.lastpos:store(pos)
 	self.last_rotation:store(rotation)
 end

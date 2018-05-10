@@ -4,7 +4,7 @@ LobbyMembers.init = function (self, lobby)
 	self.lobby = lobby
 	self.members_joined = {}
 	self.members_left = {}
-	local members = lobby.members(lobby)
+	local members = lobby:members()
 	local my_members = {}
 
 	for i, peer_id in ipairs(members) do

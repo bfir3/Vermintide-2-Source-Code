@@ -41,7 +41,7 @@ BuffExtension.extensions_ready = function (self, world, unit)
 	end
 
 	local buff_system = Managers.state.entity:system("buff_system")
-	local group_buffs = buff_system.get_player_group_buffs(buff_system)
+	local group_buffs = buff_system:get_player_group_buffs()
 	local num_group_buffs = #group_buffs
 
 	if 0 < num_group_buffs then
@@ -51,7 +51,7 @@ BuffExtension.extensions_ready = function (self, world, unit)
 			local group_buff = GroupBuffTemplates[group_buff_template_name]
 			local buff_per_instance = group_buff.buff_per_instance
 			local recipients = group_buff_data.recipients
-			local id = self.add_buff(self, buff_per_instance)
+			local id = self:add_buff(buff_per_instance)
 			recipients[unit] = id
 		end
 	end
@@ -71,7 +71,7 @@ BuffExtension.destroy = function (self)
 		buff_extension_function_params.end_time = end_time
 		buff_extension_function_params.attacker_unit = buff.attacker_unit
 
-		self._remove_sub_buff(self, buff, i, buff_extension_function_params)
+		self:_remove_sub_buff(buff, i, buff_extension_function_params)
 
 		num_buffs = num_buffs - 1
 	end
@@ -201,7 +201,7 @@ BuffExtension.add_buff = function (self, template_name, params)
 			end
 
 			if sub_buff_template.stat_buff then
-				local index = self._add_stat_buff(self, sub_buff_template, buff)
+				local index = self:_add_stat_buff(sub_buff_template, buff)
 				buff.stat_buff_index = index
 			end
 
@@ -227,19 +227,19 @@ BuffExtension.add_buff = function (self, template_name, params)
 	local activation_sound = buff_template.activation_sound
 
 	if activation_sound then
-		self._play_buff_sound(self, activation_sound)
+		self:_play_buff_sound(activation_sound)
 	end
 
 	local activation_effect = buff_template.activation_effect
 
 	if activation_effect then
-		self._play_screen_effect(self, activation_effect)
+		self:_play_screen_effect(activation_effect)
 	end
 
 	local continuous_effect = buff_template.continuous_effect
 
 	if continuous_effect then
-		self._continuous_screen_effects[id] = self._play_screen_effect(self, continuous_effect)
+		self._continuous_screen_effects[id] = self:_play_screen_effect(continuous_effect)
 	end
 
 	local deactivation_effect = buff_template.deactivation_effect
@@ -305,7 +305,7 @@ BuffExtension._add_stat_buff = function (self, sub_buff_template, buff)
 end
 
 BuffExtension.update = function (self, unit, input, dt, context, t)
-	self._update_buffs(self, dt, t)
+	self:_update_buffs(dt, t)
 end
 
 BuffExtension._update_buffs = function (self, dt, t)
@@ -326,12 +326,12 @@ BuffExtension._update_buffs = function (self, dt, t)
 		buff_extension_function_params.attacker_unit = buff.attacker_unit
 
 		if end_time and end_time <= t then
-			self._remove_sub_buff(self, buff, i, buff_extension_function_params)
+			self:_remove_sub_buff(buff, i, buff_extension_function_params)
 
 			if template.buff_after_delay then
 				local delayed_buff_name = buff.delayed_buff_name
 
-				self.add_buff(self, delayed_buff_name)
+				self:add_buff(delayed_buff_name)
 			end
 		else
 			local update_func = template.update_func
@@ -386,7 +386,7 @@ BuffExtension.remove_buff = function (self, id, handled_in_buff_update_function)
 		buff_extension_function_params.attacker_unit = buff.attacker_unit
 
 		if buff.id == id or (buff.parent_id and buff.parent_id == id) then
-			self._remove_sub_buff(self, buff, i, buff_extension_function_params)
+			self:_remove_sub_buff(buff, i, buff_extension_function_params)
 
 			num_buffs = num_buffs - 1
 			num_buffs_removed = num_buffs_removed + 1
@@ -408,7 +408,7 @@ BuffExtension._remove_sub_buff = function (self, buff, index, buff_extension_fun
 	end
 
 	if template.stat_buff then
-		self._remove_stat_buff(self, buff)
+		self:_remove_stat_buff(buff)
 	end
 
 	local buff_to_remove = template.buff_to_add
@@ -436,19 +436,19 @@ BuffExtension._remove_sub_buff = function (self, buff, index, buff_extension_fun
 	local deactivation_sound = self._deactivation_sounds[id]
 
 	if deactivation_sound then
-		self._play_buff_sound(self, deactivation_sound)
+		self:_play_buff_sound(deactivation_sound)
 	end
 
 	local continuous_screen_effect_id = self._continuous_screen_effects[id]
 
 	if continuous_screen_effect_id then
-		self._stop_screen_effect(self, continuous_screen_effect_id)
+		self:_stop_screen_effect(continuous_screen_effect_id)
 	end
 
 	local deactivation_screen_effect = self._deactivation_screen_effects[id]
 
 	if deactivation_screen_effect then
-		self._play_screen_effect(self, deactivation_screen_effect)
+		self:_play_screen_effect(deactivation_screen_effect)
 	end
 end
 
@@ -595,7 +595,7 @@ BuffExtension.trigger_procs = function (self, event, ...)
 		local buff = event_buffs_to_remove[i]
 		local id = buff.id
 
-		self.remove_buff(self, id)
+		self:remove_buff(id)
 	end
 end
 
@@ -633,7 +633,7 @@ BuffExtension._play_buff_sound = function (self, sound_event)
 	if ScriptUnit.has_extension(unit, "first_person_system") then
 		local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
 
-		first_person_extension.play_hud_sound_event(first_person_extension, sound_event)
+		first_person_extension:play_hud_sound_event(sound_event)
 	end
 end
 
@@ -642,7 +642,7 @@ BuffExtension._play_screen_effect = function (self, effect)
 
 	if ScriptUnit.has_extension(unit, "first_person_system") then
 		local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
-		local effect_id = first_person_extension.create_screen_particles(first_person_extension, effect)
+		local effect_id = first_person_extension:create_screen_particles(effect)
 
 		return effect_id
 	end
@@ -656,7 +656,7 @@ BuffExtension._stop_screen_effect = function (self, effect_id)
 	if effect_id and ScriptUnit.has_extension(unit, "first_person_system") then
 		local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
 
-		first_person_extension.stop_spawning_screen_particles(first_person_extension, effect_id)
+		first_person_extension:stop_spawning_screen_particles(effect_id)
 	end
 end
 

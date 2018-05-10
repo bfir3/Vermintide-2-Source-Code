@@ -43,7 +43,7 @@ BTSuicideRunAction.enter = function (self, unit, blackboard, t)
 	local event_data = FrameTable.alloc_table()
 	event_data.attack_tag = "pwg_suicide_run"
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "enemy_attack", event_data)
+	dialogue_input:trigger_networked_dialogue_event("enemy_attack", event_data)
 	Managers.state.entity:system("surrounding_aware_system"):add_system_event(unit, "enemy_attack", DialogueSettings.suicide_run_broadcast_range, "attack_tag", "pwg_suicide_run")
 end
 
@@ -51,7 +51,7 @@ BTSuicideRunAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 
 	blackboard.anim_cb_move = nil
 	blackboard.attack_finished = nil
@@ -62,9 +62,9 @@ BTSuicideRunAction.update_target_position = function (self, unit, blackboard, ai
 		local whereabouts_extension = ScriptUnit.extension(blackboard.target_unit, "whereabouts_system")
 		local pos = whereabouts_extension.last_pos_on_nav_mesh:unbox()
 
-		ai_navigation.move_to(ai_navigation, pos)
+		ai_navigation:move_to(pos)
 	else
-		ai_navigation.stop(ai_navigation)
+		ai_navigation:stop()
 	end
 end
 
@@ -94,12 +94,12 @@ BTSuicideRunAction.StateInit.on_enter = function (self, params)
 	local action = params.action
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.set_rotation_speed(locomotion_extension, 5)
+	locomotion_extension:set_rotation_speed(5)
 
 	local ai_navigation_extension = blackboard.navigation_extension
 	local position = position_lookup[unit]
 
-	ai_navigation_extension.move_to(ai_navigation_extension, position)
+	ai_navigation_extension:move_to(position)
 	Managers.state.network:anim_event(unit, "to_combat")
 
 	if not blackboard.explode_timer_started then
@@ -120,7 +120,7 @@ BTSuicideRunAction.StateInit.update = function (self, dt, t)
 		local rotation = LocomotionUtils.rotation_towards_unit_flat(unit, blackboard.target_unit)
 		local locomotion_extension = blackboard.locomotion_extension
 
-		locomotion_extension.set_wanted_rotation(locomotion_extension, rotation)
+		locomotion_extension:set_wanted_rotation(rotation)
 	else
 		no_target = true
 	end
@@ -150,7 +150,7 @@ BTSuicideRunAction.StateMove.on_enter = function (self, params)
 	local run_speed = breed.run_speed
 	local ai_navigation_extension = blackboard.navigation_extension
 
-	ai_navigation_extension.set_max_speed(ai_navigation_extension, run_speed)
+	ai_navigation_extension:set_max_speed(run_speed)
 
 	blackboard.explode_timer_started = true
 	self.unit = unit
@@ -172,7 +172,7 @@ BTSuicideRunAction.StateMove.update = function (self, dt, t)
 	end
 
 	self.explode_timer = self.explode_timer - dt
-	local move_done = ai_navigation.has_reached_destination(ai_navigation, suicide_run.action.distance_to_explode) or self.explode_timer < 0
+	local move_done = ai_navigation:has_reached_destination(suicide_run.action.distance_to_explode) or self.explode_timer < 0
 	local proximity_target, proximity = PerceptionUtils.pick_closest_target(unit, blackboard, blackboard.breed)
 
 	if move_done or proximity < 2 or blackboard.no_path_found then

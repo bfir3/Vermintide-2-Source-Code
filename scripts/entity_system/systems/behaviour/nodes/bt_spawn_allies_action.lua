@@ -50,8 +50,8 @@ BTSpawnAllies.enter = function (self, unit, blackboard, t)
 	else
 		local nav_ext = blackboard.navigation_extension
 
-		nav_ext.set_max_speed(nav_ext, action.run_to_spawn_speed)
-		nav_ext.move_to(nav_ext, call_position)
+		nav_ext:set_max_speed(action.run_to_spawn_speed)
+		nav_ext:move_to(call_position)
 
 		blackboard.run_speed_overridden = true
 
@@ -79,7 +79,7 @@ BTSpawnAllies.enter = function (self, unit, blackboard, t)
 	end
 
 	if action.has_ward then
-		self._activate_ward(self, unit, blackboard)
+		self:_activate_ward(unit, blackboard)
 	end
 
 	local stinger_name = action.stinger_name
@@ -97,7 +97,7 @@ end
 BTSpawnAllies.leave = function (self, unit, blackboard, t, reason)
 	local nav_ext = blackboard.navigation_extension
 
-	nav_ext.set_enabled(nav_ext, true)
+	nav_ext:set_enabled(true)
 
 	blackboard.disable_improve_slot_position = false
 
@@ -110,7 +110,7 @@ BTSpawnAllies.leave = function (self, unit, blackboard, t, reason)
 		blackboard.spawning_allies = nil
 		blackboard.spawned_allies_wave = blackboard.spawned_allies_wave + 1
 	else
-		nav_ext.set_max_speed(nav_ext, blackboard.run_speed)
+		nav_ext:set_max_speed(blackboard.run_speed)
 
 		blackboard.run_speed_overridden = nil
 		blackboard.defensive_mode_duration = blackboard.action.defensive_mode_duration or 20
@@ -120,7 +120,7 @@ BTSpawnAllies.leave = function (self, unit, blackboard, t, reason)
 	end
 
 	if blackboard.follow_animation_locked then
-		self._release_animation_lock(self, unit, blackboard)
+		self:_release_animation_lock(unit, blackboard)
 	end
 
 	blackboard.active_node = nil
@@ -290,9 +290,9 @@ BTSpawnAllies._spawn = function (self, unit, data, blackboard, t)
 
 	local loc_ext = blackboard.locomotion_extension
 
-	loc_ext.set_wanted_velocity(loc_ext, Vector3.zero())
-	loc_ext.use_lerp_rotation(loc_ext, true)
-	loc_ext.set_wanted_rotation(loc_ext, Quaternion.look(data.spawn_forward:unbox(), Vector3.up()))
+	loc_ext:set_wanted_velocity(Vector3.zero())
+	loc_ext:use_lerp_rotation(true)
+	loc_ext:set_wanted_rotation(Quaternion.look(data.spawn_forward:unbox(), Vector3.up()))
 
 	local difficulty = Managers.state.difficulty:get_difficulty()
 
@@ -307,7 +307,7 @@ BTSpawnAllies._spawn = function (self, unit, data, blackboard, t)
 		for i = 1, #spawn_list, 1 do
 			local unit = spawners[(i - 1) % #spawners + 1]
 
-			spawner_system.spawn_horde(spawner_system, unit, 1, {
+			spawner_system:spawn_horde(unit, 1, {
 				Breeds[spawn_list[i]]
 			})
 		end
@@ -344,14 +344,14 @@ BTSpawnAllies.run = function (self, unit, blackboard, t, dt)
 			data.end_time = t + action.duration
 
 			if blackboard.follow_animation_locked then
-				self._release_animation_lock(self, unit, blackboard)
+				self:_release_animation_lock(unit, blackboard)
 			end
 
-			self._spawn(self, unit, data, blackboard, t)
+			self:_spawn(unit, data, blackboard, t)
 		elseif data.spawned then
 			blackboard.locomotion_extension:set_wanted_rotation(Quaternion.look(data.spawn_forward:unbox(), Vector3.up()))
 		elseif blackboard.follow_animation_locked and blackboard.anim_cb_rotation_start then
-			self._release_animation_lock(self, unit, blackboard)
+			self:_release_animation_lock(unit, blackboard)
 		end
 
 		return "running"

@@ -40,7 +40,7 @@ end
 ExperienceSettings = {
 	get_player_level = function (player)
 		local network_manager = Managers.state.network
-		local network_game = network_manager.game(network_manager)
+		local network_game = network_manager:game()
 
 		if not network_game then
 			return nil
@@ -48,7 +48,7 @@ ExperienceSettings = {
 
 		local unit_storage = Managers.state.unit_storage
 		local unit = player.player_unit
-		local go_id = unit_storage.go_id(unit_storage, unit)
+		local go_id = unit_storage:go_id(unit)
 
 		if not go_id then
 			return nil
@@ -71,7 +71,7 @@ end
 ExperienceSettings.get_experience = function (hero_name)
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
 
-	return hero_attributes.get(hero_attributes, hero_name, "experience") or 0
+	return hero_attributes:get(hero_name, "experience") or 0
 end
 
 ExperienceSettings.get_level = function (experience)

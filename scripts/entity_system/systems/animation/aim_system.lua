@@ -16,13 +16,13 @@ end
 
 AimSystem.on_freeze_extension = function (self, unit, extension_name)
 	ScriptUnit.destroy_extension(unit, self.NAME)
-	self.on_remove_extension(self, unit, extension_name)
+	self:on_remove_extension(unit, extension_name)
 end
 
 AimSystem.update = function (self, context, t)
 	local dt = context.dt
 
-	self.update_extension(self, "GenericUnitAimExtension", dt, context, t)
+	self:update_extension("GenericUnitAimExtension", dt, context, t)
 end
 
 return

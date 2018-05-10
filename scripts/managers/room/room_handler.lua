@@ -34,7 +34,7 @@ RoomHandler.setup_level_anchor_points = function (self, level)
 end
 
 RoomHandler.create_room = function (self, room_info, room_id)
-	room_id = room_id or self._available_room_id(self)
+	room_id = room_id or self:_available_room_id()
 
 	fassert(self._rooms[room_id].available, "[RoomHandler]: room_id %q is not available", room_id)
 

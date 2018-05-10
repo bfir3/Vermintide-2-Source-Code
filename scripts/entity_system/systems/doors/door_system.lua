@@ -21,7 +21,7 @@ DoorSystem.init = function (self, entity_system_creation_context, system_name)
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.unit_extension_data = {}
 	self._broadphase = Broadphase(127, 1.5)
@@ -76,7 +76,7 @@ DoorSystem.update = function (self, context, t)
 				local data = groups[i]
 				local group_id = data.group_id
 				local active = data.active
-				local group = ai_group_system.get_ai_group(ai_group_system, group_id)
+				local group = ai_group_system:get_ai_group(group_id)
 
 				if group and not active then
 					data.active = true
@@ -89,7 +89,7 @@ DoorSystem.update = function (self, context, t)
 					for unit, extension in pairs(members) do
 						local heath_extension = ScriptUnit.has_extension(unit, "health_system")
 
-						if heath_extension and heath_extension.is_alive(heath_extension) then
+						if heath_extension and heath_extension:is_alive() then
 							should_open = false
 
 							break
@@ -110,7 +110,7 @@ DoorSystem.update = function (self, context, t)
 		for i = 1, #sections_to_open, 1 do
 			local map_section = sections_to_open[i]
 
-			self.open_boss_doors(self, map_section)
+			self:open_boss_doors(map_section)
 
 			self._active_groups[map_section] = nil
 		end
@@ -149,14 +149,14 @@ DoorSystem.close_boss_doors = function (self, map_section, group_id, breed_name)
 			local boss_door_unit = boss_doors[i]
 			local extension = ScriptUnit.extension(boss_door_unit, "door_system")
 
-			extension.set_door_state(extension, "closed", breed_name)
+			extension:set_door_state("closed", breed_name)
 
 			local level = LevelHelper:current_level(self.world)
 			local level_index = Level.unit_index(level, boss_door_unit)
 			local door_state_id = NetworkLookup.door_states.closed
 			local breed_id = (breed_name and NetworkLookup.breeds[breed_name]) or NetworkLookup.breeds["n/a"]
 
-			network_transmit.send_rpc_clients(network_transmit, "rpc_sync_boss_door_state", level_index, door_state_id, breed_id)
+			network_transmit:send_rpc_clients("rpc_sync_boss_door_state", level_index, door_state_id, breed_id)
 		end
 
 		if not self._active_groups[map_section] then
@@ -180,14 +180,14 @@ DoorSystem.open_boss_doors = function (self, map_section)
 		local boss_door_unit = boss_doors[i]
 		local extension = ScriptUnit.extension(boss_door_unit, "door_system")
 
-		extension.set_door_state(extension, "open")
+		extension:set_door_state("open")
 
 		local level = LevelHelper:current_level(self.world)
 		local level_index = Level.unit_index(level, boss_door_unit)
 		local door_state_id = NetworkLookup.door_states.open
 		local breed_id = NetworkLookup.breeds["n/a"]
 
-		network_transmit.send_rpc_clients(network_transmit, "rpc_sync_boss_door_state", level_index, door_state_id, breed_id)
+		network_transmit:send_rpc_clients("rpc_sync_boss_door_state", level_index, door_state_id, breed_id)
 	end
 end
 
@@ -199,7 +199,7 @@ DoorSystem.rpc_sync_door_state = function (self, sender, level_object_id, door_s
 	if door_extension then
 		local new_state = NetworkLookup.door_states[door_state_id]
 
-		door_extension.set_door_state(door_extension, new_state)
+		door_extension:set_door_state(new_state)
 	else
 		Application.warning(string.format("[DoorSystem:rpc_sync_door_state] The synced level_object_id (%s) doesn't correspond to a unit with a 'door_system' extension. Unit: %s", level_object_id, tostring(door_unit)))
 	end
@@ -214,7 +214,7 @@ DoorSystem.rpc_sync_boss_door_state = function (self, sender, level_object_id, d
 		local new_state = NetworkLookup.door_states[door_state_id]
 		local breed_name = NetworkLookup.breeds[breed_id]
 
-		door_extension.set_door_state(door_extension, new_state, breed_name)
+		door_extension:set_door_state(new_state, breed_name)
 	else
 		Application.warning(string.format("[DoorSystem:rpc_sync_boss_door_state] The synced level_object_id (%s) doesn't correspond to a unit with a 'door_system' extension. Unit: %s", level_object_id, tostring(door_unit)))
 	end

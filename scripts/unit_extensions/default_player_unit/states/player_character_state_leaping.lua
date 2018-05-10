@@ -26,7 +26,7 @@ PlayerCharacterStateLeaping.on_enter = function (self, unit, input, dt, context,
 	status_extension.do_leap = false
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 	local jump_speed = movement_settings_table.jump.initial_vertical_leap_speed
-	local rotation = first_person_extension.current_rotation(first_person_extension)
+	local rotation = first_person_extension:current_rotation()
 	local look_direction_flat = Vector3.normalize(Vector3.flat(Quaternion.forward(rotation)))
 	local start_position = POSITION_LOOKUP[unit]
 	local projected_hit_pos = leap_data.projected_hit_pos:unbox()
@@ -36,7 +36,7 @@ PlayerCharacterStateLeaping.on_enter = function (self, unit, input, dt, context,
 	local velocity_jump = Vector3(forward_velocity.x, forward_velocity.y, jump_speed)
 	local initial_velocity = leap_data.initial_velocity:unbox()
 
-	self._start_leap(self, unit, initial_velocity, t)
+	self:_start_leap(unit, initial_velocity, t)
 	CharacterStateHelper.look(input_extension, player.viewport_name, first_person_extension, status_extension, self.inventory_extension)
 	CharacterStateHelper.update_weapon_actions(t, unit, input_extension, inventory_extension, self.health_extension)
 
@@ -47,7 +47,7 @@ PlayerCharacterStateLeaping.on_enter = function (self, unit, input, dt, context,
 	local start_jump_height = position_lookup[unit].z
 	local status_extension = self.status_extension
 
-	status_extension.set_falling_height(status_extension, start_jump_height)
+	status_extension:set_falling_height(start_jump_height)
 
 	self._played_landing_event = nil
 end
@@ -88,54 +88,54 @@ PlayerCharacterStateLeaping.update = function (self, unit, input, dt, context, t
 	end
 
 	if CharacterStateHelper.is_using_transport(status_extension) then
-		csm.change_state(csm, "using_transport")
+		csm:change_state("using_transport")
 
 		return
 	end
 
 	if CharacterStateHelper.is_overcharge_exploding(status_extension) then
-		csm.change_state(csm, "overcharge_exploding")
+		csm:change_state("overcharge_exploding")
 
 		return
 	end
 
 	if CharacterStateHelper.is_pushed(status_extension) then
-		status_extension.set_pushed(status_extension, false)
+		status_extension:set_pushed(false)
 
 		local params = movement_settings_table.stun_settings.pushed
-		local hit_react_type = status_extension.hit_react_type(status_extension)
+		local hit_react_type = status_extension:hit_react_type()
 		params.hit_react_type = hit_react_type .. "_push"
 
-		csm.change_state(csm, "stunned", params)
+		csm:change_state("stunned", params)
 
 		return
 	end
 
 	if CharacterStateHelper.is_block_broken(status_extension) then
-		status_extension.set_block_broken(status_extension, false)
+		status_extension:set_block_broken(false)
 
 		local params = movement_settings_table.stun_settings.parry_broken
 		params.hit_react_type = "medium_push"
 
-		csm.change_state(csm, "stunned", params)
+		csm:change_state("stunned", params)
 
 		return
 	end
 
-	if self._update_movement(self, unit, dt, t) then
-		self._finish(self, unit, t)
+	if self:_update_movement(unit, dt, t) then
+		self:_finish(unit, t)
 
-		if locomotion_extension.is_on_ground(locomotion_extension) then
-			csm.change_state(csm, "walking", self.temp_params)
-			first_person_extension.change_state(first_person_extension, "walking")
+		if locomotion_extension:is_on_ground() then
+			csm:change_state("walking", self.temp_params)
+			first_person_extension:change_state("walking")
 
 			return
 		end
 
-		if not self.csm.state_next and locomotion_extension.current_velocity(locomotion_extension).z <= 0 then
-			self._finish(self, unit, t, false)
-			csm.change_state(csm, "falling", self.temp_params)
-			first_person_extension.change_state(first_person_extension, "falling")
+		if not self.csm.state_next and locomotion_extension:current_velocity().z <= 0 then
+			self:_finish(unit, t, false)
+			csm:change_state("falling", self.temp_params)
+			first_person_extension:change_state("falling")
 
 			return
 		end
@@ -185,12 +185,12 @@ PlayerCharacterStateLeaping._finish = function (self, unit, t)
 	local locomotion_extension = self.locomotion_extension
 	local first_person_extension = self.first_person_extension
 
-	first_person_extension.play_camera_effect_sequence(first_person_extension, "landed_hard", t)
+	first_person_extension:play_camera_effect_sequence("landed_hard", t)
 
 	local land_sound_event = self._leap_data.sfx_event_land
 
 	if land_sound_event and not self._played_landing_event then
-		local position = first_person_extension.current_position(first_person_extension)
+		local position = first_person_extension:current_position()
 
 		WwiseUtils.trigger_position_event(world, land_sound_event, position)
 
@@ -207,19 +207,19 @@ PlayerCharacterStateLeaping._start_leap = function (self, unit, velocity, t)
 	local first_person_extension = self.first_person_extension
 
 	CharacterStateHelper.play_animation_event(unit, self._leap_data.anim_start_event)
-	first_person_extension.play_camera_effect_sequence(first_person_extension, "jump", t)
+	first_person_extension:play_camera_effect_sequence("jump", t)
 
 	local jump_sound_event = self._leap_data.sfx_event_jump
 
 	if jump_sound_event then
-		local position = first_person_extension.current_position(first_person_extension)
+		local position = first_person_extension:current_position()
 
 		WwiseUtils.trigger_position_event(world, jump_sound_event, position)
 	end
 
-	locomotion_extension.set_maximum_upwards_velocity(locomotion_extension, velocity.z)
-	locomotion_extension.set_forced_velocity(locomotion_extension, velocity)
-	locomotion_extension.set_wanted_velocity(locomotion_extension, velocity)
+	locomotion_extension:set_maximum_upwards_velocity(velocity.z)
+	locomotion_extension:set_forced_velocity(velocity)
+	locomotion_extension:set_wanted_velocity(velocity)
 
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 	movement_settings_table.gravity_acceleration = PlayerUnitMovementSettings.gravity_acceleration * 0.9

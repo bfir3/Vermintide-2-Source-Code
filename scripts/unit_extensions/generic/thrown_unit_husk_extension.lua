@@ -9,7 +9,7 @@ ThrownUnitHuskExtension.init = function (self, extension_init_context, unit, ext
 	self.game = Managers.state.network:game()
 	self.unit = unit
 	local unit_storage = Managers.state.unit_storage
-	self.go_id = unit_storage.go_id(unit_storage, unit)
+	self.go_id = unit_storage:go_id(unit)
 end
 
 ThrownUnitHuskExtension.extensions_ready = function (self, world, unit)

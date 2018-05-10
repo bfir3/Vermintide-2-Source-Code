@@ -26,7 +26,7 @@ end
 PlayerManager.set_is_server = function (self, is_server, network_event_delegate, network_manager)
 	self.is_server = is_server
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.network_event_delegate = network_event_delegate
 	self.network_manager = network_manager
@@ -61,17 +61,17 @@ PlayerManager.rpc_to_client_spawn_player = function (self, sender, local_player_
 
 	local ammo_melee = ammo_melee_percent_int * 0.01
 	local ammo_ranged = ammo_ranged_percent_int * 0.01
-	local player = self.player(self, Network.peer_id(), local_player_id)
+	local player = self:player(Network.peer_id(), local_player_id)
 
-	player.set_profile_index(player, profile_index)
-	player.spawn(player, position, rotation, is_initial_spawn, ammo_melee, ammo_ranged, NetworkLookup.item_names[healthkit_id], NetworkLookup.item_names[potion_id], NetworkLookup.item_names[grenade_id])
+	player:set_profile_index(profile_index)
+	player:spawn(position, rotation, is_initial_spawn, ammo_melee, ammo_ranged, NetworkLookup.item_names[healthkit_id], NetworkLookup.item_names[potion_id], NetworkLookup.item_names[grenade_id])
 end
 
 PlayerManager.exit_ingame = function (self)
 	if self.is_server then
 		for _, player in pairs(self._players) do
 			if player.remote then
-				self.remove_player(self, player.network_id(player), player.local_player_id(player))
+				self:remove_player(player:network_id(), player:local_player_id())
 			end
 		end
 	end
@@ -89,7 +89,7 @@ end
 
 PlayerManager.assign_unit_ownership = function (self, unit, player, is_player_unit)
 	if script_data.network_debug_connections then
-		printf("PlayerManager:assign_unit_ownership %s %s %i", player.name(player), tostring(player.network_id(player)), player.local_player_id(player))
+		printf("PlayerManager:assign_unit_ownership %s %s %i", player:name(), tostring(player:network_id()), player:local_player_id())
 	end
 
 	self._unit_owners[unit] = player
@@ -103,7 +103,7 @@ PlayerManager.assign_unit_ownership = function (self, unit, player, is_player_un
 end
 
 PlayerManager.unit_destroy_callback = function (self, unit)
-	self.relinquish_unit_ownership(self, unit)
+	self:relinquish_unit_ownership(unit)
 end
 
 PlayerManager.unit_owner = function (self, unit)
@@ -115,7 +115,7 @@ PlayerManager.player_from_unique_id = function (self, unique_id)
 end
 
 PlayerManager.player_from_stats_id = function (self, stats_id)
-	return self.player_from_unique_id(self, stats_id)
+	return self:player_from_unique_id(stats_id)
 end
 
 PlayerManager.player_from_game_object_id = function (self, game_object_id)
@@ -152,7 +152,7 @@ PlayerManager.add_player = function (self, input_source, viewport_name, viewport
 	end
 
 	local peer_id = Network.peer_id()
-	local unique_id = self._unique_id(self, peer_id, local_player_id)
+	local unique_id = self:_unique_id(peer_id, local_player_id)
 	local player = BulldozerPlayer:new(self.network_manager, input_source, viewport_name, viewport_world_name, self.is_server, local_player_id, unique_id)
 	self._players[unique_id] = player
 	self._num_human_players = self._num_human_players + 1
@@ -162,7 +162,7 @@ PlayerManager.add_player = function (self, input_source, viewport_name, viewport
 	player_table[peer_id][local_player_id] = player
 	local stats = Managers.backend:get_interface("statistics"):get_stats()
 
-	self._statistics_db:register(player.stats_id(player), "player", stats)
+	self._statistics_db:register(player:stats_id(), "player", stats)
 
 	return player
 end
@@ -172,7 +172,7 @@ PlayerManager.add_remote_player = function (self, peer_id, player_controlled, lo
 		printf("PlayerManager:add_remote_player %s", tostring(peer_id))
 	end
 
-	local unique_id = self._unique_id(self, peer_id, local_player_id)
+	local unique_id = self:_unique_id(peer_id, local_player_id)
 	local player = RemotePlayer:new(self.network_manager, peer_id, player_controlled, self.is_server, local_player_id, unique_id, clan_tag)
 	self._players[unique_id] = player
 
@@ -185,7 +185,7 @@ PlayerManager.add_remote_player = function (self, peer_id, player_controlled, lo
 	player_table[peer_id] = player_table[peer_id] or {}
 	player_table[peer_id][local_player_id] = player
 
-	self._statistics_db:register(player.stats_id(player), "player")
+	self._statistics_db:register(player:stats_id(), "player")
 	visual_assert(table.size(self._players) <= 4, "Too many players after remote player added.")
 
 	return player
@@ -213,13 +213,13 @@ end
 
 PlayerManager.add_bot_player = function (self, player_name, bot_player_peer_id, bot_profile_index, profile_index, local_player_id)
 	local peer_id = Network.peer_id()
-	local unique_id = self._unique_id(self, peer_id, local_player_id)
+	local unique_id = self:_unique_id(peer_id, local_player_id)
 	local player = PlayerBot:new(player_name, bot_profile_index, self.is_server, profile_index, local_player_id, unique_id)
 	self._players[unique_id] = player
 	local player_table = self._players_by_peer
 	player_table[peer_id] = player_table[peer_id] or {}
 	player_table[peer_id][local_player_id] = player
-	local stats_id = player.stats_id(player)
+	local stats_id = player:stats_id()
 
 	self._statistics_db:register(stats_id, "player")
 
@@ -228,7 +228,7 @@ end
 
 PlayerManager.clear_all_players = function (self)
 	for unique_id, player in pairs(self._players) do
-		self.remove_player(self, player.network_id(player), player.local_player_id(player))
+		self:remove_player(player:network_id(), player:local_player_id())
 	end
 end
 
@@ -237,7 +237,7 @@ PlayerManager.remove_all_players_from_peer = function (self, peer_id)
 
 	if peer_table then
 		for local_player_id, player in pairs(peer_table) do
-			self.remove_player(self, peer_id, local_player_id)
+			self:remove_player(peer_id, local_player_id)
 		end
 	end
 end
@@ -246,7 +246,7 @@ PlayerManager.set_stats_backend = function (self, player)
 	if player.local_player then
 		local backend_stats = {}
 
-		self._statistics_db:generate_backend_stats(player.stats_id(player), backend_stats)
+		self._statistics_db:generate_backend_stats(player:stats_id(), backend_stats)
 		Managers.backend:set_stats(backend_stats)
 	end
 end
@@ -256,15 +256,15 @@ PlayerManager.remove_player = function (self, peer_id, local_player_id)
 		printf("PlayerManager:remove_player peer_id=%s %i", tostring(peer_id), local_player_id or -1)
 	end
 
-	local unique_id = self._unique_id(self, peer_id, local_player_id)
+	local unique_id = self:_unique_id(peer_id, local_player_id)
 	local player = self._players[unique_id]
 	local owned_units = player.owned_units
 
 	for unit, _ in pairs(owned_units) do
-		self.relinquish_unit_ownership(self, unit)
+		self:relinquish_unit_ownership(unit)
 	end
 
-	self.set_stats_backend(self, player)
+	self:set_stats_backend(player)
 
 	self._players[unique_id] = nil
 	self._human_players[unique_id] = nil
@@ -275,18 +275,18 @@ PlayerManager.remove_player = function (self, peer_id, local_player_id)
 		self._players_by_peer[peer_id] = nil
 	end
 
-	if player.is_player_controlled(player) then
+	if player:is_player_controlled() then
 		self._num_human_players = self._num_human_players - 1
 	end
 
-	self._statistics_db:unregister(player.stats_id(player))
-	player.destroy(player)
+	self._statistics_db:unregister(player:stats_id())
+	player:destroy()
 end
 
 PlayerManager.player = function (self, peer_id, local_player_id)
 	assert(peer_id and local_player_id)
 
-	return self.player_from_peer_id(self, peer_id, local_player_id)
+	return self:player_from_peer_id(peer_id, local_player_id)
 end
 
 PlayerManager.player_from_peer_id = function (self, peer_id, local_player_id)
@@ -322,7 +322,7 @@ end
 PlayerManager.num_alive_allies = function (self, player)
 	local players = Managers.player:human_and_bot_players()
 	local num_alive = 0
-	local local_player = self.local_player(self)
+	local local_player = self:local_player()
 
 	for _, player in pairs(players) do
 		if player ~= local_player then
@@ -331,7 +331,7 @@ PlayerManager.num_alive_allies = function (self, player)
 			if Unit.alive(unit) then
 				local status_extension = ScriptUnit.extension(unit, "status_system")
 
-				if not status_extension.is_disabled(status_extension) then
+				if not status_extension:is_disabled() then
 					num_alive = num_alive + 1
 				end
 			end
@@ -347,7 +347,7 @@ PlayerManager.server_player = function (self)
 	local server_peer_id = network_transmit.server_peer_id
 	local game_owner_peer_id = server_peer_id or network_transmit.peer_id
 
-	return self.player_from_peer_id(self, game_owner_peer_id, 1)
+	return self:player_from_peer_id(game_owner_peer_id, 1)
 end
 
 PlayerManager.party_leader_player = function (self)
@@ -364,7 +364,7 @@ PlayerManager.party_leader_player = function (self)
 			return Managers.player:local_player()
 		end
 
-		local party_leader_player = self.player_from_peer_id(self, leader_peer_id, 1)
+		local party_leader_player = self:player_from_peer_id(leader_peer_id, 1)
 
 		if not party_leader_player then
 			Application.warning("[PlayerManager:party_leader_player] Could not fetch party player from peer_id %s", leader_peer_id)
@@ -398,7 +398,7 @@ PlayerManager.num_players = function (self)
 end
 
 PlayerManager.local_player = function (self, local_player_id)
-	return self.player(self, Network.peer_id(), local_player_id or 1)
+	return self:player(Network.peer_id(), local_player_id or 1)
 end
 
 PlayerManager.bots = function (self)

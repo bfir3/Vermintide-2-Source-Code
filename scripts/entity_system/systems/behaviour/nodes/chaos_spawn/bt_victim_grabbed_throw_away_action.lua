@@ -15,7 +15,7 @@ BTVictimGrabbedThrowAwayAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
 
-	network_manager.anim_event(network_manager, unit, animation)
+	network_manager:anim_event(unit, animation)
 
 	if blackboard.move_state ~= "idle" then
 		blackboard.move_state = "idle"
@@ -44,7 +44,7 @@ BTVictimGrabbedThrowAwayAction.enter = function (self, unit, blackboard, t)
 	end
 
 	if not can_go then
-		local new_direction = self.find_throw_direction(self, unit, blackboard, ray_length)
+		local new_direction = self:find_throw_direction(unit, blackboard, ray_length)
 
 		if new_direction then
 			blackboard.throw_direction:store(new_direction)
@@ -139,7 +139,7 @@ BTVictimGrabbedThrowAwayAction.run = function (self, unit, blackboard, t, dt)
 	if should_exit then
 		return "done"
 	elseif blackboard.anim_cb_throw then
-		self.catapult_player(self, unit, blackboard, 25, 1)
+		self:catapult_player(unit, blackboard, 25, 1)
 	end
 
 	local target_unit = blackboard.target_unit

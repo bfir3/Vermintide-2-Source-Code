@@ -613,7 +613,7 @@ local action_data = {
 			if using_shield then
 				local is_blocking = blackboard.stagger <= 1
 
-				ai_shield_extension.set_is_blocking(ai_shield_extension, is_blocking)
+				ai_shield_extension:set_is_blocking(is_blocking)
 
 				if not is_blocking then
 					blackboard.stagger_time = blackboard.stagger_time + math.clamp(0.2 * blackboard.stagger, 0, 0.6)
@@ -639,7 +639,7 @@ local action_data = {
 		custom_exit_function = function (unit, blackboard, t)
 			local ai_shield_extension = ScriptUnit.has_extension(unit, "ai_shield_system") and ScriptUnit.extension(unit, "ai_shield_system")
 
-			ai_shield_extension.set_is_blocking(ai_shield_extension, true)
+			ai_shield_extension:set_is_blocking(true)
 		end,
 		stagger_anims = {
 			{

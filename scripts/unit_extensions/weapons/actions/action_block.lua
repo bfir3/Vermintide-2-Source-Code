@@ -17,7 +17,7 @@ ActionBlock.client_owner_start_action = function (self, new_action, t)
 	self.action_time_started = t
 	local input_extension = ScriptUnit.extension(self.owner_unit, "input_system")
 
-	input_extension.reset_input_buffer(input_extension)
+	input_extension:reset_input_buffer()
 
 	local owner_unit = self.owner_unit
 	local go_id = Managers.state.unit_storage:go_id(owner_unit)
@@ -34,7 +34,7 @@ ActionBlock.client_owner_start_action = function (self, new_action, t)
 
 	local status_extension = self._status_extension
 
-	status_extension.set_blocking(status_extension, true)
+	status_extension:set_blocking(true)
 
 	status_extension.timed_block = t + 0.5
 end
@@ -42,11 +42,11 @@ end
 ActionBlock.client_owner_post_update = function (self, dt, t, world, can_damage)
 	local status_extension = self._status_extension
 
-	if status_extension.has_blocked(status_extension) then
+	if status_extension:has_blocked() then
 		self._blocked_flag = true
 		self._blocked_time = t - self.action_time_started
 
-		status_extension.set_has_blocked(status_extension, false)
+		status_extension:set_has_blocked(false)
 	end
 end
 
@@ -65,8 +65,8 @@ ActionBlock.finish = function (self, reason)
 	self._blocked_flag = false
 	local status_extension = self._status_extension
 
-	status_extension.set_blocking(status_extension, false)
-	status_extension.set_has_blocked(status_extension, false)
+	status_extension:set_blocking(false)
+	status_extension:set_has_blocked(false)
 end
 
 ActionBlock.streak_available = function (self, t, streak_action)

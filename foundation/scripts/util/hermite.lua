@@ -42,12 +42,12 @@ Hermite.draw = function (segments, script_drawer, tangent_scale, color, p0, p1, 
 		t = segment_increment * segment
 		local point_b = Hermite.calc_point(t, p0, p1, p2, p3)
 
-		script_drawer.line(script_drawer, point_a, point_b, color)
+		script_drawer:line(point_a, point_b, color)
 
 		if tangent_scale then
 			local tangent = Hermite.calc_tangent(t, p0, p1, p2, p3)
 
-			script_drawer.vector(script_drawer, point_b, tangent * tangent_scale, color)
+			script_drawer:vector(point_b, tangent * tangent_scale, color)
 		end
 
 		point_a = point_b

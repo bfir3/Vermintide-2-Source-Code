@@ -409,7 +409,7 @@ InteractionUI.init = function (self, ingame_ui_context)
 	self.platform = PLATFORM
 	self.interaction_animations = {}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.localized_texts = {
 		hold = Localize("interaction_prefix_hold"),
@@ -432,8 +432,8 @@ end
 
 InteractionUI.button_texture_data_by_input_action = function (self, input_action)
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "Player")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local input_service = input_manager:get_service("Player")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 
 	return UISettings.get_gamepad_input_texture_data(input_service, input_action, gamepad_active)
 end
@@ -461,7 +461,7 @@ InteractionUI._handle_interaction_progress = function (self, progress)
 		if not self.draw_interaction_bar then
 			self.draw_interaction_bar = true
 
-			self._animate_in_progress_bar(self)
+			self:_animate_in_progress_bar()
 		end
 
 		widget_content.bar.bar_value = progress
@@ -496,21 +496,21 @@ InteractionUI.update = function (self, dt, t, my_player)
 	local interactor_extension = ScriptUnit.extension(player_unit, "interactor_system")
 	local interaction_bar_active = false
 	local title_text, action_text, interact_action, failed_reason, is_channeling = nil
-	local is_interacting = interactor_extension.is_interacting(interactor_extension)
-	local is_waiting_for_interaction_approval = interactor_extension.is_waiting_for_interaction_approval(interactor_extension)
+	local is_interacting = interactor_extension:is_interacting()
+	local is_waiting_for_interaction_approval = interactor_extension:is_waiting_for_interaction_approval()
 	local interaction_in_progress = is_interacting and not is_waiting_for_interaction_approval
 
 	if interaction_in_progress then
 		local t = Managers.time:time("game")
-		local progress = interactor_extension.get_progress(interactor_extension, t)
-		interaction_bar_active = self._handle_interaction_progress(self, progress)
+		local progress = interactor_extension:get_progress(t)
+		interaction_bar_active = self:_handle_interaction_progress(progress)
 
 		if interaction_bar_active then
 			is_channeling = true
 		end
 	end
 
-	title_text, action_text, interact_action, failed_reason = self._get_interaction_text(self, player_unit, is_channeling)
+	title_text, action_text, interact_action, failed_reason = self:_get_interaction_text(player_unit, is_channeling)
 
 	if title_text then
 		action_text = action_text or "NO_TEXT_ASSIGNED"
@@ -520,7 +520,7 @@ InteractionUI.update = function (self, dt, t, my_player)
 		title_text = (console_disabled and title_text) or Localize(title_text)
 		action_text = (console_disabled and action_text) or Localize(action_text)
 
-		self._assign_button_info(self, interact_action, failed_reason, is_channeling)
+		self:_assign_button_info(interact_action, failed_reason, is_channeling)
 
 		local widget_style = self.interaction_widget.style
 		local widget_content = self.interaction_widget.content
@@ -556,7 +556,7 @@ InteractionUI.update = function (self, dt, t, my_player)
 	if not interaction_bar_active and self.draw_interaction_bar then
 		self.draw_interaction_bar = nil
 
-		self._animate_out_progress_bar(self)
+		self:_animate_out_progress_bar()
 	end
 
 	UIRenderer.begin_pass(ui_renderer, ui_scenegraph, input_service, dt)
@@ -575,8 +575,8 @@ end
 InteractionUI._get_interaction_text = function (self, player_unit, is_channeling)
 	local interactor_extension = ScriptUnit.extension(player_unit, "interactor_system")
 	local title_text, action_text, interact_action = nil
-	local can_interact, failed_reason, interaction_type = interactor_extension.can_interact(interactor_extension)
-	local is_interacting, current_interaction_type = interactor_extension.is_interacting(interactor_extension)
+	local can_interact, failed_reason, interaction_type = interactor_extension:can_interact()
+	local is_interacting, current_interaction_type = interactor_extension:is_interacting()
 	interaction_type = interaction_type or current_interaction_type
 	local active_interaction = can_interact or is_channeling or failed_reason
 
@@ -587,13 +587,13 @@ InteractionUI._get_interaction_text = function (self, player_unit, is_channeling
 			end
 
 			if can_interact or is_interacting then
-				title_text, action_text = interactor_extension.interaction_description(interactor_extension)
+				title_text, action_text = interactor_extension:interaction_description()
 			elseif failed_reason then
-				title_text, action_text = interactor_extension.interaction_description(interactor_extension, failed_reason)
+				title_text, action_text = interactor_extension:interaction_description(failed_reason)
 			end
 		end
 	else
-		title_text, action_text, interact_action = self._get_wielded_interaction_text(self, player_unit)
+		title_text, action_text, interact_action = self:_get_wielded_interaction_text(player_unit)
 	end
 
 	if GameSettingsDevelopment.disabled_interactions[interaction_type] then
@@ -604,7 +604,7 @@ InteractionUI._get_interaction_text = function (self, player_unit, is_channeling
 end
 
 InteractionUI._get_wielded_interaction_text = function (self, player_unit)
-	local item_data = self._get_wielded_item_data(self, player_unit)
+	local item_data = self:_get_wielded_item_data(player_unit)
 
 	if not item_data then
 		return
@@ -614,7 +614,7 @@ InteractionUI._get_wielded_interaction_text = function (self, player_unit)
 	local highest_prio = 0
 	local best_action_name, best_sub_action_name = nil
 	local interactor_extension = ScriptUnit.extension(player_unit, "interactor_system")
-	local is_interacting, interaction_type = interactor_extension.is_interacting(interactor_extension)
+	local is_interacting, interaction_type = interactor_extension:is_interacting()
 	local item_template = BackendUtils.get_item_template(item_data)
 
 	for action_name, sub_actions in pairs(item_template.actions) do
@@ -622,7 +622,7 @@ InteractionUI._get_wielded_interaction_text = function (self, player_unit)
 			local interaction_priority = action_settings.interaction_priority or -1000
 
 			if action_settings.interaction_type ~= nil and highest_prio < interaction_priority and (action_settings.condition_func(player_unit) or (is_interacting and action_settings.interaction_type == interaction_type)) then
-				local input_device_supports_action = self.button_texture_data_by_input_action(self, action_settings.hold_input or action_name)
+				local input_device_supports_action = self:button_texture_data_by_input_action(action_settings.hold_input or action_name)
 
 				if input_device_supports_action then
 					highest_prio = action_settings.interaction_priority
@@ -637,7 +637,7 @@ InteractionUI._get_wielded_interaction_text = function (self, player_unit)
 		local action_settings = item_template.actions[best_action_name][best_sub_action_name]
 		local interaction_type = action_settings.interaction_type
 		local interaction_template = InteractionDefinitions[interaction_type]
-		local interactable_unit = interactor_extension.interactable_unit(interactor_extension)
+		local interactable_unit = interactor_extension:interactable_unit()
 		local interaction_context = interactor_extension.interaction_context
 		local interaction_data = interaction_context.data
 
@@ -662,7 +662,7 @@ end
 
 InteractionUI._get_wielded_item_data = function (self, player_unit)
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 	local item_data = equipment.wielded
 
 	return item_data
@@ -679,7 +679,7 @@ InteractionUI._assign_button_info = function (self, interact_action, failed_reas
 	local new_text_color = nil
 
 	if interact_action and not failed_reason and not channeling then
-		local button_texture_data, button_text = self.button_texture_data_by_input_action(self, interact_action)
+		local button_texture_data, button_text = self:button_texture_data_by_input_action(interact_action)
 
 		if button_texture_data and button_texture_data.texture then
 			widget_content.button_text = ""
@@ -726,7 +726,7 @@ end
 InteractionUI.external_interact_ui_description = function (self, player_unit)
 	local overcharge_extension = ScriptUnit.extension(player_unit, "overcharge_system")
 
-	if overcharge_extension.is_above_critical_limit(overcharge_extension) and not overcharge_extension.are_you_exploding(overcharge_extension) then
+	if overcharge_extension:is_above_critical_limit() and not overcharge_extension:are_you_exploding() then
 		return "interaction_overheat", "interaction_action_vent", "weapon_reload"
 	end
 end

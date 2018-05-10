@@ -13,7 +13,7 @@ local RPCS = {
 }
 
 NetworkTimerHandler.register_rpcs = function (self, network_event_delegate)
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self._network_event_delegate = network_event_delegate
 end
@@ -30,7 +30,7 @@ NetworkTimerHandler.start_timer_server = function (self, time)
 	local current_time = self._network_clock:time()
 	local end_time = current_time + time
 
-	self.start_timer_client(self, end_time)
+	self:start_timer_client(end_time)
 
 	local network_manager = Managers.state.network
 
@@ -47,7 +47,7 @@ NetworkTimerHandler.update = function (self, dt, t)
 		return
 	end
 
-	self._render_timer(self)
+	self:_render_timer()
 
 	local current_time = self._network_clock:time()
 
@@ -91,7 +91,7 @@ NetworkTimerHandler.destroy = function (self)
 end
 
 NetworkTimerHandler.rpc_start_network_timer = function (self, sender, end_time)
-	self.start_timer_client(self, end_time)
+	self:start_timer_client(end_time)
 end
 
 return

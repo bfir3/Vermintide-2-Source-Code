@@ -14,7 +14,7 @@ end
 CameraStateObserver.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
 	self._observed_player_id = nil
 
-	self.follow_next_unit(self)
+	self:follow_next_unit()
 	Managers.state.event:trigger("camera_teleported")
 end
 
@@ -32,11 +32,11 @@ CameraStateObserver.update = function (self, unit, input, dt, context, t)
 	local camera_manager = Managers.state.camera
 	local input_source = Managers.input:get_service("Player")
 
-	if input_source.get(input_source, "next_observer_target") or not Unit.alive(self._follow_unit) then
-		self.follow_next_unit(self)
+	if input_source:get("next_observer_target") or not Unit.alive(self._follow_unit) then
+		self:follow_next_unit()
 
 		if not Unit.alive(self._follow_unit) then
-			csm.change_state(csm, "idle")
+			csm:change_state("idle")
 
 			return
 		end
@@ -45,16 +45,16 @@ CameraStateObserver.update = function (self, unit, input, dt, context, t)
 	local external_state_change = camera_extension.external_state_change
 
 	if external_state_change and external_state_change ~= self.name then
-		csm.change_state(csm, external_state_change)
-		camera_extension.set_external_state_change(camera_extension, nil)
+		csm:change_state(external_state_change)
+		camera_extension:set_external_state_change(nil)
 
 		return
 	end
 
 	local rotation = Unit.local_rotation(unit, 0)
-	local look_sensitivity = (camera_manager.has_viewport(camera_manager, viewport_name) and camera_manager.fov(camera_manager, viewport_name) / 0.785) or 1
+	local look_sensitivity = (camera_manager:has_viewport(viewport_name) and camera_manager:fov(viewport_name) / 0.785) or 1
 	local gamepad_active = Managers.input:is_device_active("gamepad")
-	local look_input = (gamepad_active and input_source.get(input_source, "look_controller_3p")) or input_source.get(input_source, "look")
+	local look_input = (gamepad_active and input_source:get("look_controller_3p")) or input_source:get("look")
 	local look_delta = Vector3(0, 0, 0)
 
 	if look_input then
@@ -88,7 +88,7 @@ end
 
 CameraStateObserver.follow_next_unit = function (self)
 	local player_manager = Managers.player
-	local players = player_manager.players(player_manager)
+	local players = player_manager:players()
 	local observed_player_id = self._observed_player_id
 	local follow_unit = nil
 
@@ -107,7 +107,7 @@ CameraStateObserver.follow_next_unit = function (self)
 		local root_look_dir = Vector3.normalize(Vector3.flat(Quaternion.forward(Unit.local_rotation(follow_unit, 0))))
 		local yaw = math.atan2(root_look_dir.y, root_look_dir.x)
 
-		camera_manager.set_pitch_yaw(camera_manager, viewport_name, -0.6, yaw)
+		camera_manager:set_pitch_yaw(viewport_name, -0.6, yaw)
 		Unit.set_data(unit, "camera", "settings_node", "observer")
 
 		local current_position = Unit.world_position(follow_unit, 0)

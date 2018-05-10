@@ -24,7 +24,7 @@ NavTagVolumeHandler.init = function (self, world, nav_world)
 			self._volume_lookup_id = self._volume_lookup_id + 1
 
 			if tag_volume_data.layer_name ~= "undefined" then
-				self.create_tag_volume_from_mappings(self, level_volume_name)
+				self:create_tag_volume_from_mappings(level_volume_name)
 			end
 		end
 	end

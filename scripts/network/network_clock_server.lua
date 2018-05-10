@@ -9,7 +9,7 @@ NetworkClockServer.init = function (self)
 end
 
 NetworkClockServer.register_rpcs = function (self, network_event_delegate)
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self._network_event_delegate = network_event_delegate
 end
@@ -29,10 +29,10 @@ NetworkClockServer.time = function (self)
 end
 
 NetworkClockServer.update = function (self, dt)
-	self._update_clock(self, dt)
+	self:_update_clock(dt)
 
 	if Development.parameter("network_clock_debug") then
-		self._debug_stuff(self, dt)
+		self:_debug_stuff(dt)
 	end
 end
 
@@ -50,7 +50,7 @@ NetworkClockServer._debug_stuff = function (self, dt)
 	if debug_text_manager then
 		local text = tostring(math.floor(self._clock))
 
-		debug_text_manager.output_screen_text(debug_text_manager, text, 22, 0.1)
+		debug_text_manager:output_screen_text(text, 22, 0.1)
 	end
 end
 

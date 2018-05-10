@@ -61,7 +61,7 @@ SubtitleGui.init = function (self, ingame_ui_context)
 	local level_specific_load_files = DialogueSettings.level_specific_load_files[level_key]
 	local blocked_auto_load = DialogueSettings.blocked_auto_load_files[level_key]
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	local use_subtitles = Application.user_setting("use_subtitles")
 
@@ -127,7 +127,7 @@ SubtitleGui.update = function (self, dt)
 		if not Unit.alive(unit) then
 			playing_dialogues[unit] = nil
 
-			self._remove_subtitle(self, unit)
+			self:_remove_subtitle(unit)
 
 			remake_text = true
 		end
@@ -146,13 +146,13 @@ SubtitleGui.update = function (self, dt)
 					local dialogue_text = Localize(text_id)
 
 					if dialogue_text ~= "" then
-						if self._has_subtitle_for_unit(self, unit) then
-							self._remove_subtitle(self, unit)
+						if self:_has_subtitle_for_unit(unit) then
+							self:_remove_subtitle(unit)
 						end
 
 						local speaker_name = Localize("subtitle_name_" .. currently_playing_dialogue.speaker_name)
 
-						self._add_subtitle(self, unit, speaker_name, dialogue_text)
+						self:_add_subtitle(unit, speaker_name, dialogue_text)
 					end
 				end
 			end
@@ -160,7 +160,7 @@ SubtitleGui.update = function (self, dt)
 			playing_dialogues[unit] = currently_playing_dialogue
 		else
 			if dialogue_changed then
-				self._remove_subtitle(self, unit)
+				self:_remove_subtitle(unit)
 
 				remake_text = true
 			end
@@ -203,7 +203,7 @@ SubtitleGui.update = function (self, dt)
 	end
 
 	local input_manager = self.input_manager
-	local input_service = input_manager.get_service(input_manager, "ingame_menu")
+	local input_service = input_manager:get_service("ingame_menu")
 	local ui_renderer = self.ui_renderer
 	local ui_scenegraph = self.ui_scenegraph
 

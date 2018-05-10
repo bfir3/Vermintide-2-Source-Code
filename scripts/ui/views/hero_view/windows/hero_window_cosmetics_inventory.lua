@@ -50,13 +50,13 @@ HeroWindowCosmeticsInventory.on_enter = function (self, params, offset)
 		snap_pixel_positions = true
 	}
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self._animations = {}
 
-	self.create_ui_elements(self, params, offset)
+	self:create_ui_elements(params, offset)
 
 	self.hero_name = params.hero_name
 	self.career_index = params.career_index
@@ -64,11 +64,11 @@ HeroWindowCosmeticsInventory.on_enter = function (self, params, offset)
 	local item_grid = ItemGridUI:new(category_settings, self._widgets_by_name.item_grid, self.hero_name, self.career_index)
 	self._item_grid = item_grid
 
-	item_grid.mark_equipped_items(item_grid, true)
-	item_grid.mark_locked_items(item_grid, true)
-	item_grid.disable_locked_items(item_grid, true)
-	item_grid.disable_item_drag(item_grid)
-	item_grid.apply_item_sorting_function(item_grid, item_sort_func)
+	item_grid:mark_equipped_items(true)
+	item_grid:mark_locked_items(true)
+	item_grid:disable_locked_items(true)
+	item_grid:disable_item_drag()
+	item_grid:apply_item_sorting_function(item_sort_func)
 end
 
 HeroWindowCosmeticsInventory.create_ui_elements = function (self, params, offset)
@@ -100,7 +100,7 @@ HeroWindowCosmeticsInventory.create_ui_elements = function (self, params, offset
 		window_position[3] = window_position[3] + offset[3]
 	end
 
-	self._assign_tab_icons(self)
+	self:_assign_tab_icons()
 end
 
 HeroWindowCosmeticsInventory._assign_tab_icons = function (self)
@@ -133,16 +133,16 @@ HeroWindowCosmeticsInventory.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	self._item_grid:update(dt, t)
-	self._update_animations(self, dt)
-	self._handle_input(self, dt, t)
-	self._update_selected_cosmetic_slot_index(self)
-	self._update_loadout_sync(self)
-	self._update_page_info(self)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:_handle_input(dt, t)
+	self:_update_selected_cosmetic_slot_index()
+	self:_update_loadout_sync()
+	self:_update_page_info()
+	self:draw(dt)
 end
 
 HeroWindowCosmeticsInventory.post_update = function (self, dt, t)
@@ -156,8 +156,8 @@ HeroWindowCosmeticsInventory._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -236,21 +236,21 @@ HeroWindowCosmeticsInventory._handle_input = function (self, dt, t)
 	local parent = self.parent
 	local item_grid = self._item_grid
 	local allow_single_press = false
-	local item, is_equipped = item_grid.is_item_pressed(item_grid, allow_single_press)
+	local item, is_equipped = item_grid:is_item_pressed(allow_single_press)
 
-	if item_grid.is_item_hovered(item_grid) then
-		self._play_sound(self, "play_gui_inventory_item_hover")
+	if item_grid:is_item_hovered() then
+		self:_play_sound("play_gui_inventory_item_hover")
 	end
 
 	if item and not is_equipped then
-		parent._set_loadout_item(parent, item)
-		self._play_sound(self, "play_gui_equipment_equip_hero")
+		parent:_set_loadout_item(item)
+		self:_play_sound("play_gui_equipment_equip_hero")
 
 		local item_data = item.data
 		local slot_type = item_data.slot_type
 
 		if slot_type == "skin" then
-			parent.update_skin_sync(parent)
+			parent:update_skin_sync()
 		end
 	end
 
@@ -258,17 +258,17 @@ HeroWindowCosmeticsInventory._handle_input = function (self, dt, t)
 
 	UIWidgetUtils.animate_default_icon_tabs(item_tabs, dt)
 
-	local tab_index_hovered = self._is_inventory_tab_hovered(self)
+	local tab_index_hovered = self:_is_inventory_tab_hovered()
 
 	if tab_index_hovered then
-		self._play_sound(self, "play_gui_inventory_tab_hover")
+		self:_play_sound("play_gui_inventory_tab_hover")
 	end
 
-	local tab_index_pressed = self._is_inventory_tab_pressed(self)
+	local tab_index_pressed = self:_is_inventory_tab_pressed()
 
 	if tab_index_pressed and tab_index_pressed ~= self._selected_cosmetic_slot_index then
-		parent.set_selected_cosmetic_slot_index(parent, tab_index_pressed)
-		self._play_sound(self, "play_gui_inventory_tab_click")
+		parent:set_selected_cosmetic_slot_index(tab_index_pressed)
+		self:_play_sound("play_gui_inventory_tab_click")
 	elseif Managers.input:is_device_active("gamepad") then
 		local input_service = Managers.input:get_service("hero_view")
 		local widget = self._widgets_by_name.item_tabs
@@ -276,12 +276,12 @@ HeroWindowCosmeticsInventory._handle_input = function (self, dt, t)
 		local amount = widget_content.amount
 		local current_index = parent._selected_cosmetic_slot_index or 1
 
-		if input_service.get(input_service, "cycle_previous") and 1 < current_index then
-			parent.set_selected_cosmetic_slot_index(parent, current_index - 1)
-			self._play_sound(self, "play_gui_cosmetics_selection_click")
-		elseif input_service.get(input_service, "cycle_next") and current_index < amount then
-			parent.set_selected_cosmetic_slot_index(parent, current_index + 1)
-			self._play_sound(self, "play_gui_cosmetics_selection_click")
+		if input_service:get("cycle_previous") and 1 < current_index then
+			parent:set_selected_cosmetic_slot_index(current_index - 1)
+			self:_play_sound("play_gui_cosmetics_selection_click")
+		elseif input_service:get("cycle_next") and current_index < amount then
+			parent:set_selected_cosmetic_slot_index(current_index + 1)
+			self:_play_sound("play_gui_cosmetics_selection_click")
 		end
 	end
 
@@ -291,20 +291,20 @@ HeroWindowCosmeticsInventory._handle_input = function (self, dt, t)
 	UIWidgetUtils.animate_default_button(page_button_next, dt)
 	UIWidgetUtils.animate_default_button(page_button_previous, dt)
 
-	if self._is_button_hovered(self, page_button_next) or self._is_button_hovered(self, page_button_previous) then
-		self._play_sound(self, "play_gui_inventory_next_hover")
+	if self:_is_button_hovered(page_button_next) or self:_is_button_hovered(page_button_previous) then
+		self:_play_sound("play_gui_inventory_next_hover")
 	end
 
-	if self._is_button_pressed(self, page_button_next) then
+	if self:_is_button_pressed(page_button_next) then
 		local next_page_index = self._current_page + 1
 
-		item_grid.set_item_page(item_grid, next_page_index)
-		self._play_sound(self, "play_gui_cosmetics_inventory_next_click")
-	elseif self._is_button_pressed(self, page_button_previous) then
+		item_grid:set_item_page(next_page_index)
+		self:_play_sound("play_gui_cosmetics_inventory_next_click")
+	elseif self:_is_button_pressed(page_button_previous) then
 		local next_page_index = self._current_page - 1
 
-		item_grid.set_item_page(item_grid, next_page_index)
-		self._play_sound(self, "play_gui_cosmetics_inventory_next_click")
+		item_grid:set_item_page(next_page_index)
+		self:_play_sound("play_gui_cosmetics_inventory_next_click")
 	end
 end
 
@@ -330,7 +330,7 @@ HeroWindowCosmeticsInventory._update_selected_cosmetic_slot_index = function (se
 	if index ~= self._selected_cosmetic_slot_index then
 		self._selected_cosmetic_slot_index = index
 
-		self._change_category_by_index(self, index)
+		self:_change_category_by_index(index)
 	end
 end
 
@@ -342,7 +342,7 @@ HeroWindowCosmeticsInventory._update_loadout_sync = function (self)
 	if loadout_sync_id ~= self._loadout_sync_id then
 		self._loadout_sync_id = loadout_sync_id
 
-		item_grid.update_items_status(item_grid)
+		item_grid:update_items_status()
 	end
 end
 
@@ -384,7 +384,7 @@ HeroWindowCosmeticsInventory._play_sound = function (self, event)
 end
 
 HeroWindowCosmeticsInventory._change_category_by_index = function (self, index, force_update)
-	self._select_tab_by_category_index(self, index)
+	self:_select_tab_by_category_index(index)
 
 	if force_update then
 		index = self._current_category_index or 1

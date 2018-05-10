@@ -11,7 +11,7 @@ BTFollowPlayerAction.name = "BTFollowPlayerAction"
 BTFollowPlayerAction.enter = function (self, unit, blackboard, t)
 	local locomotion = blackboard.locomotion_extension
 
-	locomotion.enter_state_combat(locomotion, blackboard, t)
+	locomotion:enter_state_combat(blackboard, t)
 end
 
 BTFollowPlayerAction.leave = function (self, unit, blackboard, t, reason, destroy)
@@ -29,7 +29,7 @@ end
 BTFollowPlayerAction.exit_running = function (self, unit, blackboard, t)
 	local locomotion = blackboard.locomotion_extension
 
-	locomotion.enter_state_onground(locomotion, blackboard, t)
+	locomotion:enter_state_onground(blackboard, t)
 end
 
 return

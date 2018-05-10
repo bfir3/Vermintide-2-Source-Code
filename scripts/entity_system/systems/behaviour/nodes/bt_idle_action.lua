@@ -33,7 +33,7 @@ BTIdleAction.enter = function (self, unit, blackboard, t)
 	blackboard.spawn_to_running = nil
 
 	if action and action.alerted_anims and blackboard.confirmed_player_sighting then
-		network_manager.anim_event(network_manager, unit, "to_passive")
+		network_manager:anim_event(unit, "to_passive")
 
 		animation = action.alerted_anims[math.random(1, #action.alerted_anims)]
 	elseif action and action.idle_animation then
@@ -46,7 +46,7 @@ BTIdleAction.enter = function (self, unit, blackboard, t)
 			action.anim_cycle_index = index
 		end
 
-		network_manager.anim_event(network_manager, unit, "to_passive")
+		network_manager:anim_event(unit, "to_passive")
 	elseif action and action.combat_animations then
 		local anims = action.combat_animations
 		local index = action.anim_cycle_index % #anims + 1
@@ -55,7 +55,7 @@ BTIdleAction.enter = function (self, unit, blackboard, t)
 	end
 
 	if blackboard.move_state ~= "idle" or (action and action.force_idle_animation) then
-		network_manager.anim_event(network_manager, unit, animation)
+		network_manager:anim_event(unit, animation)
 
 		blackboard.move_state = "idle"
 	end
@@ -90,11 +90,11 @@ BTIdleAction._discovery_sound_when_close = function (self, unit, blackboard)
 
 		if player_unit then
 			local player = Managers.player:unit_owner(player_unit)
-			local peer_id = player.network_id(player)
+			local peer_id = player:network_id()
 			local network_manager = Managers.state.network
 			local sound_event = blackboard.action.sound_when_near_event
 			local sound_id = NetworkLookup.sound_events[sound_event]
-			local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+			local unit_id = network_manager:unit_game_object_id(unit)
 
 			network_manager.network_transmit:send_rpc("rpc_server_audio_unit_event", peer_id, sound_id, unit_id, 0)
 
@@ -112,7 +112,7 @@ BTIdleAction.run = function (self, unit, blackboard, t, dt)
 		local rot = LocomotionUtils.rotation_towards_unit_flat(unit, target_unit)
 
 		blackboard.locomotion_extension:set_wanted_rotation(rot)
-		self._discovery_sound_when_close(self, unit, blackboard)
+		self:_discovery_sound_when_close(unit, blackboard)
 	end
 
 	return "running"

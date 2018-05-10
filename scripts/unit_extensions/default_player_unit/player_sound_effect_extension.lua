@@ -47,9 +47,9 @@ PlayerSoundEffectExtension.update = function (self, unit, input, dt, context, t)
 		return
 	end
 
-	self._update_recent_hits(self, dt)
-	self._update_recent_kills(self, dt)
-	self._update_aggro_ranges(self, dt)
+	self:_update_recent_hits(dt)
+	self:_update_recent_kills(dt)
+	self:_update_aggro_ranges(dt)
 end
 
 PlayerSoundEffectExtension.destroy = function (self)
@@ -64,7 +64,7 @@ PlayerSoundEffectExtension._update_recent_hits = function (self, dt)
 	self._recent_hit_cooldown = math.max(self._recent_hit_cooldown - dt, 0)
 
 	if self._recent_hit_cooldown == 0 then
-		self._set_hit_count(self, 0)
+		self:_set_hit_count(0)
 	end
 end
 
@@ -76,7 +76,7 @@ PlayerSoundEffectExtension._update_recent_kills = function (self, dt)
 	self._recent_kill_cooldown = math.max(self._recent_kill_cooldown - dt, 0)
 
 	if self._recent_kill_cooldown == 0 then
-		self._set_kill_count(self, 0)
+		self:_set_kill_count(0)
 	end
 end
 
@@ -143,14 +143,14 @@ PlayerSoundEffectExtension.add_hit = function (self)
 	self._recent_hit_cooldown = HIT_COOLDOWN
 	local num_hits = math.min(self._num_recent_hits + 1, MAX_HITS)
 
-	self._set_hit_count(self, num_hits)
+	self:_set_hit_count(num_hits)
 end
 
 PlayerSoundEffectExtension.add_kill = function (self)
 	self._recent_kill_cooldown = KILL_COOLDOWN
 	local num_kills = math.min(self._num_recent_kills + 1, MAX_KILLS)
 
-	self._set_kill_count(self, num_kills)
+	self:_set_kill_count(num_kills)
 end
 
 PlayerSoundEffectExtension.dodge = function (self)

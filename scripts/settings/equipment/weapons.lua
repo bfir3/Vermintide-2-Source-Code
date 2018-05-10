@@ -102,7 +102,7 @@ local function add_dot(dot_template_name, hit_unit, attacker_unit, damage_source
 		buff_params.power_level = power_level
 		local buff_extension = ScriptUnit.extension(hit_unit, "buff_system")
 
-		buff_extension.add_buff(buff_extension, dot_template_name, buff_params)
+		buff_extension:add_buff(dot_template_name, buff_params)
 	end
 end
 

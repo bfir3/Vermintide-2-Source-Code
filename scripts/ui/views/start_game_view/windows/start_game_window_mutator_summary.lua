@@ -18,13 +18,13 @@ StartGameWindowMutatorSummary.on_enter = function (self, params, offset)
 		snap_pixel_positions = true
 	}
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self._animations = {}
 
-	self.create_ui_elements(self, params, offset)
+	self:create_ui_elements(params, offset)
 
 	self.previous_selected_backend_id = self.parent:get_selected_heroic_deed_backend_id()
 end
@@ -74,13 +74,13 @@ StartGameWindowMutatorSummary.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self._update_animations(self, dt)
-	self._handle_input(self, dt, t)
-	self._update_selected_item_backend_id(self)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:_handle_input(dt, t)
+	self:_update_selected_item_backend_id()
+	self:draw(dt)
 end
 
 StartGameWindowMutatorSummary.post_update = function (self, dt, t)
@@ -94,8 +94,8 @@ StartGameWindowMutatorSummary._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -131,11 +131,11 @@ StartGameWindowMutatorSummary._handle_input = function (self, dt, t)
 
 	UIWidgetUtils.animate_default_button(confirm_button, dt)
 
-	if self._is_button_hover_enter(self, confirm_button) then
-		self._play_sound(self, "play_gui_lobby_button_01_difficulty_confirm_hover")
+	if self:_is_button_hover_enter(confirm_button) then
+		self:_play_sound("play_gui_lobby_button_01_difficulty_confirm_hover")
 	end
 
-	if self._is_button_pressed(self, confirm_button) then
+	if self:_is_button_pressed(confirm_button) then
 		self.confirm_button_pressed = true
 
 		self.parent:set_layout(3)
@@ -148,7 +148,7 @@ StartGameWindowMutatorSummary._update_selected_item_backend_id = function (self)
 	if backend_id ~= self._selected_backend_id then
 		self._selected_backend_id = backend_id
 
-		self._present_item_by_backend_id(self, backend_id)
+		self:_present_item_by_backend_id(backend_id)
 	end
 end
 
@@ -162,7 +162,7 @@ StartGameWindowMutatorSummary._present_item_by_backend_id = function (self, back
 	widgets_by_name.item_presentation_bg.content.visible = true
 	widgets_by_name.game_option_placeholder.content.visible = false
 	local item_interface = Managers.backend:get_interface("items")
-	local item = item_interface.get_item_from_id(item_interface, backend_id)
+	local item = item_interface:get_item_from_id(backend_id)
 	widgets_by_name.item_presentation.content.item = item
 	local level_key = item.level_key
 	local unlocked = Managers.matchmaking:party_has_level_unlocked(level_key)

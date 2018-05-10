@@ -21,7 +21,7 @@ end
 BTVortexWanderAction.run = function (self, unit, blackboard, t, dt)
 	local vortex_data = blackboard.vortex_data
 
-	self._wander_around(self, unit, t, dt, blackboard, vortex_data)
+	self:_wander_around(unit, t, dt, blackboard, vortex_data)
 
 	return "running"
 end
@@ -32,23 +32,23 @@ BTVortexWanderAction._wander_around = function (self, unit, t, dt, blackboard, v
 	local vortex_template = vortex_data.vortex_template
 	local num_players_inside = vortex_data.num_players_inside
 	local navigation_extension = blackboard.navigation_extension
-	local is_following_path = navigation_extension.is_following_path(navigation_extension)
+	local is_following_path = navigation_extension:is_following_path()
 	blackboard.move_state = (is_following_path and "moving") or "idle"
 
 	if vortex_template.stop_and_process_player and 0 < num_players_inside and wander_state ~= "standing_still" and wander_state ~= "forced_standing_still" then
 		vortex_data.wander_state = "standing_still"
 
-		navigation_extension.stop(navigation_extension)
+		navigation_extension:stop()
 	elseif num_players_inside == 0 and vortex_data.wander_state == "standing_still" then
 		vortex_data.wander_state = "recalc_path"
 	end
 
 	if wander_state == "wandering" then
-		if navigation_extension.has_reached_destination(navigation_extension, 0.5) or vortex_data.wander_time < t then
+		if navigation_extension:has_reached_destination(0.5) or vortex_data.wander_time < t then
 			vortex_data.wander_state = "recalc_path"
 		end
 	elseif wander_state == "calculating_path" then
-		local is_computing_path = navigation_extension.is_computing_path(navigation_extension)
+		local is_computing_path = navigation_extension:is_computing_path()
 		local path_found = not blackboard.no_path_found
 
 		if not is_computing_path and (is_following_path or not path_found) then
@@ -70,7 +70,7 @@ BTVortexWanderAction._wander_around = function (self, unit, t, dt, blackboard, v
 			local random_pos = ConflictUtils.get_spawn_pos_on_circle(nav_world, position, 5, 10, 7)
 
 			if random_pos then
-				navigation_extension.move_to(navigation_extension, random_pos)
+				navigation_extension:move_to(random_pos)
 
 				vortex_data.wander_state = "calculating_path"
 			else
@@ -85,7 +85,7 @@ BTVortexWanderAction._wander_around = function (self, unit, t, dt, blackboard, v
 				local target_distance_sq = Vector3.length_squared(projected_target_position - position)
 
 				if 0.25 < target_distance_sq then
-					navigation_extension.move_to(navigation_extension, projected_target_position)
+					navigation_extension:move_to(projected_target_position)
 
 					vortex_data.wander_state = "calculating_path"
 				end

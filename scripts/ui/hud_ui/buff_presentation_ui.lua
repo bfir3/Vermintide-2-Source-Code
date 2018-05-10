@@ -10,7 +10,7 @@ BuffPresentationUI.init = function (self, ingame_ui_context)
 	local world = ingame_ui_context.world_manager:world("level_world")
 	self.wwise_world = Managers.world:wwise_world(world)
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 	rawset(_G, "buff_presentation_ui", self)
 end
 
@@ -33,12 +33,12 @@ BuffPresentationUI.destroy = function (self)
 end
 
 BuffPresentationUI.update = function (self, dt)
-	self._sync_buffs(self)
-	self._next_buff(self, dt)
+	self:_sync_buffs()
+	self:_next_buff(dt)
 
 	if self._active_buff_name then
-		self.update_animations(self, dt)
-		self.draw(self, dt)
+		self:update_animations(dt)
+		self:draw(dt)
 	end
 end
 
@@ -46,11 +46,11 @@ BuffPresentationUI.update_animations = function (self, dt)
 	local animations = self._animations
 	local ui_animator = self.ui_animator
 
-	ui_animator.update(ui_animator, dt)
+	ui_animator:update(dt)
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -96,7 +96,7 @@ BuffPresentationUI._sync_buffs = function (self)
 		table.clear(buffs_to_add)
 
 		local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-		local active_buffs = buff_extension.active_buffs(buff_extension)
+		local active_buffs = buff_extension:active_buffs()
 		local num_buffs = #active_buffs
 
 		for i = 1, num_buffs, 1 do
@@ -106,7 +106,7 @@ BuffPresentationUI._sync_buffs = function (self)
 			local handle_buff = debug_buffs or (buff_template.icon ~= nil and buff_template.priority_buff and not buffs_to_add[name] and not buffs_presented[name])
 
 			if handle_buff then
-				self._add_buff(self, buff)
+				self:_add_buff(buff)
 
 				buffs_to_add[name] = buff
 			end
@@ -125,7 +125,7 @@ BuffPresentationUI._sync_buffs = function (self)
 			end
 
 			if remove_buff then
-				self._remove_buff(self, buff_name)
+				self:_remove_buff(buff_name)
 			end
 		end
 
@@ -200,8 +200,8 @@ BuffPresentationUI._next_buff = function (self, dt)
 			local current_buff = added_buff_presentations[1]
 			self._active_buff_name = current_buff.name
 
-			self._set_buff_to_present(self, current_buff)
-			self._start_animation(self, "presentation", "presentation")
+			self:_set_buff_to_present(current_buff)
+			self:_start_animation("presentation", "presentation")
 		end
 	end
 end

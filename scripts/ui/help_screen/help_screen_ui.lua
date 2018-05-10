@@ -15,10 +15,10 @@ HelpScreenUI.init = function (self, ingame_ui_context)
 	local input_manager = ingame_ui_context.input_manager
 	self._input_manager = input_manager
 
-	input_manager.create_input_service(input_manager, "help_screen_view", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "help_screen_view", "keyboard")
-	input_manager.map_device_to_service(input_manager, "help_screen_view", "mouse")
-	input_manager.map_device_to_service(input_manager, "help_screen_view", "gamepad")
+	input_manager:create_input_service("help_screen_view", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("help_screen_view", "keyboard")
+	input_manager:map_device_to_service("help_screen_view", "mouse")
+	input_manager:map_device_to_service("help_screen_view", "gamepad")
 
 	self._input_service = self._input_manager:get_service("help_screen_view")
 	self._ingame_ui_context = ingame_ui_context
@@ -32,7 +32,7 @@ end
 HelpScreenUI._create_ui_elements = function (self)
 	self._ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph_definition)
 
-	self._set_page(self, self._current_index)
+	self:_set_page(self._current_index)
 
 	DO_RELOAD = false
 end
@@ -45,11 +45,11 @@ HelpScreenUI.update = function (self, dt)
 	end
 
 	if DO_RELOAD then
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 	end
 
-	self._update_input(self, dt)
-	self._draw(self, dt)
+	self:_update_input(dt)
+	self:_draw(dt)
 end
 
 HelpScreenUI.show_help = function (self, help_screen_name, input_service_name, on_init)
@@ -60,7 +60,7 @@ HelpScreenUI.show_help = function (self, help_screen_name, input_service_name, o
 		self._current_view = help_screen_name
 		self._current_index = 1
 
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 
 		if input_service_name then
 			Managers.input:device_block_service("gamepad", 1, input_service_name)
@@ -73,14 +73,14 @@ HelpScreenUI.show_help = function (self, help_screen_name, input_service_name, o
 		Managers.input:device_unblock_service("gamepad", 1, "help_screen_view")
 		Managers.input:device_unblock_service("keyboard", 1, "help_screen_view")
 		Managers.input:device_unblock_service("mouse", 1, "help_screen_view")
-		self._set_page(self, self._current_index)
+		self:_set_page(self._current_index)
 	else
 		Application.warning(string.format("HelpScreenUI] Help screen not available (%s)", help_screen_name))
 	end
 end
 
 HelpScreenUI.hide_help = function (self)
-	self._close_help(self)
+	self:_close_help()
 end
 
 HelpScreenUI._set_page = function (self, index)
@@ -109,17 +109,17 @@ HelpScreenUI._update_input = function (self, dt)
 	if self._input_service:get("move_left", true) then
 		self._current_index = math.max(self._current_index - 1, 1)
 
-		self._set_page(self, self._current_index)
+		self:_set_page(self._current_index)
 	elseif self._input_service:get("move_right", true) then
 		self._current_index = self._current_index + 1
 
 		if #HelpScreens[self._current_view] < self._current_index then
-			self._close_help(self)
+			self:_close_help()
 		else
-			self._set_page(self, self._current_index)
+			self:_set_page(self._current_index)
 		end
 	elseif self._input_service:get("back", true) or self._input_service:get("show_gamercard", true) then
-		self._close_help(self)
+		self:_close_help()
 	end
 end
 

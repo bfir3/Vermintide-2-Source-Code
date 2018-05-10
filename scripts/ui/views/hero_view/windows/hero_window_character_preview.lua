@@ -26,8 +26,8 @@ HeroWindowCharacterPreview.on_enter = function (self, params, offset)
 		snap_pixel_positions = true
 	}
 	local player_manager = Managers.player
-	local local_player = player_manager.local_player(player_manager)
-	self._stats_id = local_player.stats_id(local_player)
+	local local_player = player_manager:local_player()
+	self._stats_id = local_player:stats_id()
 	self.player_manager = player_manager
 	self.peer_id = ingame_ui_context.peer_id
 	self.hero_name = params.hero_name
@@ -35,7 +35,7 @@ HeroWindowCharacterPreview.on_enter = function (self, params, offset)
 	self.skin_sync_id = self.parent.skin_sync_id
 	self._animations = {}
 
-	self.create_ui_elements(self, params, offset)
+	self:create_ui_elements(params, offset)
 end
 
 HeroWindowCharacterPreview.create_ui_elements = function (self, params, offset)
@@ -119,22 +119,22 @@ HeroWindowCharacterPreview.update = function (self, dt, t)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	if self.world_previewer and self.hero_unit_spawned then
-		self._handle_input(self, dt, t)
+		self:_handle_input(dt, t)
 
 		local input_service = self.parent:window_input_service()
 
-		self._update_statistics_widget(self, input_service, dt)
+		self:_update_statistics_widget(input_service, dt)
 	end
 
-	self._update_animations(self, dt)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:draw(dt)
 
 	if self.world_previewer then
-		local statistics_activate = self._statistics_activate(self)
+		local statistics_activate = self:_statistics_activate()
 		local disable_hero_unit_input = statistics_activate
 
 		self.world_previewer:update(dt, t, disable_hero_unit_input)
@@ -147,7 +147,7 @@ HeroWindowCharacterPreview.post_update = function (self, dt, t)
 		self._fadeout_loading_overlay = true
 	end
 
-	self._update_loading_overlay_fadeout_animation(self, dt)
+	self:_update_loading_overlay_fadeout_animation(dt)
 
 	if not self.initialized and self._viewport_widget then
 		local world_previewer = MenuWorldPreviewer:new(self.ingame_ui_context, camera_position_by_character)
@@ -158,8 +158,8 @@ HeroWindowCharacterPreview.post_update = function (self, dt, t)
 
 		self.hero_unit_spawned = false
 
-		world_previewer.on_enter(world_previewer, self._viewport_widget, self.hero_name)
-		world_previewer.request_spawn_hero_unit(world_previewer, self.hero_name, self.career_index, false, callback)
+		world_previewer:on_enter(self._viewport_widget, self.hero_name)
+		world_previewer:request_spawn_hero_unit(self.hero_name, self.career_index, false, callback)
 
 		self.world_previewer = world_previewer
 		self.initialized = true
@@ -167,9 +167,9 @@ HeroWindowCharacterPreview.post_update = function (self, dt, t)
 
 	if self.world_previewer then
 		if self.hero_unit_spawned then
-			self._update_skin_sync(self)
-			self._update_loadout_sync(self)
-			self._update_wielded_slot(self)
+			self:_update_skin_sync()
+			self:_update_loadout_sync()
+			self:_update_wielded_slot()
 		end
 
 		self.world_previewer:post_update(dt, t)
@@ -198,7 +198,7 @@ HeroWindowCharacterPreview.respawn_hero = function (self)
 		self:_update_wielded_slot()
 	end
 
-	world_previewer.respawn_hero_unit(world_previewer, self.hero_name, self.career_index, false, callback)
+	world_previewer:respawn_hero_unit(self.hero_name, self.career_index, false, callback)
 end
 
 HeroWindowCharacterPreview._update_animations = function (self, dt)
@@ -208,8 +208,8 @@ HeroWindowCharacterPreview._update_animations = function (self, dt)
 	local ui_animator = self.ui_animator
 
 	for animation_name, animation_id in pairs(animations) do
-		if ui_animator.is_animation_completed(ui_animator, animation_id) then
-			ui_animator.stop_animation(ui_animator, animation_id)
+		if ui_animator:is_animation_completed(animation_id) then
+			ui_animator:stop_animation(animation_id)
 
 			animations[animation_name] = nil
 		end
@@ -223,11 +223,11 @@ HeroWindowCharacterPreview._update_loadout_sync = function (self)
 	local loadout_sync_id = parent.loadout_sync_id
 
 	if loadout_sync_id ~= self._loadout_sync_id then
-		self._populate_loadout(self)
+		self:_populate_loadout()
 
 		self._loadout_sync_id = loadout_sync_id
 
-		self._sync_statistics(self)
+		self:_sync_statistics()
 	end
 end
 
@@ -236,7 +236,7 @@ HeroWindowCharacterPreview._update_skin_sync = function (self)
 	local parent_skin_sync_id = parent.skin_sync_id
 
 	if parent_skin_sync_id ~= self.skin_sync_id then
-		self.respawn_hero(self)
+		self:respawn_hero()
 
 		self.skin_sync_id = parent_skin_sync_id
 	end
@@ -244,7 +244,7 @@ end
 
 HeroWindowCharacterPreview._update_wielded_slot = function (self)
 	local parent = self.parent
-	local selected_loadout_slot_index = parent.get_selected_loadout_slot_index(parent)
+	local selected_loadout_slot_index = parent:get_selected_loadout_slot_index()
 
 	if selected_loadout_slot_index ~= self._selected_loadout_slot_index then
 		local slots = InventorySettings.slots_by_slot_index
@@ -287,12 +287,12 @@ HeroWindowCharacterPreview._populate_loadout = function (self)
 			local item_data = item.data
 			local item_name = item_data.name
 			local item_slot_type = slot.type
-			local current_item_name = world_previewer.item_name_by_slot_type(world_previewer, item_slot_type)
+			local current_item_name = world_previewer:item_name_by_slot_type(item_slot_type)
 
 			if item_name ~= current_item_name or item_slot_type == "melee" or item_slot_type == "ranged" then
 				local backend_id = item.backend_id
 
-				world_previewer.equip_item(world_previewer, item_name, slot, backend_id)
+				world_previewer:equip_item(item_name, slot, backend_id)
 			end
 		end
 	end
@@ -329,8 +329,8 @@ HeroWindowCharacterPreview._handle_input = function (self, dt, t)
 	local widgets_by_name = self._widgets_by_name
 	local detailed_widget = widgets_by_name.detailed
 
-	if self._is_button_pressed(self, detailed_widget) then
-		self._handle_statistics_pressed(self)
+	if self:_is_button_pressed(detailed_widget) then
+		self:_handle_statistics_pressed()
 	end
 end
 
@@ -401,9 +401,9 @@ HeroWindowCharacterPreview._handle_statistics_pressed = function (self)
 	local widget = widgets_by_name.detailed
 
 	if widget.content.active then
-		self._deactivate_statistics(self)
+		self:_deactivate_statistics()
 	else
-		self._activate_statistics(self, widget)
+		self:_activate_statistics(widget)
 	end
 end
 
@@ -429,18 +429,18 @@ HeroWindowCharacterPreview._activate_statistics = function (self)
 	local drop_down_arrow = widget.style.drop_down_arrow
 	drop_down_arrow.angle = math.pi
 
-	self._sync_statistics(self)
+	self:_sync_statistics()
 end
 
 HeroWindowCharacterPreview._sync_statistics = function (self)
-	if not self._statistics_activate(self) then
+	if not self:_statistics_activate() then
 		return
 	end
 
 	local template = HeroStatisticsTemplate
 	local layout = UIUtils.get_hero_statistics_by_template(template)
 
-	self._populate_statistics(self, layout)
+	self:_populate_statistics(layout)
 end
 
 HeroWindowCharacterPreview._deactivate_statistics = function (self)
@@ -513,7 +513,7 @@ HeroWindowCharacterPreview._populate_statistics = function (self, layout)
 
 	style.num_draws = num_entries
 
-	self._setup_tab_scrollbar(self, widget)
+	self:_setup_tab_scrollbar(widget)
 end
 
 HeroWindowCharacterPreview._setup_tab_scrollbar = function (self, widget)

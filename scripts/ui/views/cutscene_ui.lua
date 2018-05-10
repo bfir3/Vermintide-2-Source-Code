@@ -11,10 +11,10 @@ CutsceneUI.init = function (self, ingame_ui_context, cutscene_system)
 	local input_manager = ingame_ui_context.input_manager
 	self.input_manager = input_manager
 
-	input_manager.create_input_service(input_manager, "cutscene", "CutsceneKeymaps", "CutsceneFilters")
-	input_manager.map_device_to_service(input_manager, "cutscene", "keyboard")
-	input_manager.map_device_to_service(input_manager, "cutscene", "mouse")
-	input_manager.map_device_to_service(input_manager, "cutscene", "gamepad")
+	input_manager:create_input_service("cutscene", "CutsceneKeymaps", "CutsceneFilters")
+	input_manager:map_device_to_service("cutscene", "keyboard")
+	input_manager:map_device_to_service("cutscene", "mouse")
+	input_manager:map_device_to_service("cutscene", "gamepad")
 
 	self.ui_scenegraph = UISceneGraph.init_scenegraph(definitions.scenegraph)
 	self.letterbox_widget = UIWidget.init(definitions.widgets.letterbox)
@@ -40,7 +40,7 @@ CutsceneUI.destroy = function (self)
 end
 
 CutsceneUI.update = function (self, dt)
-	self.check_for_fade(self)
+	self:check_for_fade()
 
 	for name, ui_animation in pairs(self.ui_animations) do
 		UIAnimation.update(ui_animation, dt)
@@ -49,7 +49,7 @@ CutsceneUI.update = function (self, dt)
 			self.ui_animations[name] = nil
 
 			if name == "logo_fade_out" then
-				self.on_fade_out_complete(self)
+				self:on_fade_out_complete()
 			end
 		end
 	end
@@ -58,24 +58,24 @@ CutsceneUI.update = function (self, dt)
 	local queue = cutscene_system.ui_event_queue
 
 	if not array.empty(queue) then
-		self.handle_event_queue(self, queue)
+		self:handle_event_queue(queue)
 		array.set_empty(queue)
 	end
 
 	if cutscene_system.active_camera then
 		local input_service = self.input_manager:get_service("cutscene")
 
-		if input_service.get(input_service, "skip_cutscene") or LEVEL_EDITOR_TEST then
-			cutscene_system.skip_pressed(cutscene_system)
+		if input_service:get("skip_cutscene") or LEVEL_EDITOR_TEST then
+			cutscene_system:skip_pressed()
 		end
 	end
 
-	if self.do_draw(self) then
-		self.prepare_draw(self)
-		self.draw(self, dt)
+	if self:do_draw() then
+		self:prepare_draw()
+		self:draw(dt)
 	end
 
-	self.draw_game_logo_widget(self, dt)
+	self:draw_game_logo_widget(dt)
 end
 
 CutsceneUI.do_draw = function (self)
@@ -183,25 +183,25 @@ CutsceneUI.set_player_input_enabled = function (self, enabled)
 
 	if enabled then
 		if Managers.chat:chat_is_focused() then
-			input_manager.block_device_except_service(input_manager, "chat_input", "keyboard")
-			input_manager.block_device_except_service(input_manager, "chat_input", "mouse")
-			input_manager.block_device_except_service(input_manager, "chat_input", "gamepad")
+			input_manager:block_device_except_service("chat_input", "keyboard")
+			input_manager:block_device_except_service("chat_input", "mouse")
+			input_manager:block_device_except_service("chat_input", "gamepad")
 		else
-			input_manager.device_unblock_all_services(input_manager, "keyboard")
-			input_manager.device_unblock_all_services(input_manager, "mouse")
-			input_manager.device_unblock_all_services(input_manager, "gamepad")
+			input_manager:device_unblock_all_services("keyboard")
+			input_manager:device_unblock_all_services("mouse")
+			input_manager:device_unblock_all_services("gamepad")
 		end
 	else
 		self.ingame_ui:handle_transition("close_active")
 
 		if Managers.chat:chat_is_focused() then
-			input_manager.block_device_except_service(input_manager, "chat_input", "keyboard")
-			input_manager.block_device_except_service(input_manager, "chat_input", "mouse")
-			input_manager.block_device_except_service(input_manager, "chat_input", "gamepad")
+			input_manager:block_device_except_service("chat_input", "keyboard")
+			input_manager:block_device_except_service("chat_input", "mouse")
+			input_manager:block_device_except_service("chat_input", "gamepad")
 		else
-			input_manager.block_device_except_service(input_manager, "cutscene", "keyboard")
-			input_manager.block_device_except_service(input_manager, "cutscene", "mouse")
-			input_manager.block_device_except_service(input_manager, "cutscene", "gamepad")
+			input_manager:block_device_except_service("cutscene", "keyboard")
+			input_manager:block_device_except_service("cutscene", "mouse")
+			input_manager:block_device_except_service("cutscene", "gamepad")
 		end
 	end
 end
@@ -286,13 +286,13 @@ CutsceneUI.check_for_fade = function (self)
 			cutscene_system.fade_in_game_logo = nil
 			cutscene_system.fade_in_game_logo_time = nil
 
-			self.fade_in_logo(self, fade_time)
+			self:fade_in_logo(fade_time)
 		elseif cutscene_system.fade_out_game_logo_time then
 			local fade_time = cutscene_system.fade_out_game_logo_time
 			cutscene_system.fade_out_game_logo = nil
 			cutscene_system.fade_out_game_logo_time = nil
 
-			self.fade_out_logo(self, fade_time)
+			self:fade_out_logo(fade_time)
 		end
 	end
 end

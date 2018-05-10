@@ -36,8 +36,8 @@ ContextAwarePingExtension.update = function (self, unit, input, dt, context, t)
 			pinged_unit = unit
 		else
 			local first_person_extension = self.first_person_extension
-			local camera_position = first_person_extension.current_position(first_person_extension)
-			local camera_rotation = first_person_extension.current_rotation(first_person_extension)
+			local camera_position = first_person_extension:current_position()
+			local camera_rotation = first_person_extension:current_rotation()
 			local camera_forward = Quaternion.forward(camera_rotation)
 			local hits, hits_n = self._physics_world:immediate_raycast(camera_position, camera_forward, PING_RANGE, "all", "collision_filter", "filter_ray_ping")
 
@@ -53,11 +53,11 @@ ContextAwarePingExtension.update = function (self, unit, input, dt, context, t)
 							local health_ext = ScriptUnit.has_extension(hit_unit, "health_system")
 							local status_ext = ScriptUnit.has_extension(hit_unit, "status_system")
 							local is_pickup = ScriptUnit.has_extension(hit_unit, "pickup_system")
-							local is_alive = health_ext and health_ext.is_alive(health_ext)
+							local is_alive = health_ext and health_ext:is_alive()
 							local is_skaven = Unit.get_data(hit_unit, "breed") ~= nil
-							local is_incapacitated_player = status_ext and status_ext.is_disabled(status_ext)
+							local is_incapacitated_player = status_ext and status_ext:is_disabled()
 
-							if (is_pickup or (is_alive and is_skaven) or (is_alive and is_incapacitated_player)) and not darkness_system.is_in_darkness(darkness_system, hit[INDEX_POSITION]) then
+							if (is_pickup or (is_alive and is_skaven) or (is_alive and is_incapacitated_player)) and not darkness_system:is_in_darkness(hit[INDEX_POSITION]) then
 								pinged_unit = hit_unit
 
 								break
@@ -73,8 +73,8 @@ ContextAwarePingExtension.update = function (self, unit, input, dt, context, t)
 
 		if pinged_unit and not LEVEL_EDITOR_TEST then
 			local network_manager = Managers.state.network
-			local pinger_unit_id = network_manager.unit_game_object_id(network_manager, unit)
-			local pinged_unit_id = network_manager.unit_game_object_id(network_manager, pinged_unit)
+			local pinger_unit_id = network_manager:unit_game_object_id(unit)
+			local pinged_unit_id = network_manager:unit_game_object_id(pinged_unit)
 
 			network_manager.network_transmit:send_rpc_server("rpc_ping_unit", pinger_unit_id, pinged_unit_id)
 		end

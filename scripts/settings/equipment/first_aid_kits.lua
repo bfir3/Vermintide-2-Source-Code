@@ -18,8 +18,8 @@ weapon_template.actions = {
 			condition_func = function (attacker_unit)
 				local interactor_extension = ScriptUnit.extension(attacker_unit, "interactor_system")
 				local buff_extension = ScriptUnit.extension(attacker_unit, "buff_system")
-				local can_interact = interactor_extension.can_interact(interactor_extension, attacker_unit, "heal")
-				local trinket_prevents_healing = buff_extension.has_buff_type(buff_extension, "trait_necklace_no_healing_health_regen")
+				local can_interact = interactor_extension:can_interact(attacker_unit, "heal")
+				local trinket_prevents_healing = buff_extension:has_buff_type("trait_necklace_no_healing_health_regen")
 
 				return can_interact and not trinket_prevents_healing
 			end
@@ -69,7 +69,7 @@ weapon_template.actions = {
 			chain_condition_func = function (attacker_unit, input_extension)
 				local status_extension = ScriptUnit.extension(attacker_unit, "status_system")
 
-				return not status_extension.fatigued(status_extension)
+				return not status_extension:fatigued()
 			end
 		}
 	},
@@ -90,7 +90,7 @@ weapon_template.actions = {
 			condition_func = function (attacker_unit)
 				local interactor_extension = ScriptUnit.extension(attacker_unit, "interactor_system")
 
-				return interactor_extension and interactor_extension.can_interact(interactor_extension, nil, "heal")
+				return interactor_extension and interactor_extension:can_interact(nil, "heal")
 			end
 		}
 	},
@@ -116,7 +116,7 @@ weapon_template.actions = {
 			condition_func = function (attacker_unit)
 				local interactor_extension = ScriptUnit.extension(attacker_unit, "interactor_system")
 
-				return interactor_extension and interactor_extension.can_interact(interactor_extension, attacker_unit, "heal")
+				return interactor_extension and interactor_extension:can_interact(attacker_unit, "heal")
 			end
 		}
 	},
@@ -142,7 +142,7 @@ weapon_template.actions = {
 			condition_func = function (attacker_unit)
 				local interactor_extension = ScriptUnit.extension(attacker_unit, "interactor_system")
 
-				return interactor_extension and interactor_extension.can_interact(interactor_extension, nil, "heal")
+				return interactor_extension and interactor_extension:can_interact(nil, "heal")
 			end
 		}
 	},

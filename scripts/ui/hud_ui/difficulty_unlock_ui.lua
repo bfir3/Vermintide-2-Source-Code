@@ -17,8 +17,8 @@ DifficultyUnlockUI.init = function (self, ingame_ui_context)
 	self.statistics_db = ingame_ui_context.statistics_db
 	self.ui_animations = {}
 
-	self.create_ui_elements(self)
-	self.difficulty_set(self)
+	self:create_ui_elements()
+	self:difficulty_set()
 	Managers.state.event:register(self, "difficulty_synced", "difficulty_set")
 	rawset(_G, "difficulty_unlock_ui", self)
 end
@@ -50,7 +50,7 @@ end
 DifficultyUnlockUI.difficulty_set = function (self)
 	local statistics_db = self.statistics_db
 	local player = Managers.player:local_player()
-	local player_stats_id = player.stats_id(player)
+	local player_stats_id = player:stats_id()
 	local level_key = Managers.state.game_mode:level_key()
 	local level_settings = LevelSettings[level_key]
 	local level_difficulties = self.difficulty_manager:get_level_difficulties(level_key)
@@ -106,7 +106,7 @@ end
 DifficultyUnlockUI.destroy = function (self)
 	self.ui_animator = nil
 
-	self.set_visible(self, false)
+	self:set_visible(false)
 	rawset(_G, "difficulty_unlock_ui", nil)
 end
 
@@ -153,7 +153,7 @@ DifficultyUnlockUI._update_start_timer = function (self, dt)
 		local end_time = 10
 
 		if time == end_time then
-			self.display_unlock(self, nil, self.display_presentation_difficulty)
+			self:display_unlock(nil, self.display_presentation_difficulty)
 
 			self.display_presentation_difficulty = nil
 			time = nil
@@ -169,14 +169,14 @@ DifficultyUnlockUI.update = function (self, dt, mission_data)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	if self.next_presentation_wave then
-		self._check_for_presentation_start(self, mission_data)
+		self:_check_for_presentation_start(mission_data)
 	end
 
-	self._update_start_timer(self, dt)
+	self:_update_start_timer(dt)
 
 	if not self.is_visible or not self.draw_widgets then
 		return
@@ -199,17 +199,17 @@ DifficultyUnlockUI.update = function (self, dt, mission_data)
 
 	local ui_animator = self.ui_animator
 
-	ui_animator.update(ui_animator, dt)
+	ui_animator:update(dt)
 
 	local presentation_anim_id = self.presentation_anim_id
 
 	if presentation_anim_id then
-		if ui_animator.is_animation_completed(ui_animator, presentation_anim_id) then
-			ui_animator.stop_animation(ui_animator, presentation_anim_id)
+		if ui_animator:is_animation_completed(presentation_anim_id) then
+			ui_animator:stop_animation(presentation_anim_id)
 
 			self.presentation_anim_id = nil
 
-			self.start_explode_animation(self)
+			self:start_explode_animation()
 		end
 
 		is_dirty = true
@@ -218,12 +218,12 @@ DifficultyUnlockUI.update = function (self, dt, mission_data)
 	local explode_anim_id = self.explode_anim_id
 
 	if explode_anim_id then
-		if ui_animator.is_animation_completed(ui_animator, explode_anim_id) then
-			ui_animator.stop_animation(ui_animator, explode_anim_id)
+		if ui_animator:is_animation_completed(explode_anim_id) then
+			ui_animator:stop_animation(explode_anim_id)
 
 			self.explode_anim_id = nil
 
-			self.on_presentation_complete(self)
+			self:on_presentation_complete()
 		end
 
 		is_dirty = true
@@ -247,7 +247,7 @@ DifficultyUnlockUI.update = function (self, dt, mission_data)
 		end
 	end
 
-	self.draw(self, dt)
+	self:draw(dt)
 end
 
 DifficultyUnlockUI.draw = function (self, dt)
@@ -283,7 +283,7 @@ end
 DifficultyUnlockUI.set_difficulty_amount = function (self, amount)
 	self.icon_draw_count = amount
 
-	self.align_icon_widgets(self)
+	self:align_icon_widgets()
 end
 
 DifficultyUnlockUI.display_unlock = function (self, level_key, difficulty)
@@ -292,8 +292,8 @@ DifficultyUnlockUI.display_unlock = function (self, level_key, difficulty)
 	local display_name = difficulty_settings.display_name
 	self.difficulty_text_widget.content.text = display_name
 
-	self.set_difficulty_amount(self, rank)
-	self.start_presentation_animation(self)
+	self:set_difficulty_amount(rank)
+	self:start_presentation_animation()
 
 	self.draw_widgets = true
 end

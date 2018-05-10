@@ -26,8 +26,8 @@ BTRatlingGunnerMoveToShootAction.enter = function (self, unit, blackboard, t)
 	local move_speed = action.move_speed
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, move_speed)
-	navigation_extension.stop(navigation_extension)
+	navigation_extension:set_max_speed(move_speed)
+	navigation_extension:stop()
 
 	blackboard.move_pos = nil
 
@@ -46,7 +46,7 @@ BTRatlingGunnerMoveToShootAction.leave = function (self, unit, blackboard, t, re
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 end
 
 BTRatlingGunnerMoveToShootAction.run = function (self, unit, blackboard, t, dt)
@@ -59,12 +59,12 @@ BTRatlingGunnerMoveToShootAction.run = function (self, unit, blackboard, t, dt)
 	local move_pos = blackboard.move_pos
 
 	if not move_pos then
-		local position = self.calculate_move_position(self, unit, blackboard)
+		local position = self:calculate_move_position(unit, blackboard)
 		blackboard.move_attempts = blackboard.move_attempts or 0
 		blackboard.move_attempts = blackboard.move_attempts + 1
 
 		if position then
-			self.move_to(self, position, unit, blackboard)
+			self:move_to(position, unit, blackboard)
 		elseif 5 < blackboard.move_attempts then
 			return "failed"
 		end
@@ -91,8 +91,8 @@ BTRatlingGunnerMoveToShootAction.run = function (self, unit, blackboard, t, dt)
 		local move_animation = action.move_anim
 		local network_manager = Managers.state.network
 
-		network_manager.anim_event(network_manager, unit, "to_combat")
-		network_manager.anim_event(network_manager, unit, move_animation)
+		network_manager:anim_event(unit, "to_combat")
+		network_manager:anim_event(unit, move_animation)
 
 		blackboard.move_state = "moving"
 	end
@@ -103,7 +103,7 @@ end
 BTRatlingGunnerMoveToShootAction.move_to = function (self, position, unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.move_to(navigation_extension, position)
+	navigation_extension:move_to(position)
 
 	blackboard.move_pos = Vector3Box(position)
 end

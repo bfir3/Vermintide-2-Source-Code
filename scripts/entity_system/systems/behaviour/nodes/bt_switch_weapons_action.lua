@@ -17,7 +17,7 @@ BTSwitchWeaponsAction.enter = function (self, unit, blackboard, t)
 	local ai_inventory_ext = ScriptUnit.has_extension(unit, "ai_inventory_system")
 	local wanted_set = blackboard.switching_weapons
 
-	ai_inventory_ext.wield_item_set(ai_inventory_ext, wanted_set)
+	ai_inventory_ext:wield_item_set(wanted_set)
 
 	blackboard.inventory_item_set = wanted_set
 	blackboard.switching_done_time = t + 0.75

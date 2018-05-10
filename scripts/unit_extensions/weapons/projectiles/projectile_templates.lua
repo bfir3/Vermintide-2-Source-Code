@@ -70,7 +70,7 @@ ProjectileTemplates.impact_templates = {
 				local ai_base_extension = ScriptUnit.has_extension(owner_unit, "ai_system")
 
 				if ai_base_extension then
-					local blackboard = ai_base_extension.blackboard(ai_base_extension)
+					local blackboard = ai_base_extension:blackboard()
 					blackboard.explosion_impact = true
 				end
 
@@ -96,7 +96,7 @@ ProjectileTemplates.impact_templates = {
 					local event_data = FrameTable.alloc_table()
 					event_data.num_units = players_inside
 
-					dialogue_input.trigger_dialogue_event(dialogue_input, "pwg_projectile_hit", event_data)
+					dialogue_input:trigger_dialogue_event("pwg_projectile_hit", event_data)
 				end
 
 				return true

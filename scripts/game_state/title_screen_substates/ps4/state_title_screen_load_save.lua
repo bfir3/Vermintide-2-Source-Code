@@ -20,7 +20,7 @@ StateTitleScreenLoadSave.on_enter = function (self, params)
 	local online_id = Managers.account:online_id()
 
 	self._title_start_ui:set_user_name(online_id or "FAILED TO RETRIEVE ONLINE ID")
-	self._setup_input(self)
+	self:_setup_input()
 end
 
 StateTitleScreenLoadSave._setup_input = function (self)
@@ -31,7 +31,7 @@ end
 StateTitleScreenLoadSave.update = function (self, dt, t)
 	local title_start_ui = self._title_start_ui
 
-	title_start_ui.update(title_start_ui, dt, t)
+	title_start_ui:update(dt, t)
 
 	if self._error_popup then
 		local result = Managers.popup:query_result(self._error_popup)
@@ -52,7 +52,7 @@ StateTitleScreenLoadSave.update = function (self, dt, t)
 			local has_access = Managers.account:has_access("network_availability")
 
 			if error_code then
-				self._show_error(self, error_code)
+				self:_show_error(error_code)
 			elseif not has_access then
 				self._error_popup = Managers.popup:queue_popup(Localize("popup_ps4_network_not_available"), Localize("popup_error_topic"), "ok", Localize("popup_choice_ok"))
 			else
@@ -67,9 +67,9 @@ StateTitleScreenLoadSave.update = function (self, dt, t)
 			local has_access = Managers.account:has_access("playstation_plus")
 
 			if error_code then
-				self._show_error(self, error_code)
+				self:_show_error(error_code)
 			elseif not has_access then
-				self._setup_playstation_plus_dialog(self)
+				self:_setup_playstation_plus_dialog()
 			else
 				self._state = "parental_control_access"
 
@@ -94,7 +94,7 @@ StateTitleScreenLoadSave.update = function (self, dt, t)
 				self._title_start_ui:set_information_text(Localize("loading_verifying_parental_control"))
 			else
 				Managers.transition:hide_loading_icon()
-				title_start_ui.set_start_pressed(title_start_ui, false)
+				title_start_ui:set_start_pressed(false)
 
 				self._state = "none"
 				self._new_state = StateTitleScreenMain
@@ -107,18 +107,18 @@ StateTitleScreenLoadSave.update = function (self, dt, t)
 			local error_code = Managers.account:has_error("chat")
 
 			if error_code then
-				self._show_error(self, error_code)
+				self:_show_error(error_code)
 			else
-				self._load_save(self)
+				self:_load_save()
 			end
 		end
 	elseif self._state == "check_popup" then
-		self._check_popup(self)
+		self:_check_popup()
 	elseif self._state == "load_save_error_popup" then
 		local result = Managers.popup:query_result(self._popup_id)
 
 		if result then
-			self._handle_popup_result(self, result)
+			self:_handle_popup_result(result)
 			Managers.popup:cancel_popup(self._popup_id)
 
 			self._popup_id = nil
@@ -129,9 +129,9 @@ StateTitleScreenLoadSave.update = function (self, dt, t)
 		end
 	elseif self._state == "signin_to_backend" then
 		self._title_start_ui:set_information_text(Localize("loading_signing_in"))
-		self._signin(self)
+		self:_signin()
 	elseif self._state == "signing_in" and Managers.backend:profiles_loaded() then
-		self._signed_in_to_backend(self, true)
+		self:_signed_in_to_backend(true)
 	end
 
 	if Managers.backend then
@@ -145,7 +145,7 @@ StateTitleScreenLoadSave.update = function (self, dt, t)
 		end
 	end
 
-	return self._next_state(self)
+	return self:_next_state()
 end
 
 StateTitleScreenLoadSave._show_error = function (self, error_code)
@@ -172,7 +172,7 @@ StateTitleScreenLoadSave._check_popup = function (self)
 		self._new_state = StateTitleScreenMainMenu
 		self._state = "none"
 	elseif result == "support_info_done" then
-		self._fetch_dlcs(self)
+		self:_fetch_dlcs()
 	elseif result then
 		fassert(false, "[StateTitleScreenLoadSave] The popup result doesn't exist (%s)", result)
 	end
@@ -275,7 +275,7 @@ StateTitleScreenLoadSave.cb_load_done = function (self, result)
 			self._popup_id = Managers.popup:queue_popup(Localize("ps4_save_error_broken"), Localize("popup_error_topic"), "delete", Localize("button_delete_save"), "back_to_title", Localize("button_back_to_title"))
 			self._state = "load_save_error_popup"
 		elseif result.sce_error_code then
-			self._show_error(self, result.sce_error_code)
+			self:_show_error(result.sce_error_code)
 		else
 			Application.warning("[StateTitleScreenLoadSave] LOAD ERROR, NO ERROR CODE FOUND!")
 
@@ -290,10 +290,10 @@ StateTitleScreenLoadSave.cb_load_done = function (self, result)
 
 		local input_service = self.input_manager:get_service("main_menu")
 
-		if input_service.get(input_service, "show_support_info") then
-			self._show_support_info(self)
+		if input_service:get("show_support_info") then
+			self:_show_support_info()
 		else
-			self._fetch_dlcs(self)
+			self:_fetch_dlcs()
 		end
 
 		if Development.parameter("network_log_spew") then
@@ -316,7 +316,7 @@ StateTitleScreenLoadSave.cb_delete_save = function (self, result)
 	end
 
 	print("[StateTitleScreenLoadSave] Save override done")
-	self._load_save(self)
+	self:_load_save()
 end
 
 StateTitleScreenLoadSave._next_state = function (self)

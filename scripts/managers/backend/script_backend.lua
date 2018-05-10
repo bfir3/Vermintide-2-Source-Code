@@ -83,7 +83,7 @@ ScriptBackend.init = function (self)
 
 	self._backend = true
 
-	self.refresh_log_level(self)
+	self:refresh_log_level()
 
 	self._dirty = true
 	self._dirty_stats = true
@@ -109,7 +109,7 @@ end
 
 ScriptBackend.update = function (self)
 	if self._commit_current_id then
-		self._check_current_commit(self)
+		self:_check_current_commit()
 	end
 
 	local result = Backend.update()
@@ -128,7 +128,7 @@ ScriptBackend._update_state = function (self)
 	local result = nil
 
 	if state ~= self._state and not allowed_changes[state] then
-		local error_data = self.check_for_errors(self)
+		local error_data = self:check_for_errors()
 
 		if error_data then
 			return error_data
@@ -161,11 +161,11 @@ ScriptBackend._update_state = function (self)
 end
 
 ScriptBackend.update_state = function (self)
-	return self._update_state(self)
+	return self:_update_state()
 end
 
 ScriptBackend.update_signin = function (self)
-	local error_data = self._update_state(self)
+	local error_data = self:_update_state()
 
 	if error_data then
 		return error_data
@@ -211,13 +211,13 @@ ScriptBackend._refresh_stats = function (self)
 end
 
 ScriptBackend.get_stats = function (self)
-	self._refresh_stats(self)
+	self:_refresh_stats()
 
 	return self._nice_stats
 end
 
 ScriptBackend.set_stats = function (self, nice_stats)
-	self._refresh_stats(self)
+	self:_refresh_stats()
 
 	local new_stats = table.clone(nice_stats)
 
@@ -239,7 +239,7 @@ ScriptBackend.set_stats = function (self, nice_stats)
 		ScriptApplication.send_to_crashify("ScriptBackend", "Tried to set unregistered stat %s, value: %s", tostring(stat_name), tostring(stat_value))
 	end
 
-	self.commit(self)
+	self:commit()
 
 	self._dirty_stats = true
 end
@@ -266,7 +266,7 @@ ScriptBackend._new_id = function (self)
 end
 
 ScriptBackend._check_current_commit = function (self)
-	local status = self.commit_status(self, self._commit_current_id)
+	local status = self:commit_status(self._commit_current_id)
 
 	if status ~= Backend.COMMIT_WAITING then
 		local commit_data = self._commits[self._commit_current_id]
@@ -277,7 +277,7 @@ ScriptBackend._check_current_commit = function (self)
 
 		if status == Backend.COMMIT_SUCCESS then
 			if self._commit_queue_id then
-				self.commit(self, true)
+				self:commit(true)
 			end
 		elseif status == Backend.COMMIT_ERROR then
 			self._commit_error = true
@@ -288,7 +288,7 @@ end
 
 ScriptBackend._commit_internal = function (self, queued_id)
 	local commit_id, result = Backend.commit()
-	local new_id = queued_id or self._new_id(self)
+	local new_id = queued_id or self:_new_id()
 	local commit_data = {
 		id = commit_id,
 		timeout = os.time() + 15,
@@ -304,7 +304,7 @@ end
 
 ScriptBackend._queue_commit = function (self)
 	if not self._commit_queue_id then
-		self._commit_queue_id = self._new_id(self)
+		self._commit_queue_id = self:_new_id()
 	end
 
 	return self._commit_queue_id
@@ -316,9 +316,9 @@ ScriptBackend.commit = function (self, internal)
 	if self._commit_current_id then
 		fassert(not internal, "Internal backend commit error, current commit exists")
 
-		return self._queue_commit(self)
+		return self:_queue_commit()
 	else
-		local new_id = self._commit_internal(self, self._commit_queue_id)
+		local new_id = self:_commit_internal(self._commit_queue_id)
 		self._commit_queue_id = nil
 
 		return new_id
@@ -354,7 +354,7 @@ ScriptBackend.commit_status = function (self, commit_id)
 		if status == Backend.COMMIT_SUCCESS then
 			local backend_items = Managers.backend:get_interface("items")
 
-			backend_items.__dirtify(backend_items)
+			backend_items:__dirtify()
 		end
 
 		commit_data.result = status
@@ -387,7 +387,7 @@ ScriptBackend.wait_for_shutdown = function (self, timeout)
 	local timeout_at = os.time() + timeout
 
 	while 0 < Backend.active_requests() or self._commit_queue_id do
-		local error = self.update(self)
+		local error = self:update()
 
 		if error or timeout_at < os.time() then
 			if error then
@@ -403,7 +403,7 @@ ScriptBackend.wait_for_shutdown = function (self, timeout)
 	print("disconnecting backend")
 	Backend.disconnect()
 
-	while not self.update(self) and 0 < Backend.active_requests() and os.time() < timeout_at do
+	while not self:update() and 0 < Backend.active_requests() and os.time() < timeout_at do
 	end
 
 	if timeout_at < os.time() then

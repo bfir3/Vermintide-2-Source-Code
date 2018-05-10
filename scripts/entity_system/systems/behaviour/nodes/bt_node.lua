@@ -58,11 +58,11 @@ BTNode.id = function (self)
 end
 
 BTNode.evaluate = function (self, unit, blackboard, t, dt)
-	if not self.condition(self, blackboard) then
+	if not self:condition(blackboard) then
 		return "failed"
 	end
 
-	return self.run(self, unit, blackboard, t, dt)
+	return self:run(unit, blackboard, t, dt)
 end
 
 BTNode.enter = function (self, unit, ai_data, t, dt)
@@ -78,7 +78,7 @@ BTNode.parent = function (self)
 end
 
 BTNode.run = function (self, unit, ai_data, t, dt)
-	error(false, "Implement in inherited class: " .. self.name(self))
+	error(false, "Implement in inherited class: " .. self:name())
 end
 
 BTNode.set_running_child = function (self, unit, blackboard, t, node, reason, destroy)
@@ -92,14 +92,14 @@ BTNode.set_running_child = function (self, unit, blackboard, t, node, reason, de
 	blackboard.running_nodes[identifier] = node
 
 	if old_node then
-		old_node.set_running_child(old_node, unit, blackboard, t, nil, reason, destroy)
-		old_node.leave(old_node, unit, blackboard, t, reason, destroy)
+		old_node:set_running_child(unit, blackboard, t, nil, reason, destroy)
+		old_node:leave(unit, blackboard, t, reason, destroy)
 	elseif self._parent ~= nil and node ~= nil then
 		self._parent:set_running_child(unit, blackboard, t, self, "aborted", destroy)
 	end
 
 	if node then
-		node.enter(node, unit, blackboard, t)
+		node:enter(unit, blackboard, t)
 	end
 end
 

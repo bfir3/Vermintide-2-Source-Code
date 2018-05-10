@@ -16,7 +16,7 @@ BTBossFollowAction.enter = function (self, unit, blackboard, t)
 	blackboard.follow_data = blackboard.follow_data or {}
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
+	network_manager:anim_event(unit, "to_combat")
 
 	if blackboard.fling_skaven_timer and blackboard.fling_skaven_timer < t then
 		blackboard.fling_skaven_timer = t + 0.5
@@ -36,7 +36,7 @@ BTBossFollowAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	local default_move_speed = AiUtils.get_default_breed_move_speed(unit, blackboard)
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_max_speed(navigation_extension, default_move_speed)
+	navigation_extension:set_max_speed(default_move_speed)
 
 	blackboard.move_animation_name = nil
 	blackboard.is_turning = nil
@@ -52,7 +52,7 @@ end
 BTBossFollowAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion_extension = blackboard.locomotion_extension
 
-	self.follow(self, unit, t, dt, blackboard, locomotion_extension)
+	self:follow(unit, t, dt, blackboard, locomotion_extension)
 
 	blackboard.chasing_timer = blackboard.chasing_timer + dt
 
@@ -62,8 +62,8 @@ end
 BTBossFollowAction._go_idle = function (self, unit, blackboard, navigation_extension, locomotion_extension)
 	blackboard.move_state = "idle"
 
-	if navigation_extension.is_following_path(navigation_extension) then
-		navigation_extension.stop(navigation_extension)
+	if navigation_extension:is_following_path() then
+		navigation_extension:stop()
 	end
 
 	local action = blackboard.action
@@ -75,7 +75,7 @@ BTBossFollowAction._go_idle = function (self, unit, blackboard, navigation_exten
 	if target_unit then
 		local rot = LocomotionUtils.rotation_towards_unit_flat(unit, target_unit)
 
-		locomotion_extension.set_wanted_rotation(locomotion_extension, rot)
+		locomotion_extension:set_wanted_rotation(rot)
 	end
 end
 
@@ -88,11 +88,11 @@ end
 BTBossFollowAction.follow = function (self, unit, t, dt, blackboard, locomotion_extension)
 	local navigation_extension = blackboard.navigation_extension
 
-	if 1 < navigation_extension.number_failed_move_attempts(navigation_extension) then
+	if 1 < navigation_extension:number_failed_move_attempts() then
 		blackboard.remembered_threat_pos = false
 
 		if blackboard.move_state ~= "idle" then
-			self._go_idle(self, unit, blackboard, navigation_extension, locomotion_extension)
+			self:_go_idle(unit, blackboard, navigation_extension, locomotion_extension)
 		end
 	end
 
@@ -118,10 +118,10 @@ BTBossFollowAction.follow = function (self, unit, t, dt, blackboard, locomotion_
 	if blackboard.fling_skaven_timer and blackboard.fling_skaven_timer < t then
 		blackboard.fling_skaven_timer = t + 0.5
 
-		self.check_fling_skaven(self, unit, blackboard, t)
+		self:check_fling_skaven(unit, blackboard, t)
 	end
 
-	local destination = navigation_extension.destination(navigation_extension)
+	local destination = navigation_extension:destination()
 	local to_vec = destination - POSITION_LOOKUP[unit]
 
 	Vector3.set_z(to_vec, 0)
@@ -129,19 +129,19 @@ BTBossFollowAction.follow = function (self, unit, t, dt, blackboard, locomotion_
 	local distance_sq = Vector3.length_squared(to_vec)
 
 	if action.override_move_speed then
-		navigation_extension.set_max_speed(navigation_extension, action.override_move_speed)
+		navigation_extension:set_max_speed(action.override_move_speed)
 	elseif distance_sq < 1 then
-		navigation_extension.set_max_speed(navigation_extension, breed.walk_speed)
+		navigation_extension:set_max_speed(breed.walk_speed)
 	elseif 4 < distance_sq then
-		navigation_extension.set_max_speed(navigation_extension, breed.run_speed)
+		navigation_extension:set_max_speed(breed.run_speed)
 	end
 
-	local is_following_path = navigation_extension.is_following_path(navigation_extension)
+	local is_following_path = navigation_extension:is_following_path()
 
 	if blackboard.move_state ~= "moving" and is_following_path and 0.25 < distance_sq then
-		self._go_moving(self, unit, blackboard, action)
+		self:_go_moving(unit, blackboard, action)
 	elseif blackboard.move_state ~= "idle" and (not is_following_path or distance_sq < 0.04000000000000001) then
-		self._go_idle(self, unit, blackboard, navigation_extension, locomotion_extension)
+		self:_go_idle(unit, blackboard, navigation_extension, locomotion_extension)
 	end
 
 	local can_rotate = not blackboard.animation_rotation_lock
@@ -150,9 +150,9 @@ BTBossFollowAction.follow = function (self, unit, t, dt, blackboard, locomotion_
 		if blackboard.target_outside_navmesh then
 			local rot = LocomotionUtils.rotation_towards_unit_flat(unit, blackboard.target_unit)
 
-			locomotion_extension.set_wanted_rotation(locomotion_extension, rot)
+			locomotion_extension:set_wanted_rotation(rot)
 		else
-			locomotion_extension.set_wanted_rotation(locomotion_extension, nil)
+			locomotion_extension:set_wanted_rotation(nil)
 		end
 	end
 end
@@ -197,7 +197,7 @@ BTBossFollowAction._follow_target_stormfiend = function (self, unit, blackboard,
 	local check_distance = data.check_distance
 	local target_distance = blackboard.target_dist
 	local navigation_extension = blackboard.navigation_extension
-	local at_goal = navigation_extension.has_reached_destination(navigation_extension, 0.5)
+	local at_goal = navigation_extension:has_reached_destination(0.5)
 	local position = nil
 	local unit_position = POSITION_LOOKUP[unit]
 	local target_unit = blackboard.target_unit
@@ -253,7 +253,7 @@ BTBossFollowAction._follow_target_stormfiend = function (self, unit, blackboard,
 		local distance_sq = position and Vector3.distance_squared(unit_position, position)
 
 		if position and STORMFIEND_MIN_REQUIRED_DISTANCE_CHANGE_SQ < distance_sq then
-			navigation_extension.move_to(navigation_extension, position)
+			navigation_extension:move_to(position)
 
 			follow_data.min_angle = 0
 			follow_data.min_distance = data.min_wanted_distance

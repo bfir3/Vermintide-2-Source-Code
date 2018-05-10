@@ -20,7 +20,7 @@ BTRatOgreWalkAction.enter = function (self, unit, blackboard, t)
 		patrol_goal_pos = blackboard.patrol_goal_pos:unbox()
 	else
 		blackboard.patroling = {}
-		patrol_goal_pos = self.find_patrol_goal(self, unit, blackboard, walk_distance)
+		patrol_goal_pos = self:find_patrol_goal(unit, blackboard, walk_distance)
 
 		if patrol_goal_pos then
 			blackboard.patrol_goal_pos = Vector3Box(patrol_goal_pos)
@@ -30,11 +30,11 @@ BTRatOgreWalkAction.enter = function (self, unit, blackboard, t)
 	if patrol_goal_pos then
 		local network_manager = Managers.state.network
 
-		network_manager.anim_event(network_manager, unit, "to_combat")
-		network_manager.anim_event(network_manager, unit, "walk_fwd")
+		network_manager:anim_event(unit, "to_combat")
+		network_manager:anim_event(unit, "walk_fwd")
 		blackboard.locomotion_extension:set_rotation_speed(10)
-		navigation_extension.move_to(navigation_extension, patrol_goal_pos)
-		navigation_extension.set_max_speed(navigation_extension, blackboard.breed.patrol_walk_speed)
+		navigation_extension:move_to(patrol_goal_pos)
+		navigation_extension:set_max_speed(blackboard.breed.patrol_walk_speed)
 	else
 		blackboard.ratogre_walking = false
 	end
@@ -51,7 +51,7 @@ end
 BTRatOgreWalkAction.run = function (self, unit, blackboard, t, dt)
 	local locomotion = blackboard.locomotion_extension
 
-	self.follow(self, unit, t, dt, blackboard, locomotion)
+	self:follow(unit, t, dt, blackboard, locomotion)
 
 	return "running", "evaluate"
 end
@@ -72,12 +72,12 @@ BTRatOgreWalkAction.follow = function (self, unit, t, dt, blackboard, locomotion
 	local distance = Vector3.length(to_vec)
 
 	if distance < 1 then
-		local patrol_goal_pos = self.find_patrol_goal(self, unit, blackboard, walk_distance)
+		local patrol_goal_pos = self:find_patrol_goal(unit, blackboard, walk_distance)
 		blackboard.patrol_goal_pos = Vector3Box(patrol_goal_pos)
 		local navigation_extension = blackboard.navigation_extension
 
-		navigation_extension.move_to(navigation_extension, patrol_goal_pos)
-		navigation_extension.set_max_speed(navigation_extension, blackboard.breed.patrol_walk_speed)
+		navigation_extension:move_to(patrol_goal_pos)
+		navigation_extension:set_max_speed(blackboard.breed.patrol_walk_speed)
 	end
 
 	QuickDrawer:sphere(blackboard.patrol_goal_pos:unbox(), 1.2 + math.sin(t * 7))

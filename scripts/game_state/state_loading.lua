@@ -52,14 +52,14 @@ StateLoading.on_enter = function (self, param_block)
 	self._registered_rpcs = false
 	self._loading_view_setup_is_done = false
 
-	self._setup_garbage_collection(self)
-	self._setup_world(self)
-	self._setup_input(self)
-	self._parse_loading_context(self)
-	self._create_loading_view(self)
-	self._setup_end_of_level_ui(self)
-	self._setup_first_time_ui(self)
-	self._setup_init_network_view(self)
+	self:_setup_garbage_collection()
+	self:_setup_world()
+	self:_setup_input()
+	self:_parse_loading_context()
+	self:_create_loading_view()
+	self:_setup_end_of_level_ui()
+	self:_setup_first_time_ui()
+	self:_setup_init_network_view()
 	Managers.popup:set_input_manager(self._input_manager)
 
 	if Managers.rcon ~= nil then
@@ -67,12 +67,12 @@ StateLoading.on_enter = function (self, param_block)
 	end
 
 	Managers.chat:set_input_manager(self._input_manager)
-	self._setup_level_transition(self)
-	self._setup_state_machine(self)
-	self._unmute_all_world_sounds(self)
+	self:_setup_level_transition()
+	self:_setup_state_machine()
+	self:_unmute_all_world_sounds()
 
 	local level_transition_handler = self._level_transition_handler
-	local next_level_key = level_transition_handler.get_next_level_key(level_transition_handler)
+	local next_level_key = level_transition_handler:get_next_level_key()
 
 	if self._switch_to_tutorial_backend then
 		Managers.backend:start_tutorial()
@@ -282,7 +282,7 @@ StateLoading._create_loading_view = function (self, level_key, act_progression_i
 		return
 	end
 
-	local game_difficulty = self._get_game_difficulty(self)
+	local game_difficulty = self:_get_game_difficulty()
 	local ui_context = {
 		world = self._world,
 		input_manager = self._input_manager,
@@ -303,7 +303,7 @@ StateLoading._trigger_loading_view = function (self, level_key, act_progression_
 
 	if not self._loading_music_triggered then
 		if not Development.parameter("gdc") then
-			self._wwise_event = self._trigger_sound_events(self, level_key)
+			self._wwise_event = self:_trigger_sound_events(level_key)
 
 			self._loading_view:trigger_subtitles(self._wwise_event, Managers.time:time("main"))
 		end
@@ -333,8 +333,8 @@ StateLoading.setup_loading_view = function (self, level_key)
 	if not DEDICATED_SERVER then
 		local package_manager = Managers.package
 
-		if self._ui_package_name and (package_manager.has_loaded(package_manager, self._ui_package_name, "global_loading_screens") or package_manager.is_loading(package_manager, self._ui_package_name)) then
-			package_manager.unload(package_manager, self._ui_package_name, "global_loading_screens")
+		if self._ui_package_name and (package_manager:has_loaded(self._ui_package_name, "global_loading_screens") or package_manager:is_loading(self._ui_package_name)) then
+			package_manager:unload(self._ui_package_name, "global_loading_screens")
 		end
 
 		local level_key = self._level_key
@@ -342,10 +342,10 @@ StateLoading.setup_loading_view = function (self, level_key)
 		self._ui_package_name = "resource_packages/loading_screens/" .. package_name
 		local act_progression_index = nil
 
-		if not package_manager.has_loaded(package_manager, self._ui_package_name) and not package_manager.has_loaded(package_manager, self._ui_package_name, "global_loading_screens") then
-			package_manager.load(package_manager, self._ui_package_name, "global_loading_screens", callback(self, "cb_loading_screen_loaded", self._level_key, act_progression_index), true, true)
+		if not package_manager:has_loaded(self._ui_package_name) and not package_manager:has_loaded(self._ui_package_name, "global_loading_screens") then
+			package_manager:load(self._ui_package_name, "global_loading_screens", callback(self, "cb_loading_screen_loaded", self._level_key, act_progression_index), true, true)
 		else
-			self.cb_loading_screen_loaded(self, self._level_key, act_progression_index, true)
+			self:cb_loading_screen_loaded(self._level_key, act_progression_index, true)
 		end
 	end
 end
@@ -358,7 +358,7 @@ StateLoading.setup_menu_assets = function (self)
 	local reference_name = "menu_assets"
 	local package_name_ingame = "resource_packages/menu_assets"
 	local package_manager = Managers.package
-	local ingame_package_loaded = package_manager.has_loaded(package_manager, package_name_ingame, reference_name) or package_manager.is_loading(package_manager, package_name_ingame, reference_name)
+	local ingame_package_loaded = package_manager:has_loaded(package_name_ingame, reference_name) or package_manager:is_loading(package_name_ingame, reference_name)
 	local load_package_path = nil
 	local package_manager = Managers.package
 
@@ -367,7 +367,7 @@ StateLoading.setup_menu_assets = function (self)
 	end
 
 	if load_package_path then
-		package_manager.load(package_manager, load_package_path, reference_name, nil, true, true)
+		package_manager:load(load_package_path, reference_name, nil, true, true)
 
 		self._ui_loading_package_reference_name = reference_name
 		self._ui_loading_package_path = load_package_path
@@ -382,21 +382,21 @@ end
 
 StateLoading.cb_loading_screen_loaded = function (self, level_key, act_progression_index, skip_fade)
 	if self._first_time_view or self._level_end_view_wrappers then
-		local game_difficulty = self._get_game_difficulty(self)
+		local game_difficulty = self:_get_game_difficulty()
 
 		self._loading_view:texture_resource_loaded(level_key, act_progression_index, game_difficulty)
 	elseif skip_fade then
-		self.cb_loading_screen_change_fade(self, level_key, act_progression_index, skip_fade)
+		self:cb_loading_screen_change_fade(level_key, act_progression_index, skip_fade)
 	else
 		Managers.transition:fade_in(3, callback(self, "cb_loading_screen_change_fade", level_key, act_progression_index))
 	end
 end
 
 StateLoading.cb_loading_screen_change_fade = function (self, level_key, act_progression_index, skip_fade)
-	local game_difficulty = self._get_game_difficulty(self)
+	local game_difficulty = self:_get_game_difficulty()
 
 	self._loading_view:texture_resource_loaded(level_key, act_progression_index, game_difficulty)
-	self._trigger_loading_view(self, level_key, act_progression_index)
+	self:_trigger_loading_view(level_key, act_progression_index)
 
 	if not skip_fade then
 		Managers.transition:fade_out(3)
@@ -444,18 +444,18 @@ end
 
 StateLoading.update = function (self, dt, t)
 	if script_data.subtitle_debug then
-		self._handle_do_reload(self)
+		self:_handle_do_reload()
 	end
 
 	Network.update_receive(dt, self._network_event_delegate.event_table)
-	self._update_network(self, dt)
+	self:_update_network(dt)
 
-	if PLATFORM == "ps4" and not self._popup_id and not self._handled_psn_client_error and self._level_transition_handler:all_packages_loaded() and self._level_transition_handler.enemy_package_loader:loading_completed() and Managers.backend:profiles_loaded() and self.global_packages_loaded(self) then
+	if PLATFORM == "ps4" and not self._popup_id and not self._handled_psn_client_error and self._level_transition_handler:all_packages_loaded() and self._level_transition_handler.enemy_package_loader:loading_completed() and Managers.backend:profiles_loaded() and self:global_packages_loaded() then
 		local psn_client_error = Managers.account:psn_client_error()
 
 		if psn_client_error then
 			printf("[StateLoading] PSN CLIENT ERROR %s", psn_client_error)
-			self.create_popup(self, "failure_psn_client_error", "popup_error_topic", "restart_as_server", "menu_accept")
+			self:create_popup("failure_psn_client_error", "popup_error_topic", "restart_as_server", "menu_accept")
 
 			self._handled_psn_client_error = true
 			self._wanted_state = StateTitleScreen
@@ -478,10 +478,10 @@ StateLoading.update = function (self, dt, t)
 	if self._level_end_view_wrappers then
 		local level_end_view_wrapper = self._level_end_view_wrappers[1]
 
-		level_end_view_wrapper.update(level_end_view_wrapper, dt, t)
+		level_end_view_wrapper:update(dt, t)
 
-		if level_end_view_wrapper.done(level_end_view_wrapper) then
-			self._tear_down_level_end_view_wrappers(self)
+		if level_end_view_wrapper:done() then
+			self:_tear_down_level_end_view_wrappers()
 		end
 	elseif self._first_time_view then
 		self._first_time_view:update(dt)
@@ -496,9 +496,9 @@ StateLoading.update = function (self, dt, t)
 		self._loading_view:update(dt)
 	end
 
-	self._update_loading_screen(self, dt, t)
+	self:_update_loading_screen(dt, t)
 	self._machine:update(dt, t)
-	self._update_lobbies(self, dt, t)
+	self:_update_lobbies(dt, t)
 
 	if Managers.matchmaking then
 		Managers.matchmaking:update(dt, t)
@@ -518,7 +518,7 @@ StateLoading.update = function (self, dt, t)
 	if self._level_end_view_wrappers then
 		local level_end_view = self._level_end_view_wrappers[1]:level_end_view()
 
-		if level_end_view.enable_chat(level_end_view) then
+		if level_end_view:enable_chat() then
 			menu_active = true
 			menu_input_service = self._level_end_view_wrappers[1]:level_end_view():active_input_service()
 		end
@@ -531,7 +531,7 @@ StateLoading.update = function (self, dt, t)
 	Managers.chat:update(dt, t, menu_active, menu_input_service)
 	Network.update_transmit(dt)
 
-	return self._try_next_state(self)
+	return self:_try_next_state()
 end
 
 StateLoading._update_network = function (self, dt)
@@ -541,10 +541,10 @@ StateLoading._update_network = function (self, dt)
 		local disconnected = self._network_server:disconnected()
 
 		if disconnected and not self._popup_id then
-			local text_id = self._get_lost_connection_text_id(self)
+			local text_id = self:_get_lost_connection_text_id()
 
-			self.create_popup(self, text_id, "popup_error_topic", "restart_as_server", "menu_accept")
-			self._destroy_lobby_host(self)
+			self:create_popup(text_id, "popup_error_topic", "restart_as_server", "menu_accept")
+			self:_destroy_lobby_host()
 			self._network_server:disconnect_all_peers("unknown_error")
 			self._network_server:destroy()
 
@@ -585,8 +585,8 @@ StateLoading._update_network = function (self, dt)
 			self._network_client = nil
 
 			if self._lobby_client then
-				self.create_popup(self, fail_reason, "popup_error_topic", "restart_as_server", "menu_accept")
-				self._destroy_lobby_client(self)
+				self:create_popup(fail_reason, "popup_error_topic", "restart_as_server", "menu_accept")
+				self:_destroy_lobby_client()
 			end
 		end
 	end
@@ -617,7 +617,7 @@ StateLoading._get_lost_connection_text_id = function (self)
 end
 
 StateLoading._update_lobbies = function (self, dt, t)
-	if not self.global_packages_loaded(self) then
+	if not self:global_packages_loaded() then
 		return
 	end
 
@@ -649,19 +649,19 @@ StateLoading._update_lobbies = function (self, dt, t)
 		local lobby_host = self._lobby_host
 		local old_state = lobby_host.state
 
-		lobby_host.update(lobby_host, dt)
+		lobby_host:update(dt)
 
 		if old_state ~= lobby_host.state and lobby_host.state == LobbyState.JOINED then
 			local lobby_host = self._lobby_host
 			local own_peer_id = Network.peer_id()
-			local host_peer_id = lobby_host.lobby_host(lobby_host)
+			local host_peer_id = lobby_host:lobby_host()
 
-			self.setup_chat_manager(self, lobby_host, host_peer_id, own_peer_id, true)
-			self.setup_deed_manager(self, lobby_host, host_peer_id, own_peer_id)
-			self.setup_enemy_package_loader(self, lobby_host, host_peer_id, own_peer_id)
+			self:setup_chat_manager(lobby_host, host_peer_id, own_peer_id, true)
+			self:setup_deed_manager(lobby_host, host_peer_id, own_peer_id)
+			self:setup_enemy_package_loader(lobby_host, host_peer_id, own_peer_id)
 
 			if not self._network_server then
-				self.host_joined(self)
+				self:host_joined()
 			end
 		elseif self._lobby_host.state == LobbyState.FAILED and not self._popup_id then
 			local text_id = nil
@@ -688,7 +688,7 @@ StateLoading._update_lobbies = function (self, dt, t)
 				text_id = "failure_start"
 			end
 
-			self._destroy_lobby_host(self)
+			self:_destroy_lobby_host()
 
 			if self._network_server then
 				self._network_server:disconnect_all_peers("unknown_error")
@@ -697,12 +697,12 @@ StateLoading._update_lobbies = function (self, dt, t)
 				self._network_server = nil
 			end
 
-			self.create_popup(self, text_id, "popup_error_topic", "restart_as_server", "menu_accept")
+			self:create_popup(text_id, "popup_error_topic", "restart_as_server", "menu_accept")
 		end
 	elseif self._lobby_finder then
-		self._update_lobby_join(self, dt, t)
+		self:_update_lobby_join(dt, t)
 	elseif self._server_lobby then
-		self._update_server_lobby_join(self, dt, t)
+		self:_update_server_lobby_join(dt, t)
 	elseif self._lobby_client then
 		self._lobby_client:update(dt)
 
@@ -725,27 +725,27 @@ StateLoading._update_lobbies = function (self, dt, t)
 				local client_network_hash = self._lobby_client.network_hash
 
 				if client_network_hash == lobby_network_hash then
-					self.setup_network_client(self, self._joined_matchmaking_lobby)
+					self:setup_network_client(self._joined_matchmaking_lobby)
 
 					local own_peer_id = Network.peer_id()
 
-					self.setup_chat_manager(self, self._lobby_client, host, own_peer_id, false)
-					self.setup_deed_manager(self, self._lobby_client, host, own_peer_id)
-					self.setup_enemy_package_loader(self, self._lobby_client, host, own_peer_id)
+					self:setup_chat_manager(self._lobby_client, host, own_peer_id, false)
+					self:setup_deed_manager(self._lobby_client, host, own_peer_id)
+					self:setup_enemy_package_loader(self._lobby_client, host, own_peer_id)
 				else
-					self._destroy_lobby_client(self)
-					self.create_popup(self, "failure_start_join_server_incorrect_hash", "popup_error_topic", "restart_as_server", "menu_accept", client_network_hash, lobby_network_hash)
+					self:_destroy_lobby_client()
+					self:create_popup("failure_start_join_server_incorrect_hash", "popup_error_topic", "restart_as_server", "menu_accept", client_network_hash, lobby_network_hash)
 				end
 			end
 		elseif self._lobby_client:failed() and not self._popup_id then
-			self._destroy_lobby_client(self)
-			self.create_popup(self, "failure_start_join_server", "popup_error_topic", "restart_as_server", "menu_accept")
+			self:_destroy_lobby_client()
+			self:create_popup("failure_start_join_server", "popup_error_topic", "restart_as_server", "menu_accept")
 			Managers.transition:fade_out(GameSettings.transition_fade_out_speed)
 		end
 	end
 
 	if PLATFORM == "xb1" and self._waiting_for_cleanup and Managers.account:all_lobbies_freed() then
-		self.setup_join_lobby(self, true)
+		self:setup_join_lobby(true)
 
 		self._waiting_for_cleanup = nil
 	end
@@ -761,7 +761,7 @@ StateLoading._destroy_lobby_client = function (self)
 
 	if self._level_end_view_wrappers then
 		for i, level_end_view_wrapper in ipairs(self._level_end_view_wrappers) do
-			level_end_view_wrapper.left_lobby(level_end_view_wrapper)
+			level_end_view_wrapper:left_lobby()
 		end
 	end
 
@@ -794,9 +794,9 @@ StateLoading._update_lobby_join = function (self, dt, t)
 	local found = false
 	local lobby_finder = self._lobby_finder
 
-	lobby_finder.update(lobby_finder, dt)
+	lobby_finder:update(dt)
 
-	local lobbies = lobby_finder.lobbies(lobby_finder)
+	local lobbies = lobby_finder:lobbies()
 
 	for i, lobby in ipairs(lobbies) do
 		local auto_join_this_lobby = false
@@ -810,7 +810,7 @@ StateLoading._update_lobby_join = function (self, dt, t)
 		end
 
 		if lobby.valid and auto_join_this_lobby then
-			self._load_level(self, lobby.level_key)
+			self:_load_level(lobby.level_key)
 
 			self._lobby_client = LobbyClient:new(self._network_options, lobby)
 			self._lobby_finder = nil
@@ -833,7 +833,7 @@ StateLoading._update_lobby_join = function (self, dt, t)
 		self._lobby_finder = nil
 		local name = self._host_to_join_name or Development.parameter("unique_server_name")
 
-		self.create_popup(self, "failure_start_join_server_timeout", "failure_find_host", "restart_as_server", "menu_accept", name)
+		self:create_popup("failure_start_join_server_timeout", "failure_find_host", "restart_as_server", "menu_accept", name)
 
 		self._wanted_state = StateTitleScreen
 	end
@@ -848,14 +848,14 @@ end
 StateLoading._update_server_lobby_join = function (self, dt, t)
 	local lobby = self._server_lobby
 
-	lobby.update(lobby, dt)
+	lobby:update(dt)
 
-	local state = lobby.state(lobby)
+	local state = lobby:state()
 
-	if lobby.is_joined(lobby) and lobby.lobby_data(lobby, "level_key") then
-		local level_key = lobby.lobby_data(lobby, "level_key")
+	if lobby:is_joined() and lobby:lobby_data("level_key") then
+		local level_key = lobby:lobby_data("level_key")
 
-		self._load_level(self, level_key)
+		self:_load_level(level_key)
 
 		self._lobby_client = lobby
 		self._server_lobby = nil
@@ -870,12 +870,12 @@ StateLoading._update_server_lobby_join = function (self, dt, t)
 		end
 
 		return
-	elseif lobby.failed(lobby) then
+	elseif lobby:failed() then
 		self._server_lobby:destroy()
 
 		self._server_lobby = nil
 
-		self.create_popup(self, "failure_start_join_server", "popup_error_topic", "restart_as_server", "menu_accept")
+		self:create_popup("failure_start_join_server", "popup_error_topic", "restart_as_server", "menu_accept")
 		Managers.transition:fade_out(GameSettings.transition_fade_out_speed)
 
 		self._wanted_state = StateTitleScreen
@@ -890,7 +890,7 @@ StateLoading._update_server_lobby_join = function (self, dt, t)
 
 		self._server_lobby = nil
 
-		self.create_popup(self, "failure_start_join_server_timeout", "failure_find_host", "restart_as_server", "menu_accept", name)
+		self:create_popup("failure_start_join_server_timeout", "failure_find_host", "restart_as_server", "menu_accept", name)
 
 		self._wanted_state = StateTitleScreen
 	end
@@ -902,7 +902,7 @@ StateLoading._update_loading_screen = function (self, dt, t)
 	if self._network_server then
 		local lobby_host = self._lobby_host
 
-		if lobby_host and lobby_host.is_joined(lobby_host) then
+		if lobby_host and lobby_host:is_joined() then
 			permission_to_go_to_next_state = true
 		end
 	elseif self._network_client and self._network_client.state == "waiting_enter_game" then
@@ -913,7 +913,7 @@ StateLoading._update_loading_screen = function (self, dt, t)
 		local peer_id = Network.peer_id()
 		local local_player_id = 1
 		local profile_synchronizer = self._network_server.profile_synchronizer
-		local profile_index = (profile_synchronizer and profile_synchronizer.profile_by_peer(profile_synchronizer, peer_id, local_player_id)) or nil
+		local profile_index = (profile_synchronizer and profile_synchronizer:profile_by_peer(peer_id, local_player_id)) or nil
 
 		if not profile_index then
 			permission_to_go_to_next_state = false
@@ -946,15 +946,15 @@ end
 
 StateLoading._try_next_state = function (self)
 	if self._popup_id then
-		self._handle_popup(self)
+		self:_handle_popup()
 	end
 
 	if self._join_popup_id then
-		self._handle_join_popup(self)
+		self:_handle_join_popup()
 	end
 
 	if self._in_post_game_popup_id and not Managers.account:leaving_game() then
-		self._handle_in_post_game_popup(self)
+		self:_handle_in_post_game_popup()
 	elseif self._in_post_game_popup_id then
 		Managers.popup:cancel_popup(self._in_post_game_popup_id)
 	end
@@ -994,8 +994,8 @@ StateLoading._try_next_state = function (self)
 		if self._first_time_view then
 			ui_done = self._first_time_view:is_done()
 
-			if ui_done and not self._popup_id and not self._packages_loaded(self) and self._level_key then
-				self._trigger_loading_view(self)
+			if ui_done and not self._popup_id and not self:_packages_loaded() and self._level_key then
+				self:_trigger_loading_view()
 				Managers.transition:show_loading_icon()
 				self._first_time_view:destroy()
 
@@ -1008,11 +1008,11 @@ StateLoading._try_next_state = function (self)
 		end
 
 		if self._level_end_view_wrappers then
-			ui_done = self._level_end_view_done(self)
+			ui_done = self:_level_end_view_done()
 		end
 
 		if Managers.backend:is_disconnected() and not self._popup_id then
-			self._backend_broken(self)
+			self:_backend_broken()
 		end
 
 		if Managers.backend:is_waiting_for_user_input() then
@@ -1025,7 +1025,7 @@ StateLoading._try_next_state = function (self)
 			eac_allowed_to_play = self._network_client:eac_allowed_to_play()
 		end
 
-		local packages_loaded = self._packages_loaded(self)
+		local packages_loaded = self:_packages_loaded()
 		local can_go_to_next_state = self._wanted_state and ui_done and eac_allowed_to_play and not self._popup_id
 
 		if can_go_to_next_state then
@@ -1095,7 +1095,7 @@ end
 StateLoading._level_end_view_done = function (self)
 	local level_end_view_wrapper = self._level_end_view_wrappers[1]
 
-	return level_end_view_wrapper.done(level_end_view_wrapper)
+	return level_end_view_wrapper:done()
 end
 
 StateLoading._handle_popup = function (self)
@@ -1197,7 +1197,7 @@ StateLoading.on_exit = function (self, application_shutdown)
 	end
 
 	if self._registered_rpcs then
-		self._unregister_rpcs(self)
+		self:_unregister_rpcs()
 	end
 
 	if self._password_request ~= nil then
@@ -1209,9 +1209,9 @@ StateLoading.on_exit = function (self, application_shutdown)
 	local skip_signin = self.parent.loading_context.skip_signin
 
 	if application_shutdown then
-		self._destroy_network(self)
+		self:_destroy_network()
 	elseif self._teardown_network then
-		self._destroy_network(self)
+		self:_destroy_network()
 	else
 		local loading_context = {
 			level_transition_handler = self._level_transition_handler,
@@ -1303,8 +1303,8 @@ StateLoading.on_exit = function (self, application_shutdown)
 
 	local package_manager = Managers.package
 
-	if self._ui_package_name and (package_manager.has_loaded(package_manager, self._ui_package_name, "global_loading_screens") or package_manager.is_loading(package_manager, self._ui_package_name)) and package_manager.can_unload(package_manager, self._ui_package_name) then
-		package_manager.unload(package_manager, self._ui_package_name, "global_loading_screens")
+	if self._ui_package_name and (package_manager:has_loaded(self._ui_package_name, "global_loading_screens") or package_manager:is_loading(self._ui_package_name)) and package_manager:can_unload(self._ui_package_name) then
+		package_manager:unload(self._ui_package_name, "global_loading_screens")
 	end
 
 	Managers.music:trigger_event("Stop_loading_screen_music")
@@ -1327,8 +1327,8 @@ StateLoading._load_global_packages = function (self)
 		local package_manager = Managers.package
 
 		for i, name in ipairs(GlobalResources) do
-			if not package_manager.has_loaded(package_manager, name) then
-				package_manager.load(package_manager, name, "global", nil, true)
+			if not package_manager:has_loaded(name) then
+				package_manager:load(name, "global", nil, true)
 			end
 		end
 
@@ -1338,13 +1338,13 @@ end
 
 StateLoading.global_packages_loaded = function (self)
 	if not GlobalResources.loaded then
-		self._load_global_packages(self)
+		self:_load_global_packages()
 	end
 
 	local package_manager = Managers.package
 
 	for i, name in ipairs(GlobalResources) do
-		if not package_manager.has_loaded(package_manager, name) then
+		if not package_manager:has_loaded(name) then
 			return false
 		end
 	end
@@ -1365,7 +1365,7 @@ StateLoading._packages_loaded = function (self)
 		local package_manager = Managers.package
 
 		for i, name in ipairs(GlobalResources) do
-			if not package_manager.has_loaded(package_manager, name) then
+			if not package_manager:has_loaded(name) then
 				return false
 			end
 		end
@@ -1374,7 +1374,7 @@ StateLoading._packages_loaded = function (self)
 			return false
 		end
 
-		if self._ui_loading_package_path and self._ui_loading_package_reference_name and not package_manager.has_loaded(package_manager, self._ui_loading_package_path, self._ui_loading_package_reference_name) then
+		if self._ui_loading_package_path and self._ui_loading_package_reference_name and not package_manager:has_loaded(self._ui_loading_package_path, self._ui_loading_package_reference_name) then
 			return false
 		end
 
@@ -1445,7 +1445,7 @@ StateLoading._destroy_network = function (self)
 
 	self.parent.loading_context = {}
 
-	self._level_transition_handler:release_level_resources(self.get_current_level_keys(self))
+	self._level_transition_handler:release_level_resources(self:get_current_level_keys())
 
 	self._level_transition_handler = nil
 
@@ -1461,23 +1461,23 @@ StateLoading._destroy_network = function (self)
 end
 
 StateLoading._load_level = function (self, level_key)
-	self._load_global_packages(self)
+	self:_load_global_packages()
 
 	local level_transition_handler = self._level_transition_handler
-	local level_key = level_key or level_transition_handler.get_next_level_key(level_transition_handler)
+	local level_key = level_key or level_transition_handler:get_next_level_key()
 
 	fassert(level_key, "No level key was set")
 
-	local loaded_level_key = level_transition_handler.get_current_level_keys(level_transition_handler)
+	local loaded_level_key = level_transition_handler:get_current_level_keys()
 
 	if level_key ~= loaded_level_key then
 		printf("[StateLoading] Need to unload %s and start load %s", tostring(loaded_level_key), level_key)
-		level_transition_handler.release_level_resources(level_transition_handler, loaded_level_key)
-		level_transition_handler.load_level(level_transition_handler, level_key)
+		level_transition_handler:release_level_resources(loaded_level_key)
+		level_transition_handler:load_level(level_key)
 	else
 		local enemy_package_loader = level_transition_handler.enemy_package_loader
 
-		enemy_package_loader.setup_startup_enemies(enemy_package_loader, level_key)
+		enemy_package_loader:setup_startup_enemies(level_key)
 	end
 end
 
@@ -1555,7 +1555,7 @@ StateLoading.register_rpcs = function (self)
 
 	if self._level_end_view_wrappers then
 		for i, level_end_view_wrapper in ipairs(self._level_end_view_wrappers) do
-			level_end_view_wrapper.register_rpcs(level_end_view_wrapper, self._network_event_delegate)
+			level_end_view_wrapper:register_rpcs(self._network_event_delegate)
 		end
 	end
 
@@ -1580,7 +1580,7 @@ StateLoading._unregister_rpcs = function (self)
 
 	if self._level_end_view_wrappers then
 		for i, level_end_view_wrapper in ipairs(self._level_end_view_wrappers) do
-			level_end_view_wrapper.unregister_rpcs(level_end_view_wrapper)
+			level_end_view_wrapper:unregister_rpcs()
 		end
 	end
 
@@ -1660,7 +1660,7 @@ StateLoading.setup_lobby_finder = function (self, lobby_joined_callback, lobby_t
 	self._lobby_finder_refresh_timer = main_time + StateLoading.join_lobby_refresh_interval
 
 	if host_to_join then
-		self.create_join_popup(self, self._host_to_join_name)
+		self:create_join_popup(self._host_to_join_name)
 	end
 end
 
@@ -1671,17 +1671,17 @@ StateLoading.setup_lobby_host = function (self, wait_for_joined_callback)
 	assert(not loading_context.network_server)
 
 	self._lobby_host = LobbyHost:new(self._network_options)
-	local level_key = self.get_next_level_key(self)
+	local level_key = self:get_next_level_key()
 
-	if not self.loading_view_setup_done(self) then
-		self.setup_loading_view(self, level_key)
+	if not self:loading_view_setup_done() then
+		self:setup_loading_view(level_key)
 	end
 
-	if not self.menu_assets_setup_done(self) then
-		self.setup_menu_assets(self)
+	if not self:menu_assets_setup_done() then
+		self:setup_menu_assets()
 	end
 
-	self._load_level(self, level_key)
+	self:_load_level(level_key)
 
 	if not wait_for_joined_callback then
 		local initial_level = self._level_transition_handler:get_current_level_keys()
@@ -1757,7 +1757,7 @@ StateLoading.setup_network_transmit = function (self, network_handler)
 	self._network_transmit = self.parent.loading_context.network_transmit or NetworkTransmit:new(true, network_handler.connection_handler)
 
 	self._network_transmit:set_network_event_delegate(self._network_event_delegate)
-	network_handler.register_rpcs(network_handler, self._network_event_delegate, self._network_transmit)
+	network_handler:register_rpcs(self._network_event_delegate, self._network_transmit)
 
 	self.parent.loading_context.network_transmit = self._network_transmit
 end
@@ -1840,7 +1840,7 @@ StateLoading.setup_network_client = function (self, clear_peer_state, lobby_clie
 		self._lobby_client = nil
 		self.parent.loading_context.lobby_client = nil
 
-		self.create_popup(self, "failure_start_join_server", "popup_error_topic", "restart_as_server", "menu_accept")
+		self:create_popup("failure_start_join_server", "popup_error_topic", "restart_as_server", "menu_accept")
 
 		return false
 	end
@@ -1884,7 +1884,7 @@ end
 StateLoading.set_lobby_host_data = function (self, level_key)
 	if self._lobby_host then
 		local lobby_host = self._lobby_host
-		local stored_lobby_host_data = lobby_host.get_stored_lobby_data(lobby_host) or {}
+		local stored_lobby_host_data = lobby_host:get_stored_lobby_data() or {}
 		stored_lobby_host_data.level_key = level_key
 		stored_lobby_host_data.matchmaking = stored_lobby_host_data.matchmaking or "true"
 
@@ -1902,7 +1902,7 @@ StateLoading.set_lobby_host_data = function (self, level_key)
 			stored_lobby_host_data.secondary_region = secondary
 		end
 
-		lobby_host.set_lobby_data(lobby_host, stored_lobby_host_data)
+		lobby_host:set_lobby_data(stored_lobby_host_data)
 	end
 end
 
@@ -1910,10 +1910,10 @@ StateLoading.start_matchmaking = function (self)
 	assert(self._lobby_host)
 
 	local lobby_host = self._lobby_host
-	local stored_lobby_host_data = lobby_host.get_stored_lobby_data(lobby_host) or {}
+	local stored_lobby_host_data = lobby_host:get_stored_lobby_data() or {}
 	stored_lobby_host_data.matchmaking = "true"
 
-	lobby_host.set_lobby_data(lobby_host, stored_lobby_host_data)
+	lobby_host:set_lobby_data(stored_lobby_host_data)
 end
 
 StateLoading.get_lobby = function (self)

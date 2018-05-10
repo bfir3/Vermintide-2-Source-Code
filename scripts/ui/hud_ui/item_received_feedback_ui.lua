@@ -48,7 +48,7 @@ ItemReceivedFeedbackUI.init = function (self, ingame_ui_context)
 		snap_pixel_positions = true
 	}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self._received_events = {}
 	self._hash_order = {}
@@ -56,7 +56,7 @@ ItemReceivedFeedbackUI.init = function (self, ingame_ui_context)
 	self._animations = {}
 	local event_manager = Managers.state.event
 
-	event_manager.register(event_manager, self, "give_item_feedback", "event_give_item_feedback")
+	event_manager:register(self, "give_item_feedback", "event_give_item_feedback")
 end
 
 ItemReceivedFeedbackUI.destroy = function (self)
@@ -64,7 +64,7 @@ ItemReceivedFeedbackUI.destroy = function (self)
 
 	local event_manager = Managers.state.event
 
-	event_manager.unregister(event_manager, "give_item_feedback", self)
+	event_manager:unregister("give_item_feedback", self)
 end
 
 ItemReceivedFeedbackUI.create_ui_elements = function (self)
@@ -99,7 +99,7 @@ ItemReceivedFeedbackUI.add_event = function (self, hash, color_from, event_type,
 		local unused_widgets = self._unused_widgets
 
 		if #unused_widgets == 0 then
-			self.remove_event(self, #events)
+			self:remove_event(#events)
 		end
 
 		local settings = event_settings[event_type]
@@ -124,7 +124,7 @@ ItemReceivedFeedbackUI.add_event = function (self, hash, color_from, event_type,
 		local style = widget.style
 		local hero_portrait_texture, item_icon = settings.icon_function(...)
 
-		self._assign_portrait_texture(self, widget, "portrait_1", hero_portrait_texture)
+		self:_assign_portrait_texture(widget, "portrait_1", hero_portrait_texture)
 
 		content.icon = item_icon
 		offset[2] = 0
@@ -170,15 +170,15 @@ ItemReceivedFeedbackUI._assign_portrait_texture = function (self, widget, pass_n
 end
 
 ItemReceivedFeedbackUI.event_give_item_feedback = function (self, hash, giver_player, item_name)
-	local player_1_name = (giver_player and giver_player.name(giver_player)) or nil
+	local player_1_name = (giver_player and giver_player:name()) or nil
 	local player_unit = giver_player and giver_player.player_unit
 	local career_extension = Unit.alive(player_unit) and ScriptUnit.extension(player_unit, "career_system")
-	local player_1_career_index = (career_extension and career_extension.career_index(career_extension)) or (giver_player and giver_player.profile_index(giver_player))
-	local player_1_profile_index = (giver_player and giver_player.profile_index(giver_player)) or nil
-	local player_1_profile_image = player_1_profile_index and player_1_career_index and self._get_hero_portrait(self, player_1_profile_index, player_1_career_index)
+	local player_1_career_index = (career_extension and career_extension:career_index()) or (giver_player and giver_player:profile_index())
+	local player_1_profile_index = (giver_player and giver_player:profile_index()) or nil
+	local player_1_profile_image = player_1_profile_index and player_1_career_index and self:_get_hero_portrait(player_1_profile_index, player_1_career_index)
 	local item_icon = item_icons[item_name] or "icons_placeholder"
 
-	self.add_event(self, hash, event_colors.default, "give_item", player_1_profile_image, item_icon)
+	self:add_event(hash, event_colors.default, "give_item", player_1_profile_image, item_icon)
 end
 
 ItemReceivedFeedbackUI._get_hero_portrait = function (self, profile_index, career_index)
@@ -227,7 +227,7 @@ ItemReceivedFeedbackUI.update = function (self, dt, t)
 		if not event.remove_time then
 			event.remove_time = t + show_duration
 		elseif event.remove_time < t then
-			self.remove_event(self, index)
+			self:remove_event(index)
 
 			removed = true
 		end

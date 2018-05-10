@@ -35,7 +35,7 @@ LoadingIconView.init = function (self, world)
 		snap_pixel_positions = true
 	}
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 
 	self._icon_fade_timer = 0
 	self._show_loading_icon = false
@@ -74,12 +74,12 @@ LoadingIconView.update = function (self, dt)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 	end
 
-	if self.active(self) then
-		self._update_loading_icon(self, dt)
-		self._draw(self, dt)
+	if self:active() then
+		self:_update_loading_icon(dt)
+		self:_draw(dt)
 	end
 end
 

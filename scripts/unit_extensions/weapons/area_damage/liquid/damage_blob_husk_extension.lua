@@ -8,7 +8,7 @@ DamageBlobHuskExtension.init = function (self, extension_init_context, unit, ext
 	self.nav_world = Managers.state.entity:system("ai_system"):nav_world()
 	self._source_unit = extension_init_data.source_unit
 	local unit_storage = Managers.state.unit_storage
-	self.go_id = unit_storage.go_id(unit_storage, unit)
+	self.go_id = unit_storage:go_id(unit)
 	self.fx_list = {}
 	self.sfx_list = {}
 	local template_name = extension_init_data.damage_blob_template_name
@@ -89,12 +89,12 @@ DamageBlobHuskExtension.update = function (self, unit, input, dt, context, t)
 	local rotation = GameSession.game_object_field(game, go_id, "rotation")
 
 	Unit.set_local_rotation(unit, 0, rotation)
-	self.update_blobs_fx_and_sfx(self, t, dt)
+	self:update_blobs_fx_and_sfx(t, dt)
 
 	local blob_update_function = self._blob_update_function
 
 	if blob_update_function then
-		local result = self._blob_update_function(self, t, dt, unit)
+		local result = self:_blob_update_function(t, dt, unit)
 
 		if not result then
 			self._blob_update_function = nil
@@ -116,13 +116,13 @@ DamageBlobHuskExtension.update_blobs_fx_and_sfx = function (self, t, dt)
 		local fx_size = fx_entry.size
 
 		if fx_size then
-			local particle_size = fx_size.unbox(fx_size)
+			local particle_size = fx_size:unbox()
 			particle_size[1] = math.min(particle_size[1] + dt * 1.5, fx_max_radius)
 			particle_size[2] = math.min(particle_size[2] + dt * 2, fx_max_height)
 			local effect_variable_id = World.find_particles_variable(world, fx_name_filled, fx_size_variable)
 
 			World.set_particles_variable(world, fx_id, effect_variable_id, particle_size)
-			fx_size.store(fx_size, particle_size)
+			fx_size:store(particle_size)
 		end
 
 		local fx_time = fx_entry.time

@@ -38,12 +38,12 @@ PlayerCharacterStateStunned.on_enter = function (self, unit, input, dt, context,
 	self.end_look_sense_override = hit_react_settings.end_look_sense_override
 	self.start_look_sense_override = hit_react_settings.start_look_sense_override
 	local duration = hit_react_settings.duration_function()
-	local duration = buff_extension.apply_buffs_to_value(buff_extension, duration, StatBuffIndex.STUN_DURATION)
+	local duration = buff_extension:apply_buffs_to_value(duration, StatBuffIndex.STUN_DURATION)
 	local onscreen_particle = hit_react_settings.onscreen_particle_function(duration)
 	local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
 
 	if first_person_extension and onscreen_particle then
-		self.onscreen_particle_id = first_person_extension.create_screen_particles(first_person_extension, onscreen_particle)
+		self.onscreen_particle_id = first_person_extension:create_screen_particles(onscreen_particle)
 	end
 
 	local move_anim_3p, move_anim_1p = CharacterStateHelper.get_move_animation(self.locomotion_extension, input_extension, status_extension)
@@ -67,14 +67,14 @@ end
 PlayerCharacterStateStunned.on_exit = function (self, unit, input, dt, context, t, next_state)
 	local input_extension = self.input_extension
 
-	if input_extension.get(input_extension, "action_one_hold") then
-		input_extension.add_stun_buffer(input_extension, "action_one_hold")
+	if input_extension:get("action_one_hold") then
+		input_extension:add_stun_buffer("action_one_hold")
 	end
 
 	local first_person_extension = ScriptUnit.has_extension(unit, "first_person_system")
 
 	if first_person_extension and self.onscreen_particle_id then
-		first_person_extension.stop_spawning_screen_particles(first_person_extension, self.onscreen_particle_id)
+		first_person_extension:stop_spawning_screen_particles(self.onscreen_particle_id)
 	end
 end
 
@@ -95,18 +95,18 @@ PlayerCharacterStateStunned.update = function (self, unit, input, dt, context, t
 	end
 
 	if CharacterStateHelper.is_ledge_hanging(world, unit, self.temp_params) then
-		csm.change_state(csm, "ledge_hanging", self.temp_params)
+		csm:change_state("ledge_hanging", self.temp_params)
 
 		return
 	end
 
 	if self.end_time < t then
-		csm.change_state(csm, "standing")
+		csm:change_state("standing")
 
 		return
 	end
 
-	self.queue_input(self, input, input_extension, inventory_extension)
+	self:queue_input(input, input_extension, inventory_extension)
 
 	local is_moving = CharacterStateHelper.has_move_input(input_extension)
 	local inventory_extension = self.inventory_extension
@@ -120,25 +120,25 @@ PlayerCharacterStateStunned.update = function (self, unit, input, dt, context, t
 		self.movement_speed = math.max(self.movement_speed_limit, self.movement_speed - movement_settings_table.move_acceleration_down * dt)
 	end
 
-	local walking = input_extension.get(input_extension, "walk")
-	local move_speed = (status_extension.is_crouching(status_extension) and movement_settings_table.crouch_move_speed) or (walking and movement_settings_table.walk_move_speed) or movement_settings_table.move_speed
-	local move_speed_multiplier = status_extension.current_move_speed_multiplier(status_extension)
+	local walking = input_extension:get("walk")
+	local move_speed = (status_extension:is_crouching() and movement_settings_table.crouch_move_speed) or (walking and movement_settings_table.walk_move_speed) or movement_settings_table.move_speed
+	local move_speed_multiplier = status_extension:current_move_speed_multiplier()
 
 	if walking ~= self.walking then
-		status_extension.set_slowed(status_extension, walking)
+		status_extension:set_slowed(walking)
 	end
 
 	move_speed = move_speed * move_speed_multiplier
 	move_speed = move_speed * movement_settings_table.player_speed_scale
 	move_speed = move_speed * self.movement_speed
 	local movement = Vector3(0, 0, 0)
-	local move_input = input_extension.get(input_extension, "move")
+	local move_input = input_extension:get("move")
 
 	if move_input then
 		movement = movement + move_input
 	end
 
-	local move_input_controller = input_extension.get(input_extension, "move_controller")
+	local move_input_controller = input_extension:get("move_controller")
 
 	if move_input_controller then
 		local controller_length = Vector3.length(move_input_controller)
@@ -187,8 +187,8 @@ PlayerCharacterStateStunned.update = function (self, unit, input, dt, context, t
 
 	self.walking = walking
 
-	if not csm.state_next and not locomotion_extension.is_on_ground(locomotion_extension) then
-		csm.change_state(csm, "falling")
+	if not csm.state_next and not locomotion_extension:is_on_ground() then
+		csm:change_state("falling")
 
 		return
 	end
@@ -210,16 +210,16 @@ PlayerCharacterStateStunned.queue_input = function (self, input, input_extension
 	local wield_input = CharacterStateHelper.wield_input(input_extension, inventory_extension, "action_wield")
 
 	if wield_input then
-		input_extension.add_buffer(input_extension, wield_input)
+		input_extension:add_buffer(wield_input)
 	end
 
-	if input_extension.get(input_extension, "action_one") then
-		input_extension.add_stun_buffer(input_extension, "action_one")
+	if input_extension:get("action_one") then
+		input_extension:add_stun_buffer("action_one")
 	end
 
 	for input, buffer in pairs(self.wield_inputs_to_buffer) do
-		if input_extension.get(input_extension, input) then
-			input_extension.add_stun_buffer(input_extension, input)
+		if input_extension:get(input) then
+			input_extension:add_stun_buffer(input)
 
 			break
 		end

@@ -18,10 +18,10 @@ PlayerHuskVisualEffectsExtension.destroy = function (self)
 end
 
 PlayerHuskVisualEffectsExtension.update = function (self, unit, input, dt, context, t)
-	local overcharge_percentage, overcharge_threshold_percentage = self._update_game_object_field(self)
+	local overcharge_percentage, overcharge_threshold_percentage = self:_update_game_object_field()
 
-	self._update_thresholds(self, overcharge_percentage, overcharge_threshold_percentage)
-	self._set_flow_values(self, overcharge_percentage)
+	self:_update_thresholds(overcharge_percentage, overcharge_threshold_percentage)
+	self:_set_flow_values(overcharge_percentage)
 end
 
 PlayerHuskVisualEffectsExtension._update_thresholds = function (self, overcharge_percentage, overcharge_threshold_percentage)
@@ -39,7 +39,7 @@ end
 PlayerHuskVisualEffectsExtension._update_game_object_field = function (self)
 	local network_manager = self.network_manager
 	local unit = self.unit
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 	local go_id = Managers.state.unit_storage:go_id(unit)
 
 	if game and go_id then

@@ -26,7 +26,7 @@ PlayerCharacterStateLeaveLedgeHangingFalling.on_enter = function (self, unit, in
 
 	self.locomotion_extension:enable_script_driven_movement()
 	self.locomotion_extension:teleport_to(position)
-	self.on_enter_animation(self)
+	self:on_enter_animation()
 end
 
 PlayerCharacterStateLeaveLedgeHangingFalling.on_exit = function (self, unit, input, dt, context, t, next_state)
@@ -45,13 +45,13 @@ PlayerCharacterStateLeaveLedgeHangingFalling.update = function (self, unit, inpu
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 
 	if CharacterStateHelper.is_dead(status_extension) then
-		csm.change_state(csm, "dead")
+		csm:change_state("dead")
 
 		return
 	end
 
 	if CharacterStateHelper.is_pounced_down(status_extension) then
-		csm.change_state(csm, "pounced_down")
+		csm:change_state("pounced_down")
 
 		return
 	end
@@ -64,22 +64,22 @@ PlayerCharacterStateLeaveLedgeHangingFalling.update = function (self, unit, inpu
 			direction = direction
 		}
 
-		csm.change_state(csm, "catapulted", params)
+		csm:change_state("catapulted", params)
 
 		return
 	end
 
 	if self.finish_time <= t then
 		if script_data.ledge_hanging_fall_and_die_turned_off then
-			csm.change_state(csm, "falling")
+			csm:change_state("falling")
 		else
 			local go_id = self.unit_storage:go_id(unit)
 
 			if self.is_server or LEVEL_EDITOR_TEST then
 				local health_system = Managers.state.entity:system("health_system")
 
-				health_system.suicide(health_system, unit)
-				csm.change_state(csm, "dead")
+				health_system:suicide(unit)
+				csm:change_state("dead")
 			else
 				self.network_transmit:send_rpc_server("rpc_suicide", go_id)
 			end
@@ -89,7 +89,7 @@ PlayerCharacterStateLeaveLedgeHangingFalling.update = function (self, unit, inpu
 	end
 
 	if self.locomotion_extension:is_colliding_down() then
-		csm.change_state(csm, "walking")
+		csm:change_state("walking")
 
 		return
 	end

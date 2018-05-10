@@ -34,13 +34,13 @@ DebugDrawer.capsule_overlap = function (self, position, size, rotation, color)
 	local from = position - offset_y
 	local to = position + offset_y
 
-	self.capsule(self, from, to, radius, color)
+	self:capsule(from, to, radius, color)
 end
 
 DebugDrawer.oobb_overlap = function (self, position, size, rotation, color)
 	local pose = Matrix4x4.from_quaternion_position(rotation, position)
 
-	self.box(self, pose, size, color)
+	self:box(pose, size, color)
 end
 
 DebugDrawer.box_sweep = function (self, pose, extents, movement_vector, color1, color2)
@@ -50,8 +50,8 @@ DebugDrawer.box_sweep = function (self, pose, extents, movement_vector, color1, 
 	local pos = Matrix4x4.translation(pose)
 	local box2_pose = Matrix4x4.from_quaternion_position(rot, pos + movement_vector)
 
-	self.box(self, pose, extents, color1)
-	self.box(self, box2_pose, extents, color1)
+	self:box(pose, extents, color1)
+	self:box(box2_pose, extents, color1)
 
 	local x_vect = Matrix4x4.right(pose)
 	local y_vect = Matrix4x4.forward(pose)
@@ -71,14 +71,14 @@ DebugDrawer.box_sweep = function (self, pose, extents, movement_vector, color1, 
 	local box1corner7 = pos + x_negative + y_negative + z_negative
 	local box1corner8 = pos + x_positive + y_negative + z_negative
 
-	self.line(self, box1corner1, box1corner1 + movement_vector, color2)
-	self.line(self, box1corner2, box1corner2 + movement_vector, color2)
-	self.line(self, box1corner3, box1corner3 + movement_vector, color2)
-	self.line(self, box1corner4, box1corner4 + movement_vector, color2)
-	self.line(self, box1corner5, box1corner5 + movement_vector, color2)
-	self.line(self, box1corner6, box1corner6 + movement_vector, color2)
-	self.line(self, box1corner7, box1corner7 + movement_vector, color2)
-	self.line(self, box1corner8, box1corner8 + movement_vector, color2)
+	self:line(box1corner1, box1corner1 + movement_vector, color2)
+	self:line(box1corner2, box1corner2 + movement_vector, color2)
+	self:line(box1corner3, box1corner3 + movement_vector, color2)
+	self:line(box1corner4, box1corner4 + movement_vector, color2)
+	self:line(box1corner5, box1corner5 + movement_vector, color2)
+	self:line(box1corner6, box1corner6 + movement_vector, color2)
+	self:line(box1corner7, box1corner7 + movement_vector, color2)
+	self:line(box1corner8, box1corner8 + movement_vector, color2)
 end
 
 DebugDrawer.capsule = function (self, from, to, radius, color)
@@ -112,14 +112,14 @@ DebugDrawer.circle = function (self, center, radius, normal, color, segments)
 end
 
 DebugDrawer.arrow_2d = function (self, from, to, color)
-	self.line(self, from, to, color)
+	self:line(from, to, color)
 
 	local vector = to - from
 	local length = Vector3.length(vector)
 	local base_axis = Vector3.cross(Vector3.normalize(vector), Vector3.up())
 
-	self.line(self, to, to - 0.2 * vector + base_axis * length * 0.2, color)
-	self.line(self, to, to - 0.2 * vector - base_axis * length * 0.2, color)
+	self:line(to, to - 0.2 * vector + base_axis * length * 0.2, color)
+	self:line(to, to - 0.2 * vector - base_axis * length * 0.2, color)
 end
 
 DebugDrawer.cylinder = function (self, pos1, pos2, radius, color, segments)
@@ -149,43 +149,43 @@ DebugDrawer.vector = function (self, position, vector, color)
 	local x, y = Vector3.make_axes(normalized)
 	local aux = tip - normalized * tip_length
 
-	self.line(self, position, tip, color)
-	self.line(self, tip, aux - x * tip_width, color)
-	self.line(self, tip, aux + x * tip_width, color)
-	self.line(self, tip, aux - y * tip_width, color)
-	self.line(self, tip, aux + y * tip_width, color)
+	self:line(position, tip, color)
+	self:line(tip, aux - x * tip_width, color)
+	self:line(tip, aux + x * tip_width, color)
+	self:line(tip, aux - y * tip_width, color)
+	self:line(tip, aux + y * tip_width, color)
 end
 
 DebugDrawer.quaternion = function (self, position, quaternion, scale)
 	scale = scale or 1
 
-	self.vector(self, position, scale * Quaternion.right(quaternion), Color(255, 0, 0))
-	self.vector(self, position, scale * Quaternion.forward(quaternion), Color(0, 255, 0))
-	self.vector(self, position, scale * Quaternion.up(quaternion), Color(0, 0, 255))
+	self:vector(position, scale * Quaternion.right(quaternion), Color(255, 0, 0))
+	self:vector(position, scale * Quaternion.forward(quaternion), Color(0, 255, 0))
+	self:vector(position, scale * Quaternion.up(quaternion), Color(0, 0, 255))
 end
 
 DebugDrawer.matrix4x4 = function (self, matrix, scale)
 	scale = scale or 1
 	local position = Matrix4x4.translation(matrix)
 
-	self.sphere(self, position, scale * 0.25)
+	self:sphere(position, scale * 0.25)
 
 	local rotation = Matrix4x4.rotation(matrix)
 
-	self.quaternion(self, position, rotation, scale)
+	self:quaternion(position, rotation, scale)
 end
 
 DebugDrawer.unit = function (self, unit, color)
 	color = color or Color(255, 255, 255)
 	local box_pose, box_extents = Unit.box(unit)
 
-	self.box(self, box_pose, box_extents, color)
+	self:box(box_pose, box_extents, color)
 
 	local position = Unit.world_position(unit, 0)
 	position.z = position.z + box_extents.z
 	local rotation = Unit.world_rotation(unit, 0)
 
-	self.quaternion(self, position, rotation)
+	self:quaternion(position, rotation)
 end
 
 DebugDrawer.navigation_mesh_search = function (self, mesh)
@@ -194,7 +194,7 @@ end
 
 DebugDrawer.update = function (self, world)
 	if script_data and script_data.disable_debug_draw then
-		self.reset(self)
+		self:reset()
 
 		return
 	end
@@ -202,7 +202,7 @@ DebugDrawer.update = function (self, world)
 	LineObject.dispatch(world, self._line_object)
 
 	if self._mode == "immediate" then
-		self.reset(self)
+		self:reset()
 	end
 end
 

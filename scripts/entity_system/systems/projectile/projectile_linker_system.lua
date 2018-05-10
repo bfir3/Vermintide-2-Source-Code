@@ -31,7 +31,7 @@ ProjectileLinkerSystem.init = function (self, entity_system_creation_context, sy
 end
 
 ProjectileLinkerSystem.on_remove_extension = function (self, unit, extension_name)
-	self.clear_linked_projectiles(self, unit)
+	self:clear_linked_projectiles(unit)
 
 	return ProjectileLinkerSystem.super.on_remove_extension(self, unit, extension_name)
 end
@@ -45,9 +45,9 @@ ProjectileLinkerSystem.clear_linked_projectiles = function (self, unit)
 	for i = 1, num_linked_projectiles, 1 do
 		local linked_projectile_unit = linked_projectiles[i]
 
-		if self._has_reference(self, linked_projectile_unit) then
-			self._remove_linked_projectile_reference(self, linked_projectile_unit)
-			unit_spawner.mark_for_deletion(unit_spawner, linked_projectile_unit)
+		if self:_has_reference(linked_projectile_unit) then
+			self:_remove_linked_projectile_reference(linked_projectile_unit)
+			unit_spawner:mark_for_deletion(linked_projectile_unit)
 		end
 	end
 end
@@ -70,8 +70,8 @@ ProjectileLinkerSystem.update = function (self, context, t)
 	local unit_spawner = Managers.state.unit_spawner
 
 	for linked_projectile_unit, alive in pairs(linked_projectiles_to_remove) do
-		self._remove_linked_projectile_reference(self, linked_projectile_unit)
-		unit_spawner.mark_for_deletion(unit_spawner, linked_projectile_unit)
+		self:_remove_linked_projectile_reference(linked_projectile_unit)
+		unit_spawner:mark_for_deletion(linked_projectile_unit)
 	end
 
 	table.clear(linked_projectiles_to_remove)
@@ -89,7 +89,7 @@ ProjectileLinkerSystem.add_linked_projectile_reference = function (self, owner_u
 		self.owner_units_count = self.owner_units_count + 1
 		local unit_spawner = Managers.state.unit_spawner
 
-		unit_spawner.add_destroy_listener(unit_spawner, owner_unit, "linked_projectile_owner_" .. self.owner_units_count, self.linked_projectile_owner_destroy_callback)
+		unit_spawner:add_destroy_listener(owner_unit, "linked_projectile_owner_" .. self.owner_units_count, self.linked_projectile_owner_destroy_callback)
 	end
 
 	local num_linked_projectile_units = #self.linked_projectile_units[owner_unit]

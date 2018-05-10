@@ -7,13 +7,13 @@ PlayerUnitFirstPerson.init = function (self, extension_init_context, unit, exten
 	local profile = extension_init_data.profile
 	local skin_name = extension_init_data.skin_name
 	local hero_attributes = Managers.backend:get_interface("hero_attributes")
-	local career_index = hero_attributes.get(hero_attributes, profile.display_name, "career") or 1
+	local career_index = hero_attributes:get(profile.display_name, "career") or 1
 	local first_person_attachment = Cosmetics[skin_name].first_person_attachment or profile.first_person_attachment
 	local unit_name = profile.base_units.first_person
 	local attachment_unit_name = first_person_attachment.unit
 	local attachment_node_linking = first_person_attachment.attachment_node_linking
 	local unit_spawner = Managers.state.unit_spawner
-	local fp_unit = unit_spawner.spawn_local_unit(unit_spawner, unit_name)
+	local fp_unit = unit_spawner:spawn_local_unit(unit_name)
 	local career = profile.careers[career_index]
 	self.profile = profile
 	self.first_person_unit = fp_unit
@@ -22,7 +22,7 @@ PlayerUnitFirstPerson.init = function (self, extension_init_context, unit, exten
 	Unit.set_flow_variable(fp_unit, "sound_character", career.sound_character)
 	Unit.flow_event(fp_unit, "character_vo_set")
 
-	self.first_person_attachment_unit = unit_spawner.spawn_local_unit(unit_spawner, attachment_unit_name)
+	self.first_person_attachment_unit = unit_spawner:spawn_local_unit(attachment_unit_name)
 
 	Unit.set_flow_variable(fp_unit, "lua_first_person_mesh_unit", self.first_person_attachment_unit)
 	AttachmentUtils.link(extension_init_context.world, self.first_person_unit, self.first_person_attachment_unit, attachment_node_linking)
@@ -45,7 +45,7 @@ PlayerUnitFirstPerson.init = function (self, extension_init_context, unit, exten
 	Unit.set_local_rotation(fp_unit, 0, Unit.local_rotation(unit, 0))
 
 	self.look_delta = nil
-	self.player_height_wanted = self._player_height_from_name(self, "stand")
+	self.player_height_wanted = self:_player_height_from_name("stand")
 	self.player_height_current = self.player_height_wanted
 	self.player_height_previous = self.player_height_wanted
 	self.player_height_time_to_change = 0.001
@@ -68,9 +68,9 @@ PlayerUnitFirstPerson.init = function (self, extension_init_context, unit, exten
 	end
 
 	if script_data.disable_aim_lead_rig_motion then
-		self.disable_rig_movement(self)
+		self:disable_rig_movement()
 	else
-		self.enable_rig_movement(self)
+		self:enable_rig_movement()
 	end
 
 	self._rig_update_timestep = 0.016666666666666666
@@ -92,25 +92,25 @@ PlayerUnitFirstPerson.extensions_ready = function (self)
 	Unit.set_flow_variable(self.first_person_unit, "lua_career_name", career_name)
 
 	if script_data.debug_third_person then
-		self.set_first_person_mode(self, false)
+		self:set_first_person_mode(false)
 	end
 end
 
 PlayerUnitFirstPerson.destroy = function (self)
 	local unit_spawner = Managers.state.unit_spawner
 
-	unit_spawner.mark_for_deletion(unit_spawner, self.first_person_unit)
-	unit_spawner.mark_for_deletion(unit_spawner, self.first_person_attachment_unit)
+	unit_spawner:mark_for_deletion(self.first_person_unit)
+	unit_spawner:mark_for_deletion(self.first_person_attachment_unit)
 end
 
 PlayerUnitFirstPerson.update = function (self, unit, input, dt, context, t)
 	if Managers.input:is_device_active("gamepad") then
-		self.update_aim_assist_multiplier(self, dt)
+		self:update_aim_assist_multiplier(dt)
 	end
 
-	self.update_player_height(self, t)
-	self.update_rotation(self, t, dt)
-	self.update_position(self)
+	self:update_player_height(t)
+	self:update_rotation(t, dt)
+	self:update_position()
 
 	local player = Managers.player:owner(unit)
 	local head_bob = Application.user_setting("head_bob")
@@ -125,12 +125,12 @@ PlayerUnitFirstPerson.update = function (self, unit, input, dt, context, t)
 		self._head_bob = false
 	end
 
-	if player and Managers.state.debug.free_flight_manager:active(player.local_player_id(player)) and self.first_person_mode then
-		self.set_first_person_mode(self, false)
+	if player and Managers.state.debug.free_flight_manager:active(player:local_player_id()) and self.first_person_mode then
+		self:set_first_person_mode(false)
 
 		self.free_flight_changed_fp_mode = true
-	elseif player and not Managers.state.debug.free_flight_manager:active(player.local_player_id(player)) and self.free_flight_changed_fp_mode then
-		self.set_first_person_mode(self, true)
+	elseif player and not Managers.state.debug.free_flight_manager:active(player:local_player_id()) and self.free_flight_changed_fp_mode then
+		self:set_first_person_mode(true)
 
 		self.free_flight_changed_fp_mode = false
 	end
@@ -138,7 +138,7 @@ PlayerUnitFirstPerson.update = function (self, unit, input, dt, context, t)
 	if self.toggle_visibility_timer and self.toggle_visibility_timer <= t then
 		self.toggle_visibility_timer = nil
 
-		self.set_first_person_mode(self, not self.first_person_mode)
+		self:set_first_person_mode(not self.first_person_mode)
 	end
 
 	local was_in_third_person = self._was_in_first_person
@@ -146,15 +146,15 @@ PlayerUnitFirstPerson.update = function (self, unit, input, dt, context, t)
 
 	if Development.parameter("third_person_mode") and not was_in_third_person then
 		CharacterStateHelper.change_camera_state(Managers.player:local_player(), "follow_third_person_over_shoulder")
-		self.set_first_person_mode(self, false, true)
+		self:set_first_person_mode(false, true)
 	elseif not Development.parameter("third_person_mode") and was_in_third_person then
 		CharacterStateHelper.change_camera_state(Managers.player:local_player(), "follow")
-		self.set_first_person_mode(self, true)
+		self:set_first_person_mode(true)
 	end
 
 	if script_data.attract_mode_spectate and self.first_person_mode then
 		CharacterStateHelper.change_camera_state(Managers.player:local_player(), "attract")
-		self.set_first_person_mode(self, false, true)
+		self:set_first_person_mode(false, true)
 	end
 end
 
@@ -162,25 +162,25 @@ PlayerUnitFirstPerson.update_aim_assist_multiplier = function (self, dt)
 	if Application.user_setting("gamepad_auto_aim_enabled") then
 		local inventory_extension = self.inventory_extension
 		local action_settings = nil
-		local equipment = inventory_extension.equipment(inventory_extension)
+		local equipment = inventory_extension:equipment()
 		local weapon_unit = equipment.right_hand_wielded_unit or equipment.left_hand_wielded_unit
 
 		if Unit.alive(weapon_unit) then
 			local weapon_extension = ScriptUnit.extension(weapon_unit, "weapon_system")
 
-			if weapon_extension.has_current_action(weapon_extension) then
-				action_settings = weapon_extension.get_current_action_settings(weapon_extension)
+			if weapon_extension:has_current_action() then
+				action_settings = weapon_extension:get_current_action_settings()
 			end
 		end
 
-		local weapon_template = inventory_extension.get_wielded_slot_item_template(inventory_extension)
+		local weapon_template = inventory_extension:get_wielded_slot_item_template()
 		local aim_assist_settings = nil
 		aim_assist_settings = (not action_settings or not action_settings.aim_assist_settings or action_settings.aim_assist_settings) and weapon_template and weapon_template.aim_assist_settings
 		local aim_assist_multiplier = (aim_assist_settings and aim_assist_settings.base_multiplier) or 0
 		local no_aim_input_multiplier = (aim_assist_settings and aim_assist_settings.no_aim_input_multiplier) or aim_assist_multiplier * 0.5
 		local input_extension = self.input_extension
-		local look_raw = input_extension.get(input_extension, "look_raw_controller")
-		local move = input_extension.get(input_extension, "move_controller")
+		local look_raw = input_extension:get("look_raw_controller")
+		local move = input_extension:get("move_controller")
 		local has_input = true
 
 		if (not aim_assist_settings or not aim_assist_settings.always_auto_aim) and Vector3.length(look_raw) < 0.01 then
@@ -300,10 +300,10 @@ PlayerUnitFirstPerson.update_rotation = function (self, t, dt)
 		local rotation = self.look_rotation:unbox()
 		local look_delta = self.look_delta
 		self.look_delta = nil
-		local look_rotation = self.calculate_look_rotation(self, rotation, look_delta)
+		local look_rotation = self:calculate_look_rotation(rotation, look_delta)
 
 		if aim_assist_unit and Managers.input:is_device_active("gamepad") then
-			look_rotation = self.calculate_aim_assisted_rotation(self, look_rotation, aim_assist_data, look_delta, dt)
+			look_rotation = self:calculate_aim_assisted_rotation(look_rotation, aim_assist_data, look_delta, dt)
 		end
 
 		self.look_rotation:store(look_rotation)
@@ -313,12 +313,12 @@ PlayerUnitFirstPerson.update_rotation = function (self, t, dt)
 
 		if is_recoiling and recoil_offset then
 			local current_rotation = look_rotation
-			local final_rotation = Quaternion.multiply(look_rotation, recoil_offset.unbox(recoil_offset))
+			local final_rotation = Quaternion.multiply(look_rotation, recoil_offset:unbox())
 			look_rotation = final_rotation
 		end
 
 		Unit.set_local_rotation(first_person_unit, 0, look_rotation)
-		self.update_rig_movement(self, look_delta)
+		self:update_rig_movement(look_delta)
 	end
 end
 
@@ -348,7 +348,7 @@ end
 PlayerUnitFirstPerson.calculate_aim_assisted_rotation = function (self, look_rotation, aim_assist_data, look_delta, dt)
 	local aim_assist_unit = aim_assist_data.unit
 	local aim_assist_position = aim_assist_data.target_position
-	local current_pos = self.current_position(self)
+	local current_pos = self:current_position()
 	local direction = aim_assist_position - current_pos
 	local target_rotation = Quaternion.look(direction, Vector3.up())
 	local aim_score = aim_assist_data.aim_score
@@ -437,8 +437,8 @@ PlayerUnitFirstPerson.apply_recoil = function (self, factor)
 	if Application.user_setting("tobii_eyetracking") and ScriptUnit.has_extension(self.unit, "eyetracking_system") then
 		local eyetracking_extension = ScriptUnit.extension(self.unit, "eyetracking_system")
 
-		if eyetracking_extension.get_is_feature_enabled(eyetracking_extension, "tobii_extended_view") then
-			camera_rotation = eyetracking_extension.get_direction_without_extended_view(eyetracking_extension, camera_rotation)
+		if eyetracking_extension:get_is_feature_enabled("tobii_extended_view") then
+			camera_rotation = eyetracking_extension:get_direction_without_extended_view(camera_rotation)
 		end
 	end
 
@@ -479,7 +479,7 @@ PlayerUnitFirstPerson.current_position = function (self)
 end
 
 PlayerUnitFirstPerson.set_wanted_player_height = function (self, state, t, time_to_change)
-	local player_height_wanted = self._player_height_from_name(self, state)
+	local player_height_wanted = self:_player_height_from_name(state)
 	local player_height_movement_speed = 3
 	self.player_height_wanted = player_height_wanted
 	self.player_height_previous = self.player_height_current
@@ -503,13 +503,13 @@ PlayerUnitFirstPerson.toggle_visibility = function (self, delay)
 	local t = Managers.time:time("game")
 
 	if self.toggle_visibility_timer then
-		self.set_first_person_mode(self, not self.first_person_mode)
+		self:set_first_person_mode(not self.first_person_mode)
 	end
 
 	if delay then
 		self.toggle_visibility_timer = t + delay
 	else
-		self.set_first_person_mode(self, not self.first_person_mode)
+		self:set_first_person_mode(not self.first_person_mode)
 	end
 end
 
@@ -530,13 +530,13 @@ PlayerUnitFirstPerson.set_first_person_mode = function (self, active, override)
 		end
 
 		if active then
-			self.unhide_weapons(self, "third_person_mode")
+			self:unhide_weapons("third_person_mode")
 
 			if self.first_person_mode ~= active then
 				Unit.flow_event(self.unit, "lua_exit_third_person_camera")
 			end
 		else
-			self.hide_weapons(self, "third_person_mode", true)
+			self:hide_weapons("third_person_mode", true)
 
 			if self.first_person_mode ~= active then
 				Unit.flow_event(self.unit, "lua_enter_third_person_camera")
@@ -566,9 +566,9 @@ PlayerUnitFirstPerson.tutorial_show_first_person_units = function (self, show)
 	self.tutorial_first_person = not show
 
 	if show then
-		self.unhide_weapons(self, "tutorial")
+		self:unhide_weapons("tutorial")
 	else
-		self.hide_weapons(self, "tutorial", show)
+		self:hide_weapons("tutorial", show)
 	end
 end
 
@@ -578,14 +578,14 @@ PlayerUnitFirstPerson.debug_set_first_person_mode = function (self, active, over
 	if active then
 		self.debug_first_person_mode = false
 
-		self.set_first_person_mode(self, override)
+		self:set_first_person_mode(override)
 
 		self.first_person_mode = first_person_mode
 		self.debug_first_person_mode = true
 	else
 		self.debug_first_person_mode = false
 
-		self.set_first_person_mode(self, first_person_mode)
+		self:set_first_person_mode(first_person_mode)
 	end
 end
 
@@ -655,13 +655,13 @@ PlayerUnitFirstPerson.play_hud_sound_event = function (self, event, wwise_source
 		local network_manager = Managers.state.network
 		local network_transmit = network_manager.network_transmit
 		local is_server = Managers.player.is_server
-		local unit_id = network_manager.unit_game_object_id(network_manager, self.unit)
+		local unit_id = network_manager:unit_game_object_id(self.unit)
 		local event_id = NetworkLookup.sound_events[event]
 
 		if is_server then
-			network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_sound_event", unit_id, event_id)
+			network_transmit:send_rpc_clients("rpc_play_husk_sound_event", unit_id, event_id)
 		else
-			network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_sound_event", unit_id, event_id)
+			network_transmit:send_rpc_server("rpc_play_husk_sound_event", unit_id, event_id)
 		end
 	end
 
@@ -677,7 +677,7 @@ PlayerUnitFirstPerson.play_hud_sound_event = function (self, event, wwise_source
 end
 
 PlayerUnitFirstPerson.play_sound_event = function (self, event, position)
-	local sound_position = position or self.current_position(self)
+	local sound_position = position or self:current_position()
 	local wwise_source_id, wwise_world = WwiseUtils.make_position_auto_source(self.world, sound_position)
 
 	WwiseWorld.set_switch(wwise_world, "husk", "false", wwise_source_id)
@@ -691,12 +691,12 @@ PlayerUnitFirstPerson.play_unit_sound_event = function (self, event, unit, node_
 		local network_manager = Managers.state.network
 		local network_transmit = network_manager.network_transmit
 		local is_server = Managers.player.is_server
-		local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+		local unit_id = network_manager:unit_game_object_id(unit)
 
 		if is_server then
-			network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+			network_transmit:send_rpc_clients("rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
 		else
-			network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
+			network_transmit:send_rpc_server("rpc_play_husk_unit_sound_event", unit_id, node_id, event_id)
 		end
 	end
 
@@ -718,7 +718,7 @@ end
 
 PlayerUnitFirstPerson.enable_rig_movement = function (self)
 	if script_data.disable_aim_lead_rig_motion then
-		self.disable_rig_movement(self)
+		self:disable_rig_movement()
 
 		return
 	end
@@ -740,7 +740,7 @@ end
 
 PlayerUnitFirstPerson.enable_rig_offset = function (self)
 	if script_data.disable_aim_lead_rig_motion then
-		self.disable_rig_offset(self)
+		self:disable_rig_offset()
 
 		return
 	end

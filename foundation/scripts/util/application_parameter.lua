@@ -11,7 +11,7 @@ Development.init_application_parameters = function (args, do_pretty_print_args)
 	end
 
 	local function first_char(s)
-		return s.sub(s, 1, 1)
+		return s:sub(1, 1)
 	end
 
 	local function is_parameter(s)
@@ -19,7 +19,7 @@ Development.init_application_parameters = function (args, do_pretty_print_args)
 	end
 
 	local function parameter(s)
-		return s.sub(s, 2)
+		return s:sub(2)
 	end
 
 	local num_args = #args

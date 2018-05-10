@@ -15,7 +15,7 @@ AIShieldUserExtension.extensions_ready = function (self, world, unit)
 	assert(Managers.state.network.is_server)
 
 	local ai_base_extension = ScriptUnit.extension(unit, "ai_system")
-	local blackboard = ai_base_extension.blackboard(ai_base_extension)
+	local blackboard = ai_base_extension:blackboard()
 	local spawn_type = blackboard.spawn_type
 	local is_blocking = spawn_type == "horde" or spawn_type == "horde_hidden"
 	self.is_blocking = is_blocking
@@ -61,7 +61,7 @@ AIShieldUserExtension.set_is_dodging = function (self, is_dodging)
 end
 
 AIShieldUserExtension.break_shield = function (self)
-	self.set_is_blocking(self, false)
+	self:set_is_blocking(false)
 
 	self.shield_broken = true
 	local unit = self._unit
@@ -77,10 +77,10 @@ AIShieldUserExtension.break_shield = function (self)
 
 	for i = 1, #inventory_item_definitions, 1 do
 		local item = inventory_item_definitions[i]
-		local success, item_unit = ai_inventory_extension.drop_single_item(ai_inventory_extension, i, reason)
+		local success, item_unit = ai_inventory_extension:drop_single_item(i, reason)
 
 		if success then
-			network_transmit.send_rpc_clients(network_transmit, "rpc_ai_drop_single_item", game_object_id, i, reason_id)
+			network_transmit:send_rpc_clients("rpc_ai_drop_single_item", game_object_id, i, reason_id)
 		end
 	end
 end

@@ -11,11 +11,11 @@ KeepDecorationView.init = function (self, ingame_ui_context)
 	local input_manager = ingame_ui_context.input_manager
 	self.input_manager = input_manager
 
-	input_manager.create_input_service(input_manager, "keep_decoration_view", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "keep_decoration_view", "keyboard")
-	input_manager.map_device_to_service(input_manager, "keep_decoration_view", "mouse")
-	input_manager.map_device_to_service(input_manager, "keep_decoration_view", "gamepad")
-	self.create_ui_elements(self)
+	input_manager:create_input_service("keep_decoration_view", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("keep_decoration_view", "keyboard")
+	input_manager:map_device_to_service("keep_decoration_view", "mouse")
+	input_manager:map_device_to_service("keep_decoration_view", "gamepad")
+	self:create_ui_elements()
 end
 
 KeepDecorationView.create_ui_elements = function (self, params)
@@ -69,8 +69,8 @@ KeepDecorationView.on_exit = function (self)
 	self.active = nil
 	self.exiting = nil
 
-	self._destroy_units(self)
-	self._unload_packages(self)
+	self:_destroy_units()
+	self:_unload_packages()
 	table.clear(self.loaded_packages)
 	table.clear(self.packages_to_load)
 
@@ -111,21 +111,21 @@ KeepDecorationView.post_update = function (self, dt)
 	local next_button = widgets_by_name.next_button
 	local previous_button = widgets_by_name.previous_button
 
-	if self._is_button_pressed(self, next_button) then
-		self.spawn_unit(self, "units/gameplay/loot_chests/gameplay_loot_chest_d1_t1")
-		self._trigger_unit_flow_event(self, self.spawned_unit, "loot_chest_enter")
-	elseif self._is_button_pressed(self, previous_button) then
-		self.spawn_unit(self, "units/gameplay/loot_chests/gameplay_loot_chest_d4_t6")
-		self._trigger_unit_flow_event(self, self.spawned_unit, "loot_chest_enter")
+	if self:_is_button_pressed(next_button) then
+		self:spawn_unit("units/gameplay/loot_chests/gameplay_loot_chest_d1_t1")
+		self:_trigger_unit_flow_event(self.spawned_unit, "loot_chest_enter")
+	elseif self:_is_button_pressed(previous_button) then
+		self:spawn_unit("units/gameplay/loot_chests/gameplay_loot_chest_d4_t6")
+		self:_trigger_unit_flow_event(self.spawned_unit, "loot_chest_enter")
 	end
 
 	local input_manager = self.input_manager
 	local input_service = self.input_manager:get_service("keep_decoration_view")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 	local close_button = widgets_by_name.close_button
 
-	if input_service.get(input_service, "toggle_menu", true) or (gamepad_active and input_service.get(input_service, "back", true)) or self._is_button_pressed(self, close_button) then
-		self.exit(self)
+	if input_service:get("toggle_menu", true) or (gamepad_active and input_service:get("back", true)) or self:_is_button_pressed(close_button) then
+		self:exit()
 
 		return
 	end
@@ -135,7 +135,7 @@ KeepDecorationView.update = function (self, dt)
 	if DO_RELOAD then
 		DO_RELOAD = false
 
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	if self.suspended then
@@ -144,8 +144,8 @@ KeepDecorationView.update = function (self, dt)
 
 	local input_manager = self.input_manager
 	local input_service = self.input_manager:get_service("keep_decoration_view")
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
-	local input_axis = (gamepad_active and input_service.get(input_service, "gamepad_left_axis")) or input_service.get(input_service, "scroll_axis")
+	local gamepad_active = input_manager:is_device_active("gamepad")
+	local input_axis = (gamepad_active and input_service:get("gamepad_left_axis")) or input_service:get("scroll_axis")
 	local ui_top_renderer = self.ui_top_renderer
 
 	UIRenderer.begin_pass(ui_top_renderer, self.ui_scenegraph, input_service, dt)
@@ -240,14 +240,14 @@ KeepDecorationView.load_package = function (self, package_name)
 		reference_name = reference_name .. tostring(self.unique_id)
 	end
 
-	package_manager.load(package_manager, package_name, reference_name, cb, true)
+	package_manager:load(package_name, reference_name, cb, true)
 end
 
 KeepDecorationView._on_load_complete = function (self, package_name)
 	self.package_name_loaded = package_name
 	self.package_to_load = nil
 
-	self.spawn_unit(self, package_name)
+	self:spawn_unit(package_name)
 end
 
 KeepDecorationView._unload_packages = function (self)
@@ -260,9 +260,9 @@ KeepDecorationView._unload_packages = function (self)
 	local package_manager = Managers.package
 
 	if self.package_name_loaded then
-		package_manager.unload(package_manager, self.package_name_loaded, reference_name)
+		package_manager:unload(self.package_name_loaded, reference_name)
 	elseif self.package_to_load then
-		package_manager.unload(package_manager, self.package_to_load, reference_name)
+		package_manager:unload(self.package_to_load, reference_name)
 	end
 
 	self.package_to_load = nil
@@ -278,12 +278,12 @@ KeepDecorationView.spawn_unit = function (self, unit_name)
 		self.spawned_unit = nil
 	end
 
-	local camera_rotation = self._get_camera_rotation(self)
+	local camera_rotation = self:_get_camera_rotation()
 	local camera_forward_vector = Quaternion.forward(camera_rotation)
 	local camera_look_rotation = Quaternion.look(camera_forward_vector, Vector3.up())
 	local horizontal_rotation = Quaternion.axis_angle(Vector3.up(), math.pi * 1)
 	local unit_spawn_rotation = Quaternion.multiply(camera_look_rotation, horizontal_rotation)
-	local camera_position = self._get_camera_position(self)
+	local camera_position = self:_get_camera_position()
 	local unit_spawn_position = camera_position + camera_forward_vector
 	local unit = World.spawn_unit(world, unit_name, unit_spawn_position, unit_spawn_rotation)
 

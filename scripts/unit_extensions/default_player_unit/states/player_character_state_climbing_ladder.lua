@@ -27,7 +27,7 @@ PlayerCharacterStateClimbingLadder.on_enter_animation_event = function (self)
 
 	local first_person_extension = self.first_person_extension
 
-	first_person_extension.play_animation_event(first_person_extension, "climb_enter_ladder")
+	first_person_extension:play_animation_event("climb_enter_ladder")
 end
 
 PlayerCharacterStateClimbingLadder.on_enter = function (self, unit, input, dt, context, t, previous_state, params)
@@ -46,8 +46,8 @@ PlayerCharacterStateClimbingLadder.on_enter = function (self, unit, input, dt, c
 	self.jump_off_height = Vector3.z(Unit.world_position(ladder_unit, jump_node))
 	local loc_ext = self.locomotion_extension
 
-	loc_ext.enable_script_driven_ladder_movement(loc_ext)
-	loc_ext.enable_rotation_towards_velocity(loc_ext, false, Unit.local_rotation(ladder_unit, 0), 0.5)
+	loc_ext:enable_script_driven_ladder_movement()
+	loc_ext:enable_rotation_towards_velocity(false, Unit.local_rotation(ladder_unit, 0), 0.5)
 
 	local ladder_pos = Unit.world_position(self.ladder_unit, 0)
 	local ladder_position_height = Vector3.z(ladder_pos)
@@ -57,16 +57,16 @@ PlayerCharacterStateClimbingLadder.on_enter = function (self, unit, input, dt, c
 		CharacterStateHelper.stop_weapon_actions(self.inventory_extension, "ladder")
 
 		local network_manager = Managers.state.network
-		local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+		local unit_id = network_manager:unit_game_object_id(unit)
 		local include_local_player = false
 
 		CharacterStateHelper.show_inventory_3p(unit, false, include_local_player, self.is_server, self.inventory_extension)
 		self.first_person_extension:hide_weapons("climbing")
-		self.on_enter_animation_event(self)
+		self:on_enter_animation_event()
 		CharacterStateHelper.set_is_on_ladder(ladder_unit, unit, true, self.is_server, self.status_extension)
 	end
 
-	loc_ext.set_mover_filter_property(loc_ext, "ladder", true)
+	loc_ext:set_mover_filter_property("ladder", true)
 end
 
 PlayerCharacterStateClimbingLadder.on_exit = function (self, unit, input, dt, context, t, next_state)
@@ -75,16 +75,16 @@ PlayerCharacterStateClimbingLadder.on_exit = function (self, unit, input, dt, co
 	if next_state and next_state ~= "leaving_ladder_top" then
 		local status_extension = self.status_extension
 
-		status_extension.set_falling_height(status_extension, true)
-		status_extension.set_left_ladder(status_extension, t)
+		status_extension:set_falling_height(true)
+		status_extension:set_left_ladder(t)
 
 		local network_manager = Managers.state.network
-		local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+		local unit_id = network_manager:unit_game_object_id(unit)
 		local include_local_player = false
 
 		CharacterStateHelper.show_inventory_3p(unit, true, include_local_player, self.is_server, self.inventory_extension)
-		loc_ext.enable_script_driven_movement(loc_ext)
-		loc_ext.enable_rotation_towards_velocity(loc_ext, true)
+		loc_ext:enable_script_driven_movement()
+		loc_ext:enable_rotation_towards_velocity(true)
 		self.first_person_extension:unhide_weapons("climbing")
 
 		if Managers.state.network:game() then
@@ -93,14 +93,14 @@ PlayerCharacterStateClimbingLadder.on_exit = function (self, unit, input, dt, co
 
 		local first_person_extension = self.first_person_extension
 
-		first_person_extension.play_animation_event(first_person_extension, "idle")
+		first_person_extension:play_animation_event("idle")
 
 		if Managers.state.network:game() then
 			CharacterStateHelper.set_is_on_ladder(self.ladder_unit, unit, false, self.is_server, self.status_extension)
 		end
 	end
 
-	loc_ext.set_mover_filter_property(loc_ext, "ladder", false)
+	loc_ext:set_mover_filter_property("ladder", false)
 end
 
 PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, context, t)
@@ -115,23 +115,23 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 		return
 	end
 
-	local current_velocity = locomotion_extension.current_velocity(locomotion_extension)
+	local current_velocity = locomotion_extension:current_velocity()
 	local current_velocity_z = current_velocity.z
 
 	if CharacterStateHelper.is_colliding_down(unit) and current_velocity_z < 0 then
-		csm.change_state(csm, "walking")
+		csm:change_state("walking")
 
 		return
 	end
 
 	local ladder_shaking = ScriptUnit.extension(self.ladder_unit, "ladder_system"):is_shaking()
 
-	if not csm.state_next and (input_extension.get(input_extension, "jump") or input_extension.get(input_extension, "jump_only") or ladder_shaking) then
+	if not csm.state_next and (input_extension:get("jump") or input_extension:get("jump_only") or ladder_shaking) then
 		local params = self.temp_params
 		params.ladder_unit = self.ladder_unit
 		params.ladder_shaking = true
 
-		csm.change_state(csm, "jumping", params)
+		csm:change_state("jumping", params)
 
 		return
 	end
@@ -147,7 +147,7 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 			local params = self.temp_params
 			params.ladder_unit = self.ladder_unit
 
-			csm.change_state(csm, "leaving_ladder_top", params)
+			csm:change_state("leaving_ladder_top", params)
 
 			return
 		elseif not colliding_with_ladder then
@@ -155,9 +155,9 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 				local params = self.temp_params
 				params.ladder_unit = self.ladder_unit
 
-				csm.change_state(csm, "leaving_ladder_top", params)
+				csm:change_state("leaving_ladder_top", params)
 			else
-				csm.change_state(csm, "falling")
+				csm:change_state("falling")
 			end
 
 			return
@@ -173,13 +173,13 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 		self.movement_speed = math.max(0, self.movement_speed - movement_settings_table.ladder.climb_move_acceleration_down * dt)
 	end
 
-	local move_speed_multiplier = status_extension.current_move_speed_multiplier(status_extension)
+	local move_speed_multiplier = status_extension:current_move_speed_multiplier()
 	local move_speed = movement_settings_table.ladder.climb_speed * move_speed_multiplier * movement_settings_table.ladder.player_ladder_speed_scale * self.movement_speed
 	local ladder_rotation = Unit.local_rotation(self.ladder_unit, 0)
 	local ladder_pos = Unit.world_position(self.ladder_unit, 0)
 	local ladder_offset = Vector3.dot(-Quaternion.forward(ladder_rotation), POSITION_LOOKUP[unit] - ladder_pos) + movement_settings_table.ladder.climb_attach_to_ladder_position_in_ladder_space_y
 
-	self._move_on_ladder(self, self.first_person_extension, ladder_rotation, input_extension, self.locomotion_extension, unit, move_speed, ladder_offset)
+	self:_move_on_ladder(self.first_person_extension, ladder_rotation, input_extension, self.locomotion_extension, unit, move_speed, ladder_offset)
 
 	local time_in_move_animation = CharacterStateHelper.time_in_ladder_move_animation(unit, ladder_pos.z)
 	local variable_index = Unit.animation_find_variable(unit, "climb_time")
@@ -189,7 +189,7 @@ PlayerCharacterStateClimbingLadder.update = function (self, unit, input, dt, con
 	local max_radians = math.degrees_to_radians(movement_settings_table.ladder.look_horizontal_max_degrees)
 
 	CharacterStateHelper.look_limited_rotation_freedom(input_extension, player.viewport_name, self.first_person_extension, self.ladder_unit, unit, max_radians, max_radians, status_extension, self.inventory_extension)
-	self.on_ladder_animation(self)
+	self:on_ladder_animation()
 
 	self.accumilated_distance = self.accumilated_distance + math.abs(current_velocity_z) * dt
 
@@ -217,7 +217,7 @@ PlayerCharacterStateClimbingLadder._move_on_ladder = function (self, first_perso
 	if collides_down and y_input <= 0 then
 		direction = Vector3(x_input, y_input, 0)
 	else
-		local first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
+		local first_person_unit = first_person_extension:get_first_person_unit()
 		local player_rotation = Unit.local_rotation(first_person_unit, 0)
 		local player_pitch = Quaternion.pitch(player_rotation)
 		local pitch_value = player_pitch + movement_settings_table.ladder.climb_pitch_offset
@@ -258,7 +258,7 @@ PlayerCharacterStateClimbingLadder._move_on_ladder = function (self, first_perso
 
 	local move_direction = Quaternion.rotate(rotation, direction)
 
-	locomotion_extension.set_wanted_velocity(locomotion_extension, move_direction * speed + ladder_offset * Quaternion.forward(rotation) * 4)
+	locomotion_extension:set_wanted_velocity(move_direction * speed + ladder_offset * Quaternion.forward(rotation) * 4)
 end
 
 PlayerCharacterStateClimbingLadder.on_ladder_animation = function (self)

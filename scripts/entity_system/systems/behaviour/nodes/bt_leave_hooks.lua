@@ -59,7 +59,7 @@ end
 
 BTLeaveHooks.stormfiend_boss_rage_leave = function (unit, blackboard, t)
 	local network_manager = Managers.state.network
-	local game = network_manager.game(network_manager)
+	local game = network_manager:game()
 	local go_id = Managers.state.unit_storage:go_id(unit)
 	blackboard.intro_rage = nil
 	local health_extension = ScriptUnit.extension(unit, "health_system")
@@ -119,17 +119,17 @@ BTLeaveHooks.on_grey_seer_intro_leave = function (unit, blackboard, t)
 				blackboard = blackboard
 			}
 
-			conflict_director.spawn_queued_unit(conflict_director, stormfiend_boss_breed, Vector3Box(pos), QuaternionBox(Unit.local_rotation(unit, 0)), spawn_category, nil, nil, optional_data)
+			conflict_director:spawn_queued_unit(stormfiend_boss_breed, Vector3Box(pos), QuaternionBox(Unit.local_rotation(unit, 0)), spawn_category, nil, nil, optional_data)
 
 			local dialogue_input = ScriptUnit.extension_input(unit, "dialogue_system")
 			local event_data = FrameTable.alloc_table()
 
-			dialogue_input.trigger_networked_dialogue_event(dialogue_input, "egs_call_mount_intro", event_data)
+			dialogue_input:trigger_networked_dialogue_event("egs_call_mount_intro", event_data)
 		else
 			print("Found no generic AI node (grey_seer_intro_stormfiend_spawn) for grey_seer_intro_leave")
 		end
 
-		conflict_director.add_angry_boss(conflict_director, 1, blackboard)
+		conflict_director:add_angry_boss(1, blackboard)
 
 		blackboard.is_angry = true
 	end
@@ -170,7 +170,7 @@ BTLeaveHooks.on_lord_intro_leave = function (unit, blackboard, t)
 		blackboard.intro_timer = nil
 		local network_manager = Managers.state.network
 
-		network_manager.anim_event(network_manager, unit, "to_combat")
+		network_manager:anim_event(unit, "to_combat")
 	end
 end
 
@@ -189,7 +189,7 @@ BTLeaveHooks.on_lord_warlord_intro_leave = function (unit, blackboard, t)
 		blackboard.jump_down_timer = t + 5
 		local network_manager = Managers.state.network
 
-		network_manager.anim_event(network_manager, unit, "to_dual_wield")
+		network_manager:anim_event(unit, "to_dual_wield")
 
 		local level_analysis = Managers.state.conflict.level_analysis
 		local node_units = level_analysis.generic_ai_node_units.skaven_warlord_intro_jump_to

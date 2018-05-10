@@ -31,7 +31,7 @@ LootObjectiveUI.init = function (self, ingame_ui_context)
 	self._animations = {}
 	self._event_queue = {}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 	rawset(_G, "loot_objective_ui", self)
 end
 
@@ -65,7 +65,7 @@ LootObjectiveUI.create_ui_elements = function (self)
 
 	DO_RELOAD = false
 
-	self._sync_missions(self, true)
+	self:_sync_missions(true)
 end
 
 LootObjectiveUI.destroy = function (self)
@@ -75,15 +75,15 @@ end
 
 LootObjectiveUI.update = function (self, dt, t)
 	if DO_RELOAD then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
-	self._sync_missions(self)
+	self:_sync_missions()
 
-	self._active_presentation_widget = self._update_active_presentation(self, dt, t)
+	self._active_presentation_widget = self:_update_active_presentation(dt, t)
 
-	self._update_animations(self, dt)
-	self.draw(self, dt)
+	self:_update_animations(dt)
+	self:draw(dt)
 end
 
 LootObjectiveUI._sync_missions = function (self, initialize)
@@ -91,7 +91,7 @@ LootObjectiveUI._sync_missions = function (self, initialize)
 
 	for _, data in pairs(settings_data) do
 		local mission_name = data.mission_name
-		local amount = self._get_item_amount_by_mission_name(self, mission_name) or 0
+		local amount = self:_get_item_amount_by_mission_name(mission_name) or 0
 
 		if not data.amount then
 			data.amount = amount or 0
@@ -105,7 +105,7 @@ LootObjectiveUI._sync_missions = function (self, initialize)
 			local widget = data.widget
 
 			if not initialize then
-				self._add_presentation_event(self, widget, data.previous_amount, amount)
+				self:_add_presentation_event(widget, data.previous_amount, amount)
 			end
 		end
 	end
@@ -117,7 +117,7 @@ end
 
 LootObjectiveUI._get_item_amount_by_mission_name = function (self, mission_name)
 	local mission_system = self._mission_system
-	local data = mission_system.get_level_end_mission_data(mission_system, mission_name)
+	local data = mission_system:get_level_end_mission_data(mission_name)
 	local current_amount = data and data.current_amount
 
 	return current_amount
@@ -147,18 +147,18 @@ LootObjectiveUI._update_active_presentation = function (self, dt, t)
 	local previous_amount = presentation_data.previous_amount
 
 	if not presentation_data.started then
-		self._assign_amount_to_widget(self, widget, amount)
+		self:_assign_amount_to_widget(widget, amount)
 
 		presentation_data.started = true
 		local life_time = 2.5
-		local duration = self._animate_in(self, widget, previous_amount)
+		local duration = self:_animate_in(widget, previous_amount)
 		presentation_data.end_time = t + duration + life_time
 	end
 
 	if presentation_data.end_time < t then
 		if not presentation_data.end_started then
 			presentation_data.end_started = true
-			local duration = self._animate_out(self, widget)
+			local duration = self:_animate_out(widget)
 			presentation_data.end_time = t + duration
 		else
 			table.remove(event_queue, 1)

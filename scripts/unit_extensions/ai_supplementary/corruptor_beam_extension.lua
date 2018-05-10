@@ -23,11 +23,11 @@ CorruptorBeamExtension.init = function (self, extension_init_context, unit, exte
 end
 
 CorruptorBeamExtension.destroy = function (self)
-	self.remove_vfx_and_sfx(self)
+	self:remove_vfx_and_sfx()
 end
 
 CorruptorBeamExtension.on_remove_extension = function (self, unit, extension_name)
-	self.remove_vfx_and_sfx(self, unit)
+	self:remove_vfx_and_sfx(unit)
 end
 
 CorruptorBeamExtension.remove_vfx_and_sfx = function (self, unit)
@@ -77,7 +77,7 @@ end
 CorruptorBeamExtension.set_state = function (self, state, target_unit)
 	if not target_unit then
 		print("Corruptor beam tried to set state to nil target unit")
-		self.remove_vfx_and_sfx(self)
+		self:remove_vfx_and_sfx()
 
 		return
 	end
@@ -115,7 +115,7 @@ CorruptorBeamExtension.set_state = function (self, state, target_unit)
 
 		self.state = state
 	elseif state == "stop_beam" then
-		self.remove_vfx_and_sfx(self)
+		self:remove_vfx_and_sfx()
 
 		self.state = state
 	end

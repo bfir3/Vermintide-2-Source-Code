@@ -11,7 +11,7 @@ local function convert_from_backend(raw_value, database_type)
 		local value_n = 0
 		local floor = math.floor
 
-		for hex_char in raw_value.gmatch(raw_value, ".") do
+		for hex_char in raw_value:gmatch(".") do
 			local hex_value = tonumber(hex_char, 16)
 
 			for i = 4, 1, -1 do
@@ -86,7 +86,7 @@ local RPCS = {
 StatisticsDatabase.register_network_event_delegate = function (self, network_event_delegate)
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 end
 
 StatisticsDatabase.unregister_network_event_delegate = function (self)
@@ -206,7 +206,7 @@ local function sync_stat_to_server(network_transmit, stat_peer_id, stat_local_pl
 
 			local networkified_path = networkified_path(path)
 
-			network_transmit.send_rpc_server(network_transmit, "rpc_sync_statistics_number", stat_peer_id, stat_local_player_id, networkified_path, cap_sync_value(stat.value), cap_sync_value(stat.persistent_value))
+			network_transmit:send_rpc_server("rpc_sync_statistics_number", stat_peer_id, stat_local_player_id, networkified_path, cap_sync_value(stat.value), cap_sync_value(stat.persistent_value))
 		end
 	else
 		for stat_name, stat_definition in pairs(stat) do
@@ -225,7 +225,7 @@ StatisticsDatabase.hot_join_sync = function (self, peer_id)
 			local player = Managers.player:player_from_stats_id(stat_id)
 			local stats = self.statistics[stat_id]
 
-			sync_stat(peer_id, player.network_id(player), player.local_player_id(player), {}, 1, stats)
+			sync_stat(peer_id, player:network_id(), player:local_player_id(), {}, 1, stats)
 		elseif category == "session" then
 		end
 	end
@@ -301,7 +301,7 @@ StatisticsDatabase.increment_stat = function (self, id, ...)
 	local event_manager = Managers.state.event
 
 	if event_manager then
-		event_manager.trigger(event_manager, "event_stat_incremented", id, ...)
+		event_manager:trigger("event_stat_incremented", id, ...)
 	end
 
 	dbprintf("StatisticsDatabase: Incremented stat %s for id=%s to %f", stat.name, tostring(id), stat.value)
@@ -328,12 +328,12 @@ end
 
 StatisticsDatabase.increment_stat_and_sync_to_clients = function (self, stat_name)
 	local player_manager = Managers.player
-	local player = player_manager.local_player(player_manager)
+	local player = player_manager:local_player()
 
 	if player then
-		local saved_stat = self.get_persistent_stat(self, player.stats_id(player), stat_name)
+		local saved_stat = self:get_persistent_stat(player:stats_id(), stat_name)
 
-		self.set_stat(self, player.stats_id(player), stat_name, saved_stat + 1)
+		self:set_stat(player:stats_id(), stat_name, saved_stat + 1)
 	end
 
 	local network_manager = Managers.state.network
@@ -522,10 +522,10 @@ StatisticsDatabase.rpc_increment_stat = function (self, sender, stat_id)
 		return
 	end
 
-	local stats_id = player.stats_id(player)
+	local stats_id = player:stats_id()
 
 	print("Incremented stat ", stat)
-	self.increment_stat(self, stats_id, stat)
+	self:increment_stat(stats_id, stat)
 end
 
 StatisticsDatabase.rpc_set_local_player_stat = function (self, sender, stat_id, amount)
@@ -536,17 +536,17 @@ StatisticsDatabase.rpc_set_local_player_stat = function (self, sender, stat_id, 
 		return
 	end
 
-	local stats_id = player.stats_id(player)
-	local old_amount = self.get_stat(self, stats_id, stat)
+	local stats_id = player:stats_id()
+	local old_amount = self:get_stat(stats_id, stat)
 
 	if old_amount < amount then
-		self.set_stat(self, stats_id, stat, amount)
+		self:set_stat(stats_id, stat, amount)
 	end
 end
 
 StatisticsDatabase.rpc_sync_statistics_number = function (self, sender, peer_id, local_player_id, statistics_path_names, value, persistent_value)
 	local player = Managers.player:player(peer_id, local_player_id)
-	local stats_id = player.stats_id(player)
+	local stats_id = player:stats_id()
 	local path = unnetworkified_path(statistics_path_names)
 	local stat = self.statistics[stats_id]
 
@@ -588,36 +588,36 @@ if DB_UNIT_TEST then
 	}
 	local sdb = StatisticsDatabase:new()
 
-	sdb.register(sdb, "player1", "unit_test", backend_stats)
-	assert(sdb.get_stat(sdb, "player1", "kills_total") == 0)
-	assert(sdb.get_stat(sdb, "player1", "profiles", "witch_hunter", "kills_total") == 0)
-	sdb.increment_stat(sdb, "player1", "kills_total")
-	sdb.increment_stat(sdb, "player1", "profiles", "witch_hunter", "kills_total")
-	assert(sdb.get_stat(sdb, "player1", "kills_total") == 1)
-	assert(sdb.get_stat(sdb, "player1", "profiles", "witch_hunter", "kills_total") == 1)
-	sdb.decrement_stat(sdb, "player1", "kills_total")
-	sdb.decrement_stat(sdb, "player1", "profiles", "witch_hunter", "kills_total")
-	assert(sdb.get_stat(sdb, "player1", "kills_total") == 0)
-	assert(sdb.get_stat(sdb, "player1", "profiles", "witch_hunter", "kills_total") == 0)
-	sdb.modify_stat_by_amount(sdb, "player1", "kills_total", 5)
-	sdb.modify_stat_by_amount(sdb, "player1", "profiles", "witch_hunter", "kills_total", 5)
-	assert(sdb.get_stat(sdb, "player1", "kills_total") == 5)
-	assert(sdb.get_stat(sdb, "player1", "profiles", "witch_hunter", "kills_total") == 5)
-	assert(sdb.get_array_stat(sdb, "player1", "lorebook_unlocks", 1) == false)
-	sdb.set_array_stat(sdb, "player1", "lorebook_unlocks", 1, true)
-	assert(sdb.get_array_stat(sdb, "player1", "lorebook_unlocks", 1) == true)
-	sdb.reset_session_stats(sdb)
-	assert(sdb.get_stat(sdb, "player1", "kills_total") == 0)
-	assert(sdb.get_stat(sdb, "player1", "profiles", "witch_hunter", "kills_total") == 0)
-	assert(sdb.get_array_stat(sdb, "player1", "lorebook_unlocks", 1) == false)
+	sdb:register("player1", "unit_test", backend_stats)
+	assert(sdb:get_stat("player1", "kills_total") == 0)
+	assert(sdb:get_stat("player1", "profiles", "witch_hunter", "kills_total") == 0)
+	sdb:increment_stat("player1", "kills_total")
+	sdb:increment_stat("player1", "profiles", "witch_hunter", "kills_total")
+	assert(sdb:get_stat("player1", "kills_total") == 1)
+	assert(sdb:get_stat("player1", "profiles", "witch_hunter", "kills_total") == 1)
+	sdb:decrement_stat("player1", "kills_total")
+	sdb:decrement_stat("player1", "profiles", "witch_hunter", "kills_total")
+	assert(sdb:get_stat("player1", "kills_total") == 0)
+	assert(sdb:get_stat("player1", "profiles", "witch_hunter", "kills_total") == 0)
+	sdb:modify_stat_by_amount("player1", "kills_total", 5)
+	sdb:modify_stat_by_amount("player1", "profiles", "witch_hunter", "kills_total", 5)
+	assert(sdb:get_stat("player1", "kills_total") == 5)
+	assert(sdb:get_stat("player1", "profiles", "witch_hunter", "kills_total") == 5)
+	assert(sdb:get_array_stat("player1", "lorebook_unlocks", 1) == false)
+	sdb:set_array_stat("player1", "lorebook_unlocks", 1, true)
+	assert(sdb:get_array_stat("player1", "lorebook_unlocks", 1) == true)
+	sdb:reset_session_stats()
+	assert(sdb:get_stat("player1", "kills_total") == 0)
+	assert(sdb:get_stat("player1", "profiles", "witch_hunter", "kills_total") == 0)
+	assert(sdb:get_array_stat("player1", "lorebook_unlocks", 1) == false)
 
 	local backend_stats_temp = {}
 
-	sdb.generate_backend_stats(sdb, "player1", backend_stats_temp)
+	sdb:generate_backend_stats("player1", backend_stats_temp)
 	assert(backend_stats_temp.kills_total == tostring(15))
 	assert(backend_stats_temp.lorebook_unlocks == "EF")
-	sdb.unregister(sdb, "player1")
-	sdb.destroy(sdb)
+	sdb:unregister("player1")
+	sdb:destroy()
 
 	script_data.statistics_debug = old_debug
 end

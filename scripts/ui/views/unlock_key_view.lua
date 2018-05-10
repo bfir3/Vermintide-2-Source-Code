@@ -10,15 +10,15 @@ UnlockKeyView.init = function (self, ingame_ui_context)
 	self.wwise_world = ingame_ui_context.dialogue_system.wwise_world
 	local input_manager = self.input_manager
 
-	input_manager.create_input_service(input_manager, "unlock_key_menu", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "unlock_key_menu", "keyboard")
-	input_manager.map_device_to_service(input_manager, "unlock_key_menu", "mouse")
-	input_manager.map_device_to_service(input_manager, "unlock_key_menu", "gamepad")
+	input_manager:create_input_service("unlock_key_menu", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("unlock_key_menu", "keyboard")
+	input_manager:map_device_to_service("unlock_key_menu", "mouse")
+	input_manager:map_device_to_service("unlock_key_menu", "gamepad")
 	rawset(_G, "global_unlock_key_view", self)
 
 	self.ui_animations = {}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.controller_cooldown = 0
 end
@@ -129,21 +129,21 @@ UnlockKeyView.update = function (self, dt, t)
 	end
 
 	if self.fade_in_done then
-		self.draw_widgets(self, dt, t)
+		self:draw_widgets(dt, t)
 	end
 
 	if not menu_animation_active then
-		self.handle_input(self, input_service)
-		self.handle_controller_input(self, input_service, dt)
+		self:handle_input(input_service)
+		self:handle_controller_input(input_service, dt)
 	end
 
-	if not menu_animation_active and (input_service.get(input_service, "toggle_menu") or self.cancel_button_widget.content.button_hotspot.on_release) then
-		self.exit(self)
+	if not menu_animation_active and (input_service:get("toggle_menu") or self.cancel_button_widget.content.button_hotspot.on_release) then
+		self:exit()
 	end
 end
 
 UnlockKeyView.exit = function (self)
-	self.on_menu_close(self)
+	self:on_menu_close()
 	Managers.transition:fade_in(10)
 
 	self.ui_animations.exit_animation = UIAnimation.init(UIAnimation.wait, 0.2)

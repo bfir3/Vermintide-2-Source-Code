@@ -31,7 +31,7 @@ ActionThrowGrimoire.finish = function (self, reason)
 	local event_data = FrameTable.alloc_table()
 	event_data.item_type = "grimoire"
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "throwing_item", event_data)
+	dialogue_input:trigger_networked_dialogue_event("throwing_item", event_data)
 
 	local player = Managers.player:unit_owner(self.owner_unit)
 	local position = POSITION_LOOKUP[self.owner_unit]
@@ -39,16 +39,16 @@ ActionThrowGrimoire.finish = function (self, reason)
 	Managers.telemetry.events:player_used_item(player, self.item_name, position)
 
 	local player_manager = Managers.player
-	local player = player_manager.unit_owner(player_manager, self.owner_unit)
+	local player = player_manager:unit_owner(self.owner_unit)
 	local predicate = "discarded_grimoire"
 
-	Managers.chat:send_system_chat_message(1, "system_chat_player_discarded_grimoire", player.name(player))
-	Managers.state.event:trigger("add_coop_feedback", player.stats_id(player), not player.bot_player, predicate, player)
+	Managers.chat:send_system_chat_message(1, "system_chat_player_discarded_grimoire", player:name())
+	Managers.state.event:trigger("add_coop_feedback", player:stats_id(), not player.bot_player, predicate, player)
 
 	if self.is_server then
-		Managers.state.network.network_transmit:send_rpc_clients("rpc_coop_feedback", player.network_id(player), player.local_player_id(player), NetworkLookup.coop_feedback[predicate], player.network_id(player), player.local_player_id(player))
+		Managers.state.network.network_transmit:send_rpc_clients("rpc_coop_feedback", player:network_id(), player:local_player_id(), NetworkLookup.coop_feedback[predicate], player:network_id(), player:local_player_id())
 	else
-		Managers.state.network.network_transmit:send_rpc_server("rpc_coop_feedback", player.network_id(player), player.local_player_id(player), NetworkLookup.coop_feedback[predicate], player.network_id(player), player.local_player_id(player))
+		Managers.state.network.network_transmit:send_rpc_server("rpc_coop_feedback", player:network_id(), player:local_player_id(), NetworkLookup.coop_feedback[predicate], player:network_id(), player:local_player_id())
 	end
 end
 

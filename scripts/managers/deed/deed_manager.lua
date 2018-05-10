@@ -33,7 +33,7 @@ DeedManager.network_context_destroyed = function (self)
 end
 
 DeedManager.register_rpcs = function (self, network_event_delegate)
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self._network_event_delegate = network_event_delegate
 end
@@ -51,7 +51,7 @@ DeedManager.reset = function (self)
 		self._owner_peer_id = nil
 		self._deed_session_faulty = nil
 
-		self._send_rpc_to_clients(self, "rpc_reset_deed")
+		self:_send_rpc_to_clients("rpc_reset_deed")
 	end
 end
 
@@ -96,29 +96,29 @@ DeedManager.consume_deed = function (self, reward_callback)
 
 	if self._owner_peer_id == self._peer_id then
 		if self._is_server then
-			self._send_rpc_to_clients(self, "rpc_deed_consumed")
+			self:_send_rpc_to_clients("rpc_deed_consumed")
 		else
-			self._send_rpc_to_server(self, "rpc_deed_consumed")
+			self:_send_rpc_to_server("rpc_deed_consumed")
 		end
 	elseif self._has_consumed_deed then
 		self._has_consumed_deed = nil
 		self._reward_callback = reward_callback
 
-		self._use_reward_callback(self)
+		self:_use_reward_callback()
 	else
 		self._reward_callback = reward_callback
 	end
 end
 
 DeedManager.update = function (self, dt)
-	if self.has_deed(self) then
-		self._update_owner(self, dt)
+	if self:has_deed() then
+		self:_update_owner(dt)
 	end
 end
 
 DeedManager.select_deed = function (self, backend_id, peer_id)
 	local item_interface = Managers.backend:get_interface("items")
-	local item = item_interface.get_item_from_id(item_interface, backend_id)
+	local item = item_interface:get_item_from_id(backend_id)
 	local item_data = item.data
 	self._selected_deed_data = item_data
 	self._selected_deed_id = backend_id
@@ -127,9 +127,9 @@ DeedManager.select_deed = function (self, backend_id, peer_id)
 	local item_name_id = NetworkLookup.item_names[item_data.name]
 
 	if self._is_server then
-		self._send_rpc_to_clients(self, "rpc_select_deed", item_name_id, peer_id)
+		self:_send_rpc_to_clients("rpc_select_deed", item_name_id, peer_id)
 	else
-		self._send_rpc_to_server(self, "rpc_select_deed", item_name_id, peer_id)
+		self:_send_rpc_to_server("rpc_select_deed", item_name_id, peer_id)
 	end
 end
 
@@ -140,7 +140,7 @@ DeedManager._update_owner = function (self, dt)
 
 	local owner_peer_id = self._owner_peer_id
 	local lobby = self._lobby
-	local members_map = lobby.members(lobby):members_map()
+	local members_map = lobby:members():members_map()
 
 	if not members_map[owner_peer_id] then
 		Managers.chat:add_local_system_message(1, "deed_owner_left_game", true)
@@ -166,7 +166,7 @@ DeedManager.rpc_select_deed = function (self, sender, item_name_id, owner_peer_i
 	self._owner_peer_id = owner_peer_id
 
 	if self._is_server then
-		self._send_rpc_to_clients_except(self, "rpc_select_deed", sender, item_name_id, owner_peer_id)
+		self:_send_rpc_to_clients_except("rpc_select_deed", sender, item_name_id, owner_peer_id)
 	end
 end
 
@@ -176,12 +176,12 @@ DeedManager.rpc_deed_consumed = function (self, sender)
 	if not self._reward_callback then
 		self._has_consumed_deed = true
 	else
-		self._use_reward_callback(self)
+		self:_use_reward_callback()
 	end
 
 	if self._is_server then
 		print("Sending to the other clients to act on deed consume")
-		self._send_rpc_to_clients_except(self, "rpc_deed_consumed", sender)
+		self:_send_rpc_to_clients_except("rpc_deed_consumed", sender)
 	end
 end
 

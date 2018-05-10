@@ -14,12 +14,12 @@ KeepDecorationSystem.init = function (self, entity_system_creation_context, syst
 	self._used_backend_keys = {}
 	self._update_index = 0
 
-	self._get_owned_paintings(self)
+	self:_get_owned_paintings()
 end
 
 KeepDecorationSystem._get_owned_paintings = function (self)
 	local item_interface = Managers.backend:get_interface("items")
-	local painting_items = item_interface.get_filtered_items(item_interface, "item_type == keep_decoration_painting")
+	local painting_items = item_interface:get_filtered_items("item_type == keep_decoration_painting")
 	local owned_paintings = {}
 
 	for _, item in pairs(painting_items) do
@@ -55,7 +55,7 @@ KeepDecorationSystem.on_add_extension = function (self, world, unit, extension_n
 	local extension = KeepDecorationSystem.super.on_add_extension(self, world, unit, extension_name, extension_init_data, ...)
 
 	if extension_name == "KeepDecorationPaintingExtension" then
-		extension.setup(extension, settings, self._owned_paintings)
+		extension:setup(settings, self._owned_paintings)
 	end
 
 	self._extensions[#self._extensions + 1] = extension
@@ -82,7 +82,7 @@ KeepDecorationSystem.update = function (self, context, t)
 
 	local extension_to_update = extensions[update_index]
 
-	extension_to_update.distributed_update(extension_to_update)
+	extension_to_update:distributed_update()
 
 	self._update_index = update_index
 end
@@ -90,27 +90,27 @@ end
 KeepDecorationSystem.on_game_object_created = function (self, unit, game_object_id)
 	local extension = self._unit_extensions[unit]
 
-	extension.on_game_object_created(extension, game_object_id)
+	extension:on_game_object_created(game_object_id)
 end
 
 KeepDecorationSystem.on_game_object_destroyed = function (self, unit)
 	local extension = self._unit_extensions[unit]
 
-	extension.on_game_object_destroyed(extension)
+	extension:on_game_object_destroyed()
 end
 
 KeepDecorationSystem.interacted_with = function (self, unit)
 	local extension = self._unit_extensions[unit]
 
-	if extension.can_interact(extension) then
-		extension.interacted_with(extension)
+	if extension:can_interact() then
+		extension:interacted_with()
 	end
 end
 
 KeepDecorationSystem.can_interact = function (self, unit)
 	local extension = self._unit_extensions[unit]
 
-	return extension.can_interact(extension)
+	return extension:can_interact()
 end
 
 KeepDecorationSystem.hot_join_sync = function (self)

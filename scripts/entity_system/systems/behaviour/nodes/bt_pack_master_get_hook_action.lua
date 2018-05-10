@@ -49,7 +49,7 @@ BTPackMasterGetHookAction.run = function (self, unit, blackboard, t, dt)
 			return "done"
 		end
 
-		self.find_hidden_cover(self, position, player_center_pos, blackboard)
+		self:find_hidden_cover(position, player_center_pos, blackboard)
 
 		if not blackboard.best_cover then
 			return "done"

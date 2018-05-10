@@ -31,11 +31,11 @@ else
 		function (this)
 			local input_manager = Managers.input
 
-			input_manager.block_device_except_service(input_manager, "options_menu", "gamepad")
-			this.activate_view(this, "options_view")
+			input_manager:block_device_except_service("options_menu", "gamepad")
+			this:activate_view("options_view")
 		end,
 		function (this)
-			this.activate_view(this, "credits_view")
+			this:activate_view("credits_view")
 		end,
 		function (this)
 			this._input_disabled = true
@@ -70,9 +70,9 @@ StateTitleScreenMainMenu.on_enter = function (self, params)
 	end
 
 	self._setup_sound()
-	self._setup_input(self)
-	self._init_menu_views(self)
-	self._init_managers(self)
+	self:_setup_input()
+	self:_init_menu_views()
+	self:_init_managers()
 	self.parent:show_menu(true)
 
 	if params.skip_signin then
@@ -171,8 +171,8 @@ end
 StateTitleScreenMainMenu.update = function (self, dt, t)
 	local title_start_ui = self._title_start_ui
 
-	self._update_play_go(self, dt, t)
-	self._update_network(self, dt, t)
+	self:_update_play_go(dt, t)
+	self:_update_network(dt, t)
 
 	if self._auto_start then
 		menu_functions[1](self)
@@ -201,14 +201,14 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 
 	if active_view then
 		self._views[active_view]:update(dt, t)
-		title_start_ui.update(title_start_ui, dt, t, BACKGROUND_ONLY)
+		title_start_ui:update(dt, t, BACKGROUND_ONLY)
 	else
-		title_start_ui.update(title_start_ui, dt, t)
+		title_start_ui:update(dt, t)
 
 		if script_data.honduras_demo then
-			self._update_demo_input(self, dt, t)
+			self:_update_demo_input(dt, t)
 		else
-			self._update_input(self, dt, t)
+			self:_update_input(dt, t)
 		end
 	end
 
@@ -228,7 +228,7 @@ StateTitleScreenMainMenu.update = function (self, dt, t)
 
 	if Managers.account:leaving_game() then
 		if active_view then
-			self.exit_current_view(self)
+			self:exit_current_view()
 		end
 
 		self.parent:show_menu(false)
@@ -247,9 +247,9 @@ StateTitleScreenMainMenu._update_input = function (self, dt, t)
 	local active_controller = Managers.account:active_controller()
 
 	if active_menu_selection and not self._input_disabled and not has_popup and not user_detached and not self._popup_id then
-		if current_menu_index and input_service.get(input_service, "start") then
+		if current_menu_index and input_service:get("start") then
 			menu_functions[current_menu_index](self)
-		elseif input_service.get(input_service, "back") then
+		elseif input_service:get("back") then
 			self.parent:show_menu(false)
 
 			self._new_state = StateTitleScreenMain
@@ -287,8 +287,8 @@ StateTitleScreenMainMenu._update_demo_input = function (self, dt, t)
 	local user_detached = Managers.account:user_detached()
 	local active_controller = Managers.account:active_controller()
 
-	if demo_ui.should_start(demo_ui) and not self._input_disabled then
-		local profile_name, career_index = demo_ui.selected_profile(demo_ui)
+	if demo_ui:should_start() and not self._input_disabled then
+		local profile_name, career_index = demo_ui:selected_profile()
 		self._input_disabled = true
 
 		Managers.transition:show_loading_icon(false)
@@ -298,22 +298,22 @@ StateTitleScreenMainMenu._update_demo_input = function (self, dt, t)
 		return
 	end
 
-	if Managers.time:get_demo_transition() and not demo_ui.in_transition(demo_ui) then
-		demo_ui.animate_to_camera(demo_ui, DemoSettings.starting_camera_name, nil, callback(self, "cb_camera_animation_complete_back"))
-		demo_ui.activate_career_ui(demo_ui, false)
+	if Managers.time:get_demo_transition() and not demo_ui:in_transition() then
+		demo_ui:animate_to_camera(DemoSettings.starting_camera_name, nil, callback(self, "cb_camera_animation_complete_back"))
+		demo_ui:activate_career_ui(false)
 		self.parent:show_menu(false)
 	end
 
 	if not self._input_disabled and not has_popup and not user_detached and not self._popup_id then
-		if input_service.get(input_service, "back") then
-			if not demo_ui.in_transition(demo_ui) then
-				demo_ui.animate_to_camera(demo_ui, DemoSettings.starting_camera_name, nil, callback(self, "cb_camera_animation_complete_back"))
-				demo_ui.activate_career_ui(demo_ui, false)
+		if input_service:get("back") then
+			if not demo_ui:in_transition() then
+				demo_ui:animate_to_camera(DemoSettings.starting_camera_name, nil, callback(self, "cb_camera_animation_complete_back"))
+				demo_ui:activate_career_ui(false)
 				self.parent:show_menu(false)
 
 				self._new_state = StateTitleScreenMain
 			end
-		elseif active_controller.pressed(active_controller.button_index("x")) and not demo_ui.in_transition(demo_ui) then
+		elseif active_controller.pressed(active_controller.button_index("x")) and not demo_ui:in_transition() then
 			local controller_id = tonumber(string.gsub(active_controller._name, "Pad", ""), 10)
 
 			XboxLive.show_account_picker(controller_id)
@@ -333,12 +333,12 @@ StateTitleScreenMainMenu._update_demo_input = function (self, dt, t)
 			end
 
 			self.parent:show_menu(false)
-			demo_ui.set_start_pressed(demo_ui, false)
+			demo_ui:set_start_pressed(false)
 
 			self._new_state = StateTitleScreenMain
 
-			demo_ui.animate_to_camera(demo_ui, DemoSettings.starting_camera_name, nil, callback(self, "cb_camera_animation_complete_back"))
-			demo_ui.activate_career_ui(demo_ui, false)
+			demo_ui:animate_to_camera(DemoSettings.starting_camera_name, nil, callback(self, "cb_camera_animation_complete_back"))
+			demo_ui:activate_career_ui(false)
 		end
 	end
 end
@@ -360,7 +360,7 @@ end
 StateTitleScreenMainMenu.on_exit = function (self)
 	for k, view in pairs(self._views) do
 		if view.destroy then
-			view.destroy(view)
+			view:destroy()
 		end
 	end
 
@@ -422,7 +422,7 @@ StateTitleScreenMainMenu.exit_current_view = function (self)
 	self._active_view = nil
 	local input_manager = Managers.input
 
-	input_manager.block_device_except_service(input_manager, "main_menu", "gamepad")
+	input_manager:block_device_except_service("main_menu", "gamepad")
 end
 
 return

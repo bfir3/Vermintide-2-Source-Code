@@ -14,7 +14,7 @@ PlayerHud.init = function (self, extension_init_context, unit, extension_init_da
 	self.picked_up_ammo = false
 	self.hit_marker_data = {}
 
-	self.reset(self)
+	self:reset()
 end
 
 PlayerHud.extensions_ready = function (self, world, unit)
@@ -37,7 +37,7 @@ end
 
 PlayerHud.draw_player_names = function (self, unit)
 	local player_manager = Managers.player
-	local players = player_manager.players(player_manager)
+	local players = player_manager:players()
 	local viewport_name = "player_1"
 	local viewport = ScriptWorld.viewport(self.world, viewport_name)
 	local camera = ScriptViewport.camera(viewport)
@@ -50,7 +50,7 @@ PlayerHud.draw_player_names = function (self, unit)
 	local offset_vector = Vector3(0, 0, 0.925)
 
 	for k, player in pairs(players) do
-		local name = player.name(player)
+		local name = player:name()
 
 		if player.player_unit and player.player_unit ~= unit then
 			local player_world_pos_center = Unit.local_position(player.player_unit, 0) + offset_vector

@@ -15,7 +15,7 @@ function flow_callback_hibernate_spawner(params)
 	local hibernate = params.hibernate
 	local spawner_system = Managers.state.entity:system("spawner_system")
 
-	spawner_system.hibernate_spawner(spawner_system, spawner_unit, hibernate)
+	spawner_system:hibernate_spawner(spawner_unit, hibernate)
 end
 
 function flow_callback_ai_move_group_command(params)
@@ -30,7 +30,7 @@ function flow_callback_ai_despawn(params)
 	local spawner_unit = params.spawner_unit
 	local spawner = ScriptUnit.extension(spawner_unit, "spawner_system")
 
-	spawner.despawn(spawner)
+	spawner:despawn()
 end
 
 function flow_callback_ai_kill(params)
@@ -73,16 +73,16 @@ function flow_callback_ai_follow_path(params)
 	if ScriptUnit.has_extension(ai_entity, "spawner_system") then
 		local spawner = ScriptUnit.extension(ai_entity, "spawner_system")
 
-		for ai_unit, _ in pairs(spawner.spawned_units(spawner)) do
+		for ai_unit, _ in pairs(spawner:spawned_units()) do
 			local ai_base = ScriptUnit.extension(ai_unit, "ai_system")
-			ai_base.blackboard(ai_base).move_orders[spline_name] = {
+			ai_base:blackboard().move_orders[spline_name] = {
 				name = "follow",
 				finish_event = finish_event
 			}
 		end
 	else
 		local ai_base = ScriptUnit.extension(ai_entity, "ai_system")
-		ai_base.blackboard(ai_base).move_orders[spline_name] = {
+		ai_base:blackboard().move_orders[spline_name] = {
 			name = "follow",
 			finish_event = finish_event
 		}
@@ -96,15 +96,15 @@ function flow_callback_ai_patrol_path(params)
 	if ScriptUnit.has_extension(ai_entity, "spawner_system") then
 		local spawner = ScriptUnit.extension(ai_entity, "spawner_system")
 
-		for ai_unit, _ in pairs(spawner.spawned_units(spawner)) do
+		for ai_unit, _ in pairs(spawner:spawned_units()) do
 			local ai_base = ScriptUnit.extension(ai_unit, "ai_system")
-			ai_base.blackboard(ai_base).move_orders[spline_name] = {
+			ai_base:blackboard().move_orders[spline_name] = {
 				name = "patrol"
 			}
 		end
 	else
 		local ai_base = ScriptUnit.extension(ai_entity, "ai_system")
-		ai_base.blackboard(ai_base).move_orders[spline_name] = {
+		ai_base:blackboard().move_orders[spline_name] = {
 			name = "patrol"
 		}
 	end
@@ -118,16 +118,16 @@ function flow_callback_ai_move_to_command(params)
 	if ScriptUnit.has_extension(ai_entity, "spawner_system") then
 		local spawner = ScriptUnit.extension(ai_entity, "spawner_system")
 
-		for ai_unit, _ in pairs(spawner.spawned_units(spawner)) do
+		for ai_unit, _ in pairs(spawner:spawned_units()) do
 			local ai_base = ScriptUnit.extension(ai_unit, "ai_system")
-			ai_base.blackboard(ai_base).move_orders[waypoint_unit] = {
+			ai_base:blackboard().move_orders[waypoint_unit] = {
 				name = "move",
 				finish_event = finish_event
 			}
 		end
 	else
 		local ai_base = ScriptUnit.extension(ai_entity, "ai_system")
-		ai_base.blackboard(ai_base).move_orders[waypoint_unit] = {
+		ai_base:blackboard().move_orders[waypoint_unit] = {
 			name = "move",
 			finish_event = finish_event
 		}
@@ -141,13 +141,13 @@ function flow_callback_ai_detect_player(params)
 	if ScriptUnit.has_extension(ai_entity, "spawner_system") then
 		local spawner = ScriptUnit.extension(ai_entity, "spawner_system")
 
-		for ai_unit, _ in pairs(spawner.spawned_units(spawner)) do
+		for ai_unit, _ in pairs(spawner:spawned_units()) do
 			local ai_base = ScriptUnit.extension(ai_unit, "ai_system")
-			ai_base.blackboard(ai_base).players[player_unit] = true
+			ai_base:blackboard().players[player_unit] = true
 		end
 	else
 		local ai_base = ScriptUnit.extension(ai_entity, "ai_system")
-		ai_base.blackboard(ai_base).players[player_unit] = true
+		ai_base:blackboard().players[player_unit] = true
 	end
 end
 
@@ -157,25 +157,25 @@ function flow_callback_ai_hold_position(params)
 	if ScriptUnit.has_extension(ai_entity, "spawner_system") then
 		local spawner = ScriptUnit.extension(ai_entity, "spawner_system")
 
-		for ai_unit, _ in pairs(spawner.spawned_units(spawner)) do
+		for ai_unit, _ in pairs(spawner:spawned_units()) do
 			local ai_base = ScriptUnit.extension(ai_unit, "ai_system")
 
-			ai_base.steering(ai_base):reset()
+			ai_base:steering():reset()
 
-			local brain = ai_base.brain(ai_base)
+			local brain = ai_base:brain()
 
-			brain.change_behaviour(brain, "avoidance", "nil_tree")
-			brain.change_behaviour(brain, "pathing", "nil_tree")
+			brain:change_behaviour("avoidance", "nil_tree")
+			brain:change_behaviour("pathing", "nil_tree")
 		end
 	else
 		local ai_base = ScriptUnit.extension(ai_entity, "ai_system")
 
-		ai_base.steering(ai_base):reset()
+		ai_base:steering():reset()
 
-		local brain = ai_base.brain(ai_base)
+		local brain = ai_base:brain()
 
-		brain.change_behaviour(brain, "avoidance", "nil_tree")
-		brain.change_behaviour(brain, "pathing", "nil_tree")
+		brain:change_behaviour("avoidance", "nil_tree")
+		brain:change_behaviour("pathing", "nil_tree")
 	end
 end
 
@@ -186,15 +186,15 @@ function flow_callback_set_ai_properties(params)
 	if ScriptUnit.has_extension(ai_entity, "spawner_system") then
 		local spawner = ScriptUnit.extension(ai_entity, "spawner_system")
 
-		for ai_unit, _ in pairs(spawner.spawned_units(spawner)) do
+		for ai_unit, _ in pairs(spawner:spawned_units()) do
 			local ai_base = ScriptUnit.extension(ai_unit, "ai_system")
 
-			ai_base.set_properties(ai_base, params)
+			ai_base:set_properties(params)
 		end
 	else
 		local ai_base = ScriptUnit.extension(ai_entity, "ai_system")
 
-		ai_base.set_properties(ai_base, params)
+		ai_base:set_properties(params)
 	end
 end
 
@@ -204,15 +204,15 @@ function flow_callback_set_ai_perception(params)
 	if ScriptUnit.has_extension(ai_entity, "spawner_system") then
 		local spawner = ScriptUnit.extension(ai_entity, "spawner_system")
 
-		for ai_unit, _ in pairs(spawner.spawned_units(spawner)) do
+		for ai_unit, _ in pairs(spawner:spawned_units()) do
 			local ai_base = ScriptUnit.extension(ai_unit, "ai_system")
 
-			ai_base.perception(ai_base):set_config(params)
+			ai_base:perception():set_config(params)
 		end
 	else
 		local ai_base = ScriptUnit.extension(ai_entity, "ai_system")
 
-		ai_base.perception(ai_base):set_config(params)
+		ai_base:perception():set_config(params)
 	end
 end
 
@@ -277,7 +277,7 @@ function flow_callback_bot_nav_transition_entered(params)
 
 	if nav_ext then
 		if nav_ext.flow_cb_entered_nav_transition then
-			nav_ext.flow_cb_entered_nav_transition(nav_ext, transition_unit, actor)
+			nav_ext:flow_cb_entered_nav_transition(transition_unit, actor)
 		end
 	else
 		Application.warning(string.format("[flow_callback_bot_nav_transition_left] Unit: %s missing extension \"ai_navigation_system\"", tostring(bot_unit)))
@@ -292,7 +292,7 @@ function flow_callback_bot_nav_transition_left(params)
 
 	if nav_ext then
 		if nav_ext.flow_cb_left_nav_transition then
-			nav_ext.flow_cb_left_nav_transition(nav_ext, transition_unit, actor)
+			nav_ext:flow_cb_left_nav_transition(transition_unit, actor)
 		end
 	else
 		Application.warning(string.format("[flow_callback_bot_nav_transition_left] Unit: %s missing extension \"ai_navigation_system\"", tostring(bot_unit)))
@@ -312,7 +312,7 @@ function flow_callback_player_bot_hold_position(params)
 
 		if should_hold_position then
 			local ai_system = Managers.state.entity:system("ai_system")
-			local nav_world = ai_system.nav_world(ai_system)
+			local nav_world = ai_system:nav_world()
 			local hold_position = params.position or Unit.local_position(player_unit, 0)
 			local above = 0.5
 			local below = 2
@@ -322,12 +322,12 @@ function flow_callback_player_bot_hold_position(params)
 				local max_distance = params.max_allowed_distance_from_position or 0
 				hold_position = Vector3(hold_position.x, hold_position.y, altitude)
 
-				ai_bot_group_extension.set_hold_position(ai_bot_group_extension, hold_position, max_distance)
+				ai_bot_group_extension:set_hold_position(hold_position, max_distance)
 			else
 				Application.warning(string.format("[flow_callback_player_bot_hold_position] %s could not hold position %s since it is not near navmesh!", tostring(player_unit), tostring(hold_position)))
 			end
 		else
-			ai_bot_group_extension.set_hold_position(ai_bot_group_extension, nil)
+			ai_bot_group_extension:set_hold_position(nil)
 		end
 	else
 		Application.warning(string.format("[flow_callback_player_bot_hold_position] Unit: %s is missing ai_bot_group_extension", tostring(player_unit)))
@@ -346,9 +346,9 @@ function flow_callback_overcharge_explode_player_bot(params)
 
 		fassert(overcharge_extension, "Tried to overcharge explode unit %s from flow but the unit has no overcharge extension", player_unit)
 
-		local max_overcharge = overcharge_extension.get_max_value(overcharge_extension)
+		local max_overcharge = overcharge_extension:get_max_value()
 
-		overcharge_extension.add_charge(overcharge_extension, max_overcharge)
+		overcharge_extension:add_charge(max_overcharge)
 	end
 end
 
@@ -363,7 +363,7 @@ function flow_callback_broadphase_ai_set_goal_destination(params)
 	local above = 1
 	local below = 5
 	local ai_system = Managers.state.entity:system("ai_system")
-	local nav_world = ai_system.nav_world(ai_system)
+	local nav_world = ai_system:nav_world()
 	local success, altitude = GwNavQueries.triangle_from_position(nav_world, goal_position, above, below)
 
 	if success then

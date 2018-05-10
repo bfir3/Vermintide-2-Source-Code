@@ -8,7 +8,7 @@ TutorialTooltipUI.init = function (self, ingame_ui_context)
 	self.tutorial_tooltip_animations = {}
 	self.tutorial_tooltip_input_widgets = {}
 
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 end
 
 TutorialTooltipUI.destroy = function (self)
@@ -28,7 +28,7 @@ end
 
 TutorialTooltipUI.button_texture_data_by_input_action = function (self, input_action, alt_button_name)
 	local input_manager = self.input_manager
-	local gamepad_active = input_manager.is_device_active(input_manager, "gamepad")
+	local gamepad_active = input_manager:is_device_active("gamepad")
 	local platform = PLATFORM
 
 	if platform == "win32" and gamepad_active then
@@ -40,7 +40,7 @@ TutorialTooltipUI.button_texture_data_by_input_action = function (self, input_ac
 
 		return button_texture_data
 	else
-		local input_service = input_manager.get_service(input_manager, "Player")
+		local input_service = input_manager:get_service("Player")
 
 		return UISettings.get_gamepad_input_texture_data(input_service, input_action, gamepad_active)
 	end
@@ -48,7 +48,7 @@ end
 
 TutorialTooltipUI.update = function (self, tooltip_tutorial, player_unit, dt)
 	if next(self.tutorial_tooltip_animations) ~= nil then
-		self.set_dirty(self)
+		self:set_dirty()
 	end
 
 	for name, ui_animation in pairs(self.tutorial_tooltip_animations) do
@@ -76,7 +76,7 @@ TutorialTooltipUI.update = function (self, tooltip_tutorial, player_unit, dt)
 
 	if inputs and 0 < #inputs then
 		if not active_tooltip_name then
-			self.fade_in(self)
+			self:fade_in()
 		end
 
 		local input_widgets = self.tutorial_tooltip_input_widgets
@@ -95,10 +95,10 @@ TutorialTooltipUI.update = function (self, tooltip_tutorial, player_unit, dt)
 				local widget_content = widget.content
 				local widget_style = widget.style
 				local input = inputs[i]
-				local button_texture_data, button_text = self.button_texture_data_by_input_action(self, input.action)
+				local button_texture_data, button_text = self:button_texture_data_by_input_action(input.action)
 
 				if not button_texture_data and active_template.alt_action_icons then
-					button_texture_data, button_text = self.button_texture_data_by_input_action(self, input.action, active_template.alt_action_icons[input.action])
+					button_texture_data, button_text = self:button_texture_data_by_input_action(input.action, active_template.alt_action_icons[input.action])
 				end
 
 				local texture_size_x = 0
@@ -228,11 +228,11 @@ end
 local FADE_TIME = 0.1
 
 TutorialTooltipUI.fade_in = function (self)
-	self._fade(self, 0, 255, FADE_TIME)
+	self:_fade(0, 255, FADE_TIME)
 end
 
 TutorialTooltipUI.fade_out = function (self)
-	self._fade(self, 255, 0, FADE_TIME)
+	self:_fade(255, 0, FADE_TIME)
 end
 
 TutorialTooltipUI._fade = function (self, from_alpha, to_alpha, duration)

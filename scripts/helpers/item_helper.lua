@@ -108,7 +108,7 @@ end
 
 ItemHelper.mark_backend_id_as_new = function (backend_id)
 	local item_interface = Managers.backend:get_interface("items")
-	local item = item_interface.get_item_from_id(item_interface, backend_id)
+	local item = item_interface:get_item_from_id(backend_id)
 	local item_data = item.data
 	local slot_type = item_data.slot_type
 	local can_wield = item_data.can_wield

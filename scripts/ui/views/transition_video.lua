@@ -23,7 +23,7 @@ TransitionVideo.init = function (self, world, video_data_table)
 	self._video_data_table = video_data_table or demo_video
 	self._ui_renderer = UIRenderer.create(world, "material", self._video_data_table.video_name)
 
-	self._create_ui_elements(self)
+	self:_create_ui_elements()
 end
 
 TransitionVideo._create_ui_elements = function (self)
@@ -46,7 +46,7 @@ local DO_RELOAD = true
 
 TransitionVideo.activate = function (self, activate)
 	if DO_RELOAD then
-		self._create_ui_elements(self)
+		self:_create_ui_elements()
 
 		DO_RELOAD = false
 	end
@@ -54,7 +54,7 @@ TransitionVideo.activate = function (self, activate)
 	self._active = activate
 
 	if not activate then
-		self._destroy_video(self)
+		self:_destroy_video()
 	end
 end
 
@@ -74,7 +74,7 @@ end
 
 TransitionVideo.update = function (self, dt, t)
 	if self._active then
-		self._draw(self, dt, t)
+		self:_draw(dt, t)
 	end
 end
 

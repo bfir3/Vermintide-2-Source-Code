@@ -86,7 +86,7 @@ ActionUtils.get_dropoff_scalar = function (damage_profile, target_settings, atta
 	local dropoff_end = range_dropoff_settings.dropoff_end
 	local buff_extension = ScriptUnit.has_extension(attacker_unit, "buff_system")
 
-	if buff_extension.has_buff_perk(buff_extension, "no_damage_dropoff") then
+	if buff_extension:has_buff_perk("no_damage_dropoff") then
 		dropoff_start = dropoff_start * 2
 		dropoff_end = dropoff_end * 2
 	end
@@ -241,7 +241,7 @@ ActionUtils.apply_buffs_to_power_level = function (unit, power_level)
 		return power_level
 	end
 
-	power_level = buff_extension.apply_buffs_to_value(buff_extension, power_level, StatBuffIndex.POWER_LEVEL)
+	power_level = buff_extension:apply_buffs_to_value(power_level, StatBuffIndex.POWER_LEVEL)
 
 	return power_level
 end
@@ -268,7 +268,7 @@ ActionUtils.apply_buffs_to_power_level_on_hit = function (unit, power_level, bre
 			local is_ranged = RangedBuffTypes[buff_type]
 
 			if is_melee then
-				power_level = buff_extension.apply_buffs_to_value(buff_extension, power_level, StatBuffIndex.POWER_LEVEL_MELEE)
+				power_level = buff_extension:apply_buffs_to_value(power_level, StatBuffIndex.POWER_LEVEL_MELEE)
 			elseif is_ranged then
 			end
 		end
@@ -277,21 +277,21 @@ ActionUtils.apply_buffs_to_power_level_on_hit = function (unit, power_level, bre
 	armor_category = (breed and breed.armor_category) or dummy_unit_armor or 1
 
 	if armor_category == 2 then
-		power_level = buff_extension.apply_buffs_to_value(buff_extension, power_level, StatBuffIndex.POWER_LEVEL_ARMOURED)
+		power_level = buff_extension:apply_buffs_to_value(power_level, StatBuffIndex.POWER_LEVEL_ARMOURED)
 	elseif armor_category == 3 then
-		power_level = buff_extension.apply_buffs_to_value(buff_extension, power_level, StatBuffIndex.POWER_LEVEL_LARGE)
+		power_level = buff_extension:apply_buffs_to_value(power_level, StatBuffIndex.POWER_LEVEL_LARGE)
 	elseif armor_category == 5 then
-		power_level = buff_extension.apply_buffs_to_value(buff_extension, power_level, StatBuffIndex.POWER_LEVEL_FRENZY)
+		power_level = buff_extension:apply_buffs_to_value(power_level, StatBuffIndex.POWER_LEVEL_FRENZY)
 	elseif armor_category == 1 then
-		power_level = buff_extension.apply_buffs_to_value(buff_extension, power_level, StatBuffIndex.POWER_LEVEL_UNARMOURED)
+		power_level = buff_extension:apply_buffs_to_value(power_level, StatBuffIndex.POWER_LEVEL_UNARMOURED)
 	end
 
 	local race = (breed and breed.race) or unit_get_data(unit, "race")
 
 	if race == "chaos" then
-		power_level = buff_extension.apply_buffs_to_value(buff_extension, power_level, StatBuffIndex.POWER_LEVEL_CHAOS)
+		power_level = buff_extension:apply_buffs_to_value(power_level, StatBuffIndex.POWER_LEVEL_CHAOS)
 	elseif race == "skaven" then
-		power_level = buff_extension.apply_buffs_to_value(buff_extension, power_level, StatBuffIndex.POWER_LEVEL_SKAVEN)
+		power_level = buff_extension:apply_buffs_to_value(power_level, StatBuffIndex.POWER_LEVEL_SKAVEN)
 	end
 
 	return power_level
@@ -319,7 +319,7 @@ ActionUtils.get_melee_boost = function (unit)
 	local boost_curve_multiplier = 0
 
 	if career_extension then
-		has_melee_boost, boost_curve_multiplier = career_extension.has_melee_boost(career_extension)
+		has_melee_boost, boost_curve_multiplier = career_extension:has_melee_boost()
 	end
 
 	return has_melee_boost, boost_curve_multiplier
@@ -331,7 +331,7 @@ ActionUtils.get_ranged_boost = function (unit)
 	local boost_curve_multiplier = 0
 
 	if career_extension then
-		has_ranged_boost, boost_curve_multiplier = career_extension.has_ranged_boost(career_extension)
+		has_ranged_boost, boost_curve_multiplier = career_extension:has_ranged_boost()
 	end
 
 	return has_ranged_boost, boost_curve_multiplier
@@ -341,7 +341,7 @@ ActionUtils.spawn_flame_wave_projectile = function (owner_unit, scale, item_temp
 	scale = scale or 100
 	local projectile_system = Managers.state.entity:system("projectile_system")
 
-	projectile_system.spawn_flame_wave_projectile(projectile_system, owner_unit, scale, item_name, item_template_name, action_name, sub_action_name, position, flat_angle, lateral_speed, initial_forward_speed)
+	projectile_system:spawn_flame_wave_projectile(owner_unit, scale, item_name, item_template_name, action_name, sub_action_name, position, flat_angle, lateral_speed, initial_forward_speed)
 end
 
 ActionUtils.spawn_player_projectile = function (owner_unit, position, rotation, scale, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, is_critical_strike, power_level, gaze_settings)
@@ -349,7 +349,7 @@ ActionUtils.spawn_player_projectile = function (owner_unit, position, rotation, 
 	local projectile_system = Managers.state.entity:system("projectile_system")
 	local ping = 0
 
-	projectile_system.spawn_player_projectile(projectile_system, owner_unit, position, rotation, scale, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, ping, is_critical_strike, power_level, gaze_settings)
+	projectile_system:spawn_player_projectile(owner_unit, position, rotation, scale, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, ping, is_critical_strike, power_level, gaze_settings)
 end
 
 ActionUtils.spawn_pickup_projectile = function (world, weapon_unit, projectile_unit_name, projectile_unit_template_name, current_action, owner_unit, position, rotation, velocity, angular_velocity, item_name, spawn_type)
@@ -375,7 +375,7 @@ ActionUtils.spawn_pickup_projectile = function (world, weapon_unit, projectile_u
 		local fuse_time = 6
 
 		if health_extension.ignited then
-			local data = health_extension.health_data(health_extension)
+			local data = health_extension:health_data()
 			explode_time = data.explode_time
 			fuse_time = data.fuse_time
 		end
@@ -415,7 +415,7 @@ ActionUtils.spawn_true_flight_projectile = function (owner_unit, target_unit, tr
 	local true_flight_template_name = TrueFlightTemplatesLookup[true_flight_template_id]
 	scale = scale or 100
 
-	projectile_system.spawn_true_flight_projectile(projectile_system, owner_unit, target_unit, true_flight_template_name, position, rotation, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, scale, is_critical_strike, power_level)
+	projectile_system:spawn_true_flight_projectile(owner_unit, target_unit, true_flight_template_name, position, rotation, angle, target_vector, speed, item_name, item_template_name, action_name, sub_action_name, scale, is_critical_strike, power_level)
 end
 
 ActionUtils.apply_attack_speed_buff = function (attack_speed_value, unit)
@@ -423,7 +423,7 @@ ActionUtils.apply_attack_speed_buff = function (attack_speed_value, unit)
 
 	if unit and Unit.alive(unit) and ScriptUnit.has_extension(unit, "buff_system") then
 		local buff_extension = ScriptUnit.extension(unit, "buff_system")
-		new_value = buff_extension.apply_buffs_to_value(buff_extension, attack_speed_value, StatBuffIndex.ATTACK_SPEED)
+		new_value = buff_extension:apply_buffs_to_value(attack_speed_value, StatBuffIndex.ATTACK_SPEED)
 	end
 
 	return new_value
@@ -462,7 +462,7 @@ ActionUtils.update_action_buff_data = function (action_buff_data, buff_data, own
 			params.external_optional_multiplier = buff.external_multiplier
 			start_times[index] = math.huge
 			local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
-			buff_identifiers[index] = buff_extension.add_buff(buff_extension, buff_template_name, params)
+			buff_identifiers[index] = buff_extension:add_buff(buff_template_name, params)
 			action_buffs_in_progress[index] = true
 		end
 	end
@@ -474,7 +474,7 @@ ActionUtils.update_action_buff_data = function (action_buff_data, buff_data, own
 			local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 			local id = buff_identifiers[index]
 
-			buff_extension.remove_buff(buff_extension, id)
+			buff_extension:remove_buff(id)
 		end
 	end
 end
@@ -488,7 +488,7 @@ ActionUtils.remove_action_buff_data = function (action_buff_data, buff_data, own
 			local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 			local id = buff_identifiers[index]
 
-			buff_extension.remove_buff(buff_extension, id)
+			buff_extension:remove_buff(id)
 		end
 	end
 end
@@ -499,7 +499,7 @@ ActionUtils.start_charge_sound = function (wwise_world, weapon_unit, player_unit
 	local charge_sound_switch = action_settings.charge_sound_switch
 
 	if charge_sound_switch then
-		if overcharge_extension.above_overcharge_threshold(overcharge_extension) then
+		if overcharge_extension:above_overcharge_threshold() then
 			WwiseWorld.set_switch(wwise_world, charge_sound_switch, "above_overcharge_threshold", wwise_source_id)
 		else
 			WwiseWorld.set_switch(wwise_world, charge_sound_switch, "below_overcharge_threshold", wwise_source_id)
@@ -528,32 +528,32 @@ end
 ActionUtils.play_husk_sound_event = function (sound_event, player_unit)
 	local network_manager = Managers.state.network
 	local network_transmit = network_manager.network_transmit
-	local go_id = network_manager.unit_game_object_id(network_manager, player_unit)
+	local go_id = network_manager:unit_game_object_id(player_unit)
 	local event_id = NetworkLookup.sound_events[sound_event]
 
 	if Managers.player.is_server then
-		network_transmit.send_rpc_clients(network_transmit, "rpc_play_husk_sound_event", go_id, event_id)
+		network_transmit:send_rpc_clients("rpc_play_husk_sound_event", go_id, event_id)
 	else
-		network_transmit.send_rpc_server(network_transmit, "rpc_play_husk_sound_event", go_id, event_id)
+		network_transmit:send_rpc_server("rpc_play_husk_sound_event", go_id, event_id)
 	end
 end
 
 ActionUtils.get_critical_strike_chance = function (unit, action)
 	local career_extension = ScriptUnit.extension(unit, "career_system")
 	local buff_extension = ScriptUnit.extension(unit, "buff_system")
-	local base_crit_chance = career_extension.get_base_critical_strike_chance(career_extension)
+	local base_crit_chance = career_extension:get_base_critical_strike_chance()
 	local additional_crit_chance = action.additional_critical_strike_chance or 0
 	local crit_chance = base_crit_chance + additional_crit_chance
 	local action_type = action.kind
 	local is_melee_action = action_type == "sweep" or action_type == "push_stagger"
 
 	if is_melee_action then
-		crit_chance = buff_extension.apply_buffs_to_value(buff_extension, crit_chance, StatBuffIndex.CRITICAL_STRIKE_CHANCE_MELEE)
+		crit_chance = buff_extension:apply_buffs_to_value(crit_chance, StatBuffIndex.CRITICAL_STRIKE_CHANCE_MELEE)
 	else
-		crit_chance = buff_extension.apply_buffs_to_value(buff_extension, crit_chance, StatBuffIndex.CRITICAL_STRIKE_CHANCE_RANGED)
+		crit_chance = buff_extension:apply_buffs_to_value(crit_chance, StatBuffIndex.CRITICAL_STRIKE_CHANCE_RANGED)
 	end
 
-	crit_chance = buff_extension.apply_buffs_to_value(buff_extension, crit_chance, StatBuffIndex.CRITICAL_STRIKE_CHANCE)
+	crit_chance = buff_extension:apply_buffs_to_value(crit_chance, StatBuffIndex.CRITICAL_STRIKE_CHANCE)
 
 	return crit_chance
 end
@@ -588,7 +588,7 @@ ActionUtils.is_critical_strike = function (unit, action, t)
 		local buff_extension = ScriptUnit.extension(unit, "buff_system")
 		local action_type = action.kind
 
-		buff_extension.trigger_procs(buff_extension, "on_critical_action", action_type)
+		buff_extension:trigger_procs("on_critical_action", action_type)
 	end
 
 	return rand < crit_chance
@@ -617,7 +617,7 @@ ActionUtils.redirect_shield_hit = function (hit_unit, hit_actor)
 	if potential_hit_unit_owner then
 		local health_extension = ScriptUnit.extension(potential_hit_unit_owner, "health_system")
 
-		if not health_extension.is_alive(health_extension) then
+		if not health_extension:is_alive() then
 			return hit_unit, hit_actor
 		end
 

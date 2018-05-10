@@ -14,7 +14,7 @@ InteractableSystem.init = function (self, entity_system_creation_context, system
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.unit_extensions = {}
 end
@@ -51,7 +51,7 @@ end
 InteractableSystem._can_interact = function (self, interactor_unit, interactable_unit, interaction_type)
 	if Unit.alive(interactor_unit) and Unit.alive(interactable_unit) then
 		local interactable_extension = ScriptUnit.extension(interactable_unit, "interactable_system")
-		local can_interact = not interactable_extension.is_being_interacted_with(interactable_extension) and InteractionDefinitions[interaction_type].server.can_interact(interactor_unit, interactable_unit)
+		local can_interact = not interactable_extension:is_being_interacted_with() and InteractionDefinitions[interaction_type].server.can_interact(interactor_unit, interactable_unit)
 
 		return can_interact
 	end
@@ -72,10 +72,10 @@ InteractableSystem._handle_standard_interact_request = function (self, interacti
 		interactable_unit = self.unit_storage:unit(interactable_id)
 	end
 
-	if self._can_interact(self, interactor_unit, interactable_unit, interaction_type) then
+	if self:_can_interact(interactor_unit, interactable_unit, interaction_type) then
 		local interactor_extension = ScriptUnit.extension(interactor_unit, "interactor_system")
 
-		interactor_extension.interaction_approved(interactor_extension, interaction_type, interactable_unit)
+		interactor_extension:interaction_approved(interaction_type, interactable_unit)
 		InteractionHelper:approve_request(interaction_type, interactor_unit, interactable_unit)
 
 		return
@@ -88,7 +88,7 @@ InteractableSystem.rpc_generic_interaction_request = function (self, sender, int
 	local interaction_type = NetworkLookup.interactions[interaction_type_id]
 
 	InteractionHelper.printf("rpc_generic_interaction_request(%s, %s, %s, %s, %s)", sender, tostring(interactor_go_id), tostring(interactable_go_id), tostring(is_level_unit), interaction_type)
-	self._handle_standard_interact_request(self, interaction_type, sender, interactor_go_id, interactable_go_id, is_level_unit)
+	self:_handle_standard_interact_request(interaction_type, sender, interactor_go_id, interactable_go_id, is_level_unit)
 end
 
 return

@@ -13,35 +13,35 @@ ObjectiveSocketSystem.init = function (self, entity_system_creation_context, sys
 
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.network_event_delegate = network_event_delegate
 	self.network_manager = Managers.state.network
 	self.socket_extensions = {}
 
 	self.objective_entered_zone_server = function (extension, unit)
-		local socket, socket_id = extension.pick_socket(extension, unit)
+		local socket, socket_id = extension:pick_socket(unit)
 
 		if not socket then
 			return
 		end
 
-		extension.objective_entered_zone_client(extension, socket_id)
+		extension:objective_entered_zone_client(socket_id)
 
 		if self.is_server then
 			local network_manager = self.network_manager
-			local unit_id = network_manager.level_object_id(network_manager, extension.unit)
+			local unit_id = network_manager:level_object_id(extension.unit)
 
 			self.network_manager.network_transmit:send_rpc_clients("rpc_objective_entered_socket_zone", unit_id, socket_id)
 
 			local unit_spawner = Managers.state.unit_spawner
 
-			unit_spawner.mark_for_deletion(unit_spawner, unit)
+			unit_spawner:mark_for_deletion(unit)
 		end
 	end
 
 	self.objective_entered_zone_client = function (extension, socket_id)
-		local socket = extension.socket_from_id(extension, socket_id)
+		local socket = extension:socket_from_id(socket_id)
 
 		assert(socket.open == true, "Sanity check, should never happen")
 
@@ -113,7 +113,7 @@ ObjectiveSocketSystem.rpc_objective_entered_socket_zone = function (self, sender
 	local unit = Level.unit_by_index(level, unit_id)
 	local objective_socket_extension = ScriptUnit.extension(unit, "objective_socket_system")
 
-	objective_socket_extension.objective_entered_zone_client(objective_socket_extension, socket_id)
+	objective_socket_extension:objective_entered_zone_client(socket_id)
 end
 
 return

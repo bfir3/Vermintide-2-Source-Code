@@ -96,7 +96,7 @@ if has_steam and not disable_voip then
 		self.network_transmit = network_transmit
 		self.network_event_delegate = network_event_delegate
 
-		network_event_delegate.register(network_event_delegate, self, "rpc_voip_room_to_join", "rpc_voip_room_request", "rpc_notify_connected")
+		network_event_delegate:register(self, "rpc_voip_room_to_join", "rpc_voip_room_request", "rpc_notify_connected")
 	end
 
 	Voip.unregister_rpcs = function (self)
@@ -127,9 +127,9 @@ if has_steam and not disable_voip then
 		local member_is_in_room = table.find(room_members, sender)
 
 		if enter and not member_is_in_room then
-			self.add_voip_member(self, sender)
+			self:add_voip_member(sender)
 		elseif not enter and member_is_in_room then
-			self.remove_member(self, sender)
+			self:remove_member(sender)
 		else
 			voip_warning_print("[VOIP] Got request from %s to %s room %s but member_is_in_room was %s", sender, (enter and "enter") or "leave", self.room_id, member_is_in_room)
 		end
@@ -155,7 +155,7 @@ if has_steam and not disable_voip then
 
 		if self.room_id then
 			if self.voip_client then
-				self.leave_voip_room(self)
+				self:leave_voip_room()
 			end
 
 			if self.is_server then
@@ -178,11 +178,11 @@ if has_steam and not disable_voip then
 		if self.voip_client then
 			if SteamVoipClient.broken_host(self.voip_client) then
 				voip_warning_print("[STEAM VOIP]: Connection to host %q broken. Leaving room.", tostring(self.room_host))
-				self.leave_voip_room(self)
+				self:leave_voip_room()
 			else
 				for peer_id, _ in pairs(self.added_members) do
 					if not self.muted_peers[peer_id] then
-						self.unmute_member(self, peer_id)
+						self:unmute_member(peer_id)
 					end
 
 					local mute_out = self.push_to_talk and not self.push_to_talk_active
@@ -198,7 +198,7 @@ if has_steam and not disable_voip then
 
 			if self.push_to_talk then
 				local input_service = Managers.input:get_service("Player")
-				local push_to_talk_active = input_service.get(input_service, "voip_push_to_talk")
+				local push_to_talk_active = input_service:get("voip_push_to_talk")
 
 				if push_to_talk_active and not self.push_to_talk_active then
 					self.push_to_talk_active = true
@@ -377,7 +377,7 @@ if has_steam and not disable_voip then
 			self.network_transmit:send_rpc_server("rpc_voip_room_request", true)
 		elseif not enabled and self.voip_client then
 			voip_info_print("[VOIP] Enabling, requesting to leave room")
-			self.leave_voip_room(self)
+			self:leave_voip_room()
 			self.network_transmit:send_rpc_server("rpc_voip_room_request", false)
 		end
 	end

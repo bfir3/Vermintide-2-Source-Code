@@ -97,8 +97,8 @@ EnvironmentBlendVolume.destroy = function (self)
 	local event_manager = Managers.state.event
 
 	if event_manager then
-		event_manager.unregister(event_manager, "enable_environment_volume", self)
-		event_manager.unregister(event_manager, "force_blend_environment_volume", self)
+		event_manager:unregister("enable_environment_volume", self)
+		event_manager:unregister("force_blend_environment_volume", self)
 	end
 end
 

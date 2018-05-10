@@ -33,7 +33,7 @@ BTMeleeOverlapAttackAction.enter = function (self, unit, blackboard, t)
 	local action = self._tree_node.action_data
 	blackboard.action = action
 	blackboard.active_node = BTMeleeOverlapAttackAction
-	local should_attack = self._init_attack(self, unit, blackboard, action, t, 1)
+	local should_attack = self:_init_attack(unit, blackboard, action, t, 1)
 
 	if not should_attack then
 		blackboard.attack_finished = true
@@ -94,7 +94,7 @@ BTMeleeOverlapAttackAction._init_attack = function (self, unit, blackboard, acti
 
 	if action.running_attacks then
 		local target_locomotion_extension = ScriptUnit.extension(target_unit, "locomotion_system")
-		local target_velocity = target_locomotion_extension.current_velocity(target_locomotion_extension)
+		local target_velocity = target_locomotion_extension:current_velocity()
 		local velocity_threshold = action.target_running_velocity_threshold
 		local target_running_distance_threshold = action.target_running_distance_threshold
 		local to_target = POSITION_LOOKUP[target_unit] - POSITION_LOOKUP[unit]
@@ -106,7 +106,7 @@ BTMeleeOverlapAttackAction._init_attack = function (self, unit, blackboard, acti
 		local self_running_speed_threshold = action.self_running_speed_threshold
 
 		if self_running_speed_threshold and not target_is_running then
-			local current_velocity = locomotion_extension.current_velocity(locomotion_extension)
+			local current_velocity = locomotion_extension:current_velocity()
 			local current_speed_sq = Vector3.length_squared(current_velocity)
 			use_running_attack = self_running_speed_threshold^2 < current_speed_sq
 		else
@@ -154,9 +154,9 @@ BTMeleeOverlapAttackAction._init_attack = function (self, unit, blackboard, acti
 	if not attack.enable_nav_extension then
 		local navigation_extension = blackboard.navigation_extension
 
-		navigation_extension.stop(navigation_extension)
-		navigation_extension.set_enabled(navigation_extension, false)
-		locomotion_extension.set_wanted_velocity_flat(locomotion_extension, Vector3.zero())
+		navigation_extension:stop()
+		navigation_extension:set_enabled(false)
+		locomotion_extension:set_wanted_velocity_flat(Vector3.zero())
 	end
 
 	blackboard.anim_locked = t + attack.attack_time
@@ -219,7 +219,7 @@ BTMeleeOverlapAttackAction._init_attack = function (self, unit, blackboard, acti
 	local script_driven_rotation = 0 < rotation_time
 
 	LocomotionUtils.set_animation_driven_movement(unit, anim_driven, affected_by_gravity, script_driven_rotation)
-	locomotion_extension.use_lerp_rotation(locomotion_extension, not anim_driven)
+	locomotion_extension:use_lerp_rotation(not anim_driven)
 	Managers.state.network:anim_event(unit, attack_anim)
 
 	local continious_overlap = attack.continious_overlap
@@ -232,7 +232,7 @@ BTMeleeOverlapAttackAction._init_attack = function (self, unit, blackboard, acti
 			local breed = blackboard.breed
 			local inventory_template = breed.default_inventory_template
 			local inventory_extension = ScriptUnit.extension(unit, "ai_inventory_system")
-			inventory_unit = inventory_extension.get_unit(inventory_extension, inventory_template)
+			inventory_unit = inventory_extension:get_unit(inventory_template)
 		end
 
 		weapon_unit = inventory_unit or unit
@@ -299,7 +299,7 @@ BTMeleeOverlapAttackAction.leave = function (self, unit, blackboard, t, reason, 
 	local locomotion_extension = blackboard.locomotion_extension
 
 	if not blackboard.attack.enable_nav_extension then
-		locomotion_extension.set_rotation_speed(locomotion_extension, nil)
+		locomotion_extension:set_rotation_speed(nil)
 		blackboard.navigation_extension:set_enabled(true)
 	else
 		blackboard.navigation_extension:reset_destination()
@@ -310,7 +310,7 @@ BTMeleeOverlapAttackAction.leave = function (self, unit, blackboard, t, reason, 
 	if blackboard.attack_anim_driven then
 		LocomotionUtils.set_animation_rotation_scale(unit, 1)
 		LocomotionUtils.set_animation_driven_movement(unit, false)
-		locomotion_extension.use_lerp_rotation(locomotion_extension, true)
+		locomotion_extension:use_lerp_rotation(true)
 
 		local is_stunned = wall_collision_data and wall_collision_data.is_stunned
 
@@ -351,7 +351,7 @@ BTMeleeOverlapAttackAction._attack_finished = function (self, unit, blackboard, 
 	local action = blackboard.action
 
 	if action.is_combo_attack then
-		return not self._init_attack(self, unit, blackboard, action, t)
+		return not self:_init_attack(unit, blackboard, action, t)
 	end
 
 	return true
@@ -394,13 +394,13 @@ BTMeleeOverlapAttackAction._create_bot_aoe_threat = function (self, unit, attack
 	local ai_bot_group_system = Managers.state.entity:system("ai_bot_group_system")
 
 	if bot_threat.collision_type == "cylinder" then
-		local obstacle_position, _, obstacle_size = self._calculate_cylinder_collision(self, attack, bot_threat, unit_position, attack_rotation)
+		local obstacle_position, _, obstacle_size = self:_calculate_cylinder_collision(attack, bot_threat, unit_position, attack_rotation)
 
-		ai_bot_group_system.aoe_threat_created(ai_bot_group_system, obstacle_position, "cylinder", obstacle_size, nil, bot_threat_duration)
+		ai_bot_group_system:aoe_threat_created(obstacle_position, "cylinder", obstacle_size, nil, bot_threat_duration)
 	elseif bot_threat.collision_type == "oobb" or not bot_threat.collision_type then
-		local obstacle_position, obstacle_rotation, obstacle_size = self._calculate_oobb_collision(self, attack, bot_threat, unit_position, attack_rotation)
+		local obstacle_position, obstacle_rotation, obstacle_size = self:_calculate_oobb_collision(attack, bot_threat, unit_position, attack_rotation)
 
-		ai_bot_group_system.aoe_threat_created(ai_bot_group_system, obstacle_position, "oobb", obstacle_size, obstacle_rotation, bot_threat_duration)
+		ai_bot_group_system:aoe_threat_created(obstacle_position, "oobb", obstacle_size, obstacle_rotation, bot_threat_duration)
 	end
 end
 
@@ -416,7 +416,7 @@ BTMeleeOverlapAttackAction._check_wall_collision = function (self, unit, blackbo
 	end
 
 	local locomotion_extension = blackboard.locomotion_extension
-	local velocity = locomotion_extension.current_velocity(locomotion_extension)
+	local velocity = locomotion_extension:current_velocity()
 	local speed = Vector3.length(velocity)
 	local direction = nil
 
@@ -450,22 +450,22 @@ BTMeleeOverlapAttackAction.run = function (self, unit, blackboard, t, dt)
 			local locomotion_extension = blackboard.locomotion_extension
 			local target_status_extension = blackboard.target_unit_status_extension
 
-			if t < blackboard.attack_rotation_update_timer and target_status_extension and not target_status_extension.is_invisible(target_status_extension) and (attack.ignores_dodging or not target_status_extension.get_is_dodging(target_status_extension)) then
+			if t < blackboard.attack_rotation_update_timer and target_status_extension and not target_status_extension:is_invisible() and (attack.ignores_dodging or not target_status_extension:get_is_dodging()) then
 				local rot = LocomotionUtils.rotation_towards_unit_flat(unit, blackboard.target_unit)
 				local rotation_speed = attack.rotation_speed
 
 				if rotation_speed then
-					locomotion_extension.use_lerp_rotation(locomotion_extension, true)
-					locomotion_extension.set_rotation_speed(locomotion_extension, rotation_speed)
+					locomotion_extension:use_lerp_rotation(true)
+					locomotion_extension:set_rotation_speed(rotation_speed)
 				end
 
-				locomotion_extension.set_wanted_rotation(locomotion_extension, rot)
+				locomotion_extension:set_wanted_rotation(rot)
 				blackboard.attack_rotation:store(rot)
 			else
 				blackboard.attack_rotation_update_timer = nil
 
 				if blackboard.attack_anim_driven then
-					locomotion_extension.set_animation_driven(locomotion_extension, true, true, false)
+					locomotion_extension:set_animation_driven(true, true, false)
 				end
 			end
 		end
@@ -481,7 +481,7 @@ BTMeleeOverlapAttackAction.run = function (self, unit, blackboard, t, dt)
 			if wall_collision_data.is_stunned then
 				return "running"
 			elseif wall_collision_data.perform_check and wall_collision_data.check_time < t then
-				local collision = self._check_wall_collision(self, unit, blackboard, wall_collision_data.check_range, dt)
+				local collision = self:_check_wall_collision(unit, blackboard, wall_collision_data.check_range, dt)
 
 				if collision then
 					blackboard.anim_locked = t + wall_collision_data.stun_time
@@ -503,7 +503,7 @@ BTMeleeOverlapAttackAction.run = function (self, unit, blackboard, t, dt)
 			local current_bot_threat = bot_threats[current_bot_threat_index]
 			local bot_threat_duration = blackboard.bot_threat_duration
 
-			self._create_bot_aoe_threat(self, unit, attack_rotation, attack, current_bot_threat, bot_threat_duration)
+			self:_create_bot_aoe_threat(unit, attack_rotation, attack, current_bot_threat, bot_threat_duration)
 
 			local next_bot_threat_index = current_bot_threat_index + 1
 			local next_bot_threat = bot_threats[next_bot_threat_index]
@@ -527,19 +527,19 @@ BTMeleeOverlapAttackAction.run = function (self, unit, blackboard, t, dt)
 			local action = blackboard.action
 			local physics_world = blackboard.physics_world
 
-			self.weapon_sweep_overlap(self, unit, blackboard, action, attack, overlap_data, physics_world, t, dt)
+			self:weapon_sweep_overlap(unit, blackboard, action, attack, overlap_data, physics_world, t, dt)
 		end
 
 		if blackboard.attack_finished then
 			blackboard.attack_finished = false
 
-			if self._attack_finished(self, unit, blackboard, t, dt) then
+			if self:_attack_finished(unit, blackboard, t, dt) then
 				return "done"
 			end
 		end
 
 		return "running"
-	elseif self._attack_finished(self, unit, blackboard, t, dt) then
+	elseif self:_attack_finished(unit, blackboard, t, dt) then
 		return "done"
 	end
 end
@@ -559,7 +559,7 @@ BTMeleeOverlapAttackAction.push_player = function (self, unit, hit_unit, push_sp
 	else
 		local locomotion_extension = ScriptUnit.extension(hit_unit, "locomotion_system")
 
-		locomotion_extension.add_external_velocity(locomotion_extension, velocity)
+		locomotion_extension:add_external_velocity(velocity)
 	end
 end
 
@@ -573,13 +573,13 @@ BTMeleeOverlapAttackAction.hit_player = function (self, unit, blackboard, hit_un
 		end
 
 		if attack.player_push_speed_blocked and not hit_unit_status_extension.knocked_down then
-			self.push_player(self, unit, hit_unit, attack.player_push_speed_blocked, attack.player_push_speed_blocked_z, attack.catapult_player)
+			self:push_player(unit, hit_unit, attack.player_push_speed_blocked, attack.player_push_speed_blocked_z, attack.catapult_player)
 		end
 	else
 		AiUtils.damage_target(hit_unit, unit, action, action.damage)
 
 		if attack.player_push_speed and not hit_unit_status_extension.knocked_down then
-			self.push_player(self, unit, hit_unit, attack.player_push_speed, attack.player_push_speed_z, attack.catapult_player)
+			self:push_player(unit, hit_unit, attack.player_push_speed, attack.player_push_speed_z, attack.catapult_player)
 		end
 	end
 
@@ -623,7 +623,7 @@ BTMeleeOverlapAttackAction.hit_ai = function (self, unit, hit_unit, action, atta
 end
 
 BTMeleeOverlapAttackAction.anim_cb_frenzy_damage = function (self, unit, blackboard)
-	self.anim_cb_damage(self, unit, blackboard)
+	self:anim_cb_damage(unit, blackboard)
 end
 
 BTMeleeOverlapAttackAction.anim_cb_damage = function (self, unit, blackboard)
@@ -643,19 +643,19 @@ BTMeleeOverlapAttackAction.anim_cb_damage = function (self, unit, blackboard)
 	local up = Vector3.up() * (offset_up + half_height)
 	local oobb_pos = unit_position + forward + up
 	local time_manager = Managers.time
-	local t = time_manager.time(time_manager, "game")
+	local t = time_manager:time("game")
 	local action = blackboard.action
 	local physics_world = blackboard.physics_world
 	local overlap_update_radius = math.max(range, math.max(height, width))
 	local hit_units = FrameTable.alloc_table()
 	hit_units[unit] = true
 
-	self.overlap_checks(self, unit, blackboard, physics_world, t, action, attack, oobb_pos, unit_rotation, hit_size, hit_units, overlap_update_radius)
+	self:overlap_checks(unit, blackboard, physics_world, t, action, attack, oobb_pos, unit_rotation, hit_size, hit_units, overlap_update_radius)
 
 	local push_units_data = attack.push_units_in_the_way
 
 	if attack.push_close_units_during_attack and push_units_data then
-		self.push_close_units(self, unit, blackboard, t, push_units_data)
+		self:push_close_units(unit, blackboard, t, push_units_data)
 	end
 end
 
@@ -711,7 +711,7 @@ BTMeleeOverlapAttackAction.push_close_units = function (self, unit, blackboard, 
 					local pushed_velocity = data.player_pushed_speed * Vector3.normalize(to_target)
 					local locomotion_extension = ScriptUnit.extension(hit_unit, "locomotion_system")
 
-					locomotion_extension.add_external_velocity(locomotion_extension, pushed_velocity)
+					locomotion_extension:add_external_velocity(pushed_velocity)
 				end
 			end
 		end
@@ -764,7 +764,7 @@ BTMeleeOverlapAttackAction.weapon_sweep_overlap = function (self, unit, blackboa
 	local oobb_pos = mid_pos + up + forward + to_old_frame_tip_node_pos * 0.5
 	local overlap_update_radius = math.max(range, math.max(height, width))
 	local hit_units = data.hit_units
-	local num_hit_units = self.overlap_checks(self, unit, blackboard, physics_world, t, action, attack, oobb_pos, box_rot, box_size, hit_units, overlap_update_radius)
+	local num_hit_units = self:overlap_checks(unit, blackboard, physics_world, t, action, attack, oobb_pos, box_rot, box_size, hit_units, overlap_update_radius)
 
 	if not attack.hit_multiple_targets and 0 < num_hit_units then
 		data.perform_overlap = false
@@ -795,7 +795,7 @@ BTMeleeOverlapAttackAction.overlap_checks = function (self, unit, blackboard, ph
 
 				if not attack.ignore_targets_behind or 0 < Vector3.dot(attack_dir, forward_dir) then
 					if Managers.player:owner(hit_unit) then
-						self.hit_player(self, unit, blackboard, hit_unit, action, attack)
+						self:hit_player(unit, blackboard, hit_unit, action, attack)
 
 						hit_units[hit_unit] = true
 						num_hit_units = num_hit_units + 1
@@ -804,7 +804,7 @@ BTMeleeOverlapAttackAction.overlap_checks = function (self, unit, blackboard, ph
 							break
 						end
 					elseif Unit.has_data(hit_unit, "breed") then
-						self.hit_ai(self, unit, hit_unit, action, attack, blackboard, t)
+						self:hit_ai(unit, hit_unit, action, attack, blackboard, t)
 
 						hit_units[hit_unit] = true
 						num_hit_units = num_hit_units + 1

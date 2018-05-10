@@ -31,7 +31,7 @@ PlayerCharacterStateUsingTransport.update = function (self, unit, input, dt, con
 	end
 
 	if not CharacterStateHelper.is_using_transport(status_extension) then
-		csm.change_state(csm, "standing")
+		csm:change_state("standing")
 
 		return
 	end
@@ -39,9 +39,9 @@ PlayerCharacterStateUsingTransport.update = function (self, unit, input, dt, con
 	local interactor_extension = self.interactor_extension
 
 	if CharacterStateHelper.is_starting_interaction(input_extension, interactor_extension) then
-		local config = interactor_extension.interaction_config(interactor_extension)
+		local config = interactor_extension:interaction_config()
 
-		interactor_extension.start_interaction(interactor_extension, "interacting")
+		interactor_extension:start_interaction("interacting")
 
 		if not config.allow_movement then
 			local params = self.temp_params
@@ -49,14 +49,14 @@ PlayerCharacterStateUsingTransport.update = function (self, unit, input, dt, con
 			params.show_weapons = config.show_weapons
 			params.activate_block = config.activate_block
 
-			csm.change_state(csm, "interacting", params)
+			csm:change_state("interacting", params)
 		end
 
 		return
 	end
 
 	if CharacterStateHelper.is_interacting(interactor_extension) then
-		local config = interactor_extension.interaction_config(interactor_extension)
+		local config = interactor_extension:interaction_config()
 
 		if not config.allow_movement then
 			local params = self.temp_params
@@ -64,7 +64,7 @@ PlayerCharacterStateUsingTransport.update = function (self, unit, input, dt, con
 			params.show_weapons = config.show_weapons
 			params.activate_block = config.activate_block
 
-			csm.change_state(csm, "interacting", params)
+			csm:change_state("interacting", params)
 		end
 
 		return

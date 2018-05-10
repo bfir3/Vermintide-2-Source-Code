@@ -26,7 +26,7 @@ CameraSystem.init = function (self, context, system_name)
 	self.input_manager = context.input_manager
 	local network_event_delegate = context.network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.network_event_delegate = network_event_delegate
 end
@@ -42,8 +42,8 @@ CameraSystem.idle_camera_dummy_spawned = function (self, camera_dummy_unit)
 	for player, camera_unit in pairs(self.camera_units) do
 		local camera_ext = ScriptUnit.extension(camera_unit, "camera_system")
 
-		camera_ext.set_idle_position(camera_ext, position)
-		camera_ext.set_idle_rotation(camera_ext, rotation)
+		camera_ext:set_idle_position(position)
+		camera_ext:set_idle_rotation(rotation)
 	end
 end
 
@@ -53,7 +53,7 @@ CameraSystem.external_state_change = function (self, player, state)
 	if ScriptUnit.has_extension(camera_unit, "camera_system") then
 		local camera_ext = ScriptUnit.extension(camera_unit, "camera_system")
 
-		camera_ext.set_external_state_change(camera_ext, state)
+		camera_ext:set_external_state_change(state)
 	end
 end
 
@@ -64,14 +64,14 @@ CameraSystem.set_follow_unit = function (self, player, follow_unit, follow_node_
 		local camera_ext = ScriptUnit.extension(camera_unit, "camera_system")
 		local camera_state_ext = ScriptUnit.extension(camera_unit, "camera_state_machine_system")
 
-		camera_ext.set_follow_unit(camera_ext, follow_unit, follow_node_name)
+		camera_ext:set_follow_unit(follow_unit, follow_node_name)
 
 		local camera_state = camera_state_ext.state_machine.state_current
 
 		if camera_state.refresh_follow_unit then
 			local follow_node = (follow_unit and Unit.node(follow_unit, follow_node_name)) or nil
 
-			camera_state.refresh_follow_unit(camera_state, follow_unit, follow_node)
+			camera_state:refresh_follow_unit(follow_unit, follow_node)
 		end
 	end
 end
@@ -80,20 +80,20 @@ CameraSystem.local_player_created = function (self, player)
 	local camera_manager = Managers.state.camera
 	local viewport_name = player.viewport_name
 
-	self._setup_viewport(self, viewport_name)
-	self._setup_camera(self, viewport_name)
-	self._setup_camera_unit(self, player, viewport_name)
-	camera_manager.set_camera_node(camera_manager, viewport_name, "first_person", "first_person_node")
+	self:_setup_viewport(viewport_name)
+	self:_setup_camera(viewport_name)
+	self:_setup_camera_unit(player, viewport_name)
+	camera_manager:set_camera_node(viewport_name, "first_person", "first_person_node")
 
 	local camera_unit = self.camera_units[player]
 
-	player.set_camera_follow_unit(player, camera_unit)
+	player:set_camera_follow_unit(camera_unit)
 end
 
 CameraSystem._setup_viewport = function (self, viewport_name)
 	local camera_manager = Managers.state.camera
 
-	camera_manager.create_viewport(camera_manager, viewport_name, Vector3.zero(), Quaternion.identity())
+	camera_manager:create_viewport(viewport_name, Vector3.zero(), Quaternion.identity())
 end
 
 CameraSystem._setup_camera = function (self, viewport_name)
@@ -101,10 +101,10 @@ CameraSystem._setup_camera = function (self, viewport_name)
 	local camera = ScriptViewport.camera(viewport)
 	local camera_manager = Managers.state.camera
 
-	camera_manager.load_node_tree(camera_manager, viewport_name, "default", "world")
-	camera_manager.load_node_tree(camera_manager, viewport_name, "first_person", "first_person")
-	camera_manager.load_node_tree(camera_manager, viewport_name, "player_dead", "player_dead")
-	camera_manager.load_node_tree(camera_manager, viewport_name, "cutscene", "cutscene")
+	camera_manager:load_node_tree(viewport_name, "default", "world")
+	camera_manager:load_node_tree(viewport_name, "first_person", "first_person")
+	camera_manager:load_node_tree(viewport_name, "player_dead", "player_dead")
+	camera_manager:load_node_tree(viewport_name, "cutscene", "cutscene")
 end
 
 CameraSystem._setup_camera_unit = function (self, player, viewport_name)
@@ -135,8 +135,8 @@ CameraSystem._setup_camera_unit = function (self, player, viewport_name)
 	local camera_unit = Managers.state.unit_spawner:spawn_local_unit_with_extensions(unit_name, unit_template_name, extension_init_data, position, rotation)
 	local camera_ext = ScriptUnit.extension(camera_unit, "camera_system")
 
-	camera_ext.set_idle_position(camera_ext, position)
-	camera_ext.set_idle_rotation(camera_ext, rotation)
+	camera_ext:set_idle_position(position)
+	camera_ext:set_idle_rotation(rotation)
 	Unit.set_data(camera_unit, "camera", "settings_tree", "first_person")
 	Unit.set_data(camera_unit, "camera", "settings_node", "first_person_node")
 
@@ -191,11 +191,11 @@ CameraSystem.update = function (self, context)
 		local tree_name = Unit.get_data(camera_unit, "camera", "settings_tree")
 		local node_name = Unit.get_data(camera_unit, "camera", "settings_node")
 
-		if node_name ~= camera_manager.current_camera_node(camera_manager, viewport_name) then
-			camera_manager.set_camera_node(camera_manager, viewport_name, tree_name, node_name)
+		if node_name ~= camera_manager:current_camera_node(viewport_name) then
+			camera_manager:set_camera_node(viewport_name, tree_name, node_name)
 		end
 
-		camera_manager.update(camera_manager, dt, t, viewport_name)
+		camera_manager:update(dt, t, viewport_name)
 	end
 end
 
@@ -207,7 +207,7 @@ CameraSystem.post_update = function (self, context)
 	for player, camera_unit in pairs(self.camera_units) do
 		local viewport_name = player.viewport_name
 
-		camera_manager.post_update(camera_manager, dt, t, viewport_name)
+		camera_manager:post_update(dt, t, viewport_name)
 	end
 
 	Managers.state.entity:system("tutorial_system"):pre_render_update(dt, t)

@@ -14,26 +14,26 @@ BTTransformAction.enter = function (self, unit, blackboard, t)
 	local action = blackboard.action
 	local network_manager = Managers.state.network
 
-	network_manager.anim_event(network_manager, unit, "to_combat")
+	network_manager:anim_event(unit, "to_combat")
 
 	local transform_animation = action.transform_animation
 
 	if transform_animation then
-		network_manager.anim_event(network_manager, unit, transform_animation)
+		network_manager:anim_event(unit, transform_animation)
 	else
 		blackboard.transform_anim_finished = true
 	end
 
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.set_enabled(navigation_extension, false)
-	navigation_extension.set_max_speed(navigation_extension, 0)
+	navigation_extension:set_enabled(false)
+	navigation_extension:set_max_speed(0)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3(0, 0, 0))
 
 	local enemy_package_loader = Managers.state.game_mode.level_transition_handler.enemy_package_loader
 
 	if not enemy_package_loader.breed_processed[action.wanted_breed_transform] then
-		enemy_package_loader.request_breed(enemy_package_loader, action.wanted_breed_transform, true)
+		enemy_package_loader:request_breed(action.wanted_breed_transform, true)
 	end
 end
 
@@ -43,7 +43,7 @@ end
 
 BTTransformAction.run = function (self, unit, blackboard, t, dt)
 	if blackboard.transform_anim_finished and not blackboard.has_transformed then
-		self.transform(self, unit, blackboard)
+		self:transform(unit, blackboard)
 
 		return "done"
 	end
@@ -64,13 +64,13 @@ BTTransformAction.transform = function (self, unit, blackboard)
 			if transfer_health_percentage then
 				local original_hp_percentage = optional_data.original_hp_percentage
 				local health_extension = ScriptUnit.extension(transformed_unit, "health_system")
-				local max_health = health_extension.get_max_health(health_extension)
+				local max_health = health_extension:get_max_health()
 				local damage = max_health * (1 - original_hp_percentage)
 
-				health_extension.set_current_damage(health_extension, damage)
+				health_extension:set_current_damage(damage)
 
 				local network_manager = Managers.state.network
-				local go_id, is_level_unit = network_manager.game_object_or_level_id(network_manager, transformed_unit)
+				local go_id, is_level_unit = network_manager:game_object_or_level_id(transformed_unit)
 				local state = NetworkLookup.health_statuses[health_extension.state]
 
 				Managers.state.network.network_transmit:send_rpc_clients("rpc_sync_damage_taken", go_id, is_level_unit, false, damage, state)
@@ -81,8 +81,8 @@ BTTransformAction.transform = function (self, unit, blackboard)
 	local spawn_category = "misc"
 	local conflict_director = Managers.state.conflict
 
-	conflict_director.spawn_queued_unit(conflict_director, breed, Vector3Box(POSITION_LOOKUP[unit]), QuaternionBox(Unit.local_rotation(unit, 0)), spawn_category, nil, nil, optional_data)
-	conflict_director.destroy_unit(conflict_director, unit, blackboard, "boss_transformation")
+	conflict_director:spawn_queued_unit(breed, Vector3Box(POSITION_LOOKUP[unit]), QuaternionBox(Unit.local_rotation(unit, 0)), spawn_category, nil, nil, optional_data)
+	conflict_director:destroy_unit(unit, blackboard, "boss_transformation")
 
 	blackboard.has_transformed = true
 end

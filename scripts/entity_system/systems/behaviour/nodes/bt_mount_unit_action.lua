@@ -19,7 +19,7 @@ BTMountUnitAction.enter = function (self, unit, blackboard, t)
 
 	blackboard.navigation_extension:set_enabled(false)
 	blackboard.locomotion_extension:set_wanted_velocity(Vector3.zero())
-	network_manager.anim_event(network_manager, unit, animation)
+	network_manager:anim_event(unit, animation)
 
 	local mounted_data = blackboard.mounted_data
 

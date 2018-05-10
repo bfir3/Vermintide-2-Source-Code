@@ -14,26 +14,26 @@ ActionCareerBWScholar.client_owner_start_action = function (self, new_action, t,
 	local talent_extension = self.talent_extension
 	local owner_unit = self.owner_unit
 
-	if talent_extension.has_talent(talent_extension, "sienna_scholar_activated_ability_dump_overcharge", "bright_wizard", true) then
+	if talent_extension:has_talent("sienna_scholar_activated_ability_dump_overcharge", "bright_wizard", true) then
 		local player = Managers.player:owner(owner_unit)
 
 		if player.local_player or (self.is_server and player.bot_player) then
 			local overcharge_extension = self.overcharge_extension
 
-			overcharge_extension.reset(overcharge_extension)
+			overcharge_extension:reset()
 		end
 	end
 
-	if talent_extension.has_talent(talent_extension, "sienna_scholar_activated_ability_heal", "bright_wizard", true) then
+	if talent_extension:has_talent("sienna_scholar_activated_ability_heal", "bright_wizard", true) then
 		local network_manager = Managers.state.network
 		local network_transmit = network_manager.network_transmit
-		local unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
+		local unit_id = network_manager:unit_game_object_id(owner_unit)
 		local heal_type_id = NetworkLookup.heal_types.career_skill
 
-		network_transmit.send_rpc_server(network_transmit, "rpc_request_heal", unit_id, 20, heal_type_id)
+		network_transmit:send_rpc_server("rpc_request_heal", unit_id, 20, heal_type_id)
 	end
 
-	self._play_vo(self)
+	self:_play_vo()
 end
 
 ActionCareerBWScholar.finish = function (self, reason)
@@ -47,7 +47,7 @@ ActionCareerBWScholar._play_vo = function (self)
 	local dialogue_input = ScriptUnit.extension_input(owner_unit, "dialogue_system")
 	local event_data = FrameTable.alloc_table()
 
-	dialogue_input.trigger_networked_dialogue_event(dialogue_input, "activate_ability", event_data)
+	dialogue_input:trigger_networked_dialogue_event("activate_ability", event_data)
 end
 
 return

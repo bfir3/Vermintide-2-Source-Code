@@ -78,7 +78,7 @@ end
 PlayGoTutorialSystem.add_animation_hook = function (self, animation_hook)
 	self._animation_hooks[#self._animation_hooks + 1] = animation_hook
 
-	self._add_next_animation_hook(self)
+	self:_add_next_animation_hook()
 end
 
 PlayGoTutorialSystem._add_next_animation_hook = function (self)
@@ -95,7 +95,7 @@ PlayGoTutorialSystem._add_next_animation_hook = function (self)
 				animation_hook.timer = Managers.time:time("game") + animation_hook.animation_delay or 0
 				animation_hook.world = self._world
 
-				animation_hook.on_enter(animation_hook, unit)
+				animation_hook:on_enter(unit)
 			end
 
 			return self._unit_animation_event(unit, animation_event)
@@ -110,7 +110,7 @@ end
 
 PlayGoTutorialSystem.on_remove_extension = function (self, unit, extension_name)
 	ScriptUnit.remove_extension(unit, self.NAME)
-	self._unload_profile_packages(self)
+	self:_unload_profile_packages()
 
 	script_data.cap_num_bots = nil
 	script_data.ai_bots_disabled = nil
@@ -132,23 +132,23 @@ end
 PlayGoTutorialSystem.set_bot_ready_for_assisted_respawn = function (self, unit, respawn_unit)
 	local status_extension = ScriptUnit.extension(unit, "status_system")
 
-	status_extension.set_ready_for_assisted_respawn(status_extension, true, respawn_unit)
+	status_extension:set_ready_for_assisted_respawn(true, respawn_unit)
 end
 
 PlayGoTutorialSystem.remove_player_ammo = function (self)
 	local player = Managers.player:local_player()
 	local inventory_extension = ScriptUnit.extension(player.player_unit, "inventory_system")
-	local current, max = inventory_extension.current_ammo_status(inventory_extension, "slot_ranged")
+	local current, max = inventory_extension:current_ammo_status("slot_ranged")
 
 	if current and 0 < current then
-		local slot_data = inventory_extension.get_slot_data(inventory_extension, "slot_ranged")
+		local slot_data = inventory_extension:get_slot_data("slot_ranged")
 		local left_unit_1p = slot_data.left_unit_1p
 		local right_unit_1p = slot_data.right_unit_1p
 		local ammo_extension = (ScriptUnit.has_extension(left_unit_1p, "ammo_system") and ScriptUnit.extension(left_unit_1p, "ammo_system")) or (ScriptUnit.has_extension(right_unit_1p, "ammo_system") and ScriptUnit.extension(right_unit_1p, "ammo_system"))
 
 		if ammo_extension then
-			ammo_extension.use_ammo(ammo_extension, 1)
-			ammo_extension.add_ammo_to_reserve(ammo_extension, -(current - 1))
+			ammo_extension:use_ammo(1)
+			ammo_extension:add_ammo_to_reserve(-(current - 1))
 		end
 	end
 end
@@ -156,7 +156,7 @@ end
 PlayGoTutorialSystem.check_player_ammo = function (self)
 	local player = Managers.player:local_player()
 	local inventory_extension = ScriptUnit.extension(player.player_unit, "inventory_system")
-	local current, max = inventory_extension.current_ammo_status(inventory_extension, "slot_ranged")
+	local current, max = inventory_extension:current_ammo_status("slot_ranged")
 
 	if 0 < current then
 		return true
@@ -176,13 +176,13 @@ PlayGoTutorialSystem.give_player_potion_from_bot = function (self, player_unit, 
 	local item_name = "potion_speed_boost_01"
 	local item_data = ItemMasterList[item_name]
 
-	inventory.add_equipment(inventory, "slot_potion", item_data)
+	inventory:add_equipment("slot_potion", item_data)
 
 	local player_manager = Managers.player
-	local interactor_player = player_manager.unit_owner(player_manager, bot_unit)
+	local interactor_player = player_manager:unit_owner(bot_unit)
 
 	if interactor_player then
-		Managers.state.event:trigger("give_item_feedback", interactor_player.stats_id(interactor_player) .. item_name, interactor_player, item_name)
+		Managers.state.event:trigger("give_item_feedback", interactor_player:stats_id() .. item_name, interactor_player, item_name)
 	end
 end
 
@@ -206,7 +206,7 @@ PlayGoTutorialSystem.update = function (self, context, t)
 		local player_unit = player.player_unit
 		local player_input = ScriptUnit.extension(player_unit, "input_system")
 
-		player_input.set_enabled(player_input, true)
+		player_input:set_enabled(true)
 
 		self._current_animation_hook = nil
 
@@ -218,13 +218,13 @@ PlayGoTutorialSystem.update = function (self, context, t)
 		DO_RELOAD = false
 	end
 
-	self._update_animation_hooks(self, player, t)
-	self._update_pause_events(self, t)
-	self._update_player_health(self, player)
-	self._update_player_ammo(self, player)
-	self._update_ai_units(self)
-	self._capture_wield_switch(self, player)
-	self._capture_attacks(self, player)
+	self:_update_animation_hooks(player, t)
+	self:_update_pause_events(t)
+	self:_update_player_health(player)
+	self:_update_player_ammo(player)
+	self:_update_ai_units()
+	self:_capture_wield_switch(player)
+	self:_capture_attacks(player)
 end
 
 PlayGoTutorialSystem._update_animation_hooks = function (self, player, t)
@@ -234,7 +234,7 @@ PlayGoTutorialSystem._update_animation_hooks = function (self, player, t)
 
 		self._current_animation_hook = nil
 
-		self._add_next_animation_hook(self)
+		self:_add_next_animation_hook()
 	end
 end
 
@@ -249,10 +249,10 @@ end
 PlayGoTutorialSystem._update_player_health = function (self, player)
 	local player_unit = player.player_unit
 	local health_extension = ScriptUnit.extension(player_unit, "health_system")
-	local hp_percent = health_extension.current_health_percent(health_extension)
+	local hp_percent = health_extension:current_health_percent()
 
 	if hp_percent < 0.2 then
-		health_extension.reset(health_extension)
+		health_extension:reset()
 	end
 end
 
@@ -260,8 +260,8 @@ PlayGoTutorialSystem._capture_wield_switch = function (self, player)
 	local player_unit = player.player_unit
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
 
-	if inventory_extension.get_wielded_slot_name(inventory_extension) ~= self._last_slot_name then
-		self._last_slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
+	if inventory_extension:get_wielded_slot_name() ~= self._last_slot_name then
+		self._last_slot_name = inventory_extension:get_wielded_slot_name()
 
 		Unit.flow_event(self._tutorial_unit, "lua_wield_switch")
 	end
@@ -270,14 +270,14 @@ end
 PlayGoTutorialSystem._capture_attacks = function (self, player)
 	local player_unit = player.player_unit
 	local inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 	local weapon_unit = equipment.right_hand_wielded_unit or equipment.left_hand_wielded_unit
 
 	if weapon_unit then
 		local weapon_extension = ScriptUnit.extension(weapon_unit, "weapon_system")
 
-		if weapon_extension.has_current_action(weapon_extension) then
-			local action_settings = weapon_extension.get_current_action_settings(weapon_extension)
+		if weapon_extension:has_current_action() then
+			local action_settings = weapon_extension:get_current_action_settings()
 
 			if action_settings.charge_value ~= nil then
 				self._last_known_attack = action_settings.charge_value
@@ -292,18 +292,18 @@ PlayGoTutorialSystem._update_player_ammo = function (self, player)
 	end
 
 	local inventory_extension = ScriptUnit.extension(player.player_unit, "inventory_system")
-	local current, max = inventory_extension.current_ammo_status(inventory_extension, "slot_ranged")
+	local current, max = inventory_extension:current_ammo_status("slot_ranged")
 
 	if current == 0 then
-		local slot_data = inventory_extension.get_slot_data(inventory_extension, "slot_ranged")
+		local slot_data = inventory_extension:get_slot_data("slot_ranged")
 		local left_unit_1p = slot_data.left_unit_1p
 		local ammo_extension = ScriptUnit.has_extension(left_unit_1p, "ammo_system") and ScriptUnit.extension(left_unit_1p, "ammo_system")
 
 		if ammo_extension then
-			ammo_extension.add_ammo(ammo_extension, max)
+			ammo_extension:add_ammo(max)
 
-			if inventory_extension.get_wielded_slot_name(inventory_extension) == "slot_ranged" and ammo_extension.can_reload(ammo_extension) then
-				ammo_extension.start_reload(ammo_extension, true)
+			if inventory_extension:get_wielded_slot_name() == "slot_ranged" and ammo_extension:can_reload() then
+				ammo_extension:start_reload(true)
 			end
 		end
 	end
@@ -531,7 +531,7 @@ PlayGoTutorialSystem.register_unit = function (self, spawner_unit, ai_unit)
 
 		outline_extension.outline_color = OutlineSettings.colors.interactable
 
-		outline_extension.reapply_outline(outline_extension)
+		outline_extension:reapply_outline()
 
 		data.is_highlighted = true
 	end
@@ -545,14 +545,14 @@ end
 PlayGoTutorialSystem.teleport_unit = function (self, unit, position, rotation)
 	local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
 
-	locomotion_extension.teleport_to(locomotion_extension, position, rotation)
+	locomotion_extension:teleport_to(position, rotation)
 
 	local bot = Unit.get_data(unit, "bot")
 
 	if bot then
 		local navigation_extension = ScriptUnit.extension(unit, "ai_navigation_system")
 
-		navigation_extension.teleport(navigation_extension, position)
+		navigation_extension:teleport(position)
 	end
 end
 

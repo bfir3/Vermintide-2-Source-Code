@@ -16,7 +16,7 @@ BTVortexSpawnAction.enter = function (self, unit, blackboard, t)
 	if not is_position_on_navmesh then
 		local conflict_director = Managers.state.conflict
 
-		conflict_director.destroy_unit(conflict_director, unit, blackboard, "no_navmesh")
+		conflict_director:destroy_unit(unit, blackboard, "no_navmesh")
 	end
 end
 

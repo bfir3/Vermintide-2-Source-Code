@@ -82,7 +82,7 @@ BackendInterfaceStatisticsPlayFab.save = function (self, save_callback)
 		return false
 	end
 
-	local player = player_manager.local_player(player_manager)
+	local player = player_manager:local_player()
 
 	if not player then
 		print("[BackendInterfaceStatisticsPlayFab] No player found, skipping saving statistics...")
@@ -90,7 +90,7 @@ BackendInterfaceStatisticsPlayFab.save = function (self, save_callback)
 		return false
 	end
 
-	local player_stats_id = player.stats_id(player)
+	local player_stats_id = player:stats_id()
 	local player_stats = Managers.player:statistics_db():get_all_stats(player_stats_id)
 	local stats_to_save = filter_stats(flatten_stats(player_stats))
 
@@ -102,7 +102,7 @@ BackendInterfaceStatisticsPlayFab.save = function (self, save_callback)
 		return false
 	end
 
-	return self._save_player_stats(self, stats_to_save, save_callback)
+	return self:_save_player_stats(stats_to_save, save_callback)
 end
 
 BackendInterfaceStatisticsPlayFab._save_player_stats = function (self, stats, save_callback)

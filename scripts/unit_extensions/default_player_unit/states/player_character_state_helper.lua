@@ -2,8 +2,8 @@ CharacterStateHelper = CharacterStateHelper or {}
 local CharacterStateHelper = CharacterStateHelper
 
 CharacterStateHelper.get_movement_input = function (input_extension)
-	local move_input = input_extension.get(input_extension, "move") or Vector3(0, 0, 0)
-	local move_input_controller = input_extension.get(input_extension, "move_controller") or Vector3(0, 0, 0)
+	local move_input = input_extension:get("move") or Vector3(0, 0, 0)
+	local move_input_controller = input_extension:get("move_controller") or Vector3(0, 0, 0)
 	local movement = nil
 
 	if Vector3.length(move_input_controller) < Vector3.length(move_input) then
@@ -16,8 +16,8 @@ CharacterStateHelper.get_movement_input = function (input_extension)
 end
 
 CharacterStateHelper.get_square_movement_input = function (input_extension)
-	local move_input = input_extension.get(input_extension, "move") or Vector3(0, 0, 0)
-	local move_input_controller = input_extension.get(input_extension, "move_controller") or Vector3(0, 0, 0)
+	local move_input = input_extension:get("move") or Vector3(0, 0, 0)
+	local move_input_controller = input_extension:get("move_controller") or Vector3(0, 0, 0)
 	local movement = nil
 
 	if Vector3.length(move_input_controller) < Vector3.length(move_input) then
@@ -35,27 +35,27 @@ CharacterStateHelper.get_look_input = function (input_extension, status_extensio
 
 	if ScriptUnit.has_extension(hacky_unit, "smart_targeting_system") then
 		local targeting_extension = ScriptUnit.extension(hacky_unit, "smart_targeting_system")
-		targeting_data = targeting_extension.get_targeting_data(targeting_extension)
+		targeting_data = targeting_extension:get_targeting_data()
 	end
 
-	local look_input = input_extension.get(input_extension, "look")
+	local look_input = input_extension:get("look")
 	local look_input_gamepad = nil
-	local is_zooming = status_extension.is_zooming(status_extension)
+	local is_zooming = status_extension:is_zooming()
 	local gamepad_enabled = Managers.input:is_device_active("gamepad")
-	local wielded_slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
-	local weapon_template = inventory_extension.get_wielded_slot_item_template(inventory_extension)
+	local wielded_slot_name = inventory_extension:get_wielded_slot_name()
+	local weapon_template = inventory_extension:get_wielded_slot_item_template()
 
 	if gamepad_enabled then
 		if is_zooming then
-			look_input_gamepad = input_extension.get(input_extension, "look_controller_zoom")
+			look_input_gamepad = input_extension:get("look_controller_zoom")
 		elseif is_3p then
-			look_input_gamepad = input_extension.get(input_extension, "look_controller_3p")
+			look_input_gamepad = input_extension:get("look_controller_3p")
 		elseif wielded_slot_name == "slot_ranged" then
-			look_input_gamepad = input_extension.get(input_extension, "look_controller_ranged")
+			look_input_gamepad = input_extension:get("look_controller_ranged")
 		elseif wielded_slot_name == "slot_melee" and targeting_data and targeting_data.targets_within_range then
-			look_input_gamepad = input_extension.get(input_extension, "look_controller_melee")
+			look_input_gamepad = input_extension:get("look_controller_melee")
 		else
-			look_input_gamepad = input_extension.get(input_extension, "look_controller")
+			look_input_gamepad = input_extension:get("look_controller")
 		end
 	end
 
@@ -77,8 +77,8 @@ CharacterStateHelper.get_look_input = function (input_extension, status_extensio
 end
 
 CharacterStateHelper.update_dodge_lock = function (unit, input_extension, status_extension)
-	if status_extension.dodge_locked(status_extension) and not input_extension.get(input_extension, "dodge_hold") then
-		status_extension.set_dodge_locked(status_extension, false)
+	if status_extension:dodge_locked() and not input_extension:get("dodge_hold") then
+		status_extension:set_dodge_locked(false)
 	end
 end
 
@@ -89,7 +89,7 @@ local DOUBLE_TAP_DODGES = {
 }
 
 CharacterStateHelper.check_to_start_dodge = function (unit, input_extension, status_extension, t)
-	if status_extension.dodge_locked(status_extension) or not status_extension.can_dodge(status_extension, t) then
+	if status_extension:dodge_locked() or not status_extension:can_dodge(t) then
 		return false
 	end
 
@@ -98,30 +98,30 @@ CharacterStateHelper.check_to_start_dodge = function (unit, input_extension, sta
 	local double_tap_dodge = input_extension.double_tap_dodge
 	local start_dodge = false
 	local dodge_direction = Vector3(0, 0, 0)
-	local dodge_hold = input_extension.get(input_extension, "dodge_hold")
-	local manual_dodge = input_extension.get(input_extension, "dodge")
-	local dodge_input = manual_dodge or (input_extension.get(input_extension, "jump") and dodge_hold)
+	local dodge_hold = input_extension:get("dodge_hold")
+	local manual_dodge = input_extension:get("dodge")
+	local dodge_input = manual_dodge or (input_extension:get("jump") and dodge_hold)
 	local input_length = Vector3.length(input)
 	local using_keyboard = not Managers.input:is_device_active("gamepad")
 	local stationary_dodge = Application.user_setting("toggle_stationary_dodge")
 
 	if double_tap_dodge then
 		for input, dir in pairs(DOUBLE_TAP_DODGES) do
-			if input_extension.get(input_extension, input) then
-				local was_double_tap = input_extension.was_double_tap(input_extension, input, t, Application.user_setting("double_tap_dodge_threshold"))
+			if input_extension:get(input) then
+				local was_double_tap = input_extension:was_double_tap(input, t, Application.user_setting("double_tap_dodge_threshold"))
 
 				for input, dir in pairs(DOUBLE_TAP_DODGES) do
-					input_extension.clear_double_tap(input_extension, input)
+					input_extension:clear_double_tap(input)
 				end
 
 				if was_double_tap then
 					start_dodge = true
-					dodge_direction = dir.unbox(dir)
+					dodge_direction = dir:unbox()
 
 					break
 				end
 
-				input_extension.start_double_tap(input_extension, input, t)
+				input_extension:start_double_tap(input, t)
 
 				break
 			end
@@ -151,9 +151,9 @@ CharacterStateHelper.check_to_start_dodge = function (unit, input_extension, sta
 
 	if start_dodge then
 		Managers.state.entity:system("play_go_tutorial_system"):register_dodge(dodge_direction)
-		status_extension.add_fatigue_points(status_extension, "action_dodge")
-		status_extension.set_dodge_locked(status_extension, true)
-		status_extension.add_dodge_cooldown(status_extension)
+		status_extension:add_fatigue_points("action_dodge")
+		status_extension:set_dodge_locked(true)
+		status_extension:add_dodge_cooldown()
 
 		slot15 = ScriptUnit.extension(unit, "first_person_system")
 	end
@@ -162,7 +162,7 @@ CharacterStateHelper.check_to_start_dodge = function (unit, input_extension, sta
 end
 
 CharacterStateHelper.move_on_ground = function (first_person_extension, input_extension, locomotion_extension, local_move_direction, speed, unit)
-	local unit_rotation = first_person_extension.current_rotation(first_person_extension)
+	local unit_rotation = first_person_extension:current_rotation()
 	local flat_unit_rotation = Quaternion.look(Vector3.flat(Quaternion.forward(unit_rotation)), Vector3.up())
 	local move_direction = Quaternion.rotate(flat_unit_rotation, local_move_direction)
 
@@ -171,7 +171,7 @@ CharacterStateHelper.move_on_ground = function (first_person_extension, input_ex
 		speed = speed * movement_settings_table.backward_move_scale
 	end
 
-	locomotion_extension.set_wanted_velocity(locomotion_extension, move_direction * speed)
+	locomotion_extension:set_wanted_velocity(move_direction * speed)
 end
 
 CharacterStateHelper.update_soft_collision_movement = function (first_person_extension, status_extension, locomotion_extension, unit, world, current_animation)
@@ -203,11 +203,11 @@ CharacterStateHelper.update_soft_collision_movement = function (first_person_ext
 	local idle_speed_threshold = movement_settings_table.soft_collision.idle_speed_threshold
 
 	if final_direction_length <= idle_speed_threshold then
-		locomotion_extension.set_wanted_velocity(locomotion_extension, Vector3(0, 0, 0))
+		locomotion_extension:set_wanted_velocity(Vector3(0, 0, 0))
 	else
 		final_direction_length = math.clamp(final_direction_length, movement_settings_table.soft_collision.lowest_speed, movement_settings_table.soft_collision.highest_speed)
 
-		locomotion_extension.set_wanted_velocity(locomotion_extension, final_direction * final_direction_length)
+		locomotion_extension:set_wanted_velocity(final_direction * final_direction_length)
 	end
 
 	if final_direction_length <= idle_speed_threshold then
@@ -236,19 +236,19 @@ end
 
 CharacterStateHelper.do_common_state_transitions = function (status_extension, csm, in_state)
 	if CharacterStateHelper.is_dead(status_extension) then
-		csm.change_state(csm, "dead")
+		csm:change_state("dead")
 
 		return true
 	end
 
 	if CharacterStateHelper.is_knocked_down(status_extension) then
-		csm.change_state(csm, "knocked_down")
+		csm:change_state("knocked_down")
 
 		return true
 	end
 
 	if CharacterStateHelper.is_pounced_down(status_extension) then
-		csm.change_state(csm, "pounced_down")
+		csm:change_state("pounced_down")
 
 		return true
 	end
@@ -261,43 +261,43 @@ CharacterStateHelper.do_common_state_transitions = function (status_extension, c
 			direction = direction
 		}
 
-		csm.change_state(csm, "catapulted", params)
+		csm:change_state("catapulted", params)
 
 		return true
 	end
 
 	if CharacterStateHelper.is_grabbed_by_pack_master(status_extension) then
-		csm.change_state(csm, "grabbed_by_pack_master")
+		csm:change_state("grabbed_by_pack_master")
 
 		return true
 	end
 
 	if status_extension.grabbed_by_corruptor then
-		csm.change_state(csm, "grabbed_by_corruptor")
+		csm:change_state("grabbed_by_corruptor")
 
 		return true
 	end
 
 	if status_extension.grabbed_by_tentacle then
-		csm.change_state(csm, "grabbed_by_tentacle")
+		csm:change_state("grabbed_by_tentacle")
 
 		return true
 	end
 
 	if status_extension.grabbed_by_chaos_spawn then
-		csm.change_state(csm, "grabbed_by_chaos_spawn")
+		csm:change_state("grabbed_by_chaos_spawn")
 
 		return true
 	end
 
 	if status_extension.in_vortex then
-		csm.change_state(csm, "in_vortex")
+		csm:change_state("in_vortex")
 
 		return true
 	end
 
 	if status_extension.do_lunge then
-		csm.change_state(csm, "lunging")
+		csm:change_state("lunging")
 
 		return true
 	end
@@ -310,7 +310,7 @@ CharacterStateHelper.do_common_state_transitions = function (status_extension, c
 			cage_unit = cage_unit
 		}
 
-		csm.change_state(csm, "in_hanging_cage", params)
+		csm:change_state("in_hanging_cage", params)
 
 		return true
 	end
@@ -318,7 +318,7 @@ CharacterStateHelper.do_common_state_transitions = function (status_extension, c
 	if in_state ~= "overpowered" and status_extension.overpowered then
 		local params = PlayerUnitMovementSettings.overpowered_templates[status_extension.overpowered_template]
 
-		csm.change_state(csm, "overpowered", params)
+		csm:change_state("overpowered", params)
 
 		return true
 	end
@@ -366,7 +366,7 @@ CharacterStateHelper.move_in_air = function (first_person_extension, input_exten
 	end
 
 	local move_direction = Vector3.normalize(movement)
-	local unit_rotation = first_person_extension.current_rotation(first_person_extension)
+	local unit_rotation = first_person_extension:current_rotation()
 	local move_velocity = Vector3.normalize(Vector3.flat(Quaternion.rotate(unit_rotation, move_direction)))
 	local movement_settings_table = PlayerUnitMovementSettings.get_movement_settings_table(unit)
 	local move_cap = math.clamp(movement_settings_table.move_speed, 0, PlayerUnitMovementSettings.move_speed)
@@ -376,17 +376,17 @@ CharacterStateHelper.move_in_air = function (first_person_extension, input_exten
 		move_cap = move_cap * movement_settings_table.backward_move_scale * 0.9
 	end
 
-	local prev_move_velocity = Vector3.flat(locomotion_extension.current_velocity(locomotion_extension))
+	local prev_move_velocity = Vector3.flat(locomotion_extension:current_velocity())
 	local new_move_velocity = prev_move_velocity + move_velocity * speed
 	local new_move_speed = Vector3.length(new_move_velocity)
 	new_move_speed = math.clamp(new_move_speed, 0, move_cap * movement_settings_table.player_speed_scale)
 	local new_move_direction = Vector3.normalize(new_move_velocity)
 
-	locomotion_extension.set_wanted_velocity(locomotion_extension, new_move_direction * new_move_speed)
+	locomotion_extension:set_wanted_velocity(new_move_direction * new_move_speed)
 end
 
 CharacterStateHelper.looking_up = function (first_person_extension, threshold)
-	local first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
+	local first_person_unit = first_person_extension:get_first_person_unit()
 	local rotation = Unit.world_rotation(first_person_unit, 0)
 	local direction = Quaternion.forward(rotation)
 	local normalised_direction = Vector3.normalize(direction)
@@ -396,7 +396,7 @@ CharacterStateHelper.looking_up = function (first_person_extension, threshold)
 end
 
 CharacterStateHelper.looking_down = function (first_person_extension, threshold)
-	local first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
+	local first_person_unit = first_person_extension:get_first_person_unit()
 	local rotation = Unit.world_rotation(first_person_unit, 0)
 	local direction = Quaternion.forward(rotation)
 	local normalised_direction = Vector3.normalize(direction)
@@ -407,7 +407,7 @@ end
 
 CharacterStateHelper.look = function (input_extension, viewport_name, first_person_extension, status_extension, inventory_extension, override_sens, override_delta)
 	local camera_manager = Managers.state.camera
-	local look_sensitivity = override_sens or (camera_manager.has_viewport(camera_manager, viewport_name) and camera_manager.fov(camera_manager, viewport_name) / 0.785) or 1
+	local look_sensitivity = override_sens or (camera_manager:has_viewport(viewport_name) and camera_manager:fov(viewport_name) / 0.785) or 1
 	local is_3p = false
 	local look_delta = CharacterStateHelper.get_look_input(input_extension, status_extension, inventory_extension, is_3p)
 	look_delta = look_delta * look_sensitivity
@@ -416,12 +416,12 @@ CharacterStateHelper.look = function (input_extension, viewport_name, first_pers
 		look_delta = look_delta + override_delta
 	end
 
-	first_person_extension.set_look_delta(first_person_extension, look_delta)
+	first_person_extension:set_look_delta(look_delta)
 end
 
 CharacterStateHelper.look_limited_rotation_freedom = function (input_extension, viewport_name, first_person_extension, ledge_unit, unit, max_radians_yaw, max_radians_pitch, status_extension, inventory_extension)
 	local camera_manager = Managers.state.camera
-	local look_sensitivity = (camera_manager.has_viewport(camera_manager, viewport_name) and Managers.state.camera:fov(viewport_name) / 0.785) or 1
+	local look_sensitivity = (camera_manager:has_viewport(viewport_name) and Managers.state.camera:fov(viewport_name) / 0.785) or 1
 	local is_3p = false
 	local look_delta = CharacterStateHelper.get_look_input(input_extension, status_extension, inventory_extension, is_3p)
 	look_delta = look_delta * look_sensitivity
@@ -462,7 +462,7 @@ CharacterStateHelper.look_limited_rotation_freedom = function (input_extension, 
 		Vector3.set_y(new_look_delta, look_delta_y)
 	end
 
-	first_person_extension.set_look_delta(first_person_extension, new_look_delta)
+	first_person_extension:set_look_delta(new_look_delta)
 end
 
 CharacterStateHelper.lerp_player_rotation_radian = function (player_radian, target_radian, original_diference_radian, percentage_in_lerp)
@@ -516,12 +516,12 @@ CharacterStateHelper.lerp_player_pitch_rotation = function (player_start_pitch, 
 	local yaw_pitch_rotation = Quaternion.multiply(player_yaw_rotation, player_pitch_rotation)
 	local final_roation = Quaternion.multiply(yaw_pitch_rotation, player_roll_rotation)
 
-	first_person_extension.set_rotation(first_person_extension, final_roation)
+	first_person_extension:set_rotation(final_roation)
 	Unit.set_local_rotation(unit, 0, final_roation)
 end
 
 CharacterStateHelper.lerp_player_yaw_rotation = function (player_yaw, target_yaw, original_diference_yaw, first_person_extension, percentage_in_lerp, unit)
-	local first_person_unit = first_person_extension.get_first_person_unit(first_person_extension)
+	local first_person_unit = first_person_extension:get_first_person_unit()
 	local player_rotation = Unit.local_rotation(first_person_unit, 0)
 	local final_yaw = CharacterStateHelper.lerp_player_rotation_radian(player_yaw, target_yaw, original_diference_yaw, percentage_in_lerp)
 	local player_pitch = Quaternion.pitch(player_rotation)
@@ -532,7 +532,7 @@ CharacterStateHelper.lerp_player_yaw_rotation = function (player_yaw, target_yaw
 	local yaw_pitch_rotation = Quaternion.multiply(player_yaw_rotation, player_pitch_rotation)
 	local final_roation = Quaternion.multiply(yaw_pitch_rotation, player_roll_rotation)
 
-	first_person_extension.set_rotation(first_person_extension, final_roation)
+	first_person_extension:set_rotation(final_roation)
 	Unit.set_local_rotation(unit, 0, final_roation)
 end
 
@@ -549,14 +549,14 @@ end
 
 CharacterStateHelper.show_inventory_3p = function (unit, show_inventory_3p, include_local_player, is_server, inventory_extension)
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
 
 	if not network_manager.game_session then
 		return
 	end
 
 	if include_local_player or (is_server and inventory_extension.is_bot) then
-		inventory_extension.show_third_person_inventory(inventory_extension, show_inventory_3p)
+		inventory_extension:show_third_person_inventory(show_inventory_3p)
 	end
 
 	if is_server then
@@ -568,30 +568,30 @@ end
 
 CharacterStateHelper.set_is_on_ladder = function (ladder_unit, unit, on_ladder, is_server, status_extension)
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
-	local ladder_level_index, is_level_unit = network_manager.game_object_or_level_id(network_manager, ladder_unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
+	local ladder_level_index, is_level_unit = network_manager:game_object_or_level_id(ladder_unit)
 
 	assert(is_level_unit, "Ladder unit wasn't a level unit")
 
 	if is_server or LEVEL_EDITOR_TEST then
 		local status_system = Managers.state.entity:system("status_system")
 
-		status_system.rpc_status_change_bool(status_system, nil, NetworkLookup.statuses.ladder_climbing, on_ladder, unit_id, ladder_level_index)
+		status_system:rpc_status_change_bool(nil, NetworkLookup.statuses.ladder_climbing, on_ladder, unit_id, ladder_level_index)
 	else
-		status_extension.set_is_on_ladder(status_extension, on_ladder, ladder_unit)
+		status_extension:set_is_on_ladder(on_ladder, ladder_unit)
 		network_manager.network_transmit:send_rpc_server("rpc_status_change_bool", NetworkLookup.statuses.ladder_climbing, on_ladder, unit_id, ladder_level_index)
 	end
 end
 
 CharacterStateHelper.set_is_on_ledge = function (ledge_unit, unit, on_ledge, is_server, status_extension)
 	local network_manager = Managers.state.network
-	local unit_id = network_manager.unit_game_object_id(network_manager, unit)
-	local ledge_level_index, is_level_unit = network_manager.game_object_or_level_id(network_manager, ledge_unit)
+	local unit_id = network_manager:unit_game_object_id(unit)
+	local ledge_level_index, is_level_unit = network_manager:game_object_or_level_id(ledge_unit)
 
-	status_extension.set_crouching(status_extension, false)
+	status_extension:set_crouching(false)
 
 	if Managers.state.network:game() and not LEVEL_EDITOR_TEST then
-		status_extension.set_is_ledge_hanging(status_extension, on_ledge, ledge_unit)
+		status_extension:set_is_ledge_hanging(on_ledge, ledge_unit)
 		network_manager.network_transmit:send_rpc_server("rpc_status_change_bool", NetworkLookup.statuses.ledge_hanging, on_ledge, unit_id, ledge_level_index)
 	end
 end
@@ -600,7 +600,7 @@ CharacterStateHelper.get_buffered_input = function (input_id, input_extension, n
 	local input = nil
 
 	if input_id then
-		input = input_extension.get(input_extension, input_id)
+		input = input_extension:get(input_id)
 
 		if input and softbutton_threshold and input < softbutton_threshold then
 			return false
@@ -608,9 +608,9 @@ CharacterStateHelper.get_buffered_input = function (input_id, input_extension, n
 
 		if not no_buffer then
 			if input then
-				input_extension.add_buffer(input_extension, input_id, doubleclick_window)
+				input_extension:add_buffer(input_id, doubleclick_window)
 			else
-				input = input_extension.get_buffer(input_extension, input_id)
+				input = input_extension:get_buffer(input_id)
 			end
 		end
 	end
@@ -625,7 +625,7 @@ CharacterStateHelper.wield_input = function (input_extension, inventory_extensio
 
 	local slots_by_name = InventorySettings.slots_by_name
 	local wieldable_slots = InventorySettings.slots_by_wield_input
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 	local wielded_slot_name = equipment.wielded_slot
 	local current_slot = slots_by_name[wielded_slot_name]
 	local current_slot_wield_input = current_slot.wield_input
@@ -654,9 +654,9 @@ CharacterStateHelper.wield_input = function (input_extension, inventory_extensio
 
 	local scroll_value = 0
 
-	if input_extension.get(input_extension, "wield_prev") then
+	if input_extension:get("wield_prev") then
 		scroll_value = -1
-	elseif input_extension.get(input_extension, "wield_next") then
+	elseif input_extension:get("wield_next") then
 		scroll_value = 1
 	end
 
@@ -704,7 +704,7 @@ end
 local empty_table = {}
 
 CharacterStateHelper.get_item_data_and_weapon_extensions = function (inventory_extension)
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 	local item_data = equipment.wielded
 
 	if item_data == nil then
@@ -800,14 +800,14 @@ CharacterStateHelper._check_chain_action = function (wield_input, action_data, i
 	local input_extra_requirement = true
 
 	if release_required then
-		input_extra_requirement = input_extension.released_input(input_extension, release_required)
+		input_extra_requirement = input_extension:released_input(release_required)
 	end
 
 	local hold_required = action_data.hold_required
 
 	if hold_required then
 		for index, hold_require in pairs(hold_required) do
-			if input_extension.released_input(input_extension, hold_require) then
+			if input_extension:released_input(hold_require) then
 				input_extra_requirement = false
 
 				break
@@ -824,7 +824,7 @@ CharacterStateHelper._check_chain_action = function (wield_input, action_data, i
 	local blocked = false
 
 	if blocking_input then
-		blocked = input_extension.get(input_extension, blocking_input)
+		blocked = input_extension:get(blocking_input)
 	end
 
 	if input_extra_requirement and not blocked then
@@ -839,7 +839,7 @@ CharacterStateHelper._check_chain_action = function (wield_input, action_data, i
 	if input or action_data.auto_chain then
 		local select_chance = action_data.select_chance or 1
 		local is_selected = math.random() <= select_chance
-		local chain_action_available = current_action_extension.is_chain_action_available(current_action_extension, action_data, t)
+		local chain_action_available = current_action_extension:is_chain_action_available(action_data, t)
 
 		if chain_action_available and is_selected then
 			local sub_action = action_data.sub_action
@@ -897,7 +897,7 @@ CharacterStateHelper._get_chain_action_data = function (item_template, current_a
 	if career_extension then
 		local lookup_data = current_action_settings.lookup_data
 		local current_action_name = lookup_data.action_name
-		local activated_ability_data = career_extension.get_activated_ability_data(career_extension)
+		local activated_ability_data = career_extension:get_activated_ability_data()
 		local action_name = activated_ability_data.action_name
 
 		if action_name and action_name ~= current_action_name then
@@ -924,9 +924,9 @@ CharacterStateHelper._get_chain_action_data = function (item_template, current_a
 		local action_settings = item_template.actions[new_action] and item_template.actions[new_action][new_sub_action]
 
 		if clear_buffer or new_sub_action == "push" then
-			input_extension.clear_input_buffer(input_extension)
+			input_extension:clear_input_buffer()
 		elseif action_settings and not wield_input and not action_settings.keep_buffer and not send_buffer then
-			input_extension.reset_input_buffer(input_extension)
+			input_extension:reset_input_buffer()
 		end
 	end
 
@@ -938,9 +938,9 @@ local function validate_action(unit, action_name, sub_action_name, action_settin
 	local skip_hold = action_settings.do_not_validate_with_hold
 	local hold_input = not skip_hold and action_settings.hold_input
 	local wield_input = CharacterStateHelper.wield_input(input_extension, inventory_extension, input_id)
-	local buffered_input = input_extension.get_buffer(input_extension, input_id)
-	local action_input = input_extension.get(input_extension, input_id)
-	local action_hold_input = hold_input and input_extension.get(input_extension, hold_input)
+	local buffered_input = input_extension:get_buffer(input_id)
+	local action_input = input_extension:get(input_id)
+	local action_hold_input = hold_input and input_extension:get(hold_input)
 	local allow_toggle = action_settings.allow_hold_toggle and input_extension.toggle_alternate_attack
 	local hold_or_toggle_input = (allow_toggle and action_input) or (not allow_toggle and (action_input or action_hold_input))
 
@@ -956,7 +956,7 @@ local function validate_action(unit, action_name, sub_action_name, action_settin
 
 		if condition_passed then
 			if not wield_input and not action_settings.keep_buffer then
-				input_extension.reset_input_buffer(input_extension)
+				input_extension:reset_input_buffer()
 			end
 
 			return action_name, sub_action_name
@@ -982,14 +982,14 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 	local new_action, new_sub_action, current_action_settings, current_action_extension, current_action_hand = nil
 	current_action_settings, current_action_extension, current_action_hand = CharacterStateHelper.get_current_action_data(left_hand_weapon_extension, right_hand_weapon_extension)
 	local item_template = BackendUtils.get_item_template(item_data)
-	local recent_damage_type, recent_hit_react_type = health_extension.recently_damaged(health_extension)
+	local recent_damage_type, recent_hit_react_type = health_extension:recently_damaged()
 	local status_extension = ScriptUnit.extension(unit, "status_system")
 	local buff_extension = ScriptUnit.extension(unit, "buff_system")
 	local uninterruptible_heavy = false
 
 	if current_action_settings then
 		local damage_profile = current_action_settings.damage_profile
-		uninterruptible_heavy = damage_profile and DamageProfileTemplates[damage_profile].charge_value == "heavy_attack" and buff_extension.has_buff_perk(buff_extension, "uninterruptible_heavy")
+		uninterruptible_heavy = damage_profile and DamageProfileTemplates[damage_profile].charge_value == "heavy_attack" and buff_extension:has_buff_perk("uninterruptible_heavy")
 	end
 
 	local can_interrupt, reloading = nil
@@ -1009,23 +1009,23 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 			end
 		end
 
-		if (current_action_settings and current_action_settings.uninterruptible) or script_data.uninterruptible or reloading or is_bot_player or buff_extension.has_buff_perk(buff_extension, "uninterruptible") or uninterruptible_heavy then
+		if (current_action_settings and current_action_settings.uninterruptible) or script_data.uninterruptible or reloading or is_bot_player or buff_extension:has_buff_perk("uninterruptible") or uninterruptible_heavy then
 			can_interrupt = false
 		elseif recent_damage_type == "cutting_berserker" then
 			can_interrupt = true
 		else
-			can_interrupt = status_extension.hitreact_interrupt(status_extension)
+			can_interrupt = status_extension:hitreact_interrupt()
 		end
 
-		if can_interrupt and not status_extension.is_disabled(status_extension) then
-			local has_reduced_hit_react_buff = buff_extension.has_buff_perk(buff_extension, "reduced_hit_react")
+		if can_interrupt and not status_extension:is_disabled() then
+			local has_reduced_hit_react_buff = buff_extension:has_buff_perk("reduced_hit_react")
 
 			if has_reduced_hit_react_buff then
 				recent_hit_react_type = "light"
 			end
 
 			if current_action_settings then
-				current_action_extension.stop_action(current_action_extension, "interrupted")
+				current_action_extension:stop_action("interrupted")
 			end
 
 			local first_person_extension = ScriptUnit.extension(unit, "first_person_system")
@@ -1033,18 +1033,18 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 			CharacterStateHelper.play_animation_event(unit, "hit_reaction")
 
 			if recent_hit_react_type == "medium" then
-				first_person_extension.play_hud_sound_event(first_person_extension, "enemy_hit_medium")
+				first_person_extension:play_hud_sound_event("enemy_hit_medium")
 			elseif recent_hit_react_type == "heavy" then
-				first_person_extension.play_hud_sound_event(first_person_extension, "enemy_hit_heavy")
+				first_person_extension:play_hud_sound_event("enemy_hit_heavy")
 			end
 
 			if not Development.parameter("attract_mode") then
 				if recent_damage_type == "cutting_berserker" then
-					status_extension.set_hit_react_type(status_extension, recent_hit_react_type)
-					status_extension.set_pushed_no_cooldown(status_extension, true, t)
+					status_extension:set_hit_react_type(recent_hit_react_type)
+					status_extension:set_pushed_no_cooldown(true, t)
 				else
-					status_extension.set_hit_react_type(status_extension, recent_hit_react_type)
-					status_extension.set_pushed(status_extension, true, t)
+					status_extension:set_hit_react_type(recent_hit_react_type)
+					status_extension:set_pushed(true, t)
 				end
 			end
 
@@ -1061,14 +1061,14 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 			if current_action_settings.allow_hold_toggle and input_extension.toggle_alternate_attack then
 				local input_id = current_action_settings.lookup_data.action_name
 
-				if input_id and input_extension.get(input_extension, input_id, true) and current_action_extension.can_stop_hold_action(current_action_extension, t) then
-					current_action_extension.stop_action(current_action_extension, "hold_input_released")
+				if input_id and input_extension:get(input_id, true) and current_action_extension:can_stop_hold_action(t) then
+					current_action_extension:stop_action("hold_input_released")
 				end
 			else
 				local input_id = current_action_settings.hold_input
 
-				if input_id and not input_extension.get(input_extension, input_id) and current_action_extension.can_stop_hold_action(current_action_extension, t) then
-					current_action_extension.stop_action(current_action_extension, "hold_input_released")
+				if input_id and not input_extension:get(input_id) and current_action_extension:can_stop_hold_action(t) then
+					current_action_extension:stop_action("hold_input_released")
 				end
 			end
 		end
@@ -1122,7 +1122,7 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 
 	if new_action and new_sub_action then
 		local career_ext = ScriptUnit.extension(unit, "career_system")
-		local power_level = career_ext.get_career_power_level(career_ext)
+		local power_level = career_ext:get_career_power_level()
 		local actions = item_template.actions
 		local new_action_settings = actions[new_action][new_sub_action]
 		local weapon_action_hand = new_action_settings.weapon_action_hand or "right"
@@ -1133,11 +1133,11 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 			assert(left_hand_weapon_extension and right_hand_weapon_extension, "tried to start a dual wield weapon action without both a left and right hand wielded unit")
 
 			if current_action_hand == "left" then
-				left_hand_weapon_extension.stop_action(left_hand_weapon_extension, "new_interupting_action", interupting_action_data)
+				left_hand_weapon_extension:stop_action("new_interupting_action", interupting_action_data)
 			end
 
 			if current_action_hand == "right" then
-				right_hand_weapon_extension.stop_action(right_hand_weapon_extension, "new_interupting_action", interupting_action_data)
+				right_hand_weapon_extension:stop_action("new_interupting_action", interupting_action_data)
 			end
 
 			local left_action_init_data = (next_action_init_data and table.merge(next_action_init_data, {
@@ -1151,8 +1151,8 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 				action_hand = "right"
 			}
 
-			left_hand_weapon_extension.start_action(left_hand_weapon_extension, new_action, new_sub_action, item_template.actions, t, power_level, left_action_init_data)
-			right_hand_weapon_extension.start_action(right_hand_weapon_extension, new_action, new_sub_action, item_template.actions, t, power_level, right_action_init_data)
+			left_hand_weapon_extension:start_action(new_action, new_sub_action, item_template.actions, t, power_level, left_action_init_data)
+			right_hand_weapon_extension:start_action(new_action, new_sub_action, item_template.actions, t, power_level, right_action_init_data)
 
 			return
 		end
@@ -1169,10 +1169,10 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 			assert(left_hand_weapon_extension, "tried to start a left hand weapon action without a left hand wielded unit")
 
 			if current_action_hand == "right" then
-				right_hand_weapon_extension.stop_action(right_hand_weapon_extension, "new_interupting_action", interupting_action_data)
+				right_hand_weapon_extension:stop_action("new_interupting_action", interupting_action_data)
 			end
 
-			left_hand_weapon_extension.start_action(left_hand_weapon_extension, new_action, new_sub_action, item_template.actions, t, power_level, next_action_init_data)
+			left_hand_weapon_extension:start_action(new_action, new_sub_action, item_template.actions, t, power_level, next_action_init_data)
 
 			return
 		end
@@ -1180,36 +1180,36 @@ CharacterStateHelper.update_weapon_actions = function (t, unit, input_extension,
 		assert(right_hand_weapon_extension, "tried to start a right hand weapon action without a right hand wielded unit")
 
 		if current_action_hand == "left" then
-			left_hand_weapon_extension.stop_action(left_hand_weapon_extension, "new_interupting_action", interupting_action_data)
+			left_hand_weapon_extension:stop_action("new_interupting_action", interupting_action_data)
 		end
 
-		right_hand_weapon_extension.start_action(right_hand_weapon_extension, new_action, new_sub_action, item_template.actions, t, power_level, next_action_init_data)
+		right_hand_weapon_extension:start_action(new_action, new_sub_action, item_template.actions, t, power_level, next_action_init_data)
 	end
 end
 
 CharacterStateHelper.stop_weapon_actions = function (inventory_extension, reason)
-	local equipment = inventory_extension.equipment(inventory_extension)
+	local equipment = inventory_extension:equipment()
 	local right_hand_wielded_unit = equipment.right_hand_wielded_unit
 	local left_hand_wielded_unit = equipment.left_hand_wielded_unit
 	local right_weapon_extension = Unit.alive(right_hand_wielded_unit) and ScriptUnit.extension(right_hand_wielded_unit, "weapon_system")
 	local left_weapon_extension = Unit.alive(left_hand_wielded_unit) and ScriptUnit.extension(left_hand_wielded_unit, "weapon_system")
 
 	if right_weapon_extension and right_weapon_extension.current_action_settings then
-		right_weapon_extension.stop_action(right_weapon_extension, reason)
+		right_weapon_extension:stop_action(reason)
 	end
 
 	if left_weapon_extension and left_weapon_extension.current_action_settings then
-		left_weapon_extension.stop_action(left_weapon_extension, reason)
+		left_weapon_extension:stop_action(reason)
 	end
 end
 
 CharacterStateHelper.reload = function (input_extension, inventory_extension, status_extension)
-	if not input_extension.get(input_extension, "weapon_reload") then
+	if not input_extension:get("weapon_reload") then
 		return false
 	end
 
-	local equipment = inventory_extension.equipment(inventory_extension)
-	local zooming = status_extension.is_zooming(status_extension)
+	local equipment = inventory_extension:equipment()
+	local zooming = status_extension:is_zooming()
 
 	if zooming then
 		return false
@@ -1230,23 +1230,23 @@ CharacterStateHelper.reload = function (input_extension, inventory_extension, st
 		ammo_extension = ScriptUnit.extension(equipment.left_hand_wielded_unit, "ammo_system")
 	end
 
-	if not ammo_extension or not ammo_extension.can_reload(ammo_extension) then
+	if not ammo_extension or not ammo_extension:can_reload() then
 		return false
 	end
 
 	local play_reload_animation = true
 
-	ammo_extension.start_reload(ammo_extension, play_reload_animation)
+	ammo_extension:start_reload(play_reload_animation)
 end
 
 CharacterStateHelper.check_crouch = function (unit, input_extension, status_extension, toggle_crouch, first_person_extension, t)
-	local is_crouching = status_extension.is_crouching(status_extension)
+	local is_crouching = status_extension:is_crouching()
 	local crouch = is_crouching
-	local toggle_input = input_extension.get(input_extension, "crouch")
-	local hold_toggle_input = input_extension.get(input_extension, "crouching")
+	local toggle_input = input_extension:get("crouch")
+	local hold_toggle_input = input_extension:get("crouching")
 
 	if toggle_crouch and toggle_input then
-		crouch = status_extension.crouch_toggle(status_extension)
+		crouch = status_extension:crouch_toggle()
 	elseif not toggle_crouch and not hold_toggle_input then
 		crouch = false
 	elseif not toggle_crouch and hold_toggle_input then
@@ -1271,16 +1271,16 @@ end
 
 CharacterStateHelper.crouch = function (unit, t, first_person_extension, status_extension)
 	CharacterStateHelper.play_animation_event(unit, "to_crouch")
-	first_person_extension.set_wanted_player_height(first_person_extension, "crouch", t)
+	first_person_extension:set_wanted_player_height("crouch", t)
 	ScriptUnit.extension(unit, "locomotion_system"):set_active_mover("crouch")
-	status_extension.set_crouching(status_extension, true)
+	status_extension:set_crouching(true)
 end
 
 CharacterStateHelper.uncrouch = function (unit, t, first_person_extension, status_extension)
 	CharacterStateHelper.play_animation_event(unit, "to_uncrouch")
-	first_person_extension.set_wanted_player_height(first_person_extension, "stand", t)
+	first_person_extension:set_wanted_player_height("stand", t)
 	ScriptUnit.extension(unit, "locomotion_system"):set_active_mover("standing")
-	status_extension.set_crouching(status_extension, false)
+	status_extension:set_crouching(false)
 end
 
 local EPSILON_MOVEMENT_SPEED_TO_IDLE_ANIM = 0.05
@@ -1288,9 +1288,9 @@ local SLOW_MOVEMENT_SPEED = 2.1
 
 CharacterStateHelper.get_move_animation = function (locomotion_extension, input_extension, status_extension)
 	local move_direction = CharacterStateHelper.get_movement_input(input_extension)
-	local slowed = Vector3.length(Vector3.flat(locomotion_extension.current_velocity(locomotion_extension))) < SLOW_MOVEMENT_SPEED
+	local slowed = Vector3.length(Vector3.flat(locomotion_extension:current_velocity())) < SLOW_MOVEMENT_SPEED
 
-	if Vector3.length(locomotion_extension.current_velocity(locomotion_extension)) < EPSILON_MOVEMENT_SPEED_TO_IDLE_ANIM then
+	if Vector3.length(locomotion_extension:current_velocity()) < EPSILON_MOVEMENT_SPEED_TO_IDLE_ANIM then
 		return "idle", "idle"
 	end
 
@@ -1320,7 +1320,7 @@ CharacterStateHelper.has_move_input = function (input_extension)
 end
 
 CharacterStateHelper.is_moving = function (locomotion_extension)
-	local velocity_current = locomotion_extension.current_velocity(locomotion_extension)
+	local velocity_current = locomotion_extension:current_velocity()
 	local speed = Vector3.length_squared(velocity_current)
 	local moving = 0.001 < speed
 
@@ -1328,29 +1328,29 @@ CharacterStateHelper.is_moving = function (locomotion_extension)
 end
 
 CharacterStateHelper.is_moving_backwards = function (locomotion_extension, first_person_extension)
-	local rotation_current = first_person_extension.current_rotation(first_person_extension)
-	local velocity_current = Vector3.flat(locomotion_extension.current_velocity(locomotion_extension))
+	local rotation_current = first_person_extension:current_rotation()
+	local velocity_current = Vector3.flat(locomotion_extension:current_velocity())
 	local dot = Vector3.dot(velocity_current, rotation_current)
 
 	return dot < -0.1
 end
 
 CharacterStateHelper.is_knocked_down = function (status_extension)
-	return status_extension.is_knocked_down(status_extension)
+	return status_extension:is_knocked_down()
 end
 
 CharacterStateHelper.is_pounced_down = function (status_extension)
-	return status_extension.is_pounced_down(status_extension)
+	return status_extension:is_pounced_down()
 end
 
 CharacterStateHelper.is_catapulted = function (status_extension)
-	local is_catapulted, direction = status_extension.is_catapulted(status_extension)
+	local is_catapulted, direction = status_extension:is_catapulted()
 
 	return is_catapulted, direction
 end
 
 CharacterStateHelper.is_grabbed_by_pack_master = function (status_extension)
-	return status_extension.is_grabbed_by_pack_master(status_extension)
+	return status_extension:is_grabbed_by_pack_master()
 end
 
 CharacterStateHelper.is_grabbed_by_tentacle = function (status_extension)
@@ -1362,7 +1362,7 @@ CharacterStateHelper.is_in_vortex = function (status_extension)
 end
 
 CharacterStateHelper.is_overcharge_exploding = function (status_extension)
-	return status_extension.is_overcharge_exploding(status_extension)
+	return status_extension:is_overcharge_exploding()
 end
 
 CharacterStateHelper.pack_master_status = function (status_extension)
@@ -1382,64 +1382,64 @@ CharacterStateHelper.grabbed_by_chaos_spawn_status = function (status_extension)
 end
 
 CharacterStateHelper.is_waiting_for_assisted_respawn = function (status_extension)
-	return status_extension.is_ready_for_assisted_respawn(status_extension)
+	return status_extension:is_ready_for_assisted_respawn()
 end
 
 CharacterStateHelper.is_assisted_respawning = function (status_extension)
-	return status_extension.is_assisted_respawning(status_extension)
+	return status_extension:is_assisted_respawning()
 end
 
 CharacterStateHelper.is_pushed = function (status_extension)
-	return status_extension.is_pushed(status_extension)
+	return status_extension:is_pushed()
 end
 
 CharacterStateHelper.is_block_broken = function (status_extension)
-	return status_extension.is_block_broken(status_extension)
+	return status_extension:is_block_broken()
 end
 
 CharacterStateHelper.is_dead = function (status_extension)
-	return status_extension.is_dead(status_extension)
+	return status_extension:is_dead()
 end
 
 CharacterStateHelper.is_using_transport = function (status_extension)
-	return status_extension.is_using_transport(status_extension)
+	return status_extension:is_using_transport()
 end
 
 CharacterStateHelper.is_zooming = function (status_extension)
-	return status_extension.is_zooming(status_extension)
+	return status_extension:is_zooming()
 end
 
 CharacterStateHelper.is_crouching = function (status_extension)
-	return status_extension.is_crouching(status_extension)
+	return status_extension:is_crouching()
 end
 
 CharacterStateHelper.is_starting_interaction = function (input_extension, interactor_extension)
-	local can_interact, fail_reason, interaction_type = interactor_extension.can_interact(interactor_extension)
+	local can_interact, fail_reason, interaction_type = interactor_extension:can_interact()
 
 	if GameSettingsDevelopment.disabled_interactions[interaction_type] then
 		return false
 	end
 
-	return can_interact and interaction_type ~= "heal" and interaction_type ~= "give_item" and input_extension.get(input_extension, "interact", true)
+	return can_interact and interaction_type ~= "heal" and interaction_type ~= "give_item" and input_extension:get("interact", true)
 end
 
 CharacterStateHelper.is_interacting = function (interactor_extension)
-	return interactor_extension.is_interacting(interactor_extension)
+	return interactor_extension:is_interacting()
 end
 
 CharacterStateHelper.is_waiting_for_interaction_approval = function (interactor_extension)
-	return interactor_extension.is_waiting_for_interaction_approval(interactor_extension)
+	return interactor_extension:is_waiting_for_interaction_approval()
 end
 
 CharacterStateHelper.interact = function (input_extension, interactor_extension)
-	local config = interactor_extension.interaction_config(interactor_extension)
+	local config = interactor_extension:interaction_config()
 
 	if config.hold then
-		local key_to_hold = interactor_extension.interaction_hold_input(interactor_extension)
-		local is_holding = input_extension.get(input_extension, key_to_hold)
+		local key_to_hold = interactor_extension:interaction_hold_input()
+		local is_holding = input_extension:get(key_to_hold)
 
 		if not is_holding then
-			interactor_extension.abort_interaction(interactor_extension)
+			interactor_extension:abort_interaction()
 
 			return false
 		end
@@ -1470,7 +1470,7 @@ CharacterStateHelper.is_ledge_hanging = function (world, unit, params)
 end
 
 CharacterStateHelper.recently_left_ladder = function (status_extension, t)
-	return status_extension.has_recently_left_ladder(status_extension, t)
+	return status_extension:has_recently_left_ladder(t)
 end
 
 CharacterStateHelper.change_camera_state = function (player, state)
@@ -1483,9 +1483,9 @@ CharacterStateHelper.change_camera_state = function (player, state)
 	end
 
 	local entity_manager = Managers.state.entity
-	local camera_system = entity_manager.system(entity_manager, "camera_system")
+	local camera_system = entity_manager:system("camera_system")
 
-	camera_system.external_state_change(camera_system, player, state)
+	camera_system:external_state_change(player, state)
 end
 
 CharacterStateHelper.play_animation_event = function (unit, anim_event)
@@ -1493,7 +1493,7 @@ CharacterStateHelper.play_animation_event = function (unit, anim_event)
 end
 
 CharacterStateHelper.play_animation_event_first_person = function (first_person_extension, anim_event)
-	first_person_extension.animation_event(first_person_extension, anim_event)
+	first_person_extension:animation_event(anim_event)
 end
 
 CharacterStateHelper.play_animation_event_with_variable_float = function (unit, anim_event, variable_name, variable_value)

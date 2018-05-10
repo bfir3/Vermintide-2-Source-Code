@@ -63,7 +63,7 @@ PickupUnitExtension.destroy = function (self)
 	local pickup_system = Managers.state.entity:system("pickup_system")
 
 	if pickup_system and self.spawn_index then
-		pickup_system.set_taken(pickup_system, self.spawn_index)
+		pickup_system:set_taken(self.spawn_index)
 	end
 
 	if self.is_server then

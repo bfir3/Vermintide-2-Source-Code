@@ -67,7 +67,7 @@ VortexExtension.init = function (self, extension_init_context, unit, extension_i
 		local high_cost_type = vortex_template.high_cost_nav_cost_map_cost_type
 		local medium_cost_type = vortex_template.medium_cost_nav_cost_map_cost_type
 
-		self._create_nav_cost_maps(self, ai_system, position, full_outer_radius, high_cost_type, medium_cost_type)
+		self:_create_nav_cost_maps(ai_system, position, full_outer_radius, high_cost_type, medium_cost_type)
 
 		self._use_nav_cost_map_volumes = true
 	end
@@ -77,14 +77,14 @@ VortexExtension._create_nav_cost_maps = function (self, ai_system, position, ful
 	local num_volumes = 1
 	local transform = Matrix4x4.from_translation(position)
 	local scale_vector = Vector3(full_outer_radius, full_outer_radius, 1)
-	local high_cost_map_id = ai_system.create_nav_cost_map(ai_system, high_cost_type, num_volumes)
-	self._high_cost_nav_cost_map_volume_id = ai_system.add_nav_cost_map_box_volume(ai_system, transform, scale_vector, high_cost_map_id)
+	local high_cost_map_id = ai_system:create_nav_cost_map(high_cost_type, num_volumes)
+	self._high_cost_nav_cost_map_volume_id = ai_system:add_nav_cost_map_box_volume(transform, scale_vector, high_cost_map_id)
 	self._high_cost_nav_cost_map_id = high_cost_map_id
-	local medium_cost_map_id = ai_system.create_nav_cost_map(ai_system, medium_cost_type, num_volumes)
-	self._medium_cost_nav_cost_map_volume_id = ai_system.add_nav_cost_map_box_volume(ai_system, transform, scale_vector, medium_cost_map_id)
+	local medium_cost_map_id = ai_system:create_nav_cost_map(medium_cost_type, num_volumes)
+	self._medium_cost_nav_cost_map_volume_id = ai_system:add_nav_cost_map_box_volume(transform, scale_vector, medium_cost_map_id)
 	self._medium_cost_nav_cost_map_id = medium_cost_map_id
 	local time_manager = Managers.time
-	local t = time_manager.time(time_manager, "game")
+	local t = time_manager:time("game")
 	self._next_nav_cost_map_update_t = t + NAV_COST_MAP_UPDATE_INTERVAL
 end
 
@@ -93,7 +93,7 @@ VortexExtension.extensions_ready = function (self, world, unit)
 	self.blackboard = blackboard
 	local vortex_template = self.vortex_template
 	local time_manager = Managers.time
-	local t = time_manager.time(time_manager, "game")
+	local t = time_manager:time("game")
 	local max_size = NUMBER_OF_RAYCASTS
 	blackboard.vortex_data = {
 		idle_time = 0,
@@ -131,11 +131,11 @@ VortexExtension.extensions_ready = function (self, world, unit)
 	}
 	local locomotion_extension = blackboard.locomotion_extension
 
-	locomotion_extension.set_rotation_speed(locomotion_extension, 0)
+	locomotion_extension:set_rotation_speed(0)
 
 	local navigation_extension = blackboard.navigation_extension
 
-	navigation_extension.init_position(navigation_extension)
+	navigation_extension:init_position()
 	WwiseUtils.trigger_unit_event(world, "Play_enemy_sorcerer_vortex_loop", unit)
 end
 
@@ -178,13 +178,13 @@ VortexExtension.destroy = function (self)
 			if target_blackboard then
 				local locomotion_extension = target_blackboard.locomotion_extension
 
-				locomotion_extension.set_wanted_velocity(locomotion_extension, velocity)
-				locomotion_extension.set_affected_by_gravity(locomotion_extension, true)
-				locomotion_extension.set_movement_type(locomotion_extension, "constrained_by_mover")
+				locomotion_extension:set_wanted_velocity(velocity)
+				locomotion_extension:set_affected_by_gravity(true)
+				locomotion_extension:set_movement_type("constrained_by_mover")
 
 				local ejected_from_vortex = target_blackboard.ejected_from_vortex or Vector3Box()
 
-				ejected_from_vortex.store(ejected_from_vortex, velocity)
+				ejected_from_vortex:store(velocity)
 
 				target_blackboard.ejected_from_vortex = ejected_from_vortex
 				target_blackboard.in_vortex_state = "ejected_from_vortex"
@@ -216,14 +216,14 @@ VortexExtension.destroy = function (self)
 		local high_cost_cost_map_id = self._high_cost_nav_cost_map_id
 		local high_cost_volume_id = self._high_cost_nav_cost_map_volume_id
 
-		ai_system.remove_nav_cost_map_volume(ai_system, high_cost_volume_id, high_cost_cost_map_id)
-		ai_system.destroy_nav_cost_map(ai_system, high_cost_cost_map_id)
+		ai_system:remove_nav_cost_map_volume(high_cost_volume_id, high_cost_cost_map_id)
+		ai_system:destroy_nav_cost_map(high_cost_cost_map_id)
 
 		local medium_cost_cost_map_id = self._medium_cost_nav_cost_map_id
 		local medium_cost_volume_id = self._medium_cost_nav_cost_map_volume_id
 
-		ai_system.remove_nav_cost_map_volume(ai_system, medium_cost_volume_id, medium_cost_cost_map_id)
-		ai_system.destroy_nav_cost_map(ai_system, medium_cost_cost_map_id)
+		ai_system:remove_nav_cost_map_volume(medium_cost_volume_id, medium_cost_cost_map_id)
+		ai_system:destroy_nav_cost_map(medium_cost_cost_map_id)
 	end
 end
 
@@ -235,12 +235,12 @@ VortexExtension.update = function (self, unit, input, dt, context, t)
 	local vortex_data = blackboard.vortex_data
 	local nav_world = blackboard.nav_world
 	local navigation_extension = blackboard.navigation_extension
-	local traverse_logic = navigation_extension.traverse_logic(navigation_extension)
+	local traverse_logic = navigation_extension:traverse_logic()
 	local position = position_lookup[unit]
-	local inner_radius, outer_radius, fx_radius = self.control_size(self, unit, t, dt, nav_world, traverse_logic, vortex_template, vortex_data)
+	local inner_radius, outer_radius, fx_radius = self:control_size(unit, t, dt, nav_world, traverse_logic, vortex_template, vortex_data)
 
 	if vortex_data.windup_time < t then
-		self.attract(self, unit, t, dt, blackboard, vortex_template, vortex_data, position, inner_radius, outer_radius)
+		self:attract(unit, t, dt, blackboard, vortex_template, vortex_data, position, inner_radius, outer_radius)
 	end
 
 	if vortex_data.time_of_death < t then
@@ -254,7 +254,7 @@ VortexExtension.update = function (self, unit, input, dt, context, t)
 		local locomotion_extension = blackboard.locomotion_extension
 		local full_outer_radius = vortex_template.full_outer_radius
 
-		self._update_nav_cost_map_volumes(self, position, full_outer_radius, nav_world, ai_system, navigation_extension, locomotion_extension)
+		self:_update_nav_cost_map_volumes(position, full_outer_radius, nav_world, ai_system, navigation_extension, locomotion_extension)
 
 		self._next_nav_cost_map_update_t = t + NAV_COST_MAP_UPDATE_INTERVAL
 	end
@@ -288,7 +288,7 @@ local function position_aligned_on_navmesh_transform(nav_world, position, x_axis
 end
 
 VortexExtension._update_nav_cost_map_volumes = function (self, position, full_outer_radius, nav_world, ai_system, navigation_extension, locomotion_extension)
-	local velocity = locomotion_extension.current_velocity(locomotion_extension)
+	local velocity = locomotion_extension:current_velocity()
 	local velocity_normalized = Vector3.normalize(velocity)
 	local x_axis = Vector3.cross(velocity_normalized, Vector3.up())
 	local high_cost_transform, high_cost_position, high_cost_rotation, high_cost_direction = position_aligned_on_navmesh_transform(nav_world, position, x_axis)
@@ -300,22 +300,22 @@ VortexExtension._update_nav_cost_map_volumes = function (self, position, full_ou
 	local high_cost_map_id = self._high_cost_nav_cost_map_id
 	local high_cost_volume_id = self._high_cost_nav_cost_map_volume_id
 
-	ai_system.set_nav_cost_map_volume_transform(ai_system, high_cost_volume_id, high_cost_map_id, high_cost_transform)
+	ai_system:set_nav_cost_map_volume_transform(high_cost_volume_id, high_cost_map_id, high_cost_transform)
 
 	local speed = Vector3.length(velocity)
-	local max_speed = navigation_extension.get_max_speed(navigation_extension)
+	local max_speed = navigation_extension:get_max_speed()
 	local lerp_value = speed / max_speed
 	local scale_value = math.lerp(1, 2, lerp_value)
 	local new_scale = Vector3(full_outer_radius, scale_value * full_outer_radius, 1)
 	local medium_cost_map_id = self._medium_cost_nav_cost_map_id
 	local medium_cost_volume_id = self._medium_cost_nav_cost_map_volume_id
 
-	ai_system.set_nav_cost_map_volume_scale(ai_system, medium_cost_volume_id, medium_cost_map_id, new_scale)
+	ai_system:set_nav_cost_map_volume_scale(medium_cost_volume_id, medium_cost_map_id, new_scale)
 
 	local medium_cost_position = high_cost_position + high_cost_direction * 0.5 * full_outer_radius * scale_value
 	local medium_cost_transform = Matrix4x4.from_quaternion_position(high_cost_rotation, medium_cost_position)
 
-	ai_system.set_nav_cost_map_volume_transform(ai_system, medium_cost_volume_id, medium_cost_map_id, medium_cost_transform)
+	ai_system:set_nav_cost_map_volume_transform(medium_cost_volume_id, medium_cost_map_id, medium_cost_transform)
 end
 
 local INCREASE_HEIGHT_LERP_PROGRESS_PER_SECOND = 0.25
@@ -438,8 +438,8 @@ end
 VortexExtension.control_size = function (self, unit, t, dt, nav_world, traverse_logic, vortex_template, vortex_data)
 	vortex_data.current_raycast_rad = math.fmod(vortex_data.current_raycast_rad + RAYCAST_INVERAL_RAD, 2 * math.pi)
 
-	self._update_radius(self, unit, t, dt, nav_world, traverse_logic, vortex_template, vortex_data)
-	self._update_height(self, unit, t, dt, vortex_template, vortex_data)
+	self:_update_radius(unit, t, dt, nav_world, traverse_logic, vortex_template, vortex_data)
+	self:_update_height(unit, t, dt, vortex_template, vortex_data)
 
 	local game = Managers.state.network:game()
 	local go_id = Managers.state.unit_storage:go_id(unit)
@@ -480,7 +480,7 @@ VortexExtension._update_attract_players = function (self, unit, blackboard, vort
 	for i = 1, num_player_and_bots, 1 do
 		local player_unit = player_and_bot_units[i]
 		local target_status_extension = ScriptUnit.extension(player_unit, "status_system")
-		local valid_vortex_target = target_status_extension.is_valid_vortex_target(target_status_extension)
+		local valid_vortex_target = target_status_extension:is_valid_vortex_target()
 		local locomotion_extension = ScriptUnit.extension(player_unit, "locomotion_system")
 		local player_position = position_lookup[player_unit]
 		local suck_dir = center_pos - player_position
@@ -505,7 +505,7 @@ VortexExtension._update_attract_players = function (self, unit, blackboard, vort
 			if side_collides then
 				if not target_status_extension.smacked_into_wall then
 					target_status_extension.smacked_into_wall = t + 0.7
-					local player_velocity = locomotion_extension.current_velocity(locomotion_extension)
+					local player_velocity = locomotion_extension:current_velocity()
 					local player_velocity_normalized = Vector3.normalize(player_velocity)
 					local breed_name = blackboard.breed.name
 					local impact_damage = DamageUtils.calculate_damage(vortex_template.damage, player_unit, unit)
@@ -522,7 +522,7 @@ VortexExtension._update_attract_players = function (self, unit, blackboard, vort
 				players_inside[player_unit] = nil
 				vortex_data.num_players_inside = vortex_data.num_players_inside - 1
 			elseif vortex_eject_height < height or vortex_height < height or vortex_eject_time < t then
-				local current_velocity = locomotion_extension.current_velocity(locomotion_extension)
+				local current_velocity = locomotion_extension:current_velocity()
 				local velocity_normalized = Vector3.normalize(current_velocity)
 				local wanted_landing_position = LocomotionUtils.pos_on_mesh(nav_world, player_position + velocity_normalized * eject_distance, land_test_above, land_test_below)
 
@@ -543,7 +543,7 @@ VortexExtension._update_attract_players = function (self, unit, blackboard, vort
 			local bliss_time = players_ejected[player_unit]
 
 			if bliss_time < 0 then
-				if not target_status_extension.is_catapulted(target_status_extension) then
+				if not target_status_extension:is_catapulted() then
 					if player_distance < outer_radius then
 						local edge_distance = outer_radius - player_distance
 						local time_multiplier = edge_distance / outer_radius
@@ -555,14 +555,14 @@ VortexExtension._update_attract_players = function (self, unit, blackboard, vort
 			elseif bliss_time < t then
 				players_ejected[player_unit] = nil
 			end
-		elseif valid_vortex_target and not target_status_extension.is_in_vortex(target_status_extension) and player_distance < outer_radius and minimum_height_diff <= height and height < vortex_height then
+		elseif valid_vortex_target and not target_status_extension:is_in_vortex() and player_distance < outer_radius and minimum_height_diff <= height and height < vortex_height then
 			if inner_radius < player_distance then
 				local distance_to_inner_radius = player_distance - inner_radius
 				local k = math.clamp(1 - distance_to_inner_radius / falloff_radius, 0, 1)
 				local speed = player_attract_speed * k * k
 				local dir = Vector3.normalize(suck_dir)
 
-				locomotion_extension.add_external_velocity(locomotion_extension, dir * speed)
+				locomotion_extension:add_external_velocity(dir * speed)
 			else
 				StatusUtils.set_in_vortex_network(player_unit, true, unit)
 
@@ -612,7 +612,7 @@ VortexExtension._update_attract_outside_ai = function (self, vortex_data, blackb
 							local dir = Vector3.normalize(suck_dir)
 							local velocity = dir * speed
 
-							locomotion_extension.set_external_velocity(locomotion_extension, velocity)
+							locomotion_extension:set_external_velocity(velocity)
 						else
 							target_blackboard.in_vortex_state = "in_vortex"
 							target_blackboard.in_vortex = true
@@ -620,7 +620,7 @@ VortexExtension._update_attract_outside_ai = function (self, vortex_data, blackb
 							ai_units_inside[ai_unit] = true
 
 							if vortex_template.suck_in_ai_func then
-								vortex_template.suck_in_ai_func(vortex_template, blackboard)
+								vortex_template:suck_in_ai_func(blackboard)
 							end
 						end
 					end
@@ -650,19 +650,19 @@ VortexExtension._update_attract_inside_ai = function (self, blackboard, vortex_d
 				local velocity, new_radius, new_height = LocomotionUtils.get_vortex_spin_velocity(unit_position, center_pos, ai_wanted_distance, up_direction, ai_rotation_speed, ai_radius_change_speed, ai_ascension_speed, dt)
 				local locomotion_extension = target_blackboard.locomotion_extension
 
-				locomotion_extension.set_wanted_velocity(locomotion_extension, velocity)
+				locomotion_extension:set_wanted_velocity(velocity)
 
 				if target_blackboard.eject_height < new_height or vortex_height < new_height or allowed_distance < new_radius then
 					local ejected_from_vortex = target_blackboard.ejected_from_vortex or Vector3Box()
 
-					ejected_from_vortex.store(ejected_from_vortex, velocity)
+					ejected_from_vortex:store(velocity)
 
 					target_blackboard.ejected_from_vortex = ejected_from_vortex
 					target_blackboard.in_vortex_state = "ejected_from_vortex"
 
 					AiUtils.aggro_unit_of_enemy(ai_unit, blackboard.target_unit)
-					locomotion_extension.set_affected_by_gravity(locomotion_extension, true)
-					locomotion_extension.set_movement_type(locomotion_extension, "constrained_by_mover")
+					locomotion_extension:set_affected_by_gravity(true)
+					locomotion_extension:set_movement_type("constrained_by_mover")
 				end
 			elseif target_blackboard.in_vortex_state == "landed" then
 				ai_units_inside[ai_unit] = nil
@@ -679,9 +679,9 @@ VortexExtension.attract = function (self, unit, t, dt, blackboard, vortex_templa
 	local max_allowed_inner_radius_dist = vortex_template.max_allowed_inner_radius_dist
 	local allowed_distance = inner_radius + max_allowed_inner_radius_dist
 
-	self._update_attract_players(self, unit, blackboard, vortex_data, vortex_template, t, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius, allowed_distance)
-	self._update_attract_outside_ai(self, vortex_data, blackboard, vortex_template, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius)
-	self._update_attract_inside_ai(self, blackboard, vortex_data, vortex_template, dt, center_pos, inner_radius, allowed_distance)
+	self:_update_attract_players(unit, blackboard, vortex_data, vortex_template, t, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius, allowed_distance)
+	self:_update_attract_outside_ai(vortex_data, blackboard, vortex_template, center_pos, minimum_height_diff, inner_radius, outer_radius, falloff_radius)
+	self:_update_attract_inside_ai(blackboard, vortex_data, vortex_template, dt, center_pos, inner_radius, allowed_distance)
 end
 
 VortexExtension.is_position_inside = function (self, position, min_allowed_distance)

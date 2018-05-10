@@ -36,7 +36,7 @@ SlotAllocator.allocate_slot = function (self, profile_index, peer_id, local_play
 	profile_table.peer_id = peer_id
 	profile_table.local_player_index = local_player_index
 
-	self._update_lobby_data(self)
+	self:_update_lobby_data()
 end
 
 SlotAllocator.free_slot = function (self, profile_index)
@@ -47,7 +47,7 @@ SlotAllocator.free_slot = function (self, profile_index)
 	profile_table.peer_id = SlotAllocator.INVALID_PEER
 	profile_table.local_player_index = 0
 
-	self._update_lobby_data(self)
+	self:_update_lobby_data()
 end
 
 SlotAllocator.free_peer_slots = function (self, peer_id, local_player_index)
@@ -64,7 +64,7 @@ SlotAllocator.free_peer_slots = function (self, peer_id, local_player_index)
 		end
 	end
 
-	self._update_lobby_data(self)
+	self:_update_lobby_data()
 end
 
 SlotAllocator.owner = function (self, profile_index)
@@ -150,8 +150,8 @@ end
 
 SlotAllocator._split_lobby_entry = function (entry)
 	local split_point = string.find(entry, ":")
-	local peer_id = entry.sub(entry, 1, split_point - 1)
-	local local_player_index = tonumber(entry.sub(entry, split_point + 1))
+	local peer_id = entry:sub(1, split_point - 1)
+	local local_player_index = tonumber(entry:sub(split_point + 1))
 
 	return peer_id, local_player_index
 end
@@ -172,17 +172,17 @@ SlotAllocator._update_lobby_data = function (self)
 	assert(self._is_server)
 
 	local lobby = self._lobby
-	local lobby_data = lobby.get_stored_lobby_data(lobby)
+	local lobby_data = lobby:get_stored_lobby_data()
 
 	for profile_index = 1, #self._profiles, 1 do
-		local key, value = self._lobby_data_row(self, profile_index)
+		local key, value = self:_lobby_data_row(profile_index)
 
 		sa_printf("Write lobby data %s = %s", key, value)
 
 		lobby_data[key] = value
 	end
 
-	lobby.set_lobby_data(lobby, lobby_data)
+	lobby:set_lobby_data(lobby_data)
 end
 
 return

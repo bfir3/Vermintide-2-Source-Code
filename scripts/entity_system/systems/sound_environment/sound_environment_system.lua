@@ -25,8 +25,8 @@ SoundEnvironmentSystem.init = function (self, entity_system_creation_context, sy
 	local aux_bus_name = level_settings.player_aux_bus_name
 	local environment_state = level_settings.environment_state
 
-	self.register_sound_environment(self, "global", -1, ambient_sound_event, global_environment_fade_time, aux_bus_name, environment_state)
-	self.enter_environment(self, 0, "global")
+	self:register_sound_environment("global", -1, ambient_sound_event, global_environment_fade_time, aux_bus_name, environment_state)
+	self:enter_environment(0, "global")
 
 	self._updated_sources = {}
 	self._num_sources = 0
@@ -95,7 +95,7 @@ SoundEnvironmentSystem.set_source_environment = function (self, source, position
 		return
 	end
 
-	local volume_name = self._highest_prio_environment_at_position(self, position)
+	local volume_name = self:_highest_prio_environment_at_position(position)
 	local environments = self._environments
 	local wwise_world = self.wwise_world
 	local bus_name = environments[volume_name or "global"].source_aux_bus_name
@@ -169,7 +169,7 @@ SoundEnvironmentSystem._update_source_environments = function (self)
 		current_index = current_index % num_sources + 1
 		local data = updated_sources[current_index]
 		local pos = Unit.world_position(data.unit, data.node)
-		slot11 = self.set_source_environment(self, data.source, pos)
+		slot11 = self:set_source_environment(data.source, pos)
 	end
 
 	self._current_index = current_index
@@ -188,18 +188,18 @@ SoundEnvironmentSystem.update = function (self, context, t)
 	local viewport_name = local_player.viewport_name
 	local pose = Managers.state.camera:listener_pose(viewport_name)
 	local position = Matrix4x4.translation(pose)
-	local highest_prio_env_name = self._highest_prio_environment_at_position(self, position)
+	local highest_prio_env_name = self:_highest_prio_environment_at_position(position)
 
 	if highest_prio_env_name then
 		if highest_prio_env_name ~= self._current_environment then
-			self.enter_environment(self, t, highest_prio_env_name, self._current_environment)
+			self:enter_environment(t, highest_prio_env_name, self._current_environment)
 		end
 	elseif self._current_environment ~= "global" then
-		self.enter_environment(self, t, "global", self._current_environment)
+		self:enter_environment(t, "global", self._current_environment)
 	end
 
 	if GameSettingsDevelopment.fade_environments then
-		self._update_fade(self, t)
+		self:_update_fade(t)
 
 		if script_data.debug_sound_environments then
 			local current_environment = self._current_environment
@@ -215,7 +215,7 @@ SoundEnvironmentSystem.update = function (self, context, t)
 			end
 		end
 
-		self._update_source_environments(self)
+		self:_update_source_environments()
 	end
 end
 
@@ -302,15 +302,15 @@ SoundEnvironmentSystem.enter_environment = function (self, t, volume_name, curre
 			end
 		end
 
-		self._add_fade_environment(self, t, volume_name, fade_time, 1)
+		self:_add_fade_environment(t, volume_name, fade_time, 1)
 
 		if current_environment_name then
-			self._add_fade_environment(self, t, current_environment_name, fade_time, 0)
+			self:_add_fade_environment(t, current_environment_name, fade_time, 0)
 		end
 
-		self._clamp_num_fade_environments(self)
+		self:_clamp_num_fade_environments()
 	else
-		self._set_environment(self, volume_name)
+		self:_set_environment(volume_name)
 	end
 
 	Wwise.set_state("interior_exterior", environment.environment_state)

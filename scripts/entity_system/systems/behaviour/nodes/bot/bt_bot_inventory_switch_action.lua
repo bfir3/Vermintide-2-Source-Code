@@ -22,14 +22,14 @@ BTBotInventorySwitchAction.run = function (self, unit, blackboard, t, dt)
 	local inventory_ext = blackboard.inventory_extension
 	local input_extension = blackboard.input_extension
 
-	if inventory_ext.equipment(inventory_ext).wielded_slot == wanted_slot then
+	if inventory_ext:equipment().wielded_slot == wanted_slot then
 		return "done"
 	elseif blackboard.node_timer + 0.3 < t then
 		blackboard.node_timer = t
 
 		return "running", "evaluate"
 	else
-		input_extension.wield(input_extension, wanted_slot)
+		input_extension:wield(wanted_slot)
 
 		return "running"
 	end

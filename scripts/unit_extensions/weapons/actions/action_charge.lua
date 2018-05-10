@@ -12,8 +12,8 @@ ActionCharge.init = function (self, world, item_name, is_server, owner_unit, dam
 
 	if ScriptUnit.has_extension(owner_unit, "inventory_system") then
 		local inventory_extension = ScriptUnit.extension(self.owner_unit, "inventory_system")
-		local slot_name = inventory_extension.get_wielded_slot_name(inventory_extension)
-		local slot_data = inventory_extension.get_slot_data(inventory_extension, slot_name)
+		local slot_name = inventory_extension:get_wielded_slot_name()
+		local slot_data = inventory_extension:get_slot_data(slot_name)
 		self.left_unit = slot_data.left_unit_1p
 	end
 
@@ -38,8 +38,8 @@ ActionCharge.client_owner_start_action = function (self, new_action, t)
 	self._max_charge = false
 	local overcharge_extension = self.overcharge_extension
 
-	if new_action.vent_overcharge and overcharge_extension and 0 < overcharge_extension.get_overcharge_value(overcharge_extension) then
-		overcharge_extension.vent_overcharge(overcharge_extension)
+	if new_action.vent_overcharge and overcharge_extension and 0 < overcharge_extension:get_overcharge_value() then
+		overcharge_extension:vent_overcharge()
 
 		self.venting_overcharge = true
 	end
@@ -48,7 +48,7 @@ ActionCharge.client_owner_start_action = function (self, new_action, t)
 	self.remove_overcharge_on_interrupt = new_action.remove_overcharge_on_interrupt
 	local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
 	self.charge_level = 0
-	self.charge_time = buff_extension.apply_buffs_to_value(buff_extension, new_action.charge_time, StatBuffIndex.REDUCED_RANGED_CHARGE_TIME)
+	self.charge_time = buff_extension:apply_buffs_to_value(new_action.charge_time, StatBuffIndex.REDUCED_RANGED_CHARGE_TIME)
 	self.charge_complete_time = self.charge_time + t
 	self.overcharge_timer = 0
 
@@ -97,8 +97,8 @@ ActionCharge.client_owner_start_action = function (self, new_action, t)
 	if new_action.zoom then
 		local status_extension = ScriptUnit.extension(self.owner_unit, "status_system")
 
-		if not status_extension.is_zooming(status_extension) then
-			status_extension.set_zooming(status_extension, true)
+		if not status_extension:is_zooming() then
+			status_extension:set_zooming(true)
 		end
 	end
 
@@ -107,7 +107,7 @@ ActionCharge.client_owner_start_action = function (self, new_action, t)
 	if loaded_projectile_settings then
 		local inventory_extension = ScriptUnit.extension(self.owner_unit, "inventory_system")
 
-		inventory_extension.set_loaded_projectile_override(inventory_extension, loaded_projectile_settings)
+		inventory_extension:set_loaded_projectile_override(loaded_projectile_settings)
 	end
 end
 
@@ -136,7 +136,7 @@ ActionCharge.client_owner_post_update = function (self, dt, t, world, can_damage
 	local overcharge_extension = self.overcharge_extension
 	local inventory_extension = ScriptUnit.extension(self.owner_unit, "inventory_system")
 
-	if overcharge_type and overcharge_extension.get_overcharge_value(overcharge_extension) == 0 and self.venting_overcharge then
+	if overcharge_type and overcharge_extension:get_overcharge_value() == 0 and self.venting_overcharge then
 		CharacterStateHelper.stop_weapon_actions(inventory_extension, "no_more_overcharge")
 	end
 
@@ -241,14 +241,14 @@ ActionCharge.finish = function (self, reason)
 	local overcharge_extension = self.overcharge_extension
 
 	if current_action.vent_overcharge and overcharge_extension then
-		overcharge_extension.vent_overcharge_done(overcharge_extension)
+		overcharge_extension:vent_overcharge_done()
 	end
 
 	if self.remove_overcharge_on_interrupt then
 		if reason == "interrupted" then
-			overcharge_extension.remove_charge(overcharge_extension, self.total_overcharge_added * 0.75)
+			overcharge_extension:remove_charge(self.total_overcharge_added * 0.75)
 		elseif reason == "hold_input_released" then
-			overcharge_extension.remove_charge(overcharge_extension, self.total_overcharge_added * 0.5)
+			overcharge_extension:remove_charge(self.total_overcharge_added * 0.5)
 		end
 	end
 
@@ -280,12 +280,12 @@ ActionCharge.finish = function (self, reason)
 	if current_action.zoom then
 		local status_extension = ScriptUnit.extension(owner_unit, "status_system")
 
-		status_extension.set_zooming(status_extension, false)
+		status_extension:set_zooming(false)
 	end
 
 	local inventory_extension = ScriptUnit.extension(self.owner_unit, "inventory_system")
 
-	inventory_extension.set_loaded_projectile_override(inventory_extension, nil)
+	inventory_extension:set_loaded_projectile_override(nil)
 
 	local charge_sound_husk_stop_event = current_action.charge_sound_husk_stop_event
 

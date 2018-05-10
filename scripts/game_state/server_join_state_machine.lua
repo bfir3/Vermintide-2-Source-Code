@@ -137,15 +137,15 @@ ServerJoinStateMachine.init = function (self, network_options, ip_port, user_dat
 	self._action = nil
 	self._password = nil
 
-	self.add_transition(self, "FindServerInternetState", "password_required", PasswordDialogState)
-	self.add_transition(self, "FindServerInternetState", "password_not_required", ServerJoinState)
-	self.add_transition(self, "FindServerInternetState", "server_not_found", FindServerLANState)
-	self.add_transition(self, "FindServerLANState", "password_required", PasswordDialogState)
-	self.add_transition(self, "FindServerLANState", "password_not_required", ServerJoinState)
-	self.add_transition(self, "FindServerLANState", "server_not_found", PasswordDialogState)
-	self.add_transition(self, "PasswordDialogState", "password_entered", ServerJoinState)
-	self.add_transition(self, "PasswordDialogState", "password_cancelled", AbortState)
-	self.set_initial_state(self, FindServerInternetState)
+	self:add_transition("FindServerInternetState", "password_required", PasswordDialogState)
+	self:add_transition("FindServerInternetState", "password_not_required", ServerJoinState)
+	self:add_transition("FindServerInternetState", "server_not_found", FindServerLANState)
+	self:add_transition("FindServerLANState", "password_required", PasswordDialogState)
+	self:add_transition("FindServerLANState", "password_not_required", ServerJoinState)
+	self:add_transition("FindServerLANState", "server_not_found", PasswordDialogState)
+	self:add_transition("PasswordDialogState", "password_entered", ServerJoinState)
+	self:add_transition("PasswordDialogState", "password_cancelled", AbortState)
+	self:set_initial_state(FindServerInternetState)
 end
 
 ServerJoinStateMachine.result = function (self)

@@ -48,7 +48,7 @@ BTObservePoisonWind.run = function (self, unit, blackboard, t, dt)
 	local throw_position = blackboard.throw_globe_data.throw_pos:unbox()
 	local rotation = LocomotionUtils.look_at_position_flat(unit, throw_position)
 
-	locomotion_extension.set_wanted_rotation(locomotion_extension, rotation)
+	locomotion_extension:set_wanted_rotation(rotation)
 
 	local poison_globe_impact = blackboard.explosion_impact
 

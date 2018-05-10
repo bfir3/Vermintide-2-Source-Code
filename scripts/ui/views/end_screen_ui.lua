@@ -22,16 +22,16 @@ EndScreenUI.init = function (self, ingame_ui_context)
 	local input_manager = ingame_ui_context.input_manager
 	self.input_manager = input_manager
 
-	input_manager.create_input_service(input_manager, "end_screen_ui", "IngameMenuKeymaps", "IngameMenuFilters")
-	input_manager.map_device_to_service(input_manager, "end_screen_ui", "keyboard")
-	input_manager.map_device_to_service(input_manager, "end_screen_ui", "mouse")
-	input_manager.map_device_to_service(input_manager, "end_screen_ui", "gamepad")
+	input_manager:create_input_service("end_screen_ui", "IngameMenuKeymaps", "IngameMenuFilters")
+	input_manager:map_device_to_service("end_screen_ui", "keyboard")
+	input_manager:map_device_to_service("end_screen_ui", "mouse")
+	input_manager:map_device_to_service("end_screen_ui", "gamepad")
 
 	local world = self.world_manager:world("level_world")
 	self.wwise_world = Managers.world:wwise_world(world)
 
 	rawset(_G, "EndScreenUI_pointer", self)
-	self.create_ui_elements(self)
+	self:create_ui_elements()
 
 	self.act_presentation_ui = ActPresentationUI:new(ingame_ui_context)
 end
@@ -98,23 +98,23 @@ EndScreenUI.on_enter = function (self, game_won, checkpoint_available, level_key
 	local input_manager = self.input_manager
 
 	if not Managers.chat:chat_is_focused() then
-		input_manager.block_device_except_service(input_manager, "end_screen_ui", "mouse")
-		input_manager.block_device_except_service(input_manager, "end_screen_ui", "keyboard")
-		input_manager.block_device_except_service(input_manager, "end_screen_ui", "gamepad", 1)
+		input_manager:block_device_except_service("end_screen_ui", "mouse")
+		input_manager:block_device_except_service("end_screen_ui", "keyboard")
+		input_manager:block_device_except_service("end_screen_ui", "gamepad", 1)
 	end
 
-	self.fade_in_background(self)
+	self:fade_in_background()
 
 	self._game_won = game_won
 	self._level_key = level_key
 	self._previous_completed_difficulty_index = previous_completed_difficulty_index
 
-	self.play_sound(self, "mute_all_world_sounds")
+	self:play_sound("mute_all_world_sounds")
 
 	if game_won then
-		self.play_sound(self, "play_gui_splash_victory")
+		self:play_sound("play_gui_splash_victory")
 	else
-		self.play_sound(self, "play_gui_splash_defeat")
+		self:play_sound("play_gui_splash_defeat")
 	end
 
 	Wwise.set_state("override", "false")
@@ -127,9 +127,9 @@ EndScreenUI.on_exit = function (self)
 	if not Managers.chat:chat_is_focused() then
 		local input_manager = self.input_manager
 
-		input_manager.device_unblock_all_services(input_manager, "mouse", 1)
-		input_manager.device_unblock_all_services(input_manager, "keyboard", 1)
-		input_manager.device_unblock_all_services(input_manager, "gamepad", 1)
+		input_manager:device_unblock_all_services("mouse", 1)
+		input_manager:device_unblock_all_services("keyboard", 1)
+		input_manager:device_unblock_all_services("gamepad", 1)
 	end
 
 	WwiseWorld.trigger_event(self.wwise_world, "hud_in_inventory_state_off")
@@ -176,7 +176,7 @@ end
 
 EndScreenUI.update = function (self, dt)
 	if DO_RELOAD then
-		self.create_ui_elements(self)
+		self:create_ui_elements()
 	end
 
 	if not self.is_active then
@@ -185,37 +185,37 @@ EndScreenUI.update = function (self, dt)
 
 	local ui_animator = self.ui_animator
 
-	ui_animator.update(ui_animator, dt)
+	ui_animator:update(dt)
 
-	if not self.banner_anim_id and self.background_in_anim_id and ui_animator.is_animation_completed(ui_animator, self.background_in_anim_id) then
+	if not self.banner_anim_id and self.background_in_anim_id and ui_animator:is_animation_completed(self.background_in_anim_id) then
 		self.background_in_anim_id = nil
 
-		self.show_text_screen(self)
+		self:show_text_screen()
 
 		self._fade_in_completed = true
-	elseif self.banner_anim_id and ui_animator.is_animation_completed(ui_animator, self.banner_anim_id) then
+	elseif self.banner_anim_id and ui_animator:is_animation_completed(self.banner_anim_id) then
 		self.banner_anim_id = nil
 
 		if not self._game_won then
 			Managers.transition:fade_in(GameSettings.transition_fade_in_speed, callback(self, "on_complete"))
 		end
-	elseif self.background_out_anim_id and ui_animator.is_animation_completed(ui_animator, self.background_out_anim_id) then
+	elseif self.background_out_anim_id and ui_animator:is_animation_completed(self.background_out_anim_id) then
 		self.background_out_anim_id = nil
 
-		self.on_complete(self)
+		self:on_complete()
 	end
 
 	local act_presentation_ui = self.act_presentation_ui
 
 	if act_presentation_ui.active then
-		act_presentation_ui.update(act_presentation_ui, dt)
+		act_presentation_ui:update(dt)
 
-		if act_presentation_ui.presentation_completed(act_presentation_ui) then
+		if act_presentation_ui:presentation_completed() then
 			Managers.transition:fade_in(GameSettings.transition_fade_in_speed, callback(self, "on_complete"))
 		end
 	end
 
-	self.draw(self, dt)
+	self:draw(dt)
 end
 
 EndScreenUI.draw = function (self, dt)

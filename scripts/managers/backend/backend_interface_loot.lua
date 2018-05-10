@@ -12,7 +12,7 @@ BackendInterfaceLoot.init = function (self)
 end
 
 BackendInterfaceLoot.setup = function (self, data_server_queue)
-	self._register_executors(self, data_server_queue)
+	self:_register_executors(data_server_queue)
 
 	self._queue = data_server_queue
 	self.dirty = false
@@ -20,9 +20,9 @@ BackendInterfaceLoot.setup = function (self, data_server_queue)
 end
 
 BackendInterfaceLoot._register_executors = function (self, queue)
-	queue.register_executor(queue, "loot_chest_generated", callback(self, "_command_loot_chest_generated"))
-	queue.register_executor(queue, "loot_chest_consumed", callback(self, "_command_loot_chest_consumed"))
-	queue.register_executor(queue, "weapon_with_properties_generated", callback(self, "_command_weapon_with_properties_generated"))
+	queue:register_executor("loot_chest_generated", callback(self, "_command_loot_chest_generated"))
+	queue:register_executor("loot_chest_consumed", callback(self, "_command_loot_chest_consumed"))
+	queue:register_executor("weapon_with_properties_generated", callback(self, "_command_weapon_with_properties_generated"))
 end
 
 BackendInterfaceLoot._command_loot_chest_generated = function (self, entity_id)
@@ -30,10 +30,10 @@ BackendInterfaceLoot._command_loot_chest_generated = function (self, entity_id)
 
 	self.dirty = false
 	local backend_item = Managers.backend:get_interface("items")
-	self.last_generated_loot_chest = backend_item.get_item_from_id(backend_item, entity_id).key
+	self.last_generated_loot_chest = backend_item:get_item_from_id(entity_id).key
 
 	Backend.load_entities()
-	self._refresh_attributes(self)
+	self:_refresh_attributes()
 end
 
 BackendInterfaceLoot._command_loot_chest_consumed = function (self, status_code)
@@ -50,7 +50,7 @@ BackendInterfaceLoot._command_weapon_with_properties_generated = function (self,
 	self.dirty = false
 
 	Backend.load_entities()
-	self._refresh_attributes(self)
+	self:_refresh_attributes()
 end
 
 BackendInterfaceLoot.generate_loot_chest = function (self, hero_name, difficulty, num_tomes, num_grimoires, num_loot_dice, level_key)
@@ -96,11 +96,11 @@ BackendInterfaceLoot._refresh_attributes = function (self)
 end
 
 BackendInterfaceLoot.on_authenticated = function (self)
-	self._refresh_attributes(self)
+	self:_refresh_attributes()
 end
 
 BackendInterfaceLoot.get_loot = function (self, backend_id)
-	self._refresh_attributes(self)
+	self:_refresh_attributes()
 
 	local attributes = self._attributes[backend_id]
 

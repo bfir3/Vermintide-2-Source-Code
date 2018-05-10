@@ -130,7 +130,7 @@ ActionFlamethrower.client_owner_post_update = function (self, dt, t, world, can_
 
 	if self.state == "shooting" and t < self.max_flame_time then
 		local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-		local player_position = first_person_extension.current_position(first_person_extension)
+		local player_position = first_person_extension:current_position()
 
 		if not Managers.player:owner(owner_unit).bot_player and not self._rumble_effect_id then
 			self._rumble_effect_id = Managers.state.controller_features:add_effect("persistent_rumble", {
@@ -146,8 +146,8 @@ ActionFlamethrower.client_owner_post_update = function (self, dt, t, world, can_
 			end
 
 			if self.damage_timer == 0 then
-				self._check_critical_strike(self, t)
-				self._select_targets(self, world, true)
+				self:_check_critical_strike(t)
+				self:_select_targets(world, true)
 
 				local targets = self.targets
 
@@ -176,7 +176,7 @@ ActionFlamethrower.client_owner_post_update = function (self, dt, t, world, can_
 
 						local target_position = Unit.world_position(current_target, Unit.node(current_target, node))
 						local direction = Vector3.normalize(target_position - player_position)
-						local result = self.raycast_to_target(self, world, player_position, direction, current_target)
+						local result = self:raycast_to_target(world, player_position, direction, current_target)
 
 						if result then
 							local power_level = self.power_level
@@ -198,7 +198,7 @@ ActionFlamethrower.client_owner_post_update = function (self, dt, t, world, can_
 					end
 				end
 
-				self._clear_targets(self)
+				self:_clear_targets()
 
 				local weapon_unit = self.weapon_unit
 				local muzzle_position = Unit.world_position(weapon_unit, Unit.node(weapon_unit, self.muzzle_node_name))
@@ -292,7 +292,7 @@ ActionFlamethrower.client_owner_post_update = function (self, dt, t, world, can_
 end
 
 ActionFlamethrower.finish = function (self, reason)
-	self._clear_targets(self)
+	self:_clear_targets()
 
 	if not self.vfx_stopped then
 		if self.flamethrower_effect then
@@ -362,7 +362,7 @@ end
 ActionFlamethrower._select_targets = function (self, world, show_outline)
 	local owner_unit = self.owner_unit
 	local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-	local player_position = first_person_extension.current_position(first_person_extension)
+	local player_position = first_person_extension:current_position()
 	local first_person_unit = self.first_person_unit
 	local player_rotation = Unit.world_rotation(first_person_unit, 0)
 	local player_direction = Vector3.normalize(Quaternion.forward(player_rotation))
@@ -390,11 +390,11 @@ ActionFlamethrower._select_targets = function (self, world, show_outline)
 				local breed = Unit.get_data(hit_unit, "breed")
 
 				if table.contains(PLAYER_AND_BOT_UNITS, hit_unit) and not ignore_hitting_allies then
-					if self._is_infront_player(self, player_position, player_direction, hit_position) and self._check_within_cone(self, start_point, player_direction, hit_unit, true) then
+					if self:_is_infront_player(player_position, player_direction, hit_position) and self:_check_within_cone(start_point, player_direction, hit_unit, true) then
 						targets[#targets + 1] = hit_unit
 						hit_units[hit_unit] = true
 					end
-				elseif breed and self._is_infront_player(self, player_position, player_direction, hit_position) and self._check_within_cone(self, start_point, player_direction, hit_unit) then
+				elseif breed and self:_is_infront_player(player_position, player_direction, hit_position) and self:_check_within_cone(start_point, player_direction, hit_unit) then
 					targets[#targets + 1] = hit_unit
 					hit_units[hit_unit] = true
 

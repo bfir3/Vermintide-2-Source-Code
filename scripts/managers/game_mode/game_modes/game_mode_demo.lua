@@ -14,12 +14,12 @@ end
 
 GameModeDemo.evaluate_end_conditions = function (self, round_started, dt, t)
 	local spawn_manager = Managers.state.spawn
-	local humans_dead = spawn_manager.all_humans_dead(spawn_manager)
-	local players_disabled = spawn_manager.all_players_disabled(spawn_manager)
-	local lost = humans_dead or players_disabled or self._level_failed or self._is_time_up(self)
+	local humans_dead = spawn_manager:all_humans_dead()
+	local players_disabled = spawn_manager:all_players_disabled()
+	local lost = humans_dead or players_disabled or self._level_failed or self:_is_time_up()
 
 	if self._level_completed or lost then
-		self.complete_level(self)
+		self:complete_level()
 
 		COMPLETE_LEVEL_VAR = false
 		FAIL_LEVEL_VAR = false

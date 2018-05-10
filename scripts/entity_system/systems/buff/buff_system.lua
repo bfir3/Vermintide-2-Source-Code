@@ -27,7 +27,7 @@ BuffSystem.init = function (self, entity_system_creation_context, system_name)
 	local network_event_delegate = entity_system_creation_context.network_event_delegate
 	self.network_event_delegate = network_event_delegate
 
-	network_event_delegate.register(network_event_delegate, self, unpack(RPCS))
+	network_event_delegate:register(self, unpack(RPCS))
 
 	self.network_manager = entity_system_creation_context.network_manager
 	self.unit_extension_data = {}
@@ -59,25 +59,25 @@ BuffSystem.hot_join_sync = function (self, sender)
 			local group_buff_template_name = group_buff_data.group_buff_template_name
 			local group_buff_template_id = NetworkLookup.group_buff_templates[group_buff_template_name]
 
-			network_transmit.send_rpc(network_transmit, "rpc_add_group_buff", sender, group_buff_template_id, 1)
+			network_transmit:send_rpc("rpc_add_group_buff", sender, group_buff_template_id, 1)
 		end
 
 		for unit, data in pairs(self.server_controlled_buffs) do
 			for server_buff_id, buff_data in pairs(data) do
 				local template_name = buff_data.template_name
 				local attacker_unit = buff_data.attacker_unit
-				local unit_object_id = network_manager.unit_game_object_id(network_manager, unit)
+				local unit_object_id = network_manager:unit_game_object_id(unit)
 				local buff_template_name_id = NetworkLookup.buff_templates[template_name]
-				local attacker_unit_object_id = network_manager.unit_game_object_id(network_manager, attacker_unit) or NetworkConstants.invalid_game_object_id
+				local attacker_unit_object_id = network_manager:unit_game_object_id(attacker_unit) or NetworkConstants.invalid_game_object_id
 
-				network_transmit.send_rpc(network_transmit, "rpc_add_buff", sender, unit_object_id, buff_template_name_id, attacker_unit_object_id, server_buff_id, false)
+				network_transmit:send_rpc("rpc_add_buff", sender, unit_object_id, buff_template_name_id, attacker_unit_object_id, server_buff_id, false)
 			end
 		end
 	end
 end
 
 BuffSystem.on_remove_extension = function (self, unit, extension_name)
-	self.on_freeze_extension(self, unit, extension_name)
+	self:on_freeze_extension(unit, extension_name)
 
 	local unit_data = self.server_controlled_buffs[unit]
 
@@ -154,7 +154,7 @@ BuffSystem._add_buff_helper_function = function (self, unit, template_name, atta
 		end
 
 		if not self.server_controlled_buffs[unit][server_buff_id] then
-			local local_buff_id = buff_extension.add_buff(buff_extension, template_name, params)
+			local local_buff_id = buff_extension:add_buff(template_name, params)
 			self.server_controlled_buffs[unit][server_buff_id] = {
 				local_buff_id = local_buff_id,
 				template_name = template_name,
@@ -162,7 +162,7 @@ BuffSystem._add_buff_helper_function = function (self, unit, template_name, atta
 			}
 		end
 	else
-		buff_extension.add_buff(buff_extension, template_name, params)
+		buff_extension:add_buff(template_name, params)
 	end
 end
 
@@ -173,15 +173,15 @@ BuffSystem.add_buff = function (self, unit, template_name, attacker_unit, is_ser
 
 	fassert(self.is_server or not is_server_controlled, "[BuffSystem]: Trying to add a server controlled buff from a client!")
 
-	local server_buff_id = (is_server_controlled and self._next_free_server_buff_id(self)) or 0
+	local server_buff_id = (is_server_controlled and self:_next_free_server_buff_id()) or 0
 
 	if ScriptUnit.has_extension(unit, "buff_system") then
-		self._add_buff_helper_function(self, unit, template_name, attacker_unit, server_buff_id)
+		self:_add_buff_helper_function(unit, template_name, attacker_unit, server_buff_id)
 	end
 
 	local network_manager = self.network_manager
-	local unit_object_id = network_manager.game_object_or_level_id(network_manager, unit)
-	local attacker_unit_object_id = network_manager.game_object_or_level_id(network_manager, attacker_unit)
+	local unit_object_id = network_manager:game_object_or_level_id(unit)
+	local attacker_unit_object_id = network_manager:game_object_or_level_id(attacker_unit)
 	local buff_template_name_id = NetworkLookup.buff_templates[template_name]
 
 	if self.is_server then
@@ -198,11 +198,11 @@ BuffSystem.remove_server_controlled_buff = function (self, unit, server_buff_id)
 
 	local buff_extension = ScriptUnit.extension(unit, "buff_system")
 	local id = self.server_controlled_buffs[unit][server_buff_id].local_buff_id
-	local num_buffs_removed = buff_extension.remove_buff(buff_extension, id)
+	local num_buffs_removed = buff_extension:remove_buff(id)
 	self.server_controlled_buffs[unit][server_buff_id] = nil
 	self.free_server_buff_ids[#self.free_server_buff_ids + 1] = server_buff_id
 	local network_manager = self.network_manager
-	local unit_object_id = network_manager.game_object_or_level_id(network_manager, unit)
+	local unit_object_id = network_manager:game_object_or_level_id(unit)
 
 	network_manager.network_transmit:send_rpc_clients("rpc_remove_server_controlled_buff", unit_object_id, server_buff_id)
 
@@ -216,12 +216,12 @@ BuffSystem.add_volume_buff_multiplier = function (self, unit, buff_template_name
 
 	if owner.remote then
 		local network_manager = Managers.state.network
-		local unit_object_id = network_manager.unit_game_object_id(network_manager, unit)
+		local unit_object_id = network_manager:unit_game_object_id(unit)
 		local buff_template_name_id = NetworkLookup.buff_templates.movement_volume_generic_slowdown
 
 		network_manager.network_transmit:send_rpc("rpc_add_volume_buff_multiplier", owner.peer_id, unit_object_id, buff_template_name_id, multiplier)
 	else
-		self.add_volume_buff(self, unit, buff_template_name, multiplier)
+		self:add_volume_buff(unit, buff_template_name, multiplier)
 	end
 end
 
@@ -240,7 +240,7 @@ BuffSystem.add_volume_buff = function (self, unit, buff_template_name, multiplie
 	end
 
 	if not self.volume_buffs[unit][buff_template_name] then
-		self.volume_buffs[unit][buff_template_name] = buff_extension.add_buff(buff_extension, buff_template_name, params)
+		self.volume_buffs[unit][buff_template_name] = buff_extension:add_buff(buff_template_name, params)
 	end
 end
 
@@ -251,12 +251,12 @@ BuffSystem.remove_volume_buff_multiplier = function (self, unit, buff_template_n
 
 	if owner.remote then
 		local network_manager = Managers.state.network
-		local unit_object_id = network_manager.unit_game_object_id(network_manager, unit)
+		local unit_object_id = network_manager:unit_game_object_id(unit)
 		local buff_template_name_id = NetworkLookup.buff_templates.movement_volume_generic_slowdown
 
 		network_manager.network_transmit:send_rpc("rpc_remove_volume_buff", owner.peer_id, unit_object_id, buff_template_name_id)
 	else
-		self.remove_volume_buff(self, unit, buff_template_name)
+		self:remove_volume_buff(unit, buff_template_name)
 	end
 end
 
@@ -268,7 +268,7 @@ BuffSystem.remove_volume_buff = function (self, unit, buff_template_name)
 	local buff_extension = ScriptUnit.extension(unit, "buff_system")
 	local id = self.volume_buffs[unit][buff_template_name]
 
-	buff_extension.remove_buff(buff_extension, id)
+	buff_extension:remove_buff(id)
 
 	self.volume_buffs[unit][buff_template_name] = nil
 end
@@ -291,7 +291,7 @@ BuffSystem._update_debug = function (self, t)
 			for _, player in pairs(human_players) do
 				local unit = player.player_unit
 				local health_extension = ScriptUnit.has_extension(unit, "health_system")
-				local has_shield = health_extension and health_extension.has_assist_shield(health_extension)
+				local has_shield = health_extension and health_extension:has_assist_shield()
 
 				if has_shield then
 					local head_node = Unit.node(unit, "c_head")
@@ -321,7 +321,7 @@ BuffSystem.rpc_add_buff = function (self, sender, unit_id, buff_template_name_id
 	local buff_template_name = NetworkLookup.buff_templates[buff_template_name_id]
 
 	if ScriptUnit.has_extension(unit, "buff_system") then
-		self._add_buff_helper_function(self, unit, buff_template_name, attacker_unit, server_buff_id)
+		self:_add_buff_helper_function(unit, buff_template_name, attacker_unit, server_buff_id)
 	end
 end
 
@@ -332,7 +332,7 @@ BuffSystem.rpc_remove_server_controlled_buff = function (self, sender, unit_id, 
 		local buff_extension = ScriptUnit.extension(unit, "buff_system")
 		local id = self.server_controlled_buffs[unit][server_buff_id].local_buff_id
 
-		buff_extension.remove_buff(buff_extension, id)
+		buff_extension:remove_buff(id)
 
 		self.server_controlled_buffs[unit][server_buff_id] = nil
 	end
@@ -342,14 +342,14 @@ BuffSystem.rpc_add_volume_buff_multiplier = function (self, sender, unit_id, buf
 	local unit = self.unit_storage:unit(unit_id)
 	local buff_template_name = NetworkLookup.buff_templates[buff_template_name_id]
 
-	self.add_volume_buff(self, unit, buff_template_name, multiplier)
+	self:add_volume_buff(unit, buff_template_name, multiplier)
 end
 
 BuffSystem.rpc_remove_volume_buff = function (self, sender, unit_id, buff_template_name_id)
 	local unit = self.unit_storage:unit(unit_id)
 	local buff_template_name = NetworkLookup.buff_templates[buff_template_name_id]
 
-	self.remove_volume_buff(self, unit, buff_template_name)
+	self:remove_volume_buff(unit, buff_template_name)
 end
 
 BuffSystem.rpc_add_group_buff = function (self, sender, group_buff_template_id, num_instances)
@@ -374,7 +374,7 @@ BuffSystem.rpc_add_group_buff = function (self, sender, group_buff_template_id, 
 
 			if Unit.alive(unit) then
 				local buff_extension = ScriptUnit.extension(unit, "buff_system")
-				local id = buff_extension.add_buff(buff_extension, buff_per_instance)
+				local id = buff_extension:add_buff(buff_per_instance)
 				local recipients = group_buff_data.recipients
 				recipients[unit] = id
 			end
@@ -415,7 +415,7 @@ BuffSystem.rpc_remove_group_buff = function (self, sender, group_buff_template_i
 			if Unit.alive(unit) then
 				local buff_extension = ScriptUnit.extension(unit, "buff_system")
 
-				buff_extension.remove_buff(buff_extension, id)
+				buff_extension:remove_buff(id)
 			end
 		end
 	end
@@ -442,7 +442,7 @@ BuffSystem.rpc_proc_event = function (self, sender, peer_id, local_player_id, ev
 	local player_unit = player.player_unit
 	local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
 
-	buff_extension.trigger_procs(buff_extension, event)
+	buff_extension:trigger_procs(event)
 end
 
 BuffSystem.rpc_remove_gromril_armour = function (self, sender, unit_id)
@@ -453,16 +453,16 @@ BuffSystem.rpc_remove_gromril_armour = function (self, sender, unit_id)
 	end
 
 	local buff_extension = ScriptUnit.extension(unit, "buff_system")
-	local has_gromril_armour = buff_extension.has_buff_type(buff_extension, "bardin_ironbreaker_gromril_armour")
+	local has_gromril_armour = buff_extension:has_buff_type("bardin_ironbreaker_gromril_armour")
 
 	if has_gromril_armour then
-		local buff = buff_extension.get_non_stacking_buff(buff_extension, "bardin_ironbreaker_gromril_armour")
+		local buff = buff_extension:get_non_stacking_buff("bardin_ironbreaker_gromril_armour")
 		local id = buff.id
 
-		buff_extension.remove_buff(buff_extension, id)
+		buff_extension:remove_buff(id)
 	end
 
-	buff_extension.trigger_procs(buff_extension, "on_gromril_armour_removed")
+	buff_extension:trigger_procs("on_gromril_armour_removed")
 end
 
 return
