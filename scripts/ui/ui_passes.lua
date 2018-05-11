@@ -75,6 +75,11 @@ local function get_line_color_override(line_index, line_length, line_global_star
 end
 
 UIPasses = UIPasses or {}
+local NilCursor = {
+	0,
+	0,
+	0
+}
 local UIRenderer = UIRenderer
 local UIRenderer_draw_texture = UIRenderer.draw_texture
 local UIRenderer_draw_texture_uv = UIRenderer.draw_texture_uv
@@ -2316,11 +2321,6 @@ UIPasses.viewport = {
 
 		return PhysicsWorld.immediate_raycast(physics_world, position, raycast_dir, range, result_type, "collision_filter", collision_filter)
 	end
-}
-local NilCursor = {
-	0,
-	0,
-	0
 }
 script_data.ui_debug_hover = script_data.ui_debug_hover or Development.parameter("ui_debug_hover")
 script_data.ui_debug_drag = script_data.ui_debug_drag or Development.parameter("ui_debug_drag")

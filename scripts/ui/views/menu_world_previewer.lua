@@ -503,6 +503,12 @@ MenuWorldPreviewer._poll_hero_package_loading = function (self)
 		return 
 	end
 
+	local requested_hero_spawn_data = self._requested_hero_spawn_data
+
+	if requested_hero_spawn_data then
+		return 
+	end
+
 	local reference_name = self._reference_name(self)
 	local package_manager = Managers.package
 	local package_names = data.package_names
@@ -719,6 +725,12 @@ MenuWorldPreviewer._poll_item_package_loading = function (self)
 	local character_unit = self.character_unit
 
 	if not Unit.alive(character_unit) then
+		return 
+	end
+
+	local requested_hero_spawn_data = self._requested_hero_spawn_data
+
+	if requested_hero_spawn_data then
 		return 
 	end
 

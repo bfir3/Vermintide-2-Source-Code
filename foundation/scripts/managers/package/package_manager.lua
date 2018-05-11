@@ -296,7 +296,7 @@ PackageManager.update = function (self)
 		end
 	end
 
-	return 
+	return next(self._asynch_packages) == nil
 end
 PackageManager.dump_reference_counter = function (self, reference_name)
 	printf("[PackageManager] Dumping reference counters for %s", reference_name)

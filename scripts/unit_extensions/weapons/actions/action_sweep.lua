@@ -1090,14 +1090,14 @@ ActionSweep.finish = function (self, reason, data)
 	local attacker_unit_id = network_manager.unit_game_object_id(network_manager, owner_unit)
 	local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
 	local has_melee_boost, melee_boost_curve_multiplier = ActionUtils.get_melee_boost(owner_unit)
-	local power_level = self.power_level
 	local is_critical_strike = self._is_critical_strike or has_melee_boost
-	local target_settings = damage_profile.default_target
 	local damage_profile_id = self.damage_profile_id
+	local power_level = self.power_level
+	local hit_target_index = nil
 	local shield_blocked = false
 	local shield_break_procc = false
+	local charge_value = self.damage_profile.charge_value
 	local send_to_server = true
-	local charge_value = damage_profile.charge_value
 
 	DamageUtils.buff_on_attack(owner_unit, target_breed_unit, charge_value, is_critical_strike, hit_zone_name, self.number_of_hit_enemies + 1, send_to_server)
 	weapon_system.send_rpc_attack_hit(weapon_system, NetworkLookup.damage_sources[self.item_name], attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", hit_target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", melee_boost_curve_multiplier, "is_critical_strike", is_critical_strike)

@@ -94,7 +94,7 @@ DamageNumbersUI.event_add_damage_number = function (self, damage, size, unit, ti
 	local cam_to_unit_dir = Vector3.normalize(unit_position - camera_position)
 	local cam_direction = Quaternion.forward(Camera.world_rotation(self.camera))
 	local forward_dot = Vector3.dot(cam_direction, cam_to_unit_dir)
-	local is_infront = 0.55 <= forward_dot and forward_dot <= 1
+	local is_infront = 0 <= forward_dot and forward_dot <= 1
 
 	if is_infront then
 		local size = size or 1
