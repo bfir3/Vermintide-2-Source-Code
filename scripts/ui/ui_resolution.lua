@@ -271,6 +271,10 @@ function EnumDisplayModes()
 					local aspect_ratio = AspectRatio.calculate(width, height)
 
 					printf("ui: SKIPPED %d/%d adapter %d, output %d. Reason: WRONG ADAPTER", width, height, adapter, output)
+					table.insert(resolutions_by_aspect_ratio[aspect_ratio], {
+						width,
+						height
+					})
 				until true
 			end
 		end

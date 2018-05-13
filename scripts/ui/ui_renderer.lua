@@ -1,7 +1,3 @@
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
 require("scripts/utils/strict_table")
 require("scripts/ui/ui_scenegraph")
 require("scripts/ui/ui_resolution")
@@ -379,8 +375,6 @@ UIRenderer.draw_element = function (self, ui_element, ui_style, ui_style_global,
 
 	for i, pass_info in ipairs(ui_element.passes) do
 		repeat
-
-			-- Decompilation error in this vicinity:
 			local pass_type = pass_info.pass_type
 			local content_id = pass_info.content_id
 			local element_content = (content_id and ui_content[content_id]) or ui_content
@@ -430,6 +424,61 @@ UIRenderer.draw_element = function (self, ui_element, ui_style, ui_style_global,
 			if ui_pass.update then
 				ui_pass.update(self, pass_data, ui_scenegraph, pass_info, style_data, element_content, input_service, dt, ui_style_global, visible)
 			end
+
+			if pass_info.retained_mode then
+				local visible_previous = pass_data.visible
+				pass_data.visible = visible
+
+				if visible_previous and not visible then
+					ui_pass.destroy(self, pass_data, pass_info)
+
+					break
+				elseif not visible_previous and visible then
+					pass_data.dirty = true
+				end
+
+				if not ui_element.dirty and not pass_data.dirty then
+					break
+				end
+			end
+
+			if not visible then
+				break
+			end
+
+			local pass_size, pass_position = nil
+			local pass_scenegraph_id = (style_data and style_data.scenegraph_id) or pass_info.scenegraph_id
+
+			if pass_scenegraph_id then
+				pass_size = UISceneGraph_get_size_scaled(ui_scenegraph, pass_scenegraph_id, widget_optional_scale)
+				local world_pos = UISceneGraph_get_world_position(ui_scenegraph, pass_scenegraph_id)
+				pass_position = Vector3(world_pos[1], world_pos[2], world_pos[3])
+			else
+				pass_size = size
+				pass_position = position
+			end
+
+			if ui_element.dirty then
+			end
+
+			local style_data_size = style_data and style_data.size
+
+			if style_data_size and not Vector2(style_data_size[1] or pass_size[1], style_data_size[2] or pass_size[2]) then
+			end
+
+			local style_offset = style_data and style_data.offset
+
+			if style_offset and not (pass_position + Vector3(style_offset[1], style_offset[2], style_offset[3] or 0)) then
+			end
+
+			if widget_optional_scale then
+				pass_size[1] = pass_size[1] * widget_optional_scale
+				pass_size[2] = pass_size[2] * widget_optional_scale
+				pass_position[1] = pass_position[1] * widget_optional_scale
+				pass_position[2] = pass_position[2] * widget_optional_scale
+			end
+
+			ui_pass.draw(self, pass_data, ui_scenegraph, pass_info, style_data, element_content, pass_position, pass_size, input_service, dt, ui_style_global)
 		until true
 	end
 
@@ -447,6 +496,17 @@ UIRenderer.set_element_visible = function (self, ui_element, visible)
 			if pass_info.retained_mode then
 				local visible_previous = pass_data.visible
 				pass_data.visible = visible
+
+				if visible_previous and not visible then
+					local pass_type = pass_info.pass_type
+					local ui_pass = UIPasses[pass_type]
+
+					ui_pass.destroy(self, pass_data, pass_info)
+
+					break
+				elseif not visible_previous and visible then
+					pass_data.dirty = true
+				end
 			end
 		until true
 	end
