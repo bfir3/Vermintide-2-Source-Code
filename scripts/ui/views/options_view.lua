@@ -1111,20 +1111,24 @@ OptionsView.update_gamepad_layout_widget = function (self, keymaps, using_left_h
 	for keymaps_table_name, keymaps_table in pairs(keymaps) do
 		for keybindings_name, keybindings in pairs(keymaps_table) do
 			for action_name, keybind in pairs(keybindings) do
-				if not settings_definitions.ignore_keybind[action_name] then
-					if ignore_gamepad_action_names and ignore_gamepad_action_names[action_name] then
-					else
+				repeat
+					if not settings_definitions.ignore_keybind[action_name] then
+						if ignore_gamepad_action_names and ignore_gamepad_action_names[action_name] then
+							break
+						end
+
 						local num_variables = #keybind
 
 						if num_variables < 3 then
-						else
-							local button_name = keybind[2]
-							local actions = display_keybinds[button_name] or {}
-							display_keybinds[button_name] = actions
-							actions[#actions + 1] = action_name
+							break
 						end
+
+						local button_name = keybind[2]
+						local actions = display_keybinds[button_name] or {}
+						display_keybinds[button_name] = actions
+						actions[#actions + 1] = action_name
 					end
-				end
+				until true
 			end
 		end
 	end
@@ -3696,10 +3700,13 @@ OptionsView.cb_resolutions_setup = function (self)
 	local num_modes = DisplayAdapter.num_modes(adapter_index, output_screen)
 
 	for i = 0, num_modes - 1, 1 do
-		local width, height = DisplayAdapter.mode(adapter_index, output_screen, i)
+		repeat
+			local width, height = DisplayAdapter.mode(adapter_index, output_screen, i)
 
-		if width < GameSettingsDevelopment.lowest_resolution then
-		else
+			if width < GameSettingsDevelopment.lowest_resolution then
+				break
+			end
+
 			local text = tostring(width) .. "x" .. tostring(height)
 			options[#options + 1] = {
 				text = text,
@@ -3708,7 +3715,7 @@ OptionsView.cb_resolutions_setup = function (self)
 					height
 				}
 			}
-		end
+		until true
 	end
 
 	local function comparator(a, b)

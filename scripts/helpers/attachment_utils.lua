@@ -75,15 +75,18 @@ AttachmentUtils.hot_join_sync = function (sender, unit, slots)
 	local unit_go_id = Managers.state.unit_storage:go_id(unit)
 
 	for slot_name, slot_data in pairs(slots) do
-		local slot = InventorySettings.slots_by_name[slot_name]
+		repeat
+			local slot = InventorySettings.slots_by_name[slot_name]
 
-		if slot.category ~= "attachment" then
-		else
+			if slot.category ~= "attachment" then
+				break
+			end
+
 			local slot_id = NetworkLookup.equipment_slots[slot_name]
 			local attachment_id = NetworkLookup.item_names[slot_data.name]
 
 			RPC.rpc_create_attachment(sender, unit_go_id, slot_id, attachment_id)
-		end
+		until true
 	end
 end
 

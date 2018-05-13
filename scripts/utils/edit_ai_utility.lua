@@ -235,24 +235,28 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 				local breed_actions = BreedActions[breed_name]
 
 				for i, breed_action in pairs(breed_actions) do
-					local unit_considerations = breed_action.considerations
+					repeat
+						local unit_considerations = breed_action.considerations
 
-					if not unit_considerations then
-					else
+						if not unit_considerations then
+							break
+						end
+
 						local consideration_name = unit_considerations.name
 
 						if consideration_name ~= action then
-						else
-							for unit_data_name, unit_data in pairs(unit_considerations) do
-								local data_name = data.name
+							break
+						end
 
-								if unit_data_name == data_name then
-									unit_data.spline = table.clone(data.spline)
-									unit_data.max_value = data.max_value
-								end
+						for unit_data_name, unit_data in pairs(unit_considerations) do
+							local data_name = data.name
+
+							if unit_data_name == data_name then
+								unit_data.spline = table.clone(data.spline)
+								unit_data.max_value = data.max_value
 							end
 						end
-					end
+					until true
 				end
 			end
 		end

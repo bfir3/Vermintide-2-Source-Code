@@ -248,38 +248,40 @@ ActionBountyHunterHandgun._do_aoe = function (self)
 	end
 
 	for i = 1, actors_n, 1 do
-		local hit_actor = actors[i]
-		local hit_unit = Actor.unit(hit_actor)
-		local breed = unit_get_data(hit_unit, "breed")
+		repeat
+			local hit_actor = actors[i]
+			local hit_unit = Actor.unit(hit_actor)
+			local breed = unit_get_data(hit_unit, "breed")
 
-		if breed and not hit_units[hit_unit] then
-			hit_units[hit_unit] = true
-			local node = Actor.node(hit_actor)
-			local hit_zone = breed.hit_zones_lookup[node]
-			local target_hit_zone_name = hit_zone.name
-			local target_hit_position = Unit.world_position(hit_unit, node)
-			self.target_hit_zones_names[hit_unit] = target_hit_zone_name
-			self.target_hit_unit_positions[hit_unit] = target_hit_position
-			local attack_direction = Vector3.normalize(POSITION_LOOKUP[hit_unit] - attack_pos)
-			local node = Actor.node(hit_actor)
-			local hit_zone = breed.hit_zones_lookup[node]
-			local hit_zone_name = hit_zone.name
-			local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
-			local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
-			local power_level = self.power_level
-			local damage_profile_id = self.damage_profile_aoe_id
-			local shield_blocked = AiUtils.attack_is_shield_blocked(hit_unit, owner_unit)
-			local damage_source = self.item_name
-			local damage_source_id = NetworkLookup.damage_sources[damage_source]
-			local weapon_system = self.weapon_system
-			local ranged_boost_curve_multiplier = 1
-			local is_critical_strike = self.is_critical_strike
-			local can_damage = false
-			local can_stagger = true
-			local target_index = nil
+			if breed and not hit_units[hit_unit] then
+				hit_units[hit_unit] = true
+				local node = Actor.node(hit_actor)
+				local hit_zone = breed.hit_zones_lookup[node]
+				local target_hit_zone_name = hit_zone.name
+				local target_hit_position = Unit.world_position(hit_unit, node)
+				self.target_hit_zones_names[hit_unit] = target_hit_zone_name
+				self.target_hit_unit_positions[hit_unit] = target_hit_position
+				local attack_direction = Vector3.normalize(POSITION_LOOKUP[hit_unit] - attack_pos)
+				local node = Actor.node(hit_actor)
+				local hit_zone = breed.hit_zones_lookup[node]
+				local hit_zone_name = hit_zone.name
+				local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
+				local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
+				local power_level = self.power_level
+				local damage_profile_id = self.damage_profile_aoe_id
+				local shield_blocked = AiUtils.attack_is_shield_blocked(hit_unit, owner_unit)
+				local damage_source = self.item_name
+				local damage_source_id = NetworkLookup.damage_sources[damage_source]
+				local weapon_system = self.weapon_system
+				local ranged_boost_curve_multiplier = 1
+				local is_critical_strike = self.is_critical_strike
+				local can_damage = false
+				local can_stagger = true
+				local target_index = nil
 
-			weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", target_index, "blocking", shield_blocked, "shield_break_procced", false, "boost_curve_multiplier", ranged_boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", can_damage, "can_stagger", can_stagger)
-		end
+				weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", target_index, "blocking", shield_blocked, "shield_break_procced", false, "boost_curve_multiplier", ranged_boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", can_damage, "can_stagger", can_stagger)
+			end
+		until true
 	end
 end
 

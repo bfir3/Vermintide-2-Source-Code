@@ -414,14 +414,17 @@ NavigationGroupManager.calc_distances_from_finish_for_all = function (self, in_g
 	local first_poly_hash = self:get_poly_hash(first_poly)
 
 	for i, poly in ipairs(in_group_queue) do
-		Script.set_temp_count(a, b, c)
+		repeat
+			Script.set_temp_count(a, b, c)
 
-		local poly_hash = self:get_poly_hash(poly)
-		local group = self._registered_polygons[poly_hash]
-		local is_first_group = false
+			local poly_hash = self:get_poly_hash(poly)
+			local group = self._registered_polygons[poly_hash]
+			local is_first_group = false
 
-		if group:get_distance_from_finish() ~= math.huge then
-		else
+			if group:get_distance_from_finish() ~= math.huge then
+				break
+			end
+
 			if group == self._registered_polygons[first_poly_hash] then
 				is_first_group = true
 			end
@@ -429,7 +432,7 @@ NavigationGroupManager.calc_distances_from_finish_for_all = function (self, in_g
 			local distance_from_finish = self:calc_distance_from_finish(group, is_first_group)
 
 			group:set_distance_from_finish(distance_from_finish)
-		end
+		until true
 	end
 end
 

@@ -28,13 +28,16 @@ local function profile_packages(profile_index, career_index, packages_list, is_f
 	local slots_n = #InventorySettings.slots
 
 	for i = 1, slots_n, 1 do
-		local slot = InventorySettings.slots[i]
-		local slot_name = slot.name
-		local slot_category = slot.category
-		local item = BackendUtils.get_loadout_item(career_name, slot_name)
+		repeat
+			local slot = InventorySettings.slots[i]
+			local slot_name = slot.name
+			local slot_category = slot.category
+			local item = BackendUtils.get_loadout_item(career_name, slot_name)
 
-		if not item then
-		else
+			if not item then
+				break
+			end
+
 			local item_data = item.data
 			local backend_id = item.backend_id
 			local item_template = BackendUtils.get_item_template(item_data, backend_id)
@@ -90,15 +93,22 @@ local function profile_packages(profile_index, career_index, packages_list, is_f
 						packages_list[ammo_data.ammo_unit_3p] = false
 					end
 				end
-			elseif slot_category == "attachment" then
-				if item_units.unit then
-					packages_list[item_units.unit] = false
-				end
-			elseif slot_category == "cosmetic" then
 			else
+				if slot_category == "attachment" then
+					if item_units.unit then
+						packages_list[item_units.unit] = false
+					end
+
+					break
+				end
+
+				if slot_category == "cosmetic" then
+					break
+				end
+
 				error("InventoryPackageSynchronizerClient unknown template_type: " .. template_type)
 			end
-		end
+		until true
 	end
 
 	local base_skin_name = career.base_skin

@@ -215,13 +215,16 @@ UnitFramesUI.update_portrait_frames = function (self, dt, my_player)
 	local other_player_portraits = self.other_player_portraits
 
 	for index, player in pairs(human_players) do
-		if player == my_player then
-		else
+		repeat
+			if player == my_player then
+				break
+			end
+
 			i = i + 1
 			local player_portrait_widget = other_player_portraits[i]
 			local unit = player.player_unit
 			player_portrait_widget.content.portrait_frame = "unit_frame_01"
-		end
+		until true
 	end
 end
 
@@ -255,8 +258,11 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 	tmp_peer_ids[self.peer_id] = true
 
 	for index, player in pairs(human_players) do
-		if player == my_player then
-		else
+		repeat
+			if player == my_player then
+				break
+			end
+
 			i = i + 1
 			local player_inventory_widget = other_player_inventories[i]
 			local player_portrait_widget = other_player_portraits[i]
@@ -265,235 +271,236 @@ UnitFramesUI.update_teammates_unit_frames = function (self, dt, t, ui_scenegraph
 			local profile_index = profile_synchronizer:profile_by_peer(player_peer_id, player:local_player_id())
 
 			if not profile_index then
-			else
-				tmp_peer_ids[player_peer_id] = true
-				tmp_peer_ids_by_index[i] = player_peer_id
-				local ingame_display_name = UIRenderer.crop_text(player:name(), 26)
-				local level = nil
-				local is_player_controlled = player:is_player_controlled()
-
-				if is_player_controlled then
-					level = ExperienceSettings.get_player_level(player) or ""
-				else
-					level = "BOT"
-				end
-
-				modified_teammate[i] = player_portrait_widget.content.player_name ~= ingame_display_name
-				modified_teammate[i] = modified_teammate[i] or player_portrait_widget.content.player_level ~= level
-				player_portrait_widget.content.player_name = ingame_display_name
-				player_portrait_widget.content.player_level = level
-				local player_unit = player.player_unit
-				local portrait_content = player_portrait_widget.content
-				local portrait_style = player_portrait_widget.style
-				local health_percent, is_dead, is_knocked_down, inventory_extension, dialogue_extension, needs_help, is_wounded, is_ready_for_assisted_respawn = nil
-				local shield_percent = 0
-
-				if player_unit then
-					local health_extension = ScriptUnit.extension(player_unit, "health_system")
-					local status_extension = ScriptUnit.extension(player_unit, "status_system")
-					inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
-					dialogue_extension = ScriptUnit.extension(player_unit, "dialogue_system")
-					health_percent = health_extension:current_health_percent()
-					local max_health = health_extension.unmodified_max_health
-					local has_shield, shield_amount = health_extension:has_assist_shield()
-
-					if has_shield then
-						shield_percent = shield_amount / max_health
-
-						if not self.shielded_players[i + 1] then
-							local hp_bar_highlight = portrait_style.hp_bar_highlight
-							hp_bar_highlight.color[1] = 255
-							hp_bar_highlight.color[2] = 140
-							hp_bar_highlight.color[3] = 180
-							hp_bar_highlight.color[4] = 255
-							player_portrait_widget.element.dirty = true
-							self.shielded_players[i + 1] = true
-						end
-					elseif self.shielded_players[i + 1] then
-						local hp_bar_highlight = portrait_style.hp_bar_highlight
-						hp_bar_highlight.color[1] = 0
-						hp_bar_highlight.color[2] = 0
-						hp_bar_highlight.color[3] = 0
-						hp_bar_highlight.color[4] = 0
-						player_portrait_widget.element.dirty = true
-						self.shielded_players[i + 1] = false
-					end
-
-					is_wounded = status_extension:is_wounded()
-					is_knocked_down = status_extension:is_knocked_down() and 0 < health_percent
-					is_ready_for_assisted_respawn = status_extension:is_ready_for_assisted_respawn()
-					needs_help = status_extension:is_grabbed_by_pack_master() or is_ready_for_assisted_respawn or status_extension:is_hanging_from_hook() or status_extension:is_pounced_down() or status_extension:get_is_ledge_hanging()
-				else
-					health_percent = 0
-					is_knocked_down = false
-				end
-
-				modified_teammate[i] = modified_teammate[i] or portrait_content.hp_bar.draw_health_bar ~= not is_ready_for_assisted_respawn
-				portrait_content.hp_bar.draw_health_bar = not is_ready_for_assisted_respawn
-
-				if not self.is_server then
-					portrait_content.is_host = is_player_controlled and is_player_server
-				end
-
-				is_dead = health_percent <= 0
-				local show_overlay = false
-				local show_icon = false
-				local character_portrait = nil
-				local num_of_health_dividers = 0
-
-				if is_knocked_down then
-					show_overlay = true
-					show_icon = true
-				elseif is_dead then
-					show_overlay = true
-				elseif needs_help then
-					show_overlay = true
-					show_icon = true
-					num_of_health_dividers = MAX_HEALTH_DIVIDERS
-				else
-					num_of_health_dividers = MAX_HEALTH_DIVIDERS
-				end
-
-				local portrait_texture, portrait_texture_point_sample = get_portrait_name_by_profile_index(profile_index)
-				character_portrait = portrait_texture
-
-				if show_overlay then
-					local alpha = 255
-
-					if is_dead then
-						portrait_content.portrait_overlay = "unit_frame_portrait_dead"
-						alpha = 255
-					elseif is_knocked_down then
-						portrait_content.portrait_overlay = "unit_frame_portrait_dead"
-						local i = math.sirp(0, 0.7, self.overlay_time)
-						alpha = 255 * i
-					elseif needs_help then
-						portrait_content.portrait_overlay = "unit_frame_red_overlay"
-						local i = math.sirp(0.6, 1, self.overlay_time)
-						alpha = 255 * i
-					end
-
-					modified_teammate[i] = modified_teammate[i] or portrait_style.portrait_overlay.color[1] ~= alpha
-					portrait_style.portrait_overlay.color[1] = alpha
-				end
-
-				if is_knocked_down or needs_help then
-					local gui = ui_renderer.gui
-					local gui_material = Gui.material(gui, portrait_texture_point_sample or portrait_texture)
-
-					Material.set_vector2(gui_material, "saturate_params", Vector2(0.7, 1))
-				else
-					local gui = ui_renderer.gui
-					local gui_material = Gui.material(gui, portrait_texture_point_sample or portrait_texture)
-
-					Material.set_vector2(gui_material, "saturate_params", Vector2(0, 1))
-				end
-
-				local active_percentage = 1
-
-				if player_unit then
-					local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
-					local num_grimoires = buff_extension:num_buff_perk("skaven_grimoire")
-					local multiplier = buff_extension:apply_buffs_to_value(PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF, StatBuffIndex.CURSE_PROTECTION)
-					local num_twitch_grimoires = buff_extension:num_buff_perk("twitch_grimoire")
-					local twitch_multiplier = PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF
-					active_percentage = 1 + num_grimoires * multiplier + num_twitch_grimoires * twitch_multiplier
-				end
-
-				fassert(health_percent * active_percentage <= 1, "Health was greater then 1. %s , %s", health_percent, active_percentage)
-
-				local health_changed = self:on_player_health_changed("player_" .. index, player_portrait_widget, health_percent * active_percentage)
-				local grims_changed = self:on_num_grimoires_changed("player_" .. index .. "_grimoires", player_portrait_widget, 1 - active_percentage)
-				modified_teammate[i] = modified_teammate[i] or health_changed or grims_changed
-				local hp_bar_value = player_portrait_widget.content.hp_bar.bar_value
-				local grimoire_value = player_portrait_widget.content.hp_bar_grimoire_debuff.bar_value
-				player_portrait_widget.content.hp_bar_shield.bar_value_position = hp_bar_value
-				player_portrait_widget.content.hp_bar_shield.bar_value_offset = grimoire_value
-				player_portrait_widget.content.hp_bar_shield.bar_value_size = shield_percent
-				local max_health_divider_content = portrait_content.hp_bar_max_health_divider
-				max_health_divider_content.active = false
-				local grimoire_icon_content = portrait_content.hp_bar_grimoire_icon
-				grimoire_icon_content.active = false
-
-				if active_percentage < 1 then
-					max_health_divider_content.active = true
-					local max_health_divider_style = player_portrait_widget.style.hp_bar_max_health_divider
-					local default_bar_length = definitions.scenegraph_definition.hp_bar_grimoire_debuff_fill.size[1]
-					local bar_value = portrait_content.hp_bar_grimoire_debuff.bar_value
-					local bar_offset = -bar_value * default_bar_length
-					max_health_divider_style.offset[1] = bar_offset
-					grimoire_icon_content.active = true
-					local grimoire_icon_style = player_portrait_widget.style.hp_bar_grimoire_icon
-					grimoire_icon_style.offset[1] = bar_offset / 2
-				end
-
-				low_health = (not is_dead and not is_knocked_down and health_percent < UISettings.unit_frames.low_health_threshold) or nil
-				portrait_content.hp_bar.low_health = low_health or false
-				portrait_content.hp_bar.is_knocked_down = is_knocked_down or false
-				portrait_content.hp_bar.is_wounded = is_wounded or false
-				portrait_content.character_portrait = character_portrait
-				portrait_content.connecting = false
-				portrait_content.display_portrait_icon = show_icon
-				portrait_content.display_portrait_overlay = show_overlay
-				portrait_style.hp_bar_divider.texture_amount = num_of_health_dividers
-
-				if inventory_extension then
-					local inventory_widgets = self.inventory_widgets
-					local equipment = inventory_extension:equipment()
-					local inventory_slots = InventorySettings.slots
-					local player_inventory_list_content = player_inventory_widget.content.list_content
-					local player_inventory_item_styles = player_inventory_widget.style.list_style.item_styles
-
-					for _, slot in ipairs(inventory_slots) do
-						local slot_name = slot.name
-						local widget_slot_index = teammate_inventory_widget_slots[slot_name]
-
-						if widget_slot_index then
-							local slot_data = equipment.slots[slot_name]
-							local slot_visible = (slot_data and true) or false
-
-							if slot_visible and not player_inventory_list_content[widget_slot_index].occupied then
-								self:add_slot_equip_animation("player_" .. index .. "_" .. slot_name .. "_equip_anim", player_inventory_item_styles[widget_slot_index].item_highlight)
-
-								modified_teammate[i] = true
-							end
-
-							if slot_visible then
-								local item_name = slot_data.item_data.name
-								local texture_name = inventory_consumable_icons[item_name]
-								player_inventory_list_content[widget_slot_index].item_texture = texture_name or "teammate_consumable_icon_medpack"
-							else
-								local texture_name = inventory_consumable_icons[widget_slot_index]
-								player_inventory_list_content[widget_slot_index].item_texture = texture_name
-							end
-
-							player_inventory_list_content[widget_slot_index].occupied = slot_visible
-						end
-					end
-				end
-
-				local is_talking = false
-
-				if dialogue_extension then
-					is_talking = dialogue_extension.currently_playing_dialogue ~= nil
-				end
-
-				local talk_indicator_style = player_portrait_widget.style.talk_indicator_highlight
-				local old_alpha = talk_indicator_style.color[1]
-				old_alpha = old_alpha + ((is_talking and 1) or -1) * 255 * dt
-
-				if is_talking then
-					old_alpha = old_alpha + math.sin(t * 3) * 20
-					old_alpha = old_alpha + math.cos((t + 1) * 13) * 20
-					local scenegraph_size = self.ui_scenegraph[talk_indicator_style.scenegraph_id].size
-					scenegraph_size[2] = 70 + math.sin(t * 7) * 15 + math.cos((t + 1) * 17) * 10
-				end
-
-				old_alpha = math.clamp(old_alpha, 0, 255)
-				modified_teammate[i] = old_alpha ~= talk_indicator_style.color[1]
-				talk_indicator_style.color[1] = old_alpha
+				break
 			end
-		end
+
+			tmp_peer_ids[player_peer_id] = true
+			tmp_peer_ids_by_index[i] = player_peer_id
+			local ingame_display_name = UIRenderer.crop_text(player:name(), 26)
+			local level = nil
+			local is_player_controlled = player:is_player_controlled()
+
+			if is_player_controlled then
+				level = ExperienceSettings.get_player_level(player) or ""
+			else
+				level = "BOT"
+			end
+
+			modified_teammate[i] = player_portrait_widget.content.player_name ~= ingame_display_name
+			modified_teammate[i] = modified_teammate[i] or player_portrait_widget.content.player_level ~= level
+			player_portrait_widget.content.player_name = ingame_display_name
+			player_portrait_widget.content.player_level = level
+			local player_unit = player.player_unit
+			local portrait_content = player_portrait_widget.content
+			local portrait_style = player_portrait_widget.style
+			local health_percent, is_dead, is_knocked_down, inventory_extension, dialogue_extension, needs_help, is_wounded, is_ready_for_assisted_respawn = nil
+			local shield_percent = 0
+
+			if player_unit then
+				local health_extension = ScriptUnit.extension(player_unit, "health_system")
+				local status_extension = ScriptUnit.extension(player_unit, "status_system")
+				inventory_extension = ScriptUnit.extension(player_unit, "inventory_system")
+				dialogue_extension = ScriptUnit.extension(player_unit, "dialogue_system")
+				health_percent = health_extension:current_health_percent()
+				local max_health = health_extension.unmodified_max_health
+				local has_shield, shield_amount = health_extension:has_assist_shield()
+
+				if has_shield then
+					shield_percent = shield_amount / max_health
+
+					if not self.shielded_players[i + 1] then
+						local hp_bar_highlight = portrait_style.hp_bar_highlight
+						hp_bar_highlight.color[1] = 255
+						hp_bar_highlight.color[2] = 140
+						hp_bar_highlight.color[3] = 180
+						hp_bar_highlight.color[4] = 255
+						player_portrait_widget.element.dirty = true
+						self.shielded_players[i + 1] = true
+					end
+				elseif self.shielded_players[i + 1] then
+					local hp_bar_highlight = portrait_style.hp_bar_highlight
+					hp_bar_highlight.color[1] = 0
+					hp_bar_highlight.color[2] = 0
+					hp_bar_highlight.color[3] = 0
+					hp_bar_highlight.color[4] = 0
+					player_portrait_widget.element.dirty = true
+					self.shielded_players[i + 1] = false
+				end
+
+				is_wounded = status_extension:is_wounded()
+				is_knocked_down = status_extension:is_knocked_down() and 0 < health_percent
+				is_ready_for_assisted_respawn = status_extension:is_ready_for_assisted_respawn()
+				needs_help = status_extension:is_grabbed_by_pack_master() or is_ready_for_assisted_respawn or status_extension:is_hanging_from_hook() or status_extension:is_pounced_down() or status_extension:get_is_ledge_hanging()
+			else
+				health_percent = 0
+				is_knocked_down = false
+			end
+
+			modified_teammate[i] = modified_teammate[i] or portrait_content.hp_bar.draw_health_bar ~= not is_ready_for_assisted_respawn
+			portrait_content.hp_bar.draw_health_bar = not is_ready_for_assisted_respawn
+
+			if not self.is_server then
+				portrait_content.is_host = is_player_controlled and is_player_server
+			end
+
+			is_dead = health_percent <= 0
+			local show_overlay = false
+			local show_icon = false
+			local character_portrait = nil
+			local num_of_health_dividers = 0
+
+			if is_knocked_down then
+				show_overlay = true
+				show_icon = true
+			elseif is_dead then
+				show_overlay = true
+			elseif needs_help then
+				show_overlay = true
+				show_icon = true
+				num_of_health_dividers = MAX_HEALTH_DIVIDERS
+			else
+				num_of_health_dividers = MAX_HEALTH_DIVIDERS
+			end
+
+			local portrait_texture, portrait_texture_point_sample = get_portrait_name_by_profile_index(profile_index)
+			character_portrait = portrait_texture
+
+			if show_overlay then
+				local alpha = 255
+
+				if is_dead then
+					portrait_content.portrait_overlay = "unit_frame_portrait_dead"
+					alpha = 255
+				elseif is_knocked_down then
+					portrait_content.portrait_overlay = "unit_frame_portrait_dead"
+					local i = math.sirp(0, 0.7, self.overlay_time)
+					alpha = 255 * i
+				elseif needs_help then
+					portrait_content.portrait_overlay = "unit_frame_red_overlay"
+					local i = math.sirp(0.6, 1, self.overlay_time)
+					alpha = 255 * i
+				end
+
+				modified_teammate[i] = modified_teammate[i] or portrait_style.portrait_overlay.color[1] ~= alpha
+				portrait_style.portrait_overlay.color[1] = alpha
+			end
+
+			if is_knocked_down or needs_help then
+				local gui = ui_renderer.gui
+				local gui_material = Gui.material(gui, portrait_texture_point_sample or portrait_texture)
+
+				Material.set_vector2(gui_material, "saturate_params", Vector2(0.7, 1))
+			else
+				local gui = ui_renderer.gui
+				local gui_material = Gui.material(gui, portrait_texture_point_sample or portrait_texture)
+
+				Material.set_vector2(gui_material, "saturate_params", Vector2(0, 1))
+			end
+
+			local active_percentage = 1
+
+			if player_unit then
+				local buff_extension = ScriptUnit.extension(player_unit, "buff_system")
+				local num_grimoires = buff_extension:num_buff_perk("skaven_grimoire")
+				local multiplier = buff_extension:apply_buffs_to_value(PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF, StatBuffIndex.CURSE_PROTECTION)
+				local num_twitch_grimoires = buff_extension:num_buff_perk("twitch_grimoire")
+				local twitch_multiplier = PlayerUnitDamageSettings.GRIMOIRE_HEALTH_DEBUFF
+				active_percentage = 1 + num_grimoires * multiplier + num_twitch_grimoires * twitch_multiplier
+			end
+
+			fassert(health_percent * active_percentage <= 1, "Health was greater then 1. %s , %s", health_percent, active_percentage)
+
+			local health_changed = self:on_player_health_changed("player_" .. index, player_portrait_widget, health_percent * active_percentage)
+			local grims_changed = self:on_num_grimoires_changed("player_" .. index .. "_grimoires", player_portrait_widget, 1 - active_percentage)
+			modified_teammate[i] = modified_teammate[i] or health_changed or grims_changed
+			local hp_bar_value = player_portrait_widget.content.hp_bar.bar_value
+			local grimoire_value = player_portrait_widget.content.hp_bar_grimoire_debuff.bar_value
+			player_portrait_widget.content.hp_bar_shield.bar_value_position = hp_bar_value
+			player_portrait_widget.content.hp_bar_shield.bar_value_offset = grimoire_value
+			player_portrait_widget.content.hp_bar_shield.bar_value_size = shield_percent
+			local max_health_divider_content = portrait_content.hp_bar_max_health_divider
+			max_health_divider_content.active = false
+			local grimoire_icon_content = portrait_content.hp_bar_grimoire_icon
+			grimoire_icon_content.active = false
+
+			if active_percentage < 1 then
+				max_health_divider_content.active = true
+				local max_health_divider_style = player_portrait_widget.style.hp_bar_max_health_divider
+				local default_bar_length = definitions.scenegraph_definition.hp_bar_grimoire_debuff_fill.size[1]
+				local bar_value = portrait_content.hp_bar_grimoire_debuff.bar_value
+				local bar_offset = -bar_value * default_bar_length
+				max_health_divider_style.offset[1] = bar_offset
+				grimoire_icon_content.active = true
+				local grimoire_icon_style = player_portrait_widget.style.hp_bar_grimoire_icon
+				grimoire_icon_style.offset[1] = bar_offset / 2
+			end
+
+			low_health = (not is_dead and not is_knocked_down and health_percent < UISettings.unit_frames.low_health_threshold) or nil
+			portrait_content.hp_bar.low_health = low_health or false
+			portrait_content.hp_bar.is_knocked_down = is_knocked_down or false
+			portrait_content.hp_bar.is_wounded = is_wounded or false
+			portrait_content.character_portrait = character_portrait
+			portrait_content.connecting = false
+			portrait_content.display_portrait_icon = show_icon
+			portrait_content.display_portrait_overlay = show_overlay
+			portrait_style.hp_bar_divider.texture_amount = num_of_health_dividers
+
+			if inventory_extension then
+				local inventory_widgets = self.inventory_widgets
+				local equipment = inventory_extension:equipment()
+				local inventory_slots = InventorySettings.slots
+				local player_inventory_list_content = player_inventory_widget.content.list_content
+				local player_inventory_item_styles = player_inventory_widget.style.list_style.item_styles
+
+				for _, slot in ipairs(inventory_slots) do
+					local slot_name = slot.name
+					local widget_slot_index = teammate_inventory_widget_slots[slot_name]
+
+					if widget_slot_index then
+						local slot_data = equipment.slots[slot_name]
+						local slot_visible = (slot_data and true) or false
+
+						if slot_visible and not player_inventory_list_content[widget_slot_index].occupied then
+							self:add_slot_equip_animation("player_" .. index .. "_" .. slot_name .. "_equip_anim", player_inventory_item_styles[widget_slot_index].item_highlight)
+
+							modified_teammate[i] = true
+						end
+
+						if slot_visible then
+							local item_name = slot_data.item_data.name
+							local texture_name = inventory_consumable_icons[item_name]
+							player_inventory_list_content[widget_slot_index].item_texture = texture_name or "teammate_consumable_icon_medpack"
+						else
+							local texture_name = inventory_consumable_icons[widget_slot_index]
+							player_inventory_list_content[widget_slot_index].item_texture = texture_name
+						end
+
+						player_inventory_list_content[widget_slot_index].occupied = slot_visible
+					end
+				end
+			end
+
+			local is_talking = false
+
+			if dialogue_extension then
+				is_talking = dialogue_extension.currently_playing_dialogue ~= nil
+			end
+
+			local talk_indicator_style = player_portrait_widget.style.talk_indicator_highlight
+			local old_alpha = talk_indicator_style.color[1]
+			old_alpha = old_alpha + ((is_talking and 1) or -1) * 255 * dt
+
+			if is_talking then
+				old_alpha = old_alpha + math.sin(t * 3) * 20
+				old_alpha = old_alpha + math.cos((t + 1) * 13) * 20
+				local scenegraph_size = self.ui_scenegraph[talk_indicator_style.scenegraph_id].size
+				scenegraph_size[2] = 70 + math.sin(t * 7) * 15 + math.cos((t + 1) * 17) * 10
+			end
+
+			old_alpha = math.clamp(old_alpha, 0, 255)
+			modified_teammate[i] = old_alpha ~= talk_indicator_style.color[1]
+			talk_indicator_style.color[1] = old_alpha
+		until true
 	end
 
 	local num_drawn_widgets = i

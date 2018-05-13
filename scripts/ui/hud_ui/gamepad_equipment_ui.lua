@@ -365,84 +365,86 @@ GamePadEquipmentUI._sync_player_equipment = function (self)
 	local added_items = self._added_items
 
 	for i = 1, num_inventory_slots, 1 do
-		local slot = inventory_slots[i]
-		local slot_name = slot.name
-		local slot_data = equipment_slots[slot_name]
-		local slot_visible = (slot_data and true) or false
-		local item_data = slot_data and slot_data.item_data
-		local item_name = item_data and item_data.name
-		local is_wielded = (item_name and wielded == item_data) or false
+		repeat
+			local slot = inventory_slots[i]
+			local slot_name = slot.name
+			local slot_data = equipment_slots[slot_name]
+			local slot_visible = (slot_data and true) or false
+			local item_data = slot_data and slot_data.item_data
+			local item_name = item_data and item_data.name
+			local is_wielded = (item_name and wielded == item_data) or false
 
-		if is_wielded then
-			local master_item = slot_data.master_item
-			local slot_type = master_item.slot_type
-			local widget = self._widgets_by_name.weapon_slot
-			local content = widget.content
-			local style = widget.style
-			content.wielded_slot = slot_type
+			if is_wielded then
+				local master_item = slot_data.master_item
+				local slot_type = master_item.slot_type
+				local widget = self._widgets_by_name.weapon_slot
+				local content = widget.content
+				local style = widget.style
+				content.wielded_slot = slot_type
 
-			if self._wielded_slot_name ~= slot_name then
-				if slot_type == "melee" or slot_type == "ranged" then
-					self._weapon_was_wielded = true
+				if self._wielded_slot_name ~= slot_name then
+					if slot_type == "melee" or slot_type == "ranged" then
+						self._weapon_was_wielded = true
 
-					self:_add_animation("weapon_slot", widget, widget, "_animate_weapon_wield", 0.5)
-				elseif self._weapon_was_wielded then
-					self._weapon_was_wielded = false
+						self:_add_animation("weapon_slot", widget, widget, "_animate_weapon_wield", 0.5)
+					elseif self._weapon_was_wielded then
+						self._weapon_was_wielded = false
 
-					self:_add_animation("weapon_slot", widget, widget, "_animate_weapon_unwield", 0.5)
+						self:_add_animation("weapon_slot", widget, widget, "_animate_weapon_unwield", 0.5)
+					end
 				end
+
+				self._wielded_slot_name = slot_name
 			end
 
-			self._wielded_slot_name = slot_name
-		end
+			if allowed_equipment_slots[slot_name] then
+				local verified = false
 
-		if allowed_equipment_slots[slot_name] then
-			local verified = false
+				for j = 1, #added_items, 1 do
+					local data = added_items[j]
+					local same_item = data.item_name == item_name
+					local same_slot = data.slot_name == slot_name
 
-			for j = 1, #added_items, 1 do
-				local data = added_items[j]
-				local same_item = data.item_name == item_name
-				local same_slot = data.slot_name == slot_name
+					if same_item then
+						if not verified_widgets[j] then
+							verified = true
+							verified_widgets[j] = true
 
-				if same_item then
-					if not verified_widgets[j] then
+							break
+						end
+					elseif item_name and same_slot then
 						verified = true
 						verified_widgets[j] = true
 
+						self:_add_item(slot_data, data)
+
+						inventory_modified = true
+
 						break
 					end
-				elseif item_name and same_slot then
-					verified = true
-					verified_widgets[j] = true
+				end
 
-					self:_add_item(slot_data, data)
+				if not verified and slot_data ~= nil then
+					self:_add_item(slot_data)
 
+					verified_widgets[#added_items] = true
 					inventory_modified = true
+				end
 
-					break
+				if is_wielded then
+					wielded_item_name = item_name
+				end
+			else
+				if slot_name == "slot_ranged" and item_data then
+					self:_update_ammo_count(item_data, slot_data, player_unit)
+					self:_set_ammo_text_focus(is_wielded)
+				end
+
+				if is_wielded then
+					wielded_item_name = item_name
 				end
 			end
-
-			if not verified and slot_data ~= nil then
-				self:_add_item(slot_data)
-
-				verified_widgets[#added_items] = true
-				inventory_modified = true
-			end
-
-			if is_wielded then
-				wielded_item_name = item_name
-			end
-		else
-			if slot_name == "slot_ranged" and item_data then
-				self:_update_ammo_count(item_data, slot_data, player_unit)
-				self:_set_ammo_text_focus(is_wielded)
-			end
-
-			if is_wielded then
-				wielded_item_name = item_name
-			end
-		end
+		until true
 	end
 
 	table.clear(widgets_to_remove)

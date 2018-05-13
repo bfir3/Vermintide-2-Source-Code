@@ -1,5 +1,3 @@
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
 LocomotionTemplates = LocomotionTemplates or {}
 local LocomotionTemplates = LocomotionTemplates
 local detailed_profiler_start, detailed_profiler_stop = nil
@@ -120,10 +118,37 @@ LocomotionTemplates.AILocomotionExtension = {
 		local Quaternion_lerp = Quaternion.lerp
 
 		for unit, extension in pairs(data.all_update_units) do
+			repeat
+				local wanted_velocity = extension._wanted_velocity
+				local wanted_rotation = extension._wanted_rotation
 
-			-- Decompilation error in this vicinity:
-			local wanted_velocity = extension._wanted_velocity
-			local wanted_rotation = extension._wanted_rotation
+				if not wanted_rotation then
+					local flat_velocity = Vector3_flat(wanted_velocity)
+
+					if Vector3_length_squared(flat_velocity) < 0.010000000000000002 then
+						break
+					end
+
+					wanted_rotation = Quaternion_look(flat_velocity, up_vector)
+				end
+
+				extension._wanted_rotation = nil
+
+				if extension._lerp_rotation then
+					if 1 < extension._rotation_speed * extension._rotation_speed_modifier * dt then
+						local new_rotation = wanted_rotation
+
+						Unit_set_local_rotation(unit, 0, new_rotation)
+					else
+						local current_rotation = Unit_local_rotation(unit, 0)
+						local new_rotation = Quaternion_lerp(current_rotation, wanted_rotation, extension._rotation_speed * extension._rotation_speed_modifier * dt)
+
+						Unit_set_local_rotation(unit, 0, new_rotation)
+					end
+				else
+					Unit_set_local_rotation(unit, 0, wanted_rotation)
+				end
+			until true
 		end
 
 		for unit, extension in pairs(data.rotation_speed_modifier_update_units) do

@@ -1,5 +1,3 @@
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
 require("scripts/utils/function_command_queue")
 require("scripts/entity_system/systems/dialogues/tag_query")
 require("scripts/entity_system/systems/dialogues/tag_query_database")
@@ -462,45 +460,48 @@ DialogueSystem.update_currently_playing_dialogues = function (self, dt)
 	local playing_units = self.playing_units
 
 	for unit, extension in pairs(playing_units) do
-		if not Unit.alive(unit) then
-			playing_units[unit] = nil
-		else
-			local currently_playing_dialogue = extension.currently_playing_dialogue
-
-			assert(currently_playing_dialogue)
-
-			local dialogue_timer = extension.dialogue_timer
-			local is_currently_playing = nil
-
-			if dialogue_timer then
-				is_currently_playing = 0 < dialogue_timer - dt
-			else
-				assert(currently_playing_dialogue.currently_playing_id)
-
-				is_currently_playing = WwiseWorld.is_playing(wwise_world, currently_playing_dialogue.currently_playing_id)
-			end
-
-			if not is_currently_playing then
-				if player_manager:owner(unit) ~= nil or Unit.has_data(unit, "dialogue_face_anim") then
-					function_command_queue:queue_function_command(Unit.animation_event, unit, "face_neutral")
-					function_command_queue:queue_function_command(Unit.animation_event, unit, "dialogue_end")
-				elseif Unit.has_data(unit, "enemy_dialogue_face_anim") and Unit.has_animation_state_machine(unit) then
-					function_command_queue:queue_function_command(Unit.animation_event, unit, "talk_end")
-				end
-
-				if Unit.has_data(unit, "enemy_dialogue_body_anim") and Unit.has_animation_state_machine(unit) then
-					function_command_queue:queue_function_command(Unit.animation_event, unit, "talk_body_end")
-				end
-
-				local sound_distance = extension.currently_playing_dialogue and extension.currently_playing_dialogue.sound_distance
-				extension.currently_playing_dialogue = nil
-				currently_playing_dialogue.currently_playing_id = nil
-				currently_playing_dialogue.currently_playing_unit = nil
-				self.playing_dialogues[currently_playing_dialogue] = nil
+		repeat
+			if not Unit.alive(unit) then
 				playing_units[unit] = nil
+			else
+				local currently_playing_dialogue = extension.currently_playing_dialogue
 
-				if not self.is_server then
+				assert(currently_playing_dialogue)
+
+				local dialogue_timer = extension.dialogue_timer
+				local is_currently_playing = nil
+
+				if dialogue_timer then
+					is_currently_playing = 0 < dialogue_timer - dt
 				else
+					assert(currently_playing_dialogue.currently_playing_id)
+
+					is_currently_playing = WwiseWorld.is_playing(wwise_world, currently_playing_dialogue.currently_playing_id)
+				end
+
+				if not is_currently_playing then
+					if player_manager:owner(unit) ~= nil or Unit.has_data(unit, "dialogue_face_anim") then
+						function_command_queue:queue_function_command(Unit.animation_event, unit, "face_neutral")
+						function_command_queue:queue_function_command(Unit.animation_event, unit, "dialogue_end")
+					elseif Unit.has_data(unit, "enemy_dialogue_face_anim") and Unit.has_animation_state_machine(unit) then
+						function_command_queue:queue_function_command(Unit.animation_event, unit, "talk_end")
+					end
+
+					if Unit.has_data(unit, "enemy_dialogue_body_anim") and Unit.has_animation_state_machine(unit) then
+						function_command_queue:queue_function_command(Unit.animation_event, unit, "talk_body_end")
+					end
+
+					local sound_distance = extension.currently_playing_dialogue and extension.currently_playing_dialogue.sound_distance
+					extension.currently_playing_dialogue = nil
+					currently_playing_dialogue.currently_playing_id = nil
+					currently_playing_dialogue.currently_playing_unit = nil
+					self.playing_dialogues[currently_playing_dialogue] = nil
+					playing_units[unit] = nil
+
+					if not self.is_server then
+						break
+					end
+
 					extension.dialogue_timer = nil
 					local last_query = extension.last_query
 					local success_rule = last_query.validated_rule
@@ -552,11 +553,11 @@ DialogueSystem.update_currently_playing_dialogues = function (self, dt)
 
 						extension.last_query_sound_event = nil
 					end
+				elseif dialogue_timer then
+					extension.dialogue_timer = dialogue_timer - dt
 				end
-			elseif dialogue_timer then
-				extension.dialogue_timer = dialogue_timer - dt
 			end
-		end
+		until true
 	end
 end
 
@@ -966,10 +967,13 @@ DialogueSystem.update_new_events = function (self, t)
 	local input_event_queue_n = self.input_event_queue_n
 
 	for i = 1, input_event_queue_n, 4 do
-		local unit = input_event_queue[i]
+		repeat
+			local unit = input_event_queue[i]
 
-		if not Unit.alive(unit) then
-		else
+			if not Unit.alive(unit) then
+				break
+			end
+
 			local dialogue_category = nil
 
 			if self.dialogues[input_event_queue[i + 2].dialogue_name] then
@@ -980,39 +984,40 @@ DialogueSystem.update_new_events = function (self, t)
 
 			if extension then
 				if extension.is_incapacitated and extension.incapacitate_time + 0.1 < t and dialogue_category ~= "knocked_down_override" and input_event_queue[i + 2].is_ping ~= true then
-				else
-					local event_name = input_event_queue[i + 1]
-					local event_data = input_event_queue[i + 2]
-					local identifier = input_event_queue[i + 3]
-					local query = tagquery_database:create_query()
-					local temp_table = FrameTable.alloc_table()
-					local n_temp_table = 0
-
-					for key, value in pairs(event_data) do
-						temp_table[n_temp_table + 1] = key
-						temp_table[n_temp_table + 2] = value
-						n_temp_table = n_temp_table + 2
-					end
-
-					local breed_data = Unit.get_data(unit, "breed")
-					local source_name = nil
-
-					if breed_data then
-						source_name = breed_data.dialogue_source_name or breed_data.name
-					else
-						local extension_data = self.unit_extension_data[unit]
-						source_name = extension_data.context.player_profile
-					end
-
-					query:add("concept", event_name, "source", unit, "source_name", source_name, "identifier", identifier, unpack(temp_table))
-					query:finalize()
-
-					input_event_queue[i] = nil
-					input_event_queue[i + 1] = nil
-					input_event_queue[i + 2] = nil
+					break
 				end
+
+				local event_name = input_event_queue[i + 1]
+				local event_data = input_event_queue[i + 2]
+				local identifier = input_event_queue[i + 3]
+				local query = tagquery_database:create_query()
+				local temp_table = FrameTable.alloc_table()
+				local n_temp_table = 0
+
+				for key, value in pairs(event_data) do
+					temp_table[n_temp_table + 1] = key
+					temp_table[n_temp_table + 2] = value
+					n_temp_table = n_temp_table + 2
+				end
+
+				local breed_data = Unit.get_data(unit, "breed")
+				local source_name = nil
+
+				if breed_data then
+					source_name = breed_data.dialogue_source_name or breed_data.name
+				else
+					local extension_data = self.unit_extension_data[unit]
+					source_name = extension_data.context.player_profile
+				end
+
+				query:add("concept", event_name, "source", unit, "source_name", source_name, "identifier", identifier, unpack(temp_table))
+				query:finalize()
+
+				input_event_queue[i] = nil
+				input_event_queue[i + 1] = nil
+				input_event_queue[i + 2] = nil
 			end
-		end
+		until true
 	end
 
 	self.input_event_queue_n = 0
@@ -1045,12 +1050,68 @@ DialogueSystem.update_debug = function (self, t)
 		local start_x = 200
 
 		for unit, contexts in pairs(contexts_by_object) do
-			local player_data = Managers.player:owner(unit)
-			local unit_name = nil
+			repeat
+				local player_data = Managers.player:owner(unit)
+				local unit_name = nil
 
-			if player_data then
-				unit_name = player_data.viewport_name or player_data.peer_id
-			end
+				if player_data then
+					unit_name = player_data.viewport_name or player_data.peer_id
+
+					if false then
+						break
+					end
+
+					local start_y = 20 + font_size
+
+					Gui.text(gui, unit_name, font_mtrl, font_size, font, Vector3(start_x, start_y, 250), unit_name_color)
+
+					start_y = start_y + font_size
+					local max_context_width = 0
+
+					for context_name, context_data in pairs(contexts) do
+						Gui.text(gui, context_name, font_mtrl, font_size, font, Vector3(start_x, start_y, 250), context_name_color)
+
+						local context_start_y = start_y
+						start_y = start_y + font_size
+						local kv_order = {}
+						local max_key_width = 0
+						local key_start_y = start_y
+
+						for key, value in pairs(context_data) do
+							Gui.text(gui, tostring(key), font_mtrl, font_size, font, Vector3(start_x, start_y, 250), data_color)
+
+							local min, max = Gui.text_extents(gui, tostring(key), font_mtrl, font_size)
+							local width = max.x - min.x
+							max_key_width = math.max(width, max_key_width)
+							start_y = start_y + font_size
+							kv_order[#kv_order + 1] = key
+						end
+
+						max_key_width = max_key_width + 10
+						start_y = key_start_y
+						local max_value_width = 0
+
+						for i, key in ipairs(kv_order) do
+							local value = context_data[key]
+
+							Gui.text(gui, tostring(value), font_mtrl, font_size, font, Vector3(start_x + max_key_width, start_y, 250), data_color)
+
+							start_y = start_y + font_size
+							local min, max = Gui.text_extents(gui, tostring(value), font_mtrl, font_size)
+							local width = max.x - min.x
+							max_value_width = math.max(width, max_key_width)
+						end
+
+						max_context_width = math.max(max_context_width, max_key_width + max_value_width)
+
+						Gui.rect(gui, Vector3(start_x - 2, context_start_y - 2, 249), Vector2(max_context_width, start_y - context_start_y), Color(200, 20, 20, 20))
+
+						start_y = start_y + font_size * 0.5
+					end
+
+					start_x = start_x + max_context_width
+				end
+			until true
 		end
 	elseif script_data.dialogue_debug_local_player_context then
 	end
@@ -1059,10 +1120,13 @@ DialogueSystem.update_debug = function (self, t)
 		local unit_extension_data = self.unit_extension_data
 
 		for unit, extension in pairs(unit_extension_data) do
-			local last_query = extension.last_query
+			repeat
+				local last_query = extension.last_query
 
-			if not last_query then
-			else
+				if not last_query then
+					break
+				end
+
 				local start_x = 20
 				local start_y = res_y - 20 - font_size
 
@@ -1090,7 +1154,7 @@ DialogueSystem.update_debug = function (self, t)
 
 					Gui.text(gui, tostring(last_query.query_context[key]), font_mtrl, font_size, font, Vector3(start_x + max_key_width, start_y, 250), data_color)
 				end
-			end
+			until true
 		end
 	end
 

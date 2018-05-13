@@ -1,5 +1,3 @@
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
 require("scripts/unit_extensions/default_player_unit/inventory/gear_utils")
 require("scripts/managers/backend/backend_utils")
 
@@ -196,12 +194,33 @@ SimpleInventoryExtension.add_equipment_by_category = function (self, category)
 	local num_slots = #category_slots
 
 	for i = 1, num_slots, 1 do
+		repeat
+			local slot = category_slots[i]
+			local slot_name = slot.name
+			local item = BackendUtils.get_loadout_item(career_name, slot_name)
+			local item_data = nil
 
-		-- Decompilation error in this vicinity:
-		local slot = category_slots[i]
-		local slot_name = slot.name
-		local item = BackendUtils.get_loadout_item(career_name, slot_name)
-		local item_data = nil
+			if item then
+				item_data = table.clone(item.data)
+				item_data.backend_id = item.backend_id
+			else
+				local item_name = self.initial_inventory[slot_name]
+				item_data = rawget(ItemMasterList, item_name)
+
+				if not item_data then
+					break
+				end
+			end
+
+			if item_data.slot_to_use then
+				local override_slot_data = self._equipment.slots[item_data.slot_to_use]
+				local override_item_data = override_slot_data.item_data
+				item_data.left_hand_unit = override_item_data.left_hand_unit
+				item_data.right_hand_unit = override_item_data.right_hand_unit
+			end
+
+			self:add_equipment(slot_name, item_data, nil, nil, self.initial_ammo_percent[slot_name])
+		until true
 	end
 end
 

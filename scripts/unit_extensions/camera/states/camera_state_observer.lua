@@ -93,8 +93,13 @@ CameraStateObserver.follow_next_unit = function (self)
 	local follow_unit = nil
 
 	for i = 1, table.size(players), 1 do
-		if follow_unit then
-		end
+		repeat
+
+			-- Decompilation error in this vicinity:
+			if follow_unit then
+				break
+			end
+		until true
 	end
 
 	local snap_camera = nil

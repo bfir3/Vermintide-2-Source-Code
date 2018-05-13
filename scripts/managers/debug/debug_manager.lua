@@ -669,38 +669,40 @@ DebugManager._load_patched_items_into_backend = function (self)
 	local item_master_list_debug_patch = dofile("scripts/settings/equipment/item_master_list_debug_patch")
 
 	for name, data in pairs(item_master_list_debug_patch) do
-		local already_exists = rawget(ItemMasterList, name)
+		repeat
+			local already_exists = rawget(ItemMasterList, name)
 
-		if already_exists then
-			Debug.sticky_text("name %s already exists in ItemMasterList", name)
-		else
-			data.name = name
-			ItemMasterList[name] = data
-			local item_name_index = #NetworkLookup.item_names + 1
-			NetworkLookup.item_names[item_name_index] = name
-			NetworkLookup.item_names[name] = item_name_index
-			local damage_source_index = #NetworkLookup.damage_sources + 1
-			NetworkLookup.damage_sources[damage_source_index] = name
-			NetworkLookup.damage_sources[name] = damage_source_index
-			local right_hand_unit_name = data.right_hand_unit
+			if already_exists then
+				Debug.sticky_text("name %s already exists in ItemMasterList", name)
+			else
+				data.name = name
+				ItemMasterList[name] = data
+				local item_name_index = #NetworkLookup.item_names + 1
+				NetworkLookup.item_names[item_name_index] = name
+				NetworkLookup.item_names[name] = item_name_index
+				local damage_source_index = #NetworkLookup.damage_sources + 1
+				NetworkLookup.damage_sources[damage_source_index] = name
+				NetworkLookup.damage_sources[name] = damage_source_index
+				local right_hand_unit_name = data.right_hand_unit
 
-			if right_hand_unit_name then
-				self:_load_resource(right_hand_unit_name)
+				if right_hand_unit_name then
+					self:_load_resource(right_hand_unit_name)
+				end
+
+				local left_hand_unit_name = data.left_hand_unit
+
+				if left_hand_unit_name then
+					self:_load_resource(left_hand_unit_name)
+				end
+
+				local backend_items = Managers.backend:get_interface("items")
+				local backend_id = backend_items:award_item(name)
+
+				table.insert(added_items, backend_id)
+				printf("added %s: to ItemMasterList", name)
+				printf("awarded %s: to player", name)
 			end
-
-			local left_hand_unit_name = data.left_hand_unit
-
-			if left_hand_unit_name then
-				self:_load_resource(left_hand_unit_name)
-			end
-
-			local backend_items = Managers.backend:get_interface("items")
-			local backend_id = backend_items:award_item(name)
-
-			table.insert(added_items, backend_id)
-			printf("added %s: to ItemMasterList", name)
-			printf("awarded %s: to player", name)
-		end
+		until true
 	end
 
 	return added_items

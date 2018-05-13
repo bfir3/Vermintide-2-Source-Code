@@ -39,19 +39,20 @@ DoorSystem.on_add_extension = function (self, world, unit, extension_name, ...)
 		local boss_doors = self._boss_doors
 
 		for i = 0, 2, 1 do
-			local map_section = Unit.get_data(unit, "map_sections", i)
+			repeat
+				local map_section = Unit.get_data(unit, "map_sections", i)
 
-			if map_section then
-				if map_section == 0 then
-				else
-					if not boss_doors[map_section] then
-						boss_doors[map_section] = {}
-					end
-
-					local boss_doors_in_section = boss_doors[map_section]
-					boss_doors_in_section[#boss_doors_in_section + 1] = unit
+				if not map_section or map_section == 0 then
+					break
 				end
-			end
+
+				if not boss_doors[map_section] then
+					boss_doors[map_section] = {}
+				end
+
+				local boss_doors_in_section = boss_doors[map_section]
+				boss_doors_in_section[#boss_doors_in_section + 1] = unit
+			until true
 		end
 	end
 

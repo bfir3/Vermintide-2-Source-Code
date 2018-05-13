@@ -264,12 +264,14 @@ function EnumDisplayModes()
 			local num_modes = DisplayAdapter.num_modes(adapter, output)
 
 			for mode = 0, num_modes - 1, 1 do
+				repeat
 
-				-- Decompilation error in this vicinity:
-				local width, height = DisplayAdapter.mode(adapter, output, mode)
-				local aspect_ratio = AspectRatio.calculate(width, height)
+					-- Decompilation error in this vicinity:
+					local width, height = DisplayAdapter.mode(adapter, output, mode)
+					local aspect_ratio = AspectRatio.calculate(width, height)
 
-				printf("ui: SKIPPED %d/%d adapter %d, output %d. Reason: WRONG ADAPTER", width, height, adapter, output)
+					printf("ui: SKIPPED %d/%d adapter %d, output %d. Reason: WRONG ADAPTER", width, height, adapter, output)
+				until true
 			end
 		end
 	end

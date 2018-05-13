@@ -758,11 +758,14 @@ AISystem.update_debug_draw = function (self, t)
 
 	if script_data.debug_stagger then
 		for unit, extension in pairs(self.ai_units_alive) do
-			local blackboard = extension._blackboard
-			local stagger_immunity = blackboard.stagger_immunity
+			repeat
+				local blackboard = extension._blackboard
+				local stagger_immunity = blackboard.stagger_immunity
 
-			if not stagger_immunity then
-			else
+				if not stagger_immunity then
+					break
+				end
+
 				local color = Managers.state.debug:color(unit)
 				local x, y, z, w = Quaternion.to_elements(color)
 				local color_vector = Vector3(y, z, w)
@@ -835,7 +838,7 @@ AISystem.update_debug_draw = function (self, t)
 						index = index + 1
 					end
 				end
-			end
+			until true
 		end
 	end
 end

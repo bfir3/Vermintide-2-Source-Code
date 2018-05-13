@@ -1,5 +1,3 @@
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
 require("scripts/entity_system/systems/tutorial/tutorial_templates")
 
 local TIME_TO_WAIT_BETWEEN_SHOWS = 30
@@ -294,10 +292,54 @@ TutorialSystem.iterate_tooltips = function (self, t, unit, extension, raycast_un
 	local is_in_inn = level_key == "inn_level"
 
 	for i = 1, tooltip_templates_n, 1 do
+		repeat
+			local template = tooltip_templates[i]
+			local name = template.name
 
-		-- Decompilation error in this vicinity:
-		local template = tooltip_templates[i]
-		local name = template.name
+			if in_play_go and not template.allowed_in_tutorial then
+				break
+			elseif not in_play_go and template.incompatible_in_game then
+			elseif not is_in_inn and template.inn_only then
+				break
+			end
+
+			template.update_data(t, unit, extension.data)
+
+			local ok, world_position = template.can_show(t, unit, extension.data, raycast_unit, world)
+
+			if not ok then
+				break
+			end
+
+			if template.get_text then
+				template.text = template.get_text(extension.data)
+			end
+
+			if template.get_inputs then
+				template.inputs = template.get_inputs(extension.data)
+			end
+
+			if template.get_gamepad_inputs then
+				template.gamepad_inputs = template.get_gamepad_inputs(extension.data)
+			end
+
+			if template.get_force_update then
+				template.force_update = template.get_force_update(extension.data)
+			end
+
+			extension.tooltip_tutorial.active = true
+			extension.tooltip_tutorial.name = name
+
+			if world_position then
+				extension.tooltip_tutorial.world_position = Vector3Box(world_position)
+			else
+				extension.tooltip_tutorial.world_position = nil
+			end
+
+			extension.shown_times[name] = t
+
+			return
+		until true
 	end
 end
 
@@ -346,15 +388,18 @@ TutorialSystem.iterate_objective_tooltips = function (self, t, unit, extension, 
 	objective_tooltips.units_n = 0
 
 	for i = 1, objective_tooltip_templates_n, 1 do
-		local template = objective_tooltip_templates[i]
-		local name = template.name
+		repeat
+			local template = objective_tooltip_templates[i]
+			local name = template.name
 
-		template.update_data(t, unit, extension.data)
+			template.update_data(t, unit, extension.data)
 
-		local ok, objective_units, objective_units_n = template.can_show(t, unit, extension.data, raycast_unit, world)
+			local ok, objective_units, objective_units_n = template.can_show(t, unit, extension.data, raycast_unit, world)
 
-		if not ok then
-		else
+			if not ok then
+				break
+			end
+
 			if template.get_text then
 				template.text = template.get_text(extension.data)
 			end
@@ -403,7 +448,7 @@ TutorialSystem.iterate_objective_tooltips = function (self, t, unit, extension, 
 			end
 
 			return
-		end
+		until true
 	end
 end
 
@@ -424,18 +469,23 @@ TutorialSystem.iterate_info_slates = function (self, t, unit, extension, raycast
 		local info_slate_templates_n = TutorialInfoSlateTemplates_n
 
 		for i = 1, info_slate_templates_n, 1 do
-			local template = info_slate_templates[i]
-			local name = template.name
-			local cooldown = (template.cooldown and template.cooldown) or INFOSLATE_COOLDOWN
+			repeat
+				local template = info_slate_templates[i]
+				local name = template.name
+				local cooldown = (template.cooldown and template.cooldown) or INFOSLATE_COOLDOWN
 
-			if t < extension.shown_times[name] + cooldown then
-			elseif template.can_show(t, unit, extension.data, raycast_unit, world) then
-				extension.shown_times[name] = t
-				local text = (template.get_text and template.get_text(extension.data, template)) or template.text
-				text = Localize(text)
+				if t < extension.shown_times[name] + cooldown then
+					break
+				end
 
-				self.tutorial_ui:queue_info_slate_entry("tutorial", text, nil, nil, template, unit, raycast_unit)
-			end
+				if template.can_show(t, unit, extension.data, raycast_unit, world) then
+					extension.shown_times[name] = t
+					local text = (template.get_text and template.get_text(extension.data, template)) or template.text
+					text = Localize(text)
+
+					self.tutorial_ui:queue_info_slate_entry("tutorial", text, nil, nil, template, unit, raycast_unit)
+				end
+			until true
 		end
 	else
 		self.tutorial_ui:clear_tutorials()

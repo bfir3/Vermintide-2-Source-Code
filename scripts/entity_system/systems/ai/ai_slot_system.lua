@@ -694,10 +694,13 @@ local function overlap_with_other_target_slot(slot, target_units, unit_extension
 	local target_units_n = #target_units
 
 	for i = 1, target_units_n, 1 do
-		local target_unit = target_units[i]
+		repeat
+			local target_unit = target_units[i]
 
-		if target_unit == slot_target_unit then
-		else
+			if target_unit == slot_target_unit then
+				break
+			end
+
 			local target_unit_extension = unit_extension_data[target_unit]
 			local all_slots = target_unit_extension.all_slots
 
@@ -708,20 +711,23 @@ local function overlap_with_other_target_slot(slot, target_units, unit_extension
 				local total_slots_count = slot_data.total_slots_count
 
 				for j = 1, total_slots_count, 1 do
-					local target_slot = target_slots[j]
+					repeat
+						local target_slot = target_slots[j]
 
-					if target_slot.disabled then
-					else
+						if target_slot.disabled then
+							break
+						end
+
 						local target_slot_position = target_slot.absolute_position:unbox()
 						local distance_squared = Vector3.distance_squared(slot_position, target_slot_position)
 
 						if distance_squared < overlap_distance_sq then
 							return target_slot
 						end
-					end
+					until true
 				end
 			end
-		end
+		until true
 	end
 
 	return false
@@ -738,32 +744,39 @@ local function overlap_with_own_slots(slot, unit_extension_data)
 	local all_slots = target_unit_extension.all_slots
 
 	for slot_b_type, slot_data in pairs(all_slots) do
-		if slot_a_type == slot_b_type then
-		else
+		repeat
+			if slot_a_type == slot_b_type then
+				break
+			end
+
 			local slot_b_radius = SlotSettings[slot_b_type].radius
 			local overlap_distance_sq = slot_b_radius * slot_b_radius
 			local slots = slot_data.slots
 			local num_slots = slot_data.total_slots_count
 
 			for j = 1, num_slots, 1 do
-				local slot_b = slots[j]
+				repeat
+					local slot_b = slots[j]
 
-				if slot_b.disabled then
-				else
+					if slot_b.disabled then
+						break
+					end
+
 					local ai_unit_b = slot_b.ai_unit
 
 					if not ai_unit_b then
-					else
-						local slot_b_position = slot_b.absolute_position:unbox()
-						local distance_squared = Vector3.distance_squared(slot_a_position, slot_b_position)
-
-						if distance_squared < overlap_distance_sq then
-							return slot_b
-						end
+						break
 					end
-				end
+
+					local slot_b_position = slot_b.absolute_position:unbox()
+					local distance_squared = Vector3.distance_squared(slot_a_position, slot_b_position)
+
+					if distance_squared < overlap_distance_sq then
+						return slot_b
+					end
+				until true
 			end
-		end
+		until true
 	end
 
 	return false
@@ -778,17 +791,20 @@ local function overlap_with_other_target(slot, target_units, unit_extension_data
 	local target_units_n = #target_units
 
 	for i = 1, target_units_n, 1 do
-		local target_unit = target_units[i]
+		repeat
+			local target_unit = target_units[i]
 
-		if target_unit == slot_target_unit then
-		else
+			if target_unit == slot_target_unit then
+				break
+			end
+
 			local target_unit_position = unit_extension_data[target_unit].position:unbox()
 			local distance_squared = Vector3.distance_squared(slot_position, target_unit_position)
 
 			if distance_squared < OVERLAP_SLOT_TO_TARGET_DISTANCE_SQ then
 				return true
 			end
-		end
+		until true
 	end
 
 	return false
@@ -1017,18 +1033,21 @@ local function get_anchor_slot(slot_type, target_unit, unit_extension_data)
 	local best_anchor_weight = best_slot.anchor_weight
 
 	for i = 1, total_slots_count, 1 do
-		local slot = target_slots[i]
-		local slot_disabled = slot.disabled
+		repeat
+			local slot = target_slots[i]
+			local slot_disabled = slot.disabled
 
-		if slot_disabled then
-		else
+			if slot_disabled then
+				break
+			end
+
 			local slot_anchor_weight = slot.anchor_weight
 
 			if best_anchor_weight < slot_anchor_weight or (slot_anchor_weight == best_anchor_weight and slot.index < best_slot.index) then
 				best_slot = slot
 				best_anchor_weight = slot_anchor_weight
 			end
-		end
+		until true
 	end
 
 	return best_slot
@@ -1369,12 +1388,18 @@ local function get_best_slot(target_unit, target_units, ai_unit, unit_extension_
 	local previous_slot = ai_unit_extension.slot
 
 	for i = 1, total_slots_count, 1 do
-		local slot = target_slots[i]
-		local disabled = slot.disabled
+		repeat
+			local slot = target_slots[i]
+			local disabled = slot.disabled
 
-		if disabled then
-		elseif skip_slots_behind_target and slot_is_behind_target(slot, ai_unit, target_unit_extension) then
-		else
+			if disabled then
+				break
+			end
+
+			if skip_slots_behind_target and slot_is_behind_target(slot, ai_unit, target_unit_extension) then
+				break
+			end
+
 			local slot_owner = slot.ai_unit
 			local slot_released = slot.released
 			local slot_position = slot.original_absolute_position:unbox()
@@ -1400,15 +1425,18 @@ local function get_best_slot(target_unit, target_units, ai_unit, unit_extension_
 				best_slot = slot
 				best_score = slot_score
 			end
-		end
+		until true
 	end
 
 	if best_slot then
-		ai_unit_extension.temporary_wait_position = nil
-		local current_slot = ai_unit_extension.slot
+		repeat
+			ai_unit_extension.temporary_wait_position = nil
+			local current_slot = ai_unit_extension.slot
 
-		if current_slot and current_slot == best_slot then
-		else
+			if current_slot and current_slot == best_slot then
+				break
+			end
+
 			local waiting_on_slot = ai_unit_extension.waiting_on_slot
 
 			if current_slot or waiting_on_slot then
@@ -1428,7 +1456,7 @@ local function get_best_slot(target_unit, target_units, ai_unit, unit_extension_
 			ai_unit_extension.slot = best_slot
 
 			update_anchor_weights(target_unit, unit_extension_data)
-		end
+		until true
 	end
 
 	if previous_slot ~= ai_unit_extension.slot then
@@ -1470,25 +1498,32 @@ local function get_best_slot_to_wait_on(target_unit, ai_unit, unit_extension_dat
 	local best_slot = nil
 
 	for i = 1, target_slots_n, 1 do
-		local slot = target_slots[i]
-		local queue = slot.queue
-		local queue_n = #queue
+		repeat
+			local slot = target_slots[i]
+			local queue = slot.queue
+			local queue_n = #queue
 
-		if slot.disabled then
-		elseif skip_slots_behind_target and slot_is_behind_target(slot, ai_unit, target_unit_extension) then
-		else
+			if slot.disabled then
+				break
+			end
+
+			if skip_slots_behind_target and slot_is_behind_target(slot, ai_unit, target_unit_extension) then
+				break
+			end
+
 			local slot_queue_position, additional_penalty = get_slot_queue_position(unit_extension_data, slot, nav_world)
 
 			if not slot_queue_position then
-			else
-				local slot_queue_distance = Vector3.distance_squared(slot_queue_position, ai_unit_position) + queue_n * queue_n * SLOT_QUEUE_PENALTY_MULTIPLIER + additional_penalty
-
-				if slot_queue_distance < best_distance then
-					best_distance = slot_queue_distance
-					best_slot = slot
-				end
+				break
 			end
-		end
+
+			local slot_queue_distance = Vector3.distance_squared(slot_queue_position, ai_unit_position) + queue_n * queue_n * SLOT_QUEUE_PENALTY_MULTIPLIER + additional_penalty
+
+			if slot_queue_distance < best_distance then
+				best_distance = slot_queue_distance
+				best_slot = slot
+			end
+		until true
 	end
 
 	if best_slot then
@@ -2016,136 +2051,140 @@ function debug_draw_slots(unit_extension_data, nav_world, t)
 	local z = Vector3.up() * 0.1
 
 	for i_target, target_unit in pairs(targets) do
-		if not unit_alive(target_unit) then
-		else
+		repeat
+			if not unit_alive(target_unit) then
+				break
+			end
+
 			local target_unit_extension = unit_extension_data[target_unit]
 
-			if target_unit_extension then
-				if not target_unit_extension.valid_target then
-				else
-					local all_slots = target_unit_extension.all_slots
+			if not target_unit_extension or not target_unit_extension.valid_target then
+				break
+			end
 
-					for slot_type, slot_data in pairs(all_slots) do
-						local target_slots = slot_data.slots
-						local target_slots_n = #target_slots
-						local target_position = target_unit_extension.position:unbox()
-						local target_color = Colors.get(target_unit_extension.debug_color_name)
+			local all_slots = target_unit_extension.all_slots
 
-						drawer:circle(target_position + z, 0.5, Vector3.up(), target_color)
-						drawer:circle(target_position + z, 0.45, Vector3.up(), target_color)
+			for slot_type, slot_data in pairs(all_slots) do
+				local target_slots = slot_data.slots
+				local target_slots_n = #target_slots
+				local target_position = target_unit_extension.position:unbox()
+				local target_color = Colors.get(target_unit_extension.debug_color_name)
 
-						if target_unit_extension.next_slot_status_update_at then
-							local percent = (t - target_unit_extension.next_slot_status_update_at) / SLOT_STATUS_UPDATE_INTERVAL
+				drawer:circle(target_position + z, 0.5, Vector3.up(), target_color)
+				drawer:circle(target_position + z, 0.45, Vector3.up(), target_color)
 
-							drawer:circle(target_position + z, 0.45 * percent, Vector3.up(), target_color)
-						end
+				if target_unit_extension.next_slot_status_update_at then
+					local percent = (t - target_unit_extension.next_slot_status_update_at) / SLOT_STATUS_UPDATE_INTERVAL
 
-						for i = 1, target_slots_n, 1 do
-							local slot = target_slots[i]
-							local anchor_slot = get_anchor_slot(slot_type, target_unit, unit_extension_data)
-							local is_anchor_slot = slot == anchor_slot
-							local ai_unit = slot.ai_unit
-							local ai_unit_extension = nil
-							local alpha = (ai_unit and 255) or 150
-							local color = (slot.disabled and Colors.get_color_with_alpha("gray", alpha)) or Colors.get_color_with_alpha(slot.debug_color_name, alpha)
+					drawer:circle(target_position + z, 0.45 * percent, Vector3.up(), target_color)
+				end
 
-							if slot.absolute_position then
-								local slot_absolute_position = slot.absolute_position:unbox()
+				for i = 1, target_slots_n, 1 do
+					repeat
+						local slot = target_slots[i]
+						local anchor_slot = get_anchor_slot(slot_type, target_unit, unit_extension_data)
+						local is_anchor_slot = slot == anchor_slot
+						local ai_unit = slot.ai_unit
+						local ai_unit_extension = nil
+						local alpha = (ai_unit and 255) or 150
+						local color = (slot.disabled and Colors.get_color_with_alpha("gray", alpha)) or Colors.get_color_with_alpha(slot.debug_color_name, alpha)
 
-								if unit_alive(ai_unit) then
-									local ai_unit_position = POSITION_LOOKUP[ai_unit]
-									local ai_unit_extension = unit_extension_data[ai_unit]
+						if slot.absolute_position then
+							local slot_absolute_position = slot.absolute_position:unbox()
+
+							if unit_alive(ai_unit) then
+								local ai_unit_position = POSITION_LOOKUP[ai_unit]
+								local ai_unit_extension = unit_extension_data[ai_unit]
+
+								drawer:circle(ai_unit_position + z, 0.35, Vector3.up(), color)
+								drawer:circle(ai_unit_position + z, 0.3, Vector3.up(), color)
+
+								local head_node = Unit.node(ai_unit, "c_head")
+								local viewport_name = "player_1"
+								local color_table = (slot.disabled and Colors.get_table("gray")) or Colors.get_table(slot.debug_color_name)
+								local color_vector = Vector3(color_table[2], color_table[3], color_table[4])
+								local offset_vector = Vector3(0, 0, -1)
+								local text_size = 0.4
+								local text = slot.index
+								local category = "slot_index"
+
+								Managers.state.debug_text:clear_unit_text(ai_unit, category)
+								Managers.state.debug_text:output_unit_text(text, text_size, ai_unit, head_node, offset_vector, nil, category, color_vector, viewport_name)
+
+								if slot.ghost_position.x ~= 0 and not slot.disable_at then
+									local ghost_position = slot.ghost_position:unbox()
+
+									drawer:line(ghost_position + z, slot_absolute_position + z, color)
+									drawer:sphere(ghost_position + z, 0.3, color)
+									drawer:line(ghost_position + z, ai_unit_position + z, color)
+								else
+									drawer:line(slot_absolute_position + z, ai_unit_position + z, color)
+								end
+							end
+
+							local text_size = 0.4
+							local color_table = (slot.disabled and Colors.get_table("gray")) or Colors.get_table(slot.debug_color_name)
+							local color_vector = Vector3(color_table[2], color_table[3], color_table[4])
+							local category = "slot_index_" .. slot_type .. "_" .. slot.index .. "_" .. i_target
+
+							Managers.state.debug_text:clear_world_text(category)
+							Managers.state.debug_text:output_world_text(slot.index, text_size, slot_absolute_position + z, nil, category, color_vector)
+
+							local slot_radius = SlotSettings[slot_type].radius
+
+							drawer:circle(slot_absolute_position + z, slot_radius, Vector3.up(), color)
+							drawer:circle(slot_absolute_position + z, slot_radius - 0.05, Vector3.up(), color)
+
+							local slot_queue_position = get_slot_queue_position(unit_extension_data, slot, nav_world)
+
+							if slot_queue_position then
+								drawer:circle(slot_queue_position + z, SLOT_QUEUE_RADIUS, Vector3.up(), color)
+								drawer:circle(slot_queue_position + z, SLOT_QUEUE_RADIUS - 0.05, Vector3.up(), color)
+								drawer:line(slot_absolute_position + z, slot_queue_position + z, color)
+
+								local queue = slot.queue
+								local queue_n = #queue
+
+								for i = 1, queue_n, 1 do
+									local ai_unit_waiting = queue[i]
+									local ai_unit_position = POSITION_LOOKUP[ai_unit_waiting]
 
 									drawer:circle(ai_unit_position + z, 0.35, Vector3.up(), color)
 									drawer:circle(ai_unit_position + z, 0.3, Vector3.up(), color)
-
-									local head_node = Unit.node(ai_unit, "c_head")
-									local viewport_name = "player_1"
-									local color_table = (slot.disabled and Colors.get_table("gray")) or Colors.get_table(slot.debug_color_name)
-									local color_vector = Vector3(color_table[2], color_table[3], color_table[4])
-									local offset_vector = Vector3(0, 0, -1)
-									local text_size = 0.4
-									local text = slot.index
-									local category = "slot_index"
-
-									Managers.state.debug_text:clear_unit_text(ai_unit, category)
-									Managers.state.debug_text:output_unit_text(text, text_size, ai_unit, head_node, offset_vector, nil, category, color_vector, viewport_name)
-
-									if slot.ghost_position.x ~= 0 and not slot.disable_at then
-										local ghost_position = slot.ghost_position:unbox()
-
-										drawer:line(ghost_position + z, slot_absolute_position + z, color)
-										drawer:sphere(ghost_position + z, 0.3, color)
-										drawer:line(ghost_position + z, ai_unit_position + z, color)
-									else
-										drawer:line(slot_absolute_position + z, ai_unit_position + z, color)
-									end
+									drawer:line(slot_queue_position + z, ai_unit_position, color)
 								end
-
-								local text_size = 0.4
-								local color_table = (slot.disabled and Colors.get_table("gray")) or Colors.get_table(slot.debug_color_name)
-								local color_vector = Vector3(color_table[2], color_table[3], color_table[4])
-								local category = "slot_index_" .. slot_type .. "_" .. slot.index .. "_" .. i_target
-
-								Managers.state.debug_text:clear_world_text(category)
-								Managers.state.debug_text:output_world_text(slot.index, text_size, slot_absolute_position + z, nil, category, color_vector)
-
-								local slot_radius = SlotSettings[slot_type].radius
-
-								drawer:circle(slot_absolute_position + z, slot_radius, Vector3.up(), color)
-								drawer:circle(slot_absolute_position + z, slot_radius - 0.05, Vector3.up(), color)
-
-								local slot_queue_position = get_slot_queue_position(unit_extension_data, slot, nav_world)
-
-								if slot_queue_position then
-									drawer:circle(slot_queue_position + z, SLOT_QUEUE_RADIUS, Vector3.up(), color)
-									drawer:circle(slot_queue_position + z, SLOT_QUEUE_RADIUS - 0.05, Vector3.up(), color)
-									drawer:line(slot_absolute_position + z, slot_queue_position + z, color)
-
-									local queue = slot.queue
-									local queue_n = #queue
-
-									for i = 1, queue_n, 1 do
-										local ai_unit_waiting = queue[i]
-										local ai_unit_position = POSITION_LOOKUP[ai_unit_waiting]
-
-										drawer:circle(ai_unit_position + z, 0.35, Vector3.up(), color)
-										drawer:circle(ai_unit_position + z, 0.3, Vector3.up(), color)
-										drawer:line(slot_queue_position + z, ai_unit_position, color)
-									end
-								end
-
-								if slot.released then
-									local color = Colors.get("green")
-
-									drawer:sphere(slot_absolute_position + z, 0.2, color)
-								end
-
-								if is_anchor_slot then
-									local color = Colors.get("red")
-
-									drawer:sphere(slot_absolute_position + z, 0.3, color)
-								end
-
-								local check_index = slot.position_check_index
-								local check_position = slot_absolute_position
-
-								if check_index == SLOT_POSITION_CHECK_INDEX.CHECK_MIDDLE then
-								else
-									local radians = SLOT_POSITION_CHECK_RADIANS[check_index]
-									check_position = rotate_position_from_origin(check_position, target_position, radians, SLOT_RADIUS)
-								end
-
-								local ray_from_pos = target_position + Vector3.normalize(check_position - target_position) * RAYCANGO_OFFSET
-
-								drawer:line(ray_from_pos + z, check_position + z, color)
-								drawer:circle(check_position + z, 0.1, Vector3.up(), Color(255, 0, 255))
 							end
+
+							if slot.released then
+								local color = Colors.get("green")
+
+								drawer:sphere(slot_absolute_position + z, 0.2, color)
+							end
+
+							if is_anchor_slot then
+								local color = Colors.get("red")
+
+								drawer:sphere(slot_absolute_position + z, 0.3, color)
+							end
+
+							local check_index = slot.position_check_index
+							local check_position = slot_absolute_position
+
+							if check_index == SLOT_POSITION_CHECK_INDEX.CHECK_MIDDLE then
+							else
+								local radians = SLOT_POSITION_CHECK_RADIANS[check_index]
+								check_position = rotate_position_from_origin(check_position, target_position, radians, SLOT_RADIUS)
+							end
+
+							local ray_from_pos = target_position + Vector3.normalize(check_position - target_position) * RAYCANGO_OFFSET
+
+							drawer:line(ray_from_pos + z, check_position + z, color)
+							drawer:circle(check_position + z, 0.1, Vector3.up(), Color(255, 0, 255))
 						end
-					end
+					until true
 				end
 			end
-		end
+		until true
 	end
 end
 

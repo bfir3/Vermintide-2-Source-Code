@@ -28,16 +28,18 @@ PlayerUnitAttachmentExtension.extensions_ready = function (self, world, unit)
 	local career_name = self.career_extension:career_name()
 
 	for i = 1, slots_n, 1 do
-		local slot = attachment_slots[i]
-		local slot_name = slot.name
-		local item = BackendUtils.get_loadout_item(career_name, slot_name)
+		repeat
+			local slot = attachment_slots[i]
+			local slot_name = slot.name
+			local item = BackendUtils.get_loadout_item(career_name, slot_name)
 
-		if item then
-			local item_data = table.clone(item.data)
-			item_data.backend_id = item.backend_id
+			if item then
+				local item_data = table.clone(item.data)
+				item_data.backend_id = item.backend_id
 
-			self:create_attachment(slot_name, item_data)
-		end
+				self:create_attachment(slot_name, item_data)
+			end
+		until true
 	end
 
 	self:show_attachments(false)

@@ -157,14 +157,16 @@ AIPanicSystem.inside_panic_zone = function (self, position)
 	local panic_zones_n = #panic_zones
 
 	for i = 1, panic_zones_n, 1 do
-		local panic_zone = panic_zones[i]
-		local panic_zone_position = panic_zone.position:unbox()
-		local radius_squared = panic_zone.radius_squared
-		local distance_squared = Vector3.distance_squared(position, panic_zone_position)
+		repeat
+			local panic_zone = panic_zones[i]
+			local panic_zone_position = panic_zone.position:unbox()
+			local radius_squared = panic_zone.radius_squared
+			local distance_squared = Vector3.distance_squared(position, panic_zone_position)
 
-		if distance_squared <= radius_squared then
-			return panic_zone
-		end
+			if distance_squared <= radius_squared then
+				return panic_zone
+			end
+		until true
 	end
 
 	return nil
@@ -184,16 +186,19 @@ AIPanicSystem.update_fear_units = function (self)
 	local end_index = math.min((start_index + FEAR_UNITS_UPDATES_PER_FRAME) - 1, fear_units_n)
 
 	for i = start_index, end_index, 1 do
-		local unit = fear_units[i]
-		local extension = self.unit_extension_data[unit]
+		repeat
+			local unit = fear_units[i]
+			local extension = self.unit_extension_data[unit]
 
-		if not extension.active then
-		else
+			if not extension.active then
+				break
+			end
+
 			local panic_zone = extension.panic_zone
 			local position = POSITION_LOOKUP[unit]
 
 			self:set_panic_zone_position(panic_zone, position)
-		end
+		until true
 	end
 
 	self.current_fear_unit_index = end_index + 1

@@ -458,10 +458,13 @@ TutorialUI.update_objective_tooltip = function (self, objective_tooltips, player
 	table.clear(self._objective_tooltip_position_lookup)
 
 	for i = 1, units_n, 1 do
-		local objective_unit = objective_units[i]
+		repeat
+			local objective_unit = objective_units[i]
 
-		if not unit_alive(objective_unit) then
-		else
+			if not unit_alive(objective_unit) then
+				break
+			end
+
 			local widget_holder_id = unit_widget_lookup[objective_unit]
 
 			if widget_holder_id then
@@ -491,7 +494,7 @@ TutorialUI.update_objective_tooltip = function (self, objective_tooltips, player
 				new_units_n = new_units_n + 1
 				new_units[new_units_n] = objective_unit
 			end
-		end
+		until true
 	end
 
 	for i = 1, NUMBER_OF_OBJECTIVE_TOOLTIPS, 1 do

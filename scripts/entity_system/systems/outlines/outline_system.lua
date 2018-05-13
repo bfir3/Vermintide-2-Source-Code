@@ -242,17 +242,20 @@ OutlineSystem.update = function (self, context, t)
 	local units = self.units
 
 	for i = 1, checks_per_frame, 1 do
-		current_index = current_index + 1
+		repeat
+			current_index = current_index + 1
 
-		if not units[current_index] then
-			current_index = 1
-		end
+			if not units[current_index] then
+				current_index = 1
+			end
 
-		local unit = self.units[current_index]
-		local extension = self.unit_extension_data[unit]
+			local unit = self.units[current_index]
+			local extension = self.unit_extension_data[unit]
 
-		if not extension then
-		else
+			if not extension then
+				break
+			end
+
 			local is_pinged = extension.pinged
 			local method = (is_pinged and extension.pinged_method) or extension.method
 
@@ -276,7 +279,7 @@ OutlineSystem.update = function (self, context, t)
 
 			extension.new_color = false
 			extension.reapply = false
-		end
+		until true
 	end
 
 	self.current_index = current_index

@@ -1,7 +1,3 @@
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
 require("scripts/settings/patrol_formation_settings")
 require("scripts/helpers/navigation_utils")
 
@@ -848,18 +844,22 @@ function update_units(nav_world, group, t, dt)
 	local slow_mode = spline_speed == group.formation_settings.speeds.SLOW_SPLINE_SPEED
 
 	for i = 1, num_indexed_members, 1 do
-		local unit = indexed_members[i]
-		local blackboard = BLACKBOARDS[unit]
+		repeat
+			local unit = indexed_members[i]
+			local blackboard = BLACKBOARDS[unit]
 
-		if blackboard.patrol_start_delay_timer then
-			blackboard.patrol_start_delay_timer = blackboard.patrol_start_delay_timer - dt
+			if blackboard.patrol_start_delay_timer then
+				blackboard.patrol_start_delay_timer = blackboard.patrol_start_delay_timer - dt
 
-			if blackboard.patrol_start_delay_timer < 0 then
-				blackboard.patrol_start_delay_timer = nil
-				blackboard.goal_destination = blackboard.stored_goal_destination
-				blackboard.patrolling = true
+				if blackboard.patrol_start_delay_timer < 0 then
+					blackboard.patrol_start_delay_timer = nil
+					blackboard.goal_destination = blackboard.stored_goal_destination
+					blackboard.patrolling = true
+				else
+					break
+				end
 			end
-		else
+
 			local unit_pos = POSITION_LOOKUP[unit]
 			local breed = blackboard.breed
 			local navigation_extension = blackboard.navigation_extension
@@ -907,7 +907,7 @@ function update_units(nav_world, group, t, dt)
 			if success then
 				navigation_extension:move_to(destination)
 			end
-		end
+		until true
 	end
 
 	if any_unit_lagging_behind then
@@ -1007,15 +1007,19 @@ function update_spline_anchor_points(nav_world, group, dt)
 	local num_anchors = #group.anchors
 
 	for i = 1, num_anchors, 1 do
-		local anchor = group.anchors[i]
+		repeat
+			local anchor = group.anchors[i]
 
-		if anchor.start_timer then
-			anchor.start_timer = anchor.start_timer - dt
+			if anchor.start_timer then
+				anchor.start_timer = anchor.start_timer - dt
 
-			if anchor.start_timer < 0 then
-				anchor.start_timer = nil
+				if anchor.start_timer < 0 then
+					anchor.start_timer = nil
+				else
+					break
+				end
 			end
-		else
+
 			local previous_anchor = group.anchors[i - 1]
 			local previous_position = anchor.point:unbox()
 			local spline = anchor.spline
@@ -1044,7 +1048,7 @@ function update_spline_anchor_points(nav_world, group, dt)
 			if script_data.debug_storm_vermin_patrol then
 				drawer:sphere(position, 0.1, Colors.get("cadet_blue"))
 			end
-		end
+		until true
 	end
 
 	local main_spline = group.anchors[1].spline

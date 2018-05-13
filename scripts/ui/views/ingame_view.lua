@@ -1250,40 +1250,43 @@ IngameView.update_controller_input = function (self, input_service, dt)
 		return
 	else
 		speed_multiplier = self.speed_multiplier or 1
-		local move_up = input_service:get("move_up")
-		local move_up_hold = input_service:get("move_up_hold")
-		local controller_selection_index = self.controller_selection_index or 0
 
-		if move_up or move_up_hold then
-			local new_index = math.max(controller_selection_index - 1, 1)
-			local selection_accepted = self:controller_select_button_index(new_index)
+		repeat
+			local move_up = input_service:get("move_up")
+			local move_up_hold = input_service:get("move_up_hold")
+			local controller_selection_index = self.controller_selection_index or 0
 
-			while not selection_accepted do
-				new_index = math.max(new_index - 1, 1)
-				selection_accepted = self:controller_select_button_index(new_index)
+			if move_up or move_up_hold then
+				local new_index = math.max(controller_selection_index - 1, 1)
+				local selection_accepted = self:controller_select_button_index(new_index)
+
+				while not selection_accepted do
+					new_index = math.max(new_index - 1, 1)
+					selection_accepted = self:controller_select_button_index(new_index)
+				end
+
+				self.controller_cooldown = GamepadSettings.menu_cooldown * speed_multiplier
+
+				return
 			end
 
-			self.controller_cooldown = GamepadSettings.menu_cooldown * speed_multiplier
+			local move_down = input_service:get("move_down")
+			local move_down_hold = input_service:get("move_down_hold")
 
-			return
-		end
+			if move_down or move_down_hold then
+				local new_index = math.min(controller_selection_index + 1, num_buttons)
+				local selection_accepted = self:controller_select_button_index(new_index)
 
-		local move_down = input_service:get("move_down")
-		local move_down_hold = input_service:get("move_down_hold")
+				while not selection_accepted do
+					new_index = math.min(new_index + 1, num_buttons)
+					selection_accepted = self:controller_select_button_index(new_index)
+				end
 
-		if move_down or move_down_hold then
-			local new_index = math.min(controller_selection_index + 1, num_buttons)
-			local selection_accepted = self:controller_select_button_index(new_index)
+				self.controller_cooldown = GamepadSettings.menu_cooldown * speed_multiplier
 
-			while not selection_accepted do
-				new_index = math.min(new_index + 1, num_buttons)
-				selection_accepted = self:controller_select_button_index(new_index)
+				return
 			end
-
-			self.controller_cooldown = GamepadSettings.menu_cooldown * speed_multiplier
-
-			return
-		end
+		until true
 	end
 
 	self.speed_multiplier = 1

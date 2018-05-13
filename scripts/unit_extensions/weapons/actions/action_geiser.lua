@@ -217,19 +217,22 @@ ActionGeiser._update_damage = function (self, current_action)
 	local buff_extension = self.owner_buff_extension
 
 	for i = damage_buffer_index, num_units, 1 do
-		local damage_data = damage_buffer[i]
+		repeat
+			local damage_data = damage_buffer[i]
 
-		if not damage_data then
-			return true
-		end
+			if not damage_data then
+				return true
+			end
 
-		local hit_unit = damage_data.hit_unit
-		local damage_profile_name = damage_data.damage_profile_name
-		local target_index = damage_data.target_index
-		local hit_zone_name = damage_data.hit_zone_name
+			local hit_unit = damage_data.hit_unit
+			local damage_profile_name = damage_data.damage_profile_name
+			local target_index = damage_data.target_index
+			local hit_zone_name = damage_data.hit_zone_name
 
-		if not Unit.alive(hit_unit) then
-		else
+			if not Unit.alive(hit_unit) then
+				break
+			end
+
 			if check_buffs then
 				local send_to_server = true
 
@@ -241,21 +244,22 @@ ActionGeiser._update_damage = function (self, current_action)
 			local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
 
 			if not hit_unit_id then
-			else
-				local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
-				local damage_profile_id = NetworkLookup.damage_profiles[damage_profile_name]
-				local hit_position = POSITION_LOOKUP[hit_unit] or Unit.local_position(hit_unit, 0)
-				local attack_direction = Vector3.normalize(hit_position - attacker_position)
-				local power_level = self.power_level
-				local shield_blocked = false
-				local shield_break_procc = false
-				local has_ranged_boost, ranged_boost_curve_multiplier = ActionUtils.get_ranged_boost(owner_unit)
-				local is_critical_strike = self._is_critical_strike or has_ranged_boost
-				local weapon_system = Managers.state.entity:system("weapon_system")
-
-				weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", ranged_boost_curve_multiplier, "is_critical_strike", is_critical_strike)
+				break
 			end
-		end
+
+			local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
+			local damage_profile_id = NetworkLookup.damage_profiles[damage_profile_name]
+			local hit_position = POSITION_LOOKUP[hit_unit] or Unit.local_position(hit_unit, 0)
+			local attack_direction = Vector3.normalize(hit_position - attacker_position)
+			local power_level = self.power_level
+			local shield_blocked = false
+			local shield_break_procc = false
+			local has_ranged_boost, ranged_boost_curve_multiplier = ActionUtils.get_ranged_boost(owner_unit)
+			local is_critical_strike = self._is_critical_strike or has_ranged_boost
+			local weapon_system = Managers.state.entity:system("weapon_system")
+
+			weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id, "power_level", power_level, "hit_target_index", target_index, "blocking", shield_blocked, "shield_break_procced", shield_break_procc, "boost_curve_multiplier", ranged_boost_curve_multiplier, "is_critical_strike", is_critical_strike)
+		until true
 	end
 
 	self._damage_buffer_index = num_units + 1

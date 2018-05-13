@@ -423,38 +423,41 @@ LinkerTransportationExtension._update_local_player_position = function (self)
 	local num_transported_units = #transported_units
 
 	for i = 1, num_transported_units, 1 do
-		local unit = transported_units[i]
+		repeat
+			local unit = transported_units[i]
 
-		if not Unit.alive(unit) then
-		else
+			if not Unit.alive(unit) then
+				break
+			end
+
 			local unit_owner = player_manager:owner(unit)
 
-			if unit_owner then
-				if not unit_owner.local_player then
-				else
-					local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
-					local platform_unit = locomotion_extension:get_moving_platform()
-
-					if platform_unit ~= self.unit then
-					else
-						local is_inside_transportation_unit = self:_is_inside_transportation_unit(unit, 1)
-
-						if not is_inside_transportation_unit then
-							local index = table.find(self._bot_slots, unit)
-
-							if index == false then
-								index = math.random(1, 4)
-							end
-
-							local position = self:_get_position_from_index(index)
-							local current_rotation = locomotion_extension:current_rotation()
-
-							locomotion_extension:teleport_to(position, current_rotation)
-						end
-					end
-				end
+			if not unit_owner or not unit_owner.local_player then
+				break
 			end
-		end
+
+			local locomotion_extension = ScriptUnit.extension(unit, "locomotion_system")
+			local platform_unit = locomotion_extension:get_moving_platform()
+
+			if platform_unit ~= self.unit then
+				break
+			end
+
+			local is_inside_transportation_unit = self:_is_inside_transportation_unit(unit, 1)
+
+			if not is_inside_transportation_unit then
+				local index = table.find(self._bot_slots, unit)
+
+				if index == false then
+					index = math.random(1, 4)
+				end
+
+				local position = self:_get_position_from_index(index)
+				local current_rotation = locomotion_extension:current_rotation()
+
+				locomotion_extension:teleport_to(position, current_rotation)
+			end
+		until true
 	end
 end
 

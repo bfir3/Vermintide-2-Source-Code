@@ -358,17 +358,20 @@ GearUtils.hot_join_sync = function (sender, unit, equipment)
 	local unit_object_id = Managers.state.unit_storage:go_id(unit)
 
 	for slot_name, slot_data in pairs(slots) do
-		local slot = InventorySettings.slots_by_name[slot_name]
+		repeat
+			local slot = InventorySettings.slots_by_name[slot_name]
 
-		if slot.category ~= "weapon" and slot.category ~= "career_skill_weapon" and slot.category ~= "enemy_weapon" and slot.category ~= "level_event" then
-		else
+			if slot.category ~= "weapon" and slot.category ~= "career_skill_weapon" and slot.category ~= "enemy_weapon" and slot.category ~= "level_event" then
+				break
+			end
+
 			local slot_id = NetworkLookup.equipment_slots[slot_name]
 			local item_data = slot_data.item_data
 			local item_id = NetworkLookup.item_names[item_data.name]
 			local weapon_skin_id = NetworkLookup.weapon_skins[slot_data.skin or "n/a"]
 
 			RPC.rpc_add_equipment(sender, unit_object_id, slot_id, item_id, weapon_skin_id)
-		end
+		until true
 	end
 
 	if equipment.wielded then

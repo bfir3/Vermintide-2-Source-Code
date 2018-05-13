@@ -188,10 +188,13 @@ ActionPushStagger.client_owner_post_update = function (self, dt, t, world, can_d
 		local outer_push_half_angle = math.rad(buff_extension:apply_buffs_to_value(current_action.outer_push_angle or 0, StatBuffIndex.BLOCK_ANGLE) * 0.5)
 
 		for i = 1, num_hits, 1 do
-			local hit_actor = overlap_units[i]:unbox()
+			repeat
+				local hit_actor = overlap_units[i]:unbox()
 
-			if hit_actor == nil then
-			else
+				if hit_actor == nil then
+					break
+				end
+
 				local hit_unit = Actor.unit(hit_actor)
 				local is_enemy = DamageUtils.is_enemy(hit_unit)
 
@@ -209,74 +212,75 @@ ActionPushStagger.client_owner_post_update = function (self, dt, t, world, can_d
 					local outer_push = push_half_angle < angle_to_target and angle_to_target <= outer_push_half_angle
 
 					if not inner_push and not outer_push then
-					else
-						if inner_push and not outer_push then
-							local push_arc_event = "Play_player_push_ark_success"
-							local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
-
-							first_person_extension:play_hud_sound_event(push_arc_event, nil, false)
-						end
-
-						local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
-						local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
-						local power_level = self.power_level
-						local damage_profile_id_to_use = (inner_push and self.damage_profile_inner_id) or self.damage_profile_outer_id
-						local damage_profile_to_use = (inner_push and self.damage_profile_inner) or self.damage_profile_outer
-						local target_settings = damage_profile_to_use.default_target
-						local hit_position = Unit.world_position(hit_unit, node)
-						local hit_effect = current_action.impact_particle_effect or "fx/impact_block_push"
-
-						if hit_effect then
-							EffectHelper.player_melee_hit_particles(world, hit_effect, hit_position, attack_direction, nil, hit_unit)
-						end
-
-						local sound_event = current_action.stagger_impact_sound_event or "blunt_hit"
-
-						if sound_event then
-							local attack_template = AttackTemplates[target_settings.attack_template]
-							local sound_type = (attack_template and attack_template.sound_type) or "stun_heavy"
-							local husk = self.bot_player
-
-							EffectHelper.play_melee_hit_effects(sound_event, world, hit_position, sound_type, husk, hit_unit)
-
-							local sound_event_id = NetworkLookup.sound_events[sound_event]
-							local sound_type_id = NetworkLookup.melee_impact_sound_types[sound_type]
-							hit_position = Vector3(math.clamp(hit_position.x, -600, 600), math.clamp(hit_position.y, -600, 600), math.clamp(hit_position.z, -600, 600))
-
-							if self.is_server then
-								network_manager.network_transmit:send_rpc_clients("rpc_play_melee_hit_effects", sound_event_id, hit_position, sound_type_id, hit_unit_id)
-							else
-								network_manager.network_transmit:send_rpc_server("rpc_play_melee_hit_effects", sound_event_id, hit_position, sound_type_id, hit_unit_id)
-							end
-						else
-							Application.warning("[ActionSweep] Missing sound event for push action in unit %q.", self.weapon_unit)
-						end
-
-						local shield_blocked = AiUtils.attack_is_shield_blocked(hit_unit, owner_unit)
-						local damage_source = self.item_name
-						local damage_source_id = NetworkLookup.damage_sources[damage_source]
-						local is_critical_strike = self._is_critical_strike
-
-						weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id_to_use, "power_level", power_level, "hit_target_index", nil, "blocking", shield_blocked, "shield_break_procced", false, "boost_curve_multiplier", self.melee_boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", false, "can_stagger", true)
-
-						if Managers.state.controller_features and self.owner.local_player and not self.has_played_rumble_effect then
-							Managers.state.controller_features:add_effect("rumble", {
-								rumble_effect = "push_hit"
-							})
-
-							self.has_played_rumble_effect = true
-						end
-
-						Managers.state.entity:system("play_go_tutorial_system"):register_push(hit_unit)
-
-						local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
-
-						buff_extension:trigger_procs("on_push", hit_unit, damage_source)
-
-						hit_once = true
+						break
 					end
+
+					if inner_push and not outer_push then
+						local push_arc_event = "Play_player_push_ark_success"
+						local first_person_extension = ScriptUnit.extension(owner_unit, "first_person_system")
+
+						first_person_extension:play_hud_sound_event(push_arc_event, nil, false)
+					end
+
+					local hit_unit_id = network_manager:unit_game_object_id(hit_unit)
+					local hit_zone_id = NetworkLookup.hit_zones[hit_zone_name]
+					local power_level = self.power_level
+					local damage_profile_id_to_use = (inner_push and self.damage_profile_inner_id) or self.damage_profile_outer_id
+					local damage_profile_to_use = (inner_push and self.damage_profile_inner) or self.damage_profile_outer
+					local target_settings = damage_profile_to_use.default_target
+					local hit_position = Unit.world_position(hit_unit, node)
+					local hit_effect = current_action.impact_particle_effect or "fx/impact_block_push"
+
+					if hit_effect then
+						EffectHelper.player_melee_hit_particles(world, hit_effect, hit_position, attack_direction, nil, hit_unit)
+					end
+
+					local sound_event = current_action.stagger_impact_sound_event or "blunt_hit"
+
+					if sound_event then
+						local attack_template = AttackTemplates[target_settings.attack_template]
+						local sound_type = (attack_template and attack_template.sound_type) or "stun_heavy"
+						local husk = self.bot_player
+
+						EffectHelper.play_melee_hit_effects(sound_event, world, hit_position, sound_type, husk, hit_unit)
+
+						local sound_event_id = NetworkLookup.sound_events[sound_event]
+						local sound_type_id = NetworkLookup.melee_impact_sound_types[sound_type]
+						hit_position = Vector3(math.clamp(hit_position.x, -600, 600), math.clamp(hit_position.y, -600, 600), math.clamp(hit_position.z, -600, 600))
+
+						if self.is_server then
+							network_manager.network_transmit:send_rpc_clients("rpc_play_melee_hit_effects", sound_event_id, hit_position, sound_type_id, hit_unit_id)
+						else
+							network_manager.network_transmit:send_rpc_server("rpc_play_melee_hit_effects", sound_event_id, hit_position, sound_type_id, hit_unit_id)
+						end
+					else
+						Application.warning("[ActionSweep] Missing sound event for push action in unit %q.", self.weapon_unit)
+					end
+
+					local shield_blocked = AiUtils.attack_is_shield_blocked(hit_unit, owner_unit)
+					local damage_source = self.item_name
+					local damage_source_id = NetworkLookup.damage_sources[damage_source]
+					local is_critical_strike = self._is_critical_strike
+
+					weapon_system:send_rpc_attack_hit(damage_source_id, attacker_unit_id, hit_unit_id, hit_zone_id, attack_direction, damage_profile_id_to_use, "power_level", power_level, "hit_target_index", nil, "blocking", shield_blocked, "shield_break_procced", false, "boost_curve_multiplier", self.melee_boost_curve_multiplier, "is_critical_strike", is_critical_strike, "can_damage", false, "can_stagger", true)
+
+					if Managers.state.controller_features and self.owner.local_player and not self.has_played_rumble_effect then
+						Managers.state.controller_features:add_effect("rumble", {
+							rumble_effect = "push_hit"
+						})
+
+						self.has_played_rumble_effect = true
+					end
+
+					Managers.state.entity:system("play_go_tutorial_system"):register_push(hit_unit)
+
+					local buff_extension = ScriptUnit.extension(owner_unit, "buff_system")
+
+					buff_extension:trigger_procs("on_push", hit_unit, damage_source)
+
+					hit_once = true
 				end
-			end
+			until true
 		end
 
 		if hit_once and not self.bot_player then

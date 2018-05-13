@@ -48,8 +48,11 @@ if not rawget(_G, "G_IS_PROFILING") and PLATFORM == "win32" and BUILD ~= "releas
 	})
 
 	for function_name, org_func in pairs(Unit) do
-		if exclude_from_patching[function_name] then
-		else
+		repeat
+			if exclude_from_patching[function_name] then
+				break
+			end
+
 			Unit[function_name] = function (unit, ...)
 				if unit == nil then
 					local args = ""
@@ -83,7 +86,7 @@ if not rawget(_G, "G_IS_PROFILING") and PLATFORM == "win32" and BUILD ~= "releas
 				printf("ARGS: %s", args)
 				assert(false, sprintf("[unit_deleted] tried to access function '%s' for deleted unit(%s)!", function_name, err_unit))
 			end
-		end
+		until true
 	end
 
 	function tostring(...)

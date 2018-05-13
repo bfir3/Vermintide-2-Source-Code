@@ -4,12 +4,6 @@
 --   Code may be incomplete or incorrect.
 -- WARNING: Error occurred during decompilation.
 --   Code may be incomplete or incorrect.
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
 require("scripts/unit_extensions/human/ai_player_unit/ai_utils")
 
 PerceptionUtils = {}
@@ -680,59 +674,71 @@ PerceptionUtils.patrol_passive_target_selection = function (ai_unit, blackboard,
 		local attacker_pos = POSITION_LOOKUP[blackboard_target]
 
 		for _, target_unit in pairs(global_targets) do
-			if not AiUtils_unit_alive(target_unit) then
-			elseif ScriptUnit.has_extension(target_unit, "ai_slot_system") then
-				local target_slot_extension = ScriptUnit.extension(target_unit, "ai_slot_system")
+			repeat
+				if not AiUtils_unit_alive(target_unit) then
+					break
+				end
 
-				if not target_slot_extension.valid_target then
-					if false then
+				if ScriptUnit.has_extension(target_unit, "ai_slot_system") then
+					local target_slot_extension = ScriptUnit.extension(target_unit, "ai_slot_system")
+
+					if not target_slot_extension.valid_target then
+						break
 					end
 				else
-					local target_unit_position = POSITION_LOOKUP[target_unit]
-					local distance_sq = Vector3.distance_squared(attacker_pos, target_unit_position)
-
-					if distance_sq < detection_radius_sqr then
-						group_targets[target_unit] = true
-					end
+					break
 				end
-			end
+
+				local target_unit_position = POSITION_LOOKUP[target_unit]
+				local distance_sq = Vector3.distance_squared(attacker_pos, target_unit_position)
+
+				if distance_sq < detection_radius_sqr then
+					group_targets[target_unit] = true
+				end
+			until true
 		end
 	end
 
 	for _, target_unit in ipairs(global_targets) do
-		if not AiUtils_unit_alive(target_unit) then
-		elseif ScriptUnit.has_extension(target_unit, "ai_slot_system") then
-			local target_slot_extension = ScriptUnit.extension(target_unit, "ai_slot_system")
+		repeat
+			if not AiUtils_unit_alive(target_unit) then
+				break
+			end
 
-			if not target_slot_extension.valid_target then
-				if false then
+			if ScriptUnit.has_extension(target_unit, "ai_slot_system") then
+				local target_slot_extension = ScriptUnit.extension(target_unit, "ai_slot_system")
+
+				if not target_slot_extension.valid_target then
+					break
 				end
 			else
-				local target_unit_position = POSITION_LOOKUP[target_unit]
-				local is_bot = Managers.player:owner(target_unit).bot_player
-				local distance_sq = Vector3.distance_squared(ai_unit_position, target_unit_position)
-				local view_cone_dot = 0.5
+				break
+			end
 
-				if distance_sq < detection_radius_sqr then
-					local anchor_direction = blackboard.anchor_direction
-					local ai_unit_rotation = (anchor_direction and anchor_direction:unbox()) or Quaternion.forward(Unit.world_rotation(ai_unit, 0))
-					local ai_unit_direction = Vector3.normalize(ai_unit_rotation)
-					local ai_unit_to_target_dir = Vector3.normalize(target_unit_position - ai_unit_position)
-					local dot = Vector3.dot(ai_unit_to_target_dir, ai_unit_direction)
+			local target_unit_position = POSITION_LOOKUP[target_unit]
+			local is_bot = Managers.player:owner(target_unit).bot_player
+			local distance_sq = Vector3.distance_squared(ai_unit_position, target_unit_position)
+			local view_cone_dot = 0.5
 
-					if (view_cone_dot < dot and not is_bot) or distance_sq < breed.panic_close_detection_radius_sq then
-						local physics_world = World.get_data(Unit.world(target_unit), "physics_world")
-						local see_you = PerceptionUtils.raycast_spine_to_spine(ai_unit, target_unit, physics_world)
+			if distance_sq < detection_radius_sqr then
+				local anchor_direction = blackboard.anchor_direction
+				local ai_unit_rotation = (anchor_direction and anchor_direction:unbox()) or Quaternion.forward(Unit.world_rotation(ai_unit, 0))
+				local ai_unit_direction = Vector3.normalize(ai_unit_rotation)
+				local ai_unit_to_target_dir = Vector3.normalize(target_unit_position - ai_unit_position)
+				local dot = Vector3.dot(ai_unit_to_target_dir, ai_unit_direction)
 
-						if see_you then
-							group_targets[target_unit] = true
-							best_target_unit = target_unit
-							distance_to_target_sq = distance_sq
-						end
+				if (view_cone_dot < dot and not is_bot) or distance_sq < breed.panic_close_detection_radius_sq then
+					local physics_world = World.get_data(Unit.world(target_unit), "physics_world")
+					local see_you = PerceptionUtils.raycast_spine_to_spine(ai_unit, target_unit, physics_world)
+
+					if see_you then
+						group_targets[target_unit] = true
+						best_target_unit = target_unit
+						distance_to_target_sq = distance_sq
 					end
 				end
 			end
-		end
+		until true
 	end
 
 	return nil
@@ -782,17 +788,44 @@ PerceptionUtils.storm_patrol_death_squad_target_selection = function (ai_unit, b
 	end
 
 	for target_unit, _ in pairs(group_targets) do
-		if not valid_players_and_bots[target_unit] then
-			group_targets[target_unit] = nil
-		else
-			local status_extension = ScriptUnit.extension(target_unit, "status_system")
-
-			if status_extension.using_transport or status_extension.spawn_grace then
+		repeat
+			if not valid_players_and_bots[target_unit] then
 				group_targets[target_unit] = nil
 			else
-				local score_dogpile = 0
+				local status_extension = ScriptUnit.extension(target_unit, "status_system")
+
+				if status_extension.using_transport or status_extension.spawn_grace then
+					group_targets[target_unit] = nil
+				else
+					local score_dogpile = 0
+
+					if ScriptUnit.has_extension(target_unit, "ai_slot_system") then
+						local target_slot_extension = ScriptUnit.extension(target_unit, "ai_slot_system")
+
+						if not target_slot_extension.valid_target then
+							break
+						end
+
+						score_dogpile = ai_slot_system:slots_count(target_unit) * DOGPILE_SCORE
+					end
+
+					local aggro_extension = ScriptUnit.extension(target_unit, "aggro_system")
+					local aggro_modifier = aggro_extension.aggro_modifier
+					local target_unit_position = POSITION_LOOKUP[target_unit]
+					local distance_sq = Vector3.distance_squared(ai_unit_position, target_unit_position)
+					local score_distance = distance_sq * 0.1
+					local score_stickyness = (target_unit == target_current and -5) or 0
+					local knocked_down_modifer = (status_extension:is_knocked_down() and 5) or 0
+					local score = score_dogpile + score_distance + score_stickyness + knocked_down_modifer + aggro_modifier
+
+					if score < best_score then
+						best_score = score
+						best_target_unit = target_unit
+						distance_to_target_sq = distance_sq
+					end
+				end
 			end
-		end
+		until true
 	end
 
 	if distance_to_target_sq == nil then

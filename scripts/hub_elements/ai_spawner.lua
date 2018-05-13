@@ -69,17 +69,20 @@ end
 AISpawner.check_for_enabled = function (self)
 	local i = 1
 	local name = "spawner"
-	name = "spawner" .. i
 
-	if Unit.has_data(self._unit, "spawner_settings", name) then
-		if Unit.get_data(self._unit, "spawner_settings", name, "enabled") then
-			return name
+	repeat
+		name = "spawner" .. i
+
+		if Unit.has_data(self._unit, "spawner_settings", name) then
+			if Unit.get_data(self._unit, "spawner_settings", name, "enabled") then
+				return name
+			end
+		else
+			return nil
 		end
-	else
-		return nil
-	end
 
-	i = i + 1
+		i = i + 1
+	until true
 end
 
 AISpawner.add_breeds = function (self, breed_list)

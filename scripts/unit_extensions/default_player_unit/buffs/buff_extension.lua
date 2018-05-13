@@ -1,5 +1,3 @@
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
 local bpc = dofile("scripts/settings/bpc")
 script_data.buff_debug = script_data.buff_debug or Development.parameter("buff_debug")
 BuffExtension = class(BuffExtension)
@@ -87,46 +85,87 @@ BuffExtension.add_buff = function (self, template_name, params)
 	local world = self.world
 
 	for i, sub_buff_template in ipairs(buffs) do
-		local duration = sub_buff_template.duration
-		local max_stacks = sub_buff_template.max_stacks
-		local end_time = duration and start_time + duration
+		repeat
+			local duration = sub_buff_template.duration
+			local max_stacks = sub_buff_template.max_stacks
+			local end_time = duration and start_time + duration
 
-		if max_stacks then
-			local has_max_stacks = false
-			local stacks = 0
+			if max_stacks then
+				local has_max_stacks = false
+				local stacks = 0
 
-			for j = 1, #self._buffs, 1 do
-				local existing_buff = self._buffs[j]
+				for j = 1, #self._buffs, 1 do
+					local existing_buff = self._buffs[j]
 
-				if existing_buff.buff_type == sub_buff_template.name then
-					if duration and sub_buff_template.refresh_durations then
-						existing_buff.start_time = start_time
-						existing_buff.duration = duration
-						existing_buff.end_time = end_time
-						existing_buff.attacker_unit = (params and params.attacker_unit) or nil
-						local reapply_buff_func = sub_buff_template.reapply_buff_func
+					if existing_buff.buff_type == sub_buff_template.name then
+						if duration and sub_buff_template.refresh_durations then
+							existing_buff.start_time = start_time
+							existing_buff.duration = duration
+							existing_buff.end_time = end_time
+							existing_buff.attacker_unit = (params and params.attacker_unit) or nil
+							local reapply_buff_func = sub_buff_template.reapply_buff_func
 
-						if reapply_buff_func then
-							buff_extension_function_params.bonus = existing_buff.bonus
-							buff_extension_function_params.multiplier = existing_buff.multiplier
-							buff_extension_function_params.t = start_time
-							buff_extension_function_params.end_time = end_time
-							buff_extension_function_params.attacker_unit = existing_buff.attacker_unit
+							if reapply_buff_func then
+								buff_extension_function_params.bonus = existing_buff.bonus
+								buff_extension_function_params.multiplier = existing_buff.multiplier
+								buff_extension_function_params.t = start_time
+								buff_extension_function_params.end_time = end_time
+								buff_extension_function_params.attacker_unit = existing_buff.attacker_unit
 
-							BuffFunctionTemplates.functions[reapply_buff_func](self._unit, existing_buff, buff_extension_function_params, world)
+								BuffFunctionTemplates.functions[reapply_buff_func](self._unit, existing_buff, buff_extension_function_params, world)
+							end
+						end
+
+						stacks = stacks + 1
+
+						if stacks == max_stacks then
+							has_max_stacks = true
+
+							break
+						end
+					end
+				end
+
+				if has_max_stacks then
+					break
+				elseif stacks == max_stacks - 1 then
+					local on_max_stacks_func = sub_buff_template.on_max_stacks_func
+
+					if on_max_stacks_func then
+						local player = Managers.player:owner(self._unit)
+
+						if player then
+							on_max_stacks_func(player, sub_buff_template)
 						end
 					end
 
-					stacks = stacks + 1
+					if sub_buff_template.reset_on_max_stacks then
+						local num_buffs = #self._buffs
+						local j = 1
 
-					if stacks == max_stacks then
-						has_max_stacks = true
+						while j <= num_buffs do
+							local buff = self._buffs[j]
+
+							if buff.buff_type == sub_buff_template.name then
+								buff_extension_function_params.bonus = buff.bonus
+								buff_extension_function_params.multiplier = buff.multiplier
+								buff_extension_function_params.t = start_time
+								buff_extension_function_params.end_time = buff.duration and buff.start_time + buff.duration
+								buff_extension_function_params.attacker_unit = buff.attacker_unit
+
+								self:_remove_sub_buff(buff, j, buff_extension_function_params)
+
+								num_buffs = num_buffs - 1
+							else
+								j = j + 1
+							end
+						end
 
 						break
 					end
 				end
 			end
-		else
+
 			local buff = {
 				id = id,
 				parent_id = params and params.parent_id,
@@ -221,7 +260,7 @@ BuffExtension.add_buff = function (self, template_name, params)
 			end
 
 			self._buffs[#self._buffs + 1] = buff
-		end
+		until true
 	end
 
 	local activation_sound = buff_template.activation_sound

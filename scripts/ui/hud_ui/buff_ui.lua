@@ -76,37 +76,39 @@ BuffUI._sync_buffs = function (self)
 		end
 
 		for i = 1, num_buffs, 1 do
-			local buff = buffs[i]
-			local duration = buff.duration
-			local start_time = buff.start_time
-			local buff_template = buff.template
-			local handle_buff = debug_buffs or buff_template.icon ~= nil
+			repeat
+				local buff = buffs[i]
+				local duration = buff.duration
+				local start_time = buff.start_time
+				local buff_template = buff.template
+				local handle_buff = debug_buffs or buff_template.icon ~= nil
 
-			if handle_buff then
-				local buff_name = buff_template.name
-				local buff_id = buff.id
-				local infinite = not duration
-				local end_time = duration and start_time + duration
-				local remaining_duration = end_time and math.max(end_time - t, 0)
-				local verified = false
+				if handle_buff then
+					local buff_name = buff_template.name
+					local buff_id = buff.id
+					local infinite = not duration
+					local end_time = duration and start_time + duration
+					local remaining_duration = end_time and math.max(end_time - t, 0)
+					local verified = false
 
-				for j = 1, #active_buffs, 1 do
-					local data = active_buffs[j]
+					for j = 1, #active_buffs, 1 do
+						local data = active_buffs[j]
 
-					if data.id == buff_id then
-						if not end_time or end_time == data.end_time then
-							data.verified = true
-							verified = true
+						if data.id == buff_id then
+							if not end_time or end_time == data.end_time then
+								data.verified = true
+								verified = true
+							end
+
+							break
 						end
+					end
 
-						break
+					if not verified and (infinite or 0 < remaining_duration) then
+						buffs_to_add[#buffs_to_add + 1] = buff_id
 					end
 				end
-
-				if not verified and (infinite or 0 < remaining_duration) then
-					buffs_to_add[#buffs_to_add + 1] = buff_id
-				end
-			end
+			until true
 		end
 
 		table.clear(widgets_to_remove)

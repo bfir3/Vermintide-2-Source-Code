@@ -1,5 +1,3 @@
--- WARNING: Error occurred during decompilation.
---   Code may be incomplete or incorrect.
 require("scripts/settings/twitch_settings")
 
 DEBUG_TWITCH = false
@@ -698,9 +696,15 @@ TwitchManager._handle_results = function (self, vote_results)
 	local options = vote_results.options
 
 	for i = 1, num_options, 1 do
-		if vote_type == "multiple_choice" then
-			local valid_player_index = self:_valid_player_index(i)
-		else
+		repeat
+			if vote_type == "multiple_choice" then
+				local valid_player_index = self:_valid_player_index(i)
+
+				if not valid_player_index then
+					break
+				end
+			end
+
 			local option = options[i]
 
 			if best_option < option then
@@ -714,7 +718,7 @@ TwitchManager._handle_results = function (self, vote_results)
 					best_option = option
 				end
 			end
-		end
+		until true
 	end
 
 	local vote_template_name = vote_results.vote_templates[best_option_index]
@@ -979,12 +983,15 @@ TwitchGameMode._next_standard_vote = function (self)
 	selected_templates[first_template_name] = true
 
 	for selected_template_name, vote_info in pairs(TwitchVoteTemplates) do
-		if not selected_templates[selected_template_name] and not vote_info.multiple_choice and selected_template_name ~= first_template_name then
-			local second_vote_cost = vote_info.cost
-			local second_is_positive = second_vote_cost < 0
+		repeat
+			if not selected_templates[selected_template_name] and not vote_info.multiple_choice and selected_template_name ~= first_template_name then
+				local second_vote_cost = vote_info.cost
+				local second_is_positive = second_vote_cost < 0
 
-			if first_is_positive ~= second_is_positive and 5 < math.random(1, 100) then
-			else
+				if first_is_positive ~= second_is_positive and 5 < math.random(1, 100) then
+					break
+				end
+
 				local diff = first_vote_cost - second_vote_cost * sign_diff
 
 				if diff < best_template_diff then
@@ -993,7 +1000,7 @@ TwitchGameMode._next_standard_vote = function (self)
 					total_cost = first_vote_cost + second_vote_cost
 				end
 			end
-		end
+		until true
 	end
 
 	if not best_template_name or self._max_diff < best_template_diff then

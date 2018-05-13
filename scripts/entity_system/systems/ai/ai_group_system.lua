@@ -276,11 +276,14 @@ AIGroupSystem.set_level = function (self, level)
 	local world = self._world
 
 	for i = 1, MAX_PATROL_SPLINES, 1 do
-		local spline_name = PATROL_SPLINE_PREFIX .. i
-		local spline_points = Level.spline(level, spline_name)
+		repeat
+			local spline_name = PATROL_SPLINE_PREFIX .. i
+			local spline_points = Level.spline(level, spline_name)
 
-		if #spline_points == 0 then
-		else
+			if #spline_points == 0 then
+				break
+			end
+
 			local start_position = spline_points[1]
 			local start_direction = Vector3.normalize(spline_points[3] - spline_points[1])
 			local data = {
@@ -289,15 +292,18 @@ AIGroupSystem.set_level = function (self, level)
 			}
 			self._patrol_splines[spline_name] = data
 			self._spline_lookup[spline_name] = data
-		end
+		until true
 	end
 
 	for i = 1, MAX_ROAMING_SPLINES, 1 do
-		local spline_name = ROAMING_SPLINE_PREFIX .. i
-		local spline_points = Level.spline(level, spline_name)
+		repeat
+			local spline_name = ROAMING_SPLINE_PREFIX .. i
+			local spline_points = Level.spline(level, spline_name)
 
-		if #spline_points == 0 then
-		else
+			if #spline_points == 0 then
+				break
+			end
+
 			local start_position = spline_points[1]
 			local start_direction = Vector3.normalize(spline_points[3] - spline_points[1])
 			local data = {
@@ -306,15 +312,18 @@ AIGroupSystem.set_level = function (self, level)
 			}
 			self._roaming_splines[spline_name] = data
 			self._spline_lookup[spline_name] = data
-		end
+		until true
 	end
 
 	for i = 1, MAX_EVENT_SPLINES, 1 do
-		local spline_name = EVENT_SPLINE_PREFIX .. i
-		local spline_points = Level.spline(level, spline_name)
+		repeat
+			local spline_name = EVENT_SPLINE_PREFIX .. i
+			local spline_points = Level.spline(level, spline_name)
 
-		if #spline_points == 0 then
-		else
+			if #spline_points == 0 then
+				break
+			end
+
 			local start_position = spline_points[1]
 			local start_direction = Vector3.normalize(spline_points[3] - spline_points[1])
 			local data = {
@@ -323,7 +332,7 @@ AIGroupSystem.set_level = function (self, level)
 			}
 			self._event_splines[spline_name] = data
 			self._spline_lookup[spline_name] = data
-		end
+		until true
 	end
 end
 
@@ -347,21 +356,25 @@ AIGroupSystem.get_best_spline = function (self, position, spline_type)
 	end
 
 	for spline_name, spline_data in pairs(splines) do
-		local random_distance_modifier = math.random(1, MAX_RANDOM_DISTANCE_MODIFIER)
-		local start_position = spline_data.start_position:unbox()
-		local distance = Vector3.distance(position, start_position)
+		repeat
+			local random_distance_modifier = math.random(1, MAX_RANDOM_DISTANCE_MODIFIER)
+			local start_position = spline_data.start_position:unbox()
+			local distance = Vector3.distance(position, start_position)
 
-		if max_distance < distance then
-		else
+			if max_distance < distance then
+				break
+			end
+
 			distance = distance - random_distance_modifier
 
 			if best_distance < distance then
-			else
-				best_distance = distance
-				best_spline = spline_name
-				best_spline_data = spline_data
+				break
 			end
-		end
+
+			best_distance = distance
+			best_spline = spline_name
+			best_spline_data = spline_data
+		until true
 	end
 
 	return best_spline, best_spline_data
@@ -555,10 +568,13 @@ AIGroupSystem.update = function (self, context, t)
 		self.patrol_analysis:run()
 
 		for spline_name, spline_type in pairs(self._computing_splines) do
-			local spline_ready = self:_spline_ready(spline_name)
+			repeat
+				local spline_ready = self:_spline_ready(spline_name)
 
-			if not spline_ready then
-			else
+				if not spline_ready then
+					break
+				end
+
 				local spline = self.patrol_analysis:spline(spline_name)
 				local spline_points = spline.spline_points
 				local start_position_boxed = spline_points[1]
@@ -597,7 +613,7 @@ AIGroupSystem.update = function (self, context, t)
 
 					self._computing_splines[spline_name] = nil
 				end
-			end
+			until true
 		end
 	end
 

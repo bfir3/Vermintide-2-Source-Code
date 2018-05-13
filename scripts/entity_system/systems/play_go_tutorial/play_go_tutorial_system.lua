@@ -347,13 +347,16 @@ PlayGoTutorialSystem._load_profile_packages = function (self)
 		local career_name = career.name
 
 		for i = 1, num_slots, 1 do
-			local slot = slots[i]
-			local slot_name = slot.NAME
-			local slot_category = slot.category
-			local item = BackendUtils.get_loadout_item(career_name, slot_name)
+			repeat
+				local slot = slots[i]
+				local slot_name = slot.NAME
+				local slot_category = slot.category
+				local item = BackendUtils.get_loadout_item(career_name, slot_name)
 
-			if not item then
-			else
+				if not item then
+					break
+				end
+
 				local backend_id = item.backend_id
 				local item_data = item.data
 				local item_template = BackendUtils.get_item_template(item_data, backend_id)
@@ -418,7 +421,7 @@ PlayGoTutorialSystem._load_profile_packages = function (self)
 				else
 					error("InventoryPackageSynchronizerClient unknown slot_category: " .. slot_category)
 				end
-			end
+			until true
 		end
 
 		local base_units = profile.base_units

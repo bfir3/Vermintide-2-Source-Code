@@ -454,11 +454,14 @@ TwitchVoteUI._show_multiple_choice_vote = function (self)
 	local option_strings = active_vote.inputs
 
 	for index, player in pairs(players) do
-		local profile_index = player:profile_index()
-		local player_profile = SPProfiles[profile_index]
+		repeat
+			local profile_index = player:profile_index()
+			local player_profile = SPProfiles[profile_index]
 
-		if not player_profile then
-		else
+			if not player_profile then
+				break
+			end
+
 			local career_index = player:career_index()
 			local career_settings = player_profile.careers[career_index]
 			local base_portrait = career_settings.portrait_image .. "_twitch"
@@ -472,7 +475,7 @@ TwitchVoteUI._show_multiple_choice_vote = function (self)
 			local vote_widget_index = "hero_vote_" .. index
 			local vote_widget = self._widgets[vote_widget_index]
 			vote_widget.content.text = option_strings[profile_index]
-		end
+		until true
 	end
 
 	local vote_icon_widget = self._widgets.vote_icon

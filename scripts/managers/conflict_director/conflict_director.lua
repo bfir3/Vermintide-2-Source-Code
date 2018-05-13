@@ -2389,10 +2389,13 @@ ConflictDirector._spawn_spline_group = function (self, base_group_data)
 
 	for row, columns in ipairs(formation_data) do
 		for column, data in ipairs(columns) do
-			local breed_name = data.breed_name
+			repeat
+				local breed_name = data.breed_name
 
-			if not Breeds[breed_name] then
-			else
+				if not Breeds[breed_name] then
+					break
+				end
+
 				local optional_data = nil
 				local spawn_breed = Breeds[breed_name]
 
@@ -2422,7 +2425,7 @@ ConflictDirector._spawn_spline_group = function (self, base_group_data)
 				spawn_breed.far_off_despawn_immunity = true
 
 				self:spawn_queued_unit(spawn_breed, Vector3Box(spawn_pos), QuaternionBox(rotation), spawn_category, nil, nil, optional_data, group_data)
-			end
+			until true
 		end
 	end
 end
