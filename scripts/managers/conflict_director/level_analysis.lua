@@ -2014,7 +2014,8 @@ LevelAnalysis.check_splines_integrity = function (self)
 		end
 
 		local start_position = ai_group_system:spline_start_position(spline_name)
-		slot16 = ai_group_system:create_formation_data(start_position, formation, spline_name)
+		local formation_data = ai_group_system.create_formation_data
+		formation_data = formation_data(ai_group_system, start_position, formation, spline_name)
 	end
 
 	print("----> Checking splines integrity ENDS.")

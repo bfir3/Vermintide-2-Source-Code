@@ -36,7 +36,10 @@ BTChaosSorcererTeleportAction.leave = function (self, unit, blackboard, t, reaso
 
 	navigation_extension:set_enabled(true)
 
-	slot7 = navigation_extension:is_using_smart_object() and navigation_extension:use_smart_object(false)
+	if navigation_extension:is_using_smart_object() then
+		local success = navigation_extension.use_smart_object
+		success = success(navigation_extension, false)
+	end
 end
 
 BTChaosSorcererTeleportAction.run = function (self, unit, blackboard, t, dt)

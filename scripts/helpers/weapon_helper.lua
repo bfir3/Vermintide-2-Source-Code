@@ -176,10 +176,16 @@ WeaponHelper.ray_segmented_test = function (physics_world, segment_list, delta)
 		local current_velocity = pos2 - pos1
 
 		if Vector3.length(current_velocity) < 0.001 then
-			slot11 = math.random()
+			local lol = math.random
+			lol = lol()
 		end
 
-		local result, hit_position, _, _, actor = PhysicsWorld.immediate_raycast(physics_world, pos1, current_velocity, Vector3.length(current_velocity), "closest", "collision_filter", "filter_ai_mover")
+		local result = PhysicsWorld.immediate_raycast
+		local hit_position = physics_world
+		local _ = pos1
+		local _ = current_velocity
+		local actor = Vector3.length(current_velocity)
+		result, hit_position, _, _, actor = result(hit_position, _, _, actor, "closest", "collision_filter", "filter_ai_mover")
 
 		if script_data.debug_ai_movement then
 			QuickDrawerStay:line(pos1, pos2, Colors.get_indexed(i))
@@ -187,7 +193,8 @@ WeaponHelper.ray_segmented_test = function (physics_world, segment_list, delta)
 
 		if result then
 			if i == sections then
-				local hit_unit = Actor.unit(actor)
+				local hit_unit = Actor.unit
+				hit_unit = hit_unit(actor)
 
 				if POSITION_LOOKUP[hit_unit] then
 					return true

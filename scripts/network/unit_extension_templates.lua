@@ -1,3 +1,5 @@
+-- WARNING: Error occurred during decompilation.
+--   Code may be incomplete or incorrect.
 local ai_locomotion_name = (_G.GameSettingsDevelopment and GameSettingsDevelopment.use_engine_optimized_ai_locomotion and "AILocomotionExtensionC") or "AILocomotionExtension"
 local unit_templates = {
 	player_unit_3rd = {
@@ -1962,6 +1964,8 @@ unit_templates.get_extensions = function (unit, unit_template_name, is_husk, is_
 end
 
 unit_templates.extensions_to_remove_on_death = function (unit_template_name, is_husk, is_server)
+
+	-- Decompilation error in this vicinity:
 	local extensions, num_extensions = nil
 	local remove_when_killed = unit_templates[unit_template_name].remove_when_killed
 
@@ -1983,10 +1987,6 @@ unit_templates.extensions_to_remove_on_death = function (unit_template_name, is_
 	else
 		num_extensions = remove_when_killed.num_self_owned_extensions
 		extensions = remove_when_killed.self_owned_extensions
-	end
-
-	if type(extensions) ~= "table" or type(num_extensions) ~= "number" then
-		slot6 = 1
 	end
 
 	return extensions, num_extensions

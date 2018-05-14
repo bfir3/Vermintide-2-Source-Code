@@ -155,7 +155,8 @@ CharacterStateHelper.check_to_start_dodge = function (unit, input_extension, sta
 		status_extension:set_dodge_locked(true)
 		status_extension:add_dodge_cooldown()
 
-		slot15 = ScriptUnit.extension(unit, "first_person_system")
+		local first_person_extension = ScriptUnit.extension
+		first_person_extension = first_person_extension(unit, "first_person_system")
 	end
 
 	return start_dodge, dodge_direction

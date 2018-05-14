@@ -192,7 +192,8 @@ RconManager._server_command = function (self, command_string)
 	self._rcon_ui:add_output(command_string, RconUI.ECHO_MSG)
 
 	if self._connected then
-		slot2 = RConClient.command(self._connection_id, command_string)
+		local command_id = RConClient.command
+		command_id = command_id(self._connection_id, command_string)
 	else
 		self._rcon_ui:add_output(tr("rcon_command_error_not_connected"), RconUI.META_MSG)
 	end

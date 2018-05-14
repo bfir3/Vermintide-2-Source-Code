@@ -94,7 +94,11 @@ BTJumpAcrossAction.leave = function (self, unit, blackboard, t, reason, destroy)
 
 	local hit_reaction_extension = ScriptUnit.extension(unit, "hit_reaction_system")
 	hit_reaction_extension.force_ragdoll_on_death = nil
-	slot9 = navigation_extension:is_using_smart_object() and navigation_extension:use_smart_object(false)
+
+	if navigation_extension:is_using_smart_object() then
+		local success = navigation_extension.use_smart_object
+		success = success(navigation_extension, false)
+	end
 end
 
 BTJumpAcrossAction.run = function (self, unit, blackboard, t, dt)

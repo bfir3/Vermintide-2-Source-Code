@@ -335,8 +335,10 @@ NavGraphSystem.hot_join_sync = function (self, sender)
 end
 
 NavGraphSystem.get_smart_object_type = function (self, smart_object_id)
-	if self.smart_object_types[smart_object_id] == nil then
-		slot2 = 1
+	local bp = self.smart_object_types[smart_object_id]
+
+	if bp == nil then
+		bp = 1
 	end
 
 	return self.smart_object_types[smart_object_id]

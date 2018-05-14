@@ -46,7 +46,8 @@ if false and PLATFORM == "win32" and BUILD == "release" then
 			ffi.cdef("\t\t\t\n\t\t\tint MessageBoxA(void *w, const char *txt, const char *cap, int type);\n\t\t\t")
 
 			local MB_OK = 0
-			slot8 = ffi.C.MessageBoxA(nil, error_string, "Missing Plugin/Files Error", MB_OK)
+			local result = ffi.C.MessageBoxA
+			result = result(nil, error_string, "Missing Plugin/Files Error", MB_OK)
 		end
 
 		error(error_string)

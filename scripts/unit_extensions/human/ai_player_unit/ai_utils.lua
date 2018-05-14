@@ -112,7 +112,8 @@ AiUtils.chaos_exalted_champion_set_shield_state = function (unit, state, is_serv
 
 	if is_server then
 		local network_manager = Managers.state.network
-		slot4 = network_manager:unit_game_object_id(unit)
+		local unit_id = network_manager.unit_game_object_id
+		unit_id = unit_id(network_manager, unit)
 	end
 end
 

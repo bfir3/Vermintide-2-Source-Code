@@ -1416,76 +1416,104 @@ DamageUtils.apply_buffs_to_damage = function (current_damage, attacked_unit, att
 
 		if ELITES[damage_source] then
 			local damage_before = damage
-			damage = buff_extension:apply_buffs_to_value(damage, StatBuffIndex.DAMAGE_TAKEN_ELITES)
-			slot14 = damage
+			local damage_after = buff_extension:apply_buffs_to_value(damage, StatBuffIndex.DAMAGE_TAKEN_ELITES)
+			damage = damage_after
+			damage_after = damage
 		end
 
-		status_extension = attacked_player and ScriptUnit.has_extension(attacked_unit, "status_system")
+		if attacked_player then
+			local status_extension = ScriptUnit.has_extension
+			status_extension = status_extension(attacked_unit, "status_system")
+		end
 
 		if status_extension then
-			local is_knocked_down = status_extension:is_knocked_down()
+			local is_knocked_down = status_extension.is_knocked_down
+			is_knocked_down = is_knocked_down(status_extension)
 
 			if is_knocked_down then
 				damage = (damage_type ~= "overcharge" and buff_extension:apply_buffs_to_value(damage, StatBuffIndex.DAMAGE_TAKEN_KD)) or 0
 			end
 
-			local is_disabled = status_extension:is_disabled()
+			local is_disabled = status_extension.is_disabled
+			is_disabled = is_disabled(status_extension)
 
 			if not is_disabled then
 				local valid_damage_to_overheat = damage_source ~= "ground_impact" and damage_type ~= "overcharge" and damage_type ~= "temporary_health_degen"
 
-				if valid_damage_to_overheat and 0 < damage and not is_knocked_down then
-					local original_damage = damage
-					local new_damage = buff_extension:apply_buffs_to_value(damage, StatBuffIndex.DAMAGE_TAKEN_TO_OVERCHARGE)
+				if valid_damage_to_overheat then
+					local original_damage = 0
 
-					if new_damage < original_damage then
-						local damage_to_overcharge = original_damage - new_damage
-						damage_to_overcharge = DamageUtils.networkify_damage(damage_to_overcharge)
+					if original_damage < damage and not is_knocked_down then
+						original_damage = damage
+						local damage_to_overcharge = buff_extension
+						local new_damage = buff_extension.apply_buffs_to_value
+						new_damage = new_damage(damage_to_overcharge, damage, StatBuffIndex.DAMAGE_TAKEN_TO_OVERCHARGE)
 
-						if attacked_player.remote then
-							local peer_id = attacked_player.peer_id
-							local unit_id = network_manager:unit_game_object_id(attacked_unit)
+						if new_damage < original_damage then
+							damage_to_overcharge = original_damage - new_damage
+							damage_to_overcharge = DamageUtils.networkify_damage(damage_to_overcharge)
+							local peer_id = attacked_player.remote
 
-							RPC.rpc_damage_taken_overcharge(peer_id, unit_id, damage_to_overcharge)
-						else
-							DamageUtils.apply_damage_to_overcharge(attacked_unit, damage_to_overcharge)
+							if peer_id then
+								peer_id = attacked_player.peer_id
+								local unit_id = network_manager.unit_game_object_id
+								unit_id = unit_id(network_manager, attacked_unit)
+
+								RPC.rpc_damage_taken_overcharge(peer_id, unit_id, damage_to_overcharge)
+							else
+								local i = attacked_unit
+								local unit = damage_to_overcharge
+
+								DamageUtils.apply_damage_to_overcharge(i, unit)
+							end
+
+							damage = slot18
 						end
-
-						damage = new_damage
 					end
 				end
 			end
 		end
 
-		local damage_cap = buff_extension:apply_buffs_to_value(0, StatBuffIndex.MAX_DAMAGE_TAKEN)
+		local damage_cap = buff_extension.apply_buffs_to_value
+		damage_cap = damage_cap(buff_extension, 0, StatBuffIndex.MAX_DAMAGE_TAKEN)
 
 		if 0 < damage_cap and damage_cap <= damage then
 			damage = math.max(damage * 0.5, damage_cap)
 		end
 
-		if buff_extension:has_buff_type("shared_health_pool") and not IGNORED_SHARED_DAMAGE_TYPES[damage_source] then
-			local player_and_bot_units = PLAYER_AND_BOT_UNITS
-			local num_player_and_bot_units = #player_and_bot_units
-			local num_players_with_shared_health_pool = 1
+		local num_player_and_bot_units = buff_extension
+		local num_players_with_shared_health_pool = "shared_health_pool"
 
-			for i = 1, num_player_and_bot_units, 1 do
-				local unit = player_and_bot_units[i]
+		if buff_extension.has_buff_type(num_player_and_bot_units, num_players_with_shared_health_pool) then
+			local player_and_bot_units = IGNORED_SHARED_DAMAGE_TYPES[damage_source]
 
-				if unit ~= attacked_unit then
-					local buff_extension = ScriptUnit.extension(unit, "buff_system")
+			if not player_and_bot_units then
+				player_and_bot_units = PLAYER_AND_BOT_UNITS
+				num_player_and_bot_units = #player_and_bot_units
+				num_players_with_shared_health_pool = 1
 
-					if buff_extension:has_buff_type("shared_health_pool") then
-						num_players_with_shared_health_pool = num_players_with_shared_health_pool + 1
-						victim_units[#victim_units + 1] = unit
+				for i = 1, num_player_and_bot_units, 1 do
+					unit = player_and_bot_units[i]
+
+					if unit ~= attacked_unit then
+						local buff_extension = ScriptUnit.extension
+						buff_extension = buff_extension(unit, "buff_system")
+
+						if buff_extension:has_buff_type("shared_health_pool") then
+							num_players_with_shared_health_pool = num_players_with_shared_health_pool + 1
+							victim_units[#victim_units + 1] = slot22
+						end
 					end
 				end
-			end
 
-			damage = damage / num_players_with_shared_health_pool
+				damage = damage / slot17
+			end
 		end
 
-		local is_invulnerable = buff_extension:has_buff_type("invulnerable")
-		local has_gromril_armor = buff_extension:has_buff_type("bardin_ironbreaker_gromril_armour")
+		local is_invulnerable = buff_extension.has_buff_type
+		is_invulnerable = is_invulnerable(buff_extension, "invulnerable")
+		local has_gromril_armor = buff_extension.has_buff_type
+		has_gromril_armor = has_gromril_armor(buff_extension, "bardin_ironbreaker_gromril_armour")
 		local valid_damage_source = damage_source ~= "ground_impact" and damage_source ~= "temporary_health_degen" and damage_source ~= "overcharge"
 
 		if is_invulnerable or (has_gromril_armor and valid_damage_source) then
@@ -1493,33 +1521,42 @@ DamageUtils.apply_buffs_to_damage = function (current_damage, attacked_unit, att
 		end
 
 		if has_gromril_armor and valid_damage_source then
-			local buff = buff_extension:get_non_stacking_buff("bardin_ironbreaker_gromril_armour")
-			local id = buff.id
+			local id = buff_extension
+			local buff = buff_extension.get_non_stacking_buff
+			buff = buff(id, "bardin_ironbreaker_gromril_armour")
+			id = buff.id
 
 			buff_extension:remove_buff(id)
 			buff_extension:trigger_procs("on_gromril_armour_removed")
 
-			local attacked_unit_id = network_manager:unit_game_object_id(attacked_unit)
+			local attacked_unit_id = network_manager.unit_game_object_id
+			attacked_unit_id = attacked_unit_id(network_manager, attacked_unit)
 
 			network_manager.network_transmit:send_rpc_clients("rpc_remove_gromril_armour", attacked_unit_id)
 		end
 	end
 
 	if ScriptUnit.has_extension(attacker_unit, "buff_system") and attacker_player then
-		local buff_extension = ScriptUnit.extension(attacker_unit, "buff_system")
-		local item_data = rawget(ItemMasterList, damage_source)
-		local weapon_template_name = item_data and item_data.template
+		local buff_extension = ScriptUnit.extension
+		buff_extension = buff_extension(attacker_unit, "buff_system")
+		local item_data = rawget
+		local weapon_template_name = ItemMasterList
+		item_data = item_data(weapon_template_name, damage_source)
+		weapon_template_name = item_data and item_data.template
 
 		if weapon_template_name then
-			local weapon_template = Weapons[weapon_template_name]
+			local weapon_template = Weapons
+			weapon_template = weapon_template[weapon_template_name]
 			local buff_type = weapon_template.buff_type
 
 			if buff_type then
 				damage = buff_extension:apply_buffs_to_value(damage, StatBuffIndex.INCREASED_WEAPON_DAMAGE)
 			end
 
-			local is_melee = MeleeBuffTypes[buff_type]
-			local is_ranged = RangedBuffTypes[buff_type]
+			local is_melee = MeleeBuffTypes
+			is_melee = is_melee[buff_type]
+			local is_ranged = RangedBuffTypes
+			is_ranged = is_ranged[buff_type]
 
 			if is_melee then
 				damage = buff_extension:apply_buffs_to_value(damage, StatBuffIndex.INCREASED_WEAPON_DAMAGE_MELEE)
@@ -1535,7 +1572,8 @@ DamageUtils.apply_buffs_to_damage = function (current_damage, attacked_unit, att
 				end
 			elseif is_ranged then
 				damage = buff_extension:apply_buffs_to_value(damage, StatBuffIndex.INCREASED_WEAPON_DAMAGE_RANGED)
-				local attacked_health_extension = ScriptUnit.extension(attacked_unit, "health_system")
+				local attacked_health_extension = ScriptUnit.extension
+				attacked_health_extension = attacked_health_extension(attacked_unit, "health_system")
 
 				if 0 < attacked_health_extension:get_damage_taken() then
 					damage = buff_extension:apply_buffs_to_value(damage, StatBuffIndex.INCREASED_WEAPON_DAMAGE_RANGED_TO_WOUNDED)
@@ -1545,7 +1583,8 @@ DamageUtils.apply_buffs_to_damage = function (current_damage, attacked_unit, att
 			local weapon_type = weapon_template.weapon_type
 
 			if weapon_type then
-				local stat_buff = WeaponSpecificStatBuffs[weapon_type].damage
+				local stat_buff = WeaponSpecificStatBuffs[weapon_type]
+				stat_buff = stat_buff.damage
 				damage = buff_extension:apply_buffs_to_value(damage, StatBuffIndex[stat_buff])
 			end
 		end
@@ -1795,7 +1834,8 @@ DamageUtils.check_block = function (attacking_unit, target_unit, fatigue_type, e
 			return true
 		end
 
-		slot13 = BLACKBOARDS[attacking_unit]
+		local blackboard = BLACKBOARDS
+		blackboard = blackboard[attacking_unit]
 	end
 
 	return false

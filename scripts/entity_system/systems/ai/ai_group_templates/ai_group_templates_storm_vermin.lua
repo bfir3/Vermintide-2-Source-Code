@@ -1209,17 +1209,19 @@ function antennae_check(nav_world, group, dt)
 				drawer:line(antenna_position, antenna_mid_position, Colors.get("orange"))
 
 				if antenna_lock then
-					slot38 = Managers.state.debug:drawer({
+					local drawer = Managers.state.debug.drawer
+					drawer = drawer(Managers.state.debug, {
 						mode = "retained",
 						name = "storm_vermin_patrol_retained"
 					})
 				end
 			end
 
-			local distance = antenna_collision(nav_world, antenna_position, antenna_mid_position, wanted_dir_normal)
+			local distance = antenna_collision
+			distance = distance(nav_world, antenna_position, antenna_mid_position, wanted_dir_normal)
 
 			if distance then
-				total_distance = total_distance + distance
+				total_distance = total_distance + slot37
 			end
 		end
 
@@ -1237,14 +1239,16 @@ function antennae_check(nav_world, group, dt)
 		anchor.antenna_lock = antenna_lock
 
 		if antenna_lock then
-			local antenna_on_path2 = Vector3Box.unbox(anchor.locked_antenna_target_on_path)
-			antenna_target = antenna_on_path2 + wanted_dir_normal * antenna_x_offset
+			local antenna_on_path2 = Vector3Box.unbox
+			antenna_on_path2 = antenna_on_path2(anchor.locked_antenna_target_on_path)
+			antenna_target = Vector3Box + wanted_dir_normal * antenna_x_offset
 		else
 			antenna_target = antenna_on_path + wanted_dir_normal * antenna_x_offset
 		end
 
 		if script_data.debug_storm_vermin_patrol and antenna_lock then
-			slot32 = Managers.state.debug:drawer({
+			local drawer = Managers.state.debug.drawer
+			slot32 = Managers.state.debug(Managers.state.debug, {
 				mode = "retained",
 				name = "storm_vermin_patrol_retained"
 			})

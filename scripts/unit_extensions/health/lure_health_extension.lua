@@ -63,7 +63,10 @@ LureHealthExtension.get_max_health = function (self)
 end
 
 LureHealthExtension.add_damage = function (self, ...)
-	slot1 = self._is_server and (self._is_dead or (Unit.alive(self._attached_unit) and ScriptUnit.extension(self._attached_unit, "health_system"):add_damage(...)))
+	if self._is_server and not self._is_dead and Unit.alive(self._attached_unit) then
+		local health_ext = ScriptUnit.extension(self._attached_unit, "health_system").add_damage
+		health_ext = health_ext(ScriptUnit.extension(self._attached_unit, "health_system"), ...)
+	end
 end
 
 LureHealthExtension.update = function (self, dt, context, t)

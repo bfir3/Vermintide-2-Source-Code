@@ -164,22 +164,30 @@ PlayerCharacterStateInVortex.update = function (self, unit, input, dt, context, 
 		end
 	end
 
-	slot14 = Unit.alive(self.vortex_unit) and self:update_spin_velocity(unit, self.vortex_unit, self.vortex_unit_go_id, dt)
-	local player = self.player
-	local viewport_name = player.viewport_name
-	local inventory_extension = self.inventory_extension
+	if Unit.alive(self.vortex_unit) then
+		local viewport_name = self
+		local spin_direction = self.update_spin_velocity
+		local inventory_extension = unit
+		spin_direction = spin_direction(viewport_name, inventory_extension, self.vortex_unit, self.vortex_unit_go_id, dt)
+	end
 
-	CharacterStateHelper.look(input_extension, viewport_name, first_person_extension, status_extension, inventory_extension)
+	local player = self.player
+	viewport_name = player.viewport_name
+	inventory_extension = self.inventory_extension
+	local health_extension = CharacterStateHelper.look
+
+	health_extension(input_extension, viewport_name, first_person_extension, status_extension, inventory_extension)
 
 	if player_actions_allowed then
-		local health_extension = self.health_extension
+		health_extension = self.health_extension
 
 		CharacterStateHelper.update_weapon_actions(t, unit, input_extension, inventory_extension, health_extension)
 		CharacterStateHelper.reload(input_extension, inventory_extension, status_extension)
 	end
 
 	if self.force_player_look_dir_to_spinn_dir and rot then
-		local rot = Quaternion.look(-spin_direction, Vector3.up())
+		local rot = Quaternion.look
+		rot = rot(-spin_direction, Vector3.up())
 
 		first_person_extension:force_look_rotation(rot)
 	end

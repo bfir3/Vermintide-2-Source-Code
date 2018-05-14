@@ -2537,7 +2537,8 @@ BuffFunctionTemplates.functions = {
 	end_bardin_ironbreaker_activated_ability = function (unit, buff, params)
 		if is_local(unit) then
 			params.next_vo_time = nil
-			slot3 = ScriptUnit.extension(unit, "career_system")
+			local career_extension = ScriptUnit.extension
+			career_extension = career_extension(unit, "career_system")
 		end
 	end,
 	end_ranger_activated_ability = function (unit, buff, params)

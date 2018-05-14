@@ -45,13 +45,16 @@ PlayerCharacterStateGrabbedByPackMaster.on_enter = function (self, unit, input, 
 
 	if self.ai_extension == nil then
 		local wwise_world = Managers.world:wwise_world(self.world)
-		slot16, slot17 = WwiseWorld.trigger_event(wwise_world, "start_strangled_state", first_person_extension:get_first_person_unit())
+		local wwise_playing_id = WwiseWorld.trigger_event
+		wwise_playing_id, slot17 = wwise_playing_id(wwise_world, "start_strangled_state", first_person_extension:get_first_person_unit())
 	end
 
 	self.last_valid_position:store(position)
 
-	self.pack_master_status = CharacterStateHelper.pack_master_status(status_extension)
-	local states = PlayerCharacterStateGrabbedByPackMaster.states
+	local states = CharacterStateHelper.pack_master_status(status_extension)
+	self.pack_master_status = states
+	states = PlayerCharacterStateGrabbedByPackMaster
+	states = states.states
 
 	if states[self.pack_master_status].enter then
 		states[self.pack_master_status].enter(self, unit)
@@ -80,7 +83,8 @@ PlayerCharacterStateGrabbedByPackMaster.on_exit = function (self, unit, input, d
 
 	if self.ai_extension == nil then
 		local wwise_world = Managers.world:wwise_world(self.world)
-		slot11, slot12 = WwiseWorld.trigger_event(wwise_world, "stop_strangled_state", first_person_extension:get_first_person_unit())
+		local wwise_playing_id = WwiseWorld.trigger_event
+		wwise_playing_id, slot12 = wwise_playing_id(wwise_world, "stop_strangled_state", first_person_extension:get_first_person_unit())
 	end
 end
 

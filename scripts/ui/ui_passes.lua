@@ -2528,7 +2528,8 @@ UIPasses.generic_tooltip = {
 
 		if end_pass then
 			local data = end_pass.data
-			slot23 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
+			local pass_height = end_pass.draw
+			pass_height = pass_height(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
 	end
 }
@@ -2659,7 +2660,8 @@ UIPasses.additional_option_tooltip = {
 
 		if end_pass then
 			local data = end_pass.data
-			slot31 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
+			local pass_height = end_pass.draw
+			pass_height = pass_height(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
 	end
 }
@@ -2772,7 +2774,8 @@ UIPasses.level_tooltip = {
 
 		if end_pass then
 			local data = end_pass.data
-			slot30 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
+			local pass_height = end_pass.draw
+			pass_height = pass_height(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
 	end
 }
@@ -2897,7 +2900,8 @@ UIPasses.hero_power_tooltip = {
 
 		if end_pass then
 			local data = end_pass.data
-			slot29 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
+			local pass_height = end_pass.draw
+			pass_height = pass_height(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
 	end
 }
@@ -3009,7 +3013,8 @@ UIPasses.option_tooltip = {
 
 		if end_pass then
 			local data = end_pass.data
-			slot30 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
+			local pass_height = end_pass.draw
+			pass_height = pass_height(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
 	end
 }
@@ -3364,7 +3369,8 @@ UIPasses.item_tooltip = {
 
 				if end_pass then
 					local data = end_pass.data
-					slot53 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
+					local pass_height = end_pass.draw
+					pass_height = pass_height(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
 				end
 			end
 
@@ -3481,7 +3487,8 @@ UIPasses.talent_tooltip = {
 
 		if end_pass then
 			local data = end_pass.data
-			slot30 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
+			local pass_height = end_pass.draw
+			pass_height = pass_height(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, data, draw_downwards)
 		end
 	end
 }
@@ -4223,7 +4230,8 @@ UIPasses.item_presentation = {
 
 		if end_pass and draw_end_passes then
 			local data = end_pass.data
-			slot24 = end_pass.draw(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
+			local pass_height = end_pass.draw
+			pass_height = pass_height(draw, ui_renderer, pass_data, ui_scenegraph, pass_definition, ui_style, ui_content, position, size, input_service, dt, ui_style_global, item, data, draw_downwards)
 		end
 
 		ui_style.item_presentation_height = size[2]

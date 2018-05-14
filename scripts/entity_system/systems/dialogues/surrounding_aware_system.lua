@@ -482,14 +482,17 @@ SurroundingAwareSystem.update_events = function (self, context, t)
 
 					if unit then
 						local target_world_pos = POSITION_LOOKUP[target] or Unit.local_position(target, 0)
-						slot25 = Vector3.distance(source_wp, target_world_pos)
+						local distance = Vector3.distance
+						local k = target_world_pos
+						distance = distance(source_wp, k)
 					end
 
 					event_data.distance = distance
 					event_data.height_distance = height_distance
 
 					for k = 1, num_args / 2, 1 do
-						local array_data_index = i + 3 + (k - 1) * 2 + 1
+						local array_data_index = i + 3 + (k - 1) * 2
+						array_data_index = array_data_index + 1
 						event_data[array_data[array_data_index]] = array_data[array_data_index + 1]
 					end
 

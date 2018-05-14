@@ -238,7 +238,8 @@ BTCorruptorGrabAction.grab_player = function (self, unit, blackboard)
 		end
 
 		blackboard.grabbed_unit = blackboard.corruptor_target
-		slot13 = blackboard.action.grabbed_sound_event_2d
+		local sound_event = blackboard.action
+		sound_event = sound_event.grabbed_sound_event_2d
 	else
 		blackboard.attack_aborted = true
 	end

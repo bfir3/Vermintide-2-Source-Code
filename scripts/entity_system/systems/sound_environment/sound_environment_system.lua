@@ -169,7 +169,8 @@ SoundEnvironmentSystem._update_source_environments = function (self)
 		current_index = current_index % num_sources + 1
 		local data = updated_sources[current_index]
 		local pos = Unit.world_position(data.unit, data.node)
-		slot11 = self:set_source_environment(data.source, pos)
+		local bus_name = self.set_source_environment
+		bus_name = bus_name(self, data.source, pos)
 	end
 
 	self._current_index = current_index

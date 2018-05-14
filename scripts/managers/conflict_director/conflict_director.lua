@@ -3009,52 +3009,83 @@ ConflictDirector.update_server_debug = function (self, t, dt)
 		local ahead_unit = main_path_info.ahead_unit
 		local dist_to_intervention = 0
 
-		for slot19, slot20 in pairs(self.main_path_player_info) do
+		for unit, slot20 in pairs(self.main_path_player_info) do
 		end
 
 		if ahead_unit then
-			local player_info = self.main_path_player_info[ahead_unit]
+			local player_info = self.main_path_player_info
+			player_info = player_info[ahead_unit]
 			dist_to_intervention = self._rushing_intervention_travel_dist - player_info.travel_dist
-			local path_pos = player_info.path_pos:unbox()
-			local color = Color(0, 200, 30)
-			local player_pos = POSITION_LOOKUP[ahead_unit]
-			local a2 = path_pos + Vector3(0, 0, 0.5)
-			local a3 = path_pos + Vector3(0, 0, 1)
-			local a4 = path_pos + Vector3(0, 0, 1.5)
+			local path_pos = player_info.path_pos
+			path_pos = path_pos.unbox
+			path_pos = path_pos(path_pos)
+			local color = Color
+			local player_pos = 0
+			color = color(player_pos, 200, 30)
+			player_pos = POSITION_LOOKUP
+			player_pos = player_pos[ahead_unit]
+			local a2 = Vector3
+			a2 = a2(0, 0, 0.5)
+			a2 = path_pos + a2
+			local a3 = Vector3
+			a3 = a3(0, 0, 1)
+			a3 = path_pos + a3
+			local a4 = Vector3
+			a4 = a4(0, 0, 1.5)
+			a4 = path_pos + a4
 
 			QuickDrawer:cone(path_pos, a2, 0.3, color, 8, 8)
 			QuickDrawer:cone(a2, a3, 0.3, color, 8, 8)
 			QuickDrawer:cone(a3, a4, 0.3, color, 8, 8)
 			QuickDrawer:cone(player_pos, player_pos + Vector3(0, 0, 2), 0.3, color, 8, 8)
-			QuickDrawer:line(player_pos + Vector3(0, 0, 1), path_pos + Vector3(0, 0, 1), color)
 
-			local ap = main_path_info.ahead_percent * 100
-			local np = self._next_progression_percent * 100
+			local np = QuickDrawer
+			local ap = QuickDrawer.line
 
-			Debug.text("Ahead unit travel dist: %.1f, progression %d/%d", player_info.travel_dist, ap, np)
+			ap(np, player_pos + Vector3(0, 0, 1), path_pos + Vector3(0, 0, 1), color)
+
+			ap = main_path_info.ahead_percent
+			ap = ap * 100
+			np = self._next_progression_percent
+			np = np * 100
+
+			Debug.text("Ahead unit travel dist: %.1f, progression %d/%d", player_info.travel_dist, ap, QuickDrawer)
 		end
 
 		local behind_unit = main_path_info.behind_unit
 
 		if behind_unit then
-			local player_info = self.main_path_player_info[behind_unit]
-			local path_pos = player_info.path_pos:unbox()
-			local color = Color(200, 200, 0)
-			local player_pos = POSITION_LOOKUP[behind_unit]
-			local b2 = path_pos + Vector3(0, 0, 0.5)
-			local b3 = path_pos + Vector3(0, 0, 1)
-			local b4 = path_pos + Vector3(0, 0, 1.5)
+			local player_info = self.main_path_player_info
+			player_info = player_info[behind_unit]
+			local path_pos = player_info.path_pos
+			path_pos = path_pos.unbox
+			path_pos = path_pos(path_pos)
+			local color = Color
+			local player_pos = 200
+			color = color(player_pos, 200, 0)
+			player_pos = POSITION_LOOKUP
+			player_pos = player_pos[behind_unit]
+			local b2 = Vector3
+			b2 = b2(0, 0, 0.5)
+			b2 = path_pos + b2
+			local b3 = Vector3
+			b3 = b3(0, 0, 1)
+			b3 = path_pos + b3
+			local b4 = Vector3
+			b4 = b4(0, 0, 1.5)
+			b4 = path_pos + b4
 
 			QuickDrawer:cone(path_pos, b2, 0.3, color, 8, 7)
 			QuickDrawer:cone(b2, b3, 0.3, color, 8, 7)
 			QuickDrawer:cone(b3, b4, 0.3, color, 8, 7)
 			QuickDrawer:cone(player_pos, player_pos + Vector3(0, 0, 2), 0.3, color, 8, 8)
-			QuickDrawer:line(player_pos + Vector3(0, 0, 1), path_pos + Vector3(0, 0, 1), color)
+			QuickDrawer:line(player_pos + Vector3(0, 0, 1), path_pos + Vector3(0, 0, 1), path_pos)
 		end
 
-		local tt_intervention = self._next_rushing_intervention_time - t
+		local tt_intervention = self._next_rushing_intervention_time
+		tt_intervention = tt_intervention - t
 
-		Debug.text("cluster-utility: %s, lone-value: %.1f, intervention dist: %.1f, intervention timer: %.1f", tostring(cluster_utility), loneliness_value, dist_to_intervention, tt_intervention)
+		Debug.text("cluster-utility: %s, lone-value: %.1f, intervention dist: %.1f, intervention timer: %.1f", tostring(cluster_utility), loneliness_value, dist_to_intervention, slot17)
 	end
 end
 

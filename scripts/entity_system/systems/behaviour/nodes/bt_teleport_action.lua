@@ -24,7 +24,11 @@ BTTeleportAction.leave = function (self, unit, blackboard, t, reason, destroy)
 	blackboard.entrance_position = nil
 	blackboard.teleport_timeout = nil
 	local navigation_extension = blackboard.navigation_extension
-	slot7 = navigation_extension:is_using_smart_object() and navigation_extension:use_smart_object(false)
+
+	if navigation_extension:is_using_smart_object() then
+		local success = navigation_extension.use_smart_object
+		success = success(navigation_extension, false)
+	end
 end
 
 BTTeleportAction.run = function (self, unit, blackboard, t, dt)

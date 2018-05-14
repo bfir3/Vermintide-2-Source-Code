@@ -144,7 +144,10 @@ BTClimbAction.leave = function (self, unit, blackboard, t, reason, destroy)
 		shield_extension:set_is_blocking(true)
 	end
 
-	slot10 = navigation_extension:is_using_smart_object() and navigation_extension:use_smart_object(false)
+	if navigation_extension:is_using_smart_object() then
+		local success = navigation_extension.use_smart_object
+		success = success(navigation_extension, false)
+	end
 end
 
 BTClimbAction.run = function (self, unit, blackboard, t, dt)

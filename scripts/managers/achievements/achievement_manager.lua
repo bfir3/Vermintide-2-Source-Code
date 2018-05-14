@@ -492,7 +492,8 @@ AchievementManager._test = function (self)
 		self._info = Achievements2017.info(self._achievements, 1)
 	end
 
-	slot1 = self._info and 0
+	local test = self._info
+	test = test and 0
 end
 
 AchievementManager.reset = function (self)

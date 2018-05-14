@@ -75,7 +75,8 @@ BTNinjaHighGroundAction.leave = function (self, unit, blackboard, t, reason, des
 			hit_reaction_extension.force_ragdoll_on_death = nil
 
 			if navigation_extension:is_using_smart_object() then
-				slot10 = navigation_extension:use_smart_object(false)
+				local success = navigation_extension.use_smart_object
+				success = success(navigation_extension, false)
 			end
 		end
 	else

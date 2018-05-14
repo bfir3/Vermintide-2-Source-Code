@@ -22,28 +22,33 @@ end
 
 Utility.get_action_utility = function (breed_action, action_name, blackboard, from_draw_ai_behavior)
 	if not from_draw_ai_behavior then
-		slot4 = true
+		local temp_debug_stopper = true
 	end
 
 	local total_utility = 1
-	local blackboard_action_data = blackboard.utility_actions[action_name]
-	local get_utility_from_spline = Utility.GetUtilityValueFromSpline
+	local blackboard_action_data = blackboard.utility_actions
+	blackboard_action_data = blackboard_action_data[action_name]
+	local get_utility_from_spline = Utility
+	get_utility_from_spline = get_utility_from_spline.GetUtilityValueFromSpline
 	local considerations = breed_action.considerations
 
 	for name, consideration in pairs(considerations) do
 		repeat
-			local is_table = type(consideration) == "table"
+			local input = consideration
+			local is_table = type(input) == "table"
 
 			if not is_table then
 				break
 			end
 
-			local input = consideration.blackboard_input
-			local blackboard_value = blackboard_action_data[input] or blackboard[input]
+			input = consideration.blackboard_input
+			local blackboard_value = blackboard_action_data[input]
+			blackboard_value = blackboard_value or blackboard[input]
 			local utility = 0
+			local invert = consideration.is_condition
 
-			if consideration.is_condition then
-				local invert = consideration.invert
+			if invert then
+				invert = consideration.invert
 
 				if blackboard_value then
 					if invert then
@@ -57,8 +62,10 @@ Utility.get_action_utility = function (breed_action, action_name, blackboard, fr
 					utility = 0
 				end
 			else
-				min_value = consideration.min_value or 0
-				local norm_value = math.clamp((blackboard_value - min_value) / (consideration.max_value - min_value), 0, 1)
+				local min_value = consideration.min_value
+				min_value = min_value or 0
+				local norm_value = math.clamp
+				norm_value = norm_value((blackboard_value - min_value) / (consideration.max_value - min_value), 0, 1)
 				utility = get_utility_from_spline(consideration.spline, norm_value)
 			end
 

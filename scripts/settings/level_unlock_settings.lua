@@ -429,7 +429,8 @@ LevelUnlockUtils.debug_set_completed_game_difficulty = function (difficulty)
 	local stats_id = player:stats_id()
 
 	for _, level_key in pairs(LevelDifficultyDBNames) do
-		slot9 = statistics_db:set_stat(stats_id, "completed_levels_difficulty", level_key, difficulty)
+		local difficulty = statistics_db.set_stat
+		difficulty = difficulty(statistics_db, stats_id, "completed_levels_difficulty", level_key, difficulty)
 	end
 
 	local backend_stats = {}

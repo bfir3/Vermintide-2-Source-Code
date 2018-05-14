@@ -410,7 +410,7 @@ AchievementTemplates = {
 local function completed_levels(statistics_db, stats_id)
 	local levels_completed = 0
 
-	for slot6, slot7 in ipairs(MainGameLevels) do
+	for _, slot7 in ipairs(MainGameLevels) do
 	end
 
 	for slot6, slot7 in ipairs(NoneActLevels) do

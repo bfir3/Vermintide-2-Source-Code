@@ -15,7 +15,8 @@ end
 ActionCareerBase.finish = function (self, reason)
 	if reason == "action_complete" then
 		local owner_unit = self.owner_unit
-		slot3 = ScriptUnit.extension(owner_unit, "first_person_system")
+		local first_person_extension = ScriptUnit.extension
+		first_person_extension = first_person_extension(owner_unit, "first_person_system")
 	end
 end
 

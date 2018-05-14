@@ -670,7 +670,7 @@ local animation_definitions = {
 			update = function (ui_scenegraph, scenegraph_definition, widgets, progress, params)
 				local thumb_widgets = widgets.thumb_widgets
 
-				for slot9, slot10 in ipairs(thumb_widgets) do
+				for index, slot10 in ipairs(thumb_widgets) do
 				end
 			end,
 			on_complete = function (ui_scenegraph, scenegraph_definition, widgets, params)

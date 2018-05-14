@@ -265,7 +265,8 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 	end
 
 	if blackboard then
-		slot12 = Vector2(window_list[1].x, window_list[1].y)
+		local pos = Vector2
+		pos = pos(window_list[1].x, window_list[1].y)
 	end
 
 	if DebugKeyHandler.key_pressed("s", "save to disk", "ai editor", "left ctrl") then
@@ -280,7 +281,10 @@ EditAiUtility.update = function (self, unit, t, dt, input_service, blackboard)
 		pick_action(action_list[status.selected_action], status.selected_action)
 	end
 
-	local bk_color = (status.hover_action_window and Color(164, 28, 44, 100)) or Color(92, 28, 44, 100)
+	if not status.hover_action_window or not Color(164, 28, 44, 100) then
+		local bk_color = Color
+		bk_color = bk_color(92, 28, 44, 100)
+	end
 
 	self:draw_action_list(unit, t, "Actions", action_list_layout, action_list, bk_color, status.selected_action, blackboard)
 end

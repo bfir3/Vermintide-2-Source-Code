@@ -39,7 +39,10 @@ BTVortexFlyAction.leave = function (self, unit, blackboard, t, reason, destroy)
 
 	navigation_extension:set_enabled(true)
 
-	slot8 = navigation_extension:is_using_smart_object() and navigation_extension:use_smart_object(false)
+	if navigation_extension:is_using_smart_object() then
+		local success = navigation_extension.use_smart_object
+		success = success(navigation_extension, false)
+	end
 end
 
 BTVortexFlyAction._move_to_destination = function (self, current_position, destination, locomotion_extension, dt, max_speed)

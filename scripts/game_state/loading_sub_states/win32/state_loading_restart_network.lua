@@ -99,7 +99,10 @@ StateLoadingRestartNetwork._init_network = function (self)
 		self.parent:register_rpcs()
 	end
 
-	slot7 = self._starting_tutorial and Managers.invite:get_invited_lobby_data()
+	if self._starting_tutorial then
+		local lobby_data = Managers.invite.get_invited_lobby_data
+		lobby_data = lobby_data(Managers.invite)
+	end
 
 	if Managers.invite:has_invitation() then
 		self._has_invitation = true
@@ -118,8 +121,10 @@ StateLoadingRestartNetwork._init_network = function (self)
 		self._server_created = true
 	end
 
-	if loading_context.previous_session_error then
-		local previous_session_error = loading_context.previous_session_error
+	local previous_session_error = loading_context.previous_session_error
+
+	if previous_session_error then
+		previous_session_error = loading_context.previous_session_error
 		loading_context.previous_session_error = nil
 
 		self.parent:create_popup(previous_session_error, self._previous_session_error_headers_lookup[previous_session_error], "continue")

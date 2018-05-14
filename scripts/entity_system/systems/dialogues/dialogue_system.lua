@@ -923,7 +923,8 @@ DialogueSystem.physics_async_update = function (self, context, t)
 
 				if query.validated_rule.tutorial ~= nil then
 					local tutorial_template = query.validated_rule.tutorial.template
-					slot21 = query.validated_rule.tutorial.message
+					local tutorial_message = query.validated_rule.tutorial
+					tutorial_message = tutorial_message.message
 				end
 			end
 		end
